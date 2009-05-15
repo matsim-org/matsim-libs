@@ -39,7 +39,7 @@ public class ControlerTest extends MatsimTestCase {
 	public void testRun() {
 		
 		KTIControler testee = new KTIControler(this.config);
-//		testee.getControler().setCreateGraphs(false);
+		testee.setCreateGraphs(false);
 		testee.run();
 		
 	}

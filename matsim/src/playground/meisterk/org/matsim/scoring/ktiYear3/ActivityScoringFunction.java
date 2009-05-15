@@ -21,6 +21,7 @@
 package playground.meisterk.org.matsim.scoring.ktiYear3;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
@@ -69,8 +71,8 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	private List<ScoringPenalty> penalty = new Vector<ScoringPenalty>();
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
-	private TreeMap<String, Double> accumulatedTimeSpentPerforming = new TreeMap<String, Double>();
-	private TreeMap<String, Double> zeroUtilityDurations = new TreeMap<String, Double>();
+	private HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
+	private HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private double accumulatedTooShortDuration;
 	private double timeSpentWaiting;
 	private double accumulatedNegativeDuration;
@@ -106,7 +108,8 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
 		}
 		
-		// technical penalty: negative activity activity durations are penalized heavily,
+		// technical penalty: negative activity durations are penalized heavily
+		// so that 24 hour plans are enforced (home activity must not start later than it ended)
 		if (fromArrivalToDeparture < 0.0) {
 			this.accumulatedNegativeDuration += fromArrivalToDeparture;
 		}
@@ -127,6 +130,11 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 				if (openTimes == null) {
 					openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 				}
+			} else {
+				logger.error("Agent wants to perform an activity whose type is not available in the planned facility.");
+				logger.error("facility id: " + act.getFacilityId());
+				logger.error("activity type: " + act.getType());
+				Gbl.errorMsg("Agent wants to perform an activity whose type is not available in the planned facility.");
 			}
 
 			// calculate effective activity duration bounded by opening times
@@ -290,6 +298,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		}
 		this.accumulatedTooShortDuration = 0.0;
 		this.timeSpentWaiting = 0.0;
+		this.accumulatedNegativeDuration = 0.0;
 	}
 
 	public Map<String, Double> getAccumulatedDurations() {
