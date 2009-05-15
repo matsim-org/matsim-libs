@@ -89,11 +89,10 @@ public class CountsSimCompareTest {
 							// * fromCoord.getY();
 							// if (x != 0 && y != 0)
 
-							if (va.getVolumesForLink(linkId.toString()) != null) {
+							if (va.getVolumesForLink(linkId) != null) {
 								double countVal = count.getVolume(h + 1)
 										.getValue();
-								double simVal = va.getVolumesForLink(linkId
-										.toString())[h]
+								double simVal = va.getVolumesForLink(linkId)[h]
 										* countsScaleFactor;
 								diffs.add(simVal - countVal);
 								// writer

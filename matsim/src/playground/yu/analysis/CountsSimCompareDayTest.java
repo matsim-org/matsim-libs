@@ -67,12 +67,12 @@ public class CountsSimCompareDayTest {
 					double x = 0.7 * toCoord.getX() + 0.3 * fromCoord.getX();
 					double y = 0.7 * toCoord.getY() + 0.3 * fromCoord.getY();
 					if ((x != 0 && y != 0)
-							&& (va.getVolumesForLink(linkId.toString()) != null)) {
+							&& (va.getVolumesForLink(linkId) != null)) {
 						double countVal = 0.0;
 						double simVal = 0.0;
 						for (int h = 0; h < 24; h++) {
 							countVal += count.getVolume(h + 1).getValue();
-							simVal += va.getVolumesForLink(linkId.toString())[h]
+							simVal += va.getVolumesForLink(linkId)[h]
 									* countsScaleFactor;
 						}
 						writer.write(linkId + "\t" + x + "\t" + y + "\t"

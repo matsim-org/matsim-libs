@@ -54,7 +54,7 @@ public class Volume2QGIS extends MATSimNet2QGIS{
 			volumes.add(i, null);
 		for (Link link : net.getLinks().values()) {
 			Id linkId = link.getId();
-			int[] v = va.getVolumesForLink(linkId.toString());
+			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Integer> m = volumes.get(i);
 				if (m == null) {
@@ -74,7 +74,7 @@ public class Volume2QGIS extends MATSimNet2QGIS{
 			volumes.add(i, null);
 		for (Link link : net.getLinks()) {
 			Id linkId = link.getId();
-			int[] v = va.getVolumesForLink(linkId.toString());
+			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Integer> m = volumes.get(i);
 				if (m == null) {

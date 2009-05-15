@@ -38,13 +38,10 @@ import org.matsim.counts.MatsimCountsReader;
 public class VolumefromEventsOfIters {
 
 	/**
-	 * @param args
+	 * @param args array: 
 	 *            [0] - netfile;
-	 * @param args
 	 *            [1] - first EventsFilePath;
-	 * @param args
 	 *            [2] - countsFilename;
-	 * @param args
 	 *            [3] - picPath;
 	 */
 	public static void main(final String[] args) {
@@ -83,13 +80,13 @@ public class VolumefromEventsOfIters {
 						+ " traffic volume", "time", "traffic volume");
 				double[] x = new double[97];
 				for (int j = 0; j < 97; j++) {
-					x[j] = (double) j * 900.0;
+					x[j] = j * 900.0;
 				}
 				for (int i = 0; i < 5; i++) {
-					int[] v = vols.get(i).getVolumesForLink(linkId.toString());
+					int[] v = vols.get(i).getVolumesForLink(linkId);
 					double[] vd = new double[97];
 					for (int k = 0; k < 97; k++) {
-						vd[k] = (double) (v != null ? v[k] * 40.0 : 0);
+						vd[k] = (v != null ? v[k] * 40.0 : 0);
 					}
 
 					chart.addSeries("it." + (i + 500), x, vd);

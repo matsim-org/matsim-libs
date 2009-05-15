@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -51,7 +52,7 @@ public class JamTest extends Controler {
 			c = event.getControler();
 			NetworkLayer n = c.getNetwork();
 			try {
-				for (String linkId : va.getLinkIds()) {
+				for (Id linkId : va.getLinkIds()) {
 					int[] v = va.getVolumesForLink(linkId);
 					StringBuffer sb = new StringBuffer("");
 					for (int i = 6; i < 10; i++) {

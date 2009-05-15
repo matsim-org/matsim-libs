@@ -48,8 +48,8 @@ public class VolumefromEventsTest {
 
 		Map<String, Double> vol7s = new HashMap<String, Double>();
 		for (Link ql : network.getLinks().values()) {
-			int[] v = volumes.getVolumesForLink(ql.getId().toString());
-			vol7s.put(ql.getId().toString(), (double) (v != null ? v[7] : 0));
+			int[] v = volumes.getVolumesForLink(ql.getId());
+			vol7s.put(ql.getId().toString(), Double.valueOf(v != null ? v[7] : 0));
 		}
 		System.out.println("-> Done!");
 		System.exit(0);

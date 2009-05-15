@@ -32,6 +32,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
@@ -47,22 +48,20 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS{
 		for (int i = 0; i < 24; i++) {
 			saturationLevels.add(i, null);
 		}
-		double capPeriod = (double) net.getCapacityPeriod() / 3600.0;
+		double capPeriod = net.getCapacityPeriod() / 3600.0;
 		for (Link link : (net.getLinks()).values()) {
 			Id linkId = link.getId();
-			int[] v = va.getVolumesForLink(linkId.toString());
+			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = saturationLevels.get(i);
 				if (m == null)
 					m = new HashMap<Id, Double>();
-				m
-						.put(
+					m.put(
 								linkId,
-								(double) ((v != null) ? v[i] : 0)
+								Double.valueOf( ((v != null) ? v[i] : 0)
 										* 10.0
-										/ link
-												.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-										* capPeriod);
+										/ link.getCapacity(Time.UNDEFINED_TIME)
+										* capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}
@@ -76,22 +75,20 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS{
 		for (int i = 0; i < 24; i++) {
 			saturationLevels.add(i, null);
 		}
-		double capPeriod = (double) net.getCapacityPeriod() / 3600.0;
+		double capPeriod = net.getCapacityPeriod() / 3600.0;
 		for (Link link : rps.getLinks()) {
 			Id linkId = link.getId();
-			int[] v = va.getVolumesForLink(linkId.toString());
+			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = saturationLevels.get(i);
 				if (m == null)
 					m = new HashMap<Id, Double>();
-				m
-						.put(
+					m.put(
 								linkId,
-								(double) ((v != null) ? v[i] : 0)
+								Double.valueOf( ((v != null) ? v[i] : 0)
 										/ flowCapFactor
-										/ link
-												.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-										* capPeriod);
+										/ link.getCapacity(Time.UNDEFINED_TIME)
+										* capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}

@@ -4,7 +4,7 @@
 package playground.yu.analysis;
 
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -35,8 +35,8 @@ public class QvDiagram {
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		double maxQ = 0;
-		String maxQlinkId = "";
-		for (String linkId : clas.getInterestLinkIds()) {
+		Id maxQlinkId = null;
+		for (Id linkId : clas.getInterestLinkIds()) {
 			XYScatterChart chart = new XYScatterChart("Q-V Diagram of link "
 					+ linkId, "q [veh/h]", "v [km/h]");
 			int vaQ[] = va.getVolumesForLink(linkId);
@@ -44,11 +44,11 @@ public class QvDiagram {
 				double v[] = new double[288];
 				double q[] = new double[288];
 				for (int i = 0; i < 288; i++) {
-					v[i] = clas.getAvgSpeed(new IdImpl(linkId), i * 300);
+					v[i] = clas.getAvgSpeed(linkId, i * 300);
 					q[i] = vaQ[i] * 12.0;
 					if (q[i] > maxQ) {
 						maxQ = q[i];
-						if (!maxQlinkId.equals(linkId))
+						if (!linkId.equals(maxQlinkId))
 							maxQlinkId = linkId;
 					}
 				}

@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -61,7 +62,7 @@ public class LinkTrafficVolumeExtractor {
 					+ " s]\tLinkVolume[veh/h]\n");
 			for (int anI = 0; anI < 24 * 3600; anI = anI + timeBin) {
 				index = (anI) / timeBin;
-				ys[index] = va.getVolumesForLink("6760")[index];
+				ys[index] = va.getVolumesForLink(new IdImpl("6760"))[index];
 				writer.write(anI + "\t" + ys[index] + "\t" + ys[index] * 3600.0
 						/ timeBin + "\n");
 				ys[index] = ys[index] * 3600.0 / timeBin;

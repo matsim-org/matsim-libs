@@ -295,11 +295,11 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
 	}
 
-	public Set<String> getInterestLinkIds() {
-		Set<String> interestLinkIds = new HashSet<String>();
+	public Set<Id> getInterestLinkIds() {
+		Set<Id> interestLinkIds = new HashSet<Id>();
 		for (Link link : interestLinks == null ? network.getLinks().values()
 				: interestLinks) {
-			interestLinkIds.add(link.getId().toString());
+			interestLinkIds.add(link.getId());
 		}
 		return interestLinkIds;
 	}

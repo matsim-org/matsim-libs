@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 
 import net.opengis.kml._2.DocumentType;
@@ -42,8 +41,6 @@ import net.opengis.kml._2.PolyStyleType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
-import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -72,7 +69,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -580,77 +576,6 @@ public class MyRuns {
 		}
 		catch (final IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	public static void someTests(final String[] args) {
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/ivtch/network_r1.1.xml");
-		Events events = new Events();
-		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(network, 15*60, 30*3600);
-		VolumesAnalyzer vol = new VolumesAnalyzer(3600, 30*3600, network);
-		CalcLinkStats linkStats = new CalcLinkStats(network);
-		int[] volumes;
-		events.addHandler(ttimeCalc);
-		events.addHandler(vol);
-
-		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/16.events.txt.gz");
-		events.printEventsCount();
-		linkStats.addData(vol, ttimeCalc);
-		volumes = vol.getVolumesForLink("101885");
-		if (volumes != null) {
-			System.out.println("16 volume 7-8: " + volumes[7]);
-		}
-
-		events.resetHandlers(17);
-		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/17.events.txt.gz");
-		events.printEventsCount();
-		linkStats.addData(vol, ttimeCalc);
-		volumes = vol.getVolumesForLink("101885");
-		if (volumes != null) {
-			System.out.println("17 volume 7-8: " + volumes[7]);
-		}
-
-		events.resetHandlers(18);
-		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/18.events.txt.gz");
-		events.printEventsCount();
-		linkStats.addData(vol, ttimeCalc);
-		volumes = vol.getVolumesForLink("101885");
-		if (volumes != null) {
-			System.out.println("18 volume 7-8: " + volumes[7]);
-		}
-
-		events.resetHandlers(19);
-		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/19.events.txt.gz");
-		events.printEventsCount();
-		linkStats.addData(vol, ttimeCalc);
-		volumes = vol.getVolumesForLink("101885");
-		if (volumes != null) {
-			System.out.println("19 volume 7-8: " + volumes[7]);
-		}
-
-		events.resetHandlers(20);
-		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/20.events.txt.gz");
-		events.printEventsCount();
-		linkStats.addData(vol, ttimeCalc);
-		volumes = vol.getVolumesForLink("101885");
-		if (volumes != null) {
-			System.out.println("20 volume 7-8: " + volumes[7]);
-		}
-
-		linkStats.writeFile("./output/testStats.txt");
-	}
-
-	public static void randomWalk(final int steps) {
-		long sum = 0;
-		final Random rand = new Random(4710);
-		for (int i = 0; i <= steps; i++) {
-			if (rand.nextDouble() < 0.5) {
-				sum--;
-			} else {
-				sum++;
-			}
-			System.out.println(i + "\t" + sum);
 		}
 	}
 

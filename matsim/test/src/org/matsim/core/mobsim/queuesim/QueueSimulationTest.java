@@ -381,7 +381,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		sim.run();
 
 		/* finish */
-		int[] volume = vAnalyzer.getVolumesForLink("2");
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
 		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
@@ -438,7 +438,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		sim.run();
 
 		/* finish */
-		int[] volume = vAnalyzer.getVolumesForLink("2");
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
 		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
@@ -507,7 +507,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		sim.run();
 
 		/* finish */
-		int[] volume = vAnalyzer.getVolumesForLink("2");
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
 		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));

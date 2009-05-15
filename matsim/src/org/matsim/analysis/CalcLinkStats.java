@@ -82,7 +82,7 @@ public class CalcLinkStats {
 		// TODO verify analyzer and ttimes have hourly timeBin-Settings
 		for (Id linkId : this.linkData.keySet()) {
 			Link link = this.network.getLinks().get(linkId);
-			int[] volumes = analyzer.getVolumesForLink(linkId.toString());
+			int[] volumes = analyzer.getVolumesForLink(linkId);
 			LinkData data = this.linkData.get(linkId);
 			int sum = 0; // daily (0-24) sum
 			if (volumes == null) {
