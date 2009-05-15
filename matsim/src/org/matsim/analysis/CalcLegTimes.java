@@ -22,6 +22,7 @@ package org.matsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
@@ -134,8 +135,9 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 
 	public void writeStats(final java.io.Writer out) throws IOException {
 		boolean first = true;
-		for (String key : this.legStats.keySet()) {
-			int[] counts = this.legStats.get(key);
+		for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
+			String key = entry.getKey();
+			int[] counts = entry.getValue();
 			if (first) {
 				first = false;
 				out.write("pattern");
