@@ -40,7 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class ScoreElements implements StartupListener, ScoringListener, ShutdownListener {
 
-	public static final String[] SCORE_ELEMENT_NAMES = new String[]{"sum", "perf", "wait", "short", "facilityPenalty"};
+	public static final String[] SCORE_ELEMENT_NAMES = new String[]{"sum", "perf", "wait", "short", "facilityPenalty", "negative"};
 	
 	final private String filename;
 	private BufferedWriter out;
@@ -96,6 +96,8 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 					sumScoreParts.put("short", d);
 					d = sumScoreParts.get("facilityPenalty") + asf.getFacilityPenaltiesScore();
 					sumScoreParts.put("facilityPenalty", d);
+					d = sumScoreParts.get("negative") + asf.getNegativeDurationScore();
+					sumScoreParts.put("negative", d);
 				}
 			}
 		}
