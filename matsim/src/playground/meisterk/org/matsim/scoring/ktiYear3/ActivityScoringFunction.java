@@ -101,17 +101,11 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		///////////////////////////////////////////////////////////////////
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 		
-		// disutility if duration of that activity was too short
-		// penalty for too short duration is applied only to the entire time between arrival and departure
-		// and applies also if this time is negative
-		if (fromArrivalToDeparture < ActivityScoringFunction.MINIMUM_DURATION) {
-			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
-		}
-		
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
 		if (fromArrivalToDeparture < 0.0) {
 			this.accumulatedNegativeDuration += fromArrivalToDeparture;
+			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
 		}
 		///////////////////////////////////////////////////////////////////
 		// the time between arrival and departure is either spent
@@ -208,6 +202,12 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 				}
 				this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
 			}
+
+			// disutility if duration of that activity was too short
+			if (timeSpentPerforming < ActivityScoringFunction.MINIMUM_DURATION) {
+				this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - timeSpentPerforming);
+			}
+			
 
 		}
 		
