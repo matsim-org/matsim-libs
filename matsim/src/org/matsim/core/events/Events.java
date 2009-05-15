@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.events.BasicEvent;
@@ -88,7 +89,7 @@ public class Events {
 
 	private final List<HandlerData> handlerData = new ArrayList<HandlerData>();
 
-	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new HashMap<Class<?>, HandlerInfo[]>(15);
+	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<Class<?>, HandlerInfo[]>(15);
 
 	private long counter = 0;
 	private long nextCounterMsg = 1;
@@ -102,7 +103,7 @@ public class Events {
 		return null;
 	}
 
-	public synchronized void processEvent(final BasicEvent event) {
+	public void processEvent(final BasicEvent event) {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
 			this.nextCounterMsg *= 2;
@@ -210,13 +211,15 @@ public class Events {
 
 	private void computeEvent(final BasicEvent event) {
 		for (HandlerInfo info : getHandlersForClass(event.getClass())) {
-			if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
-				continue;
-			}
-			try {
-				info.method.invoke(info.eventHandler, event);
-			} catch (Exception e) {
-				e.printStackTrace();
+			synchronized(info.eventHandler) {
+				if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
+					continue;
+				}
+				try {
+					info.method.invoke(info.eventHandler, event);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
