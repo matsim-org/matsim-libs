@@ -55,7 +55,6 @@ public class PlanWrapper {
 	 * <h4>Note:</h4> 
 	 * TODO I am not quite sure if the <code>populationBuilder</code> is required. Maybe 
 	 * one can rather create a new one locally?
-	 * 
 	 */
 	public PlanWrapper(BasicPopulationBuilder populationBuilder, int timeWindow, int squeezeThreshold){
 		this.pb = populationBuilder;
@@ -96,7 +95,7 @@ public class PlanWrapper {
 				result.add(plan);
 			} else if( la.getStartTime() > this.tw && la.getStartTime() <= (this.tw + this.squeezeThreshold)){
 				/*
-				 * TODO Squeeze the plan				 *
+				 * TODO Squeeze the plan.
 				 */				
 			} else if(la.getStartTime() > (this.tw + this.squeezeThreshold)){
 				/*
