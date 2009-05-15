@@ -2,6 +2,7 @@ package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
@@ -130,9 +131,22 @@ public class ActivityDifferentiationShop {
 	
 	
 	private void assignFacility() {
+		
+		NOGATypes nogatypes = new NOGATypes();
+		
+		List<ActivityFacility> groceryFacilities = new Vector<ActivityFacility>();
+		for (int i = 0; i < nogatypes.shopGrocery.length; i++) {
+			groceryFacilities.addAll(this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopGrocery[i]).values());
+		}
+				
+		List<ActivityFacility> nonGroceryFacilities = new Vector<ActivityFacility>();
+		for (int i = 0; i < nogatypes.shopNonGrocery.length; i++) {
+			nonGroceryFacilities.addAll(this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopNonGrocery[i]).values());
+		}
+
 		FacilityQuadTreeBuilder builder = new FacilityQuadTreeBuilder();
-		QuadTree<ActivityFacility> groceryTree = builder.buildFacilityQuadTree("shop_grocery", this.facilitiesActDiff);
-		QuadTree<ActivityFacility> nongroceryTree = builder.buildFacilityQuadTree("shop_nongrocery", this.facilitiesActDiff);
+		QuadTree<ActivityFacility> groceryTree = builder.buildFacilityQuadTree("shop_grocery", groceryFacilities);
+		QuadTree<ActivityFacility> nongroceryTree = builder.buildFacilityQuadTree("shop_nongrocery", nonGroceryFacilities);
 		
 		AssignLocations assignShops = new AssignLocations((QuadTreeRing<ActivityFacility>)nongroceryTree);
 		assignShops.run(this.plans, "shop_nongrocery");
