@@ -52,14 +52,14 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGenerator2 {
 	// String value that must be set
-	final static String PROVINCE = "Gauteng";
+	final static String PROVINCE = "Temp";
 	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "/home/jjoubert/";
 	
-	private static final int populationSize = 5000;
-	private static final int firstIndex = 100000;
+	private static final int populationSize = 20;
+	private static final int firstIndex = 1000;
 	private static double WITHIN_THRESHOLD = 0.90;
 
 	private final static int dimensionStart = 24; 		// vales 00h00m00 - 23h59m59
@@ -178,15 +178,10 @@ public class MyCommercialDemandGenerator2 {
 			BasicActivity majorActivityEnd = pb.createActivityFromCoord("major", majorActivityStart.getCoord());
 			majorActivityEnd.setStartTime(endTime);
 			plan.getPlanElements().add(majorActivityEnd);
-			
-			// Now I have a nice long chain. If the chain ends before 24:00:00, no problem. If, on the other
-			// hand, the chain ends after 24:00:00, I need to find the last activity of the day, make it the "major"
-			// activity for that day; duplicate it as the first home activity ending at 00:00:00 for a new dummy
-			// agent, and add the remaining activities to the new dummy agent. Note: the activity end times must be 
-			// adjusted for the remaining activities, and the new dummy agent must be checked to see if the new end 
-			// chain end time is before 24:00:00.
-			
-			ArrayList<BasicPlan> planList = chopPlan(plan, pb);			
+						
+//			ArrayList<BasicPlan> planList = chopPlan(plan, pb);
+			PlanWrapper pw = new PlanWrapper(pb, 86400, 0);
+			ArrayList<BasicPlan> planList = pw.wrapPlan(plan);
 
 			for (int p = 0; p < planList.size(); p++) {
 				// Create a truck agent
@@ -214,98 +209,6 @@ public class MyCommercialDemandGenerator2 {
 		System.out.println("Done!");
 		System.out.printf("\nPlans generation: Complete\n");
 	}
-
-	/**
-	 * The class receives an activity plan, that may or may not end after 24h00m00, and returns
-	 * an ArrayList of activity plans, each ending before or at 24h00m00.
-	 * 
-	 * @param plan of type {@code BasicPlan}
-	 * @param pb a population builder of type {@code BasicPopulationBuilder}
-	 * @return an {@code ArrayList} of {@code BasicPlan}s
-	 */
-	@SuppressWarnings("unchecked")
-	private static ArrayList<BasicPlan> chopPlan(BasicPlan plan, BasicPopulationBuilder pb) {
-		
-		ArrayList<BasicPlan> result = new ArrayList<BasicPlan>();
-		Object lastActivity = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
-		
-		// I shouldn't have to test if the lastActivitiy is an instance of BasicActivity
-		if( ((BasicActivity) lastActivity).getStartTime() > 86400 ){// 24h00m00
-			// Add the first activity
-			BasicPlan dummyPlan = pb.createPlan(null);
-			BasicActivity firstActivity = (BasicActivity) plan.getPlanElements().get(0);
-			dummyPlan.getPlanElements().add(firstActivity);
-			BasicLeg firstLeg = (BasicLeg) plan.getPlanElements().get(1);
-			dummyPlan.addLeg(firstLeg);
-			
-//			boolean found = false;
-			int index = 2;
-			while(index < plan.getPlanElements().size()){
-				BasicActivity ba = (BasicActivity) plan.getPlanElements().get(index);
-				if(ba.getType() == "minor"){ //TODO This must be generalized to ANY activity type
-					if(ba.getEndTime() > 86400){
-//						found = true;
-						// Create a new dummy activity, and add to end of current plan
-						BasicActivity baDummy1 = pb.createActivityFromCoord("major", ba.getCoord() );
-						baDummy1.setStartTime(86399); // 23:59:59
-						dummyPlan.getPlanElements().add(baDummy1);
-						result.add(dummyPlan);
-						
-						// Create a new dummy plan, and add the dummy activity as the first activity
-						dummyPlan = pb.createPlan(null);
-						BasicActivity baDummy2 = pb.createActivityFromCoord("major", ba.getCoord() );
-						// Make it the start time of the first activity of the new day. This is fine since
-						// it already has the same location as the first activity of the new day.
-						baDummy2.setEndTime(1); // 00:00:01
-						dummyPlan.getPlanElements().add(baDummy2);
-						BasicLeg leg = (BasicLeg) plan.getPlanElements().get(index - 1);
-						dummyPlan.getPlanElements().add(leg);
-						
-						// Add the remaining activities, adjusting the times
-						while(index < plan.getPlanElements().size()){
-							BasicActivity ba3 = (BasicActivity) plan.getPlanElements().get(index);
-							if(ba3.getStartTime() > 0){
-								double st = ba3.getStartTime();
-								ba3.setStartTime(st - 86400);
-							}
-							if(ba3.getEndTime() > 0){
-								double st = ba3.getEndTime();
-								ba3.setEndTime(st - 86400);
-							}
-							dummyPlan.getPlanElements().add(ba3);
-							if(ba3.getType() == "minor"){
-								BasicLeg bl = (BasicLeg) plan.getPlanElements().get(index + 1);
-								dummyPlan.getPlanElements().add(bl);
-							}
-							index += 2;
-						}
-						// Recursively check the new dummy plan
-						ArrayList<BasicPlan> recursivePlans = chopPlan(dummyPlan, pb);
-						for (BasicPlan bp : recursivePlans) {
-							result.add(bp);
-						}
-						
-					} else{
-						dummyPlan.getPlanElements().add(ba);
-						BasicLeg leg = (BasicLeg) plan.getPlanElements().get(index+1);
-						dummyPlan.getPlanElements().add(leg);
-						index += 2;
-					}			
-				} else {
-					dummyPlan.getPlanElements().add(ba);
-					result.add(dummyPlan);
-					dummyPlan = pb.createPlan(null);
-					index += 2;
-				}
-			}
-
-		} else{
-			// The plan only spans one day.
-			result.add(plan);
-		}
-		return result;
-	}
-
 
 	private static CumulativeDistribution convertMatrixToDurationCDF(
 			ArrayList<ArrayList<ArrayList<Integer>>> matrix, int bin1,

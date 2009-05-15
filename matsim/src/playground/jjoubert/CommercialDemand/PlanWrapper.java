@@ -27,121 +27,163 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 
+/**
+ * A class to wrap a plan around a given time window. This is achieved by adding a <i>dummy</i> 
+ * activity at the end of each <i>circulation</i>. The dummy activity has the same location as 
+ * the first activity of the new <i>circulation</i>, forcing the travel leg to be executed in the 
+ * current <i>circulation</i>. The dummy activity shares the same activity type as the first 
+ * activity of the current <i>circulation</i>.
+ *   
+ * @author johanwjoubert
+ *
+ */
 public class PlanWrapper {
 	private final BasicPopulationBuilder pb; 	// Population builder 
 	private final int tw;						// Time window
+	private final int squeezeThreshold;			// Threshold 
 	
-	public PlanWrapper(BasicPopulationBuilder populationBuilder, int timeWindow){
-		this.pb = populationBuilder;	
+	/**
+	 * Constructor to create a <i>plan wrapper</i>
+	 * 
+	 * @param populationBuilder used to build temporary plans.
+	 * @param timeWindow the time window (expressed in minutes), around which the plans will be 
+	 *        <i>wrapped</i>.
+	 * @param squeezeThreshold a time threshold (expressed in minutes after the time window ends) 
+	 *        before which the plan will be squeezed proportionally to fit into one time window, 
+	 *        rather than being <i>wrapped</i> around the time window.
+	 *        
+	 * <h4>Note:</h4> 
+	 * TODO I am not quite sure if the <code>populationBuilder</code> is required. Maybe 
+	 * one can rather create a new one locally?
+	 * 
+	 */
+	public PlanWrapper(BasicPopulationBuilder populationBuilder, int timeWindow, int squeezeThreshold){
+		this.pb = populationBuilder;
 		this.tw = timeWindow;
+		this.squeezeThreshold = squeezeThreshold;
 	}
 
 	/**
 	 * The method receives an activity plan, which may or may not span a given time window, and 
-	 * wrap it into separate plans, each fitting within the time window.
+	 * <i>wrap</i> it into separate plans, each fitting within the time window.
 	 * 
 	 * @param plan of type {@code BasicPlan}
-	 * @param pb a population builder of type {@code BasicPopulationBuilder}
 	 * @return an {@code ArrayList} of {@code BasicPlan}s
 	 */
 	@SuppressWarnings("unchecked")
 	
-	// TODO These things must be done:
-	// - Generalize 24h
-	// - Add private variable to indicate what activity type must be used to 'split' the chains (here "major")
-	// - Generalize split activity type
-	// - Plan sequence will not always be activity-leg-activity-leg-activity-leg... 
-	// - Maybe, since activity types may be multiple, I should rather use the activity types in the chain to assign to the dummy activities. 
 	public ArrayList<BasicPlan> wrapPlan(BasicPlan plan) {
-		
 		ArrayList<BasicPlan> result = new ArrayList<BasicPlan>();
-		Object lastActivity = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 		
-		// I shouldn't have to test if the lastActivitiy is an instance of BasicActivity
-		if( ((BasicActivity) lastActivity).getStartTime() > this.tw ){
-			// Add the first activity
-			BasicPlan dummyPlan = this.getPb().createPlan(null);
-			BasicActivity firstActivity = (BasicActivity) plan.getPlanElements().get(0);
-			dummyPlan.getPlanElements().add(firstActivity);
-			BasicLeg firstLeg = (BasicLeg) plan.getPlanElements().get(1);
-			dummyPlan.addLeg(firstLeg);
+		Object firstActivity = plan.getPlanElements().get(0);
+		// Checks that the first plan element is an activity
+		if ( !(firstActivity instanceof BasicActivity) ){
+			System.err.println("The last activity of the chain is not of type BasicActivity!!");
+		}
+		BasicActivity first = (BasicActivity) firstActivity;
+	
+		Object lastActivity = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 			
-			int index = 2; 
-			// Only have to check the activities... nope must change!
-			while(index < plan.getPlanElements().size()){
-				BasicActivity ba = (BasicActivity) plan.getPlanElements().get(index);
-				if(ba.getType() == "minor"){ //TODO This must be generalized to ANY activity type
-					if(ba.getEndTime() > 86400){
-						// Create a new dummy activity, and add to end of current plan
-						BasicActivity baDummy1 = pb.createActivityFromCoord("major", ba.getCoord() );
-						baDummy1.setStartTime(86399); // 23:59:59
-						dummyPlan.getPlanElements().add(baDummy1);
-						result.add(dummyPlan);
-						
-						// Create a new dummy plan, and add the dummy activity as the first activity
-						dummyPlan = pb.createPlan(null);
-						BasicActivity baDummy2 = pb.createActivityFromCoord("major", ba.getCoord() );
-						// Make it the start time of the first activity of the new day. This is fine since
-						// it already has the same location as the first activity of the new day.
-						baDummy2.setEndTime(1); // 00:00:01
-						dummyPlan.getPlanElements().add(baDummy2);
-						BasicLeg leg = (BasicLeg) plan.getPlanElements().get(index - 1);
-						dummyPlan.getPlanElements().add(leg);
-						
-						// Add the remaining activities, adjusting the times
-						while(index < plan.getPlanElements().size()){
-							BasicActivity ba3 = (BasicActivity) plan.getPlanElements().get(index);
-							if(ba3.getStartTime() > 0){
-								double st = ba3.getStartTime();
-								ba3.setStartTime(st - 86400);
-							}
-							if(ba3.getEndTime() > 0){
-								double st = ba3.getEndTime();
-								ba3.setEndTime(st - 86400);
-							}
-							dummyPlan.getPlanElements().add(ba3);
-							if(ba3.getType() == "minor"){
-								BasicLeg bl = (BasicLeg) plan.getPlanElements().get(index + 1);
-								dummyPlan.getPlanElements().add(bl);
-							}
-							index += 2;
-						}
-						// Recursively check the new dummy plan
-						PlanWrapper pb = new PlanWrapper(this.getPb(), this.getTw() );
-						ArrayList<BasicPlan> recursivePlans = pb.wrapPlan(dummyPlan);
-						for (BasicPlan bp : recursivePlans) {
-							result.add(bp);
-						}
-						
-					} else{
-						dummyPlan.getPlanElements().add(ba);
-						BasicLeg leg = (BasicLeg) plan.getPlanElements().get(index+1);
-						dummyPlan.getPlanElements().add(leg);
-						index += 2;
-					}			
-				} else {
-					dummyPlan.getPlanElements().add(ba);
-					result.add(dummyPlan);
-					dummyPlan = pb.createPlan(null);
-					index += 2;
-				}
-			}
-
+		// Checks that the last plan element is an activity. 
+		if( !(lastActivity instanceof BasicActivity) ){
+			System.err.println("The last activity of the chain is not of type BasicActivity!!");
 		} else{
-			// The plan only spans one day.
-			result.add(plan);
+			BasicActivity la = (BasicActivity)lastActivity;
+			if(la.getStartTime() < this.tw){
+				/*
+				 * The whole plan fits within the time window. Just return the complete plan.
+				 */
+				result.add(plan);
+			} else if( la.getStartTime() > this.tw && la.getStartTime() <= (this.tw + this.squeezeThreshold)){
+				/*
+				 * TODO Squeeze the plan				 *
+				 */				
+			} else if(la.getStartTime() > (this.tw + this.squeezeThreshold)){
+				/*
+				 * Wrap the plan
+				 */
+				BasicPlan dummyPlan = this.pb.createPlan(null);
+				
+				int index = 0;
+				while(index < plan.getPlanElements().size()){
+					Object object = plan.getPlanElements().get(index);
+					if(object instanceof BasicActivity ){
+						BasicActivity ba = (BasicActivity) object;
+						if(ba.getEndTime() < this.tw){
+							/*
+							 * If the activity ends within the current time window, simply add the
+							 * activity to the current dummy plan.
+							 */
+							dummyPlan.getPlanElements().add(ba);
+							index++;
+						} else{
+							/* 
+							 * STEP 1: Create a dummy activity to add at the end of the first plan. The location
+							 *         of the dummy activity is then same as first activity of the new 'day': 
+							 *         forcing the traveling (if required) to occur in the current plan; the 
+							 *         activity type is the same as the first activity of the current plan.
+							 */ 
+							BasicActivity dummyActivity = this.pb.createActivityFromCoord(first.getType(), ba.getCoord());
+							dummyActivity.setStartTime(this.tw);
+							dummyPlan.getPlanElements().add(dummyActivity);
+							result.add(dummyPlan);
+							
+							/*
+							 * STEP 2: Create a new dummy plan, and add the remaining plan elements to it, adjusting
+							 *         the end times of each activity.
+							 */
+							dummyPlan = this.pb.createPlan(null);
+							ba.setStartTime(ba.getStartTime() - this.tw);
+							ba.setEndTime(ba.getEndTime() - this.tw);
+							dummyPlan.getPlanElements().add(ba);
+							index++;
+							while(index < plan.getPlanElements().size()){
+								Object dummyObject = plan.getPlanElements().get(index);
+								if(dummyObject instanceof BasicActivity){
+									BasicActivity ba2 = (BasicActivity) dummyObject;
+									ba2.setStartTime( (ba2.getStartTime() - this.tw) >= 0 ? ba2.getStartTime() - this.tw : Double.NEGATIVE_INFINITY );
+									ba2.setEndTime((ba2.getEndTime() - this.tw) >= 0 ? ba2.getEndTime() - this.tw : Double.NEGATIVE_INFINITY );
+									dummyPlan.getPlanElements().add(ba2);
+									index++;
+								} else if(dummyObject instanceof BasicLeg){
+									BasicLeg bl2 = (BasicLeg) dummyObject;
+									bl2.setDepartureTime( bl2.getDepartureTime() >= 0 ? bl2.getDepartureTime() : Double.NEGATIVE_INFINITY );
+									dummyPlan.getPlanElements().add(bl2);
+									index++;
+								} else{
+									System.err.println("Plan element is neither a BasicActivity nor a BasicLeg!!");									
+								}
+							}
+							
+							/* 
+							 * STEP 3: Check the new dummy plan. 
+							 */
+							PlanWrapper pw = new PlanWrapper(this.pb,this.tw,squeezeThreshold);
+							ArrayList<BasicPlan> recursivePlans = pw.wrapPlan(dummyPlan);
+							for (BasicPlan bp : recursivePlans) {
+								result.add(bp);
+							}
+						}
+					} else if(object instanceof BasicLeg){
+						BasicLeg bl = (BasicLeg) object;
+						dummyPlan.getPlanElements().add(bl);
+						index++;
+					} else{
+						System.err.println("Plan element is neither a BasicActivity nor a BasicLeg!!");
+					}
+				}
+				
+			} 
 		}
 		return result;
+	}	
+	
+	public BasicPopulationBuilder getPopulationBuilder() {
+		return this.pb;
 	}
 	
-	
-	public BasicPopulationBuilder getPb() {
-		return pb;
-	}
-
-	
-	public Integer getTw() {
-		return tw;
+	public Integer getTimeWindow() {
+		return this.tw;
 	}
 
 }
