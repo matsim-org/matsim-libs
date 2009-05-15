@@ -4,14 +4,16 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.testcases.MatsimTestCase;
 
+/**
+ * @author rashid_waraich
+ */
 public class ParallelEventsTest extends MatsimTestCase {
 
-	// tests, if the right number of events were processed by the handler(s)
-	// for different number of threads, events, handlers and different
-	// constructors
+	/** Tests if the right number of events were processed by the handler(s)
+	 * for different number of threads, events, handlers and different
+	 * constructors */
 	public void testEventCount() {
 		processEvents(new ParallelEvents(1), 100, 1, 1);
 		processEvents(new ParallelEvents(2), 100, 10, 2);
@@ -27,7 +29,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		processEvents(new ParallelEvents(2, 5000), 100, 3, 1);
 	}
 
-	// test, if adding and removing a handler works
+	/** test, if adding and removing a handler works */
 	public void testAddAndRemoveHandler() {
 		Events events = new ParallelEvents(2);
 
