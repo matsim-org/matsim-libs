@@ -30,6 +30,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -83,22 +84,76 @@ public class AnalysisSelectedPlans {
 	}
 	
 	private void analyze(){
-		PrintStream stream;
+	
+		PrintStream stream1;
 		try {
-			stream = new PrintStream (new File(this.outputDir + "/analysis.xls"));
+			stream1 = new PrintStream (new File(this.outputDir + "/analysis.xls"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
-		stream.println("Number of occurrences\tActivity chain");
+		
+		/* Analysis of activity chains */
+		double averageACLength=0;
+		stream1.println("Number of occurrences\tActivity chain");
 		for (int i=0; i<this.activityChains.size();i++){
-			stream.print((this.plans.get(i).size())+"\t");
-			for (int j=0; j<this.activityChains.get(i).size();j=j+2){
-				stream.print(((Activity)(this.activityChains.get(i).get(j))).getType()+"\t");
+			double weight = this.plans.get(i).size();
+			stream1.print(weight+"\t");
+			double length = this.activityChains.get(i).size();
+			averageACLength+=weight*(java.lang.Math.ceil(length/2));
+			for (int j=0; j<length;j=j+2){
+				stream1.print(((Activity)(this.activityChains.get(i).get(j))).getType()+"\t");
 			}
-			stream.println();
+			stream1.println();
 		}
-		stream.close();
+		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
+		stream1.println();
+		
+		
+		/* Analysis of legs */
+		double averageDistance=0;
+		double averageTime=0;
+		stream1.println("Person ID\tInitial travel distance\tFinal travel distance\tInitial travel time\tFinal travel time");
+		for (int i=0; i<this.plans.size();i++){
+			
+			for (int j=0; j<this.plans.get(i).size();j++){
+				stream1.print(this.plans.get(i).get(j).getPerson().getId()+"\t");
+				double distance=0;
+				double time=0;
+				for (int k=1;k<this.plans.get(i).get(j).getPlanElements().size();k=k+2){
+					distance+=((Leg)(this.plans.get(i).get(j).getPlanElements().get(k))).getRoute().getDistance();
+					time +=((Leg)(this.plans.get(i).get(j).getPlanElements().get(k))).getTravelTime();
+				}
+				averageDistance+=distance;
+				averageTime+=time;
+				stream1.println(distance+"\t"+time);
+			}
+		}
+		stream1.println();
+		stream1.println((averageDistance/this.population.getPersons().size())+"\tAverage distance\t"
+				+(averageTime/this.population.getPersons().size())+"\tAverage travel time");
+		
+		
+		stream1.close();
+		
+		/*
+		PrintStream stream2;
+		try {
+			stream2 = new PrintStream (new File(this.outputDir + "/analysis_modeChoice.xls"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream2.println("Number of occurrences\tActivity chain");
+		for (int i=0; i<this.activityChains.size();i++){
+			stream2.print((this.plans.get(i).size())+"\t");
+			for (int j=0; j<this.activityChains.get(i).size();j=j+2){
+				stream2.print(((Activity)(this.activityChains.get(i).get(j))).getType()+"\t");
+			}
+			stream2.println();
+		}
+		stream2.close();
+		*/
 	}
 	
 	private boolean checkForEquality (Plan plan, List<PlanElement> activityChain){
