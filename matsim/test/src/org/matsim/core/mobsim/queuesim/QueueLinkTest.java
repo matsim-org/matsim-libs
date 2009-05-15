@@ -31,6 +31,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -223,7 +224,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		QueueNetwork queueNetwork = new QueueNetwork(network);
-		QueueSimEngine simEngine = new QueueSimEngine(queueNetwork);
+		QueueSimEngine simEngine = new QueueSimEngine(queueNetwork, MatsimRandom.getRandom());
 		QueueLink qlink = queueNetwork.getQueueLink(new IdImpl("1"));
 		qlink.setSimEngine(simEngine);
 		qlink.finishInit();
@@ -355,7 +356,7 @@ public class QueueLinkTest extends MatsimTestCase {
 			this.link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			this.queueNetwork = new QueueNetwork(network);
-			QueueSimEngine engine = new QueueSimEngine(this.queueNetwork);
+			QueueSimEngine engine = new QueueSimEngine(this.queueNetwork, MatsimRandom.getRandom());
 			this.qlink1 = this.queueNetwork.getQueueLink(new IdImpl("1"));
 			this.qlink1.setSimEngine(engine);
 			this.qlink1.finishInit();

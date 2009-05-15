@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -61,6 +62,7 @@ import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -147,7 +149,7 @@ public class QueueSimulation {
 
 	private QueueSimListenerManager listenerManager;
 	
-	private final PriorityQueue<DriverAgent> activityEndsList = new PriorityQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	private final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
@@ -171,7 +173,7 @@ public class QueueSimulation {
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory(this);
 		
-		this.simEngine = new QueueSimEngine(this.network);
+		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
 	}
 
 	/**
@@ -575,13 +577,13 @@ public class QueueSimulation {
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
-			int nofActiveLinks = this.simEngine.getSimulatedLinks().size();
+			int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
 			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}
 
-		return Simulation.isLiving() && (this.stopTime > time);
+		return (Simulation.isLiving() && (this.stopTime > time));
 	}
 
 	protected void afterSimStep(final double time) {

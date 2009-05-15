@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes. 
@@ -46,6 +47,7 @@ public class QueueSimEngine {
 	private static boolean simulateAllLinks = false;
 	private static boolean simulateAllNodes = false;
 
+	private final List<QueueLink> allLinks;
 	/** This is the collection of links that have to be moved in the simulation */
 	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
@@ -53,11 +55,17 @@ public class QueueSimEngine {
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 	
-	private final QueueNetwork network;
+	private final Random random;
 	
-	public QueueSimEngine(final QueueNetwork network) {
-		this.network = network;
-		this.simNodesArray = network.getNodes().values().toArray(new QueueNode[network.getNodes().size()]);
+	public QueueSimEngine(final QueueNetwork network, final Random random) {
+		this(network.getLinks().values(), network.getNodes().values(), random);
+	}
+	
+	/*package*/ QueueSimEngine(final Collection<QueueLink> links, final Collection<QueueNode> nodes, final Random random) {
+		this.random = random;
+		this.allLinks = new ArrayList<QueueLink>(links);
+		
+		this.simNodesArray = nodes.toArray(new QueueNode[nodes.size()]);
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
 		Arrays.sort(this.simNodesArray, new Comparator<QueueNode>() {
@@ -65,22 +73,22 @@ public class QueueSimEngine {
 				return o1.getNode().compareTo(o2.getNode());
 			}
 		});
-		for (QueueLink link : this.network.getLinks().values()) {
+		for (QueueLink link : this.allLinks) {
 			link.finishInit();
 			link.setSimEngine(this);
 		}
 		if (simulateAllLinks) {
-			this.simLinksArray.addAll(this.network.getLinks().values());
+			this.simLinksArray.addAll(this.allLinks);
 		}
 	}
-	
+
 	protected void afterSim() {
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (QueueLink link : this.network.getLinks().values()) {
+		for (QueueLink link : this.allLinks) {
 			link.clearVehicles();
 		}
 	}
@@ -91,11 +99,10 @@ public class QueueSimEngine {
 	 */
 	protected void simStep(final double time) {
 		moveNodes(time);
-		reactivateLinks();
 		moveLinks(time);
 	}
 
-	private void moveNodes(final double time) {
+	protected void moveNodes(final double time) {
 		for (QueueNode node : this.simNodesArray) {
 			if (node.isActive() || node.isSignalized() || simulateAllNodes) {
 				/* It is faster to first test if the node is active, and only then call moveNode(),
@@ -104,12 +111,13 @@ public class QueueSimEngine {
 				 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
 				 * -marcel/20aug2008
 				 */
-				node.moveNode(time);
+				node.moveNode(time, random);
 			}
 		}
 	}
 
-	private void moveLinks(final double time) {
+	protected void moveLinks(final double time) {
+		reactivateLinks();
 		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
 		QueueLink link;
 		boolean isActive;
@@ -137,11 +145,11 @@ public class QueueSimEngine {
 			}
 		}
 	}
-	
+
 	/**
 	 * @return Returns the simLinksArray.
 	 */
-	protected Collection<QueueLink> getSimulatedLinks() {
-		return this.simLinksArray;
+	protected int getNumberOfSimulatedLinks() {
+		return this.simLinksArray.size();
 	}
 }

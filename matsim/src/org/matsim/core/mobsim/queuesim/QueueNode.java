@@ -23,13 +23,13 @@ package org.matsim.core.mobsim.queuesim;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -173,8 +173,9 @@ public class QueueNode {
 	 *
 	 * @param now
 	 *          The current time in seconds from midnight.
+	 * @param random the random number generator to be used
 	 */
-	public void moveNode(final double now) {
+	public void moveNode(final double now, final Random random) {
 		/* called by the framework, do all necessary action for node movement here */
 		if (this.signalized) {
 			for (QueueLink link : this.inLinksArrayCache){
@@ -206,7 +207,7 @@ public class QueueNode {
 			int auxCounter = 0;
 			// randomize based on capacity
 			while (auxCounter < inLinksCounter) {
-				double rndNum = MatsimRandom.getRandom().nextDouble() * inLinksCapSum;
+				double rndNum = random.nextDouble() * inLinksCapSum;
 				double selCap = 0.0;
 				for (int i = 0; i < inLinksCounter; i++) {
 					QueueLink link = this.tempLinks[i];
