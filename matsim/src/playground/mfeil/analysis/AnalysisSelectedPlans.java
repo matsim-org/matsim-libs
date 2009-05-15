@@ -22,51 +22,22 @@ package playground.mfeil.analysis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.matsim.api.basic.v01.Id;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.jfree.util.Log;
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.mfeil.PlanomatXPlan;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * Simple class to analyze a plans-file for selected plans.
