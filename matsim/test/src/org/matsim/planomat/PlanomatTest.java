@@ -196,7 +196,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 	}
 
-	public void testStepThroughPlan_WriteBack() {
+	public void testStepThroughPlan_WriteBack() throws InvalidConfigurationException {
 
 		// writeChromosome2Plan() has 3 arguments:
 		Plan testPlan = null;
@@ -218,41 +218,36 @@ public class PlanomatTest extends MatsimTestCase {
 
 		Configuration jgapConfiguration = new Configuration();
 
-		try {
-			Gene[] testGenes = new Gene[1 + numActs + planAnalyzeSubtours.getNumSubtours()];
+		Gene[] testGenes = new Gene[1 + numActs + planAnalyzeSubtours.getNumSubtours()];
 
-			Integer startPlan = Integer.valueOf(31);
-			Integer workDur = Integer.valueOf(40);
-			Integer homeDur = Integer.valueOf(88);
-			Integer modeIndex = Integer.valueOf(0);
-			
-			for (int ii=0; ii < testGenes.length; ii++) {
-				switch(ii) {
-				case 0:
-					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(startPlan);
-					break;
-				case 1:
-					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(workDur);
-					break;
-				case 2:
-					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(homeDur);
-					break;
-				case 3:
-					testGenes[ii] = new IntegerGene(jgapConfiguration);
-					testGenes[ii].setAllele(modeIndex);
-					break;
-				}
-
+		Integer startPlan = Integer.valueOf(31);
+		Integer workDur = Integer.valueOf(40);
+		Integer homeDur = Integer.valueOf(88);
+		Integer modeIndex = Integer.valueOf(0);
+		
+		for (int ii=0; ii < testGenes.length; ii++) {
+			switch(ii) {
+			case 0:
+				testGenes[ii] = new IntegerGene(jgapConfiguration);
+				testGenes[ii].setAllele(startPlan);
+				break;
+			case 1:
+				testGenes[ii] = new IntegerGene(jgapConfiguration);
+				testGenes[ii].setAllele(workDur);
+				break;
+			case 2:
+				testGenes[ii] = new IntegerGene(jgapConfiguration);
+				testGenes[ii].setAllele(homeDur);
+				break;
+			case 3:
+				testGenes[ii] = new IntegerGene(jgapConfiguration);
+				testGenes[ii].setAllele(modeIndex);
+				break;
 			}
 
-			testChromosome = new Chromosome(jgapConfiguration, testGenes);
-
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
 		}
+
+		testChromosome = new Chromosome(jgapConfiguration, testGenes);
 
 		// init LegTravelTimeEstimator
 		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);

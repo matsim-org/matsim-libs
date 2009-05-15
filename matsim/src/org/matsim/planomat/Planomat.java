@@ -64,7 +64,7 @@ public class Planomat implements PlanAlgorithm {
 	 */
 	public static final double SCENARIO_DURATION = 24.0 * 3600;
 
-	protected static enum StepThroughPlanAction {EVALUATE, WRITE_BACK};
+	protected static enum StepThroughPlanAction {EVALUATE, WRITE_BACK}
 
 	private final PlanomatConfigGroup config = Gbl.getConfig().planomat();
 	private final int numTimeIntervals = (int) Math.pow(2, config.getLevelOfTimeResolution());
@@ -115,7 +115,7 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running evolution...done.");
 			logger.info("Writing solution back to Plan object...");
 		}
-		double score = this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan);
+		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan);
 		if (this.doLogging) {
 			logger.info("Writing solution back to Plan object...done.");
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
@@ -244,7 +244,7 @@ public class Planomat implements PlanAlgorithm {
 		}
 
 		// solution of first gene, normalized to scenario duration, is end time of first activity 
-		double now = Math.rint(0.0);
+		double now = 0.0;
 
 		origin = plan.getFirstActivity();
 		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
