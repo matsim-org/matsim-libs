@@ -69,7 +69,7 @@ public class QueueLane {
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	/*package*/ final Queue<QueueVehicle> waitingList;
+	/*package*/ final Queue<QueueVehicle> waitingList = new LinkedList<QueueVehicle>();
 
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
@@ -129,7 +129,7 @@ public class QueueLane {
 	 */
 	private final boolean originalLane;
 
-	private double length_m = Double.NaN;
+	private double length = Double.NaN;
 
 	private double freespeedTravelTime = Double.NaN;
 
@@ -156,9 +156,8 @@ public class QueueLane {
 	/*package*/ QueueLane(final QueueLink ql, final boolean isOriginalLane) {
 		this.queueLink = ql;
 		this.originalLane = isOriginalLane;
-		this.waitingList = new LinkedList<QueueVehicle>();
 		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
-		this.length_m = ql.getLink().getLength();
+		this.length = ql.getLink().getLength();
 		this.meterFromLinkEnd = 0.0;
 		/*
 		 * moved capacity calculation to two methods, to be able to call it from
@@ -225,7 +224,7 @@ public class QueueLane {
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.length_m * this.queueLink.getLink().getNumberOfLanes(time))
+		this.storageCapacity = (this.length * this.queueLink.getLink().getNumberOfLanes(time))
 				/ ((NetworkLayer) this.queueLink.getLink().getLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -252,7 +251,7 @@ public class QueueLane {
 
 
 	public void recalcTimeVariantAttributes(final double now) {
-		this.freespeedTravelTime = this.length_m / this.queueLink.getLink().getFreespeed(now);
+		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(now);
 		initFlowCapacity(now);
 		recalcCapacity(now);
 	}
@@ -268,20 +267,20 @@ public class QueueLane {
 			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
 					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
 					" at the original link.");
-			this.length_m = 15.0;
+			this.length = 15.0;
 		} else {
-			this.length_m = laneLength_m;
+			this.length = laneLength_m;
 		}
 
 		this.meterFromLinkEnd  = meterFromLinkEnd_m;
-		this.freespeedTravelTime = this.length_m / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
+		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 		this.simulatedFlowCapacity = numberOfRepresentedLanes * averageSimulatedFlowCapacityPerLane_Veh_s
 				* SimulationTimer.getSimTickTime();
 
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
-		this.storageCapacity = (this.length_m * numberOfRepresentedLanes) /
+		this.storageCapacity = (this.length * numberOfRepresentedLanes) /
 								this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * config.getStorageCapFactor();
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
 
@@ -395,7 +394,7 @@ public class QueueLane {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		boolean active = (this.buffercap_accumulate < 1.0) || (this.vehQueue.size() != 0) || (this.waitingList.size() != 0);
+		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty());
 		return active;
 	}
 
