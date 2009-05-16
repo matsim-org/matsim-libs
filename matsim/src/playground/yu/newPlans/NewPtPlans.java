@@ -30,23 +30,27 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.api.population.Plan.Type;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.yu.analysis.PlanModeJudger;
+
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
- * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
+ * "car" and the other with type "pt", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
  * 
  * @author ychen
  * 
  */
-public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
+public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	private Person person;
 	private List<Plan> copyPlans = new ArrayList<Plan>();
 
@@ -57,11 +61,11 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewPtWalkPlan(final Population plans) {
+	public NewPtPlans(final Population plans) {
 		super(plans);
 	}
 
-	public NewPtWalkPlan(final Population population, final String filename) {
+	public NewPtPlans(final Population population, final String filename) {
 		super(population, filename);
 	}
 
@@ -81,17 +85,20 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	}
 
 	public void run(Plan plan) {
+		if (PlanModeJudger.useCar(plan))
+			plan.setType(Type.CAR);
 		Plan ptPlan = new PlanImpl(person);
-		Plan walkPlan = new PlanImpl(person);
+		ptPlan.setType(Type.PT);
+		// Plan walkPlan = new PlanImpl(person);
 		List<PlanElement> actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);
 			if (i % 2 == 0) {
 				ptPlan.addActivity((Activity) o);
-				walkPlan.addActivity((Activity) o);
+				// walkPlan.addActivity((Activity) o);
 			} else {
 				Leg leg = (Leg) o;
-				Leg ptLeg = new org.matsim.core.population.LegImpl(leg);
+				Leg ptLeg = new LegImpl(leg);
 				ptLeg.setMode(TransportMode.pt);
 				ptLeg.setRoute(null);
 				// -----------------------------------------------
@@ -100,10 +107,10 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 				// -----------------------------------------------
 				ptPlan.addLeg(ptLeg);
 
-				Leg walkLeg = new org.matsim.core.population.LegImpl(leg);
-				walkLeg.setMode(TransportMode.walk);
-				walkLeg.setRoute(null);
-				walkPlan.addLeg(walkLeg);
+				// Leg walkLeg = new org.matsim.core.population.LegImpl(leg);
+				// walkLeg.setMode(TransportMode.walk);
+				// walkLeg.setRoute(null);
+				// walkPlan.addLeg(walkLeg);
 				if (!leg.getMode().equals(TransportMode.car)) {
 					leg.setRoute(null);
 					leg.setMode(TransportMode.car);
@@ -111,22 +118,24 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 			}
 		}
 		copyPlans.add(ptPlan);
-		copyPlans.add(walkPlan);
+		// copyPlans.add(walkPlan);
 	}
 
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../matsimTests/scoringTest/network.xml";
-		final String plansFilename = "../matsimTests/scoringTest/plans100.xml";
-		final String outputFilename = "../matsimTests/scoringTest/plans100_pt_walk.xml";
+		final String netFilename = "examples/equil/network.xml";
+		final String plansFilename = "examples/equil/plans100.xml";
+		final String outputFilename = "../matsimTests/Calibration/rop/plans100car_pt.xml";
+
+		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		Population population = new PopulationImpl();
 
-		NewPtWalkPlan npwp = new NewPtWalkPlan(population, outputFilename);
+		NewPtPlans npwp = new NewPtPlans(population, outputFilename);
 
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 

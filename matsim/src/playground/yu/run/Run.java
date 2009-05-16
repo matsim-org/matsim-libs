@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerWithRemoveOldestPlan.java
+ * Run.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,44 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.yu.replanning;
+package playground.yu.run;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
-/**
- * test the effect with "removeOldestPlan"
- * 
- * @author yu
- * 
- */
-public class ControlerWithRemoveOldestPlan extends Controler {
+public class Run {
 
 	/**
 	 * @param args
-	 */
-	public ControlerWithRemoveOldestPlan(String[] args) {
-		super(args);
-	}
-
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan();
-		StrategyManagerConfigLoader.load(this, this.config, manager);
-		return manager;
-	}
-
-	/**
-	 * @param args
+	 *            args[0] - configfile, args[1] - writeEventsInterval(int),
+	 *            args[2] - writeGraphs (boolean)
 	 */
 	public static void main(String[] args) {
-		Controler controler = new ControlerWithRemoveOldestPlan(args);
-		controler.setWriteEventsInterval(0);
-		controler.setCreateGraphs(false);
+		Controler controler = new Controler(args[0]);
+		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
+		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
 		controler.run();
 	}
 
