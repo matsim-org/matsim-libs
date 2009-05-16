@@ -1,7 +1,7 @@
 package org.matsim.signalsystems;
 
-import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestCase;
@@ -18,24 +18,23 @@ public class CalculateAngleTest extends MatsimTestCase {
 		ScenarioImpl data = new ScenarioImpl(conf);
 		ScenarioLoader loader = new ScenarioLoader(data);
 		loader.loadNetwork();
-		
-		
+
 		assertEquals("Has to be 'null', since there is no other way back but Link 11.",
 				null, CalculateAngle.getLeftLane(data.getNetwork().getLink(new IdImpl("1"))));
 
-		assertEquals(" ",
+		assertEquals(
 				data.getNetwork().getLink(data.createId("2")), CalculateAngle.getLeftLane(data.getNetwork().getLink(data.createId("11"))));
 
-		assertEquals(" ",
+		assertEquals(
 				data.getNetwork().getLink(data.createId("3")), CalculateAngle.getLeftLane(data.getNetwork().getLink(data.createId("22"))));
 		
-		assertEquals(" ",
+		assertEquals(
 				data.getNetwork().getLink(data.createId("4")), CalculateAngle.getLeftLane(data.getNetwork().getLink(data.createId("33"))));
 		
-		assertEquals(" ",
+		assertEquals(
 				data.getNetwork().getLink(data.createId("1")), CalculateAngle.getLeftLane(data.getNetwork().getLink(data.createId("44"))));
 		
-		assertEquals(" ",
+		assertEquals(
 				data.getNetwork().getLink(data.createId("5")), CalculateAngle.getLeftLane(data.getNetwork().getLink(data.createId("3"))));
 				
 	}
