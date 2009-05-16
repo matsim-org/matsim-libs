@@ -21,11 +21,8 @@ package org.matsim.core.basic.v01;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 
@@ -36,7 +33,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 @Deprecated
 public class MatsimCommonWriter extends MatsimXmlWriter {
 
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+//	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	
 	public MatsimCommonWriter(Writer writer) {
 		this.writer = writer;

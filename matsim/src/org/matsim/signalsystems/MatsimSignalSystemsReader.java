@@ -80,14 +80,16 @@ public class MatsimSignalSystemsReader {
 			if (sid != null) {
 				log.debug("creating parser for system id: " + sid);
 				if (sid.compareTo(SIGNALSYSTEMS10) == 0) {
-					reader = new LightSignalSystemsReader10(this.laneDefinitions,
-							this.lightSignalSystems, sid);
+					reader = new LightSignalSystemsReader10(this.laneDefinitions, this.lightSignalSystems, sid);
 					log.info("Using LightSignalSystemsReader10 ...");
 					log.warn("This file format is deprecated, use signalSystems_v1.1.xsd instead");
 				}
 				else if (sid.compareTo(SIGNALSYSTEMS11) == 0){
 					reader = new SignalSystemsReader11(this.lightSignalSystems, SIGNALSYSTEMS11);
 					log.info("Using SignalSystemsReader11 ...");					
+				}
+				else {
+					throw new IllegalArgumentException("Unknown file format.");
 				}
 			}
 			else {

@@ -46,7 +46,7 @@ public class MatsimSignalSystemConfigurationsReader {
 	public static final String SIGNALSYSTEMSCONFIG10 = "http://www.matsim.org/files/dtd/lightSignalSystemsConfig_v1.0.xsd";
 
 	public static final String SIGNALSYSTEMSCONFIG11 = "http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd";
-
+	
 	private BasicSignalSystemConfigurations lightSignalSystemConfigs;
 
 
@@ -57,8 +57,7 @@ public class MatsimSignalSystemConfigurationsReader {
 	@SuppressWarnings("deprecation")
 	public void readFile(final String filename) {
 		try {
-			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(
-					filename);
+			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
 			String sid = fileTypeGuesser.getSystemId();
 			MatsimJaxbXmlParser reader = null;
 			if (sid != null) {
@@ -70,11 +69,11 @@ public class MatsimSignalSystemConfigurationsReader {
 				else if (sid.compareTo(SIGNALSYSTEMSCONFIG11)== 0){
 					reader = new SignalSystemConfigurationsReader11(this.lightSignalSystemConfigs, sid);
 					log.info("Using SignalSystemConfigurationsReader11 .. ");
+				} else {
+					throw new IllegalArgumentException("Unknown file format.");
 				}
-			}
-			else {
-				throw new IllegalArgumentException(
-						"System Id of xml document couldn't be detected. Make shure that you try to read a xml document with a valid header.");
+			}	else {
+				throw new IllegalArgumentException(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
 			}
 			reader.readFile(filename);
 		} catch (JAXBException e) {

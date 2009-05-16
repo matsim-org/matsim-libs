@@ -38,10 +38,10 @@ import org.matsim.api.basic.v01.population.BasicRoute;
  */
 public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 
-	private final BasicPopulation population;
+//	private final BasicPopulation population;
 
 	public BasicPopulationBuilderImpl(final BasicPopulation pop) {
-		this.population = pop;
+//		this.population = pop;
 	}
 
 	public BasicPerson createPerson(final Id id) {
