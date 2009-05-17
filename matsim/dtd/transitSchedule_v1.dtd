@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!ELEMENT transitSchedule  (transitLine)*>
+<!ELEMENT transitSchedule  (transitStops?,transitLine*)>
+
+<!ELEMENT transitStops     (stopFacility)*>
+
+<!ELEMENT stopFacility     EMPTY>
+<!ATTLIST stopFacility
+          id               CDATA   #REQUIRED
+          x                CDATA   #REQUIRED
+          y                CDATA   #REQUIRED
+          linkRefId        CDATA   #IMPLIED>
 
 <!ELEMENT transitLine      (transitRoute)*>
 <!ATTLIST transitLine

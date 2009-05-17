@@ -20,21 +20,19 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import org.matsim.core.api.facilities.ActivityFacility;
-
 public class TransitRouteStop {
 
-	private final ActivityFacility stop;
+	private final TransitStopFacility stop;
 	private final double departureDelay;
 	private final double arrivalDelay;
 
-	public TransitRouteStop(final ActivityFacility stop, final double arrivalDelay, final double departureDelay) {
+	public TransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
 		this.stop = stop;
 		this.departureDelay = departureDelay;
 		this.arrivalDelay = arrivalDelay;
 	}
 
-	public ActivityFacility getStopFacility() {
+	public TransitStopFacility getStopFacility() {
 		return this.stop;
 	}
 

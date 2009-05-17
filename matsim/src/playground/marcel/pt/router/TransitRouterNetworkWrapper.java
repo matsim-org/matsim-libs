@@ -38,6 +38,7 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -309,7 +310,7 @@ public class TransitRouterNetworkWrapper implements Network {
 		}
 
 		public double getLength() {
-			return this.link.toNode.stop.getStopFacility().calcDistance(this.link.fromNode.stop.getStopFacility().getCoord());
+			return CoordUtils.calcDistance(this.link.toNode.stop.getStopFacility().getCoord(), this.link.fromNode.stop.getStopFacility().getCoord());
 		}
 
 		public void setCapacity(final double capacity) {

@@ -31,12 +31,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -44,6 +43,9 @@ import org.xml.sax.SAXException;
 
 public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
+	private static final String STOP_FACILITY = "stopFacility";
+	private static final String LINK_REF_ID = "linkRefId";
+	
 	private static final String TRANSIT_LINE = "transitLine";
 	private static final String TRANSIT_ROUTE = "transitRoute";
 	private static final String DESCRIPTION = "description";
@@ -60,17 +62,14 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private final TransitSchedule schedule;
 	private final NetworkLayer network;
-	private final ActivityFacilities facilities;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final NetworkLayer network, final ActivityFacilities facilities) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final NetworkLayer network) {
 		this.schedule = schedule;
 		this.network = network;
-		this.facilities = facilities;
-//		this.setValidating(false);
 	}
 
 	public void readFile(final String fileName) throws SAXException, ParserConfigurationException, IOException {
@@ -79,7 +78,18 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		if (TRANSIT_LINE.equals(name)) {
+		if (STOP_FACILITY.equals(name)) {
+			TransitStopFacility stop = new TransitStopFacility(
+					new IdImpl(atts.getValue(ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+			if (atts.getValue(LINK_REF_ID) != null) {
+				Link link = this.network.getLink(atts.getValue(LINK_REF_ID));
+				if (link == null) {
+					throw new RuntimeException("no link with id " + atts.getValue(REF_ID));
+				}
+				stop.setLink(link);
+			}
+			this.schedule.addStopFacility(stop);
+		} else if (TRANSIT_LINE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(ID));
 			this.currentTransitLine = new TransitLine(id);
 			this.schedule.addTransitLine(this.currentTransitLine);
@@ -100,7 +110,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			this.currentRouteProfile.addLink(link);
 		} else if (STOP.equals(name)) {
 			Id id = new IdImpl(atts.getValue(REF_ID));
-			ActivityFacility facility = this.facilities.getFacilities().get(id);
+			TransitStopFacility facility = this.schedule.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(REF_ID));
 			}
@@ -155,11 +165,11 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	}
 
 	private static class TempStop {
-		protected final ActivityFacility stop;
+		protected final TransitStopFacility stop;
 		protected double departure = Time.UNDEFINED_TIME;
 		protected double arrival = Time.UNDEFINED_TIME;
 
-		protected TempStop(final ActivityFacility stop) {
+		protected TempStop(final TransitStopFacility stop) {
 			this.stop = stop;
 		}
 	}

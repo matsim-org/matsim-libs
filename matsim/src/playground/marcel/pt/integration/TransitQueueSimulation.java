@@ -24,8 +24,6 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -45,21 +43,20 @@ import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class TransitQueueSimulation extends QueueSimulation {
 	
 	private final OnTheFlyServer otfServer;
 	
 
-	private final ActivityFacilities facilities;
 	private TransitSchedule schedule = null;
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
-	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events, final ActivityFacilities facilities) {
+	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events) {
 		super(network, population, events);
-		this.facilities = facilities;
-
+	
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
 
 		this.agentTracker = new TransitStopAgentTracker();
@@ -67,7 +64,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 		this.otfServer = OnTheFlyServer.createInstance("OTFServer_Transit", this.network, this.plans, getEvents(), false);
 		try {
 			this.otfServer.pause();
-			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.facilities, this.agentTracker));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -87,6 +83,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	public void setTransitSchedule(final TransitSchedule schedule) {
 		this.schedule = schedule;
+		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
 	}
 
 	public Object getAgent(final Person p) {
@@ -123,7 +120,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		Leg leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-			ActivityFacility stop = this.facilities.getFacilities().get(route.getAccessStopId());
+			TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 			this.agentTracker.addAgentToStop(agent, stop);
 		} else {
 			super.agentDeparts(agent, link);

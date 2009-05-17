@@ -34,6 +34,8 @@ import org.matsim.core.utils.misc.Time;
 
 public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 
+	private static final String TRANSIT_STOPS = "transitStops";
+	private static final String STOP_FACILITY = "stopFacility";
 	private static final String TRANSIT_SCHEDULE = "transitSchedule";
 	private static final String TRANSIT_LINE = "transitLine";
 	private static final String TRANSIT_ROUTE = "transitRoute";
@@ -63,11 +65,30 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		this.writeDoctype(TRANSIT_SCHEDULE, "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd");
 		this.writeStartTag(TRANSIT_SCHEDULE, null);
 
+		this.writeTransitStops();
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			writeTransitLine(line);
 		}
 		this.writeEndTag(TRANSIT_SCHEDULE);
 		this.close();
+	}
+	
+	private void writeTransitStops() throws IOException {
+		this.writeStartTag(TRANSIT_STOPS, null);
+		
+		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(4);
+		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
+			attributes.clear();
+			attributes.add(this.createTuple(ID, stop.getId().toString()));
+			attributes.add(this.createTuple("x", stop.getCoord().getX()));
+			attributes.add(this.createTuple("y", stop.getCoord().getY()));
+			if (stop.getLink() != null) {
+				attributes.add(this.createTuple("linkRefId", stop.getLinkId().toString()));
+			}
+			this.writeStartTag(STOP_FACILITY, attributes, true);
+		}
+		
+		this.writeEndTag(TRANSIT_STOPS);
 	}
 
 	private void writeTransitLine(final TransitLine line) throws IOException {

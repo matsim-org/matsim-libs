@@ -27,25 +27,20 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.marcel.pt.utils.FacilityNetworkMatching;
 
 public class TransitRouterTest extends MatsimTestCase {
 
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
-	private static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
 
 	public void testGetNextDepartures() throws SAXException, ParserConfigurationException, IOException {
 
@@ -54,24 +49,13 @@ public class TransitRouterTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
-
-		World world = new World();
-		world.setFacilityLayer(facilities);
-		world.setNetworkLayer(network);
-		world.complete();
-
-		FacilityNetworkMatching.loadMapping(facilities, network, world, "../thesis-data/examples/minibln/facilityMatching.txt");
-
-//		PrintFacilityNetworkMatching.printMatching(facilities);
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitRouter router = new TransitRouter(schedule);
-//		router.getNextDeparturesAtStop(facilities.getFacilities().get(new IdImpl("stop2")), Time.parseTime("07:01:00"));
-		router.getNextDeparturesAtStop(facilities.getFacilities().get(new IdImpl("1")), Time.parseTime("07:01:00"));
+//		router.getNextDeparturesAtStop(schedule.getFacilities().get(new IdImpl("stop2")), Time.parseTime("07:01:00"));
+		router.getNextDeparturesAtStop(schedule.getFacilities().get(new IdImpl("1")), Time.parseTime("07:01:00"));
 
 		// TODO [MR] missing assert-statement, until now the code just tests if it compiles/runs without Exception
 	}
@@ -82,23 +66,14 @@ public class TransitRouterTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
-
-		World world = new World();
-		world.setFacilityLayer(facilities);
-		world.setNetworkLayer(network);
-		world.complete();
-
-		FacilityNetworkMatching.loadMapping(facilities, network, world, "../thesis-data/examples/minibln/facilityMatching.txt");
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitRouter router = new TransitRouter(schedule);
 		//		router.calcRoute(new CoordImpl(200, 200), new CoordImpl(4800, 800), Time.parseTime("07:01:00"));
-		List<Id> linkIds = router.calcRoute(facilities.getFacilities().get(new IdImpl("h")).getCoord(),
-				facilities.getFacilities().get(new IdImpl("l2")).getCoord(),
+		List<Id> linkIds = router.calcRoute(schedule.getFacilities().get(new IdImpl("h")).getCoord(),
+				schedule.getFacilities().get(new IdImpl("l2")).getCoord(),
 				Time.parseTime("07:01:00"));
 		assertNotNull(linkIds);
 		assertEquals(7, linkIds.size());

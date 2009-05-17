@@ -23,12 +23,11 @@ package playground.marcel.pt.transitSchedule.modules;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.matsim.core.api.facilities.ActivityFacility;
-
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class CreateTimetableForStop {
 
@@ -38,7 +37,7 @@ public class CreateTimetableForStop {
 		this.line = line;
 	}
 
-	public double[] getDeparturesAtStop(final ActivityFacility stop) {
+	public double[] getDeparturesAtStop(final TransitStopFacility stop) {
 		int numOfDepartures = 0;
 		Collection<TransitRoute> routes = this.line.getRoutes().values();
 		for (TransitRoute route : routes) {

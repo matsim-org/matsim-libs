@@ -27,8 +27,6 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -39,24 +37,26 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import playground.marcel.pt.integration.TransitStopAgentTracker;
+import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class FacilityDrawer {
 	
 	public static class DataWriter_v1_0 extends OTFDataWriter {
 
 		private static final long serialVersionUID = 1L;
-		private final transient ActivityFacilities facilites;
+		private final transient TransitSchedule schedule;
 		private final transient TransitStopAgentTracker agentTracker;
 		
-		public DataWriter_v1_0(final ActivityFacilities facilities, final TransitStopAgentTracker agentTracker) {
-			this.facilites = facilities;
+		public DataWriter_v1_0(final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
+			this.schedule = schedule;
 			this.agentTracker = agentTracker;
 		}
 		
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			out.putInt(this.facilites.getFacilities().size());
-			for (ActivityFacility facility : this.facilites.getFacilities().values()) {
+			out.putInt(this.schedule.getFacilities().size());
+			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				ByteBufferUtils.putString(out, facility.getId().toString());
 				out.putDouble(facility.getCoord().getX());
 				out.putDouble(facility.getCoord().getY());
@@ -66,7 +66,7 @@ public class FacilityDrawer {
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			for (ActivityFacility facility : this.facilites.getFacilities().values()) {
+			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				out.putInt(this.agentTracker.getAgentsAtStop(facility).size());
 			}
 		}

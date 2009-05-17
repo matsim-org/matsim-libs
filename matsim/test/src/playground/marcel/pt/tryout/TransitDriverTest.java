@@ -27,17 +27,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
@@ -52,12 +48,12 @@ import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
+import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class TransitDriverTest extends MatsimTestCase {
 
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
-	private static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
 
 	public void testPersonsLeavingBus() throws SAXException, ParserConfigurationException, IOException {
 		loadConfig(null);
@@ -65,16 +61,9 @@ public class TransitDriverTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
-
-		World world = new World();
-		world.setFacilityLayer(facilities);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 //		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
@@ -84,17 +73,17 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events, facilities);
+		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);
 
 		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
 		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
-		ActivityFacility home = facilities.getFacilities().get(new IdImpl("home"));
-		ActivityFacility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
-		ActivityFacility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
-		ActivityFacility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
-		ActivityFacility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
+		TransitStopFacility home  = schedule.getFacilities().get(new IdImpl("home"));
+		TransitStopFacility stop2 = schedule.getFacilities().get(new IdImpl("stop2"));
+		TransitStopFacility stop3 = schedule.getFacilities().get(new IdImpl("stop3"));
+		TransitStopFacility stop4 = schedule.getFacilities().get(new IdImpl("stop4"));
+		TransitStopFacility stop6 = schedule.getFacilities().get(new IdImpl("stop6"));
 
 		MockAgent agent1 = new MockAgent(home, stop2);
 		MockAgent agent2 = new MockAgent(home, stop3);
@@ -125,23 +114,16 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 	}
 
-	public void testPersonsEnteringBus() throws SAXException, ParserConfigurationException, IOException { // TODO [MR] disabled test
+	public void testPersonsEnteringBus() throws SAXException, ParserConfigurationException, IOException {
 		loadConfig(null);
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
 
 		NetworkLayer network = new NetworkLayer();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
-
-		World world = new World();
-		world.setFacilityLayer(facilities);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 //		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
@@ -151,17 +133,18 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events, facilities);
+		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);
+		sim.setTransitSchedule(schedule);
 		
 		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
 		TransitVehicle bus = new TransitQueueVehicle(20, events);
 		driver.setVehicle(bus);
 
-		ActivityFacility work = facilities.getFacilities().get(new IdImpl("work"));
-		ActivityFacility stop2 = facilities.getFacilities().get(new IdImpl("stop2"));
-		ActivityFacility stop3 = facilities.getFacilities().get(new IdImpl("stop3"));
-		ActivityFacility stop4 = facilities.getFacilities().get(new IdImpl("stop4"));
-		ActivityFacility stop6 = facilities.getFacilities().get(new IdImpl("stop6"));
+		TransitStopFacility work  = schedule.getFacilities().get(new IdImpl("work"));
+		TransitStopFacility stop2 = schedule.getFacilities().get(new IdImpl("stop2"));
+		TransitStopFacility stop3 = schedule.getFacilities().get(new IdImpl("stop3"));
+		TransitStopFacility stop4 = schedule.getFacilities().get(new IdImpl("stop4"));
+		TransitStopFacility stop6 = schedule.getFacilities().get(new IdImpl("stop6"));
 
 		MockAgent agent1 = new MockAgent(stop2, work);
 		MockAgent agent2 = new MockAgent(stop3, work);

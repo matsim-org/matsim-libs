@@ -21,7 +21,6 @@
 package playground.marcel.pt.mocks;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
@@ -34,14 +33,15 @@ import org.matsim.core.population.PersonImpl;
 import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.transitSchedule.TransitLine;
+import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class MockAgent implements DriverAgent, PassengerAgent {
 
-	private final ActivityFacility exitStop;
+	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
 	private final Person dummyPerson = new PersonImpl(new IdImpl(1));
 	
-	public MockAgent(final ActivityFacility enterStop, final ActivityFacility exitStop) {
+	public MockAgent(final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
 		this.exitStop = exitStop;
 		this.dummyLeg = new LegImpl(TransportMode.pt);
 		GenericRoute route = new ExperimentalTransitRoute(enterStop.getLink(), exitStop.getLink());
@@ -81,7 +81,7 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 	public void teleportToLink(Link link) {
 	}
 
-	public boolean arriveAtStop(final ActivityFacility stop) {
+	public boolean arriveAtStop(final TransitStopFacility stop) {
 		return stop == exitStop;
 	}
 

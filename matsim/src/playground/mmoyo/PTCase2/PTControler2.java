@@ -114,8 +114,8 @@ public class PTControler2 {
 	    		break;
 	    	case 8:
 	    		ToTransitScheduleConverter converter = new ToTransitScheduleConverter();	    		
-	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "PtFacilities.xml", path + "transitSchedule.xml");
-	    		//converter.createFacilities("../shared-svn/studies/schweiz-ivtch/pt-experimental/PtFacilities.xml");
+//	    		converter.createFacilities(network);
+	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "transitSchedule.xml");
 	    		break;
 		}//switch
 	}//main

@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -43,10 +42,11 @@ import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class TransitDriver implements DriverAgent {
 
-		private final List<ActivityFacility> stops;
+		private final List<TransitStopFacility> stops;
 		private final List<Link> linkRoute;
 		private final NetworkRoute carRoute;
 		private final double departureTime;
@@ -65,7 +65,7 @@ public class TransitDriver implements DriverAgent {
 		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
 			this.transitLine = line;
 			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + departure.getId().toString()));
-			this.stops = new ArrayList<ActivityFacility>(route.getStops().size());
+			this.stops = new ArrayList<TransitStopFacility>(route.getStops().size());
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());
 			}
@@ -96,14 +96,14 @@ public class TransitDriver implements DriverAgent {
 			this.currentLink = this.linkRoute.get(this.nextLinkIndex);
 			this.nextLinkIndex++;
 			// let's see if we have a stop at that link
-			for (ActivityFacility stop : this.stops) {
+			for (TransitStopFacility stop : this.stops) {
 				if (stop.getLink() == this.currentLink) {
 					handleStop(stop, SimulationTimer.getTime());
 				}
 			}
 		}
 
-		private void handleStop(final ActivityFacility stop, double now) {
+		private void handleStop(final TransitStopFacility stop, double now) {
 			// let passengers get out if they want
 			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
 			for (PassengerAgent passenger : this.vehicle.getPassengers()) {

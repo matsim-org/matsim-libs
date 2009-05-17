@@ -25,13 +25,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -43,29 +40,21 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 
 	public static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	public static final String INPUT_TEST_FILE_NETWORK = "network.xml";
-	public static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
 
 	public void testGetDeparturesAtStop() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
-
-		World world = new World();
-		world.setFacilityLayer(facilities);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine line = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(line);
 		assertNotNull("could not get transit line.", line);
 
-		double[] departures = timetable.getDeparturesAtStop(facilities.getFacilities().get(new IdImpl("stop3")));
+		double[] departures = timetable.getDeparturesAtStop(schedule.getFacilities().get(new IdImpl("stop3")));
 
 		for (double d : departures) {
 			System.out.println("Departure at " + Time.writeTime(d));

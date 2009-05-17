@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
-import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -74,15 +73,11 @@ public class TestIntegration {
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-//		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
-//		System.out.println(network.getLinks().size());
-//		System.out.println(facilities.getFacilities().size());
 		
 		try {
-//			new TransitScheduleReaderV1(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
-			new TransitScheduleReaderV1(schedule, network, facilities).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
-			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events, facilities);
+//			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
+			new TransitScheduleReaderV1(schedule, network).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
+			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
 			sim.setTransitSchedule(schedule);
 			sim.run();
 			OTFVis.playMVI(new String[] {"./otfvis.mvi"});
@@ -116,15 +111,11 @@ public class TestIntegration {
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-//		FacilityNetworkMatching.loadMapping(facilities, network, scenario.getWorld(), "../thesis-data/examples/minibln/facilityMatching.txt");
-//		System.out.println(network.getLinks().size());
-//		System.out.println(facilities.getFacilities().size());
 		
 		try {
-			new TransitScheduleReaderV1(schedule, network, facilities).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
-//			new TransitScheduleReaderV1(schedule, network, facilities).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
-			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events, facilities);
+			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
+//			new TransitScheduleReaderV1(schedule, network).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
+			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
 			sim.setTransitSchedule(schedule);
 			sim.run();
 //			OTFVis.playMVI(new String[] {"./otfvis.mvi"});

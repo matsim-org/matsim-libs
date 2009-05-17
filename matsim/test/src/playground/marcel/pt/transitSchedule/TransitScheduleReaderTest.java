@@ -29,35 +29,24 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 public class TransitScheduleReaderTest extends MatsimTestCase {
 
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
-	private static final String INPUT_TEST_FILE_FACILITIES = "facilities.xml";
 
 	public void testReadFile_General() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = getPackageInputDirectory();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(inputDir + INPUT_TEST_FILE_FACILITIES);
-
-		World world = new World();
-		world.setFacilityLayer(facilities);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		TransitSchedule schedule = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, facilities).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
 		assertEquals("wrong line id.", new IdImpl("T1"), schedule.getTransitLines().keySet().iterator().next());

@@ -29,13 +29,10 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRoute;
@@ -49,29 +46,27 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
+import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class CreatePseudoNetwork {
 
-	public static final String INPUT_FACILITIES = "../thesis-data/examples/berta/facilities.xml";
 	public static final String INPUT_SCHEDULE = "../thesis-data/examples/berta/schedule.xml";
 	public static final String OUTPUT_SCHEDULE = "../thesis-data/examples/berta/pseudoSchedule.xml";
 	public static final String OUTPUT_NETWORK = "../thesis-data/examples/berta/pseudoNetwork.xml";
 	
-	private Map<Tuple<ActivityFacility, ActivityFacility>, Link> links = null;
-	private Map<ActivityFacility, Node> nodes = null;
+	private Map<Tuple<TransitStopFacility, TransitStopFacility>, Link> links = null;
+	private Map<TransitStopFacility, Node> nodes = null;
 	private NetworkLayer network = null;
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
 	
 	public void run() {
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		network = new NetworkLayer();
 		this.linkIdCounter = 0;
 		this.nodeIdCounter = 0;
-		new MatsimFacilitiesReader(facilities).readFile(INPUT_FACILITIES);
 		TransitSchedule schedule = new TransitSchedule();
 		try {
-			new TransitScheduleReaderV1(schedule, null, facilities).readFile(INPUT_SCHEDULE);
+			new TransitScheduleReaderV1(schedule, null).readFile(INPUT_SCHEDULE);
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -80,17 +75,17 @@ public class CreatePseudoNetwork {
 			e.printStackTrace();
 		}
 		
-		this.links = new HashMap<Tuple<ActivityFacility, ActivityFacility>, Link>();
-		this.nodes = new HashMap<ActivityFacility, Node>();
+		this.links = new HashMap<Tuple<TransitStopFacility, TransitStopFacility>, Link>();
+		this.nodes = new HashMap<TransitStopFacility, Node>();
 		
 		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
 		
 		for (TransitLine tLine : schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
 				ArrayList<Link> routeLinks = new ArrayList<Link>();
-				ActivityFacility prevFacility = null;
+				TransitStopFacility prevFacility = null;
 				for (TransitRouteStop stop : tRoute.getStops()) {
-					ActivityFacility facility = stop.getStopFacility();
+					TransitStopFacility facility = stop.getStopFacility();
 					if (prevFacility != null) {
 						Link link = getNetworkLink(prevFacility, facility);
 						// add link to route
@@ -126,8 +121,8 @@ public class CreatePseudoNetwork {
 		
 	}
 	
-	private Link getNetworkLink(final ActivityFacility fromStop, final ActivityFacility toStop) {
-		Tuple<ActivityFacility, ActivityFacility> connection = new Tuple<ActivityFacility, ActivityFacility>(fromStop, toStop);
+	private Link getNetworkLink(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
+		Tuple<TransitStopFacility, TransitStopFacility> connection = new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop);
 		Link link = links.get(connection);
 		if (link == null) {
 			Node fromNode = nodes.get(fromStop);
@@ -141,7 +136,7 @@ public class CreatePseudoNetwork {
 				nodes.put(toStop, toNode);
 			}
 			link = network.createLink(new IdImpl(linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromStop.getCoord(), toStop.getCoord()), 30.0 / 3.6, 500, 1);
-			links.put(new Tuple<ActivityFacility, ActivityFacility>(fromStop, toStop), link);
+			links.put(new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop), link);
 		}
 		return link;
 	}

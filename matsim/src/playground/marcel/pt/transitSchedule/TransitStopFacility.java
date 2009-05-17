@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitSchedule.java
+ * TransitStopFacility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,42 +20,43 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
-
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.network.Link;
 
-public class TransitSchedule {
+public class TransitStopFacility implements Facility {
 
-	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
-	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
-
-	public TransitSchedule() {
-	}
-
-	public void addTransitLine(final TransitLine line) {
-		final Id id = line.getId();
-		if (this.transitLines.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
-		}
-		this.transitLines.put(id, line);
+	private final Id id;
+	private final Coord coord;
+	private Link link = null;
+	
+	public TransitStopFacility(final Id id, final Coord coord) {
+		this.id = id;
+		this.coord = coord;
 	}
 	
-	public void addStopFacility(final TransitStopFacility stop) {
-		final Id id = stop.getId();
-		if (this.stopFacilities.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a stop facility with id " + id.toString());
-		}
-		this.stopFacilities.put(id, stop);
-	}
-
-	public Map<Id, TransitLine> getTransitLines() {
-		return Collections.unmodifiableMap(this.transitLines);
+	public Link getLink() {
+		return this.link;
 	}
 	
-	public Map<Id, TransitStopFacility> getFacilities() {
-		return Collections.unmodifiableMap(this.stopFacilities);
+	public void setLink(final Link link) {
+		this.link = link;
+	}
+
+	public Id getLinkId() {
+		if (this.link == null) {
+			return null;
+		}
+		return this.link.getId();
+	}
+
+	public Coord getCoord() {
+		return this.coord;
+	}
+
+	public Id getId() {
+		return this.id;
 	}
 
 }

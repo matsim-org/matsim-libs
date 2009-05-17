@@ -27,13 +27,10 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -55,12 +52,11 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		Link l2 = network.createLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
 		Link l3 = network.createLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
 		Link l4 = network.createLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 
-		ActivityFacility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
-		ActivityFacility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
-		ActivityFacility stop3 = facilities.createFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000));
-		ActivityFacility stop4 = facilities.createFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
+		TransitStopFacility stop1 = new TransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
+		TransitStopFacility stop2 = new TransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
+		TransitStopFacility stop3 = new TransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000));
+		TransitStopFacility stop4 = new TransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
 
 		// prepare some schedule, without network-route
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(4);
@@ -80,13 +76,17 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		line1.addRoute(route1);
 
 		TransitSchedule schedule1 = new TransitSchedule();
+		schedule1.addStopFacility(stop1);
+		schedule1.addStopFacility(stop2);
+		schedule1.addStopFacility(stop3);
+		schedule1.addStopFacility(stop4);
 		schedule1.addTransitLine(line1);
 
 		// write and read it
 		String filename = getOutputDirectory() + "scheduleNoRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitSchedule schedule2 = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule2, network, facilities).readFile(filename);
+		new TransitScheduleReaderV1(schedule2, network).readFile(filename);
 
 		// first test, without network-route
 		assertEquals(schedule1, schedule2);
@@ -104,12 +104,22 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		filename = getOutputDirectory() + "scheduleWithRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitSchedule schedule3 = new TransitSchedule();
-		new TransitScheduleReaderV1(schedule3, network, facilities).readFile(filename);
+		new TransitScheduleReaderV1(schedule3, network).readFile(filename);
 
 		assertEquals(schedule1, schedule3);
 	}
 
 	private static void assertEquals(final TransitSchedule expected, final TransitSchedule actual) {
+		
+		assertEquals("different number of stopFacilities.", expected.getFacilities().size(), actual.getFacilities().size());
+		for (TransitStopFacility stopE : expected.getFacilities().values()) {
+			TransitStopFacility stopA = actual.getFacilities().get(stopE.getId());
+			assertNotNull("stopFacility not found: " + stopE.getId().toString(), stopA);
+			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), EPSILON);
+			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), EPSILON);
+			assertEquals("different link information.", stopE.getLink(), stopA.getLink());
+		}
+		
 		assertEquals("different number of transitLines.", expected.getTransitLines().size(), actual.getTransitLines().size());
 		for (TransitLine lineE : expected.getTransitLines().values()) {
 			// *E = expected, *A = actual
@@ -126,7 +136,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 					TransitRouteStop stopE = routeE.getStops().get(i);
 					TransitRouteStop stopA = routeA.getStops().get(i);
 					assertNotNull("stop not found", stopA);
-					assertEquals("different stop facilities.", stopE.getStopFacility(), stopA.getStopFacility());
+					assertEquals("different stop facilities.", stopE.getStopFacility().getId(), stopA.getStopFacility().getId());
 					assertEquals("different arrival delay.", stopE.getArrivalDelay(), stopA.getArrivalDelay(), EPSILON);
 					assertEquals("different departure delay.", stopE.getDepartureDelay(), stopA.getDepartureDelay(), EPSILON);
 				}
