@@ -45,6 +45,24 @@ public class SimpleWriter implements Closeable, Flushable {
 		}
 	}
 
+	public void write(char[] c) {
+		if (writer != null)
+			try {
+				writer.write(c);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+
+	public void write(char c) {
+		if (writer != null)
+			try {
+				writer.write(c);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+
 	public void write(String s) {
 		if (writer != null) {
 			try {
@@ -58,6 +76,10 @@ public class SimpleWriter implements Closeable, Flushable {
 
 	public void writeln(String s) {
 		write(s + "\n");
+	}
+
+	public void writeln() {
+		write('\n');
 	}
 
 	public void close() {

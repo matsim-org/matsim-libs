@@ -25,6 +25,7 @@ package playground.yu.utils.qgis;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -45,34 +47,14 @@ import org.xml.sax.SAXException;
  * @author yu
  * 
  */
-public class Volume2QGIS extends MATSimNet2QGIS{
+public class Volume2QGIS extends MATSimNet2QGIS {
 
-	public static List<Map<Id, Integer>> createVolumes(final NetworkLayer net,
+	public static List<Map<Id, Integer>> createVolumes(Collection<Link> links,
 			final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++)
 			volumes.add(i, null);
-		for (Link link : net.getLinks().values()) {
-			Id linkId = link.getId();
-			int[] v = va.getVolumesForLink(linkId);
-			for (int i = 0; i < 24; i++) {
-				Map<Id, Integer> m = volumes.get(i);
-				if (m == null) {
-					m = new HashMap<Id, Integer>();
-					volumes.add(i, m);
-				}
-				m.put(linkId, (int) ((v != null ? v[i] : 0) / flowCapFactor));
-			}
-		}
-		return volumes;
-	}
-
-	public static List<Map<Id, Integer>> createVolumes(
-			final RoadPricingScheme net, final VolumesAnalyzer va) {
-		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
-		for (int i = 0; i < 24; i++)
-			volumes.add(i, null);
-		for (Link link : net.getLinks()) {
+		for (Link link : links) {
 			Id linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
@@ -120,8 +102,8 @@ public class Volume2QGIS extends MATSimNet2QGIS{
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../matsimTests/Calibration/e5_700/700.events.txt.gz",
-				va);
+		mn2q.readEvents("../runs-svn/run669/it.1000/1000.events.txt.gz",
+				new EventHandler[]{va});
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(net);
 		try {
 			tollReader.parse(tollFilename);
@@ -134,16 +116,18 @@ public class Volume2QGIS extends MATSimNet2QGIS{
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		List<Map<Id, Integer>> vols = createVolumes(rps, va);
+		Collection<Link> links = (rps != null) ? rps.getLinks() : net
+				.getLinks().values();
+		List<Map<Id, Integer>> vols = createVolumes(links, va);
 		List<Map<Id, Double>> sls = SaturationLevel2QGIS
 				.createSaturationLevels(net, rps, va);
 
-		for (int i = 6; i <= 19; i++) {
+		for (int i = 0; i < 24; i++) {
 			Volume2QGIS v2q = new Volume2QGIS();
 			v2q.setCrs(ch1903, mn2q.network, mn2q.crs, rps.getLinkIds());
 			v2q.addParameter("vol", Integer.class, vols.get(i));
 			v2q.addParameter("sl", Double.class, sls.get(i));
-			v2q.writeShapeFile("../matsimTests/Calibration/e5_700/700."
+			v2q.writeShapeFile("../runs-svn/run669/it.1000/1000.Volume.QGIS/1000."
 					+ (i + 1) + ".shp");
 		}
 		/*

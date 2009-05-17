@@ -144,9 +144,10 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public void readEvents(final String eventsFilename,
-			final EventHandler handler) {
+			final EventHandler[] handlers) {
 		Events events = new Events();
-		events.addHandler(handler);
+		for (int i = 0; i < handlers.length; i++)
+			events.addHandler(handlers[i]);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 	}
 

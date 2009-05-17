@@ -31,6 +31,7 @@ import java.util.Map;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -39,7 +40,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
  * @author yu
  * 
  */
-public class SaturationLevel2QGIS extends MATSimNet2QGIS{
+public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 
 	public static List<Map<Id, Double>> createSaturationLevels(
 			NetworkLayer net, VolumesAnalyzer va) {
@@ -56,12 +57,8 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS{
 				Map<Id, Double> m = saturationLevels.get(i);
 				if (m == null)
 					m = new HashMap<Id, Double>();
-					m.put(
-								linkId,
-								Double.valueOf( ((v != null) ? v[i] : 0)
-										* 10.0
-										/ link.getCapacity(Time.UNDEFINED_TIME)
-										* capPeriod));
+				m.put(linkId, Double.valueOf(((v != null) ? v[i] : 0) * 10.0
+						/ link.getCapacity(Time.UNDEFINED_TIME) * capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}
@@ -83,12 +80,9 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS{
 				Map<Id, Double> m = saturationLevels.get(i);
 				if (m == null)
 					m = new HashMap<Id, Double>();
-					m.put(
-								linkId,
-								Double.valueOf( ((v != null) ? v[i] : 0)
-										/ flowCapFactor
-										/ link.getCapacity(Time.UNDEFINED_TIME)
-										* capPeriod));
+				m.put(linkId, Double.valueOf(((v != null) ? v[i] : 0)
+						/ flowCapFactor / link.getCapacity(Time.UNDEFINED_TIME)
+						* capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}
@@ -109,7 +103,8 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS{
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../matsimTests/Calibration/680.events.txt.gz", va);
+		mn2q.readEvents("../matsimTests/Calibration/680.events.txt.gz",
+				new EventHandler[] { va });
 		List<Map<Id, Double>> sls = createSaturationLevels(net, va);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class, sls

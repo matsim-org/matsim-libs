@@ -155,6 +155,11 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			timeSum[timeBin] += time;
 		}
 
+		/**
+		 * @param timeBin
+		 * @return speed [km/h], if there was not traffic on a link, returns
+		 *         directly the free speed
+		 */
 		public double getSpeed(final int timeBin) {
 			return timeSum[timeBin] != 0.0 ? lengthSum[timeBin]
 					/ timeSum[timeBin] * 3.6 : freeSpeeds[timeBin] * 3.6;
@@ -224,7 +229,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	private int getBinIdx(final double time) {
-		int bin = (int) (time / binSize);
+		int bin = ((int) time) / binSize;
 		if (bin >= nofBins)
 			return nofBins - 1;
 		return bin;
