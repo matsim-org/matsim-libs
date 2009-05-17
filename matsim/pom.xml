@@ -42,7 +42,8 @@
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
           <!-- configure initial and maximal memory for compiling -->
-<!--          <meminitial> </meminitial>-->
+          <fork>true</fork>
+          <meminitial>128m</meminitial>
           <maxmem>512m</maxmem>
           <compilerArguments>
             <Xmaxwarns>4000</Xmaxwarns>
