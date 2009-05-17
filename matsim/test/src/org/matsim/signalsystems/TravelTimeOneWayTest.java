@@ -99,8 +99,8 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 			log.debug("circulationTime: " + circulationTime);
 			log.debug("dropping  : " + dropping);
 
-			assertEquals((dropping * 2000 / circulationTime),
-					eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1);
+			assertEquals((dropping * 2000.0 / circulationTime),
+					eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
 			assertEquals(5000.0, eventHandler.beginningOfLink2.numberOfVehPassed, EPSILON);
 		}
 	}
@@ -134,7 +134,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		// this.beginningOfLink2.lastVehPassTime_s);
 
 		MeasurementPoint qSim = eventHandler.beginningOfLink2;
-		eventHandler.beginningOfLink2 = null;
+		eventHandler.reset(1);
 
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 		if (eventHandler.beginningOfLink2 != null) {
