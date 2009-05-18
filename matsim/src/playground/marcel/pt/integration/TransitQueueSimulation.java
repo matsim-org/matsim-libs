@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
@@ -35,7 +36,6 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.Simulation;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
@@ -53,7 +53,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
-	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events) {
+	public TransitQueueSimulation(final Network network, final Population population, final Events events) {
 		super(network, population, events);
 	
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
