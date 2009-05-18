@@ -43,7 +43,7 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.LinkToLinkTravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -62,7 +62,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	protected Activity originAct = null;
 	protected Activity destinationAct = null;
 
-	protected TravelTimeCalculator linkTravelTimeEstimator = null;
+	protected LinkToLinkTravelTimeCalculator linkTravelTimeEstimator = null;
 	protected TravelCost linkTravelCostEstimator = null;
 	protected DepartureDelayAverageCalculator tDepDelayCalc = null;
 	private FixedRouteLegTravelTimeEstimator testee = null;
@@ -96,7 +96,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.destinationAct = (Activity) actsLegs.get(TEST_LEG_NR + 2);
 
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
-		this.linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
+		this.linkTravelTimeEstimator = new LinkToLinkTravelTimeCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE, config.travelTimeCalculator());
 		this.linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(this.linkTravelTimeEstimator, config.charyparNagelScoring());
 	}
 
@@ -270,8 +270,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 
 		// we have one agent on this link, taking 1 minute and 48 seconds
-		LinkEnterEvent enterEvent = new LinkEnterEvent(Time.parseTime("06:05:00"), TEST_PERSON_ID, linkId);
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(Time.parseTime("06:06:48"), TEST_PERSON_ID, linkId);
+		LinkEnterEvent enterEvent = new LinkEnterEvent(Time.parseTime("06:05:00"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(Time.parseTime("06:06:48"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
 
 		for (BasicEventImpl event : new BasicEventImpl[]{enterEvent, leaveEvent}) {
 			events.processEvent(event);

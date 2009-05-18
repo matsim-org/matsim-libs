@@ -50,12 +50,12 @@ public class BKickHouseholdsCreator {
     BasicHouseholdBuilder b = hhs.getHouseholdBuilder();
     
     BasicHousehold hh = b.createHousehold(id1);
-    hh.setIncome(b.createIncome(40000, BasicIncome.IncomePeriod.year));
+    hh.setIncome(b.createIncome(120000, BasicIncome.IncomePeriod.year));
     hh.getMemberIds().add(id1);
     hhs.getHouseholds().put(id1, hh);
     
     hh = b.createHousehold(id2);
-    hh.setIncome(b.createIncome(120000, BasicIncome.IncomePeriod.year));
+    hh.setIncome(b.createIncome(40000, BasicIncome.IncomePeriod.year));
     hh.getMemberIds().add(id2);
     hhs.getHouseholds().put(id2, hh);
     

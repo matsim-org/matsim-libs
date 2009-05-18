@@ -178,7 +178,7 @@ public class CalcRouteSets {
 
 		fw = new FileWriter("output/routesets.txt");
 		out = new BufferedWriter(fw);
-		gen = new RouteSetGenerator(network);
+		gen = new RouteSetGenerator(network, config);
 
 		out.write("# Routesets\n");
 		out.write("# SEG_ID\tFROM_NODE\tTO_NODE\tROUTE(linklist)...\t-1\tLEASTCOSTROUTE(0,1)\t-1\n");

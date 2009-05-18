@@ -41,7 +41,7 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.LinkToLinkTravelTimeCalculator;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.PlanomatTest;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
@@ -73,7 +73,7 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		Gbl.printMemoryUsage();
 
 		log.info("Initializing TravelTimeCalculator...");
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
+		LinkToLinkTravelTimeCalculator tTravelEstimator = new LinkToLinkTravelTimeCalculator(network, 900, config.travelTimeCalculator());
 		log.info("Initializing TravelTimeCalculator...done.");
 		log.info("Initializing TravelCost...");
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);

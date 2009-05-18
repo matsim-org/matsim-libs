@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -32,17 +33,19 @@ public class EventsReaderTXTv1 {
 
 	private BufferedReader infile = null;
 	protected Events events;
+	private BasicEventsBuilder builder;
 
 	public EventsReaderTXTv1(final Events events) {
 		super();
 		this.events = events;
+		this.builder = events.getBuilder();
 	}
 
 	public void readFile(final String filename) {
 		try {
 			this.infile = IOUtils.getBufferedReader(filename);
 			String line = this.infile.readLine();
-			if (line != null && line.charAt(0) >= '0' && line.charAt(0) <= '9') {
+			if ((line != null) && (line.charAt(0) >= '0') && (line.charAt(0) <= '9')) {
 				/* The line starts with a number, so assume it's an event and parse it.
 				 * Otherwise it is likely the header.  */
 				parseLine(line);
@@ -59,45 +62,45 @@ public class EventsReaderTXTv1 {
 
 	}
 
-	static public final void createEvent(final Events events, final double time, final Id agentId,
+	 public final void createEvent(final Events events, final double time, final Id agentId,
 			final Id linkId, final int flag, final String desc, final String acttype) {
-		BasicEventImpl data = null;
+		 BasicEvent data = null;
 
 		switch (flag) {
 			case 2:
-				data = new LinkLeaveEvent(time, agentId, linkId);
+				data = this.builder.createLinkLeaveEvent(time, agentId, linkId);
 				break;
 			case 5:
-				data = new LinkEnterEvent(time, agentId, linkId);
+				data = this.builder.createLinkEnterEvent(time, agentId, linkId);
 				break;
 			case 3:
-				data = new AgentStuckEvent(time, agentId, linkId);
+				data = this.builder.createAgentStuckEvent(time, agentId, linkId);
 				break;
 			case 4:
-				data = new AgentWait2LinkEvent(time, agentId, linkId);
+				data = this.builder.createAgentWait2LinkEvent(time, agentId, linkId);
 				break;
 			case 6:
-				data = new AgentDepartureEvent(time, agentId, linkId);
+				data = this.builder.createAgentDepartureEvent(time, agentId, linkId);
 				break;
 			case 0:
-				data = new AgentArrivalEvent(time, agentId, linkId);
+				data = this.builder.createAgentArrivalEvent(time, agentId, linkId);
 				break;
 			case 7:
-				if ("".equals(acttype) && desc != null) {
+				if ("".equals(acttype) && (desc != null)) {
 					data = new ActivityStartEvent(time, agentId, linkId, desc.replace("actstart ", ""));
 				} else {
-					data = new ActivityStartEvent(time, agentId, linkId, acttype);
+					data = this.builder.createActivityStartEvent(time, agentId, linkId, acttype);
 				}
 				break;
 			case 8:
-				if ("".equals(acttype) && desc != null) {
+				if ("".equals(acttype) && (desc != null)) {
 					data = new ActivityEndEvent(time, agentId, linkId, desc.replace("actend ", ""));
 				} else {
-					data = new ActivityEndEvent(time, agentId, linkId, acttype);
+					data = this.builder.createActivityEndEvent(time, agentId, linkId, acttype);
 				}
 				break;
 			case 9:
-				data = new AgentMoneyEvent(time, agentId, Double.parseDouble(desc.replace("agentMoney\t", "")));
+				data = this.builder.createAgentMoneyEvent(time, agentId, Double.parseDouble(desc.replace("agentMoney\t", "")));
 				break;
 			default:
 				throw new RuntimeException("Type of events with flag = " + flag + " is not known!");

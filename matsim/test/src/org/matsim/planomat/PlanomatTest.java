@@ -36,7 +36,10 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsBuilderImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.PersonEvent;
+import org.matsim.core.events.handler.PersonEventHandler;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -44,7 +47,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.LinkToLinkTravelTimeCalculator;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
@@ -64,6 +67,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private Scenario scenario;
 	
+	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -75,6 +79,16 @@ public class PlanomatTest extends MatsimTestCase {
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
+		//store the only existing person
+		Person p = scenario.getPopulation().getPerson(TEST_PERSON_ID);
+		//read the events once to create a complete test population
+		Events events = new Events(new EventsBuilderImpl(this.scenario));
+		events.addHandler(new ScenarioCreatePersonEventHandler(this.scenario));
+		new MatsimEventsReader(events).readFile(this.getClassInputDirectory() + "equil-times-only-1000.events.txt.gz");
+		//now overwrite the testee person in the scenario
+		scenario.getPopulation().getPersons().put(TEST_PERSON_ID, p);
+		
+		
 	}
 
 	public void testRunDefault() {
@@ -99,11 +113,11 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private void runATestRun(final PlanomatTestRun testRun) {
 
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), 900);
+		LinkToLinkTravelTimeCalculator tTravelEstimator = new LinkToLinkTravelTimeCalculator(this.scenario.getNetwork(), 900, this.scenario.getConfig().travelTimeCalculator());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
-		Events events = new Events();
+		Events events = new Events(new EventsBuilderImpl(this.scenario));
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
@@ -286,4 +300,24 @@ public class PlanomatTest extends MatsimTestCase {
 		super.tearDown();
 	}
 
+	private static final class ScenarioCreatePersonEventHandler implements PersonEventHandler{
+
+		private Scenario scenario;
+
+		public ScenarioCreatePersonEventHandler(Scenario scenario) {
+			this.scenario = scenario;
+		}
+
+		public void handleEvent(PersonEvent event) {
+			this.scenario.getPopulation().getPersons().put(event.getPersonId(), this.scenario.getPopulation().getPopulationBuilder().createPerson(event.getPersonId()));
+		}
+
+		public void reset(int iteration) {
+			
+		}
+		
+		
+	}
+	
+	
 }

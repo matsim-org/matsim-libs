@@ -43,7 +43,7 @@ public class BKickScoringTest extends MatsimTestCase {
 	
 	private EventsToScore planScorer;
 
-	public void testSingleIterationScoring() {
+	public void estSingleIterationScoring() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configScoreTest.xml");
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
@@ -74,7 +74,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		
 	}
 	
-	public void testSingleIterationControlerScoring() {
+	public void estSingleIterationControlerScoring() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configControlerScoreTest.xml");
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
@@ -105,8 +105,8 @@ public class BKickScoringTest extends MatsimTestCase {
 		
 	}
 	
-	public void estSingleIterationIncomeScoring() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + "configScoreTest.xml");
+	public void testSingleIterationIncomeScoring() {
+		Config config = this.loadConfig(this.getClassInputDirectory() + "configIncomeScoreTest.xml");
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
@@ -136,6 +136,8 @@ public class BKickScoringTest extends MatsimTestCase {
 		//this score is calculated as follows:
 		//U_total_car = 0                          -(0.2*0.12/1000m)*50000m      +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
 		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
+		System.out.println("Agent 001: " + this.planScorer.getAgentScore(id1));
+		System.out.println("Agent 002: " + this.planScorer.getAgentScore(id2));
 		assertEquals(51.1966331116414, this.planScorer.getAgentScore(id1), EPSILON);
 		assertEquals(50.9354264369152, this.planScorer.getAgentScore(id2), EPSILON);
 		

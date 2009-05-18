@@ -32,9 +32,11 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 	static public final String EVENTS = "events";
 
 	private final Events events;
+	private BasicEventsBuilder builder;
 
 	public EventsReaderXMLv1(final Events events) {
 		this.events = events;
+		this.builder = events.getBuilder();
 		this.setValidating(false);// events-files have not DTD, thus they cannot validate
 	}
 
@@ -54,41 +56,41 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		String eventType = atts.getValue("type");
 
 		if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkLeaveEvent(time,
+			this.events.processEvent(this.builder.createLinkLeaveEvent(time,
 					new IdImpl(atts.getValue(LinkLeaveEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK))));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkEnterEvent(time,
+			this.events.processEvent(this.builder.createLinkEnterEvent(time,
 					new IdImpl(atts.getValue(LinkEnterEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK))));
 		} else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActivityEndEvent(time,
+			this.events.processEvent(this.builder.createActivityEndEvent(time,
 					new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK)),
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActivityStartEvent(time,
+			this.events.processEvent(this.builder.createActivityStartEvent(time,
 					new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK)),
 					atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (AgentArrivalEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new AgentArrivalEvent(time,
+			this.events.processEvent(this.builder.createAgentArrivalEvent(time,
 					new IdImpl(atts.getValue(AgentArrivalEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentArrivalEvent.ATTRIBUTE_LINK))));
 		} else if (AgentDepartureEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new AgentDepartureEvent(time,
+			this.events.processEvent(this.builder.createAgentDepartureEvent(time,
 					new IdImpl(atts.getValue(AgentDepartureEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentDepartureEvent.ATTRIBUTE_LINK))));
 		} else if (AgentWait2LinkEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new AgentWait2LinkEvent(time,
+			this.events.processEvent(this.builder.createAgentWait2LinkEvent(time,
 					new IdImpl(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LINK))));
 		} else if (AgentStuckEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new AgentStuckEvent(time,
+			this.events.processEvent(this.builder.createAgentStuckEvent(time,
 					new IdImpl(atts.getValue(AgentStuckEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentStuckEvent.ATTRIBUTE_LINK))));
 		} else if (AgentMoneyEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new AgentMoneyEvent(time,
+			this.events.processEvent(this.builder.createAgentMoneyEvent(time,
 					new IdImpl(atts.getValue(AgentStuckEvent.ATTRIBUTE_PERSON)),
 					Double.parseDouble(atts.getValue(AgentMoneyEvent.ATTRIBUTE_AMOUNT))));
 		}

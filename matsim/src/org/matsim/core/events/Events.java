@@ -94,6 +94,16 @@ public class Events {
 	private long counter = 0;
 	private long nextCounterMsg = 1;
 
+	private BasicEventsBuilder builder;
+	
+	public Events() {
+		this.builder = new BasicEventsBuilderImpl();
+	}
+	
+	public Events(BasicEventsBuilder builder) {
+		this.builder = builder;
+	}
+	
 	private HandlerData findHandler(final Class<?> evklass) {
 		for (HandlerData handler : this.handlerData) {
 			if (handler.eventklass == evklass) {
@@ -308,6 +318,10 @@ public class Events {
 				log.info("  - " + handler.getClass().getName());
 			}
 		}
+	}
+	
+	public BasicEventsBuilder getBuilder(){
+		return this.builder;
 	}
 
 }

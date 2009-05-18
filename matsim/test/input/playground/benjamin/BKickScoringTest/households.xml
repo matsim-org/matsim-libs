@@ -8,7 +8,7 @@
 			<personId refId="2"/>
 		</members>
 		<income period="year">
-				120000.0
+				40000.0
 		</income>
 	</household>
 	<household id="1">
@@ -16,7 +16,7 @@
 			<personId refId="1"/>
 		</members>
 		<income period="year">
-				40000.0
+				120000.0
 		</income>
 	</household>
 </households>
