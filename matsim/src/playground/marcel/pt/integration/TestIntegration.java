@@ -77,6 +77,7 @@ public class TestIntegration {
 //			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 			new TransitScheduleReaderV1(schedule, network).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
 			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
+			sim.startOTFServer("OTFServer_Transit");
 			sim.setTransitSchedule(schedule);
 			sim.run();
 			OTFVis.playMVI(new String[] {"./otfvis.mvi"});
@@ -109,6 +110,7 @@ public class TestIntegration {
 		try {
 			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
+			sim.startOTFServer("OTFServer_Transit");
 			sim.setTransitSchedule(schedule);
 			sim.run();
 		} catch (SAXException e) {

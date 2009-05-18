@@ -47,8 +47,7 @@ import playground.marcel.pt.transitSchedule.TransitSchedule;
 
 public class TransitQueueSimulation extends QueueSimulation {
 	
-	private final OnTheFlyServer otfServer;
-	
+	private OnTheFlyServer otfServer = null;
 
 	private TransitSchedule schedule = null;
 	/*package*/ final TransitStopAgentTracker agentTracker;
@@ -58,32 +57,39 @@ public class TransitQueueSimulation extends QueueSimulation {
 		super(network, population, events);
 	
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
-
 		this.agentTracker = new TransitStopAgentTracker();
-		
-		this.otfServer = OnTheFlyServer.createInstance("OTFServer_Transit", this.network, this.plans, getEvents(), false);
+	}
+
+	public void startOTFServer(final String serverName) {
+		this.otfServer = OnTheFlyServer.createInstance(serverName, this.network, this.plans, getEvents(), false);
 		try {
 			this.otfServer.pause();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	@Override
 	protected void cleanupSim() {
-		this.otfServer.cleanup();
+		if (otfServer != null) {
+			this.otfServer.cleanup();
+		}
 		super.cleanupSim();
 	}
 	
 	@Override
 	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
-		this.otfServer.updateStatus(time);
+		if (this.otfServer != null) {
+			this.otfServer.updateStatus(time);
+		}
 	}
 
 	public void setTransitSchedule(final TransitSchedule schedule) {
 		this.schedule = schedule;
-		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
+		if (this.otfServer != null) {
+			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
+		}
 	}
 
 	public Object getAgent(final Person p) {
