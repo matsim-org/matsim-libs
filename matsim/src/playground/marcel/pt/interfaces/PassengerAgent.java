@@ -20,8 +20,9 @@
 
 package playground.marcel.pt.interfaces;
 
+import org.matsim.transitSchedule.TransitStopFacility;
+
 import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 /**
  * @author mrieser

@@ -29,11 +29,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class MockAgent implements DriverAgent, PassengerAgent {
 

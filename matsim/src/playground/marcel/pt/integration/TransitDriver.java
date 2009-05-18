@@ -32,9 +32,10 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.Simulation;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.TransitVehicle;
@@ -42,9 +43,8 @@ import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
-public class TransitDriver implements DriverAgent {
+public class TransitDriver implements TransitDriverAgent {
 
 		private final List<TransitStopFacility> stops;
 		private final List<Link> linkRoute;
@@ -60,6 +60,9 @@ public class TransitDriver implements DriverAgent {
 		private final Leg currentLeg = new LegImpl(TransportMode.car);
 		private final Person dummyPerson;
 		
+		private final Iterator<TransitStopFacility> stopIterator;
+		private TransitStopFacility nextStop;
+		
 		private final TransitLine transitLine;
 		
 		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
@@ -69,6 +72,8 @@ public class TransitDriver implements DriverAgent {
 			for (TransitRouteStop stop : route.getStops()) {
 				this.stops.add(stop.getStopFacility());
 			}
+			this.stopIterator = this.stops.iterator();
+			this.nextStop = stopIterator.next();
 			this.sim = sim;
 			this.departureTime = departure.getDepartureTime();
 			this.carRoute = route.getRoute();
@@ -95,15 +100,21 @@ public class TransitDriver implements DriverAgent {
 		public void moveOverNode() {
 			this.currentLink = this.linkRoute.get(this.nextLinkIndex);
 			this.nextLinkIndex++;
-			// let's see if we have a stop at that link
-			for (TransitStopFacility stop : this.stops) {
-				if (stop.getLink() == this.currentLink) {
-					handleStop(stop, SimulationTimer.getTime());
-				}
-			}
+		}
+		
+		public TransitStopFacility getNextTransitStop() {
+			return this.nextStop;
 		}
 
-		private void handleStop(final TransitStopFacility stop, double now) {
+		public double handleTransitStop(final TransitStopFacility stop, final double now) {
+			if (stop != this.nextStop) {
+				throw new RuntimeException("Expected different stop.");
+			}
+			if (this.stopIterator.hasNext()) {
+				this.nextStop = this.stopIterator.next();
+			} else {
+				this.nextStop = null;
+			}
 			// let passengers get out if they want
 			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
 			for (PassengerAgent passenger : this.vehicle.getPassengers()) {
@@ -119,6 +130,8 @@ public class TransitDriver implements DriverAgent {
 				agent.legEnds(now);
 			}
 
+			int cntEgress = passengersLeaving.size();
+			int cntAccess = 0;
 			for (Iterator<DriverAgent> iter = this.sim.agentTracker.getAgentsAtStop(stop).iterator(); iter.hasNext(); ) {
 				DriverAgent agent = iter.next();
 				PassengerAgent passenger = (PassengerAgent) agent;
@@ -126,8 +139,13 @@ public class TransitDriver implements DriverAgent {
 					this.vehicle.addPassenger(passenger);
 					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 					iter.remove();
+					cntAccess++;
 				}
 			}
+			if (cntAccess > 0 || cntEgress > 0) {
+				return 10.0 + cntAccess * 5 + cntEgress * 3;
+			}
+			return 0.0;
 		}
 
 		public double getDepartureTime() {

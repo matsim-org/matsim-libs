@@ -38,6 +38,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.TransitStopFacility;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

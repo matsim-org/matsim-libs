@@ -11,6 +11,7 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -18,7 +19,6 @@ import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 

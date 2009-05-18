@@ -31,6 +31,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import playground.marcel.pt.transitSchedule.Departure;
@@ -38,7 +39,6 @@ import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class TransitRouter {
 

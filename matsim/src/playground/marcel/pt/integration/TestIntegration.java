@@ -97,7 +97,6 @@ public class TestIntegration {
 //		final Config config = scenario.getConfig();
 //		
 //		config.network().setInputFile("../thesis-data/examples/berta/pseudoNetwork.xml");
-//		config.facilities().setInputFile("../thesis-data/examples/berta/facilities.xml");
 //		config.plans().setInputFile("../thesis-data/examples/berta/pseudoPerson.xml");
 //		config.simulation().setSnapshotPeriod(60);
 //		config.simulation().setEndTime(12.0*3600);
@@ -105,7 +104,7 @@ public class TestIntegration {
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
-		sl.loadScenario();	
+		sl.loadScenario();
 
 		final TransitSchedule schedule = new TransitSchedule();
 		final Events events = new Events();

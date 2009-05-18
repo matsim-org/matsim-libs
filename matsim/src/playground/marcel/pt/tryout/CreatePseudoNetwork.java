@@ -38,6 +38,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.transitSchedule.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -46,7 +47,6 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class CreatePseudoNetwork {
 

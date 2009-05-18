@@ -34,6 +34,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.transitSchedule.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
@@ -48,7 +49,6 @@ import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class TransitDriverTest extends MatsimTestCase {
 
@@ -101,6 +101,10 @@ public class TransitDriverTest extends MatsimTestCase {
 		Link link = driver.chooseNextLink();
 		driver.moveOverNode();
 		while (link != null) {
+			if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
+				driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
+				continue;
+			}
 			Link nextLink = driver.chooseNextLink();
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
@@ -162,6 +166,10 @@ public class TransitDriverTest extends MatsimTestCase {
 		Link link = driver.chooseNextLink();
 		driver.moveOverNode();
 		while (link != null) {
+			if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
+				driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
+				continue;
+			}
 			Link nextLink = driver.chooseNextLink();
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 public class TransitSchedule {
 

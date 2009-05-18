@@ -14,10 +14,6 @@
 	<module name="plans">
 		<param name="inputPlansFile" value="test/input/playground/marcel/pt/plans.xml" />
 	</module>
-	
-	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/input/playground/marcel/pt/transitSchedule/facilities.xml" />
-	</module>
 
 	<module name="controler">
 		<param name="outputDirectory" value="./output/transitIntegrationTest" />

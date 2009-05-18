@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.marcel.pt.otfvis.FacilityDrawer;
@@ -43,7 +44,6 @@ import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class TransitQueueSimulation extends QueueSimulation {
 	
@@ -68,7 +68,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	protected void cleanupSim() {
 		this.otfServer.cleanup();

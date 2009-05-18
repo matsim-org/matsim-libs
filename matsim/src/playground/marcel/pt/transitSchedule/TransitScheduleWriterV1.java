@@ -31,6 +31,7 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 

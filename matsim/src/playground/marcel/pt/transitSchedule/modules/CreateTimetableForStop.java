@@ -23,11 +23,12 @@ package playground.marcel.pt.transitSchedule.modules;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.matsim.transitSchedule.TransitStopFacility;
+
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class CreateTimetableForStop {
 

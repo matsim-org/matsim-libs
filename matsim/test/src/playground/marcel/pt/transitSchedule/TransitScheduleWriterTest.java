@@ -36,6 +36,7 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.transitSchedule.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 public class TransitScheduleWriterTest extends MatsimTestCase {

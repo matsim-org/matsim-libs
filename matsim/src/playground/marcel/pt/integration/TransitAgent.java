@@ -23,10 +23,10 @@ package playground.marcel.pt.integration;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class TransitAgent extends PersonAgent implements PassengerAgent {
 

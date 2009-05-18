@@ -29,6 +29,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 public class TransitRoute {
 

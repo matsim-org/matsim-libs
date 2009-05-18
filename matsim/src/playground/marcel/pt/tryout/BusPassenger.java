@@ -22,10 +22,10 @@ package playground.marcel.pt.tryout;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitStopFacility;
 
 public class BusPassenger extends PersonImpl implements PassengerAgent {
 
