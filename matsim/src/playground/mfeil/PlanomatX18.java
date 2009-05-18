@@ -41,7 +41,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -51,6 +50,7 @@ import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mfeil.config.PlanomatXConfigGroup;
@@ -78,6 +78,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private static final Logger 			log = Logger.getLogger(PlanomatX18.class);
 	private final String					finalOpt;
 	
+	private final LegTravelTimeEstimator legTravelTimeEstimator;
+	
 	
 	
 	//////////////////////////////////////////////////////////////////////
@@ -85,16 +87,22 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public PlanomatX18 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator){
+	public PlanomatX18 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc){
 		this.preProcessRoutingData 	= preProcessRoutingData;
 		this.factory				= controler.getScoringFunctionFactory();
 		//this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(this.preProcessRoutingData));
 		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (this.factory);
-		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
-				controler.getNetwork(), 
-				controler.getTraveltimeBinSize());
-		LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+		//DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
+		//		controler.getNetwork(), 
+		//		controler.getTraveltimeBinSize());
+		/*LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+				controler.getTravelTimeCalculator(), 
+				controler.getTravelCostCalculator(), 
+				tDepDelayCalc, 
+				controler.getNetwork());*/
+		//this.legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+		this.legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
 				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
@@ -141,7 +149,18 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//////////////////////////////////////////////////////////////////////
 		// Initialization
 		//////////////////////////////////////////////////////////////////////
-		//log.info("Start for Person "+plan.getPerson().getId());
+
+		/* Test of legEstimator, to be removed later */
+		//if (plan.getPerson().getId().toString().equals("108")){
+		//	for (int i=1;i<plan.getPlanElements().size();i=i+2){
+		//		double tt =	this.legTravelTimeEstimator.getLegTravelTimeEstimation(plan.getPerson().getId(), ((Leg)(plan.getPlanElements().get(i))).getDepartureTime(), (Activity)(plan.getPlanElements().get(i-1)), (Activity)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
+		//		System.out.println("Leg "+i+": Plan: dt = "+((Leg)plan.getPlanElements().get(i)).getDepartureTime()+", tt = "+(((Leg)plan.getPlanElements().get(i)).getArrivalTime()-((Leg)plan.getPlanElements().get(i)).getDepartureTime())+"; tt laut legEstimator = "+tt);
+		//	}
+			
+		//}
+		
+		
+		
 		
 		MatsimRandom.getLocalInstance();
 		
@@ -205,9 +224,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-	//		for (int z=1;z<plan.getPlanElements().size();z+=2){
-	//			((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
-	//		}
+			for (int z=1;z<plan.getPlanElements().size();z+=2){
+				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+			}
 	//	}
 		this.router.run(plan);
 		this.timer.run(plan);
@@ -229,9 +248,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			/* Routing*/
 		//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-		//		for (int z=1;z<plan.getPlanElements().size();z+=2){
-		//			((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
-		//		}
+				for (int z=1;z<plan.getPlanElements().size();z+=2){
+					((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+				}
 		//	}
 			this.router.run(plan);
 			this.timer.run(plan);
@@ -295,9 +314,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					
 					/* Routing*/
 				//	if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-				//		for (int z=1;z<neighbourhood[x].getPlanElements().size();z+=2){
-				//			((Leg)(neighbourhood[x].getPlanElements().get(z))).setMode(TransportMode.car);
-				//		}
+						for (int z=1;z<neighbourhood[x].getPlanElements().size();z+=2){
+							((Leg)(neighbourhood[x].getPlanElements().get(z))).setMode(TransportMode.car);
+						}
 				//	}
 					this.router.run(neighbourhood[x]);
 										
@@ -333,9 +352,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				stream.print(infoOnNeighbourhood[x][0]+"\t");
 				stream.print(tabuInNeighbourhood[x]+"\t");
 				stream.print(scoredInNeighbourhood[x]+"\t");
-				for (int i= 0;i<neighbourhood[x].getActsLegs().size();i=i+2){
-					Act act = (Act)neighbourhood[x].getActsLegs().get(i);
-					if (i!=neighbourhood[x].getActsLegs().size()-1) stream.print(act.getType()+"\t"+((Leg)(neighbourhood[x].getActsLegs()).get(i+1)).getMode()+"\t");
+				for (int i= 0;i<neighbourhood[x].getPlanElements().size();i=i+2){
+					Activity act = (Activity)neighbourhood[x].getPlanElements().get(i);
+					if (i!=neighbourhood[x].getPlanElements().size()-1) stream.print(act.getType()+"\t"+((Leg)(neighbourhood[x].getPlanElements()).get(i+1)).getMode()+"\t");
 					else stream.print(act.getType()+"\t");
 				}
 				stream.print(infoOnNeighbourhood[x][1]+"\t");
@@ -388,10 +407,10 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			this.finalTimer.run(tabuList.get(tabuList.size()-1));
 			tabuList.get(tabuList.size()-1).setScore(this.scorer.getScore(tabuList.get(tabuList.size()-1)));
 			scoreStat.add(tabuList.get(tabuList.size()-1).getScoreAsPrimitiveType());
-	/*		stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
-			for (int i= 0;i<tabuList.get(tabuList.size()-1).getActsLegs().size();i=i+2){
-				Act act = (Act)tabuList.get(tabuList.size()-1).getActsLegs().get(i);
-				if (i!=tabuList.get(tabuList.size()-1).getActsLegs().size()-1) stream.print(act.getType()+"\t"+((Leg)(tabuList.get(tabuList.size()-1).getActsLegs()).get(i+1)).getMode()+"\t");
+		/*	stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
+			for (int i= 0;i<tabuList.get(tabuList.size()-1).getPlanElements().size();i=i+2){
+				Activity act = (Activity)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
+				if (i!=tabuList.get(tabuList.size()-1).getPlanElements().size()-1) stream.print(act.getType()+"\t"+((Leg)(tabuList.get(tabuList.size()-1).getPlanElements()).get(i+1)).getMode()+"\t");
 				else stream.print(act.getType()+"\t");
 			}
 			stream.println(); */

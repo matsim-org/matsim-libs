@@ -20,11 +20,13 @@
 package playground.mfeil;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
@@ -37,10 +39,11 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 	
 	
-	private final NetworkLayer 				network;
-	private final Controler					controler;
-	private final PreProcessLandmarks		preProcessRoutingData;
-	private final LocationMutatorwChoiceSet locator;
+	private final NetworkLayer 						network;
+	private final Controler							controler;
+	private final PreProcessLandmarks				preProcessRoutingData;
+	private final LocationMutatorwChoiceSet 		locator;
+	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
 
 	
 	
@@ -52,6 +55,11 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 		this.controler = controler;
 		this.init(network);	
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
+		
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
+				this.network,
+				Gbl.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		this.controler.getEvents().addHandler(tDepDelayCalc);
 	}
 	
 	public PlanomatX12Initialiser (final ControlerMFeil controler, 
@@ -73,7 +81,7 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm planomatXAlgorithm;
-		planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, this.locator);
+		planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, this.locator, this.tDepDelayCalc);
 		return planomatXAlgorithm;
 	}
 	
