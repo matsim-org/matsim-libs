@@ -54,7 +54,7 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 	 */
 	public static void main(String[] args) {
 		Controler controler = new ControlerWithRemoveOldestPlan(args);
-		controler.addControlerListener(new FirstPersonPlanScoreMonitor());
+		controler.addControlerListener(new OnePersonPlanScoreMonitor());
 		controler.setWriteEventsInterval(0);
 		controler.setCreateGraphs(false);
 		controler.run();

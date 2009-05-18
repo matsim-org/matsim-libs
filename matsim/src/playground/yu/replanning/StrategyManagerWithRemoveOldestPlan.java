@@ -91,54 +91,44 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 
 	private void removeOldestPlan(Person person, int maxSize) {
 		List<Plan> plans = person.getPlans();
-
-		if (plans.size() <= maxSize) {
+		int size = plans.size();
+		if (size <= maxSize) {
 			return;
 		}
+
 		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
 		// initialize list of types
 		for (Plan plan : plans) {
 			Integer cnt = typeCounts.get(plan.getType());
 			if (cnt == null) {
-				typeCounts.put(plan.getType(), Integer.valueOf(1));
+				typeCounts.put(plan.getType(), 1);
 			} else {
-				typeCounts.put(plan.getType(), Integer
-						.valueOf(cnt.intValue() + 1));
+				typeCounts.put(plan.getType(), cnt + 1);
 			}
 		}
 
-		int size = plans.size();
 		while (size > maxSize) {
-			Plan oldest = null;
+			Plan oldestPlan = null;
 			for (int i = 0; i < size; i++) {
-				Plan tmp = plans.get(i);
-				if (typeCounts.get(tmp.getType()).intValue() > 1) {
-					oldest = tmp;
+				Plan plan_i = plans.get(i);
+				if (typeCounts.get(plan_i.getType()) > 1) {
+					oldestPlan = plan_i;
 					break;
 				}
 			}
-			if (oldest != null) {
-				person.removePlan(oldest);
+			if (oldestPlan != null) {
+				person.removePlan(oldestPlan);
 				size = plans.size();
-				if (oldest.isSelected()) {
+				if (oldestPlan.isSelected()) {
 					person.setSelectedPlan(person.getRandomPlan());
 				}
 				// reduce the number of plans of this type
-				Integer cnt = typeCounts.get(oldest.getType());
-				typeCounts.put(oldest.getType(), Integer
-						.valueOf(cnt.intValue() - 1));
+				Integer cnt = typeCounts.get(oldestPlan.getType());
+				typeCounts.put(oldestPlan.getType(), cnt - 1);
 			} else {
 				return; // should only happen if we have more different
 				// plan-types than maxSize
 			}
 		}
 	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-	}
-
 }
