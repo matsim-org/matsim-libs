@@ -62,6 +62,19 @@ public class LinkToLinkTravelTimeCalculator extends AbstractTravelTimeCalculator
 
 	private boolean calculateLinkToLinkTravelTimes;
 	
+	public LinkToLinkTravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+		this(network, 15*60, 30*3600, ttconfigGroup);	// default timeslot-duration: 15 minutes
+	}
+
+	public LinkToLinkTravelTimeCalculator(final Network network, final int timeslice, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+		this(network, timeslice, 30*3600, ttconfigGroup); // default: 30 hours at most
+	}
+
+	public LinkToLinkTravelTimeCalculator(Network network, int timeslice,	int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory(), ttconfigGroup);
+	}
+
+	
 	public LinkToLinkTravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 			TravelTimeAggregatorFactory factory, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		super(network, timeslice, maxTime, factory);
