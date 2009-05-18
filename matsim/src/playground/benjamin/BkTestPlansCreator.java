@@ -102,7 +102,7 @@ public class BkTestPlansCreator {
 			act3.setLinkId(id1);
 			plan.addActivity(act3);
 			
-			pop.addPerson(p);
+			pop.getPersons().put(p.getId(), p);
 //			homeEndTime++;				
 		}
 		log.info("created population...");

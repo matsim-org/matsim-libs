@@ -110,7 +110,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	public void endTag(final String name, final String content,
 			final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			this.plans.addPerson(this.currperson);
+			this.plans.getPersons().put(this.currperson.getId(), this.currperson);
 			this.currperson = null;
 		}
 		else if (PLAN.equals(name)) {

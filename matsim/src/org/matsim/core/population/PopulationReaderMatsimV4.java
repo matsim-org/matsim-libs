@@ -31,9 +31,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
@@ -164,7 +164,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			this.plans.addPerson(this.currperson);
+			this.plans.getPersons().put(this.currperson.getId(), this.currperson);
 			this.currperson = null;
 		} else if (DESIRES.equals(name)) {
 			this.currdesires = null;
