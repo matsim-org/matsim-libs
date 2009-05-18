@@ -29,7 +29,11 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
  * Root class of the population description (previously also called "plans file")
  */
 public interface Population extends BasicPopulation<Person> {
-	
+	/**
+	 * @deprecated use getPersons().put(...) instead
+	 * @see org.matsim.api.basic.v01.population.BasicPopulation#addPerson(org.matsim.api.basic.v01.population.BasicPerson)
+	 */
+	@Deprecated
 	public void addPerson(final Person p);
 
 	public PopulationBuilder getPopulationBuilder();
