@@ -7,7 +7,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -25,6 +24,7 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.transitSchedule.TransitLine;
@@ -66,7 +66,6 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 	///
 
 	//////////Simulation variables////////
-	private ActivityFacilities facilities;;
 	private TransitSchedule transitSchedule;
 	public List<ExperimentalTransitRoute> PlanExpTransRoute;
 	
@@ -317,7 +316,6 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 	}
 	
 	public void setFacilities(ActivityFacilities facilities, TransitSchedule transitSchedule){
-		this.facilities = facilities;
 		this.transitSchedule = transitSchedule;
 	}
 	
@@ -325,9 +323,9 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 		Node node = legRouteLinks.get(0).getFromNode();
 		Id idEgressFacility = legRouteLinks.get(legRouteLinks.size()-1).getToNode().getId();
 		
-		ActivityFacility accessFacility = facilities.getFacilities().get(node.getId());
+		TransitStopFacility accessFacility = this.transitSchedule.getFacilities().get(node.getId());
 		TransitLine line = this.transitSchedule.getTransitLines().get(((PTNode)node).getIdPTLine()); 
-		ActivityFacility egressFacility = facilities.getFacilities().get(idEgressFacility);
+		TransitStopFacility egressFacility = this.transitSchedule.getFacilities().get(idEgressFacility);
 		return new ExperimentalTransitRoute(accessFacility, line, egressFacility);
 	}  
 	
