@@ -122,7 +122,7 @@ public class MyRuns {
 		
 	}
 	
-	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos) {
+	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, NetworkLayer network) {
 
 		PopulationImpl population = null;
 
@@ -138,7 +138,7 @@ public class MyRuns {
 				}
 			}
 		}
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(inputFilename);
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -181,7 +181,7 @@ public class MyRuns {
 
 		PopulationImpl matsimAgentPopulation = new PopulationImpl();
 		matsimAgentPopulation.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation);
+		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		matsimAgentPopulation.printPlansCount();
 		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();

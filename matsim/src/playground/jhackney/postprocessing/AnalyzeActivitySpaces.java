@@ -47,7 +47,7 @@ public class AnalyzeActivitySpaces {
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldConnectLocations().run(world);
 
-		Population plans = Scenario.readPlans();
+		Population plans = Scenario.readPlans(network);
 			//read in social network
 //		System.out.println(" Initializing the social network ...");
 //		SocialNetwork snet=new SocialNetwork(plans);

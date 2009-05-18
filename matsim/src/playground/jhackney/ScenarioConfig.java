@@ -23,6 +23,7 @@ package playground.jhackney;
 import java.io.IOException;
 
 import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -217,18 +218,18 @@ public abstract class ScenarioConfig {
 		return Matrices.getSingleton();
 	}
 
-	public static final Population readPlans() {
-		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+//	public static final Population readPlans() {
+//		System.out.println("  reading plans xml file... ");
+//		Population plans = new PopulationImpl();
 //		System.out.println(Gbl.getConfig().plans().getInputFile());
 //		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
-		System.out.println(popFileName);
-		new MatsimPopulationReader(plans).readFile(popFileName);
-
-		System.out.println("  done.");
-		return plans;
-	}
-	public static final Population readPlans(final int i) {
+//		System.out.println(popFileName);
+//		new MatsimPopulationReader(plans).readFile(popFileName);
+//
+//		System.out.println("  done.");
+//		return plans;
+//	}
+	public static final Population readPlans(final Network network, final int i) {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
@@ -236,7 +237,7 @@ public abstract class ScenarioConfig {
 		String filename=input_directory +popFileName;
 //		System.out.println(filename);
 		System.out.println(filename);
-		new MatsimPopulationReader(plans).readFile(filename);
+		new MatsimPopulationReader(plans, network).readFile(filename);
 
 		System.out.println("  done.");
 		return plans;

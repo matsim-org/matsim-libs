@@ -50,7 +50,7 @@ public class EgoNetMakeActivitySpaces {
 		World world = Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		Population plans = Scenario.readPlans();
+		Population plans = Scenario.readPlans(network);
 		ActivityFacilities facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");

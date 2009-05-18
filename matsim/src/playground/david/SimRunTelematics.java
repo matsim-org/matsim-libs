@@ -28,7 +28,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.world.World;
 
 public class SimRunTelematics {
 
@@ -36,18 +35,13 @@ public class SimRunTelematics {
 		String netFileName = "test/simple/equil_net.xml";
 		String popFileName = "test/simple/equil_plans.xml";
 
-		Gbl.startMeasurement();
 		Gbl.createConfig(args);
-
-		World world = Gbl.createWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new MyPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();

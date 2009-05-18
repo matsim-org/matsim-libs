@@ -55,7 +55,7 @@ public class AnalyzeTimeCorrelations {
 		int i=500;
 //		read in plans
 		System.out.println(" Initializing the plans ...");
-		Population plans = Scenario.readPlans(i);
+		Population plans = Scenario.readPlans(network, i);
 		System.out.println("... done");
 
 		// read in events

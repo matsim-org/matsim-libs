@@ -20,14 +20,9 @@
 
 package playground.jhackney;
 
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldCreateRasterLayer;
-import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.jhackney.algorithms.PersonsRandomizeId;
 
@@ -44,8 +39,8 @@ public class ScenarioParsing {
 		Scenario.setUpScenarioConfig();
 
 		Scenario.readWorld();
-		Scenario.readNetwork();
-		Population plans = Scenario.readPlans();
+		Network network = Scenario.readNetwork();
+		Population plans = Scenario.readPlans(network);
 		
 //		System.out.println("  reading world xml file... ");
 //		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());

@@ -30,9 +30,7 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -56,18 +54,6 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private MatsimXmlParser delegate = null;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
-
-	/**
-	 * Creates a new reader for MATSim plans (population) files.
-	 * Uses the network available in Gbl.getWorld().
-	 *
-	 * @param plans The data structure where to store the persons with their plans.
-	 * @deprecated use {@link #MatsimPopulationReader(Population, NetworkLayer)}
-	 */
-	@Deprecated
-	public MatsimPopulationReader(final BasicPopulation plans) {
-		this(plans, (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE));
-	}
 
 	/**
 	 * Creates a new reader for MATSim plans (population) files.

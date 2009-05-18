@@ -64,7 +64,7 @@ public class AnalyzeScores {
 		NetworkLayer network =ScenarioConfig.readNetwork();
 		new WorldConnectLocations().run(world);
 		int i=500;
-		Population plans = ScenarioConfig.readPlans(i);
+		Population plans = ScenarioConfig.readPlans(network, i);
 		System.out.println(" Initializing the social network ...");
 		
 		// Override the config to take the last iteration
