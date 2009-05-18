@@ -99,7 +99,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		
 		Events events2 = new Events();
 		
-		LinkToLinkTravelTimeCalculator ttcalc = new LinkToLinkTravelTimeCalculator(network, timeBinSize, 30*3600, factory, scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory, scenario.getConfig().travelTimeCalculator());
 		events2.addHandler(ttcalc);
 		for (BasicEventImpl e : eventsList){
 			events2.processEvent(e);
@@ -165,7 +165,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		int timeBinSize = 15*60;
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		LinkToLinkTravelTimeCalculator ttcalc = new LinkToLinkTravelTimeCalculator(network, timeBinSize, 12*3600, factory, scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, factory, scenario.getConfig().travelTimeCalculator());
 
 		Person person = new PersonImpl(new IdImpl(1));
 		

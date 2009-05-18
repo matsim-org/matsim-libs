@@ -47,7 +47,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.LinkToLinkTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
@@ -113,7 +113,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private void runATestRun(final PlanomatTestRun testRun) {
 
-		LinkToLinkTravelTimeCalculator tTravelEstimator = new LinkToLinkTravelTimeCalculator(this.scenario.getNetwork(), 900, this.scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), 900, this.scenario.getConfig().travelTimeCalculator());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 

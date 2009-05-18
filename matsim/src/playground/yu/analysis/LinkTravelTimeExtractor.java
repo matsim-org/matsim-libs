@@ -7,7 +7,9 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -45,7 +47,9 @@ public class LinkTravelTimeExtractor {
 
 		Events events = new Events();
 
-		TravelTimeCalculator ttc = new TravelTimeCalculator(network, timeBin);
+		Config config = new ScenarioImpl().getConfig();
+		
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, timeBin, config.travelTimeCalculator());
 		events.addHandler(ttc);
 
 		System.out.println("-->reading evetsfile: " + eventsFilename);

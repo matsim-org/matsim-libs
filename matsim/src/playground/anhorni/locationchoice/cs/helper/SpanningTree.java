@@ -25,11 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -121,7 +123,7 @@ public class SpanningTree {
 		HashMap<Id,NodeData> tree = this.nodeData;
 		for (Id id : tree.keySet()) {
 			NodeData d = tree.get(id);
-			if (d.getPrevNode() != null && d.getCost() <= travelTimeBudget) {
+			if ((d.getPrevNode() != null) && (d.getCost() <= travelTimeBudget)) {
 					// TODO: Check if this is ok 'prev'!
 					nodesList.add(d.getPrevNode());
 					travelTimesList.add(d.getCost());		
@@ -179,9 +181,9 @@ public class SpanningTree {
 	public static void main(String[] args) {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("../../input/network.xml");
-		
-		if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
-		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600);
+		Config conf = Gbl.getConfig();
+		if (conf == null) { conf = Gbl.createConfig(null); }
+		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator());
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
 		Node origin = network.getNode(new IdImpl(1));
 		st.setOrigin(origin);

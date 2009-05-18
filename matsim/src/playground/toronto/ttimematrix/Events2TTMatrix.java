@@ -110,7 +110,7 @@ public class Events2TTMatrix {
 
 		if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
 
-		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600, Gbl.getConfig().travelTimeCalculator());
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
 		TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 

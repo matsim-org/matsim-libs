@@ -57,11 +57,11 @@ public class TravelTimeCalculatorBuilder {
 		}
 		
 		if (this.travelTimeCalcConfigGroup.isCalculateLinkToLinkTravelTimes()){
-			calculator = new LinkToLinkTravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
+			calculator = new TravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
 					endTime, factory, this.travelTimeCalcConfigGroup);		
 		}
 		else {
-			calculator = new LinkToLinkTravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
+			calculator = new TravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
 					endTime, factory, this.travelTimeCalcConfigGroup);
 		}
 		

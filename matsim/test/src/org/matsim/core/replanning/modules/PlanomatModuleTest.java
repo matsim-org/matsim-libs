@@ -39,7 +39,7 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.LinkToLinkTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -90,7 +90,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		config.planomat().setPossibleModes("car,pt");
 
 		Events emptyEvents = new Events();
-		LinkToLinkTravelTimeCalculator tTravelEstimator = new LinkToLinkTravelTimeCalculator(this.network, 900, config.travelTimeCalculator());
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, 900, config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
 		

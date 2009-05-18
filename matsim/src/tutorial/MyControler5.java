@@ -69,7 +69,7 @@ public class MyControler5 {
 		strategyManager.addStrategy(strategy1, 0.9);
 		strategyManager.addStrategy(strategy2, 0.1);
 
-		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(scenario.getNetwork());
+		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc, config.charyparNagelScoring());
 		strategy2.addStrategyModule(new ReRouteDijkstra(scenario.getNetwork(), costCalc, ttimeCalc));
 		events.addHandler(ttimeCalc);
