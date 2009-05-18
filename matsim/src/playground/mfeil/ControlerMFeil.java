@@ -114,6 +114,7 @@ public class ControlerMFeil extends Controler {
 	
 	@Override
 		protected ScoringFunctionFactory loadScoringFunctionFactory() {
+			//return new PlanomatXScoringFunctionFactory(this.getConfig().charyparNagelScoring());
 			return new JohScoringFunctionFactory();
 	}
 	
