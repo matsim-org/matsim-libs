@@ -4,12 +4,14 @@
 <transitSchedule>
 
 	<transitStops>
+		<stopFacility id="home" x="400.0" y="399.0" linkRefId="2" />
 		<stopFacility id="stop1" x="100.0" y="900.0" linkRefId="1" />
 		<stopFacility id="stop2" x="1000.0" y="500.0" linkRefId="3" />
 		<stopFacility id="stop3" x="2800.0" y="500.0" linkRefId="5" />
 		<stopFacility id="stop4" x="3300.0" y="500.0" linkRefId="5" />
 		<stopFacility id="stop5" x="4100.0" y="499.0" linkRefId="6" />
 		<stopFacility id="stop6" x="4800.0" y="200.0" linkRefId="8" />
+		<stopFacility id="work" x="4700.0" y="700.0" linkRefId="7" />
 	</transitStops>
 
 	<transitLine id="T1">
