@@ -26,15 +26,31 @@ import org.matsim.core.router.util.TravelTime;
 
 public abstract class AbstractTravelTimeCalculator implements TravelTime, EventHandler{
 
-	private final Network network;
 	protected final int timeslice;
 	protected final int numSlots;
 	private final TravelTimeAggregatorFactory factory;
 	private  final AbstractTravelTimeAggregator aggregator;
 
+	/**
+	 * 
+	 * @param network
+	 * @param timeslice
+	 * @param maxTime
+	 * @param factory
+	 * @deprecated use the constructor without reference to network
+	 */
+	@Deprecated
 	public AbstractTravelTimeCalculator(final Network network, final int timeslice, 
 			final int maxTime, TravelTimeAggregatorFactory factory) {
-		this.network = network;
+		this.factory = factory;
+		this.timeslice = timeslice;
+		this.numSlots = (maxTime / this.timeslice) + 1;
+		this.aggregator = this.factory.createTravelTimeAggregator(this.numSlots, this.timeslice);
+	}
+	
+	
+	public AbstractTravelTimeCalculator(final int timeslice, 
+			final int maxTime, TravelTimeAggregatorFactory factory) {
 		this.factory = factory;
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
@@ -51,10 +67,6 @@ public abstract class AbstractTravelTimeCalculator implements TravelTime, EventH
 
 	protected AbstractTravelTimeAggregator getTravelTimeAggregator() {
 		return aggregator;
-	}
-	
-	protected Network getNetwork() {
-		return network;
 	}
 	
 	public abstract double getLinkTravelTime(Link link, double time);
