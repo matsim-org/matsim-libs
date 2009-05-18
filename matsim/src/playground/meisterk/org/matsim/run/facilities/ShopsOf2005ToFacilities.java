@@ -57,9 +57,9 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
@@ -701,7 +701,7 @@ public class ShopsOf2005ToFacilities {
 						System.out.println("There it is: " + name);
 						System.out.flush();
 					}
-					ActivityFacility newFacility = facilities.createFacility(new IdImpl(name), ch1903Coordinates);
+					/*ActivityFacility newFacility =*/ facilities.createFacility(new IdImpl(name), ch1903Coordinates);
 				}
 			}
 
@@ -784,7 +784,7 @@ public class ShopsOf2005ToFacilities {
 				//System.out.print(OPEN + ":\t");
 				for (String token : openTokens) {
 					if (!token.equals("") && !token.equals(openTokens[0])) {
-						openNumbers.add(Integer.parseInt(token));
+						openNumbers.add(Integer.valueOf(token));
 						//System.out.print(token + "\t");
 					}
 				}
@@ -794,7 +794,7 @@ public class ShopsOf2005ToFacilities {
 				//System.out.print(CLOSE + ":\t");
 				for (String token : closeTokens) {
 					if (!token.equals("")) {
-						closeNumbers.add(Integer.parseInt(token));
+						closeNumbers.add(Integer.valueOf(token));
 						//System.out.print(token + "\t");
 					}
 				}
@@ -822,10 +822,8 @@ public class ShopsOf2005ToFacilities {
 						}
 
 						previousOpenSeconds = openSeconds;
-						String openTimeString = Time.writeTime(openSeconds);
-						String closeTimeString = Time.writeTime(closeSeconds);
 
-						opentime = new OpeningTimeImpl(days[dayPointer].getAbbrevEnglish(), openTimeString, closeTimeString);
+						opentime = new OpeningTimeImpl(days[dayPointer].getAbbrevEnglish(), openSeconds, closeSeconds);
 
 						shopping.addOpeningTime(opentime);
 
@@ -951,10 +949,7 @@ public class ShopsOf2005ToFacilities {
 								case FRIDAY:
 									System.out.println("Adding times to weekdays...");
 									for (int weekday = 0; weekday <= 4; weekday++) {
-										opentime = new OpeningTimeImpl(days[weekday]
-										                             .getAbbrevEnglish(), Time
-										                             .writeTime(oldTime), Time
-										                             .writeTime(time));
+										opentime = new OpeningTimeImpl(days[weekday].getAbbrevEnglish(), oldTime, time);
 										shopping.addOpeningTime(opentime);
 									}
 									break;
@@ -963,8 +958,8 @@ public class ShopsOf2005ToFacilities {
 								System.out.println("Adding times to " + englishDayString + "...");
 								opentime = new OpeningTimeImpl(
 										englishDayString,
-										Time.writeTime(oldTime),
-										Time.writeTime(time));
+										oldTime,
+										time);
 								shopping.addOpeningTime(opentime);
 								break;
 								}
@@ -1083,8 +1078,8 @@ public class ShopsOf2005ToFacilities {
 									System.out.println("Adding times to " + englishDayString + "...");
 									opentime = new OpeningTimeImpl(
 											englishDayString,
-											Time.writeTime(openingHour),
-											Time.writeTime(time));
+											openingHour,
+											time);
 									shopping.addOpeningTime(opentime);
 
 								}
@@ -1171,8 +1166,8 @@ public class ShopsOf2005ToFacilities {
 							System.out.println("Adding times to " + englishDayString + "...");
 							opentime = new OpeningTimeImpl(
 									englishDayString,
-									openingHour,
-									time);
+									Time.parseTime(openingHour),
+									Time.parseTime(time));
 							shopping.addOpeningTime(opentime);
 						}
 
@@ -1265,8 +1260,8 @@ public class ShopsOf2005ToFacilities {
 											for (int weekday = 0; weekday <= 4; weekday++) {
 												opentime = new OpeningTimeImpl(
 														days[weekday].getAbbrevEnglish(),
-														Time.writeTime(openingHour),
-														Time.writeTime(time));
+														openingHour,
+														time);
 												shopping.addOpeningTime(opentime);
 											}
 											break;
@@ -1275,8 +1270,8 @@ public class ShopsOf2005ToFacilities {
 											System.out.println("Adding times to saturday...");
 											opentime = new OpeningTimeImpl(
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
-													Time.writeTime(openingHour),
-													Time.writeTime(time));
+													openingHour,
+													time);
 											shopping.addOpeningTime(opentime);
 											break;
 										}
@@ -1417,16 +1412,16 @@ public class ShopsOf2005ToFacilities {
 											for (int weekday = 0; weekday <= 4; weekday++) {
 												opentime = new OpeningTimeImpl(
 														days[weekday].getAbbrevEnglish(),
-														Time.writeTime(openingHour),
-														Time.writeTime(time));
+														openingHour,
+														time);
 												shopping.addOpeningTime(opentime);
 											}
 										} else if (openTimeString.equals(saturdayToken)) {
 											System.out.println("Adding times to saturday...");
 											opentime = new OpeningTimeImpl(
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
-													Time.writeTime(openingHour),
-													Time.writeTime(time));
+													openingHour,
+													time);
 											shopping.addOpeningTime(opentime);
 										}
 									}

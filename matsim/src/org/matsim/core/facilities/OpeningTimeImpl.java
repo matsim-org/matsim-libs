@@ -27,21 +27,9 @@ import org.matsim.core.utils.misc.Time;
 
 public class OpeningTimeImpl implements OpeningTime {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	private DayType day;
 	private double startTime;
 	private double endTime;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructor
-	//////////////////////////////////////////////////////////////////////
-	@Deprecated
-	public OpeningTimeImpl(final DayType day, final String start_time, final String end_time) {
-		this(day, Time.parseTime(start_time), Time.parseTime(end_time));
-	}
 
 	public OpeningTimeImpl(final DayType day, final double startTime, final double endTime) {
 		this.day = day;
