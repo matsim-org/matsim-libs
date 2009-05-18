@@ -105,7 +105,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		
 	}
 	
-	public void testSingleIterationIncomeScoring() {
+	public void estSingleIterationIncomeScoring() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configIncomeScoreTest.xml");
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
