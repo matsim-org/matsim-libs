@@ -44,8 +44,10 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.snapshots.writers.PositionInfo;
+
 
 /**
  * A QueueLane has no own active state and only offers isActive() for a
@@ -354,7 +356,7 @@ public class QueueLane {
 	 * @param now
 	 *          The current time.
 	 */
-	private void moveLaneToBuffer(final double now) {
+	protected void moveLaneToBuffer(final double now) {
 		QueueVehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
@@ -374,6 +376,22 @@ public class QueueLane {
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
 				continue;
 			}
+			
+			if (veh.getDriver() instanceof TransitDriverAgent) {
+				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
+				TransitStopFacility stop = driver.getNextTransitStop();
+				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
+					double delay = driver.handleTransitStop(driver.getNextTransitStop(), now);
+					if (delay > 0.0) {
+						veh.setEarliestLinkExitTime(veh.getEarliestLinkExitTime() + delay);
+					}
+					/* start over: either this veh is still first in line, 
+					 * but has another stop on this link, or on another link, then it is moved on
+					 */
+					continue; 
+				}
+			}
+			
 
 			/* is there still room left in the buffer, or is it overcrowded from the
 			 * last time steps? */
