@@ -57,7 +57,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 	public static class MyEventsHandler implements PersonEventHandler, Serializable{
 
 		private static final long serialVersionUID = 1L;
-		public final static List<PersonEvent> events = new ArrayList<PersonEvent>();
+		public final static List<String> events = new ArrayList<String>();
 		private final String agentId;
 		
 		public MyEventsHandler(String agentId) {
@@ -66,7 +66,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 		public void handleEvent(PersonEvent event) {
 			if(event.getPersonId().toString().equals(this.agentId)){
-				events.add(event);
+				events.add(event.toString());
 			}
 			
 		}
@@ -171,8 +171,8 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			}
 
 			int offset = 0;
-			for(BasicEventImpl event : MyEventsHandler.events) {
-				this.texts.add(InfoText.showTextPermanent(event.toString(),(float)pos.x + 150, (float)pos.y + 150 + 80*offset++,-0.0005f));
+			for(String event : MyEventsHandler.events) {
+				this.texts.add(InfoText.showTextPermanent(event,(float)pos.x + 150, (float)pos.y + 150 + 80*offset++,-0.0005f));
 			}
 			MyEventsHandler.events.clear();
 
