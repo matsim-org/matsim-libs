@@ -21,6 +21,7 @@
 package org.matsim.counts.algorithms;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
@@ -690,9 +691,19 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 		double[] meanError = ep.getMeanRelError();
 		double[] meanBias = ep.getMeanAbsBias();
-		String outdir = kmlFilename.substring(0, kmlFilename.lastIndexOf(System.getProperty("file.separator")));
-		String file = outdir + "/biasErrorGraphData.txt";
-		log.info("writing chart data to " + file);
+		int index = kmlFilename.lastIndexOf(System.getProperty("file.separator"));
+		if (index == -1){
+			index = kmlFilename.lastIndexOf("/");
+		}
+		String outdir;
+		if (index == -1) {
+			outdir = "";
+		}
+		else {
+			outdir = kmlFilename.substring(0, index) + System.getProperty("file.separator");
+		}
+		String file = outdir + "biasErrorGraphData.txt";
+		log.info("writing chart data to " + new File(file).getAbsolutePath());
 		try {
 			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
 			StringBuffer buffer = new StringBuffer();
