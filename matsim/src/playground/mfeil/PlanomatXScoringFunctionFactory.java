@@ -21,17 +21,43 @@
 package playground.mfeil;
 
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.scoring.*;
+import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
+import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
 /**
- * A factory to create {@link JohScoringFunction}s.
+ * A factory to create {@link JohScoringFunction}s. Based on new modular approach.
  *
  * @author mfeil
  */
-public class JohScoringFunctionFactory implements ScoringFunctionFactory {
+public class PlanomatXScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return new JohScoringFunction(plan);
+	private final CharyparNagelScoringParameters params;
+	
+	public PlanomatXScoringFunctionFactory(final CharyparNagelScoringConfigGroup config) {
+		this.params = new CharyparNagelScoringParameters(config);
+	}
+	
+	/**
+	 * JohScoringFunction for activities
+	 * Standard LegScoringFunction for legs
+	 * No further score types
+	 * 
+	 * @param plan
+	 * @return
+	 */
+	public ScoringFunction getNewScoringFunction(Plan plan) {
+
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+
+		scoringFunctionAccumulator.addScoringFunction(new ModularJohScoringFunction(plan));
+		
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, this.params));
+
+		return scoringFunctionAccumulator;
 	}
 
 }

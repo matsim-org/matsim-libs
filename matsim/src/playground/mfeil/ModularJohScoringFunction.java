@@ -29,8 +29,10 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.core.scoring.interfaces.LegScoring;
+import org.matsim.core.scoring.interfaces.ActivityScoring;
+import org.matsim.core.scoring.interfaces.BasicScoring;
 
 /**
  * New scoring function following Joh's dissertation:
@@ -44,7 +46,7 @@ import org.matsim.core.utils.misc.Time;
  * @author mfeil
  */
 
-public class JohScoringFunction implements ScoringFunction {
+public class ModularJohScoringFunction implements ActivityScoring, BasicScoring {
 
 	protected final Person person;
 	protected final Plan plan;
@@ -71,25 +73,25 @@ public class JohScoringFunction implements ScoringFunction {
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	private static boolean scoreActs = true;
 
-	private static final Logger log = Logger.getLogger(JohScoringFunction.class);
+	private static final Logger log = Logger.getLogger(ModularJohScoringFunction.class);
 	
 	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = -6; //war -6
-	private static double marginalUtilityOfLateArrival = -18; //war -40
-	private static double marginalUtilityOfEarlyDeparture = -0; // war -6
-	private static double marginalUtilityOfTraveling = -6; // war für alle -12
-	private static double marginalUtilityOfTravelingPT = -6; // public transport
-	private static double marginalUtilityOfTravelingWalk = -6;
+	private static double marginalUtilityOfWaiting = -6;
+	private static double marginalUtilityOfLateArrival = -40; 
+	private static double marginalUtilityOfEarlyDeparture = -6;
+	private static double marginalUtilityOfTraveling = -12;
+	private static double marginalUtilityOfTravelingPT = -12; // public transport
+	private static double marginalUtilityOfTravelingWalk = -12;
 	private static double marginalUtilityOfDistance = 0;
 	
 	private static final double uMin_home = 0;
 	private static final double uMin_work = 0;
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
-	private static final double uMax_home = 72; //120
-	private static final double uMax_work= 60;  //100
-	private static final double uMax_shopping = 24; //40
-	private static final double uMax_leisure = 48;  //80
+	private static final double uMax_home = 120;
+	private static final double uMax_work= 80;
+	private static final double uMax_shopping = 40;
+	private static final double uMax_leisure = 60;
 	private static final double alpha_home = 6;
 	private static final double alpha_work = 4;
 	private static final double alpha_shopping = 1;
@@ -111,7 +113,7 @@ public class JohScoringFunction implements ScoringFunction {
 	
 	
 	
-	public JohScoringFunction(final Plan plan) {
+	public ModularJohScoringFunction(final Plan plan) {
 		init();
 		this.reset();
 
@@ -128,15 +130,23 @@ public class JohScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 
 	}
-	
+	/*
 	// the activity is currently handled by startLeg()
 	public void startActivity(final double time, final Activity act) {
 	}
 
 	public void endActivity(final double time) {
 	}
-	
-	
+	*/
+	public void startActivity(final double time, final Activity act) {
+		this.lastTime = time;
+	}
+
+	public void endActivity(final double time) {
+		handleAct(time);
+		this.lastTime = time;
+	}
+	/*
 	public void startLeg(final double time, final Leg leg) {
 		
 		if (this.index % 2 == 0) {
@@ -153,7 +163,7 @@ public class JohScoringFunction implements ScoringFunction {
 		handleLeg(time);
 		this.lastTime = time;
 	}
-
+	 */
 	public void agentStuck(final double time) {
 		this.lastTime = time;
 	}
@@ -251,10 +261,12 @@ public class JohScoringFunction implements ScoringFunction {
 
 		// utility of performing an action
 		if (duration > 0) {
-			/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
-			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
-			double utilWait = marginalUtilityOfWaiting / 3600 * duration;
-			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+			//if (duration>=3600){ // to adjust Planomat to TimeModeChoicer minimum duration
+				/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
+				double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
+				double utilWait = marginalUtilityOfWaiting / 3600 * duration;
+				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+			//}
 		} else if (duration<0){
 			tmpScore += 2*marginalUtilityOfLateArrival / 3600 *Math.abs(duration);
 			//tmpScore += -100000; // Negative durations results in refusal of plan
@@ -461,13 +473,6 @@ public class JohScoringFunction implements ScoringFunction {
 		} else {
 			this.score += calcActScore(this.lastTime, time, act);
 		}
-		this.index++;
+		this.index+=2;
 	}
-
-	private void handleLeg(final double time) {
-		Leg leg = (Leg)this.plan.getPlanElements().get(this.index);
-		this.score += calcLegScore(this.lastTime, time, leg);
-		this.index++;
-	}
-
 }
