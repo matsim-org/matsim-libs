@@ -27,24 +27,13 @@ import org.matsim.api.basic.v01.Id;
 * @author dgrether
 */
 public interface BasicPopulation<T extends BasicPerson> {
-	// Bin inzwischen der Meinung, dass wir es bei "population" lassen sollten, und dafuer "households" 
-	// noch einhaengen sollten.  kai, feb09
 
 	public String getName();
 	
 	public void setName(String name);
 
-	/** @deprecated please use getPersons().get(personId) instead. */
-	@Deprecated
-	public T getPerson(Id personId);
-
 	public Map<Id, T> getPersons();
 	
 	public BasicPopulationBuilder getPopulationBuilder();
-	
-	// TODO:
 
-//	public Map<Id,?> getHouseholds() ;
-//  public void addHousehold( ?? ) ;
-	
 }
