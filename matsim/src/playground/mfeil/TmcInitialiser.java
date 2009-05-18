@@ -38,18 +38,24 @@ public class TmcInitialiser extends AbstractMultithreadedModule{
 	
 	private final PlanScorer 				scorer;
 	private final Controler					controler;
+	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
 
 	
 	public TmcInitialiser (Controler controler, ScoringFunctionFactory factory) {
 		this.scorer = new PlanScorer(factory);
 		this.controler = controler;
+		
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
+				controler.getNetwork(),
+				Gbl.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		this.controler.getEvents().addHandler(tDepDelayCalc);
 	}
 
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer1 (this.controler, this.scorer);
+		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer1 (this.controler, this.tDepDelayCalc, this.scorer);
 		return timeOptAlgorithm;
 	}
 }

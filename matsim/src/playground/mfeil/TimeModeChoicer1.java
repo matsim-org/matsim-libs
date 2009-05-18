@@ -86,13 +86,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.routes					= null;
 	}
 	
-	public TimeModeChoicer1 (Controler controler, PlanScorer scorer){
+	public TimeModeChoicer1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc, PlanScorer scorer){
 		
 		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer 				= scorer;
-		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
-				controler.getNetwork(), 
-				controler.getTraveltimeBinSize());
 		this.estimator				= Gbl.getConfig().planomat().getLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
 				controler.getTravelCostCalculator(), 
@@ -206,18 +203,19 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					if (this.possibleModes.length>0){						
 						tmpScore = this.chooseModeAllChains(planAux, basePlan.getPlanElements(), planAnalyzeSubtours, subtourDis);
 					}
+					/*
 					if (tmpScore!=-100000) {
 						log.warn("Valid initial solution found by full mode choice run.");
 						// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
 						basePlan.copyPlan(planAux);
 						break;
 					}
-					else {					
+					else {		*/		
 						// TODO Check whether allowed?
 						basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
 						log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
 						return;
-					}
+			//		}
 				}
 			}
 			loops++;
