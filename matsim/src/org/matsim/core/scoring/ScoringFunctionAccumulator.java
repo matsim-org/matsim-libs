@@ -22,7 +22,6 @@ package org.matsim.core.scoring;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -38,9 +37,6 @@ import org.matsim.core.scoring.interfaces.MoneyScoring;
  */
 public class ScoringFunctionAccumulator implements ScoringFunction {
 
-	
-	private static final Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
-	
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
