@@ -103,7 +103,11 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			this.plans.getPersons().put(this.currperson.getId(), this.currperson);
+			if (this.plans instanceof PopulationImpl) {
+				((PopulationImpl) this.plans).addPerson(this.currperson);
+			} else {
+				this.plans.getPersons().put(this.currperson.getId(), this.currperson);
+			}
 			this.currperson = null;
 		} else if (PLAN.equals(name)) {
 			this.currplan = null;
