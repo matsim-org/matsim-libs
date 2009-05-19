@@ -84,7 +84,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		// writer.write("ITERATION " + event.getIteration());
 		// writePlans(event);
-		writeOnePersonPlans(event, 62);
+		// writeOnePersonPlans(event, 62);
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -97,7 +97,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 	public void notifyStartup(StartupEvent event) {
 		event.getControler();
 		writer = new SimpleWriter(Controler
-				.getOutputFilename("onePlanScores_seb4.txt"));
+				.getOutputFilename("onePlanScores_seb2_rop2.txt"));
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {

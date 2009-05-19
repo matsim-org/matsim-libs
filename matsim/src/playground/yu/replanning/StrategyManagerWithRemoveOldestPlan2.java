@@ -24,10 +24,10 @@
 package playground.yu.replanning;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
@@ -47,8 +47,8 @@ import org.matsim.core.utils.collections.Tuple;
 public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
 	private Map<Plan, Tuple<Integer, Integer>> selectedHistory = new HashMap<Plan, Tuple<Integer, Integer>>();
 	private boolean isInitialized = false;
-	private Set<Id> noNewPlanCreated = new HashSet<Id>(),
-			newPlansCreated = new HashSet<Id>();
+	private Map<Id, Boolean> newPlansCreated = new HashMap<Id, Boolean>();
+	private int maxPlansPerAgent = 0;
 
 	public void run(final Population population) {
 		// initialize all "selectedHistory" of plans
@@ -57,6 +57,7 @@ public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
 				for (Plan plan : person.getPlans()) {
 					Tuple<Integer, Integer> sh = new Tuple<Integer, Integer>(
 							plan.isSelected() ? 1 : 0, 1);
+					selectedHistory.put(plan, sh);
 				}
 			}
 			isInitialized = true;
@@ -68,26 +69,20 @@ public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
 		for (PlanStrategy strategy : this.strategies)
 			strategy.init();
 
-		int maxPlansPerAgent = getMaxPlansPerAgent();
+		maxPlansPerAgent = getMaxPlansPerAgent();
 		// then go through the population and assign each person to a strategy
 		for (Person person : population.getPersons().values()) {
 
 			if (maxPlansPerAgent > 0)
-				removeOldestPlan(person, maxPlansPerAgent);// removes the plan,
-			// which was not
-			// used for the
-			// longst time
+				removeOldestPlan(person);// removes the plan,
+			// which was not used for the longst time
 
 			PlanStrategy strategy = this.chooseStrategy();
 			if (strategy != null) {
 				strategy.run(person);
-				if (strategy.getNumberOfStrategyModules() == 0) {// no plans
-					// were
-					// created.
-					noNewPlanCreated.add(person.getId());
-				} else {// a new plan was created
-					newPlansCreated.add(person.getId());
-				}
+				// judge, whether new plans were created.
+				newPlansCreated.put(person.getId(), (strategy
+						.getNumberOfStrategyModules() > 0));
 			} else {
 				Gbl.errorMsg("No strategy found!");
 			}
@@ -97,40 +92,62 @@ public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
 		for (PlanStrategy strategy : this.strategies)
 			strategy.finish();
 
-		// if no new plans were created by strategies.
-		for (Id personId : noNewPlanCreated) {
-			for (Plan plan : population.getPersons().get(personId).getPlans()) {
-				Tuple<Integer, Integer> sh = selectedHistory.get(plan);
-				selectedHistory.put(plan, new Tuple<Integer, Integer>(plan
-						.isSelected() ? sh.getFirst() + 1 : sh.getFirst(), sh
-						.getSecond() + 1));
-			}
-		}
-		// new plans were created by strategies
-		for (Id personId : newPlansCreated) {
-			for (Plan plan : population.getPersons().get(personId).getPlans()) {
-				if (plan.isSelected()) {
-					selectedHistory
-							.put(plan, new Tuple<Integer, Integer>(1, 1));
-				} else {
+		for (Entry<Id, Boolean> entry : newPlansCreated.entrySet()) {
+			if (entry.getValue()) {// new plans were created
+				for (Plan plan : population.getPersons().get(entry.getKey())
+						.getPlans()) {
+					if (plan.isSelected()) {
+						selectedHistory.put(plan, new Tuple<Integer, Integer>(
+								0, 1));
+					} else {
+						Tuple<Integer, Integer> sh = selectedHistory.get(plan);
+						selectedHistory.put(plan, new Tuple<Integer, Integer>(
+								sh.getFirst(), sh.getSecond() + 1));
+					}
+				}
+			} else {// no new plans were created
+				for (Plan plan : population.getPersons().get(entry.getKey())
+						.getPlans()) {
 					Tuple<Integer, Integer> sh = selectedHistory.get(plan);
-					selectedHistory.put(plan, new Tuple<Integer, Integer>(sh
-							.getFirst(), sh.getSecond() + 1));
+					selectedHistory.put(plan, new Tuple<Integer, Integer>(plan
+							.isSelected() ? sh.getFirst() + 1 : sh.getFirst(),
+							sh.getSecond() + 1));
 				}
 			}
 		}
+		newPlansCreated.clear();
 	}
 
-	private void removeOldestPlan(Person person, int maxSize) {
+	private static double selectedRate(Tuple<Integer, Integer> tuple) {
+		return tuple.getFirst().doubleValue() / tuple.getSecond().doubleValue();
+	}
+
+	private static boolean oldEnough(Tuple<Integer, Integer> tuple) {
+		return tuple.getSecond().intValue() >= 4;
+	}
+
+	private void removeOldestPlan(Person person) {
 		List<Plan> plans = person.getPlans();
+
 		int size = plans.size();
-		if (size <= maxSize) {
+		int oldPlansSize = 0;
+		TreeMap<Double, Plan> oldPlans = new TreeMap<Double, Plan>();
+
+		for (Plan plan : plans) {
+			Tuple<Integer, Integer> tuple = selectedHistory.get(plan);
+			if (oldEnough(tuple)) {
+				oldPlansSize++;
+				oldPlans.put(selectedRate(tuple), plan);
+			}
+		}
+
+		if (oldPlansSize <= maxPlansPerAgent) {
 			return;
 		}
 
 		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
 		// initialize list of types
-		for (Plan plan : plans) {
+		for (Plan plan : oldPlans.values()) {
 			Integer cnt = typeCounts.get(plan.getType());
 			if (cnt == null) {
 				typeCounts.put(plan.getType(), 1);
@@ -139,18 +156,21 @@ public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
 			}
 		}
 
-		while (size > maxSize) {
+		while (oldPlansSize > maxPlansPerAgent) {
 			Plan oldestPlan = null;
-			for (int i = 0; i < size; i++) {
-				Plan plan_i = plans.get(i);
+			Double keyOfOldestPlan = null;
+			for (Entry<Double, Plan> entry : oldPlans.entrySet()) {
+				Plan plan_i = entry.getValue();
 				if (typeCounts.get(plan_i.getType()) > 1) {
 					oldestPlan = plan_i;
+					keyOfOldestPlan = entry.getKey();
 					break;
 				}
 			}
 			if (oldestPlan != null) {
 				person.removePlan(oldestPlan);
-				size = plans.size();
+				oldPlans.remove(keyOfOldestPlan);
+				oldPlansSize = oldPlans.size();
 				if (oldestPlan.isSelected()) {
 					person.setSelectedPlan(person.getRandomPlan());
 				}
