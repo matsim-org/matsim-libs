@@ -26,6 +26,8 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
@@ -59,15 +61,15 @@ public class PersonExchangeKnowledge {
 		List<ActivityOption> act2List = k2.getActivities(facType);
 		if(act2List.size()>=1){
 			ActivityOption activity2=act2List.get(MatsimRandom.getRandom().nextInt( act2List.size()));
-			k1.getMentalMap().addActivity(activity2);
+			((MentalMap)k1.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity2);
 		}
 
 //		If person2 has an edge pointed toward person1, let p1 share information with p2
-		if(p2.getKnowledge().getEgoNet().knows(p1)){
+		if(((EgoNet)p2.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p1)){
 			List<ActivityOption> act1List = k1.getActivities(facType);
 			if(act1List.size()>=1){
 				ActivityOption activity1=act1List.get(MatsimRandom.getRandom().nextInt( act1List.size()));
-				k2.getMentalMap().addActivity(activity1);
+				((MentalMap)k2.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity1);
 			}
 		}
 	}
@@ -85,7 +87,7 @@ public class PersonExchangeKnowledge {
 		Person p2 = myLink.getPersonTo();
 		Knowledge k1 = p1.getKnowledge();
 
-		Person newFriend = k1.getEgoNet().getRandomPerson();
+		Person newFriend = ((EgoNet)k1.getCustomAttributes().get(EgoNet.NAME)).getRandomPerson();
 		if ((newFriend != null) && (p2 != null)) {
 			net.makeSocialContact(newFriend, p2, iteration, "fof");
 		}

@@ -53,12 +53,16 @@ import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldConnectLocations;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 
@@ -337,7 +341,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getPlanElements().size()/2*p.getPlans().size()*1.5);
 //				this.log.info("NOTE that manageMemory is turned off");
-				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
+				((MentalMap)p.getKnowledge().getCustomAttributes().get(MentalMap.NAME)).manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... done");
 
@@ -377,9 +381,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
-				k.getMentalMap().prepareActs(plan);// // JH Hack to make sure act types are compatible with social nets
-				k.getMentalMap().initializeActActivityMapRandom(plan);
-				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities,aar);
+				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
+				if (k.getCustomAttributes().get(MentalMap.NAME) == null) { k.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
+				if (k.getCustomAttributes().get(EgoNet.NAME) == null) { k.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
+
+				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).prepareActs(plan);// // JH Hack to make sure act types are compatible with social nets
+				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapRandom(plan);
+				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapFromFile(plan,facilities,aar);
 //				Reset activity spaces because they are not read or written correctly
 				k.resetActivitySpaces();
 			}

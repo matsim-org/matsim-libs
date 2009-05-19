@@ -23,6 +23,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 /**
  * A replanning module to choose a new location for one activity in the Ego's SelectedPlan.
@@ -145,7 +146,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			
 //			Pick a new facility for it from the knowledge of alters and ego (LOGIT)
 //For each alter append its facList to existing facList
-			EgoNet egoNet = k.getEgoNet();
+			EgoNet egoNet = (EgoNet)k.getCustomAttributes().get(EgoNet.NAME);
 			ArrayList<Person> alters=egoNet.getAlters();
 			Iterator<Person> aIt=alters.iterator();
 			while(aIt.hasNext()){
@@ -195,7 +196,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			}
 
 			if(changed){
-				k.getMentalMap().addActivity(f.getActivityOption(factype));
+				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).addActivity(f.getActivityOption(factype));
 //				System.out.println(" Activity locatoin changed this many activities:"+k.getActivities().size());
 				//		 loop over all <leg>s, remove route-information
 				List<? extends BasicPlanElement> bestactslegs = newPlan.getPlanElements();

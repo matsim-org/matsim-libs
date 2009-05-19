@@ -449,31 +449,4 @@ public class Knowledge extends CustomizableImpl implements BasicKnowledge<Activi
 	public final String toString() {
 		return "[desc=" + this.desc + "]" + "[nof_activities=" + this.activities.size() + "]";
 	}
-	
-	//////////////////////////////////////////////////////////////////////
-	// for socialnetworks package
-	//////////////////////////////////////////////////////////////////////
-
-	private MentalMap map = null;
-
-	public void setMentalMap(MentalMap map) {
-		this.map = map;
-	}
-
-	public MentalMap getMentalMap() {
-		if (this.map == null) { this.map = new MentalMap(this); }
-		return map;
-	}
-
-	private EgoNet egoNet = null;
-
-	public void setEgoNet(EgoNet egoNet) {
-		this.egoNet = egoNet;
-	}
-
-	public EgoNet getEgoNet() {
-		if (this.egoNet == null) { this.egoNet = new EgoNet(); }
-		return egoNet;
-	}
-
 }

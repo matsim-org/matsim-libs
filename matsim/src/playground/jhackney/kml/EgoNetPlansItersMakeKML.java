@@ -65,6 +65,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceEllipse;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
@@ -261,7 +262,7 @@ public class EgoNetPlansItersMakeKML {
 
 		// load Data into KML folders for myPerson
 		int i=0;
-		ArrayList<Person> persons = myPerson.getKnowledge().getEgoNet().getAlters();
+		ArrayList<Person> persons = ((EgoNet)myPerson.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getAlters();
 
 		// more colors than in current egonet to allow for adding agents to egonet without repeating colors
 //		nColors=persons.size()*2;

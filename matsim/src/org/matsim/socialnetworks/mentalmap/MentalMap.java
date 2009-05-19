@@ -52,6 +52,8 @@ import org.matsim.world.Location;
  *
  */
 public class MentalMap {
+	
+	public static final String NAME = "MentalMap";
 
 	// Class to manage the knowledge.
 	// Activities and Acts need to point to each other consistently

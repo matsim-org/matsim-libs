@@ -181,7 +181,7 @@ public class TrackActsOverlap {
 						if (pe2 instanceof Activity) {
 							Activity act2 = (Activity) pe2;
 							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
-								EgoNet net = p1.getKnowledge().getEgoNet();
+								EgoNet net = (EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME);
 								if(net.getAlters().contains(p2)){
 									friend++;
 								}else{
@@ -232,7 +232,7 @@ public class TrackActsOverlap {
 						if (pe2 instanceof Activity) {
 							Activity act2 = (Activity) pe2;
 							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
-								EgoNet net = p1.getKnowledge().getEgoNet();
+								EgoNet net = (EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME);
 								if(net.getAlters().contains(p2)){
 									friend++;
 									totalTimeWithFriends+=getTimeWindowDuration(act1,act2);
@@ -291,7 +291,7 @@ public class TrackActsOverlap {
 						if (pe2 instanceof Activity) {
 							Activity act2 = (Activity) pe2;
 							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
-								EgoNet net = p1.getKnowledge().getEgoNet();
+								EgoNet net = (EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME);
 								if(net.getAlters().contains(p2)){
 									friend++;
 									totalTimeWithFriends+=getTimeWindowDuration(act1,act2);

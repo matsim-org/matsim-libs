@@ -10,6 +10,8 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.population.Knowledge;
 import org.matsim.socialnetworks.io.ActivityActReader;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 
 public class InitializeKnowledge {
 	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities){
@@ -49,12 +51,16 @@ public class InitializeKnowledge {
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
+				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
+				if (k.getCustomAttributes().get(MentalMap.NAME) == null) { k.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
+				if (k.getCustomAttributes().get(EgoNet.NAME) == null) { k.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
+
 				// JH Hack to make sure act types are compatible with social nets
-				k.getMentalMap().prepareActs(plan);
+				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).prepareActs(plan);
 				// JH If the Acts are not initialized with a Facility they get a random Facility on the Link
-				k.getMentalMap().initializeActActivityMapRandom(plan);
+				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapRandom(plan);
 				// JH If there is a user-supplied file of Facilities for the Act, read it in
-				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities, aar);
+				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapFromFile(plan,facilities, aar);
 			}
 		}
 		if(aar!=null){

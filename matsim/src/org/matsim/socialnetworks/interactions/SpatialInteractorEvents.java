@@ -12,6 +12,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 /**
@@ -154,7 +155,7 @@ public class SpatialInteractorEvents {
 						if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actType2)){
 
 							// If they know each other, probability is 1.0 that the relationship is reinforced
-							if (p1.getKnowledge().getEgoNet().knows(p2)) {
+							if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 								net.makeSocialContact(p1,p2,iteration,"renew_"+actType2);
 //								System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 							} else {
@@ -214,7 +215,7 @@ public class SpatialInteractorEvents {
 					if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actType2)){
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
-						if (p1.getKnowledge().getEgoNet().knows(p2)) {
+						if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 							net.makeSocialContact(p1,p2,iteration,"renew_"+actType2);
 //							System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 						} else {
@@ -284,7 +285,7 @@ public class SpatialInteractorEvents {
 						if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actTypes[j])){
 
 							// If they know each other, probability is 1.0 that the relationship is reinforced
-							if (p1.getKnowledge().getEgoNet().knows(p2)) {
+							if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 								net.makeSocialContact(p1,p2,iteration,"renew_"+actTypes[j]);
 //								System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 							} else {
@@ -336,7 +337,7 @@ public class SpatialInteractorEvents {
 						//agents encoutner and may befriend
 						if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actType2)){
 							// If they know each other, probability is 1.0 that the relationship is reinforced
-							if (p1.getKnowledge().getEgoNet().knows(p2)) {
+							if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 								net.makeSocialContact(p1,p2,iteration,"renew_"+actType2);
 //								System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 							} else {

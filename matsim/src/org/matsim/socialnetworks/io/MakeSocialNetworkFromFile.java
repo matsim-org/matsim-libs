@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
@@ -65,7 +66,7 @@ public class MakeSocialNetworkFromFile {
 						Person person1 = plans.getPerson(new IdImpl(egoId));
 						Person person2 = plans.getPerson(new IdImpl(alterId));
 						snet.makeSocialContact(person1, person2, 0, purpose);
-						SocialNetEdge thisEdge = person1.getKnowledge().getEgoNet().getEgoLink(person2);
+						SocialNetEdge thisEdge = ((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
 						thisEdge.setNumberOfTimesMet(timesmet);
 					}
 				}

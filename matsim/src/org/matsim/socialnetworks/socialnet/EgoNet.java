@@ -34,7 +34,9 @@ import org.matsim.core.gbl.MatsimRandom;
  * in which the integer is the Person.getId() that the EgoNet corresponds to.
  */
 public class EgoNet {
-    private int id;
+	public static final String NAME = "EgoNet";
+
+	private int id;
 
     private ArrayList<SocialNetEdge> egoLinks;
 

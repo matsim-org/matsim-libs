@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 
 public class PersonGetEgoNetGetPlans {
 
@@ -19,7 +20,7 @@ public PersonGetEgoNetGetPlans(){
 		PopulationImpl socialPlans=new PopulationImpl();
 
 		socialPlans.addPerson(ego);
-		ArrayList<Person> alters = ego.getKnowledge().getEgoNet().getAlters();
+		ArrayList<Person> alters = ((EgoNet)ego.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getAlters();
 		Iterator<Person> a_it=alters.iterator();
 		while(a_it.hasNext()){
 			socialPlans.addPerson(a_it.next());

@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
 
 
 public class PersonForgetKnowledge extends AbstractPersonAlgorithm {
@@ -35,7 +36,7 @@ public class PersonForgetKnowledge extends AbstractPersonAlgorithm {
 		Plan p = person.getSelectedPlan();
 		if(multiple>0){
 		int max_memory = (int) (p.getPlanElements().size()/2*person.getPlans().size()*multiple);
-		person.getKnowledge().getMentalMap().manageMemory(max_memory, person.getPlans());
+		((MentalMap)person.getKnowledge().getCustomAttributes().get(MentalMap.NAME)).manageMemory(max_memory, person.getPlans());
 		}
 	}
 

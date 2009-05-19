@@ -63,6 +63,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.vis.kml.KMZWriter;
 
 public class EgoNetPlansMakeKML {
@@ -289,7 +290,7 @@ public class EgoNetPlansMakeKML {
 		loadData(myPerson, 0, 1);
 
 		// Proceed to the EgoNet of myPerson
-		ArrayList<Person> persons = myPerson.getKnowledge().getEgoNet().getAlters();
+		ArrayList<Person> persons = ((EgoNet)myPerson.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getAlters();
 		Iterator<Person> altersIt= persons.iterator();
 
 		while(altersIt.hasNext()){

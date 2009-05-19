@@ -86,7 +86,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 
 				//Check if the overlapping agents are friends and sum the arrival times
 				if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2) && !p1.equals(p2)){
-					EgoNet net = p1.getKnowledge().getEgoNet();
+					EgoNet net = (EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME);
 					if(net.getAlters().contains(p2)){
 						avgStartTime+=tw2.startTime;
 						count++;

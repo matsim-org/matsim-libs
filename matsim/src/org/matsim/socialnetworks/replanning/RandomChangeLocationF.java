@@ -40,6 +40,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
 
 /**
  * Sample replanning strategy to change activity location:
@@ -163,7 +164,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					newAct.setLink(fFromFacilities.getLink());
 					newAct.setCoord(fFromFacilities.getCoord());
 					newAct.setFacility(fFromFacilities);
-					k.getMentalMap().addActivity(fFromFacilities.getActivityOption(factype));
+					((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOption(factype));
 					changed = true;
 				}
 			}
