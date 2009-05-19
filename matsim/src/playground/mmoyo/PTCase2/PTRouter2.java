@@ -15,6 +15,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.Dijkstra;
+//import playground.mmoyo.PTRouter.PTDijkstra;
+
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -34,6 +36,7 @@ import playground.mmoyo.PTRouter.PTNode;
 public class PTRouter2 {
 	private NetworkLayer net; 
 	private Dijkstra dijkstra;
+	//private PTDijkstra dijkstra;
 	private PTTravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime;   //> make private 
 	
@@ -50,14 +53,19 @@ public class PTRouter2 {
 	}
 		
 	public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
-		Collection <Node> NearStops1 = net.getNearestNodes(coord1, distToWalk);
-		Collection <Node> NearStops2 = net.getNearestNodes(coord2, distToWalk);
+		//normal distance
+		Collection <Node> nearStops1 = net.getNearestNodes(coord1, distToWalk);
+		Collection <Node> nearStops2 = net.getNearestNodes(coord2, distToWalk);
+		
+		//double distOridDest = CoordUtils.calcDistance(coord1,coord2);
+		//Collection <Node> nearStops1 = FindNearStops(coord1, distOridDest, distToWalk);
+		//Collection <Node> nearStops2 = FindNearStops(coord2, distOridDest, distToWalk);
 		
 		Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
 		Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
 
-		List <Link> walkingLinkList1 = CreateWalkingLinks(ptNode1, NearStops1, true);
-		List <Link> walkingLinkList2 = CreateWalkingLinks(ptNode2, NearStops2, false);
+		List <Link> walkingLinkList1 = CreateWalkingLinks(ptNode1, nearStops1, true);
+		List <Link> walkingLinkList2 = CreateWalkingLinks(ptNode2, nearStops2, false);
 
 		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 		
@@ -70,10 +78,21 @@ public class PTRouter2 {
 			path.nodes.remove(ptNode1);
 			path.nodes.remove(ptNode2);
 		}
-		
+			
 		return path;
 	}
-
+	
+	private Collection <Node> FindNearStops (final Coord coord, final double distOrigDestin, final double walkDistance){
+		Collection <Node> NearStops = net.getNearestNodes(coord, walkDistance);
+		if (NearStops.size()==0){
+			Node nearNode = net.getNearestNode(coord);
+			if (CoordUtils.calcDistance(coord, nearNode.getCoord())< walkDistance){
+				NearStops.add(nearNode);
+			}
+		}
+		return NearStops;
+	}	
+	
 	public Node CreateWalkingNode(Id idNode, Coord coord) {
 		Node node = new PTNode(idNode, coord, "Walking");
 		//ptNode.setIdPTLine(new IdImpl("Walk"));
@@ -170,12 +189,12 @@ public class PTRouter2 {
 					legRoute.setTravelTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
 					if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}
 					
-					//insert leg 
+					//insert leg
 					Leg leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
 					//routeTravelTime =routeTravelTime; // routeTravelTime =routeTravelTime*3600;  //Seconds
 					leg.setDepartureTime(accumulatedTime);
 					leg.setTravelTime(routeTravelTime);
-					leg.setArrivalTime((accumulatedTime + (routeTravelTime))); 
+					leg.setArrivalTime((accumulatedTime + (routeTravelTime)));
 					//leg.setNum(num);   deprecated 		
 					leg.setRoute(legRoute);
 					actLegList.add(leg);		

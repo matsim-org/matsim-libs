@@ -21,7 +21,7 @@ public class PTControler2 {
 	private static final String ZURICHPTPLANS= path + "plans.xml";
 	private static final String ALLPLANS= path + "@All_plans .xml";
 	private static final String OUTPUTPLANS= path + "output_plans.xml";
-	private static final String INPTNEWLINES= path + "TestCase/InPTNewLines.xml";
+	private static final String INPTNEWLINES= path + "TestCase/InPTDIVA.xml";
 	private static final String DIVNODES= path + "TestCase/DivNodes.xml";
 	
 	public static void main(String[] args){
@@ -41,7 +41,7 @@ public class PTControler2 {
 				pt.setPtNetworkLayer(net);
 				PTLineAggregator ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLines();
-				
+	
 				pt.getPtNetworkFactory().createTransferLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
 				
@@ -54,7 +54,7 @@ public class PTControler2 {
 			
 				break;
 			case -3:
-				//pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
+				pt.createPTNetWithTLinks(INPTNETFILE);
 	    		pt.readPTNet(INPTNETFILE);
 				ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLine();
@@ -94,8 +94,8 @@ public class PTControler2 {
 	    	case 3:
 	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
-	    		ptActWriter.writePTActsLegs();
-	    		//ptActWriter.SimplifyPtLegs();
+	    		//ptActWriter.writePTActsLegs();
+	    		ptActWriter.SimplifyPtLegs();
 	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;
@@ -114,8 +114,13 @@ public class PTControler2 {
 	    		break;
 	    	case 8:
 	    		ToTransitScheduleConverter converter = new ToTransitScheduleConverter();	    		
+
+	    		//converter.createTransitSchedule(pt.getPtTimeTable(), path + "TransitSim/PtFacilities.xml", path + "TransitSim/transitSchedule.xml");
+	    		//converter.createFacilities("../shared-svn/studies/schweiz-ivtch/pt-experimental/PtFacilities.xml");
+
 //	    		converter.createFacilities(network);
 	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "transitSchedule.xml");
+
 	    		break;
 		}//switch
 	}//main

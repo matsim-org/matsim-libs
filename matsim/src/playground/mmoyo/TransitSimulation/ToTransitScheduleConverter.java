@@ -44,16 +44,15 @@ public class ToTransitScheduleConverter {
 				/*
 				facilities.getFacilities().containsKey(idNode)){
 					throw new NullPointerException(this + "facility [id=" + idNode + " does not exist]");
-				}*/
-			
+				}
+				*/
+				
 				TransitStopFacility stop = this.transitSchedule.getFacilities().get(idNode);
 				
-				double min = ptLine.getMinutes().get(x).doubleValue();
+				double min = ptLine.getMinutes().get(x++).doubleValue();  
 				double arrivalDelay = min*60;
 				double departureDelay = min*60;
 				stops.add(new TransitRouteStop(stop, arrivalDelay, departureDelay));
-
-				x++;
 			}
 			
 			Id idTransitRoute = new IdImpl(ptLine.getId() + ptLine.getDirection());
@@ -64,7 +63,10 @@ public class ToTransitScheduleConverter {
 			x=0;
 			for (String strDeparture : ptLine.getDepartures()){
 				Id idDeparture = new IdImpl(x + "." + ptLine.getId());
+
+				//double dblDeparture =x;			// fictional departures
 				double dblDeparture=  Time.parseTime(strDeparture);
+
 				Departure departure = new Departure (idDeparture, dblDeparture);
 				transitRoute.addDeparture(departure);
 				x++;
@@ -81,7 +83,6 @@ public class ToTransitScheduleConverter {
 			System.out.println(this + ex.getMessage());
 		}
 	}
-	
 	
 	public void createFacilities(NetworkLayer net){
 		for (Node node:  net.getNodes().values()){

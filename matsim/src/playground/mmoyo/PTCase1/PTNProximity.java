@@ -139,13 +139,10 @@ public class PTNProximity
 				distance =(int)coord.calcDistance(node1.getCoord()) + 1;
 				stopList = this.ptQuadTree.get(x, y, distance);
 			}
-	
 		}
 		return stopList.toArray(new PTNode[stopList.size()]);
 	}
 	*/
-	
-	
 	
 	public PTNode getNearestNode(final double x, final double y){
 		return (PTNode)ptQuadTree.get(x, y);

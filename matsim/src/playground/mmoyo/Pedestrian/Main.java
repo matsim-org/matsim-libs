@@ -34,15 +34,18 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	
 	private static final String LOGICNETFILE = PATH + "network.xml";
-	private static final String NETFILE = PATH + "pedestrian/ivtch-osm.xml";
 	private static final String INTPUTPLAN = PATH + "output_plans.xml";
+	private static final String NETFILE = PATH + "pedestrian/ivtch-osm.xml";
 	private static final String OUTPUTPLAN = PATH + "pedestrian/PedestrianOutput.xml";
 	private static final String CONFIGFILE = PATH + "pedestrian/config.xml";
-	private Config config = Gbl.createConfig(new String[]{CONFIGFILE, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
+	
+	private static NetworkLayer net;
 	
 	public static void main(String[] args){
 
-		//Gbl.getConfig().plans().get
+		Config config = new Config();
+		config = Gbl.createConfig(new String[]{CONFIGFILE, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
+		
 		System.out.println("ROUTING TO THE PT STATIONS");
 		
 		NetworkFactory networkFactory = new NetworkFactory();
@@ -51,11 +54,11 @@ public class Main {
 		MatsimNetworkReader logicMatsimNetworkReader = new MatsimNetworkReader(logicNet);
 		logicMatsimNetworkReader.readFile(LOGICNETFILE);
 		
-		NetworkLayer net= new NetworkLayer(networkFactory);
+		net= new NetworkLayer(networkFactory);
 		MatsimNetworkReader matsimNetworkReader2 = new MatsimNetworkReader(net);
 		matsimNetworkReader2.readFile(NETFILE);
 		
-		Dijkstra dijkstra = new Dijkstra(logicNet, new PedTravelCost(), new PedTravelTime());
+		Dijkstra dijkstra = new Dijkstra(net, new PedTravelCost(), new PedTravelTime());
 		
 		Population population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population,logicNet);
@@ -80,8 +83,8 @@ public class Main {
 
 					if (leg.getMode().equals(TransportMode.walk)){
 
-				    	Node node1 = prevAct.getLink().getToNode();
-				    	Node node2 = nextAct.getLink().getToNode();
+				    	Node node1 = net.getNearestNode(prevAct.getCoord());
+				    	Node node2 = net.getNearestNode(nextAct.getCoord());
 				    	double time= prevAct.getStartTime();
 				    		
 				    	Path path = dijkstra.calcLeastCostPath(node1, node2, time);
@@ -104,23 +107,25 @@ public class Main {
 				}
 			}
 			person.exchangeSelectedPlan(newPlan, true);
+			person.removeUnselectedPlans();
 		}
 
-		/*
+		
 		System.out.println("writing output plan file...");
-		System.out.println(OUTPUTPLAN==null);
 		new PopulationWriter(population, OUTPUTPLAN, "v4").write();
 		System.out.println("Done");
 		
 		System.out.println("Found:" + found + "not found:"+ notFound);
 		System.out.println("walk:" + walking);
-		*/
+		
 	}
 
-	private static Activity cloneAct(Activity act){
+	private static Activity cloneAct(final Activity act){
 		Activity newAct= new ActivityImpl(act.getType(), act.getCoord());
 		newAct.setStartTime(act.getStartTime());
 		newAct.setEndTime(act.getEndTime());
+
+		newAct.setLink(net.getNearestLink(act.getCoord()));
 		return newAct;
 	}
 	
