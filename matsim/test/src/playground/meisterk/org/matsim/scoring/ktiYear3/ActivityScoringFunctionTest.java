@@ -227,7 +227,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
-		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:10:00", "02:40:00", "00:00:00"};
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:30:00", "03:00:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:30:00", "00:50:00", "01:05:00", "01:05:00", "01:05:00", "01:05:00", "01:05:00","00:00:00"};
 		HashMap<String, String[]> expectedAccumulatedActivityDurations = new HashMap<String, String[]>();
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "02:30:00", "02:30:00", "02:30:00", "02:30:00", null});
@@ -259,7 +259,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("12:00:00"), Time.parseTime("27:00:00")));
 		
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
-		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:10:00", "02:40:00", "00:00:00"};
+		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:30:00", "03:00:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "01:00:00", "01:20:00", "01:35:00", "01:35:00", "04:35:00", "04:35:00", "04:35:00", "00:00:00"};
 		HashMap<String, String[]> expectedAccumulatedActivityDurations = new HashMap<String, String[]>();
 		expectedAccumulatedActivityDurations.put("home", new String[]{null, null, null, null, "02:30:00", "02:30:00", "02:30:00", "02:30:00", null});
@@ -405,7 +405,6 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 				
 			}
 		}
-		logger.info("expected score: " + Double.toString(expectedScore));
 		assertEquals(expectedScore, testee.getScore());
 		
 		testee.reset();

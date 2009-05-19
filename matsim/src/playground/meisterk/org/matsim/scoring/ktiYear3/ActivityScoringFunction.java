@@ -95,20 +95,17 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	protected double calcActScore(double arrivalTime, double departureTime,
 			Activity act) {
 
+		///////////////////////////////////////////////////////////////////
+		// score terms which apply to the entire time from arrival to departure
+		// without considering opening times
+		///////////////////////////////////////////////////////////////////
 		double fromArrivalToDeparture = departureTime - arrivalTime;
-
-		// penalty for too short duration
-		// is applied without consideration if the time is spent waiting or performing
-		// also negtaive duration is too short duration
-		// disutility if duration of that activity was too short
-		if (fromArrivalToDeparture < ActivityScoringFunction.MINIMUM_DURATION) {
-			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
-		}
 		
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
 		if (fromArrivalToDeparture < 0.0) {
 			this.accumulatedNegativeDuration += fromArrivalToDeparture;
+			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
 		}
 		///////////////////////////////////////////////////////////////////
 		// the time between arrival and departure is either spent
@@ -117,7 +114,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		// - the sum of the share performing and the share waiting equals the difference between arrival and departure
 		///////////////////////////////////////////////////////////////////
 		else {
-
+			
 			SortedSet<BasicOpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
 			// assume facility is always open
@@ -193,19 +190,27 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 				timeSpentPerforming += duration;
 
 			}
-
+			
 			// accumulated waiting time, which is the time that could not be performed in activities due to closed facilities
 			this.timeSpentWaiting += (fromArrivalToDeparture - timeSpentPerforming);
 
 			// utility for additional (positive) activity duration
-			double accumulatedDuration = 0.0;
-			if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
-				accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
+			if (timeSpentPerforming >= 0) {
+				double accumulatedDuration = 0.0;
+				if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
+					accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
+				}
+				this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
 			}
-			this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
+
+			// disutility if duration of that activity was too short
+			if (timeSpentPerforming < ActivityScoringFunction.MINIMUM_DURATION) {
+				this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - timeSpentPerforming);
+			}
+			
 
 		}
-
+		
 		// no actual score is computed here
 		return 0.0;
 
@@ -277,11 +282,11 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		}
 		return performanceScore;
 	}
-
+	
 	public double getNegativeDurationScore() {
 		return (2 * this.params.marginalUtilityOfLateArrival * Math.abs(this.accumulatedNegativeDuration));
 	}
-
+	
 	@Override
 	public void reset() {
 		super.reset();
