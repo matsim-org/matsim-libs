@@ -38,7 +38,9 @@ public class MyCommercialControlerV01 {
 		c.addControlerListener(new MyShutdownListener());			// 8.
 		
 		MyAllEventCounter eventCounter = new MyAllEventCounter();
-		Events events = new Events();
+		//Events events = new Events();
+		Events events = c.getEvents();
+		
 		// Add all the events handler(s)
 		events.addHandler(eventCounter);
 //		c.getEvents().addHandler(eventCounter);
