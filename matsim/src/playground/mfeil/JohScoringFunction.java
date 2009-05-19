@@ -86,14 +86,14 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final double uMin_work = 0;
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
-	private static final double uMax_home = 72; //120
-	private static final double uMax_work= 60;  //100
-	private static final double uMax_shopping = 24; //40
-	private static final double uMax_leisure = 48;  //80
-	private static final double alpha_home = 6;
-	private static final double alpha_work = 4;
-	private static final double alpha_shopping = 1;
-	private static final double alpha_leisure = 2;
+	private static final double uMax_home = 60; //120//60
+	private static final double uMax_work= 55;  //100//55
+	private static final double uMax_shopping = 20; //40//20
+	private static final double uMax_leisure = 45;  //80//45
+	private static final double alpha_home = 6;//6
+	private static final double alpha_work = 4;//4
+	private static final double alpha_shopping = 1;//1
+	private static final double alpha_leisure = 2;//2
 	private static final double beta_home = 1.2;
 	private static final double beta_work = 1.2;
 	private static final double beta_shopping = 1.2;
@@ -250,7 +250,7 @@ public class JohScoringFunction implements ScoringFunction {
 		}
 
 		// utility of performing an action
-		if (duration > 0) {
+		if (duration > 3600) {  // needs to be changed back to 0!!!
 			/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
 			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
 			double utilWait = marginalUtilityOfWaiting / 3600 * duration;
