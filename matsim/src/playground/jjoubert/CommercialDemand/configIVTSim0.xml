@@ -34,13 +34,14 @@
         -->
         <param name="countsScaleFactor" value="10" />
     </module>
+   
 
 	<module name="simulation">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="24:00:00" />
-		<param name="flowCapacityFactor" value="?" />
-		<param name="storageCapacityFactor" value="?" />
+		<param name="flowCapacityFactor" value="0.1" />
+		<param name="storageCapacityFactor" value="0.25" />
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims, otfvis -->
 	</module>
