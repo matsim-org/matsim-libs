@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.Module;
 
+
 public class TimeModeChoicerConfigGroup extends Module {
 	
 	private static final long serialVersionUID = 1L;
@@ -192,8 +193,8 @@ public class TimeModeChoicerConfigGroup extends Module {
 	public static String getNeighbourhoodSize() {
 		return neighbourhood_size;
 	}
-	public void setNeighbourhoodSize(final String constrained) {
-		this.neighbourhood_size = constrained;
+	public void setNeighbourhoodSize(final String size) {
+		this.neighbourhood_size = size;
 	}
 	public static String getMaxIterations() {
 		return max_iterations;
