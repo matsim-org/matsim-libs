@@ -129,7 +129,6 @@ public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
 	private void removeOldestPlan(Person person) {
 		List<Plan> plans = person.getPlans();
 
-		int size = plans.size();
 		int oldPlansSize = 0;
 		TreeMap<Double, Plan> oldPlans = new TreeMap<Double, Plan>();
 

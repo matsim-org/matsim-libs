@@ -97,7 +97,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 	public void notifyStartup(StartupEvent event) {
 		event.getControler();
 		writer = new SimpleWriter(Controler
-				.getOutputFilename("onePlanScores_seb2_rop2.txt"));
+				.getOutputFilename("onePlanScores_ceb6_rop.txt"));
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {
