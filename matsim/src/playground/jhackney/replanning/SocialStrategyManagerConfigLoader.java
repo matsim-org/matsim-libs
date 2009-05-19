@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StrategyManagerConfigLoader.java
+ * SocialStrategyManagerConfigLoader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +20,25 @@
 
 package playground.jhackney.replanning;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ExternalModule;
+import org.matsim.core.replanning.modules.PlanomatModule;
+import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -39,7 +52,10 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.locationchoice.LocationChoice;
+import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherF;
+import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
+import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -48,37 +64,35 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
  *
  * @author mrieser
  */
-public class SocialStrategyManagerConfigLoader {
+public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoader{
+
+	private static final Logger log = Logger.getLogger(SocialStrategyManagerConfigLoader.class);
 
 	/**
 	 * Reads and instantiates the strategy modules specified in the config-object.
 	 *
-	 * @param config the configuration specifying which strategies should to be loaded
-	 * @param manager the strategy-manager the instantiated strategies will be added to
-	 * @param network the network strategy modules can use
-	 * @param travelCostCalc the travel cost calculator strategy modules can make use of
-	 * @param travelTimeCalc the travel time calculator strategy modules can make use of
-	 * @param legTravelTimeEstimator an estimator for travel times between two locations
+	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
+	 * @param config the {@link Config} object containing the configuration for the strategyManager
+	 * @param manager the {@link StrategyManager} to be configured according to the configuration
 	 */
-	public static void load(final Config config, final StrategyManager manager, final NetworkLayer network,
-			final TravelCost travelCostCalc, final TravelTime travelTimeCalc, final LegTravelTimeEstimator legTravelTimeEstimator) {
+	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
-		String maxvalue = config.findParam("strategy", "maxAgentPlanMemorySize");
-		if (maxvalue != null){
-			manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
-		}
+		NetworkLayer network = controler.getNetwork();
+		TravelCost travelCostCalc = controler.getTravelCostCalculator();
+		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		ActivityFacilities facilities = controler.getFacilities();
+
+		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		int externalCounter = 0;
-		int i = 0;
-		while (true) {
-			i++;
-			String modrate = "ModuleProbability_" + i;
-			String ratevalue = config.findParam("strategy", modrate);
-			if (ratevalue == null) break;
-			double rate = Double.parseDouble(ratevalue);
-			if (rate == 0.0) continue;
-			String modname = "Module_" + i;
-			String classname = config.getParam("strategy", modname);
+
+		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+			double rate = settings.getProbability();
+			if (rate == 0.0) {
+				continue;
+			}
+			String classname = settings.getModuleName();
+
 			if (classname.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
@@ -87,10 +101,13 @@ public class SocialStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new KeepSelected());
 			} else if (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (classname.equals("ReRoute_Dijkstra")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("ReRoute_Landmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
 				preProcessRoutingData.run(network);
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
@@ -99,14 +116,25 @@ public class SocialStrategyManagerConfigLoader {
 			} else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator(7200));
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
 				preProcessRoutingData.run(network);
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			} else if (classname.equals("ExternalModule")) {
 				externalCounter++;
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
-				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, network));
+				String exePath = settings.getExePath();
+				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, controler.getNetwork()));
+			} else if (classname.equals("Planomat")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
+				strategy.addStrategyModule(planomatStrategyModule);
+//				setDecayingModuleProbability(manager, strategy, 100, rate); // Why "100" and not controler.firstIteration as in "PlanomatReRoute"
+			} else if (classname.equals("PlanomatReRoute")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
+				strategy.addStrategyModule(planomatStrategyModule);
+				strategy.addStrategyModule(new ReRoute(controler));
+//				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
@@ -115,8 +143,73 @@ public class SocialStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new ExpBetaPlanChanger());
 			} else if (classname.equals("SelectRandom")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
+			} else if (classname.equals("ChangeLegMode")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy.addStrategyModule(new ChangeLegMode(config));
+				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (classname.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
+				// JH
+			} else if (classname.equals("KSecLoc")){
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
+				strategy.addStrategyModule(socialNetStrategyModule);
+			} else if (classname.equals("FSecLoc")){
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherF(network, travelCostCalc, travelTimeCalc, facilities);
+				strategy.addStrategyModule(socialNetStrategyModule);
+			} else if (classname.equals("SSecLoc")){
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(network,travelCostCalc,travelTimeCalc);
+				strategy.addStrategyModule(socialNetStrategyModule);
+				// JH
+			} else if (classname.equals("LocationChoice")) {
+	    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
+	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
+	    	strategy.addStrategyModule(new ReRoute(controler));
+				strategy.addStrategyModule(new TimeAllocationMutator());
+			}
+			//if none of the strategies above could be selected we try to load the class by name
+			else {
+				//classes loaded by name must not be part of the matsim core
+				if (classname.startsWith("org.matsim")) {
+					log.error("Strategies in the org.matsim package must not be loaded by name!");
+				}
+				else {
+					try {
+						Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(classname);
+						Class[] args = new Class[1];
+						args[0] = BasicScenario.class;
+						Constructor<? extends PlanStrategy> c = null;
+						try{
+							c = klas.getConstructor(args);
+						} catch(NoSuchMethodException e){
+							log.warn("Cannot find Constructor in PlanStrategy " + classname + " with single argument of type BasicScenario. " +
+									"This is not fatal, trying to find other constructor, however a constructor expecting BasicScenario as " +
+									"single argument is recommented!" );
+						}
+						if (c == null){
+							args[0] = Controler.class;
+							c = klas.getConstructor(args);
+						}
+						strategy = c.newInstance(controler);
+						log.info("Loaded PlanStrategy from class " + classname);
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					} catch (InstantiationException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						e.printStackTrace();
+					} catch (NoSuchMethodException e) {
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 
 			if (strategy == null) {
@@ -126,11 +219,8 @@ public class SocialStrategyManagerConfigLoader {
 			manager.addStrategy(strategy, rate);
 
 			// now check if this modules should be disabled after some iterations
-			String moditer = "ModuleDisableAfterIteration_" + i;
-			String itervalue = config.findParam("strategy", moditer);
-			if (itervalue != null) {
-				int maxIter = Integer.MAX_VALUE;
-				maxIter = Integer.parseInt(itervalue);
+			if (settings.getDisableAfter() >= 0) {
+				int maxIter = settings.getDisableAfter();
 				if (maxIter >= config.controler().getFirstIteration()) {
 					manager.addChangeRequest(maxIter + 1, strategy, 0.0);
 				} else {
@@ -154,7 +244,7 @@ public class SocialStrategyManagerConfigLoader {
 	 * @author kmeister
 	 * @author mrieser
 	 */
-	private static void setDecayingModuleProbability(final StrategyManager manager, final PlanStrategy strategy, final int iterationStartDecay, final double pReplanInit) {
+/*	private static void setDecayingModuleProbability(final StrategyManager manager, final PlanStrategy strategy, final int iterationStartDecay, final double pReplanInit) {
 		// Originally from PlanomatStrategyManagerConfigLoader
 //		double pReplan = 0.0;
 
@@ -179,6 +269,7 @@ public class SocialStrategyManagerConfigLoader {
 //
 //			manager.addChangeRequest(iter, strategy, pReplan);
 
+//			new code: TODO_ [KM] please check that this does the same as the old code above. /marcel,18jan2008
 			if (iter > iterationStartDecay) {
 				double pReplan = Math.min(pReplanInit, slope / (iter - iterationStartDecay + iterOffset) + pReplanFinal);
 				manager.addChangeRequest(iter, strategy, pReplan);
@@ -186,6 +277,5 @@ public class SocialStrategyManagerConfigLoader {
 
 		}
 	}
-
+*/
 }
-

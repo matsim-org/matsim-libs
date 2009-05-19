@@ -4,6 +4,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.jhackney.controler.SNController2;
 import playground.jhackney.controler.SNControllerListener2;
 
 public class SocialNetworksTest2  extends MatsimTestCase{
@@ -20,7 +21,7 @@ public class SocialNetworksTest2  extends MatsimTestCase{
 		String plansFile = getOutputDirectory() + "output_plans.xml.gz";
 		String socNetFile = getOutputDirectory() + "socialnets/stats/edge.txt";
 
-		final Controler controler = new Controler(new String[] {config});
+		final Controler controler = new SNController2(new String[] {config});
 		controler.addControlerListener(new SNControllerListener2());
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);

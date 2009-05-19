@@ -37,6 +37,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
@@ -52,10 +53,12 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
+import playground.christoph.knowledge.replanning.KnowledgeStrategyManagerConfigLoader;
 import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.algorithms.ParamStringToStringArray;
 import playground.jhackney.algorithms.ParamStringsToStringDoubleMap;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
+import playground.jhackney.replanning.SocialStrategyManagerConfigLoader;
 
 
 /**
@@ -130,18 +133,18 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 		this.log.info("scoring");
 //		if( event.getIteration()%interact_interval==0){ old bracket position
-//			Got new events from mobsim
-//			Now make new TimeWindows and update the Map of Agent<->TimeWindow (uses old plans and new events)
-			Gbl.printMemoryUsage();
+//		Got new events from mobsim
+//		Now make new TimeWindows and update the Map of Agent<->TimeWindow (uses old plans and new events)
+		Gbl.printMemoryUsage();
 
-			controler.stopwatch.beginOperation("timewindowmap");			
-			this.log.info(" Making time Windows and Map from Events");
-			teo.makeTimeWindows(epp);
-			twm= teo.getTimeWindowMap();
-			this.log.info(" ... done making time windows and map");
-			controler.stopwatch.endOperation("timewindowmap");
+		controler.stopwatch.beginOperation("timewindowmap");			
+		this.log.info(" Making time Windows and Map from Events");
+		teo.makeTimeWindows(epp);
+		twm= teo.getTimeWindowMap();
+		this.log.info(" ... done making time windows and map");
+		controler.stopwatch.endOperation("timewindowmap");
 
-// New bracket position			
+//		New bracket position			
 		if( event.getIteration()%interact_interval==0){
 //			Spatial interactions can change the social network and/or knowledge
 			controler.stopwatch.beginOperation("spatialencounters");
@@ -183,19 +186,19 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... removing social links done");
 			controler.stopwatch.endOperation("dissolvelinks");
-//New bracket position ensures scoring is called each iteration and that
-// actStats are updated to the events
+//			New bracket position ensures scoring is called each iteration and that
+//			actStats are updated to the events
 		}
 
-//			Update activity statistics with pruned social network
-			this.log.info(" Remaking actStats from events");
-			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
-		
-			Gbl.printMemoryUsage();
+//		Update activity statistics with pruned social network
+		this.log.info(" Remaking actStats from events");
+		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
 
-			this.log.info("SSTEST Finish Scoring with actStats "+snIter);
-			scoring.finish();
-			this.log.info(" ... scoring with actStats finished");
+		Gbl.printMemoryUsage();
+
+		this.log.info("SSTEST Finish Scoring with actStats "+snIter);
+		scoring.finish();
+		this.log.info(" ... scoring with actStats finished");
 		//} old bracket position only updated scores each replanning_interval!!!!!
 	}
 
