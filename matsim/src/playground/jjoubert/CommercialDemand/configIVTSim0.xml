@@ -18,7 +18,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output/" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="20" />
+		<param name="lastIteration" value="100" />
 	</module>
 
     <module name="counts">
@@ -39,9 +39,9 @@
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="24:00:00" />
-		<param name="flowCapacityFactor" value="0.1" />
-		<param name="storageCapacityFactor" value="0.3" />
-		<param name = "snapshotperiod"	value = "00:10:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name="flowCapacityFactor" value="?" />
+		<param name="storageCapacityFactor" value="?" />
+		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims, otfvis -->
 	</module>
 
@@ -95,7 +95,7 @@
 		<param name="Module_2" value="ReRoute" />
 		
 		<param name="ModuleProbability_3" value="0.15" />
-		<param name="Module_3" value="Planomat" />
+		<param name="Module_3" value="TimeAllocationMutator" />
 		
 	</module>
 	
@@ -104,7 +104,7 @@
 		<param name="populationSize" value="10" />
 		<param name="legTravelTimeEstimator" value="org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator" />
 		<param name="possibleModes" value="car" />
-		<param name="jgapMaxGenerations" value="50" />
+		<param name="jgapMaxGenerations" value="100" />
 		<param name="levelOfTimeResolution" value="6" />
 		<param name="doLogging" value="true" />
 		<param name="tripStructureAnalysisLayer" value="link" />
