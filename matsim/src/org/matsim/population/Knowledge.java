@@ -33,8 +33,6 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicKnowledge;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.socialnetworks.mentalmap.MentalMap;
-import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.customize.CustomizableImpl;
 
 public class Knowledge extends CustomizableImpl implements BasicKnowledge<ActivityOption>{
