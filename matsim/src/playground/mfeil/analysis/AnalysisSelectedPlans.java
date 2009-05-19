@@ -91,7 +91,7 @@ public class AnalysisSelectedPlans {
 		}
 	}
 	
-	private void checkConsistency(){
+	private void checkCorrectness(){
 		for (int i=0;i<this.plans.size();i++){
 			for (int j=0;j<this.plans.get(i).size();j++){
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
@@ -116,6 +116,14 @@ public class AnalysisSelectedPlans {
 						}
 					}
 					if (notIn) System.out.println("Prim act error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" for prim act "+this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(k));
+				}
+				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
+					if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home")){
+						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId()!=this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(0).getFacility().getId()){
+							System.out.println("Non-primary home act found in plan of person "+this.plans.get(i).get(j).getPerson().getId());
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -236,7 +244,7 @@ public class AnalysisSelectedPlans {
 
 		AnalysisSelectedPlans sp = new AnalysisSelectedPlans(scenario.getPopulation(), outputDir);
 		sp.analyze();
-		sp.checkConsistency();
+		sp.checkCorrectness();
 
 	}
 
