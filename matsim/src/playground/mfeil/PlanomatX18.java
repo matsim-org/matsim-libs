@@ -192,7 +192,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		double [] xs;
 		double [] ys 									= new double [MAX_ITERATIONS+1];		
 		*/
-		/*
+		
 		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 		Counter.counter++;
 		PrintStream stream;
@@ -203,7 +203,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			return;
 		}
 		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
-		*/
+		
 		
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
 		FileOutputStream fileOverview;
@@ -228,6 +228,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 			}
 	//	}
+		this.locator.run(plan);
 		this.router.run(plan);
 		this.timer.run(plan);
 		while (plan.getScoreAsPrimitiveType()==-100000){
@@ -252,6 +253,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 				}
 		//	}
+			this.locator.run(plan);
 			this.router.run(plan);
 			this.timer.run(plan);
 		}
@@ -264,7 +266,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		/* Write the given plan into the tabuList*/
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
-	//	stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
+		stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
 	//	ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 		
 		// TODO muss dann wieder raus! Nur f�r Planomat!
@@ -276,7 +278,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		/* Do Tabu Search iterations*/
 		int currentIteration;
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
-	//		stream.println("Iteration "+currentIteration);
+			stream.println("Iteration "+currentIteration);
 			
 			/* Define the neighbourhood*/
 			this.createNeighbourhood(neighbourhood, infoOnNeighbourhood, actTypes, primActs);	
@@ -347,7 +349,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					else if (solution.getPlanElements().size()==13) solution13.add(solution);
 					else solutionLong.add(solution);
 				}
-				/*
+				
 				stream.print(neighbourhood[x].getScore()+"\t");
 				stream.print(infoOnNeighbourhood[x][0]+"\t");
 				stream.print(tabuInNeighbourhood[x]+"\t");
@@ -360,7 +362,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				stream.print(infoOnNeighbourhood[x][1]+"\t");
 				stream.print(infoOnNeighbourhood[x][2]+"\t");
 				stream.println();
-				*/
+				
 			}
 			
 			/* Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList*/
@@ -371,7 +373,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			/* Statistics*/	
 	//		ys[currentIteration]=bestIterSolution.getScore();
-	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());	
+			stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());	
 			if (bestIterSolution.getScoreAsPrimitiveType()>bestScore) bestScore=bestIterSolution.getScoreAsPrimitiveType();
 			if (currentIteration%5==0) scoreStat.add(bestScore);
 			
@@ -398,7 +400,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		plan.setScore(tabuList.get(tabuList.size()-1).getScoreAsPrimitiveType());
 		
 		
-	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
+		stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		
 	//	xs = new double [currentIteration];
 	//	for (int i = 0;i<xs.length;i++)xs[i]=i+1;
@@ -407,13 +409,13 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			this.finalTimer.run(tabuList.get(tabuList.size()-1));
 			tabuList.get(tabuList.size()-1).setScore(this.scorer.getScore(tabuList.get(tabuList.size()-1)));
 			scoreStat.add(tabuList.get(tabuList.size()-1).getScoreAsPrimitiveType());
-		/*	stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
+			stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
 			for (int i= 0;i<tabuList.get(tabuList.size()-1).getPlanElements().size();i=i+2){
 				Activity act = (Activity)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
 				if (i!=tabuList.get(tabuList.size()-1).getPlanElements().size()-1) stream.print(act.getType()+"\t"+((Leg)(tabuList.get(tabuList.size()-1).getPlanElements()).get(i+1)).getMode()+"\t");
 				else stream.print(act.getType()+"\t");
 			}
-			stream.println(); */
+			stream.println(); 
 		}
 		
 		if(al.size()>tabuList.get(tabuList.size()-1).getPlanElements().size()){ 
@@ -447,11 +449,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//	chart.addMatsimLogo();
 	//	chart.saveAsPng(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"scorestats_.png"), 800, 600);
 		
-		/*
+		
 		stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
 		stream.println("Anzahl der Planomat-Aufrufe: "+numberTimerCalls);				
 		stream.close();
-		*/
+		
 		
 		statistics.print(plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
 		for (int i=0;i<scoreStat.size();i++){
@@ -605,9 +607,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		else{	
 			
 			/* Adding an activity, "cycling"*/			
-			if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getPlanElements().size()/2)-1)){
+			if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getPlanElements().size()/2)-1)){ //maximum number of possible insertions
 			
-				if (positions[0]==0){
+				if (positions[0]==0){ //first insertion
 					positions[0] = 1;
 					for (int i = 0; i < actsToBeAdded.length;i++){
 						actsToBeAdded[i] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
@@ -615,10 +617,10 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
 					
 				}
-				else if (positions[0]<=(int)(basePlan.getPlanElements().size()/2)){
+				else if (positions[0]<=(int)(basePlan.getPlanElements().size()/2)){ // going through activity list
 					this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);				
 				}
-				else {
+				else { // setting back to first activity
 					positions[0] = 1;
 					this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
 					
@@ -702,6 +704,12 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			} while (type.equals(act.getType()));
 			
 			act.setType(type);
+			if (act.getType().equalsIgnoreCase("home")){
+				act.setFacility(((Activity)(basePlan.getPlanElements().get(0))).getFacility());
+				act.setCoord(((Activity)(basePlan.getPlanElements().get(0))).getCoord());
+				act.setLink(((Activity)(basePlan.getPlanElements().get(0))).getLink());
+			}
+			
 			position[0]++;
 			position[1]++;
 			return (new int[]{0,position[0]-1,-1});
@@ -898,17 +906,17 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	/* Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)*/
 	private void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<ActivityOption> actTypes){
-		
+		/*
 		List<PlanElement> actslegs = basePlan.getPlanElements();
-		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
+		//Activity actHelp = new ActivityImpl ((Activity)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
 		Activity actHelp = new ActivityImpl ((Activity)(actslegs.get((position*2))));
 		actHelp.setDuration(0);
 		actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 		actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
+		*/
+		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0; //sets the pointer back to the first activity type
 		
-		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0;
-		
-		if (position!=1){
+		if (position!=1){ // ensures that no duplicate activity chains are created
 			if (actTypes.get(actToBeAdded[position]).getType().equals(((Activity)(basePlan.getPlanElements().get(position*2-2))).getType().toString())){
 				if (actToBeAdded[position]+1>=actTypes.size()){
 					actToBeAdded[position] = 0;
@@ -917,6 +925,21 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					actToBeAdded[position]++;
 				}
 			}
+		}
+		List<PlanElement> actslegs = basePlan.getPlanElements();
+		Activity actHelp;
+		if (!(actTypes.get(actToBeAdded[position]).getType().equalsIgnoreCase("home"))){ // copy activity Before/behind the gap
+		//	actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2)));
+			actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2-2)));
+			actHelp.setDuration(0);
+			actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
+			actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
+		}
+		else { // copy first activity = home activity to ensure home is always primary
+			actHelp = new ActivityImpl ((Activity)(actslegs.get((0))));
+			actHelp.setDuration(0);
+			actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
+			actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 		}
 		actHelp.setType(actTypes.get(actToBeAdded[position]).getType());
 		actToBeAdded[position]++;
