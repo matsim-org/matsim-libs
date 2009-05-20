@@ -45,7 +45,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 		implements LinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
 		AgentArrivalEventHandler, AgentStuckEventHandler {
 	
-	private final static String WARNING_NEED_LINK_REFERENCE = "This class only works with LinkEvents where the full reference to the link is set!";
+//	private final static String WARNING_NEED_LINK_REFERENCE = "This class only works with LinkEvents where the full reference to the link is set!";
 	
 	public static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 				"agent is not known the turning move travel time cannot be calculated!";
@@ -61,6 +61,8 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	private final boolean calculateLinkTravelTimes;
 
 	private boolean calculateLinkToLinkTravelTimes;
+	
+	private final Network network;
 	
 	/**
 	 * 
@@ -103,6 +105,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 			TravelTimeAggregatorFactory factory, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		super(timeslice, maxTime, factory);
+		this.network = network;
 		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
 		if (this.calculateLinkTravelTimes){
@@ -134,12 +137,17 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	}
 
 	public void handleEvent(final LinkEnterEvent e) {
-		if (e.getLink() == null) {
-			throw new IllegalArgumentException(WARNING_NEED_LINK_REFERENCE);
+		Link link = e.getLink();
+		if (link == null) {
+			link = network.getLink(e.getLinkId());
 		}
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPersonId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
-			Tuple<Link, Link> fromToLink = new Tuple<Link, Link>(oldEvent.getLink(), e.getLink());
+			Link oldLink = oldEvent.getLink();
+			if (oldLink == null) {
+				oldLink = network.getLink(oldEvent.getLinkId());
+			}
+			Tuple<Link, Link> fromToLink = new Tuple<Link, Link>(oldLink, link);
 			DataContainer data = getLinkToLinkTravelTimeData(fromToLink, true);
 			this.getTravelTimeAggregator().addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
 			data.needsConsolidation = true;
@@ -148,13 +156,14 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	}
 
 	public void handleEvent(final LinkLeaveEvent e) {
-		if (e.getLink() == null) {
-			throw new IllegalArgumentException(WARNING_NEED_LINK_REFERENCE);
+		Link link = e.getLink();
+		if (link == null) {
+			link = network.getLink(e.getLinkId());
 		}
 		if (this.calculateLinkTravelTimes) {
 			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
   		if (oldEvent != null) {
-  			DataContainer data = getTravelTimeData(e.getLink(), true);
+  			DataContainer data = getTravelTimeData(link, true);
   			this.getTravelTimeAggregator().addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
   			data.needsConsolidation = true;
   		}
@@ -173,7 +182,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 		if (e != null) {
 			Link link = event.getLink();
 			if (link == null) {
-				throw new IllegalArgumentException(WARNING_NEED_LINK_REFERENCE);
+				link = network.getLink(e.getLinkId());
 			}
 			DataContainer data = getTravelTimeData(link, true);
 			data.needsConsolidation = true;
