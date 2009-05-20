@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.jdeqsim;
+package org.matsim.core.mobsim.jdeqsim.util;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -29,18 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		
-		suite.addTestSuite(TestDESStarter_EquilPopulationPlans1Modified1.class);
-		suite.addTestSuite(TestDESStarter_equilPlans100.class);
-		suite.addTestSuite(TestDESStarter_Berlin.class);
-		
-		suite.addTestSuite(ConfigParameterTest.class);
-		
-		suite.addTestSuite(TestEventLog.class);
-		suite.addTestSuite(TestMessageFactory.class);
-		suite.addTestSuite(TestMessageQueue.class);
-		suite.addTestSuite(TestScheduler.class);
-		
-		suite.addTest(org.matsim.core.mobsim.jdeqsim.util.AllTests.suite());
+		suite.addTestSuite(TestEventLibrary.class);
 		//$JUnit-END$
 		return suite;
 	}
