@@ -61,13 +61,11 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.Events;
@@ -1133,7 +1131,7 @@ public class Controler {
 	 * implemented as a ControlerListener, to keep the structure of the
 	 * Controler as simple as possible.
 	 */
-	protected static class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener, ShutdownListener {
+	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ShutdownListener {
 
 		private EventWriter eventWriter = null;
 
@@ -1151,14 +1149,10 @@ public class Controler {
 			});
 		}
 
-		public void notifyIterationStarts(final IterationStartsEvent event) {
+		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 			Controler controler = event.getControler();
 			controler.events.resetHandlers(event.getIteration());
 			controler.events.resetCounter();
-		}
-
-		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-			Controler controler = event.getControler();
 			controler.travelTimeCalculator.resetTravelTimes();
 
 			if ((controler.writeEventsInterval > 0) && (event.getIteration() % controler.writeEventsInterval == 0)) {
