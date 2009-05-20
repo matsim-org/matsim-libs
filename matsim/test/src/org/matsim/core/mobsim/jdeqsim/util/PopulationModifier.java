@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.jdeqsim.util.testable;
+package org.matsim.core.mobsim.jdeqsim.util;
 
 import org.matsim.core.api.population.Population;
 

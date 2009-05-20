@@ -8,7 +8,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
+import org.matsim.core.mobsim.jdeqsim.util.PopulationModifier;
 
 
 public class EquilPopulationPlans1Modified1 implements PopulationModifier{

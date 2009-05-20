@@ -28,7 +28,6 @@ import org.matsim.core.events.PersonEvent;
 import org.matsim.core.events.handler.PersonEventHandler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.mobsim.jdeqsim.util.testable.PopulationModifier;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
