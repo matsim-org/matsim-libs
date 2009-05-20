@@ -27,7 +27,7 @@ import org.matsim.core.scoring.interfaces.MoneyScoring;
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
  * modular approach.
- * 
+ * @see http://www.matsim.org/node/263
  * @author rashid_waraich
  */
 public class MoneyScoringFunction implements MoneyScoring, BasicScoring {

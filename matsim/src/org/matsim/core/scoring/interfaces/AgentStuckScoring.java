@@ -22,7 +22,7 @@ package org.matsim.core.scoring.interfaces;
 
 /**
  * The scoring methods related to stuck vehicles.
- *
+ * @see http://www.matsim.org/node/263
  * @author rashid_waraich
  */
 public interface AgentStuckScoring {

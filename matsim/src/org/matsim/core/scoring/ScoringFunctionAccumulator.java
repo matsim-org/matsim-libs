@@ -32,7 +32,7 @@ import org.matsim.core.scoring.interfaces.MoneyScoring;
 
 /**
  * The accumulator adds up the different parts of the score.
- *
+ * @see http://www.matsim.org/node/263
  * @author rashid_waraich
  */
 public class ScoringFunctionAccumulator implements ScoringFunction {

@@ -24,7 +24,7 @@ import org.matsim.core.api.population.Leg;
 
 /**
  * The scoring methods related to legs.
- *
+ * @see http://www.matsim.org/node/263
  * @author rashid_waraich
  */
 public interface LegScoring {

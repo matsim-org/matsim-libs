@@ -24,7 +24,7 @@ import org.matsim.core.api.population.Activity;
 
 /**
  * The scoring methods related to activities.
- *
+ * @see http://www.matsim.org/node/263
  * @author rashid_waraich
  */
 public interface ActivityScoring {
