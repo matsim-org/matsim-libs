@@ -19,6 +19,7 @@
 
 package org.matsim.core.basic.v01.vehicles;
 
+import org.matsim.api.basic.v01.Id;
 
 /**
  * @author dgrether
@@ -32,10 +33,10 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 	private String description;
 	private BasicVehicleCapacity capacity;
 	
-	private String typeId;
+	private Id id;
 
-	public BasicVehicleTypeImpl(String typeId) {
-		this.typeId = typeId;
+	public BasicVehicleTypeImpl(Id typeId) {
+		this.id = typeId;
 	}
 
 	public void setCapacity(BasicVehicleCapacity capacity) {
@@ -66,34 +67,28 @@ public class BasicVehicleTypeImpl implements BasicVehicleType {
 		return width;
 	}
 
-	
 	public double getMaximumVelocity() {
 		return maxVelocity;
 	}
 
-	
 	public double getLength() {
 		return length;
 	}
 
-	
 	public BasicEngineInformation getEngineInformation() {
 		return engineInformation;
 	}
 
-	
 	public String getDescription() {
 		return description;
 	}
 
-	
 	public BasicVehicleCapacity getCapacity() {
 		return capacity;
 	}
 
-	
-	public String getTypeId() {
-		return typeId;
+	public Id getId() {
+		return id;
 	}
 
 }

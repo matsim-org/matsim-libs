@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Id;
  */
 public interface BasicVehicles {
 
-	public Map<String, BasicVehicleType> getVehicleTypes();
+	public Map<Id, BasicVehicleType> getVehicleTypes();
 	
 	public Map<Id, BasicVehicle> getVehicles();
 	

@@ -63,11 +63,11 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 	}
 
 	private void checkContent(BasicVehicles vehdef) {
-		Map<String, BasicVehicleType> vehicleTypes = vehdef.getVehicleTypes();
+		Map<Id, BasicVehicleType> vehicleTypes = vehdef.getVehicleTypes();
 		Map<Id, BasicVehicle> vehicles = vehdef.getVehicles();
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
-		BasicVehicleType vehType = vehicleTypes.get("normalCar");
+		BasicVehicleType vehType = vehicleTypes.get(new IdImpl("normalCar"));
 		assertNotNull(vehType);
 		assertEquals(9.5, vehType.getLength(), EPSILON);
 		assertEquals(3.0, vehType.getWidth(), EPSILON);
@@ -81,7 +81,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertEquals(BasicEngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
 		assertEquals(0.23, vehType.getEngineInformation().getGasConsumption(), EPSILON);
 		
-		vehType = vehicleTypes.get("defaultValueCar");
+		vehType = vehicleTypes.get(new IdImpl("defaultValueCar"));
 		assertNotNull(vehType);
 		assertEquals(7.5, vehType.getLength(), EPSILON);
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
@@ -93,11 +93,11 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 	
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
-		assertEquals("normalCar", vehicles.get(id23).getType().getTypeId());
+		assertEquals(new IdImpl("normalCar"), vehicles.get(id23).getType().getId());
 
 		assertNotNull(vehicles.get(id42));
 		assertEquals(id42, vehicles.get(id42).getId());
-		assertEquals("defaultValueCar", vehicles.get(id42).getType().getTypeId());
+		assertEquals(new IdImpl("defaultValueCar"), vehicles.get(id42).getType().getId());
 	}
 
 }

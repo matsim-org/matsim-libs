@@ -37,7 +37,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 public class VehicleWriterV1 extends MatsimXmlWriter {
 
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	private Map<String, BasicVehicleType> vehicleTypes;
+	private Map<Id, BasicVehicleType> vehicleTypes;
 	private Map<Id, BasicVehicle> vehicles;
 
 	
@@ -68,15 +68,15 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		for (BasicVehicle v : veh.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, v.getId().toString()));
-			atts.add(this.createTuple(VehicleSchemaV1Names.TYPE, v.getType().getTypeId()));
+			atts.add(this.createTuple(VehicleSchemaV1Names.TYPE, v.getType().getId().toString()));
 			this.writeStartTag(VehicleSchemaV1Names.VEHICLE, atts, true);
 		}
 	}
 
-	private void writeVehicleTypes(Map<String, BasicVehicleType> vts) throws IOException {
-		for (BasicVehicleType vt : vts.values()){
+	private void writeVehicleTypes(Map<Id, BasicVehicleType> vts) throws IOException {
+		for (BasicVehicleType vt : vts.values()) {
 			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.TYPEID, vt.getTypeId()));
+			atts.add(this.createTuple(VehicleSchemaV1Names.TYPEID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV1Names.VEHICLETYPE, atts);
 			if (vt.getDescription() != null) {
 				this.writeStartTag(VehicleSchemaV1Names.DESCRIPTION, null);

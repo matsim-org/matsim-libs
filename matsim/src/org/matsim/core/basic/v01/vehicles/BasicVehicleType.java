@@ -19,6 +19,8 @@
 
 package org.matsim.core.basic.v01.vehicles;
 
+import org.matsim.api.basic.v01.Id;
+
 
 /**
  * @author dgrether
@@ -49,5 +51,5 @@ public interface BasicVehicleType {
 	
 	public BasicVehicleCapacity getCapacity();
 	
-	public String getTypeId();
+	public Id getId();
 }

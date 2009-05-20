@@ -90,7 +90,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 	
 	private void createTestVehicles(ScenarioImpl scenario) {
 		BasicVehicles v = scenario.getVehicles();
-		BasicVehicleType defaultType = v.getBuilder().createVehicleType("default");
+		BasicVehicleType defaultType = v.getBuilder().createVehicleType(new IdImpl("default"));
 		v.getVehicles().put(id23, v.getBuilder().createVehicle(id23, defaultType));
 		v.getVehicles().put(id42, v.getBuilder().createVehicle(id42, defaultType));
 	}

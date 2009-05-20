@@ -36,7 +36,7 @@ public class BasicVehicleBuilderImpl implements VehicleBuilder {
 		return veh;
 	}
 	
-	public BasicVehicleType createVehicleType(String typeId) {
+	public BasicVehicleType createVehicleType(Id typeId) {
 			BasicVehicleType veh = new BasicVehicleTypeImpl(typeId);
 			return veh;
 	}

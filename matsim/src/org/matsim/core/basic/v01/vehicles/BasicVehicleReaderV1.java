@@ -84,7 +84,7 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 			this.currentCapacity = null;
 		}
 		else if (VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase(name)){
-			this.vehicles.getVehicleTypes().put(this.currentVehType.getTypeId(), this.currentVehType);
+			this.vehicles.getVehicleTypes().put(this.currentVehType.getId(), this.currentVehType);
 			this.currentVehType = null;
 		}
 	
@@ -111,7 +111,7 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase(name)) {
-			this.currentVehType = this.builder.createVehicleType(atts.getValue(VehicleSchemaV1Names.TYPEID));			
+			this.currentVehType = this.builder.createVehicleType(new IdImpl(atts.getValue(VehicleSchemaV1Names.TYPEID)));			
 		}
 		else if (VehicleSchemaV1Names.LENGTH.equalsIgnoreCase(name)){
 			this.currentVehType.setLength(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.METER)));
@@ -141,7 +141,7 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 			this.currentGasConsumption = Double.parseDouble(atts.getValue(VehicleSchemaV1Names.LITERPERMETER));
 		}
 		else if (VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase(name)){
-			String typeId = atts.getValue(VehicleSchemaV1Names.TYPE);
+			Id typeId = new IdImpl(atts.getValue(VehicleSchemaV1Names.TYPE));
 			BasicVehicleType type = this.vehicles.getVehicleTypes().get(typeId);
 			Id id = new IdImpl(atts.getValue(VehicleSchemaV1Names.ID));
 			BasicVehicle v = this.builder.createVehicle(id, type);

@@ -31,12 +31,12 @@ import org.matsim.api.basic.v01.Id;
  */
 public class BasicVehiclesImpl implements BasicVehicles {
 	
-	private Map<String, BasicVehicleType> vehicleTypes;
+	private Map<Id, BasicVehicleType> vehicleTypes;
 	private LinkedHashMap<Id, BasicVehicle> vehicles;
 	private BasicVehicleBuilderImpl builder;
 
 	public BasicVehiclesImpl(){
-		this.vehicleTypes = new LinkedHashMap<String, BasicVehicleType>();
+		this.vehicleTypes = new LinkedHashMap<Id, BasicVehicleType>();
 		this.builder = new BasicVehicleBuilderImpl();
 		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
 	}
@@ -51,7 +51,7 @@ public class BasicVehiclesImpl implements BasicVehicles {
 	}
 
 
-	public Map<String, BasicVehicleType> getVehicleTypes() {
+	public Map<Id, BasicVehicleType> getVehicleTypes() {
 		return this.vehicleTypes;
 	}
 
