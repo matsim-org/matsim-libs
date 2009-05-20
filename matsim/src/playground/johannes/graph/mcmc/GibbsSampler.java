@@ -52,11 +52,11 @@ public class GibbsSampler {
 		this.inteval = interval;
 	}
 	
-	public void sample(AdjacencyMatrix y, ConditionalDistribution d, int burninTime, MCMCSampleDelegate handler) {
+	public void sample(AdjacencyMatrix y, ConditionalDistribution d, long burninTime, MCMCSampleDelegate handler) {
 		long time = System.currentTimeMillis();
 		
 		int accept = 0;
-		for(int it = 0; it < burninTime; it++) {
+		for(long it = 0; it < burninTime; it++) {
 			if(step(y, d))
 				accept++;
 			

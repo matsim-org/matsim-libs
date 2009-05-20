@@ -38,11 +38,19 @@ import org.matsim.core.utils.io.IOUtils;
  * @author illenberger
  *
  */
-public class WeightedStatistics {
+public class Distribution {
 
 	private TDoubleArrayList values = new TDoubleArrayList();
 	
 	private TDoubleArrayList weights = new TDoubleArrayList();
+	
+	public Distribution() {
+		
+	}
+	
+	public Distribution(double[] values) {
+		addAll(values);
+	}
 	
 	public void add(double value) {
 		add(value, 1.0);
@@ -114,6 +122,10 @@ public class WeightedStatistics {
 		return devsum/wsum;
 	}
 	
+	public double varianceCoefficient() {
+		return Math.sqrt(variance()) / mean();
+	}
+	
 	public double skewness() {
 		double mu = mean();
 		double devsum = 0;
@@ -157,24 +169,6 @@ public class WeightedStatistics {
 		return freq;
 	}
 	
-	public TDoubleDoubleHashMap normalizedDistribution() {
-		double wsum = 0;
-		int size = weights.size();
-		for(int i = 0; i < size; i++) {
-			wsum += weights.get(i);
-		}
-		final double norm = 1/wsum;
-		TDoubleFunction fct = new TDoubleFunction() {
-			public double execute(double value) {
-				return value * norm;
-			}
-		
-		};
-		TDoubleDoubleHashMap distr = absoluteDistribution();
-		distr.transformValues(fct);
-		return distr;
-	}
-	
 	public TDoubleDoubleHashMap absoluteDistribution(double binsize) {
 		TDoubleDoubleHashMap freq = new TDoubleDoubleHashMap();
 		int size = values.size();
@@ -188,6 +182,33 @@ public class WeightedStatistics {
 		return freq;
 	}
 
+	public TDoubleDoubleHashMap normalizedDistribution() {
+		return normalizedDistribution(absoluteDistribution());
+	}
+	
+	public TDoubleDoubleHashMap normalizedDistribution(double binsize) {
+		return normalizedDistribution(absoluteDistribution(binsize));
+	}
+	
+	public TDoubleDoubleHashMap normalizedDistribution(TDoubleDoubleHashMap distr) {
+		double sum = 0;
+		double[] values = distr.getValues();
+		
+		for(int i = 0; i < values.length; i++) {
+			sum += values[i];
+		}
+		final double norm = 1/sum;
+		TDoubleFunction fct = new TDoubleFunction() {
+			public double execute(double value) {
+				return value * norm;
+			}
+		
+		};
+		
+		distr.transformValues(fct);
+		return distr;
+	}
+	
 	public static void writeHistogram(TDoubleDoubleHashMap distr, String filename) throws FileNotFoundException, IOException {
 		BufferedWriter aWriter = IOUtils.getBufferedWriter(filename);
 		aWriter.write("bin\tcount");
@@ -201,5 +222,22 @@ public class WeightedStatistics {
 			aWriter.newLine();
 		}
 		aWriter.close();
+	}
+	
+	public static double meanSquareError(TDoubleDoubleHashMap estimation, TDoubleDoubleHashMap observation) {
+		double square_sum = 0;
+		double[] keys = estimation.keys();
+		for(double bin : keys) {
+			double X = estimation.get(bin);
+			
+			if(!observation.containsKey(bin))
+				throw new IllegalArgumentException("The observed distribution has no value for " + bin);
+			
+			double x = observation.get(bin);
+			double diff = X - x;
+			square_sum += diff * diff;
+		}
+		
+		return square_sum/(double)keys.length;
 	}
 }

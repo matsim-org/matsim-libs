@@ -23,6 +23,8 @@
  */
 package playground.johannes.socialnet.util;
 
+import java.io.IOException;
+
 import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
@@ -41,13 +43,15 @@ public class GraphML2KMLDegree {
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		SocialNetwork<Person> socialnet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
 		
-		SNKMLObjectStyle<Ego<Person>, Person> vertexStyle = new SNKMLDegreeStyle<Person>();
 		SNKMLWriter<Person> writer = new SNKMLWriter<Person>();
+		SNKMLObjectStyle<Ego<Person>, Person> vertexStyle = new SNKMLDegreeStyle<Person>(writer.getVertexIconLink());
+		writer.setVertexStyle(vertexStyle);
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
-		writer.write(socialnet, vertexStyle, null, args[2]);
+		writer.write(socialnet, args[2]);
 	}
 }

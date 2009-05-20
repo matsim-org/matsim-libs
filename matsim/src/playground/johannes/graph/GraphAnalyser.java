@@ -34,7 +34,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.graph.GraphStatistics.GraphDistance;
 import playground.johannes.graph.io.PlainGraphMLReader;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -43,6 +43,8 @@ import playground.johannes.statistics.WeightedStatistics;
 public class GraphAnalyser {
 
 	private static final Logger logger = Logger.getLogger(GraphAnalyser.class);
+	
+	public static final String SUMMARY_FILE = "summary.txt";
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -70,26 +72,28 @@ public class GraphAnalyser {
 		analyze(g, output, extended);
 	}
 	
-	public static void analyze(Graph g, String output, boolean extended) throws FileNotFoundException, IOException {	
+	public static void analyze(Graph g, String output, boolean extended) {
+		try {
+			
 		int numEdges = g.getEdges().size();
 		int numVertices = g.getVertices().size();
 		logger.info(String.format("Loaded graph: %1$s vertices, %2$s edges.", numVertices, numEdges));
 		/*
 		 * degree
 		 */
-		WeightedStatistics degreeStats = GraphStatistics.getDegreeDistribution(g);
+		Distribution degreeStats = GraphStatistics.getDegreeDistribution(g);
 		double meanDegree = degreeStats.mean();
 		logger.info(String.format("Mean degree is %1$s.", meanDegree));
 		if(output != null)
-			WeightedStatistics.writeHistogram(degreeStats.absoluteDistribution(), output + "degree.hist.txt");
+			Distribution.writeHistogram(degreeStats.absoluteDistribution(), output + "degree.hist.txt");
 		/*
 		 * clustering - local
 		 */
-		WeightedStatistics clusteringStats = GraphStatistics.getLocalClusteringDistribution(g.getVertices());
+		Distribution clusteringStats = GraphStatistics.getLocalClusteringDistribution(g.getVertices());
 		double c_local = clusteringStats.mean();
 		logger.info(String.format("Mean local clustering coefficient is %1$s.", c_local));
 		if(output != null)
-			WeightedStatistics.writeHistogram(clusteringStats.absoluteDistribution(0.05), output + "clustering.hist.txt");
+			Distribution.writeHistogram(clusteringStats.absoluteDistribution(0.05), output + "clustering.hist.txt");
 		/*
 		 * clustering - global
 		 */
@@ -112,10 +116,10 @@ public class GraphAnalyser {
 		double numComponents = components.size();
 		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
 		if(output != null) {
-			WeightedStatistics stats = new WeightedStatistics();
+			Distribution stats = new Distribution();
 			for(Set<Vertex> component : components)
 				stats.add(component.size());
-			WeightedStatistics.writeHistogram(stats.absoluteDistribution(), output + "components.hist.txt");
+			Distribution.writeHistogram(stats.absoluteDistribution(), output + "components.hist.txt");
 		}
 				
 		GraphDistance gDistance = new GraphStatistics.GraphDistance();
@@ -129,7 +133,7 @@ public class GraphAnalyser {
 		}
 		
 		if(output != null) {
-			BufferedWriter writer = IOUtils.getBufferedWriter(output + "summary.txt");
+			BufferedWriter writer = IOUtils.getBufferedWriter(output + SUMMARY_FILE);
 			
 			writer.write("numVertices=");
 			writer.write(String.valueOf(numVertices));
@@ -184,6 +188,10 @@ public class GraphAnalyser {
 			writer.newLine();
 
 			writer.close();
+		}
+		
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

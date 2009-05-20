@@ -25,12 +25,9 @@ package playground.johannes.socialnet.io;
 
 import java.util.List;
 
-import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 
 import playground.johannes.socialnet.SocialNetwork;
 
@@ -38,9 +35,9 @@ import playground.johannes.socialnet.SocialNetwork;
  * @author illenberger
  *
  */
-public interface SNKMLObjectStyle<T, P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>>{
+public interface SNKMLObjectStyle<T, P extends BasicPerson<?>>{
 
-	public List<StyleType> getObjectStyle(SocialNetwork<P> socialnet, LinkType iconLinkType);
+	public List<StyleType> getObjectStyle(SocialNetwork<P> socialnet);
 	
 	public String getObjectSytleId(T object);
 	

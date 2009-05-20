@@ -34,7 +34,7 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.VertexDecorator;
 import playground.johannes.statistics.PowerLawFit;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -62,7 +62,7 @@ public class DegreeStats extends GraphPropertyEstimator {
 		DescriptiveStatistics observed = new DescriptiveStatistics();
 		Frequency observedDistr = new Frequency();
 		
-		WeightedStatistics estimated = new WeightedStatistics();
+		Distribution estimated = new Distribution();
 
 		for(VertexDecorator<SampledVertex> v : graph.getVertices()) {
 			if(!v.getDelegate().isAnonymous()) {

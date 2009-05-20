@@ -44,7 +44,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * A collection of function to calculate statistical properties of graphs.
@@ -94,7 +94,7 @@ public class GraphStatistics {
 	 *            the graph to retrieve the degree distribution from.
 	 * @return the degree distribution.
 	 */
-	public static WeightedStatistics getDegreeDistribution(Graph g) {
+	public static Distribution getDegreeDistribution(Graph g) {
 		return getDegreeDistribution(g.getVertices());
 	}
 	
@@ -107,8 +107,8 @@ public class GraphStatistics {
 	 *            from.
 	 * @return the degree distribution.
 	 */
-	public static WeightedStatistics getDegreeDistribution(Collection<? extends Vertex> vertices) {
-		WeightedStatistics stats = new WeightedStatistics();
+	public static Distribution getDegreeDistribution(Collection<? extends Vertex> vertices) {
+		Distribution stats = new Distribution();
 		for(Vertex v : vertices)
 			stats.add(v.getEdges().size());
 		return stats;
@@ -144,9 +144,9 @@ public class GraphStatistics {
 	 * @return an object-double map containing the vertex as key and the
 	 *         clustering coefficient as value.
 	 */
-	public static TObjectDoubleHashMap<? extends Vertex> getLocalClusteringCoefficients(Collection<? extends Vertex> vertices) {
-		TObjectDoubleHashMap<Vertex> cc = new TObjectDoubleHashMap<Vertex>();
-		for(Vertex v : vertices) {
+	public static <T extends Vertex> TObjectDoubleHashMap<T> getLocalClusteringCoefficients(Collection<T> vertices) {
+		TObjectDoubleHashMap<T> cc = new TObjectDoubleHashMap<T>();
+		for(T v : vertices) {
 			int k = v.getEdges().size();
 			if(k == 0 || k == 1) {
 				cc.put(v, 0.0);
@@ -199,7 +199,7 @@ public class GraphStatistics {
 	 *            obtained.
 	 * @return the distribution of local clustering coefficients.
 	 */
-	public static WeightedStatistics getLocalClusteringDistribution(Graph g) {
+	public static Distribution getLocalClusteringDistribution(Graph g) {
 		return getLocalClusteringDistribution(g.getVertices());
 	}
 	
@@ -211,8 +211,8 @@ public class GraphStatistics {
 	 *            obtained.
 	 * @return the distribution of local clustering coefficients.
 	 */
-	public static WeightedStatistics getLocalClusteringDistribution(Collection<? extends Vertex> vertices) {
-		WeightedStatistics stats = new WeightedStatistics();
+	public static Distribution getLocalClusteringDistribution(Collection<? extends Vertex> vertices) {
+		Distribution stats = new Distribution();
 		stats.addAll(getLocalClusteringCoefficients(vertices).getValues());
 		return stats;
 	}

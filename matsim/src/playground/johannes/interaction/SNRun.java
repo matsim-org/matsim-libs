@@ -40,7 +40,7 @@ import playground.johannes.graph.Vertex;
 import playground.johannes.graph.io.PajekWriter;
 import playground.johannes.socialnet.SocialNetwork;
 import playground.johannes.socialnet.io.SNGraphMLWriter;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -63,7 +63,7 @@ public class SNRun {
 		
 		System.out.println("Mean degree is " + GraphStatistics.getDegreeStatistics(socialnet).getMean());
 		System.out.println("Mean clustering is " + GraphStatistics.getClusteringStatistics(socialnet).getMean());
-		WeightedStatistics.writeHistogram(GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution(), c.getOutputFilename("degree.hist.txt"));
+		Distribution.writeHistogram(GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution(), c.getOutputFilename("degree.hist.txt"));
 		SNGraphMLWriter writer = new SNGraphMLWriter();
 		writer.write(socialnet, c.getOutputFilename("socialnet.graphml"));
 		

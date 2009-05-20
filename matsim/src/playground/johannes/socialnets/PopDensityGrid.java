@@ -105,7 +105,7 @@ public class PopDensityGrid {
 			grid.setValue(count, homeLoc);
 		}
 		popWriter.close();
-		grid.toFile(args[2], new DoubleStringSerializer());
+		grid.toFile(args[2]);
 		
 	}
 

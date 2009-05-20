@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DoubleStringSerializer.java
+ * SampledSocialNet.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,23 +21,40 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.ivtsurveys;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+
+import playground.johannes.socialnet.Ego;
+import playground.johannes.socialnet.SocialNetwork;
 
 /**
  * @author illenberger
  *
  */
-public class DoubleStringSerializer implements StringSerializer<Double> {
+public class SampledSocialNet<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends SocialNetwork<P> {
 
-	public String decode(Double object) {
-		if(object == null)
-			return "0";
-		else
-			return String.valueOf(object);
+	private Set<Ego<P>> sampledVertices = new HashSet<Ego<P>>();
+	
+	@Override
+	public Ego<P> addEgo(P person) {
+		Ego<P> ego = super.addEgo(person);
+		sampledVertices.add(ego);
+		return ego;
 	}
 
-	public Double encode(String data) {
-		return new Double(data);
+	public Ego<P> addUnsampledEgo(P person) {
+		return addEgo(person);
+	}
+	
+	@Override
+	public Set<? extends Ego<P>> getVertices() {
+		return sampledVertices;
 	}
 
 }

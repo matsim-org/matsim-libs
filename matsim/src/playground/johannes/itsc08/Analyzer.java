@@ -59,7 +59,7 @@ import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -482,9 +482,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			w.write(Double.toString(StatUtils.mean(willingness.toNativeArray())));
 			w.close();
 			
-			WeightedStatistics.writeHistogram(avrRiskyGoodTriptimes, controler.getOutputFilename("riskyGood.txt"));
-			WeightedStatistics.writeHistogram(avrRiskyBadTriptimes, controler.getOutputFilename("riskyBad.txt"));
-			WeightedStatistics.writeHistogram(avrGuidedTriptimes, controler.getOutputFilename("guided.txt"));
+			Distribution.writeHistogram(avrRiskyGoodTriptimes, controler.getOutputFilename("riskyGood.txt"));
+			Distribution.writeHistogram(avrRiskyBadTriptimes, controler.getOutputFilename("riskyBad.txt"));
+			Distribution.writeHistogram(avrGuidedTriptimes, controler.getOutputFilename("guided.txt"));
 			dumpMap(calcAvrTriptimes(pi_guided_map), controler.getOutputFilename("pi_guided.txt"));
 			dumpMap(calcAvrTriptimes(pi_avr_map), controler.getOutputFilename("pi_avr.txt"));
 		} catch (FileNotFoundException e) {

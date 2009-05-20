@@ -35,14 +35,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.core.api.population.Person;
 
 import playground.johannes.graph.GraphStatistics;
+import playground.johannes.graph.Partitions;
 import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;
 import playground.johannes.socialnet.io.SNGraphMLReader;
-import playground.johannes.socialnets.DoubleStringSerializer;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -50,7 +51,7 @@ import playground.johannes.statistics.WeightedStatistics;
  */
 public class SpatialStatistics {
 
-	public static TDoubleDoubleHashMap getDensityDegreeCorrelation(Collection<Ego<?>> vertices, SpatialGrid<Double> densityGrid) {
+	public static TDoubleDoubleHashMap degreeDensityCorrelation(Collection<? extends Ego<? extends BasicPerson<?>>> vertices, SpatialGrid<Double> densityGrid) {
 		TObjectDoubleHashMap<Ego<?>> vertexValues = new TObjectDoubleHashMap<Ego<?>>();
 		for(Ego<?> e : vertices) {
 			vertexValues.put(e, e.getEdges().size());
@@ -59,11 +60,11 @@ public class SpatialStatistics {
 		return getDensityCorrelation(vertexValues, densityGrid, 500);
 	}
 	
-	public static TDoubleDoubleHashMap getDensityClusteringCorrelation(Collection<Ego<?>> vertices, SpatialGrid<Double> densityGrid) {
-		return getDensityCorrelation((TObjectDoubleHashMap<Ego<?>>) GraphStatistics.getLocalClusteringCoefficients(vertices), densityGrid, 500);
+	public static <V extends Ego<? extends BasicPerson<?>>> TDoubleDoubleHashMap clusteringDensityCorrelation(Collection<V> vertices, SpatialGrid<Double> densityGrid) {
+		return getDensityCorrelation(GraphStatistics.getLocalClusteringCoefficients(vertices), densityGrid, 500);
 	}
 	
-	public static TDoubleObjectHashMap<TDoubleArrayList> getDensityCorrelation(TObjectDoubleHashMap<Ego<?>> vertexValues, SpatialGrid<Double> densityGrid) {
+	public static <V extends Ego<? extends BasicPerson<?>>> TDoubleObjectHashMap<TDoubleArrayList> getDensityCorrelation(TObjectDoubleHashMap<V> vertexValues, SpatialGrid<Double> densityGrid) {
 		SpatialGrid<TDoubleArrayList> valuesGrid = new SpatialGrid<TDoubleArrayList>(densityGrid.getXmin(), densityGrid.getYmin(), densityGrid.getXmax(), densityGrid.getYmax(), densityGrid.getResolution());
 		/*
 		 * Create a grid where each cell contains an array with the values of the vertices within a cell.
@@ -76,7 +77,7 @@ public class SpatialStatistics {
 					values = new TDoubleArrayList();
 					valuesGrid.setValue(values, c);
 				}
-				values.add(vertexValues.get((Ego<?>) e));
+				values.add(vertexValues.get((V) e));
 			}
 		}
 		/*
@@ -102,7 +103,7 @@ public class SpatialStatistics {
 		return rho_values;
 	}
 	
-	public static TDoubleDoubleHashMap getDensityCorrelation(TObjectDoubleHashMap<Ego<?>> vertexValues, SpatialGrid<Double> densityGrid, double binsize) {
+	public static <V extends Ego<? extends BasicPerson<?>>> TDoubleDoubleHashMap getDensityCorrelation(TObjectDoubleHashMap<V> vertexValues, SpatialGrid<Double> densityGrid, double binsize) {
 		TDoubleObjectHashMap<TDoubleArrayList> rho_values = getDensityCorrelation(vertexValues, densityGrid);
 		/*
 		 * Discretize into density bins.
@@ -136,19 +137,30 @@ public class SpatialStatistics {
 		return rho_value_mean;
 	}
 	
+	public static <V extends Ego<? extends BasicPerson<?>>> TDoubleObjectHashMap<Set<V>> createDensityPartitions(Set<V> vertices, SpatialGrid<Double> densityGrid, double binsize) {
+		TObjectDoubleHashMap<V> vertexValues = new TObjectDoubleHashMap<V>();
+		for(V v : vertices) {
+			if(densityGrid.isInBounds(v.getCoord())) {
+				double rho = densityGrid.getValue(v.getCoord());
+				vertexValues.put(v, rho);
+			}
+		}
+		return Partitions.createPartitions(vertexValues, binsize);
+	}
+	
 	public static void main(String args[]) throws FileNotFoundException, IOException {
 		SocialNetwork<Person> socialnet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
-		SpatialGrid<Double> densityGrid = SpatialGrid.readFromFile(args[2], new DoubleStringSerializer());
+		SpatialGrid<Double> densityGrid = SpatialGrid.readFromFile(args[2]);
 		
 //		Set<Ego<Person>> anonymous = SNGraphMLReader.readAnonymousVertices(socialnet, args[3]); 
-		Set<Ego<?>> vertices = new HashSet<Ego<?>>();
+		Set<Ego<Person>> vertices = new HashSet<Ego<Person>>();
 		for(Ego<Person> e : socialnet.getVertices()) {
 //			if(!anonymous.contains(e))
 				vertices.add(e);
 		}
-		TDoubleDoubleHashMap densityDegreeHist = getDensityDegreeCorrelation(vertices, densityGrid);
-		WeightedStatistics.writeHistogram(densityDegreeHist, args[4]);
-		TDoubleDoubleHashMap densityClusteringHist = getDensityClusteringCorrelation(vertices, densityGrid);
-		WeightedStatistics.writeHistogram(densityClusteringHist, args[5]);
+		TDoubleDoubleHashMap densityDegreeHist = degreeDensityCorrelation(vertices, densityGrid);
+		Distribution.writeHistogram(densityDegreeHist, args[4]);
+		TDoubleDoubleHashMap densityClusteringHist = clusteringDensityCorrelation(vertices, densityGrid);
+		Distribution.writeHistogram(densityClusteringHist, args[5]);
 	}
 }

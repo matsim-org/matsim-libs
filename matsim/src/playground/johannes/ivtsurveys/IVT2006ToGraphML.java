@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnet.util;
+package playground.johannes.ivtsurveys;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

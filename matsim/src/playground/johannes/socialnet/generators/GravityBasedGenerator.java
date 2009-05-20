@@ -23,15 +23,13 @@
  */
 package playground.johannes.socialnet.generators;
 
-import gnu.trove.TDoubleArrayList;
-
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
 
-import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
@@ -40,11 +38,6 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 
-import playground.johannes.graph.GraphAnalyser;
-import playground.johannes.graph.GraphStatistics;
-import playground.johannes.graph.generators.ErdosRenyiGenerator;
-import playground.johannes.graph.io.PajekClusteringColorizer;
-import playground.johannes.graph.io.PajekDegreeColorizer;
 import playground.johannes.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.graph.mcmc.Ergm;
@@ -52,16 +45,16 @@ import playground.johannes.graph.mcmc.ErgmDensity;
 import playground.johannes.graph.mcmc.ErgmTerm;
 import playground.johannes.graph.mcmc.GibbsSampler;
 import playground.johannes.graph.mcmc.MCMCSampleDelegate;
-import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;
-import playground.johannes.socialnet.SocialNetworkFactory;
+import playground.johannes.socialnet.SocialNetworkAnalyzer;
 import playground.johannes.socialnet.SocialNetworkStatistics;
-import playground.johannes.socialnet.SocialTie;
 import playground.johannes.socialnet.io.SNGraphMLWriter;
-import playground.johannes.socialnet.io.SNPajekWriter;
+import playground.johannes.socialnet.io.SNKMLDegreeStyle;
+import playground.johannes.socialnet.io.SNKMLWriter;
 import playground.johannes.socialnet.mcmc.ErgmDistanceLocal;
 import playground.johannes.socialnet.mcmc.SNAdjacencyMatrix;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.socialnet.spatial.SpatialGrid;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -73,6 +66,9 @@ public class GravityBasedGenerator {
 	
 	private static final String MODULE_NAME = "gravityGenerator";
 	
+//	private static String outputDir;
+	
+	private static SpatialGrid<Double> densityGrid;
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -81,16 +77,16 @@ public class GravityBasedGenerator {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadScenario();
-		Scenario data = loader.getScenario();
-		Population population = data.getPopulation();
+		loader.loadPopulation();
+		Scenario scenario = loader.getScenario();
+		Population population = scenario.getPopulation();
 		
 		String outputDir = config.getParam(MODULE_NAME, "output");
 		/*
 		 * Setup social network and adjacency matrix.
 		 */
-		SocialNetworkFactory<Person> factory = new SocialNetworkFactory<Person>(population);
-		ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie> generator = new ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie>(factory);
+//		SocialNetworkFactory<Person> factory = new SocialNetworkFactory<Person>(population);
+//		ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie> generator = new ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie>(factory);
 //		SocialNetwork<Person> socialnet = generator.generate(population.getPersons().size(), 0.00001, config.global().getRandomSeed());
 		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
 		SNAdjacencyMatrix<Person> matrix = new SNAdjacencyMatrix<Person>(socialnet);
@@ -111,13 +107,13 @@ public class GravityBasedGenerator {
 		/*
 		 * Setup gibbs sampler.
 		 */
-		int burnin = (int)Double.parseDouble(config.getParam(MODULE_NAME, "burnin"));
+		long burnin = (long)Double.parseDouble(config.getParam(MODULE_NAME, "burnin"));
 		int samplesize = Integer.parseInt(config.getParam(MODULE_NAME, "samplesize"));
 		int sampleinterval = Integer.parseInt(config.getParam(MODULE_NAME, "sampleinterval"));
 		
 		GibbsSampler sampler = new GibbsSampler();
 		sampler.setInterval(1000000);
-		Handler handler = new Handler(outputDir + "samplestats.txt");
+		Handler handler = new Handler(outputDir, args[1]);
 		handler.setSampleSize(samplesize);
 		handler.setSampleInterval(sampleinterval);
 		
@@ -128,33 +124,27 @@ public class GravityBasedGenerator {
 		/*
 		 * Output results...
 		 */
-		socialnet = matrix.getGraph();
-		SNGraphMLWriter writer = new SNGraphMLWriter();
-		writer.write(socialnet, outputDir + "socialnet.graphml");
-		
-		PajekDegreeColorizer<Ego<Person>, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego<Person>, SocialTie>(socialnet, false);
-		PajekClusteringColorizer<Ego<Person>, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego<Person>, SocialTie>(socialnet);
-		SNPajekWriter<Person> pwriter = new SNPajekWriter<Person>();
-		pwriter.write(socialnet, colorizer1, outputDir + "socialnet.degree.net");
-		pwriter.write(socialnet, colorizer2, outputDir + "socialnet.clustering.net");
-		
-		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(socialnet, false, 0).absoluteDistribution(1000), outputDir + "edgelength.hist.txt");
-		WeightedStatistics.writeHistogram(GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution(), outputDir + "degree.hist.txt");
-		
-		GraphAnalyser.main(new String[]{outputDir + "socialnet.graphml", outputDir + "socialnet.txt", "-e"});
+//		socialnet = matrix.getGraph();
+//		SNGraphMLWriter writer = new SNGraphMLWriter();
+//		writer.write(socialnet, outputDir + "socialnet.graphml");
+//		
+//		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(socialnet, false, 0).absoluteDistribution(1000), outputDir + "edgelength.hist.txt");
+//		WeightedStatistics.writeHistogram(GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution(), outputDir + "degree.hist.txt");
+//		
+//		GraphAnalyser.main(new String[]{outputDir + "socialnet.graphml", outputDir + "socialnet.txt", "-e"});
 	}
 
 	public static class Handler implements MCMCSampleDelegate {
 		
 		private static final Logger logger = Logger.getLogger(Handler.class);
 
-		private TDoubleArrayList edges = new TDoubleArrayList();
+		private Distribution edges = new Distribution();
 		
-		private TDoubleArrayList degree = new TDoubleArrayList();
+		private Distribution degree = new Distribution();
 		
-		private TDoubleArrayList clustering = new TDoubleArrayList();
+		private Distribution clustering = new Distribution();
 		
-		private TDoubleArrayList distance = new TDoubleArrayList();
+		private Distribution distance = new Distribution();
 		
 		private int sampleSize;
 		
@@ -162,14 +152,23 @@ public class GravityBasedGenerator {
 		
 		private BufferedWriter writer;
 		
-		public Handler(String filename) {
+		private int counter;
+		
+		private String outputDir;
+		
+		private SpatialGrid<Double> densityGrid;
+		
+		public Handler(String filename, String gridFile) {
+			outputDir = filename;
+			densityGrid = SpatialGrid.readFromFile(gridFile);
 			try {
-				writer = new BufferedWriter(new FileWriter(filename));
+				writer = new BufferedWriter(new FileWriter(filename + "samplestats.txt"));
 				writer.write("m\t<k>\t<c_local>\t<c_global>\t<d>");
 				writer.newLine();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			counter = 0;
 		}
 		
 		public boolean checkTerminationCondition(AdjacencyMatrix y) {
@@ -179,7 +178,7 @@ public class GravityBasedGenerator {
 			double c_global = AdjacencyMatrixStatistics.getGlobalClusteringCoefficient(y);
 		
 			SocialNetwork<?> net = ((SNAdjacencyMatrix)y).getGraph();
-			double d_mean = SocialNetworkStatistics.getEdgeLengthStatistics(net).getMean();
+			double d_mean = SocialNetworkStatistics.edgeLengthDistribution(net).mean();
 			logger.info(String.format(Locale.US, "m=%1$s, <k>=%2$.4f, <c_local>=%3$.4f, <c_global>=%4$.4f, <d>=%5$.4f", m, k_mean, c_local, c_global, d_mean));
 		
 			try {
@@ -200,7 +199,29 @@ public class GravityBasedGenerator {
 			clustering.add(AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y));
 			
 			SocialNetwork<?> net = ((SNAdjacencyMatrix)y).getGraph();
-			distance.add(SocialNetworkStatistics.getEdgeLengthStatistics(net).getMean());
+			distance.add(SocialNetworkStatistics.edgeLengthDistribution(net).mean());
+			
+			try {
+				String currentOutputDir = String.format("%1$s%2$s/", outputDir, counter);
+				File file = new File(currentOutputDir);
+				file.mkdirs();
+				SNGraphMLWriter writer = new SNGraphMLWriter();
+				writer.write(net, String.format("%1$s%2$s.socialnet.graphml", currentOutputDir, counter));
+				SocialNetworkAnalyzer.analyze(net, currentOutputDir, false, densityGrid);
+				SNKMLWriter<Person> kmlWriter = new SNKMLWriter<Person>();
+				kmlWriter.setVertexStyle(new SNKMLDegreeStyle<Person>(kmlWriter.getVertexIconLink()));
+				kmlWriter.write((SocialNetwork<Person>) net, String.format("%1$s%2$s.socialnet.k.kml", currentOutputDir, counter));
+				//kmlWriter.write((SocialNetwork<Person>) net, new SNKMLClusteringStyle<Person>(), null, String.format("%1$s%2$s.socialnet.k.kml", currentOutputDir, counter));
+				counter++;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+//			WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(net, false, 0).absoluteDistribution(1000), outputDir + "edgelength.hist.txt");
+//			WeightedStatistics.writeHistogram(GraphStatistics.getDegreeDistribution(net).absoluteDistribution(), outputDir + "degree.hist.txt");
+			
+			
 		}
 
 		public int getSampleInterval() {
@@ -221,11 +242,13 @@ public class GravityBasedGenerator {
 
 		@Override
 		public String toString() {
-			return String.format("var(m)=%1$.4f, var(<k>)=%2$.4f, var(<c_local>)=%3$s.4f, var(<d>)=%4$.4f",
-					StatUtils.variance(edges.toNativeArray()),
-					StatUtils.variance(degree.toNativeArray()),
-					StatUtils.variance(clustering.toNativeArray()),
-					StatUtils.variance(distance.toNativeArray()));
+		
+			return String.format("VarK(m)=%1$.4f, VarK(<k>)=%2$.4f, VarK(<c_local>)=%3$s.4f, VarK(<d>)=%4$.4f",
+					edges.varianceCoefficient(),
+					degree.varianceCoefficient(),
+					clustering.varianceCoefficient(),
+					distance.varianceCoefficient());
+					
 		}
 		
 	}

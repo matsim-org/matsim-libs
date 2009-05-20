@@ -45,7 +45,7 @@ public class PowerLawFit {
 	}
 	
 	public static Tuple<Double, Double> fit(double[] values, double[] weights) {
-		WeightedStatistics stats = new WeightedStatistics();
+		Distribution stats = new Distribution();
 		stats.addAll(values, weights);
 		TDoubleDoubleHashMap dist = stats.absoluteDistribution();
 		double[] keys = dist.keys();

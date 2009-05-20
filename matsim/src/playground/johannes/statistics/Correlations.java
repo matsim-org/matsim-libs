@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IntegerStringSerializer.java
+ * Correlations.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,23 +21,37 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.statistics;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.matsim.core.utils.io.IOUtils;
+
+import gnu.trove.TDoubleDoubleHashMap;
 
 /**
  * @author illenberger
  *
  */
-public class IntegerStringSerializer implements StringSerializer<Integer> {
+public class Correlations {
 
-	public String decode(Integer object) {
-		if(object == null)
-			return "0";
-		else
-			return String.valueOf(object);
+	public static void writeToFile(TDoubleDoubleHashMap values, String filename, String xLabel, String yLabel) throws FileNotFoundException, IOException {
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write(xLabel);
+		writer.write("\t");
+		writer.write(yLabel);
+		writer.newLine();
+		double[] keys = values.keys();
+		Arrays.sort(keys);
+		for(double key : keys) {
+			writer.write(String.valueOf(key));
+			writer.write("\t");
+			writer.write(String.valueOf(values.get(key)));
+			writer.newLine();
+		}
+		writer.close();
 	}
-
-	public Integer encode(String data) {		
-		return Integer.parseInt(data);
-	}
-
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNKMLDegreeStyle.java
+ * SNKMLEgoAlterSytle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,96 +21,87 @@
 /**
  * 
  */
-package playground.johannes.socialnet.io;
-
-import gnu.trove.TIntObjectHashMap;
+package playground.johannes.ivtsurveys;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import net.opengis.kml._2.IconStyleType;
 import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.StyleType;
 
-import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 
-import playground.johannes.graph.GraphStatistics;
 import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;
-import playground.johannes.socialnet.util.ColorUtils;
+import playground.johannes.socialnet.io.SNKMLObjectStyle;
 
 /**
  * @author illenberger
  *
  */
-public class SNKMLDegreeStyle<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> implements SNKMLObjectStyle<Ego<P>, P> {
+public class SNKMLEgoAlterSytle<P extends BasicPerson<?>> implements SNKMLObjectStyle<Ego<P>, P> {
 
-	private static final String VERTEX_STYLE_PREFIX = "vertex.style.";
-	
+	private Set<Ego<P>> sampledVertices;
+		
 	private ObjectFactory objectFactory = new ObjectFactory();
-	
-	private TIntObjectHashMap<String> styleIdMappings;
 	
 	private LinkType vertexIconLink;
 	
-	private boolean logscale;
-
-	public SNKMLDegreeStyle(LinkType vertexIconLink) {
+	public SNKMLEgoAlterSytle(Set<Ego<P>> sampledVertices, LinkType vertexIconLink) {
+		this.sampledVertices = sampledVertices;
 		this.vertexIconLink = vertexIconLink;
 	}
 	
-	public void setLogscale(boolean logscale) {
-		this.logscale = logscale;
-	}
-	
 	public List<StyleType> getObjectStyle(SocialNetwork<P> socialnet) {
-		double[] degrees = GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution().keys();
-		double k_min = StatUtils.min(degrees);
-		double k_max = StatUtils.max(degrees);
-		
-		List<StyleType> styleTypes = new ArrayList<StyleType>(degrees.length);
-		styleIdMappings = new TIntObjectHashMap<String>();
 		
 		
-		for(double k : degrees) {
+		List<StyleType> styleTypes = new ArrayList<StyleType>(2);
+//		styleIdMappings = new TIntObjectHashMap<String>();
+		
+		
+		
 			StyleType styleType = objectFactory.createStyleType();
-			styleType.setId(getVertexStyleId((int)k));
+			styleType.setId("sampled");
 			
 			IconStyleType iconStyle = objectFactory.createIconStyleType();
 			iconStyle.setIcon(vertexIconLink);
 			iconStyle.setScale(0.5);
-			
-			double color = -1;
-			if(logscale) {
-				double min = Math.log(k_min + 1);
-				double max = Math.log(k_max + 1);
-				color = (Math.log(k + 1) - min) / (max - min);
-			} else {
-				color = (k - k_min) / (k_max - k_min);
-			}
-			
-			Color c = ColorUtils.getHeatmapColor(color);
+		
+			Color c = Color.RED;
 			iconStyle.setColor(new byte[]{(byte)c.getAlpha(), (byte)c.getBlue(), (byte)c.getGreen(), (byte)c.getRed()});
 			
 			styleType.setIconStyle(iconStyle);
 			
 			styleTypes.add(styleType);
-			styleIdMappings.put((int)k, styleType.getId());
-		}
+//			styleIdMappings.put("sampled", styleType.getId());
+//		}
 		
+			styleType = objectFactory.createStyleType();
+			styleType.setId("unsampled");
+			
+			iconStyle = objectFactory.createIconStyleType();
+			iconStyle.setIcon(vertexIconLink);
+			iconStyle.setScale(0.5);
+		
+			c = Color.WHITE;
+			iconStyle.setColor(new byte[]{(byte)c.getAlpha(), (byte)c.getBlue(), (byte)c.getGreen(), (byte)c.getRed()});
+			
+			styleType.setIconStyle(iconStyle);
+			
+			styleTypes.add(styleType);
 		return styleTypes;
 	}
 
+
 	public String getObjectSytleId(Ego<P> object) {
-		return styleIdMappings.get(object.getEdges().size());
+		if(sampledVertices.contains(object))
+			return "sampled";
+		else
+			return "unsampled";
 	}
-	
-	private String getVertexStyleId(int k) {
-		return VERTEX_STYLE_PREFIX + Integer.toString(k);
-	}
+
 }

@@ -21,22 +21,22 @@
 /**
  * 
  */
-package playground.johannes.socialnet;
-
-import gnu.trove.TDoubleObjectHashMap;
+package playground.johannes.ivtsurveys;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Person;
 
 import playground.johannes.graph.GraphAnalyser;
-import playground.johannes.graph.Partitions;
+import playground.johannes.socialnet.SocialNetwork;
+import playground.johannes.socialnet.SocialNetworkStatistics;
 import playground.johannes.socialnet.io.SNGraphMLReader;
 import playground.johannes.socialnet.spatial.SpatialGrid;
 import playground.johannes.socialnet.spatial.SpatialStatistics;
@@ -47,9 +47,9 @@ import playground.johannes.statistics.Distribution;
  * @author illenberger
  *
  */
-public class SocialNetworkAnalyzer {
+public class NetworkAnalyzer {
 
-	private static final Logger logger = Logger.getLogger(SocialNetworkAnalyzer.class);
+	private static final Logger logger = Logger.getLogger(NetworkAnalyzer.class);
 	
 	/**
 	 * @param args
@@ -94,7 +94,7 @@ public class SocialNetworkAnalyzer {
 	}
 
 	public static void analyze(
-			SocialNetwork<? extends BasicPerson<?>> socialnet,
+			SocialNetwork<? extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> socialnet,
 			String output, boolean extended, SpatialGrid<Double> densityGrid) {
 		GraphAnalyser.analyze(socialnet, output, extended);
 
@@ -113,24 +113,6 @@ public class SocialNetworkAnalyzer {
 				if(densityGrid != null) {
 					Correlations.writeToFile(SpatialStatistics.degreeDensityCorrelation(socialnet.getVertices(), densityGrid), output + "k_rho.txt", "density", "k");
 					Correlations.writeToFile(SpatialStatistics.clusteringDensityCorrelation(socialnet.getVertices(), densityGrid), output + "c_rho.txt", "density", "c");
-					
-					Correlations.writeToFile(SpatialStatistics.getDensityCorrelation(
-							SocialNetworkStatistics.meanEdgeLength(socialnet), densityGrid, 1000), output + "edgelength_rho", "rho", "mean_edgelength");
-				}
-				
-				Correlations.writeToFile(SocialNetworkStatistics.edgeLengthMSEDegreeCorrelation(socialnet.getVertices()), output + "edgelenghtMSE_k.txt", "degree", "MSE(d)");
-				
-				TDoubleObjectHashMap<?> kPartitions = Partitions.createDegreePartitions(socialnet.getVertices());
-				for(int k = 5; k < 16; k++) {
-					Set<? extends Ego<? extends BasicPerson<?>>> partition = (Set<? extends Ego<? extends BasicPerson<?>>>) kPartitions.get((double)k);
-					Distribution.writeHistogram(SocialNetworkStatistics.edgeLengthDistribution(partition).absoluteDistribution(100), output + "edgelength.k="+k+".hist.txt");
-				}
-				
-				TDoubleObjectHashMap<?> rhoPartitions = SpatialStatistics.createDensityPartitions(socialnet.getVertices(), densityGrid, 1000);
-				for(double rho = 1000; rho < 15000; rho += 1000) {
-					Set<? extends Ego<? extends BasicPerson<?>>> partition = (Set<? extends Ego<? extends BasicPerson<?>>>) rhoPartitions.get(rho);
-					if(partition != null)
-						Distribution.writeHistogram(SocialNetworkStatistics.edgeLengthDistribution(partition).absoluteDistribution(100), output + "edgelength.rho="+rho+".hist.txt");
 				}
 			}
 			

@@ -32,7 +32,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnets.StringSerializer;
 
 /**
  * @author illenberger
@@ -114,6 +113,7 @@ public class SpatialGrid<T> {
 				coord.getY() >= minY && coord.getY() <= maxY;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public T getValue(int row, int col) {
 		return (T)matrix[row][col];
 	}
@@ -137,7 +137,12 @@ public class SpatialGrid<T> {
 		return (int)Math.floor((yCoord - minY) / resolution);
 	}
 	
-	public void toFile(String filename, StringSerializer<T> serializer) {
+	@SuppressWarnings("unchecked")
+	public void toFile(String filename) {
+		toFile(filename, (ObjectSerializer<T>) new DoubleSerializer());
+	}
+	
+	public void toFile(String filename, ObjectSerializer<T> serializer) {
 		GridXMLWriter<T> writer = new GridXMLWriter<T>(serializer);
 		try {
 			writer.write(this, filename);
@@ -146,7 +151,11 @@ public class SpatialGrid<T> {
 		}
 	}
 	
-	public static <V> SpatialGrid<V> readFromFile(String filename, StringSerializer<V> serializer) {
+	public static SpatialGrid<Double> readFromFile(String filename) {
+		return readFromFile(filename, new DoubleSerializer());
+	}
+	
+	public static <V> SpatialGrid<V> readFromFile(String filename, ObjectSerializer<V> serializer) {
 		GridXMLParser<V> parser = new GridXMLParser<V>(serializer);
 		parser.setValidating(false);
 		try {
@@ -183,9 +192,9 @@ public class SpatialGrid<T> {
 		
 		private SpatialGrid<V> grid;
 		
-		private StringSerializer<V> serializer;
+		private ObjectSerializer<V> serializer;
 
-		public GridXMLParser(StringSerializer<V> serializer) {
+		public GridXMLParser(ObjectSerializer<V> serializer) {
 			super();
 			this.serializer = serializer;
 		}
@@ -203,7 +212,7 @@ public class SpatialGrid<T> {
 				if(data == null)
 					throw new IllegalArgumentException(VALUE_TAG + " must be specified");
 				else {
-					if(!grid.setValue(row, col, serializer.encode(data)))
+					if(!grid.setValue(row, col, serializer.decode(data)))
 						logger.warn(String.format("Out of bounds! (row=%1$s, col=%2$s)",row, col));
 				}
 			} else if(GRID_TAG.equalsIgnoreCase(name)) {
@@ -232,9 +241,9 @@ public class SpatialGrid<T> {
 	
 	private static class GridXMLWriter<V> extends MatsimXmlWriter {
 		
-		private StringSerializer<V> serializer;
+		private ObjectSerializer<V> serializer;
 		
-		public GridXMLWriter(StringSerializer<V> serializer) {
+		public GridXMLWriter(ObjectSerializer<V> serializer) {
 			this.serializer = serializer;
 		}
 		
@@ -261,7 +270,7 @@ public class SpatialGrid<T> {
 					writer.write(" ");
 					writer.write(makeAttribute(GridXMLParser.ROW_TAG, String.valueOf(row)));
 					writer.write(makeAttribute(GridXMLParser.COL_TAG, String.valueOf(col)));
-					writer.write(makeAttribute(GridXMLParser.VALUE_TAG, serializer.decode((V) grid.matrix[row][col])));
+					writer.write(makeAttribute(GridXMLParser.VALUE_TAG, serializer.encode((V) grid.matrix[row][col])));
 					writer.write("/>");
 					writer.write(NL);
 				}
@@ -282,4 +291,42 @@ public class SpatialGrid<T> {
 			return builder.toString();
 		}
 	}
+	
+	public static interface ObjectSerializer<T> {
+
+		public String encode(T object);
+		
+		public T decode(String data);
+	}
+	
+	public static class DoubleSerializer implements ObjectSerializer<Double> {
+
+		public String encode(Double object) {
+			if(object == null)
+				return "0";
+			else
+				return String.valueOf(object);
+		}
+
+		public Double decode(String data) {
+			return new Double(data);
+		}
+
+	}
+	
+	public static class IntegerSerializer implements ObjectSerializer<Integer> {
+
+		public String encode(Integer object) {
+			if(object == null)
+				return "0";
+			else
+				return String.valueOf(object);
+		}
+
+		public Integer decode(String data) {		
+			return Integer.parseInt(data);
+		}
+
+	}
+
 }

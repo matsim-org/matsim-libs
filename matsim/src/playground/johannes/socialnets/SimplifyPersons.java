@@ -80,7 +80,31 @@ public class SimplifyPersons {
 		for(Person p : remove)
 			pop.getPersons().remove(p.getId());
 		
-		PopulationWriter writer = new PopulationWriter(pop, args[1], "v4", 100);
+		PopulationWriter writer = new PopulationWriter(pop, args[1] + "plans.09.xml", "v4", 0.009);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.08.xml", "v4", 0.008);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.07.xml", "v4", 0.007);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.06.xml", "v4", 0.006);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.05.xml", "v4", 0.005);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.04.xml", "v4", 0.004);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.03.xml", "v4", 0.003);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.02.xml", "v4", 0.002);
+		writer.write();
+		
+		writer = new PopulationWriter(pop, args[1] + "plans.01.xml", "v4", 0.001);
 		writer.write();
 	}
 

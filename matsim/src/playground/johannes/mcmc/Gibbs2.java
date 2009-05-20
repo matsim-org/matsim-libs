@@ -45,7 +45,7 @@ import playground.johannes.graph.Vertex;
 import playground.johannes.graph.generators.ErdosRenyiGenerator;
 import playground.johannes.graph.generators.PlainGraphFactory;
 import playground.johannes.graph.mcmc.AdjacencyMatrix;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger

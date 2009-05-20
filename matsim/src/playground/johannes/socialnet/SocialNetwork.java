@@ -28,19 +28,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 
 import playground.johannes.graph.AbstractSparseGraph;
-import playground.johannes.graph.SparseEdge;
 import playground.johannes.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetwork<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends AbstractSparseGraph {
+public class SocialNetwork<P extends BasicPerson<?>> extends AbstractSparseGraph {
 	
 	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	

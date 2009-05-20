@@ -41,7 +41,7 @@ import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;
 import playground.johannes.socialnet.SocialNetworkStatistics;
 import playground.johannes.socialnet.SocialTie;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -60,7 +60,7 @@ public class PajekDistanceColorizer<P extends BasicPerson<? extends BasicPlan<? 
 	public PajekDistanceColorizer(SocialNetwork<P> socialnet, boolean logScale) {
 		super();
 		setLogScale(logScale);
-		d_mean = SocialNetworkStatistics.getMeanEdgeLength(socialnet);
+		d_mean = SocialNetworkStatistics.meanEdgeLength(socialnet);
 		
 		d_min = Double.MAX_VALUE;
 		d_max = Double.MIN_VALUE;
@@ -111,9 +111,9 @@ public class PajekDistanceColorizer<P extends BasicPerson<? extends BasicPlan<? 
 		SNPajekWriter<Person> pwriter = new SNPajekWriter<Person>();
 		pwriter.write(socialnet, colorizer1, outputDir + "socialnet.distance.net");
 		
-		WeightedStatistics stats = new WeightedStatistics();
-		stats.addAll(SocialNetworkStatistics.getMeanEdgeLength(socialnet).getValues());
-		WeightedStatistics.writeHistogram(stats.absoluteDistribution(1000), outputDir + "d_mean.hist.txt");
+		Distribution stats = new Distribution();
+		stats.addAll(SocialNetworkStatistics.meanEdgeLength(socialnet).getValues());
+		Distribution.writeHistogram(stats.absoluteDistribution(1000), outputDir + "d_mean.hist.txt");
 	}
 
 }

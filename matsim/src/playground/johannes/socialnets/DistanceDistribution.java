@@ -39,7 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -93,7 +93,7 @@ public class DistanceDistribution {
 			}
 		}
 		
-		WeightedStatistics.writeHistogram(hist, args[1]);
+		Distribution.writeHistogram(hist, args[1]);
 	}
 
 }

@@ -32,6 +32,7 @@ import playground.johannes.graph.io.PajekDegreeColorizer;
 import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetwork;
 import playground.johannes.socialnet.SocialTie;
+import playground.johannes.socialnet.io.PajekDistanceColorizer;
 import playground.johannes.socialnet.io.SNGraphMLReader;
 import playground.johannes.socialnet.io.SNPajekWriter;
 
@@ -50,9 +51,11 @@ public class GraphML2PajekDegree {
 		
 		PajekDegreeColorizer<Ego<Person>, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego<Person>, SocialTie>(socialNet, false);
 		PajekClusteringColorizer<Ego<Person>, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego<Person>, SocialTie>(socialNet);
+		PajekDistanceColorizer<Person> colorizer3 = new PajekDistanceColorizer<Person>(socialNet, false);
 		SNPajekWriter<Person> pwriter = new SNPajekWriter<Person>();
 		pwriter.write(socialNet, colorizer1, args[2] + "socialnet.degree.net");
 		pwriter.write(socialNet, colorizer2, args[2] + "socialnet.clustering.net");
+		pwriter.write(socialNet, colorizer3, args[2] + "socialnet.distance.net");
 	}
 
 }

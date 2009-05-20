@@ -44,7 +44,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.Vertex;
 import playground.johannes.graph.VertexDecorator;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -184,7 +184,7 @@ public abstract class GraphPropertyEstimator {
 		return statsMap;
 	}
 	
-	protected TObjectDoubleHashMap<String> getStatisticsMap(WeightedStatistics stats) {
+	protected TObjectDoubleHashMap<String> getStatisticsMap(Distribution stats) {
 		TObjectDoubleHashMap<String> statsMap = new TObjectDoubleHashMap<String>();
 		statsMap.put(MEAN_KEY, stats.mean());
 		statsMap.put(MIN_KEY, stats.min());
@@ -227,7 +227,7 @@ public abstract class GraphPropertyEstimator {
 		}
 	}
 	
-	protected void dumpFrequency(WeightedStatistics freq, int iteration, String name) {
+	protected void dumpFrequency(Distribution freq, int iteration, String name) {
 		try {
 			BufferedWriter aWriter = IOUtils.getBufferedWriter(String.format("%1$s/%2$s.%3$s.histogram.absolute.txt", outputDir, iteration, name));
 			BufferedWriter nWriter = IOUtils.getBufferedWriter(String.format("%1$s/%2$s.%3$s.histogram.normalized.txt", outputDir, iteration, name));

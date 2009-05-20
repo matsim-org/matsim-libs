@@ -42,7 +42,7 @@ import playground.johannes.graph.generators.ErdosRenyiGenerator;
 import playground.johannes.graph.generators.PlainGraphFactory;
 import playground.johannes.socialnet.Ego;
 import playground.johannes.socialnet.SocialNetworkStatistics;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -89,8 +89,8 @@ public class GibbsNetworkGenerator {
 		 */
 		PlainGraph g = (PlainGraph) createNetwork();
 		System.out.println("Initial mean degree is " + GraphStatistics.getDegreeStatistics(g).getMean()); 
-		WeightedStatistics stats = GraphStatistics.getDegreeDistribution(g);
-		WeightedStatistics.writeHistogram(stats.absoluteDistribution(), outputHist +".initial");
+		Distribution stats = GraphStatistics.getDegreeDistribution(g);
+		Distribution.writeHistogram(stats.absoluteDistribution(), outputHist +".initial");
 		/*
 		 * Create a list of vertices.
 		 */
@@ -247,7 +247,7 @@ public class GibbsNetworkGenerator {
 		System.out.println("Clustering is " + GraphStatistics.getClusteringStatistics(g).getMean());
 		System.out.println("Degree correlation is " + GraphStatistics.getDegreeCorrelation(g));
 		stats = GraphStatistics.getDegreeDistribution(g);
-		WeightedStatistics.writeHistogram(stats.absoluteDistribution(), outputHist);	
+		Distribution.writeHistogram(stats.absoluteDistribution(), outputHist);	
 //		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(g, true, 1000).absoluteDistribution(1000), "/Users/fearonni/vsp-work/socialnets/devel/MCMC/edgelength.txt");
 	}
 	

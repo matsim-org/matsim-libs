@@ -24,6 +24,9 @@
 package playground.johannes.socialnet;
 
 import gnu.trove.TIntArrayList;
+
+import org.matsim.core.utils.collections.Tuple;
+
 import playground.johannes.graph.SparseEdge;
 
 /**
@@ -50,6 +53,12 @@ public class SocialTie extends SparseEdge {
 		lastUsed = created;
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends Ego<?>, ? extends Ego<?>> getVertices() {
+		return (Tuple<? extends Ego<?>, ? extends Ego<?>>) super.getVertices();
+	}
+
 	public int getCreated() {
 		return created;
 	}

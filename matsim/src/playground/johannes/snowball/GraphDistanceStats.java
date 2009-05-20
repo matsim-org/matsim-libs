@@ -33,7 +33,7 @@ import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.GraphStatistics;
 import playground.johannes.graph.VertexDecorator;
 import playground.johannes.graph.GraphStatistics.GraphDistance;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -85,14 +85,14 @@ public class GraphDistanceStats extends GraphPropertyEstimator {
 			int iteration) {
 		GraphDistance gDistance = GraphStatistics.getCentrality(graph);
 		
-		WeightedStatistics ccObsStats = new WeightedStatistics();
-		WeightedStatistics ccEstimStats = new WeightedStatistics();
-		WeightedStatistics bcObsStats = new WeightedStatistics();
-		WeightedStatistics bcEstimStats = new WeightedStatistics();
-		WeightedStatistics bcObsNormStats = new WeightedStatistics();
-		WeightedStatistics bcEstimNormStats = new WeightedStatistics();
-		WeightedStatistics diameter = new WeightedStatistics();
-		WeightedStatistics radius = new WeightedStatistics();
+		Distribution ccObsStats = new Distribution();
+		Distribution ccEstimStats = new Distribution();
+		Distribution bcObsStats = new Distribution();
+		Distribution bcEstimStats = new Distribution();
+		Distribution bcObsNormStats = new Distribution();
+		Distribution bcEstimNormStats = new Distribution();
+		Distribution diameter = new Distribution();
+		Distribution radius = new Distribution();
 		
 		for(VertexDecorator<SampledVertex> v : graph.getVertices()) {
 			if(v.getDelegate().isSampled()) {

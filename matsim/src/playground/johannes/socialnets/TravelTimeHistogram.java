@@ -54,7 +54,7 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnet.spatial.SpatialGrid;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -90,7 +90,7 @@ public class TravelTimeHistogram {
 		 * Make grid...
 		 */
 //		
-		SpatialGrid<Double> grid = SpatialGrid.readFromFile(gridfile, new DoubleStringSerializer());		
+		SpatialGrid<Double> grid = SpatialGrid.readFromFile(gridfile);		
 		double maxX = grid.getXmax();
 		double maxY = grid.getYmax();
 		double minX = grid.getXmin();
@@ -189,7 +189,7 @@ public class TravelTimeHistogram {
 				hist.put(bin, val);
 			}
 			egoHist.put(ego, hist);
-			WeightedStatistics.writeHistogram(hist, "/Users/fearonni/vsp-work/socialnets/data-analysis/egohists/" + count + ".txt");
+			Distribution.writeHistogram(hist, "/Users/fearonni/vsp-work/socialnets/data-analysis/egohists/" + count + ".txt");
 			count++;
 			if(count % 10 == 0) {
 				System.out.println(String.format(
@@ -208,8 +208,8 @@ public class TravelTimeHistogram {
 		Dijkstra fastestPathRouter = new Dijkstra(network, freett, freett);
 		Dijkstra shortestPathRouer = new Dijkstra(network, disttt, disttt);
 		Set<Relation> relations = new HashSet<Relation>();
-		WeightedStatistics stats = new WeightedStatistics();
-		WeightedStatistics stats2 = new WeightedStatistics();
+		Distribution stats = new Distribution();
+		Distribution stats2 = new Distribution();
 		int egocount = 0;
 		for(Ego ego : egos.values()) {
 			Link homelink = network.getNearestLink(ego.homeloc);
@@ -312,7 +312,7 @@ public class TravelTimeHistogram {
 		System.out.println("Done.");
 	}
 	
-	private static void writeHistogram(WeightedStatistics stats, String outputfile, int binsize) {
+	private static void writeHistogram(Distribution stats, String outputfile, int binsize) {
 		try {
 			BufferedWriter aWriter = IOUtils.getBufferedWriter(String.format("%1$s.absolute.txt", outputfile));
 			BufferedWriter nWriter = IOUtils.getBufferedWriter(String.format("%1$s.normalized.txt", outputfile));

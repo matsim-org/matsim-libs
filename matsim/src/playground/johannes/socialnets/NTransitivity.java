@@ -37,7 +37,7 @@ import org.matsim.core.gbl.Gbl;
 import playground.johannes.graph.Graph;
 import playground.johannes.graph.Vertex;
 import playground.johannes.graph.io.PlainGraphMLReader;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -58,7 +58,7 @@ public class NTransitivity {
 		Gbl.printMemoryUsage();
 
 		TDoubleDoubleHashMap hist = getNTransitivity(g, Integer.parseInt(args[2]));
-		WeightedStatistics.writeHistogram(hist, args[1]);
+		Distribution.writeHistogram(hist, args[1]);
 		logger.info("Done.");
 	}
 

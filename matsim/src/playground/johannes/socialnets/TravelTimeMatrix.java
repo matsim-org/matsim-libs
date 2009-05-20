@@ -89,7 +89,7 @@ public class TravelTimeMatrix {
 				System.out.println(String.format("Processed %1$s of %2$s cells.", ((row+1) * col), (numRows * numCols)));
 			}			
 		}
-		ttmatrix.toFile(outputfile, new IntegerStringSerializer());
+		ttmatrix.toFile(outputfile);
 		System.out.println("Done.");
 	}
 }

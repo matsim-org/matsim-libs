@@ -26,65 +26,40 @@ package playground.johannes.socialnet;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import java.util.Set;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.graph.GraphStatistics;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
 public class SocialNetworkStatistics {
-
-	public static DescriptiveStatistics getEdgeLengthStatistics(SocialNetwork<?> network) {
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		WeightedStatistics wstats = getEdgeLengthDistribution(network, false, 0);
-		for(double val : wstats.getValues())
-			stats.addValue(val);
-		return stats;
+	
+	public static Distribution edgeLengthDistribution(SocialNetwork<? extends BasicPerson<?>> network) {
+		return edgeLengthDistribution(network.getVertices());
 	}
 	
-	public static WeightedStatistics getEdgeLengthDistribution(SocialNetwork<?> network) {
-		return getEdgeLengthDistribution(network, false, 0);
-	}
-	
-	public static WeightedStatistics getEdgeLengthDistribution(SocialNetwork<?> network, boolean normalize, double normBinSize) {
-		WeightedStatistics stats = new WeightedStatistics();
-		for(Ego<?> e : network.getVertices()) {
-			Coord c1 = e.getCoord();
-			TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
-			
-			if(normalize) {
-				for(Ego<?> e2 : network.getVertices()) {
-					Coord c2 = e2.getCoord();
-					double d = CoordUtils.calcDistance(c1, c2);
-					double bin = Math.floor(d / normBinSize);
-					double count = hist.get(bin);
-					count++;
-					hist.put(bin, count);
-				}
-			}
-			
+	public static Distribution edgeLengthDistribution(Set<? extends Ego<? extends BasicPerson<?>>> vertices) {
+		Distribution stats = new Distribution();
+		for(Ego<?> e : vertices) {
 			for(Ego<?> e2 : e.getNeighbours()) {
 				double d = CoordUtils.calcDistance(e.getCoord(), e2.getCoord());
-				double w = 1;
-				if(normalize)
-					w = 1 / hist.get(Math.floor(d / normBinSize));
-				stats.add(d, w);
+				stats.add(d);
 			}
 		}
 		
 		return stats;
 	}
 	
-	public static double getAgeCorrelation(SocialNetwork<Person> g) {
+	@SuppressWarnings("unchecked")
+	public static double ageCorrelation(SocialNetwork<Person> g) {
 		double product = 0;
 		double sum = 0;
 		double squareSum = 0;
@@ -104,9 +79,13 @@ public class SocialNetworkStatistics {
 		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
 	}
 	
-	public static TDoubleDoubleHashMap getEdgeLengthDegreeCorrelation(SocialNetwork<?> network) {
+	public static TDoubleDoubleHashMap edgeLengthDegreeCorrelation(SocialNetwork<? extends BasicPerson<?>> network) {
+		return edgeLengthDegreeCorrelation(network.getVertices());
+	}
+	
+	public static TDoubleDoubleHashMap edgeLengthDegreeCorrelation(Set<? extends Ego<?>> vertices) {
 		TObjectDoubleHashMap<Ego<?>> d_distr = new TObjectDoubleHashMap<Ego<?>>();
-		for(Ego<?> e : network.getVertices()) {
+		for(Ego<?> e : vertices) {
 			double sum = 0;
 			for(Ego<?> e2 : e.getNeighbours()) {
 				sum += CoordUtils.calcDistance(e.getCoord(), e2.getCoord());
@@ -117,9 +96,13 @@ public class SocialNetworkStatistics {
 		return GraphStatistics.getValueDegreeCorrelation(d_distr);
 	}
 	
-	public static <P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> TObjectDoubleHashMap<Ego<P>> getMeanEdgeLength(SocialNetwork<P> g) {
+	public static <P extends BasicPerson<?>> TObjectDoubleHashMap<Ego<P>> meanEdgeLength(SocialNetwork<P> g) {
+		return meanEdgeLength(g.getVertices());
+	}
+	
+	public static <P extends BasicPerson<?>> TObjectDoubleHashMap<Ego<P>> meanEdgeLength(Set<? extends Ego<P>> vertices) {
 		TObjectDoubleHashMap<Ego<P>> values = new TObjectDoubleHashMap<Ego<P>>();
-		for (Ego<P> i : g.getVertices()) {
+		for (Ego<P> i : vertices) {
 			if (i.getNeighbours().size() > 0) {
 				double sum_d = 0;
 				for (Ego<P> j : i.getNeighbours()) {
@@ -131,5 +114,31 @@ public class SocialNetworkStatistics {
 			}
 		}
 		return values;
+	}
+	
+	public static <T extends Ego<? extends BasicPerson<?>>> TObjectDoubleHashMap<T> localEdgeLengthMSE(Set<T> vertices) {
+		TObjectDoubleHashMap<T> mse = new TObjectDoubleHashMap<T>();
+		TDoubleDoubleHashMap globalDistr = edgeLengthDistribution(vertices).normalizedDistribution(1000);
+		for(T v : vertices) {
+			Distribution localDistr = new Distribution();
+			Coord c1 = v.getCoord();
+			for(Ego<?> t : v.getNeighbours()) {
+				Coord c2 = t.getCoord();
+				double d = CoordUtils.calcDistance(c1, c2);
+				localDistr.add(d);
+			}
+			mse.put(v, Distribution.meanSquareError(localDistr.normalizedDistribution(1000), globalDistr));
+		}
+		return mse;
+	}
+	
+	public static <T extends Ego<? extends BasicPerson<?>>> TDoubleDoubleHashMap edgeLengthMSEDegreeCorrelation(Set<T> vertices) {
+		TObjectDoubleHashMap<T> d_distr = new TObjectDoubleHashMap<T>();
+		TObjectDoubleHashMap<T> mseDistr = localEdgeLengthMSE(vertices);
+		for(T e : vertices) {
+			d_distr.put(e, mseDistr.get(e));
+		}
+		
+		return GraphStatistics.getValueDegreeCorrelation(d_distr);
 	}
 }

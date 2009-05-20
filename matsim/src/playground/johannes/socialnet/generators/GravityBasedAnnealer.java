@@ -53,7 +53,7 @@ import playground.johannes.socialnet.io.SNPajekWriter;
 import playground.johannes.socialnet.mcmc.ErgmDistance;
 import playground.johannes.socialnet.mcmc.ErgmDistanceLocal;
 import playground.johannes.socialnet.mcmc.SNAdjacencyMatrix;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -107,7 +107,7 @@ public class GravityBasedAnnealer {
 		
 		GibbsEdgeSwitcher sampler = new GibbsEdgeSwitcher();
 		sampler.setInterval(1000000);
-		Handler handler = new Handler(outputDir + "samplestats.txt");
+		Handler handler = new Handler(outputDir, args[1]);
 		handler.setSampleSize(samplesize);
 		handler.setSampleInterval(sampleinterval);
 		
@@ -118,20 +118,20 @@ public class GravityBasedAnnealer {
 		/*
 		 * Output results...
 		 */
-		socialnet = matrix.getGraph();
-		SNGraphMLWriter writer = new SNGraphMLWriter();
-		writer.write(socialnet, outputDir + "socialnet.graphml");
-		
-		PajekDegreeColorizer<Ego<Person>, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego<Person>, SocialTie>(socialnet, false);
-		PajekClusteringColorizer<Ego<Person>, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego<Person>, SocialTie>(socialnet);
-		SNPajekWriter<Person> pwriter = new SNPajekWriter<Person>();
-		pwriter.write(socialnet, colorizer1, outputDir + "socialnet.degree.net");
-		pwriter.write(socialnet, colorizer2, outputDir + "socialnet.clustering.net");
-		
-		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(socialnet, false, 0).absoluteDistribution(1000), outputDir + "edgelength.hist.txt");
-		WeightedStatistics.writeHistogram(GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution(), outputDir + "degree.hist.txt");
-		
-		GraphAnalyser.main(new String[]{outputDir + "socialnet.graphml", outputDir + "socialnet.txt", "-e"});
+//		socialnet = matrix.getGraph();
+//		SNGraphMLWriter writer = new SNGraphMLWriter();
+//		writer.write(socialnet, outputDir + "socialnet.graphml");
+//		
+//		PajekDegreeColorizer<Ego<Person>, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego<Person>, SocialTie>(socialnet, false);
+//		PajekClusteringColorizer<Ego<Person>, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego<Person>, SocialTie>(socialnet);
+//		SNPajekWriter<Person> pwriter = new SNPajekWriter<Person>();
+//		pwriter.write(socialnet, colorizer1, outputDir + "socialnet.degree.net");
+//		pwriter.write(socialnet, colorizer2, outputDir + "socialnet.clustering.net");
+//		
+//		Distribution.writeHistogram(SocialNetworkStatistics.edgeLengthDistribution(socialnet, false, 0).absoluteDistribution(1000), outputDir + "edgelength.hist.txt");
+//		Distribution.writeHistogram(GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution(), outputDir + "degree.hist.txt");
+//		
+//		GraphAnalyser.main(new String[]{outputDir + "socialnet.graphml", outputDir + "socialnet.txt", "-e"});
 	
 	}
 
