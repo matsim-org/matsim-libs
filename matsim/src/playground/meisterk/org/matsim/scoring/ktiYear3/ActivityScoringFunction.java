@@ -95,14 +95,11 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	protected double calcActScore(double arrivalTime, double departureTime,
 			Activity act) {
 
-		///////////////////////////////////////////////////////////////////
-		// score terms which apply to the entire time from arrival to departure
-		// without considering opening times
-		///////////////////////////////////////////////////////////////////
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 		
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
+		// also: negative duration is also too short
 		if (fromArrivalToDeparture < 0.0) {
 			this.accumulatedNegativeDuration += fromArrivalToDeparture;
 			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
@@ -114,7 +111,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		// - the sum of the share performing and the share waiting equals the difference between arrival and departure
 		///////////////////////////////////////////////////////////////////
 		else {
-			
+
 			SortedSet<BasicOpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
 			// assume facility is always open
@@ -142,21 +139,15 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 				openingTime = openTime.getStartTime();
 				closingTime = openTime.getEndTime();
 
-				activityStart = arrivalTime;
-				activityEnd = departureTime;
+				activityStart = Math.max(arrivalTime, openingTime);
+				activityEnd = Math.min(departureTime, closingTime);
 
-				if ((openingTime >=  0) && (arrivalTime < openingTime)) {
-					activityStart = openingTime;
-				}
-				if ((closingTime >= 0) && (closingTime < departureTime)) {
-					activityEnd = closingTime;
-				}
-				if ((openingTime >= 0) && (closingTime >= 0)
-						&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+				if ((openingTime > departureTime) || (closingTime < arrivalTime)) {
 					// agent could not perform action
 					activityStart = departureTime;
 					activityEnd = departureTime;
 				}
+
 				double duration = activityEnd - activityStart;
 
 				// calculate penalty due to facility load only when:
@@ -190,27 +181,24 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 				timeSpentPerforming += duration;
 
 			}
-			
+
 			// accumulated waiting time, which is the time that could not be performed in activities due to closed facilities
 			this.timeSpentWaiting += (fromArrivalToDeparture - timeSpentPerforming);
 
-			// utility for additional (positive) activity duration
-			if (timeSpentPerforming >= 0) {
-				double accumulatedDuration = 0.0;
-				if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
-					accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
-				}
-				this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
+			// accumulate time spent performing
+			double accumulatedDuration = 0.0;
+			if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
+				accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
 			}
+			this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
 
 			// disutility if duration of that activity was too short
 			if (timeSpentPerforming < ActivityScoringFunction.MINIMUM_DURATION) {
 				this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - timeSpentPerforming);
 			}
-			
 
 		}
-		
+
 		// no actual score is computed here
 		return 0.0;
 
@@ -282,11 +270,11 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		}
 		return performanceScore;
 	}
-	
+
 	public double getNegativeDurationScore() {
 		return (2 * this.params.marginalUtilityOfLateArrival * Math.abs(this.accumulatedNegativeDuration));
 	}
-	
+
 	@Override
 	public void reset() {
 		super.reset();
