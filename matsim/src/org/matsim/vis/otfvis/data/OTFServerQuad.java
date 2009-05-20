@@ -30,6 +30,7 @@ import java.util.List;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
@@ -79,6 +80,24 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 				else writer.writeDynData(this.out);
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+
+	private static class ReplaceSourceExecutor implements Executor<OTFDataWriter> {
+		public final QueueNetwork q;
+
+		public ReplaceSourceExecutor(QueueNetwork newNet) {
+			q = newNet;
+		}
+
+		public void execute(double x, double y, OTFDataWriter writer)  {
+			Object src = writer.getSrc();
+			if(src instanceof QueueLink) {
+				QueueLink link = q.getLinks().get(((QueueLink) src).getLink().getId());
+				writer.setSrc(link);
+			} else if(src instanceof QueueNode) {
+				
 			}
 		}
 	}
@@ -270,6 +289,12 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 			e.printStackTrace();
 		}
 		
+	}
+
+	public void replaceSrc(QueueNetwork newNet) {
+		//int colls = 
+		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
+				new ReplaceSourceExecutor(newNet));
 	}
 
 }
