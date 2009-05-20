@@ -180,14 +180,18 @@ public class QueueLink {
 		for (BasicLane signalLane : lanes) {
 			QueueLane lane = null;
 			if(!firstNodeLinkInitialized){
-				lane = new QueueLane(this, signalLane, false);
+				lane = new QueueLane(this, false);
+				lane.setLaneData(signalLane);
+				lane.setMetersFromLinkEnd(0.0);
 				this.originalLane.addToLane(lane);
 
 				this.setToLinks(lane, signalLane.getToLinkIds());
-
-				lane.recalculateProperties(0.0, signalLane.getLength(), signalLane.getNumberOfRepresentedLanes());
-				this.originalLane.recalculateProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(),
-						this.getLink().getNumberOfLanes(Time.UNDEFINED_TIME));
+				
+				
+				
+				lane.recalculateProperties(signalLane.getLength());
+				this.originalLane.setMetersFromLinkEnd(signalLane.getLength());
+				this.originalLane.recalculateProperties(this.getLink().getLength() - signalLane.getLength());
 				firstNodeLinkInitialized = true;
 				this.originalLane.setFireLaneEvents(true);
 			} 
@@ -207,12 +211,14 @@ public class QueueLink {
 					// Adjust SC, SQ...
 				}
   				// New QueueLane will start at originalLink
-					lane = new QueueLane(this, signalLane, false);
+					lane = new QueueLane(this, false);
+					lane.setLaneData(signalLane);
+					lane.setMetersFromLinkEnd(0.0);
 					this.originalLane.addToLane(lane);
 					this.setToLinks(lane, signalLane.getToLinkIds());
 					
 					// Only need to fix properties of new QueueLane. Original QueueLane hasn't changed
-					lane.recalculateProperties(0.0, signalLane.getLength(), signalLane.getNumberOfRepresentedLanes());
+					lane.recalculateProperties(signalLane.getLength());
 			}
 			lane.setFireLaneEvents(true);
 			this.queueLanes.add(lane);

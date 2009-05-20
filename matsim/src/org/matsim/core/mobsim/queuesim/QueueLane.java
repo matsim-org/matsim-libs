@@ -258,9 +258,15 @@ public class QueueLane {
 		recalcCapacity(now);
 	}
 
-	/*package*/ void recalculateProperties(final double meterFromLinkEnd_m, final double laneLength_m, final double numberOfRepresentedLanes) {
+	
+	void recalculateProperties(final double laneLength_m) {
 		SimulationConfigGroup config = Gbl.getConfig().simulation();
 
+		double numberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
+		if (this.laneData != null) {
+			numberOfRepresentedLanes = this.laneData.getNumberOfRepresentedLanes();
+		}
+		
 		/*variable was given as parameter in original but the method was called everywhere with the expression below,
 		 * TODO Check if this is correct! dg[jan09]*/
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
@@ -274,7 +280,6 @@ public class QueueLane {
 			this.length = laneLength_m;
 		}
 
-		this.meterFromLinkEnd  = meterFromLinkEnd_m;
 		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
 		this.simulatedFlowCapacity = numberOfRepresentedLanes * averageSimulatedFlowCapacityPerLane_Veh_s
@@ -292,7 +297,11 @@ public class QueueLane {
 			this.storageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
 		}
 	}
-
+	
+	void setMetersFromLinkEnd(double meters) {
+		this.meterFromLinkEnd = meters;
+	}
+	
 	protected double getMeterFromLinkEnd(){
 		return this.meterFromLinkEnd;
 	}
@@ -912,5 +921,9 @@ public class QueueLane {
 				return 0;
 			}
 		}
+	}
+
+	void setLaneData(BasicLane signalLane) {
+		this.laneData = signalLane;
 	}
 }
