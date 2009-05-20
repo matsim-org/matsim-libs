@@ -20,12 +20,13 @@ public class MyCommercialControlerV01 {
 	
 	public static void main(String[] args){
 
-		Controler c = new Controler("src/playground/jjoubert/CommercialDemand/configLocal.xml");
+//		Controler c = new Controler("src/playground/jjoubert/CommercialDemand/configLocal.xml");
+		Controler c = new Controler("playground/jjoubert/CommercialDemand/configIVTSim0.xml");
 		long t = System.currentTimeMillis();
 		
 		// Set some Controler characteristics
 		c.setCreateGraphs(true);
-		c.setWriteEventsInterval(1);
+		c.setWriteEventsInterval(10);
 		
 		/*
 		 * Add all the listeners
