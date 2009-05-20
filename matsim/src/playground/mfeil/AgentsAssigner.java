@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -77,11 +77,11 @@ public class AgentsAssigner implements PlanAlgorithm{
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(), 
 				controler.getTraveltimeBinSize());
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
-				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
-				controler.getNetwork());
+				plansCalcRoute);
 		this.timer					= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		//this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		this.locator 				= locator;

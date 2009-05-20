@@ -37,6 +37,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
@@ -89,7 +90,9 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		log.info("Reading events...done.");
 
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(network, travelCostEstimator, tTravelEstimator);
+
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);

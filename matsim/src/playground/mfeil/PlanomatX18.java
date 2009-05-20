@@ -36,7 +36,6 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -48,9 +47,9 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.planomat.Planomat;
+import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mfeil.config.PlanomatXConfigGroup;
@@ -95,9 +94,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		this.scorer					= new PlanScorer (this.factory);
 		this.legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
-				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
-				controler.getNetwork());
+				this.router);
 				
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(PlanomatXConfigGroup.getNeighbourhoodSize());
 		/*Weighing whether changing the sequence of activities.*/

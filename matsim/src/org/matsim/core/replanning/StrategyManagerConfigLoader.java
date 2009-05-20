@@ -120,12 +120,12 @@ public class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, controler.getNetwork()));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator(), controler.getTravelCostCalculator(), controler.getScoringFunctionFactory());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 //				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);

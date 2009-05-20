@@ -97,11 +97,12 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer 				= scorer;
-		this.estimator				= Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+		
+		this.estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
-				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
-				controler.getNetwork());
+				this.router);
+
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
 		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());

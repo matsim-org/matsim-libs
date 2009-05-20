@@ -20,9 +20,13 @@
 
 package playground.mfeil;
 
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
@@ -30,19 +34,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.planomat.Planomat;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * @author Matthias Feil
@@ -86,11 +86,13 @@ public class RecyclingModule implements PlanStrategyModule {
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(), 
 				controler.getTraveltimeBinSize());
+
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
-				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
-				controler.getNetwork());
+				plansCalcRoute);
+
 		this.nonassignedAgents 		= new LinkedList<String>();
 		this.timer					= new TimeModeChoicer1 (controler, this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
 		//this.timer					= new Planomat (this.estimator, controler.getScoringFunctionFactory());

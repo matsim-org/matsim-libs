@@ -22,11 +22,10 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -50,9 +49,9 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 
 	public CetinCompatibleLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
-			TravelCost linkTravelCostEstimator,
-			DepartureDelayAverageCalculator depDelayCalc, Network network) {
-		super(linkTravelTimeEstimator, linkTravelCostEstimator, depDelayCalc, network);
+			DepartureDelayAverageCalculator depDelayCalc,
+			PlansCalcRoute plansCalcRoute) {
+		super(linkTravelTimeEstimator, depDelayCalc, plansCalcRoute);
 	}
 
 	@Override

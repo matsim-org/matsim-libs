@@ -42,6 +42,7 @@ import org.matsim.core.events.PersonEvent;
 import org.matsim.core.events.handler.PersonEventHandler;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -121,7 +122,9 @@ public class PlanomatTest extends MatsimTestCase {
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.scenario.getNetwork());
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
+		
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 
 		log.info("Testing " + testRun.toString() + "...");
@@ -267,7 +270,10 @@ public class PlanomatTest extends MatsimTestCase {
 		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
-		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, this.scenario.getNetwork());
+		
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
+
+		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 
 		// run the method
 		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());

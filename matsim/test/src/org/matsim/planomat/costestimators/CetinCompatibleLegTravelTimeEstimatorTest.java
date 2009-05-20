@@ -30,6 +30,7 @@ import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.misc.Time;
 
 public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTravelTimeEstimatorTest {
@@ -45,11 +46,12 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 	@Override
 	public void testGetLegTravelTimeEstimation() {
 
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+
 		testee = new CetinCompatibleLegTravelTimeEstimator(
-				super.linkTravelTimeEstimator,
-				super.linkTravelCostEstimator,
-				super.tDepDelayCalc, 
-				super.scenario.getNetwork());
+				this.linkTravelTimeEstimator,
+				this.tDepDelayCalc,
+				plansCalcRoute);
 
 		Events events = new Events();
 		events.addHandler(tDepDelayCalc);

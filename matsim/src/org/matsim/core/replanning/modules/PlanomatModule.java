@@ -20,9 +20,11 @@
 
 package org.matsim.core.replanning.modules;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -39,29 +41,34 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class PlanomatModule extends AbstractMultithreadedModule {
 
-	private NetworkLayer network;
-	private Events events;
-	private TravelTime travelTime;
-	private TravelCost travelCost;
-	private ScoringFunctionFactory sf;
-
+	private final NetworkLayer network;
+	private final Events events;
+	private final TravelCost travelCost;
+	private final TravelTime travelTime;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final Controler controler;
+	
 	private DepartureDelayAverageCalculator tDepDelayCalc = null;
 
-	public PlanomatModule(NetworkLayer network, Events events,
-			TravelTime travelTime, TravelCost travelCost,
-			ScoringFunctionFactory sf) {
+	public PlanomatModule(
+			Controler controler, 
+			Events events, 
+			NetworkLayer network,
+			ScoringFunctionFactory scoringFunctionFactory,
+			TravelCost travelCost, 
+			TravelTime travelTime) {
 		super();
-		this.network = network;
+		this.controler = controler;
 		this.events = events;
-		this.travelTime = travelTime;
+		this.network = network;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.travelCost = travelCost;
-		this.sf = sf;
-
+		this.travelTime = travelTime;
+		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
 				this.network,
 				Gbl.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.events.addHandler(tDepDelayCalc);
-
 	}
 
 	@Override
@@ -75,16 +82,15 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 		 * Synchronization would make this code very slow as there are probably very many calls of the router. As it is only a temporary solution,
 		 * we simply create one instance per thread.
 		 */
+		
+		PlansCalcRoute routingAlgorithm = (PlansCalcRoute) this.controler.getRoutingAlgorithm(this.travelCost, this.travelTime);
+		
 		LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
 				this.travelTime, 
-				this.travelCost, 
 				this.tDepDelayCalc, 
-				this.network);
+				routingAlgorithm);
 
-		PlanAlgorithm planomatInstance = null;
-		planomatInstance = new Planomat(
-				legTravelTimeEstimator, 
-				this.sf);
+		PlanAlgorithm planomatInstance =  new Planomat(legTravelTimeEstimator, this.scoringFunctionFactory);
 
 		return planomatInstance;
 

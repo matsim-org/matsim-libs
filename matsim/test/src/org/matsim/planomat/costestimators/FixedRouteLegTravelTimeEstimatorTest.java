@@ -41,6 +41,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -105,6 +106,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.scenario = null;
 		this.destinationAct = null;
 		this.linkTravelTimeEstimator = null;
+		this.linkTravelCostEstimator = null;
 		this.originAct = null;
 		this.tDepDelayCalc = null;
 		this.testee = null;
@@ -118,11 +120,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
 
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
-				this.linkTravelCostEstimator,
 				this.tDepDelayCalc,
-				this.scenario.getNetwork());
+				plansCalcRoute);
 
 		double legTravelTimeEstimation = this.testee.getLegTravelTimeEstimation(
 				new IdImpl("1"),
@@ -136,11 +139,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testProcessDeparture() {
 
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
-				this.linkTravelCostEstimator,
 				this.tDepDelayCalc,
-				this.scenario.getNetwork());
+				plansCalcRoute);
 		Id linkId = this.originAct.getLinkId();
 
 		Events events = new Events();
@@ -186,11 +190,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testProcessRouteTravelTime() {
 
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
-				this.linkTravelCostEstimator,
 				this.tDepDelayCalc,
-				this.scenario.getNetwork());
+				plansCalcRoute);
 
 		Events events = new Events();
 		events.addHandler(this.linkTravelTimeEstimator);
@@ -258,11 +263,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testProcessLink() {
 
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
-				this.linkTravelCostEstimator,
 				this.tDepDelayCalc,
-				this.scenario.getNetwork());
+				plansCalcRoute);
+
 		Id linkId = ((NetworkRoute) this.testLeg.getRoute()).getLinks().get(0).getId();
 
 		Events events = new Events();

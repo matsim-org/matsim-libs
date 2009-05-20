@@ -6,9 +6,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Module;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
@@ -207,14 +206,17 @@ public class PlanomatConfigGroup extends Module {
 
 	}
 
-	public LegTravelTimeEstimator getLegTravelTimeEstimator(TravelTime travelTime, TravelCost travelCost, DepartureDelayAverageCalculator tDepDelayCalc, Network network) {
+	public LegTravelTimeEstimator getLegTravelTimeEstimator(
+			TravelTime travelTime, 
+			DepartureDelayAverageCalculator tDepDelayCalc, 
+			PlansCalcRoute plansCalcRoute) {
 
 		LegTravelTimeEstimator legTravelTimeEstimator = null;
 
 		if (PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getActualValue().equalsIgnoreCase(PlanomatConfigGroup.CETIN_COMPATIBLE)) {
-			legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(travelTime, travelCost, tDepDelayCalc, network);
+			legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(travelTime, tDepDelayCalc, plansCalcRoute);
 		} else if (PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getActualValue().equalsIgnoreCase(PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE)) {
-			legTravelTimeEstimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(travelTime, travelCost, tDepDelayCalc, network);
+			legTravelTimeEstimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(travelTime, tDepDelayCalc, plansCalcRoute);
 		} else {
 			throw new RuntimeException("legTravelTimeEstimator value: \"" + PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getActualValue() + "\" is not allowed.");
 		}

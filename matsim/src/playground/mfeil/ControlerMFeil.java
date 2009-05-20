@@ -30,6 +30,7 @@ import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -77,7 +78,7 @@ public class ControlerMFeil extends Controler {
 			}
 			else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(this.getNetwork(), this.getEvents(), this.getTravelTimeCalculator(), this.getTravelCostCalculator(), this.getScoringFunctionFactory());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(this, this.getEvents(), this.getNetwork(), this.getScoringFunctionFactory(), this.getTravelCostCalculator(), this.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 			}
 			else if (classname.equals("TimeOptimizer")) {
@@ -85,11 +86,13 @@ public class ControlerMFeil extends Controler {
 				DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 						super.network, 
 						super.getTraveltimeBinSize());
+				
+				PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator());
 				LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
-						super.getTravelTimeCalculator(), 
-						super.getTravelCostCalculator(), 
+						this.getTravelTimeCalculator(), 
 						tDepDelayCalc, 
-						super.network);
+						plansCalcRoute);
+
 				PlanStrategyModule timeOptStrategyModule = new TimeOptInitialiser(this, legTravelTimeEstimator, this.scoringFunctionFactory);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}

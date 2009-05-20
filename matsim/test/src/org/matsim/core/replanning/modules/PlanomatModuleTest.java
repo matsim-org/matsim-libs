@@ -26,6 +26,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -36,6 +37,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -94,7 +96,16 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
 		
-		PlanomatModule testee = new PlanomatModule(this.network, emptyEvents, tTravelEstimator, travelCostEstimator, scoringFunctionFactory);
+		Controler dummyControler = new Controler(this.config, this.network, this.population);
+		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
+		
+		PlanomatModule testee = new PlanomatModule(
+				dummyControler, 
+				emptyEvents, 
+				this.network, 
+				scoringFunctionFactory, 
+				travelCostEstimator, 
+				tTravelEstimator);
 		
 		testee.prepareReplanning();
 		for (Person person : this.population.getPersons().values()) {
@@ -116,6 +127,8 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		assertEquals("different plans files.", expectedChecksum, actualChecksum);
 
 	}
+	
+	
 	
 	@Override
 	protected void tearDown() throws Exception {
