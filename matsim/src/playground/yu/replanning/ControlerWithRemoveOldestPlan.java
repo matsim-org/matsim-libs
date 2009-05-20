@@ -44,7 +44,7 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 
 	@Override
 	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan();
+		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan2();
 		StrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}
@@ -54,10 +54,9 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 	 */
 	public static void main(String[] args) {
 		Controler controler = new ControlerWithRemoveOldestPlan(args);
-		controler.addControlerListener(new OnePersonPlanScoreMonitor());
+		// controler.addControlerListener(new OnePersonPlanScoreMonitor());
 		controler.setWriteEventsInterval(0);
 		controler.setCreateGraphs(false);
 		controler.run();
 	}
-
 }

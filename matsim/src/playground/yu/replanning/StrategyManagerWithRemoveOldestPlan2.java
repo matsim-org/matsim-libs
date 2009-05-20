@@ -45,25 +45,22 @@ import org.matsim.core.utils.collections.Tuple;
  * 
  */
 public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
-	private Map<Plan, Tuple<Integer, Integer>> selectedHistory = new HashMap<Plan, Tuple<Integer, Integer>>();
-	private boolean isInitialized = false;
+	private Map<Plan, Tuple<Integer, Integer>> selectedHistory = null;
 	private Map<Id, Boolean> newPlansCreated = new HashMap<Id, Boolean>();
 	private int maxPlansPerAgent = 0;
 
 	public void run(final Population population) {
 		// initialize all "selectedHistory" of plans
-		if (!isInitialized) {
-			for (Person person : population.getPersons().values()) {
-				for (Plan plan : person.getPlans()) {
-					Tuple<Integer, Integer> sh = new Tuple<Integer, Integer>(
-							plan.isSelected() ? 1 : 0, 1);
-					selectedHistory.put(plan, sh);
-				}
+		selectedHistory = new HashMap<Plan, Tuple<Integer, Integer>>();
+		for (Person person : population.getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				Tuple<Integer, Integer> sh = new Tuple<Integer, Integer>(plan
+						.isSelected() ? 1 : 0, 1);
+				selectedHistory.put(plan, sh);
 			}
-			isInitialized = true;
-			System.out.println("----->selectHistory size :\t"
-					+ selectedHistory.size());
 		}
+		System.out.println("----->selectHistory size :\t"
+				+ selectedHistory.size());
 
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies)
@@ -168,6 +165,7 @@ public class StrategyManagerWithRemoveOldestPlan2 extends StrategyManager {
 			}
 			if (oldestPlan != null) {
 				person.removePlan(oldestPlan);
+				selectedHistory.remove(oldestPlan);
 				oldPlans.remove(keyOfOldestPlan);
 				oldPlansSize = oldPlans.size();
 				if (oldestPlan.isSelected()) {
