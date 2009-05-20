@@ -22,41 +22,19 @@ package org.matsim.vis.otfvis.opengl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.XMLEncoder;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
-import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -72,7 +50,6 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
@@ -80,9 +57,6 @@ import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
-
-import de.schlichtherle.io.ArchiveDetector;
-import de.schlichtherle.io.DefaultArchiveDetector;
 
 class OTFFrame extends JFrame {
 	   public OTFFrame(String string) {
@@ -146,7 +120,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 	
 	protected OTFHostControlBar hostControl = null;
 
-	private final String filename;
+	protected String filename;
 	private boolean splitLayout = true;
 	protected JSplitPane pane = null;
 
@@ -186,7 +160,16 @@ public class OnTheFlyClientFileQuad extends Thread {
 		return drawer2;
 	}
 
+	protected String getURL() {
+		System.out.println("Loading file " + this.filename + " ....");
+		return "file:" + this.filename;
+	}
+	
+	protected OTFFileSettingsSaver getFileSaver() {
+		return new OTFFileSettingsSaver(this.filename);
+	}
 
+	
 	protected JFrame prepareRun() {
 		System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 		System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
@@ -214,7 +197,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
 		
 		if (Gbl.getConfig() == null) Gbl.createConfig(null);
-		OTFFileSettingsSaver saver = new OTFFileSettingsSaver(this.filename);
+		OTFFileSettingsSaver saver = getFileSaver();
 		
 		OTFVisConfig visconf = (OTFVisConfig) Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 		if (visconf == null) {
@@ -226,8 +209,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 		try {
 
 			
-			System.out.println("Loading file " + this.filename + " ....");
-			this.hostControl = new OTFHostControlBar("file:" + this.filename);
+			this.hostControl = new OTFHostControlBar(getURL());
 			hostControl.frame = frame;
 
 			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
