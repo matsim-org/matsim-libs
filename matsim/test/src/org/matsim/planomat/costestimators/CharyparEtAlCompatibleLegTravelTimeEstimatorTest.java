@@ -45,7 +45,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 	@Override
 	public void testGetLegTravelTimeEstimation() {
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
 
 		testee = new CharyparEtAlCompatibleLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,

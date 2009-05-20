@@ -46,7 +46,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 	@Override
 	public void testGetLegTravelTimeEstimation() {
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
 
 		testee = new CetinCompatibleLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,

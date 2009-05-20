@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.core.api.network.Network;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -37,16 +38,23 @@ public class ReRouteDijkstra extends AbstractMultithreadedModule {
 	TravelCost costCalculator = null;
 	TravelTime timeCalculator = null;
 	Network network = null;
-
-	public ReRouteDijkstra(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	private PlansCalcRouteConfigGroup configGroup = null;
+	
+	protected ReRouteDijkstra(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 	}
+	
+	public ReRouteDijkstra(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+		this(network, costCalculator, timeCalculator);
+		this.configGroup = configGroup;
+	}
+	
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansCalcRoute(this.network, this.costCalculator, this.timeCalculator, new DijkstraFactory());
+		return new PlansCalcRoute(this.configGroup, this.network, this.costCalculator, this.timeCalculator, new DijkstraFactory());
 	}
 
 }

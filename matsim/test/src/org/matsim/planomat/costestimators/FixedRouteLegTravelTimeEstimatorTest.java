@@ -120,7 +120,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
 
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
@@ -139,7 +139,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testProcessDeparture() {
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
 
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
@@ -190,7 +190,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testProcessRouteTravelTime() {
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
 
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,
@@ -263,7 +263,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	public void testProcessLink() {
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), this.linkTravelCostEstimator, this.linkTravelTimeEstimator);
 
 		this.testee = new FixedRouteLegTravelTimeEstimator(
 				this.linkTravelTimeEstimator,

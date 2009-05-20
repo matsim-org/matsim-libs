@@ -39,6 +39,7 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.MatricesConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
@@ -78,6 +79,7 @@ public class Config {
 	private NetworkConfigGroup network = null;
 	private PlansConfigGroup plans = null;
 	private PlanomatConfigGroup planomat = null;
+	private PlansCalcRouteConfigGroup plansCalcRoute = null;
 	private FacilitiesConfigGroup facilities = null;
 	private MatricesConfigGroup matrices = null;
 	private EventsConfigGroup events = null;
@@ -180,6 +182,9 @@ public class Config {
 		
 		this.scenarioConfigGroup = new ScenarioConfigGroup();
 		this.modules.put(ScenarioConfigGroup.GROUP_NAME, this.scenarioConfigGroup);
+		
+		this.plansCalcRoute = new PlansCalcRouteConfigGroup();
+		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, this.plansCalcRoute);
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -444,6 +449,10 @@ public class Config {
 	public void addConfigConsistencyChecker(
 			ConfigConsistencyChecker checker) {
 		this.consistencyCheckers.add(checker);
+	}
+
+	public PlansCalcRouteConfigGroup plansCalcRoute() {
+		return this.plansCalcRoute;
 	}
 	
 }

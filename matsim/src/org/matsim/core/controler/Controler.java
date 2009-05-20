@@ -961,9 +961,9 @@ public class Controler {
 	 */
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 		if ((this.roadPricing != null) && (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
-			return new PlansCalcAreaTollRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.roadPricing.getRoadPricingScheme());
+			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.roadPricing.getRoadPricingScheme());
 		}
-		return new PlansCalcRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+		return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
 	}
 
 	/* ===================================================================

@@ -174,9 +174,10 @@ public class PlanomatConfigGroup extends Module {
 
 	private final static Logger logger = Logger.getLogger(PlanomatConfigGroup.class);
 
+
 	public PlanomatConfigGroup() {
 		super(PlanomatConfigGroup.GROUP_NAME);
-
+		
 		for (PlanomatConfigParameter param : PlanomatConfigParameter.values()) {
 			param.setActualValue(param.getDefaultValue());
 			super.addParam(param.getParameterName(), param.getDefaultValue());

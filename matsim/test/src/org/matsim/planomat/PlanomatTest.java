@@ -122,7 +122,7 @@ public class PlanomatTest extends MatsimTestCase {
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
 		
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
@@ -271,7 +271,7 @@ public class PlanomatTest extends MatsimTestCase {
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 		
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
 
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 

@@ -27,9 +27,10 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -59,9 +60,9 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param factory
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator,
+	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final RoadPricingScheme scheme) {
-		super(network, costCalculator, timeCalculator, factory);
+		super(configGroup, network, costCalculator, timeCalculator, factory);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
 		this.tollRouter =	factory.createPathCalculator(network, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator);

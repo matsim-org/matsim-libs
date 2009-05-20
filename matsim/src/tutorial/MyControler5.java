@@ -71,7 +71,7 @@ public class MyControler5 {
 
 		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc, config.charyparNagelScoring());
-		strategy2.addStrategyModule(new ReRouteDijkstra(scenario.getNetwork(), costCalc, ttimeCalc));
+		strategy2.addStrategyModule(new ReRouteDijkstra(config.plansCalcRoute(), scenario.getNetwork(), costCalc, ttimeCalc));
 		events.addHandler(ttimeCalc);
 
 		for (int iteration = 0; iteration <= 10; iteration++) {

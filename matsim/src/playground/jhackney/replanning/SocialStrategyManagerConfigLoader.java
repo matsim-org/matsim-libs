@@ -105,7 +105,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (classname.equals("ReRoute_Dijkstra")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
+				strategy.addStrategyModule(new ReRouteDijkstra(config.plansCalcRoute(), network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("ReRoute_Landmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
