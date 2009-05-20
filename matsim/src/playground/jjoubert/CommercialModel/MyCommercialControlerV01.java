@@ -16,7 +16,7 @@ import playground.jjoubert.CommercialModel.Listeners.MySimulationStartListener;
 public class MyCommercialControlerV01 {
 	
 	private final static Logger LOG = Logger.getLogger(MyCommercialControlerV01.class);
-	private final static int COMMERCIAL_THRESHOLD = 1000000;
+	private final static int COMMERCIAL_THRESHOLD = 100000;
 	
 	public static void main(String[] args){
 
