@@ -35,7 +35,9 @@ public interface QueueVehicle extends Identifiable {
 	
 	public double getSizeInEquivalents();
 	
-	// unclear about the methods below...
+	public double getLinkEnterTime();
+	
+	public void setLinkEnterTime(final double time);
 
 	public double getEarliestLinkExitTime();
 

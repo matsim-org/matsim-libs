@@ -25,6 +25,7 @@ import org.matsim.core.api.network.Link;
 
 public class QueueVehicleImpl implements QueueVehicle {
 
+	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
 
 	private DriverAgent driver = null;
@@ -44,6 +45,14 @@ public class QueueVehicleImpl implements QueueVehicle {
 		this.sizeInEquivalents = sizeInEquivalents;
 	}
 
+	public double getLinkEnterTime() {
+		return this.linkEnterTime;
+	}
+	
+	public void setLinkEnterTime(final double time) {
+		this.linkEnterTime = time;
+	}
+	
 	public double getEarliestLinkExitTime() {
 		return this.earliestLinkExitTime;
 	}
