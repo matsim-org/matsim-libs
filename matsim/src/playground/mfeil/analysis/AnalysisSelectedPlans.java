@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -40,6 +41,8 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.MatsimPopulationReader;
+
+import playground.mfeil.PlanomatX18;
 
 
 /**
@@ -54,6 +57,7 @@ public class AnalysisSelectedPlans {
 	private ArrayList<List<PlanElement>> activityChains;
 	private ArrayList<ArrayList<Plan>> plans;
 	private final Map<String,Double> minimumTime;
+	private static final Logger log = Logger.getLogger(AnalysisSelectedPlans.class);
 	
 
 
@@ -97,12 +101,12 @@ public class AnalysisSelectedPlans {
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
 					if (k==0){
 						if ((((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration())<=this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) {
-							System.out.println("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration()));
+							log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration()));
 							break;
 						}
 					}
 					else if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()<=this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) {
-						System.out.println("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2));
+						log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2));
 						break;
 					}
 				}
@@ -115,12 +119,12 @@ public class AnalysisSelectedPlans {
 							break;
 						}
 					}
-					if (notIn) System.out.println("Prim act error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" for prim act "+this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(k));
+					if (notIn) log.warn("Prim act error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" for prim act "+this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(k));
 				}
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
 					if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home")){
 						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId()!=this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(0).getFacility().getId()){
-							System.out.println("Non-primary home act found in plan of person "+this.plans.get(i).get(j).getPerson().getId());
+							log.warn("Non-primary home act found in plan of person "+this.plans.get(i).get(j).getPerson().getId());
 							break;
 						}
 					}
@@ -230,7 +234,7 @@ public class AnalysisSelectedPlans {
 		// FIXME hard-coded file names; does this class really need a main-method?
 //		final String populationFilename = "./examples/equil/plans100.xml";
 //		final String networkFilename = "./examples/equil/network.xml";
-		final String populationFilename = "./output/Test1/output_plans.xml";
+		final String populationFilename = "./output/Test1_TMC_30_5_100iter_2/output_plans.xml.gz";
 //		final String populationFilename = "./output/Test1/ITERS/it.0/0.plans.xml.gz";
 		final String networkFilename = "./test/scenarios/chessboard/network.xml";
 		final String facilitiesFilename = "./test/scenarios/chessboard/facilities.xml";
@@ -245,7 +249,8 @@ public class AnalysisSelectedPlans {
 		AnalysisSelectedPlans sp = new AnalysisSelectedPlans(scenario.getPopulation(), outputDir);
 		sp.analyze();
 		sp.checkCorrectness();
-
+		
+		log.info("Analysis of plan finished.");
 	}
 
 }
