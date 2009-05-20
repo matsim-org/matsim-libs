@@ -496,6 +496,9 @@ public class QueueLane {
 			 * results compared to the old mobSim */
 			departureTime = Math.floor(departureTime);
 		}
+		if (this.originalLane) {
+			veh.setLinkEnterTime(now);
+		}
 		veh.setEarliestLinkExitTime(departureTime);
 	}
 
@@ -811,7 +814,7 @@ public class QueueLane {
 			 */
 			double lastDistance = Integer.MAX_VALUE;
 			for (QueueVehicle veh : QueueLane.this.vehQueue) {
-				double travelTime = now - (veh.getEarliestLinkExitTime() - QueueLane.this.queueLink.getLink().getFreespeedTravelTime(now));
+				double travelTime = now - veh.getLinkEnterTime();
 				double distanceOnLink = (QueueLane.this.queueLink.getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
 						: ((travelTime / QueueLane.this.queueLink.getLink().getFreespeedTravelTime(now)) * QueueLane.this.queueLink.getLink().getLength()));
 				if (distanceOnLink > queueEnd) { // vehicle is already in queue
