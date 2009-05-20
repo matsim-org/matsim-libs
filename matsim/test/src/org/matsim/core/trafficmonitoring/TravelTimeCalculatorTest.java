@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
@@ -35,6 +37,7 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
@@ -48,6 +51,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.xml.sax.SAXException;
 
 /**
  * @author mrieser
@@ -186,6 +190,44 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		assertEquals(10 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 3*timeBinSize), EPSILON);  // linkTravelTime2 > linkTravelTime1 - 3*timeBinSize !
 		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 4*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 1*timeBinSize
 		assertEquals(10     , ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 5*timeBinSize), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 2*timeBinSize
+	}
+	
+	/**
+	 * Tests that calculating LinkTravelTimes works also without reading in a complete scenario including population.
+	 * 
+	 * @author mrieser
+	 * 
+	 * @throws IOException 
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 */
+	public void testReadFromFile_LargeScenarioCase() throws SAXException, ParserConfigurationException, IOException {
+		/* Assume, you have a big events file from a huge scenario and you want to do data-mining...
+		 * Then you likely want to calculate link travel times. This requires the network, but NOT
+		 * the population. Thus, using "new Events(new EventsBuilderImpl(scenario))" is not appropriate
+		 * and may not even be usable if the population is too big to read it in on a laptop for
+		 * post-processing. So, it must be possible to only read the network an the events and still
+		 * calculate link travel times.
+		 */
+		String eventsFilename = getClassInputDirectory() + "link10_events.txt";
+		String networkFile = "test/scenarios/equil/network.xml";
+		
+		Config config = super.loadConfig(null);
+		
+		Network network = new NetworkLayer();
+		new MatsimNetworkReader(network).parse(networkFile);
+		
+		Events events = new Events(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
+		
+		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
+		events.addHandler(ttCalc);
+		
+		new MatsimEventsReader(events).readFile(eventsFilename);
+		
+		Link link10 = network.getLinks().get(new IdImpl("10"));
+		
+		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTime(link10, 6.0 * 3600), EPSILON);
+		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTime(link10, 6.25 * 3600), EPSILON);
 	}
 	
 	private static class EventsConverter implements BasicEventHandler {
