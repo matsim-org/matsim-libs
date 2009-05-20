@@ -20,6 +20,8 @@
 
 package org.matsim.core.basic.v01;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -144,5 +146,13 @@ implements BasicLink
 	
 	public Set<TransportMode> getAllowedModes() {
 		return this.allowedModes.clone();
+	}
+	
+	private void readObject(ObjectInputStream ois)    throws ClassNotFoundException, IOException 
+	{
+		ois.defaultReadObject();
+		
+		this.from.addOutLink(this);
+		this.to.addInLink(this);
 	}
 }

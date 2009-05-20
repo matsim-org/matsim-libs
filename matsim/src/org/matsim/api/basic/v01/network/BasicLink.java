@@ -20,6 +20,7 @@
 
 package org.matsim.api.basic.v01.network;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Identifiable;
@@ -30,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
 /**
  * A topological representation of a network link.
  */
-public interface BasicLink extends Identifiable {
+public interface BasicLink extends Identifiable, Serializable {
 
 	/**
 	 * Sets this link's non-<code>null</code> upstream node.

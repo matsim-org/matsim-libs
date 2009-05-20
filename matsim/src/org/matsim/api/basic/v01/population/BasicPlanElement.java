@@ -20,6 +20,8 @@
 
 package org.matsim.api.basic.v01.population;
 
-public interface BasicPlanElement {
+import java.io.Serializable;
+
+public interface BasicPlanElement extends Serializable{
 
 }

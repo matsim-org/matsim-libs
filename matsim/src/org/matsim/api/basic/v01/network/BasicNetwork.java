@@ -20,6 +20,7 @@
 
 package org.matsim.api.basic.v01.network;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
@@ -28,7 +29,7 @@ import org.matsim.api.basic.v01.Id;
 /**
  * A topological network representation.
  */
-public interface BasicNetwork<N extends BasicNode, L extends BasicLink> {
+public interface BasicNetwork<N extends BasicNode, L extends BasicLink> extends Serializable{
 
     /**
      * Returns a set of this network's nodes. This set might be empty, but it

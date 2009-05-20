@@ -19,6 +19,7 @@
 
 package org.matsim.core.network;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ import org.matsim.core.population.routes.RouteFactory;
 /**
  * @author dgrether
  */
-public class NetworkFactory {
+public class NetworkFactory implements Serializable{
 
 	private LinkFactory linkFactory = null;
 

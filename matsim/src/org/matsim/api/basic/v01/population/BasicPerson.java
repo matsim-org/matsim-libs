@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.api.basic.v01.population;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
@@ -27,7 +28,7 @@ import org.matsim.api.basic.v01.Identifiable;
 /**
  * @author dgrether
  */
-public interface BasicPerson<T extends BasicPlan> extends Identifiable {
+public interface BasicPerson<T extends BasicPlan> extends Identifiable, Serializable {
 
 	public List<T> getPlans();
 

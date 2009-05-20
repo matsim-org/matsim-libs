@@ -19,11 +19,13 @@
 
 package org.matsim.api.basic.v01;
 
+import java.io.Serializable;
+
 
 /**
  * @author dgrether
  */
-public interface BasicLocation extends Identifiable {
+public interface BasicLocation extends Identifiable, Serializable {
 
 	// TODO should not extend from BasicIdentifiable
 	

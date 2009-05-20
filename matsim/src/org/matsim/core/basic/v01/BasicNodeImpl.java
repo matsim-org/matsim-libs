@@ -20,6 +20,8 @@
 
 package org.matsim.core.basic.v01;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,8 +32,8 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.gbl.Gbl;
 
 public class BasicNodeImpl implements BasicNode {
-	protected final Map<Id, BasicLink> inlinks  = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
-	protected final Map<Id, BasicLink> outlinks = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
+	protected transient  Map<Id, BasicLink> inlinks  = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
+	protected transient  Map<Id, BasicLink> outlinks = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
 
 	/* TODO [balmermi]: Since the basic link is a location, it MUST have
 	 * defined some geographical information (coords). These are defined
@@ -77,4 +79,15 @@ public class BasicNodeImpl implements BasicNode {
 	public Id getId() {
 		return this.id;
 	}
+	
+
+	private void readObject(ObjectInputStream ois)
+    	throws ClassNotFoundException, IOException {
+  		ois.defaultReadObject();
+
+  		inlinks = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
+  		outlinks = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
+  
+	}
+
 }

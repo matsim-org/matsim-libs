@@ -20,6 +20,8 @@
 
 package org.matsim.core.population.routes;
 
+import java.io.Serializable;
+
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Route;
 
@@ -30,6 +32,6 @@ import org.matsim.core.api.population.Route;
  *
  * @author mrieser
  */
-public interface RouteFactory {
+public interface RouteFactory extends Serializable{
 	public Route createRoute(Link startLink, Link endLink);
 }

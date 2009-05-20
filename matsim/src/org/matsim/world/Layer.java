@@ -20,6 +20,7 @@
 
 package org.matsim.world;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +40,7 @@ import org.matsim.core.network.NetworkLayer;
  * @see ZoneLayer
  * @author Michael Balmer
  */
-public abstract class Layer {
+public abstract class Layer implements Serializable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
