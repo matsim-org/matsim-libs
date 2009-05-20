@@ -131,9 +131,12 @@ public class AccessEgressDemo {
 		TransitStopFacility[] stops = this.schedule.getFacilities().values().toArray(new TransitStopFacility[this.schedule.getFacilities().size()]);
 		TransitLine tLine = this.schedule.getTransitLines().get(ids[1]);
 		
-		TransitStopFacility lastStop = stops[stops.length - 1];
-		for (int i = 0; i < stops.length - 2; i++) {
+		TransitStopFacility lastStop = this.schedule.getFacilities().get(ids[stops.length - 1]);
+		for (int i = 0; i < stops.length; i++) {
 			TransitStopFacility stop = stops[i];
+			if (stop == lastStop) {
+				continue;
+			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
 				Person person = pb.createPerson(scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
 				Plan plan = pb.createPlan(person);
