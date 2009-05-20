@@ -20,8 +20,6 @@
 
 package org.matsim.core.router;
 
-import java.util.List;
-
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
@@ -31,6 +29,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -127,34 +126,42 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	//////////////////////////////////////////////////////////////////////
 
 	protected void handlePlan(final Plan plan) {
-		List<?> actslegs = plan.getPlanElements();
-		Activity fromAct = (Activity)actslegs.get(0);
 		double now = 0;
 
 		// loop over all <act>s
-		for (int j = 2; j < actslegs.size(); j=j+2) {
-			Activity toAct = (Activity)actslegs.get(j);
-			Leg leg = (Leg)actslegs.get(j-1);
-
-			double endTime = fromAct.getEndTime();
-			double startTime = fromAct.getStartTime();
-			double dur = fromAct.getDuration();
-			if (endTime != Time.UNDEFINED_TIME) {
-				// use fromAct.endTime as time for routing
-				now = endTime;
-			} else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				now = startTime + dur;
-			} else if (dur != Time.UNDEFINED_TIME) {
-				// use last used time + fromAct.duration as time for routing
-				now += dur;
-			} else {
-				throw new RuntimeException("act " + (j-2) + " of plan of person " + plan.getPerson().getId().toString() + " has neither end-time nor duration.");
+		Activity fromAct = null;
+		Activity toAct = null;
+		Leg leg = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				leg = (Leg) pe;
+			} else if (pe instanceof Activity) {
+				if (fromAct == null) {
+					fromAct = (Activity) pe;
+				} else {
+					toAct = (Activity) pe;
+					
+					double endTime = fromAct.getEndTime();
+					double startTime = fromAct.getStartTime();
+					double dur = fromAct.getDuration();
+					if (endTime != Time.UNDEFINED_TIME) {
+						// use fromAct.endTime as time for routing
+						now = endTime;
+					} else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+						// use fromAct.startTime + fromAct.duration as time for routing
+						now = startTime + dur;
+					} else if (dur != Time.UNDEFINED_TIME) {
+						// use last used time + fromAct.duration as time for routing
+						now += dur;
+					} else {
+						throw new RuntimeException("activity of plan of person " + plan.getPerson().getId().toString() + " has neither end-time nor duration." + fromAct.toString());
+					}
+					
+					now += handleLeg(leg, fromAct, toAct, now);
+					
+					fromAct = toAct;
+				}
 			}
-
-			now += handleLeg(leg, fromAct, toAct, now);
-
-			fromAct = toAct;
 		}
 	}
 
