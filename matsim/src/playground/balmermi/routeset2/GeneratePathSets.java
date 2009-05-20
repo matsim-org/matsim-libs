@@ -86,8 +86,9 @@ public class GeneratePathSets {
 		out.write("# SEG_ID\tFROM_NODE\tTO_NODE\tROUTE(linklist)...\t-1\tLEASTCOSTROUTE(0,1)\t-1\n");
 		out.flush();
 		
-		for (Id id : ods.keySet()) {
-			Tuple<Node,Node> od = ods.get(id);
+		for (Map.Entry<Id, Tuple<Node,Node>> entry : ods.entrySet()) {
+			Id id = entry.getKey();
+			Tuple<Node,Node> od = entry.getValue();
 			// generate paths
 			
 			log.debug("----------------------------------------------------------------------");
