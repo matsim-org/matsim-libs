@@ -37,8 +37,8 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -48,21 +48,28 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
+ * create facilities to the zrh-demand
+ * 
  * @author yu
  * 
  */
 public class NewDemandWithFacilities4Zrh {
-	public static class InsertActFacility extends AbstractPersonAlgorithm
+	public static class CreateActFacility extends AbstractPersonAlgorithm
 			implements PlanAlgorithm {
+		private ActivityFacilities afs = null;
 		private Map<Coord, ActivityFacility> afMap = null;
 		private PersonImpl currentPerson = null;
 		private Knowledge currentKnowledge = null;
+		private long facCnt = 0;
 
-		public InsertActFacility(ActivityFacilities afs) {
+		public CreateActFacility(ActivityFacilities activityFacilities) {
+			afs = activityFacilities;
 			afMap = new HashMap<Coord, ActivityFacility>();
-			for (ActivityFacility af : afs.getFacilities().values())
-				afMap.put(af.getCoord(), af);
 		}
+
+		// public ActivityFacilities getActivityfacilities() {
+		// return afs;
+		// }
 
 		@Override
 		public void run(Person person) {
@@ -85,23 +92,26 @@ public class NewDemandWithFacilities4Zrh {
 		}
 
 		private void allocateFacility2PrimaryActs4Zrh(String type, Activity act) {
-			if (type.startsWith("h") || type.startsWith("w")
-					|| type.startsWith("e")) {
-				ActivityFacility af = afMap.get(act.getCoord());
-				if (af != null) {
-					act.setFacility(af);
-					currentKnowledge.addActivity(af.createActivityOption(type),
-							true);
-				}
+			Coord coord = act.getCoord();
+			ActivityFacility af = afMap.get(coord);
+			if (af == null) {
+				af = afs.createFacility(new IdImpl(facCnt++), coord);
+				afMap.put(coord, af);
 			}
+			act.setFacility(af);
+			if (!af.getActivityOptions().containsKey(type)) {
+				currentKnowledge.addActivity(af.createActivityOption(type),
+						(type.startsWith("h") || type.startsWith("w") || type
+								.startsWith("e")));// 3 primary type
+			}
+
 		}
 	}
 
 	/**
 	 * @param args
 	 *            - args0 netFilename, args1 inputPopFilename, args2
-	 *            facilitiesFilename, args3 outputPopFilename, args4
-	 *            outputFacilitiesFilename
+	 *            outputPopFilename, args3 outputFacilitiesFilename
 	 */
 	public static void main(String[] args) {
 		// String netFilename =
@@ -117,9 +127,9 @@ public class NewDemandWithFacilities4Zrh {
 
 		String netFilename = args[0];
 		String inputPopFilename = args[1];
-		String facilitiesFilename = args[2];
-		String outputPopFilename = args[3];
-		String outputFacilitiesFilename = args[4];
+		// String facilitiesFilename = args[2];
+		String outputPopFilename = args[2];
+		String outputFacilitiesFilename = args[3];
 
 		Scenario scenario = new ScenarioImpl();
 
@@ -130,9 +140,8 @@ public class NewDemandWithFacilities4Zrh {
 		new MatsimPopulationReader(pop, net).readFile(inputPopFilename);
 
 		ActivityFacilities afs = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(afs).readFile(facilitiesFilename);
 
-		new InsertActFacility(afs).run(pop);
+		new CreateActFacility(afs).run(pop);
 
 		new PopulationWriter(pop, outputPopFilename).write();
 		new FacilitiesWriter(afs, outputFacilitiesFilename).write();
