@@ -3,7 +3,6 @@ package playground.wrashid.tryouts.performance;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import playground.wrashid.DES.util.FastQueue;
 
 public class Lists {
 	public static void main(String[] args) {
