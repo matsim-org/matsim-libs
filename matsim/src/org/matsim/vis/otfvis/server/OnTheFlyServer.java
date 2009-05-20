@@ -426,6 +426,14 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public void addAdditionalElement(OTFDataWriter element) {
 		this.additionalElements.add(element);
 	}
+	
+	public void replaceQueueNetwork(QueueNetwork newNet) {
+		this.network = newNet;
+		
+		for(QuadStorage quadS : quads.values()){
+			quadS.quad.replaceSrc(newNet);
+		}
+	}
 
 	
 }
