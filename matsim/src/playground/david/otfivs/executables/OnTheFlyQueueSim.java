@@ -53,7 +53,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		OnTheFlyClientQuad.main(new String []{"rmi:127.0.0.1:4019"});
+		OnTheFlyClientQuad.main(new String []{"rmi:127.0.0.1:4019:AName1"});
 	}
 
 	@Override
