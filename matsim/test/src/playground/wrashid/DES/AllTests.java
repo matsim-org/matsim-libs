@@ -13,7 +13,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for playground.wrashid.DES");
 
-		suite.addTest(playground.wrashid.DES.util.AllTests.suite());
+		suite.addTest(playground.wrashid.tryouts.performance.AllTests.suite());
 		
 		return suite;
 	}

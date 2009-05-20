@@ -1,10 +1,12 @@
-package playground.wrashid.DES.util;
+package playground.wrashid.tryouts.performance;
 
 import org.matsim.core.mobsim.jdeqsim.TestEventLog;
 import org.matsim.core.mobsim.jdeqsim.TestMessageFactory;
 import org.matsim.core.mobsim.jdeqsim.TestMessageQueue;
 import org.matsim.core.mobsim.jdeqsim.TestScheduler;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
+
+import playground.wrashid.DES.util.TestEventLibrary;
 
 
 import junit.framework.Test;
