@@ -771,5 +771,9 @@ public class QueueSimulation {
 			return ret;
 		}
 	}
+
+	public QueueNetwork getQueueNetwork() {
+		return network;
+	}
 	
 }
