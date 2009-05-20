@@ -4,30 +4,55 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
+import javax.media.opengl.GL;
 import javax.swing.JFrame;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentArrayDrawer;
+
 
 
 public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	
+	private static OTFOGLDrawer.FastColorizer colorizerBlue = new OTFOGLDrawer.FastColorizer(
+			new double[] { 0.0, 50.}, new Color[] {	Color.BLUE, Color.YELLOW});
+	private static AgentArrayDrawer drawer = new AgentArrayDrawer();
+
+	public class AgentPointDrawerBlue implements OTFGLDrawable, OTFDataSimpleAgent.Receiver {
+		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
+				drawer.addAgent(id, startX, startY, colorizerBlue.getColor(0.1 + 0.9*color), true);
+		}
+
+		public void onDraw(GL gl) {
+			
+		}
+
+		public void draw() {
+			
+		}
+
+		public void invalidate(SceneGraph graph) {
+			
+		}
+	}
+
 	private static final String BG_IMG_ROOT = "../vsp-cvs/studies/padang/imagery/sliced/";
 	
 	public OTFVisDualView(String filename2, OTFConnectionManager connect, boolean split) {
