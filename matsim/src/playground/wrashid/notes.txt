@@ -1,0 +1,5 @@
+On 20. May 2009, the playground was tidied up to facilitate refactorings: 
+ - Several unused parallelization efforts for DEQSim were deleted (rev. 6998).
+ - Unused test cases were deleted also.
+ - see "C:\data\backup old work spaces\playground before deleting PDES" for a local copy.
+ 
