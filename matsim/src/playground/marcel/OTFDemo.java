@@ -36,6 +36,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 import playground.marcel.pt.otfvis.FacilityDrawer;
 
 
+
 public class OTFDemo {
 
 	public static void main(final String[] args) {
@@ -76,12 +77,16 @@ public class OTFDemo {
 //		org.matsim.run.OTFVis.main(new String[] {"../mystudies/osmnet/zueri-20080410-full.xml"});
 
 //		org.matsim.run.OTFVis.main(new String[] {"../shared-svn/studies/schweiz-ivtch/pt-experimental/config_otfvis.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"test/scenarios/berlin/config.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"test/input/playground/marcel/pt/config.xml"});
 
 //		org.matsim.run.OTFVis.main(new String[] {});
+		
+		OTFDemo.ptConnect("OTFServer_Transit");
+	}
+	
+	public static void ptConnect(final String servername) {
 
-		
-		
-		
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
@@ -102,7 +107,9 @@ public class OTFDemo {
 		connect.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
 		connect.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 		
-		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
+//		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
+		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + servername, connect).start();
+//		new OnTheFlyClientQuad("rmi:127.0.0.1:4019", connect).start();
 		
 	
 		
