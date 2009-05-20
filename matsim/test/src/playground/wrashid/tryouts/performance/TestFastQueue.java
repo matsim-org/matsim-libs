@@ -41,7 +41,7 @@ public class TestFastQueue extends MatsimTestCase {
 
 	// this tests also a cyclic turn arround
 	public void testAddPoll() {
-		FastQueue<Integer> fq = new FastQueue<Integer>(256,3);
+		FastQueue<Integer> fq = new FastQueue<Integer>(256, 3);
 		for (int i = 0; i < 10000000; i++) {
 			fq.add(i);
 			assertEquals(true, fq.poll() == i);

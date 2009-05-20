@@ -9,6 +9,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTest(playground.wrashid.PHEV.Utility.AllTests.suite());
+		suite.addTest(playground.wrashid.tryouts.performance.AllTests.suite());
 
 		return suite;
 	}

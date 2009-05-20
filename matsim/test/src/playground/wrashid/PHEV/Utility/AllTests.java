@@ -1,6 +1,5 @@
 package playground.wrashid.PHEV.Utility;
 
-
 import playground.wrashid.PHEV.Utility.EnergyConsumptionSamplesTest;
 
 import junit.framework.Test;
@@ -12,10 +11,8 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(EnergyConsumptionSamplesTest.class);
-		
+
 		return suite;
 	}
-
-	
 
 }
