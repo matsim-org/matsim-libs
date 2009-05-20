@@ -42,7 +42,7 @@ import org.matsim.core.events.handler.EventHandler;
 	optionally you can also specify the estimated number of events per iteration:
     <param name="estimatedNumberOfEvents"        value="10000000" />
     (not really needed, but can make performance slightly faster in larger simulations).
- * 
+ * @see http://www.matsim.org/node/238
  * @author rashid_waraich
  * 
  */
