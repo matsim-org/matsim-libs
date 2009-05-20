@@ -55,15 +55,8 @@ public class TravelTimeCalculatorBuilder {
 		} else if (!"optimistic".equals(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType())) {
 			throw new RuntimeException(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType() + " is unknown!");
 		}
-		
-		if (this.travelTimeCalcConfigGroup.isCalculateLinkToLinkTravelTimes()){
-			calculator = new TravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
-					endTime, factory, this.travelTimeCalcConfigGroup);		
-		}
-		else {
-			calculator = new TravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
-					endTime, factory, this.travelTimeCalcConfigGroup);
-		}
+		calculator = new TravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
+				endTime, factory, this.travelTimeCalcConfigGroup);
 		
 
 		return calculator;

@@ -62,23 +62,11 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 
 	private boolean calculateLinkToLinkTravelTimes;
 	
-	
-	public TravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		this(null, 15*60, 30*3600, ttconfigGroup);
-	}
-	
-	public TravelTimeCalculator(final int timeslice, final int maxTime,
-			TravelTimeAggregatorFactory factory, TravelTimeCalculatorConfigGroup ttconfigGroup){
-		this(null, timeslice, maxTime, factory, ttconfigGroup);
-	}
-	
 	/**
 	 * 
 	 * @param network
 	 * @param ttconfigGroup
-	 * @deprecated use one of the constructors without network reference
 	 */
-	@Deprecated
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, 15*60, 30*3600, ttconfigGroup);	// default timeslot-duration: 15 minutes
 	}
@@ -88,9 +76,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	 * @param network
 	 * @param timeslice
 	 * @param ttconfigGroup
-	 * @deprecated use one of the constructors without network reference
 	 */
-	@Deprecated
 	public TravelTimeCalculator(final Network network, final int timeslice, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, timeslice, 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
@@ -101,9 +87,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	 * @param timeslice
 	 * @param maxTime
 	 * @param ttconfigGroup
-	 * @deprecated use one of the constructors without network reference
 	 */
-	@Deprecated
 	public TravelTimeCalculator(Network network, int timeslice,	int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory(), ttconfigGroup);
 	}
@@ -115,9 +99,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	 * @param maxTime
 	 * @param factory
 	 * @param ttconfigGroup
-	 * @deprecated use one of the constructors without network reference
 	 */
-	@Deprecated
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 			TravelTimeAggregatorFactory factory, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		super(timeslice, maxTime, factory);
