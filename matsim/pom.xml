@@ -207,6 +207,13 @@
       <scope>system</scope>
       <systemPath>${basedir}/libs/truezip-6.jar</systemPath>
     </dependency>
+    <dependency>
+      <groupId>prefuse</groupId>
+      <artifactId>prefuse</artifactId>
+      <version>2007.10.21</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/prefuse/prefuse.jar</systemPath>
+    </dependency>
     <!-- jaxb 2.1.7 system scope dependencies -->
     <dependency>
       <groupId>javax.xml.bind</groupId>
