@@ -48,8 +48,6 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.population.Knowledge;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;

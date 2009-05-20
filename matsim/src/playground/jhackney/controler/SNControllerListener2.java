@@ -37,16 +37,13 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
-import playground.christoph.knowledge.replanning.KnowledgeStrategyManagerConfigLoader;
 import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.algorithms.ParamStringToStringArray;
 import playground.jhackney.algorithms.ParamStringsToStringDoubleMap;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
-import playground.jhackney.replanning.SocialStrategyManagerConfigLoader;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 import playground.jhackney.socialnetworks.algorithms.PersonForgetKnowledge;
