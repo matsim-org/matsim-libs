@@ -25,25 +25,22 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 public class MyCommercialListener implements StartupListener, IterationStartsListener, IterationEndsListener{
 	
-	private Logger LOG;
 	private BufferedWriter OUTPUT = null;
 	private final String DELIMITER = ",";
 	private MyCommercialSplitter cs = null;
 
 	public MyCommercialListener() {
-		this.LOG = Logger.getLogger(MyCommercialListener.class);
+
 	}
 
 	public void notifyStartup(StartupEvent event) {
@@ -51,7 +48,8 @@ public class MyCommercialListener implements StartupListener, IterationStartsLis
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
-		String outputTruck = event.getControler().getIterationPath() + "/" + event.getControler().getIteration() + ".eventsTruckMinor.txt";
+		event.getControler();
+		String outputTruck = Controler.getIterationPath() + "/" + Controler.getIteration() + ".eventsTruckMinor.txt";
 		String header = "Long" + DELIMITER +
 						"Lat" + DELIMITER +
 						"Start_Hour";

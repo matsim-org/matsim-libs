@@ -20,11 +20,6 @@
 
 package playground.jjoubert.CommercialModel.Listeners;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;

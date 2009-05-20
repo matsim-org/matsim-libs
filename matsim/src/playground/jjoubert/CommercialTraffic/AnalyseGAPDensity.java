@@ -65,9 +65,9 @@ public class AnalyseGAPDensity {
 		System.out.println("Performing detailed GAP analysis for: " + PROVINCE );
 		System.out.println();
 		
-		ArrayList<SAZone> zoneList = readGAPShapeFile( GAP_SHAPEFILE );
+		ArrayList<SAZone> zoneList = readGAPShapeFile( GAP_SHAPEFILE, GAP_ID_INDEX );
 	
-		QuadTree<SAZone> zoneTree = buildQuadTree( zoneList );
+		QuadTree<SAZone> zoneTree = buildQuadTree( zoneList, SHAPEFILE, PROVINCE );
 
 		assignActivityToZone(zoneList, zoneTree );
 		
@@ -76,7 +76,8 @@ public class AnalyseGAPDensity {
 	
 	
 	@SuppressWarnings("unchecked")
-	private static ArrayList<SAZone> readGAPShapeFile ( String fileString ){
+	public
+	static ArrayList<SAZone> readGAPShapeFile ( String fileString , int GapIdIndex){
 		System.out.println("Reading GAP mesozone shapefile... " );
 		
 		ArrayList<SAZone> zoneList = new ArrayList<SAZone>();
@@ -89,7 +90,7 @@ public class AnalyseGAPDensity {
 			for (int i = 0; i < objectArray.size(); i++) {
 				Object thisZone = objectArray.get(i);
 				// For GAP files, field [1] contains the GAP_ID
-				String name = String.valueOf( ((Feature) thisZone).getAttribute( GAP_ID_INDEX ) ); 
+				String name = String.valueOf( ((Feature) thisZone).getAttribute( GapIdIndex ) ); 
 				Geometry shape = ((Feature) thisZone).getDefaultGeometry();
 				if( shape instanceof MultiPolygon ){
 					mp = (MultiPolygon)shape;
@@ -117,9 +118,9 @@ public class AnalyseGAPDensity {
 		return zoneList;
 	}
 
-	private static QuadTree<SAZone> buildQuadTree(ArrayList<SAZone> mesozoneList) {
-		System.out.println("Establishing quad tree extent for " + PROVINCE + "... " );
-		Polygon envelope = (Polygon) (ReadStudyAreaShapeFile.readStudyAreaPolygon( SHAPEFILE ) ).getEnvelope();
+	public static QuadTree<SAZone> buildQuadTree(ArrayList<SAZone> mesozoneList, String shapefile, String province) {
+		System.out.println("Establishing quad tree extent for " + province + "... " );
+		Polygon envelope = (Polygon) (ReadStudyAreaShapeFile.readStudyAreaPolygon( shapefile ) ).getEnvelope();
 		Coordinate [] coords = envelope.getCoordinates();
 		double minX = coords[0].x;
 		double minY = coords[0].y;

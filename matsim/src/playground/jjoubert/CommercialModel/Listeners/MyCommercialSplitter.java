@@ -36,13 +36,6 @@ public class MyCommercialSplitter implements ActivityStartEventHandler{
 
 	public void handleEvent(ActivityStartEvent event) {
 		
-		/*
-		 * TODO
-		 * 
-		 * This is where I want to read the last iteration's ActivityStart events
-		 * and check if they are 'commercial' vehicles. If so, write the event
-		 * coordinate, as well as the event start time to an external file.
-		 */
 		if(event.getAct().getType().equalsIgnoreCase("minor")){
 			double timeSeconds = event.getTime();
 			int hour = (int) Math.floor((timeSeconds) / 3600);
@@ -50,7 +43,6 @@ public class MyCommercialSplitter implements ActivityStartEventHandler{
 			String outputString = event.getLink().getCoord().getX() + "," + 
 								  event.getLink().getCoord().getY() + "," +
 								  hour;
-
 			try {
 				this.output.write(outputString);
 				this.output.newLine();
