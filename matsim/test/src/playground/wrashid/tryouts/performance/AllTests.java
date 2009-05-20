@@ -5,8 +5,8 @@ import org.matsim.core.mobsim.jdeqsim.TestMessageFactory;
 import org.matsim.core.mobsim.jdeqsim.TestMessageQueue;
 import org.matsim.core.mobsim.jdeqsim.TestScheduler;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
+import org.matsim.core.mobsim.jdeqsim.util.TestEventLibrary;
 
-import playground.wrashid.DES.util.TestEventLibrary;
 
 
 import junit.framework.Test;
