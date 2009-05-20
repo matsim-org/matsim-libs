@@ -16,7 +16,6 @@ import playground.jjoubert.CommercialModel.Listeners.MySimulationStartListener;
 public class MyCommercialControlerV01 {
 	
 	private final static Logger LOG = Logger.getLogger(MyCommercialControlerV01.class);
-	private final static int COMMERCIAL_THRESHOLD = 100000;
 	
 	public static void main(String[] args){
 
@@ -33,7 +32,7 @@ public class MyCommercialControlerV01 {
 		 * NOTE: The event handlers are added in the StartupListener
 		 * TODO: Check if this is true.
 		 */
-		MyCommercialListener cl = new MyCommercialListener(COMMERCIAL_THRESHOLD);
+		MyCommercialListener cl = new MyCommercialListener();
 		c.addControlerListener(cl);
 				
 		c.run();

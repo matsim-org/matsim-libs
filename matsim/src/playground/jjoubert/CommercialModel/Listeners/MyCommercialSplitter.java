@@ -29,11 +29,9 @@ import org.matsim.core.events.handler.ActivityStartEventHandler;
 public class MyCommercialSplitter implements ActivityStartEventHandler{
 	
 	private BufferedWriter output;
-	private int threshold;
 	
-	public MyCommercialSplitter(BufferedWriter output, int threshold) {
+	public MyCommercialSplitter(BufferedWriter output) {
 		this.output = output;
-		this.threshold = threshold;
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
@@ -45,8 +43,7 @@ public class MyCommercialSplitter implements ActivityStartEventHandler{
 		 * and check if they are 'commercial' vehicles. If so, write the event
 		 * coordinate, as well as the event start time to an external file.
 		 */
-		int thisPersonId = Integer.parseInt(event.getPerson().getId().toString());
-		if(thisPersonId >= this.threshold && event.getAct().getType().equalsIgnoreCase("minor")){
+		if(event.getAct().getType().equalsIgnoreCase("minor")){
 			double timeSeconds = event.getTime();
 			int hour = (int) Math.floor((timeSeconds) / 3600);
 			

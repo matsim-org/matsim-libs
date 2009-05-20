@@ -37,15 +37,13 @@ import org.matsim.core.controler.listener.StartupListener;
 
 public class MyCommercialListener implements StartupListener, IterationStartsListener, IterationEndsListener{
 	
-	private final Logger LOG;
+	private Logger LOG;
 	private BufferedWriter OUTPUT = null;
 	private final String DELIMITER = ",";
-	private final int THRESHOLD;
 	private MyCommercialSplitter cs = null;
 
-	public MyCommercialListener(int commercialThreshold) {
+	public MyCommercialListener() {
 		this.LOG = Logger.getLogger(MyCommercialListener.class);
-		this.THRESHOLD = commercialThreshold;
 	}
 
 	public void notifyStartup(StartupEvent event) {
@@ -65,9 +63,8 @@ public class MyCommercialListener implements StartupListener, IterationStartsLis
 			e.printStackTrace();
 		}
 		
-		this.cs = new MyCommercialSplitter(this.OUTPUT, this.THRESHOLD);
+		this.cs = new MyCommercialSplitter(this.OUTPUT);
 		event.getControler().getEvents().addHandler(this.cs);
-
 	}	
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
