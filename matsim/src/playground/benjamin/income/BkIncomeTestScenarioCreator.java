@@ -1,0 +1,158 @@
+/* *********************************************************************** *
+ * project: org.matsim.*																															*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.benjamin.income;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.BasicScenarioImpl;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.basic.v01.BasicRouteImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PopulationWriter;
+
+import playground.dgrether.DgPaths;
+
+
+/**
+ * @author dgrether
+ *
+ */
+public class BkIncomeTestScenarioCreator {
+
+	private static final Logger log = Logger.getLogger(BkIncomeTestScenarioCreator.class);
+	
+	private Id id1 = new IdImpl(1);
+	private Id id2 = new IdImpl(2);
+	private Id id3 = new IdImpl(3);
+	private Id id4 = new IdImpl(4);
+	private Id id5 = new IdImpl(5);
+	private Id id6 = new IdImpl(6);
+	private Id id7 = new IdImpl(7);
+	
+	public BasicPopulation<BasicPerson<BasicPlan>> createPlans() {
+		double firstHomeEndTime = 6.0 * 3600.0;
+		double homeEndTime = firstHomeEndTime;
+		log.info("starting plans creation...");
+		
+		BasicScenario scenario = new BasicScenarioImpl();
+		
+		BasicPopulation<BasicPerson<BasicPlan>> pop = scenario.getPopulation();
+		BasicPopulationBuilder builder = pop.getPopulationBuilder();
+		
+		for (int i = 1; i <= 2000; i++) {
+			BasicPerson p = builder.createPerson(scenario.createId(Integer.toString(i)));	
+
+			//adding carPlan to person
+			BasicPlan plan = builder.createPlan(p);
+			plan.setSelected(true);
+			p.getPlans().add(plan);
+			
+			BasicActivity act1 = builder.createActivityFromLinkId("h", id1);			
+			act1.setEndTime(homeEndTime);
+			plan.addActivity(act1);
+			
+			BasicLeg leg1Car = builder.createLeg(TransportMode.car);
+			BasicRouteImpl routeCar = new BasicRouteImpl(id1, id4);
+			List<Id> linkidsCar = new ArrayList<Id>();
+			linkidsCar.add(id2);
+			linkidsCar.add(id3);
+			routeCar.setLinkIds(linkidsCar);
+			leg1Car.setRoute(routeCar);
+			plan.addLeg(leg1Car);
+			
+			BasicActivity act2 = builder.createActivityFromLinkId("w", id4);
+			act2.setStartTime(7.0 * 3600.0);
+			act2.setEndTime(15.0 * 3600.0);
+//			act2.setDuration(8.0 * 3600.0);
+			plan.addActivity(act2);
+			
+			BasicLeg leg2Car = builder.createLeg(TransportMode.car);
+			routeCar = new BasicRouteImpl(id4, id1);
+			linkidsCar = new ArrayList<Id>();
+			linkidsCar.add(id5);
+			linkidsCar.add(id6);
+			linkidsCar.add(id7);
+			routeCar.setLinkIds(linkidsCar);
+			leg2Car.setRoute(routeCar);
+			plan.addLeg(leg2Car);
+			
+			BasicActivity act3 = builder.createActivityFromLinkId("h", id1);
+			plan.addActivity(act3);
+			
+			//adding ptPlan to person
+			plan = builder.createPlan(p);
+			p.getPlans().add(plan);
+			//plan.setSelected(true);
+			
+			plan.addActivity(act1);
+			
+			BasicLeg leg1Pt = builder.createLeg(TransportMode.pt);
+//			BasicRouteImpl routePt = new BasicRouteImpl(id1, id4);
+//			List<Id> linkidsPt = new ArrayList<Id>();
+//			routePt.setLinkIds(linkidsPt);
+//			leg1Pt.setRoute(routePt);
+			plan.addLeg(leg1Pt);
+
+			plan.addActivity(act2);
+			
+			BasicLeg leg2Pt = builder.createLeg(TransportMode.pt);
+//			routePt = new BasicRouteImpl(id4, id1);
+//			linkidsPt = new ArrayList<Id>();
+//			routePt.setLinkIds(linkidsPt);
+//			leg2Pt.setRoute(routePt);
+			plan.addLeg(leg2Pt);
+			
+			plan.addActivity(act3);
+			
+			pop.getPersons().put(p.getId(), p);
+//			homeEndTime++;				
+		}
+		log.info("created population...");
+		return pop;
+	}
+	
+	
+	/**
+	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 */
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		String outfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
+		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator();
+		BasicPopulation<BasicPerson<BasicPlan>> pop = pc.createPlans();
+		PopulationWriter writer = new PopulationWriter(pop, outfile);
+		writer.write();
+		log.info("plans written");
+		log.info("finished!");
+	}
+
+}
