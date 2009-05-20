@@ -37,10 +37,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
-import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
+
+import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 
 public abstract class Scenario {
 
@@ -61,10 +62,10 @@ public abstract class Scenario {
 //	private static final String output_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/timecorr/";
 //	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
 	private static final String thisrun = "3_HC_4";
-//	private static final String output_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
-//	private static final String input_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
-	private static final String output_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
-	private static final String input_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
+	private static final String output_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
+	private static final String input_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
+//	private static final String output_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
+//	private static final String input_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
 	private static final String out2 = thisrun+".out";
 	private static final String out1 = "AgentsAtActivities"+thisrun+".out";
 

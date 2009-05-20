@@ -46,10 +46,11 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
+
+import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 
 public abstract class ScenarioConfig {
 

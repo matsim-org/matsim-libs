@@ -27,10 +27,11 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
+
+import playground.jhackney.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 
 /**
  * 

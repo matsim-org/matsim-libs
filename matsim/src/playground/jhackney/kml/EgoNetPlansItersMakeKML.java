@@ -65,11 +65,11 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceEllipse;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
-import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
 import playground.jhackney.algorithms.PersonCalcEgoSpace;
+import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class EgoNetPlansItersMakeKML {
 

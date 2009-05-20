@@ -9,8 +9,9 @@ import java.util.Vector;
 
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
-import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
+
+import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
+import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
 public class TimeWindowCalcTimeCorrelations {
 

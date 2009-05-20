@@ -53,9 +53,10 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
-import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherF;
-import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
-import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
+
+import playground.jhackney.socialnetworks.replanning.RandomFacilitySwitcherF;
+import playground.jhackney.socialnetworks.replanning.RandomFacilitySwitcherK;
+import playground.jhackney.socialnetworks.replanning.SNPickFacilityFromAlter;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers

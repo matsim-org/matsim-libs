@@ -10,9 +10,10 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.socialnet.EgoNet;
+
+import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
+import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
+import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class SNAdjustTimes implements PlanAlgorithm {
 

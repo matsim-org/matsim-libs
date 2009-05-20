@@ -15,9 +15,9 @@ import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 import playground.jhackney.replanning.SNCoordinateArrivalTimes;
+import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
 public class SNController3 extends Controler {
 

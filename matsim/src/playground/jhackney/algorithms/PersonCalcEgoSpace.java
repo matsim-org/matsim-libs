@@ -32,7 +32,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
 import org.matsim.utils.optimization.EllipseObjective;
@@ -40,6 +39,8 @@ import org.matsim.utils.optimization.Objective;
 import org.matsim.utils.optimization.ParamPoint;
 import org.matsim.utils.optimization.SimplexOptimization;
 import org.matsim.utils.optimization.SuperEllipseObjective;
+
+import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 

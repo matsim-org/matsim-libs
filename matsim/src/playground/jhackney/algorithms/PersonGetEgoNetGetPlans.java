@@ -6,7 +6,8 @@ import java.util.Iterator;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.socialnetworks.socialnet.EgoNet;
+
+import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class PersonGetEgoNetGetPlans {
 

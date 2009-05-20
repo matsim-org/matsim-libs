@@ -31,7 +31,8 @@ import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
+
+import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
 
 /**

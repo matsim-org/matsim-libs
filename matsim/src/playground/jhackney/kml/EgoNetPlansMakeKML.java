@@ -63,8 +63,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.vis.kml.KMZWriter;
+
+import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class EgoNetPlansMakeKML {
 

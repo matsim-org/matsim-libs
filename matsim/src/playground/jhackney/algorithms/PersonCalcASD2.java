@@ -2,7 +2,8 @@ package playground.jhackney.algorithms;
 
 import org.matsim.core.api.population.Person;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
+
+import playground.jhackney.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 
 import edu.uci.ics.jung.statistics.StatisticalMoments;
 

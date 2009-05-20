@@ -46,25 +46,25 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.population.Knowledge;
-import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
-import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
-import org.matsim.socialnetworks.io.ActivityActReader;
-import org.matsim.socialnetworks.io.ActivityActWriter;
-import org.matsim.socialnetworks.io.PajekWriter;
-import org.matsim.socialnetworks.mentalmap.MentalMap;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
-import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
-import org.matsim.socialnetworks.socialnet.EgoNet;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
+import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
+import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
+import playground.jhackney.socialnetworks.interactions.NonSpatialInteractor;
+import playground.jhackney.socialnetworks.interactions.SpatialInteractorEvents;
+import playground.jhackney.socialnetworks.io.ActivityActReader;
+import playground.jhackney.socialnetworks.io.ActivityActWriter;
+import playground.jhackney.socialnetworks.io.PajekWriter;
+import playground.jhackney.socialnetworks.mentalmap.MentalMap;
+import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
+import playground.jhackney.socialnetworks.scoring.EventSocScoringFactory;
+import playground.jhackney.socialnetworks.scoring.MakeTimeWindowsFromEvents;
+import playground.jhackney.socialnetworks.socialnet.EgoNet;
+import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
+import playground.jhackney.socialnetworks.statistics.SocialNetworkStatistics;
 
 
 

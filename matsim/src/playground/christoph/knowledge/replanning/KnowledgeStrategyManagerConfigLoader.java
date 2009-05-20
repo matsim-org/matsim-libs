@@ -52,9 +52,9 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
 
 import playground.christoph.knowledge.replanning.modules.LimitedKnowledge;
+import playground.jhackney.socialnetworks.replanning.RandomFacilitySwitcherK;
 
 
 
@@ -145,7 +145,8 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 			} else if (classname.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
 				// JH
-			} else if (classname.equals("SNSecLoc")){
+//			} else if (classname.equals("SNSecLoc // JH old name
+			} else if (classname.equals("KSecLoc")){
 //				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);

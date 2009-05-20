@@ -25,12 +25,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
+import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class CreateKMZFromOutput {
 

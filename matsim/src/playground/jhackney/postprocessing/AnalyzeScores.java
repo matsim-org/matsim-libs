@@ -29,15 +29,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.ScenarioConfig;
+import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
+import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
+import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
+import playground.jhackney.socialnetworks.scoring.MakeTimeWindowsFromEvents;
+import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class AnalyzeScores {
 

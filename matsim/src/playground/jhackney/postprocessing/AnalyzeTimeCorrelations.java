@@ -25,14 +25,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
-import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.algorithms.TimeWindowCalcTimeCorrelations;
+import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
+import playground.jhackney.socialnetworks.scoring.MakeTimeWindowsFromEvents;
+import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class AnalyzeTimeCorrelations {
 
