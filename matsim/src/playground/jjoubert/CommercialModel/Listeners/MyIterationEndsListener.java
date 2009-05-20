@@ -30,5 +30,6 @@ public class MyIterationEndsListener implements IterationEndsListener {
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		log.info("  --> End of iteration " + event.getIteration() + "/" + event.getControler().getLastIteration() );
-	}	
+	}
+	
 }

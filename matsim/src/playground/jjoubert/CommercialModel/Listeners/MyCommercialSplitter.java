@@ -20,16 +20,47 @@
 
 package playground.jjoubert.CommercialModel.Listeners;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 
-public class MyAllEventCounter implements ActivityStartEventHandler{
+public class MyCommercialSplitter implements ActivityStartEventHandler{
 	
-	public int totalEvents;
+	private BufferedWriter output;
+	private int threshold;
+	
+	public MyCommercialSplitter(BufferedWriter output, int threshold) {
+		this.output = output;
+		this.threshold = threshold;
+	}
 
 	public void handleEvent(ActivityStartEvent event) {
-		event.getAct().getCoord();
-		this.totalEvents++;
+		
+		/*
+		 * TODO
+		 * 
+		 * This is where I want to read the last iteration's ActivityStart events
+		 * and check if they are 'commercial' vehicles. If so, write the event
+		 * coordinate, as well as the event start time to an external file.
+		 */
+		int thisPersonId = Integer.parseInt(event.getPerson().getId().toString());
+		if(thisPersonId >= this.threshold && event.getAct().getType().equalsIgnoreCase("minor")){
+			double timeSeconds = event.getTime();
+			int hour = (int) Math.floor((timeSeconds) / 3600);
+			
+			String outputString = event.getLink().getCoord().getX() + "," + 
+								  event.getLink().getCoord().getY() + "," +
+								  hour;
+
+			try {
+				this.output.write(outputString);
+				this.output.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void reset(int iteration) {

@@ -30,6 +30,7 @@ public class MyIterationStartsListener implements IterationStartsListener {
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		log.info("  --> Start of iteration " + event.getIteration() + "/" + event.getControler().getLastIteration() );
+		
 	}
 
 }

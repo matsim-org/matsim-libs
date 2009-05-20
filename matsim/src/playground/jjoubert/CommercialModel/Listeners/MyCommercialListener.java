@@ -26,21 +26,56 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-public class MySimulationStartListener implements StartupListener, ShutdownListener{
+public class MyCommercialListener implements StartupListener, IterationStartsListener, IterationEndsListener{
 	
-	private final Logger log = Logger.getLogger(MySimulationStartListener.class);
+	private final Logger LOG;
+	private BufferedWriter OUTPUT = null;
+	private final String DELIMITER = ",";
+	private final int THRESHOLD;
+	private MyCommercialSplitter cs = null;
 
-	public void notifyStartup(StartupEvent event) {
-		log.info("  --> My StartupListener is working!");
+	public MyCommercialListener(int commercialThreshold) {
+		this.LOG = Logger.getLogger(MyCommercialListener.class);
+		this.THRESHOLD = commercialThreshold;
 	}
 
-	public void notifyShutdown(ShutdownEvent event) {
+	public void notifyStartup(StartupEvent event) {
+	}
+
+	public void notifyIterationStarts(IterationStartsEvent event) {
+
+		String outputTruck = event.getControler().getIterationPath() + "/" + event.getControler().getIteration() + ".eventsTruckMinor.txt";
+		String header = "Long" + DELIMITER +
+						"Lat" + DELIMITER +
+						"Start_Hour";
+		try {
+			this.OUTPUT = new BufferedWriter(new FileWriter(new File( outputTruck )));
+			this.OUTPUT.write(header);
+			this.OUTPUT.newLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
+		this.cs = new MyCommercialSplitter(this.OUTPUT, this.THRESHOLD);
+		event.getControler().getEvents().addHandler(this.cs);
+
 	}	
 	
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		event.getControler().getEvents().removeHandler(this.cs);
+		try {
+			this.OUTPUT.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
