@@ -35,7 +35,7 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * The starting point of the whole micro-simulation.
- *
+ * @see http://www.matsim.org/docs/jdeqsim
  * @author rashid_waraich
  */
 public class JDEQSimulation {
