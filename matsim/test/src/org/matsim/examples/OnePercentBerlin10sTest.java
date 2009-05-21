@@ -43,7 +43,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String eventsFileName = getOutputDirectory() + "events.txt";
-		String referenceFileName = getInputDirectory() + "events.txt.gz";
+		String referenceEventsFileName = getInputDirectory() + "events.txt.gz";
 
 		MatsimRandom.reset(7411L);
 
@@ -52,6 +52,10 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		config.simulation().setTimeStepSize(10.0);
 		config.simulation().setFlowCapFactor(0.01);
 		config.simulation().setStorageCapFactor(0.04);
+		
+		config.simulation().setRemoveStuckVehicles(false);
+		config.simulation().setStuckTime(10.0);
+		
 		config.charyparNagelScoring().setLearningRate(1.0);
 
 		NetworkLayer network = new NetworkLayer();
@@ -73,7 +77,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		writer.closeFile();
 
-		final long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
+		final long checksum1 = CRCChecksum.getCRCFromFile(referenceEventsFileName);
 		final long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
 		assertEquals("different event files", checksum1, checksum2);
 	}
