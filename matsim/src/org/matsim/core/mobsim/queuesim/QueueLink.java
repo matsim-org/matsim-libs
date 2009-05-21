@@ -179,17 +179,18 @@ public class QueueLink {
 		
 		for (BasicLane signalLane : lanes) {
 			QueueLane lane = null;
-			if(!firstNodeLinkInitialized){
-				lane = new QueueLane(this, false);
-				lane.setLaneData(signalLane);
-				lane.setMetersFromLinkEnd(0.0);
-				this.originalLane.addToLane(lane);
+			lane = new QueueLane(this, false);
+			lane.setLaneData(signalLane);
+			lane.setMetersFromLinkEnd(0.0);
 
-				this.setToLinks(lane, signalLane.getToLinkIds());
-				
-				
-				
-				lane.recalculateProperties(signalLane.getLength());
+			lane.recalculateProperties(signalLane.getLength());
+
+			this.originalLane.addToLane(lane);
+			this.setToLinks(lane, signalLane.getToLinkIds());
+			lane.setFireLaneEvents(true);
+			this.queueLanes.add(lane);
+
+			if(!firstNodeLinkInitialized){
 				this.originalLane.setMetersFromLinkEnd(signalLane.getLength());
 				this.originalLane.recalculateProperties(this.getLink().getLength() - signalLane.getLength());
 				firstNodeLinkInitialized = true;
@@ -210,18 +211,7 @@ public class QueueLink {
 					// Fix Pointer...
 					// Adjust SC, SQ...
 				}
-  				// New QueueLane will start at originalLink
-					lane = new QueueLane(this, false);
-					lane.setLaneData(signalLane);
-					lane.setMetersFromLinkEnd(0.0);
-					this.originalLane.addToLane(lane);
-					this.setToLinks(lane, signalLane.getToLinkIds());
-					
-					// Only need to fix properties of new QueueLane. Original QueueLane hasn't changed
-					lane.recalculateProperties(signalLane.getLength());
 			}
-			lane.setFireLaneEvents(true);
-			this.queueLanes.add(lane);
 		}
 		findLayout();
 		addUTurn();

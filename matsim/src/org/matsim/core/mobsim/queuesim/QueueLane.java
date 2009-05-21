@@ -169,20 +169,6 @@ public class QueueLane {
 		recalcCapacity(Time.UNDEFINED_TIME);
 	}
 
-
-	/**
-	 * Call {@link #recalculateProperties(double, double, double)} if you use this Constructor, otherwise the QueueLane
-	 * is not initialized correctly!
-	 * TODO consider unifying the Constructor and the method
-	 * @param ql
-	 * @param laneData
-	 * @param isOriginalLane
-	 */
-	/*package*/ QueueLane(final QueueLink ql, final BasicLane laneData, final boolean isOriginalLane) {
-		this(ql, isOriginalLane);
-		this.laneData = laneData;
-	}
-
 	public Id getLaneId(){
 		if (this.laneData != null){
 			return this.laneData.getId();
@@ -266,10 +252,6 @@ public class QueueLane {
 		if (this.laneData != null) {
 			numberOfRepresentedLanes = this.laneData.getNumberOfRepresentedLanes();
 		}
-		
-		/*variable was given as parameter in original but the method was called everywhere with the expression below,
-		 * TODO Check if this is correct! dg[jan09]*/
-		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
 
 		if(laneLength_m < 15){//why this hard coded vehicle lengths? in the evac sim the vehicle length is 0.26 m. I would suggest to change this criterion to 2*cell_size - gl apr09 
 			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
@@ -279,6 +261,11 @@ public class QueueLane {
 		} else {
 			this.length = laneLength_m;
 		}
+
+		/*variable was given as parameter in original but the method was called everywhere with the expression below,
+		 * TODO Check if this is correct! dg[jan09]*/
+		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / 
+			this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
 
 		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
