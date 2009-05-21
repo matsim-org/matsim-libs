@@ -164,10 +164,7 @@ public class QueueLane {
 		 * moved capacity calculation to two methods, to be able to call it from
 		 * outside e.g. for reducing cap in case of an incident
 		 */
-		initFlowCapacity(Time.UNDEFINED_TIME);
-		recalcCapacity(Time.UNDEFINED_TIME);
-		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
-		
+		this.calculateCapacities();		
 	}
 
 	public Id getLaneId(){
@@ -194,7 +191,7 @@ public class QueueLane {
 		}
 	}
 
-	private void initFlowCapacity(final double time) {
+	private void calculateFlowCapacity(final double time) {
 		this.simulatedFlowCapacity = this.queueLink.getLink().getFlowCapacity(time);
 		if (this.laneData != null) {
 			/*
@@ -216,7 +213,7 @@ public class QueueLane {
 	}
 
 
-	private void recalcCapacity(final double time) {
+	private void calculateStorageCapacity(final double time) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
@@ -258,8 +255,8 @@ public class QueueLane {
 
 	public void recalcTimeVariantAttributes(final double now) {
 		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(now);
-		initFlowCapacity(now);
-		recalcCapacity(now);
+		calculateFlowCapacity(now);
+		calculateStorageCapacity(now);
 	}
 	
 	void setLaneLength(double laneLengthMeters){
@@ -268,9 +265,9 @@ public class QueueLane {
 	}
 
 	
-	void recalculateProperties() {
-		initFlowCapacity(Time.UNDEFINED_TIME);
-		recalcCapacity(Time.UNDEFINED_TIME);
+	void calculateCapacities() {
+		calculateFlowCapacity(Time.UNDEFINED_TIME);
+		calculateStorageCapacity(Time.UNDEFINED_TIME);
 		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 	}
 	
