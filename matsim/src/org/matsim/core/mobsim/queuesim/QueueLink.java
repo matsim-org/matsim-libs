@@ -172,8 +172,7 @@ public class QueueLink {
 		this.hasLanes = true;
 		//TODO dg remove this assumption/warning
 		if (this.getLink().getLength() < 60.0){
-			log.warn("Link " + this.getLink().getId() + " is signalized by traffic light, but its length is less than 60m. This is not recommended." +
-				"Recommended minimum lane length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
+			log.warn("Link " + this.getLink().getId() + " is signalized by traffic light, but its length is less than 60m. This is not recommended.");
 		}
 		boolean firstNodeLinkInitialized = false;
 		
@@ -192,26 +191,18 @@ public class QueueLink {
 
 			if(!firstNodeLinkInitialized){
 				this.originalLane.setMetersFromLinkEnd(signalLane.getLength());
-				this.originalLane.setLaneLength(this.getLink().getLength() - signalLane.getLength());
+				double originalLaneEnd = this.getLink().getLength() - signalLane.getLength();
+				this.originalLane.setLaneLength(originalLaneEnd);
 				this.originalLane.calculateCapacities();
 				firstNodeLinkInitialized = true;
 				this.originalLane.setFireLaneEvents(true);
 			} 
-			else {
-				// Now we have the original QueueLane and one additional QueueLane
-				// therefore add additional extension links for the rest of the outLinks
-				// Check, if the new extension link is not in proximity of an old one's staring point
-				if (signalLane.getLength() - this.originalLane.getMeterFromLinkEnd() > 15.0) {
-					String message = "Not Implemented yet: Every PseudoNode in 15m proximity of an old PseudoNode will be ajected to the old one";
+			else if (signalLane.getLength() != this.originalLane.getMeterFromLinkEnd()){
+					String message = "The lanes on link id " + this.getLink().getId() + " have "
+						+ "different length. Currently this feature is not supported. To " +
+								"avoid this exception set all lanes to the same lenght in lane definition file";
 					log.error(message);
-					throw new RuntimeException(message);
-					// Insert new one...
-					// Fix Pointer...
-					// Adjust SC, SQ...
-					// Generate new NodePseudoLink
-					// Fix Pointer...
-					// Adjust SC, SQ...
-				}
+					throw new IllegalStateException(message);
 			}
 		}
 		findLayout();
