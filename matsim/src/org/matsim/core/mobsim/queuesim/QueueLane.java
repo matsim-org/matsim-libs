@@ -167,6 +167,8 @@ public class QueueLane {
 		 */
 		initFlowCapacity(Time.UNDEFINED_TIME);
 		recalcCapacity(Time.UNDEFINED_TIME);
+		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
+		
 	}
 
 	public Id getLaneId(){
@@ -210,7 +212,7 @@ public class QueueLane {
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
-
+		
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * this.queueLink.getLink().getNumberOfLanes(time))
 				/ ((NetworkLayer) this.queueLink.getLink().getLayer()).getEffectiveCellSize() * storageCapFactor;
@@ -243,9 +245,20 @@ public class QueueLane {
 		initFlowCapacity(now);
 		recalcCapacity(now);
 	}
+	
+	void setLaneLength(double laneLengthMeters){
+		if(laneLengthMeters < 15){//why this hard coded vehicle lengths? in the evac sim the vehicle length is 0.26 m. I would suggest to change this criterion to 2*cell_size - gl apr09 
+			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
+					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
+					" at the original link.");
+			this.length = 15.0;
+		} else {
+			this.length = laneLengthMeters;
+		}
+	}
 
 	
-	void recalculateProperties(final double laneLength_m) {
+	void recalculateProperties() {
 		SimulationConfigGroup config = Gbl.getConfig().simulation();
 
 		double numberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
@@ -253,14 +266,6 @@ public class QueueLane {
 			numberOfRepresentedLanes = this.laneData.getNumberOfRepresentedLanes();
 		}
 
-		if(laneLength_m < 15){//why this hard coded vehicle lengths? in the evac sim the vehicle length is 0.26 m. I would suggest to change this criterion to 2*cell_size - gl apr09 
-			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
-					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
-					" at the original link.");
-			this.length = 15.0;
-		} else {
-			this.length = laneLength_m;
-		}
 
 		/*variable was given as parameter in original but the method was called everywhere with the expression below,
 		 * TODO Check if this is correct! dg[jan09]*/
@@ -291,10 +296,6 @@ public class QueueLane {
 	
 	protected double getMeterFromLinkEnd(){
 		return this.meterFromLinkEnd;
-	}
-
-	/*package*/ void finishInit() {
-		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 	}
 
 	/**

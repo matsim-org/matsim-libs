@@ -182,8 +182,8 @@ public class QueueLink {
 			lane = new QueueLane(this, false);
 			lane.setLaneData(signalLane);
 			lane.setMetersFromLinkEnd(0.0);
-
-			lane.recalculateProperties(signalLane.getLength());
+			lane.setLaneLength(signalLane.getLength());
+			lane.recalculateProperties();
 
 			this.originalLane.addToLane(lane);
 			this.setToLinks(lane, signalLane.getToLinkIds());
@@ -192,7 +192,8 @@ public class QueueLink {
 
 			if(!firstNodeLinkInitialized){
 				this.originalLane.setMetersFromLinkEnd(signalLane.getLength());
-				this.originalLane.recalculateProperties(this.getLink().getLength() - signalLane.getLength());
+				this.originalLane.setLaneLength(this.getLink().getLength() - signalLane.getLength());
+				this.originalLane.recalculateProperties();
 				firstNodeLinkInitialized = true;
 				this.originalLane.setFireLaneEvents(true);
 			} 
@@ -292,9 +293,6 @@ public class QueueLink {
 
 	/** Is called after link has been read completely */
 	public void finishInit() {
-		for (QueueLane lane : this.queueLanes) {
-			lane.finishInit();
-		}
 		this.active = false;
 	}
 
