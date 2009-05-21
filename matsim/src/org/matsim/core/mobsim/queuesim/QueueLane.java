@@ -250,11 +250,16 @@ public class QueueLane {
 		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
 		if (this.storageCapacity < tempStorageCapacity) {
 	    if (spaceCapWarningCount <= 10) {
-	        log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-	        if (spaceCapWarningCount == 10) {
-	            log.warn("Additional warnings of this type are suppressed.");
-	        }
-	        spaceCapWarningCount++;
+	    	if (!this.originalLane  || (this.toLanes != null)) {
+	    		log.warn("Lane " + this.getLaneId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+	    	}
+	    	else {
+	    		log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+	    	}
+        if (spaceCapWarningCount == 10) {
+            log.warn("Additional warnings of this type are suppressed.");
+        }
+        spaceCapWarningCount++;
 	    }
 	    this.storageCapacity = tempStorageCapacity;
 		}
