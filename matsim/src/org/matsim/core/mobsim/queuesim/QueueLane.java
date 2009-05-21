@@ -263,14 +263,7 @@ public class QueueLane {
 	}
 	
 	void setLaneLength(double laneLengthMeters){
-		if(laneLengthMeters < 15){//why this hard coded vehicle lengths? in the evac sim the vehicle length is 0.26 m. I would suggest to change this criterion to 2*cell_size - gl apr09 
-			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
-					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
-					" at the original link.");
-			this.length = 15.0;
-		} else {
-			this.length = laneLengthMeters;
-		}
+		this.length = laneLengthMeters;
 		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 	}
 
