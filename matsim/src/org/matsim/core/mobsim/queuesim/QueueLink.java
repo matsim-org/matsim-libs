@@ -183,7 +183,7 @@ public class QueueLink {
 			lane.setLaneData(signalLane);
 			lane.setMetersFromLinkEnd(0.0);
 			lane.setLaneLength(signalLane.getLength());
-			lane.recalculateProperties();
+			lane.calculateCapacities();
 
 			this.originalLane.addToLane(lane);
 			this.setToLinks(lane, signalLane.getToLinkIds());
@@ -193,7 +193,7 @@ public class QueueLink {
 			if(!firstNodeLinkInitialized){
 				this.originalLane.setMetersFromLinkEnd(signalLane.getLength());
 				this.originalLane.setLaneLength(this.getLink().getLength() - signalLane.getLength());
-				this.originalLane.recalculateProperties();
+				this.originalLane.calculateCapacities();
 				firstNodeLinkInitialized = true;
 				this.originalLane.setFireLaneEvents(true);
 			} 
@@ -393,8 +393,9 @@ public class QueueLink {
 	}
 
 	public void recalcTimeVariantAttributes(double time) {
-		// TODO dg
-		this.originalLane.recalcTimeVariantAttributes(time);
+		for (QueueLane ql : this.queueLanes){
+			ql.recalcTimeVariantAttributes(time);
+		}
 	}
 
 	public QueueVehicle getVehicle(Id vehicleId) {
