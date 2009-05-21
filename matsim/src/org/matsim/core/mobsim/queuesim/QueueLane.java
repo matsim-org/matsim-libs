@@ -146,6 +146,10 @@ public class QueueLane {
 	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
 
 	private BasicLane laneData;
+	/**
+	 * This id is only set, if there is no laneData for the Lane, i.e. it is the original lane
+	 */
+	private Id laneId = null;
 
 	private boolean thisTimeStepGreen = true;
 	/**
@@ -160,6 +164,11 @@ public class QueueLane {
 		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
 		this.length = ql.getLink().getLength();
 		this.meterFromLinkEnd = 0.0;
+		
+		if (this.originalLane){
+			this.laneId = new  IdImpl(this.queueLink.getLink().getId().toString() + ".ol");
+		}
+		
 		/*
 		 * moved capacity calculation to two methods, to be able to call it from
 		 * outside e.g. for reducing cap in case of an incident
@@ -172,8 +181,7 @@ public class QueueLane {
 			return this.laneData.getId();
 		}
 		else if (this.originalLane){
-			//TODO dg cache this id somewhere, but where?
-			return new IdImpl(this.queueLink.getLink().getId().toString() + ".ol");
+			return this.laneId;
 		}
 		else {
 			throw new IllegalStateException("Currently a lane must have a LaneData instance or be the original lane");
