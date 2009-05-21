@@ -429,12 +429,16 @@ public class QueueLink {
 	}
 
 	/**
-	 * TODO think about the need for this method
+	 * One should think about the need for this method
 	 * because it is only called by one testcase
 	 * @return
 	 */
 	protected int vehOnLinkCount() {
-		return this.originalLane.vehOnLinkCount();
+		int count = 0;
+		for (QueueLane ql : this.queueLanes){
+			count += ql.vehOnLinkCount();
+		}
+		return count;
 	}
 
 	public Link getLink() {
