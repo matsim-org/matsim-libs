@@ -67,7 +67,7 @@ public class StandaloneSimTest {
 
 		config.simulation().setStuckTime(10);
 //		config.simulation().removeStuckVehicles(false);
-		config.simulation().removeStuckVehicles(true);
+		config.simulation().setRemoveStuckVehicles(true);
 		config.simulation().setFlowCapFactor(1.5);
 		config.simulation().setStorageCapFactor(2.5);
 

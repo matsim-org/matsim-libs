@@ -84,7 +84,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		}
 		
 		if (config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes() && 
-				config.simulation().removeStuckVehicles()){
+				config.simulation().isRemoveStuckVehicles()){
 			throw new IllegalStateException("Link to link travel time calculation is not" +
 					"available if using the remove stuck vehicles option!");
 		}

@@ -100,7 +100,7 @@ public class SimulationConfigGroup extends Module {
 		} else if (STUCK_TIME.equals(key)) {
 			setStuckTime(Double.parseDouble(value));
 		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
-			removeStuckVehicles("true".equals(value) || "yes".equals(value));
+			setRemoveStuckVehicles("true".equals(value) || "yes".equals(value));
 		} else if (EVACUATION_TIME.equals(key)) {
 			setEvacuationTime(Time.parseTime(value));
 		} else if (EXTERNAL_EXE.equals(key)) {
@@ -141,7 +141,7 @@ public class SimulationConfigGroup extends Module {
 		} else if (STUCK_TIME.equals(key)) {
 			return Double.toString(getStuckTime());
 		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
-			return (removeStuckVehicles() ? "true" : "false");
+			return (isRemoveStuckVehicles() ? "true" : "false");
 		} else if (EVACUATION_TIME.equals(key)) {
 			return Double.toString(getEvacuationTime());
 		} else if (EXTERNAL_EXE.equals(key)) {
@@ -259,11 +259,11 @@ public class SimulationConfigGroup extends Module {
 		return this.stuckTime;
 	}
 
-	public void removeStuckVehicles(final boolean removeStuckVehicles) {
+	public void setRemoveStuckVehicles(final boolean removeStuckVehicles) {
 		this.removeStuckVehicles = removeStuckVehicles;
 	}
 
-	public boolean removeStuckVehicles() {
+	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
 	}
 

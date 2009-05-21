@@ -132,7 +132,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		Events events = new Events();
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().removeStuckVehicles(true);
+		config.simulation().setRemoveStuckVehicles(true);
 		config.simulation().setStuckTime(100);
 		//config.simulation().setEndTime(Time.parseTime("07:02:00"));
 		config.network().setInputFile(netFileName);

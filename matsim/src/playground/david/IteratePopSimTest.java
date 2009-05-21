@@ -75,8 +75,8 @@ public class IteratePopSimTest {
 		config.simulation().setEndTime(Time.parseTime("08:00:00"));
 
 		config.simulation().setStuckTime(10);
-		config.simulation().removeStuckVehicles(false);
-		config.simulation().removeStuckVehicles(true);
+		config.simulation().setRemoveStuckVehicles(false);
+		config.simulation().setRemoveStuckVehicles(true);
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()

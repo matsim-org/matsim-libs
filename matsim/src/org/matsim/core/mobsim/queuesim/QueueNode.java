@@ -124,7 +124,7 @@ public class QueueNode {
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
-				if (Gbl.getConfig().simulation().removeStuckVehicles()) {
+				if (Gbl.getConfig().simulation().isRemoveStuckVehicles()) {
 					currentLane.popFirstFromBuffer();
 					Simulation.decLiving();
 					Simulation.incLost();
