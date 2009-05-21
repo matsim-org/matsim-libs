@@ -196,12 +196,24 @@ public class QueueLane {
 	}
 
 	private void initFlowCapacity(final double time) {
-		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
-		double flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
-
-		// multiplying capacity from file by simTickCapFactor **and** flowCapFactor:
-		this.simulatedFlowCapacity = this.queueLink.getLink().getFlowCapacity(time)
-				* SimulationTimer.getSimTickTime() * flowCapFactor;
+		this.simulatedFlowCapacity = this.queueLink.getLink().getFlowCapacity(time);
+		if (this.laneData != null) {
+			/*
+			 * Without lanes a Link has a flow capacity that describes the flow on a certain number of
+			 * lanes. If lanes are given the following is assumed:
+			 * 
+			 * Flow of a Lane is given by the flow of the link divided by the number of lanes represented by the link.
+			 * 
+			 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes 
+			 * of the Lane definition. The flow of a lane is scaled by this number.  
+			 *   
+			 */
+			double queueLinksNumberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(time);
+			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
+				* this.laneData.getNumberOfRepresentedLanes();
+		}
+		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
 	}
 
 
@@ -255,35 +267,35 @@ public class QueueLane {
 		} else {
 			this.length = laneLengthMeters;
 		}
+		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 	}
 
 	
 	void recalculateProperties() {
+		initFlowCapacity(Time.UNDEFINED_TIME);
+		recalcCapacity(Time.UNDEFINED_TIME);
+		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
+
 		SimulationConfigGroup config = Gbl.getConfig().simulation();
+
+
+
+		/*variable was given as parameter in original but the method was called everywhere with the expression below,
+		 * TODO Check if this is correct! dg[jan09]*/
+//		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / 
+//			this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
+//		this.simulatedFlowCapacity = numberOfRepresentedLanes * averageSimulatedFlowCapacityPerLane_Veh_s
+//				* SimulationTimer.getSimTickTime();
 
 		double numberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
 		if (this.laneData != null) {
 			numberOfRepresentedLanes = this.laneData.getNumberOfRepresentedLanes();
 		}
-
-
-		/*variable was given as parameter in original but the method was called everywhere with the expression below,
-		 * TODO Check if this is correct! dg[jan09]*/
-		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / 
-			this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
-
-		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
-
-		this.simulatedFlowCapacity = numberOfRepresentedLanes * averageSimulatedFlowCapacityPerLane_Veh_s
-				* SimulationTimer.getSimTickTime();
-
-		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
-		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
+		
 		this.storageCapacity = (this.length * numberOfRepresentedLanes) /
 								this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * config.getStorageCapFactor();
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
 
-		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 
 		if (this.storageCapacity < this.freespeedTravelTime * this.simulatedFlowCapacity) {
 			this.storageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
