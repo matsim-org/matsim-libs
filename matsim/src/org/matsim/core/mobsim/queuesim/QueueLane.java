@@ -218,16 +218,14 @@ public class QueueLane {
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
 		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
+		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
+		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 	}
 
 
 	private void calculateStorageCapacity(final double time) {
-		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
-
-		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
-		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 		
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
 		//TODO dg think about the combination of several number lanes in link and in lane might be a bug
