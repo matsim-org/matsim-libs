@@ -35,7 +35,6 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.network.BasicLane;
 import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.LaneEnterEvent;
@@ -225,9 +224,14 @@ public class QueueLane {
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 		
+		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
+		//TODO dg think about the combination of several number lanes in link and in lane might be a bug
+		if (this.laneData != null) {
+			numberOfLanes = this.laneData.getNumberOfRepresentedLanes();
+		}
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.length * this.queueLink.getLink().getNumberOfLanes(time))
-				/ ((NetworkLayer) this.queueLink.getLink().getLayer()).getEffectiveCellSize() * storageCapFactor;
+		this.storageCapacity = (this.length * numberOfLanes)
+				/ this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -238,8 +242,8 @@ public class QueueLane {
 		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		if (this.storageCapacity < this.freespeedTravelTime * this.simulatedFlowCapacity) {
-			double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
+		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
+		if (this.storageCapacity < tempStorageCapacity) {
 	    if (spaceCapWarningCount <= 10) {
 	        log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 	        if (spaceCapWarningCount == 10) {
@@ -275,31 +279,6 @@ public class QueueLane {
 		initFlowCapacity(Time.UNDEFINED_TIME);
 		recalcCapacity(Time.UNDEFINED_TIME);
 		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
-
-		SimulationConfigGroup config = Gbl.getConfig().simulation();
-
-
-
-		/*variable was given as parameter in original but the method was called everywhere with the expression below,
-		 * TODO Check if this is correct! dg[jan09]*/
-//		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / 
-//			this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
-//		this.simulatedFlowCapacity = numberOfRepresentedLanes * averageSimulatedFlowCapacityPerLane_Veh_s
-//				* SimulationTimer.getSimTickTime();
-
-		double numberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
-		if (this.laneData != null) {
-			numberOfRepresentedLanes = this.laneData.getNumberOfRepresentedLanes();
-		}
-		
-		this.storageCapacity = (this.length * numberOfRepresentedLanes) /
-								this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * config.getStorageCapFactor();
-		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
-
-
-		if (this.storageCapacity < this.freespeedTravelTime * this.simulatedFlowCapacity) {
-			this.storageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
-		}
 	}
 	
 	void setMetersFromLinkEnd(double meters) {
