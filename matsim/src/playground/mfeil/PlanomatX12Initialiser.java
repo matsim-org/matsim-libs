@@ -20,7 +20,6 @@
 package playground.mfeil;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -56,9 +55,7 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 		this.init(network);	
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
 		
-		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
-				this.network,
-				Gbl.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 	}
 	

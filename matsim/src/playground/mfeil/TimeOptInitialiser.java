@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.*;
-import org.matsim.core.scoring.PlanScorer;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
 
 /**
@@ -34,17 +33,21 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class TimeOptInitialiser extends AbstractMultithreadedModule{
 	
-	private final PlanScorer 				scorer;
-	private final LegTravelTimeEstimator	estimator;
-	private final ScoringFunctionFactory	factory;
-	private final Controler					controler;
+	private final Controler							controler;
+	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
+	private final NetworkLayer 						network;
 
 	
-	public TimeOptInitialiser (Controler controler, LegTravelTimeEstimator estimator, ScoringFunctionFactory factory) {
-		this.scorer = new PlanScorer(factory);
-		this.estimator = estimator;
-		this.factory = factory;
+	public TimeOptInitialiser (Controler controler) {
+		this.network = controler.getNetwork();
+		this.init(network);
 		this.controler = controler;
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		this.controler.getEvents().addHandler(tDepDelayCalc);
+	}
+	
+	private void init(final NetworkLayer network) {
+		this.network.connect();
 	}
 
 	
@@ -52,7 +55,7 @@ public class TimeOptInitialiser extends AbstractMultithreadedModule{
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
 		//PlanAlgorithm timeOptAlgorithm = new TimeOptimizerPerformanceT (this.controler, this.estimator, this.scorer, this.factory);
-		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer (this.controler, this.estimator, this.scorer);
+		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer (this.controler, this.tDepDelayCalc);
 
 		return timeOptAlgorithm;
 	}

@@ -33,7 +33,6 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
@@ -73,7 +72,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	
 	public TimeModeChoicer1 (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
-		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer 				= scorer;
 		this.estimator				= estimator;
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
@@ -83,7 +82,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.minimumTime			= new TreeMap<String, Double>();
 		this.minimumTime.put("home", 7200.0);
 		this.minimumTime.put("work", 3600.0);
-		this.minimumTime.put("shopping", 1800.0);
+		this.minimumTime.put("shopping", 3600.0);
 		this.minimumTime.put("leisure", 3600.0);
 		this.introTime				= this.minimumTime;
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
@@ -93,12 +92,12 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.routes					= null;
 	}
 	
-	public TimeModeChoicer1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc, PlanScorer scorer){
+	public TimeModeChoicer1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc){
 		
-		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		this.scorer 				= scorer;
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		
-		this.estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+		this.estimator = controler.getConfig().planomat().getLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
 				tDepDelayCalc, 
 				this.router);
@@ -110,7 +109,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.minimumTime			= new TreeMap<String, Double>();
 		this.minimumTime.put("home", 7200.0);
 		this.minimumTime.put("work", 3600.0);
-		this.minimumTime.put("shopping", 1800.0);
+		this.minimumTime.put("shopping", 3600.0);
 		this.minimumTime.put("leisure", 3600.0);
 		this.introTime				= this.minimumTime;
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());

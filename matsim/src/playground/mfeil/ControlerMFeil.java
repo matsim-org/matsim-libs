@@ -83,17 +83,7 @@ public class ControlerMFeil extends Controler {
 			}
 			else if (classname.equals("TimeOptimizer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
-						super.network, 
-						super.getTraveltimeBinSize());
-				
-				PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator());
-				LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
-						this.getTravelTimeCalculator(), 
-						tDepDelayCalc, 
-						plansCalcRoute);
-
-				PlanStrategyModule timeOptStrategyModule = new TimeOptInitialiser(this, legTravelTimeEstimator, this.scoringFunctionFactory);
+				PlanStrategyModule timeOptStrategyModule = new TimeOptInitialiser(this);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}
 			else if (classname.equals("Clustering")) {
@@ -104,7 +94,7 @@ public class ControlerMFeil extends Controler {
 			
 			else if (classname.equals("TimeModeChoicer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule module = new TmcInitialiser(this, this.getScoringFunctionFactory());
+				PlanStrategyModule module = new TmcInitialiser(this);
 				strategy.addStrategyModule(module);
 			}
 		

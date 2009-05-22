@@ -29,6 +29,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.PlanScorer;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -52,6 +53,18 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	public TimeOptimizer (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
 		super(controler, estimator, scorer);
+		
+		this.OFFSET					= 1800;
+		this.MAX_ITERATIONS 		= 30;
+		this.STOP_CRITERION			= 5;
+		this.NEIGHBOURHOOD_SIZE		= 10;
+		
+		//TODO @MF: constants to be configured externally
+	}
+	
+	public TimeOptimizer (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc){
+		
+		super(controler, tDepDelayCalc);
 		
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;

@@ -42,7 +42,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
@@ -68,8 +67,6 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
 	private final String					LC_MODE;
-	private final PreProcessLandmarks		preProcessRoutingData;
-	private final ScoringFunctionFactory	factory;
 	private final PlanAlgorithm				timer, finalTimer;
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRoute		 	router;
@@ -87,11 +84,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	
 	public PlanomatX18 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc){
-		this.preProcessRoutingData 	= preProcessRoutingData;
-		this.factory				= controler.getScoringFunctionFactory();
-		//this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(this.preProcessRoutingData));
-		this.router 				= new PlansCalcRoute (controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		this.scorer					= new PlanScorer (this.factory);
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		this.legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
 				tDepDelayCalc, 
@@ -113,15 +107,15 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			this.timer				= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		}
 		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
-			this.timer				= new Planomat (legTravelTimeEstimator, this.factory); 
+			this.timer				= new Planomat (legTravelTimeEstimator, controler.getScoringFunctionFactory()); 
 		}
-		else this.timer				= new TimeOptimizer(controler, legTravelTimeEstimator, this.scorer);
+		else this.timer				= new TimeOptimizer(controler, this.legTravelTimeEstimator, this.scorer);
 		
 		if (this.finalOpt.equals("TimeModeChoicer")){
 			this.finalTimer			= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		}
 		else if (this.finalOpt.equals("Planomat")){
-			this.finalTimer			= new Planomat(legTravelTimeEstimator, this.factory); 
+			this.finalTimer			= new Planomat(legTravelTimeEstimator, controler.getScoringFunctionFactory()); 
 		}
 		else this.finalTimer		= new TimeOptimizerWIGIC(controler, legTravelTimeEstimator, this.scorer);		
 		
@@ -263,7 +257,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			/* Check whether differing plans are tabu*/
 			warningTabu = this.checkForTabuSolutions(tabuList, neighbourhood, infoOnNeighbourhood, tabuInNeighbourhood);
 			if (warningTabu) {
-				log.info("No non-tabu solutions availabe for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
+				log.warn("No non-tabu solutions available for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 				break; 
 			}
 			
@@ -355,7 +349,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			if (currentIteration%5==0) scoreStat.add(bestScore);
 			
 			if (this.MAX_ITERATIONS==currentIteration){
-				log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
+			//	log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
 			}
 			else {
 				/* Write this iteration's solution into all neighbourhood fields for the next iteration*/

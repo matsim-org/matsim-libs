@@ -20,13 +20,9 @@
 package playground.mfeil;
 
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.modules.*;
-import org.matsim.core.scoring.PlanScorer;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
 
 /**
@@ -36,18 +32,15 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class TmcInitialiser extends AbstractMultithreadedModule{
 	
-	private final PlanScorer 				scorer;
-	private final Controler					controler;
-	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
+	private final Controler							controler;
+	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
 
 	
-	public TmcInitialiser (Controler controler, ScoringFunctionFactory factory) {
-		this.scorer = new PlanScorer(factory);
-		this.controler = controler;
-		
+	public TmcInitialiser (Controler controler) {
+		this.controler = controler;		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(),
-				Gbl.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 	}
 
@@ -55,7 +48,7 @@ public class TmcInitialiser extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer1 (this.controler, this.tDepDelayCalc, this.scorer);
+		PlanAlgorithm timeOptAlgorithm = new TimeModeChoicer1 (this.controler, this.tDepDelayCalc);
 		return timeOptAlgorithm;
 	}
 }
