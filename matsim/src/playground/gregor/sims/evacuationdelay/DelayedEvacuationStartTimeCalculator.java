@@ -47,8 +47,15 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 		
 	}
 
+	public QuadTree<Coord> getCoordinateQuadTree() {
+		return this.coordQuadTree;
+	}
+	
 	public double getEvacuationStartTime(Activity act) {
 		Coord c = act.getCoord();
+		if (c == null) {
+			c = act.getLink().getCoord();
+		}
 		double dist = ((CoordImpl) this.coordQuadTree.get(c.getX(), c.getY())).calcDistance(c);
 		return this.baseTime + getOffset(dist);
 	}
@@ -57,18 +64,18 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 		if (dist <= 3000) {
 			double rnd = MatsimRandom.getRandom().nextDouble();
 			if (rnd <= .214) {
-				return 30*3600;
-			} else if (rnd <= .631) {
-				return MatsimRandom.getRandom().nextDouble()*10 + 10;
+				return 25 * 60;
+			} else if (rnd <= .631 ) {
+				return 15 * 60;
 			} else {
 				return .0;
 			}
 		} else {
 			double rnd = MatsimRandom.getRandom().nextDouble();
 			if (rnd <= .357) {
-				return 30*3600;
-			} else if (rnd <= .596) {
-				return MatsimRandom.getRandom().nextDouble()*10 + 10;
+				return 25 * 60;
+			} else if (rnd <= .596 ) {
+				return 15 * 60;
 			} else {
 				return .0;
 			}			

@@ -33,6 +33,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.groups.EvacuationConfigGroup.Scenario;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
@@ -48,9 +49,9 @@ public class EvacuationPlansGenerator {
 	
 	private TravelCost tc = null;
 
-	private Network network;
+	protected Network network;
 
-	private Population pop;
+	protected Population pop;
 
 	private Link saveLink;
 
@@ -88,9 +89,13 @@ public class EvacuationPlansGenerator {
 				it.remove();
 			}
 		}
+		
+		
 
 		// the remaining persons plans will be routed
 		log.info("  - generating evacuation plans for the remaining persons");
+		EvacuationStartTimeCalculator c = getEndCalculatorTime();
+		
 		final Coord saveCoord = new CoordImpl(12000.0, -12000.0);
 		for (Person person : this.pop.getPersons().values()) {
 			if (person.getPlans().size() != 1 ) {
@@ -102,6 +107,7 @@ public class EvacuationPlansGenerator {
 			if (plan.getPlanElements().size() != 1 ) {
 				throw new RuntimeException("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
+			plan.getFirstActivity().setEndTime(c.getEvacuationStartTime(plan.getFirstActivity()));
 			
 			Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			leg.setDepartureTime(0.0);
@@ -116,6 +122,9 @@ public class EvacuationPlansGenerator {
 
 	}
 
+	protected EvacuationStartTimeCalculator getEndCalculatorTime() {
+			return new StaticEvacuationStartTimeCalculator(3*3600);
+	}
 
 
 	/**

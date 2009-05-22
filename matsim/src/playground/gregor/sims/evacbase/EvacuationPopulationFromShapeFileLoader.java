@@ -12,6 +12,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.EvacuationConfigGroup.Scenario;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -35,6 +36,8 @@ public class EvacuationPopulationFromShapeFileLoader {
 	
 	private Population pop = null;
 	private QuadTree<Link> quadTree;
+	private Scenario scenario;
+	private double sample;
 
 	public EvacuationPopulationFromShapeFileLoader(List<Building> buildings,	NetworkLayer network, Config config) {
 		this.buildings = buildings;
@@ -57,15 +60,15 @@ public class EvacuationPopulationFromShapeFileLoader {
 			router = new PlansCalcRoute(this.network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());	
 		}
 		
-		Scenario scenario = this.config.evacuation().getScanrio();
+		this.scenario = this.config.evacuation().getScanrio(); 
 		Population pop = new PopulationImpl();
 		
 		Link saveLink = this.network.getLink("el1");
-		EvacuationStartTimeCalculator time = getEndCalculatorTime(scenario);
+		EvacuationStartTimeCalculator time = getEndCalculatorTime();
 		
 
 		
-		double sample = this.config.simulation().getFlowCapFactor();
+		this.sample = this.config.simulation().getFlowCapFactor();
 		
 		int count = 0;
 		for (Building building : this.buildings) {
@@ -80,21 +83,12 @@ public class EvacuationPopulationFromShapeFileLoader {
 //			Link link = this.network.getNearestLink(new CoordImpl(c.x,c.y));
 			
 			
-			int i = 0;
-			if (scenario == Scenario.day) {
-				i = (int) Math.round(building.getPopDay() * sample);
-			} else if (scenario == Scenario.night){
-				i = (int) Math.round(building.getPopNight() * sample);
-			}
+
 			
-			if (building.isQuakeProof()) {
-				building.setShelterSpace(Math.max(0, building.getShelterSpace()-i));
-				continue;
-			}
-			
+			int numOfPers = getNumOfPersons(building);
 //			i=1;
 			
-			for (int j = 0; j < i; j++) {
+			for (int i = 0; i < numOfPers; i++) {
 				Person pers = new PersonImpl(new IdImpl(count++));
 				Plan plan = new PlanImpl(pers);
 				
@@ -119,11 +113,34 @@ public class EvacuationPopulationFromShapeFileLoader {
 		
 	}
 
-	protected EvacuationStartTimeCalculator getEndCalculatorTime(Scenario scenario) {
-		double endTime = Double.NaN;
+	protected int getNumOfPersons(Building building) {
+		int pers = 0;
 		if (scenario == Scenario.day) {
+			pers = (int) Math.round(building.getPopDay());
+		} else if (scenario == Scenario.night){
+			pers = (int) Math.round(building.getPopNight());
+		}
+		int removed = 0;
+		for (int i = 0; i < pers; i++) {
+			if (MatsimRandom.getRandom().nextDouble() > this.sample) {
+				removed++;
+			}
+		}
+		pers -= removed;
+		
+		
+		if (building.isQuakeProof()) {
+			building.setShelterSpace(Math.max(0, building.getShelterSpace()-pers));
+			return 0;
+		}
+		return pers;
+	}
+
+	protected EvacuationStartTimeCalculator getEndCalculatorTime() {
+		double endTime = Double.NaN;
+		if (this.scenario == Scenario.day) {
 			endTime = 12 * 3600;
-		} else if (scenario == Scenario.night) {
+		} else if (this.scenario == Scenario.night) {
 			endTime = 3 * 3600;
 		}
 		return new StaticEvacuationStartTimeCalculator(endTime);
