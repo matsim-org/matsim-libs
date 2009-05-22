@@ -1,10 +1,14 @@
 package playground.gregor.gis.networkFromShape;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -12,15 +16,18 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.GMLFileWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class NetworkFromShape {
 	
 	
-	public static void main(String [] args) throws IOException {
+	public static void main(String [] args) throws IOException, IllegalAttributeException {
 		
 		String links = "/home/laemmel/workspace/vsp-cvs/studies/padang/gis/network_v20080618/links.shp";
 		String nodes = "/home/laemmel/workspace/vsp-cvs/studies/padang/gis/network_v20080618/nodes.shp";
@@ -49,8 +56,14 @@ public class NetworkFromShape {
 		System.out.println(net.getNodes().size());
 		fs = ShapeFileReader.readDataFile(links);
 		it = fs.getFeatures().iterator();
+		
+		Collection<Feature> fts = new ArrayList<Feature>();
 		while(it.hasNext()) {
+			
 			Feature f = (Feature) it.next();
+			Polygon p = (Polygon) ((MultiPolygon)f.getDefaultGeometry()).getGeometryN(0);
+			f.setDefaultGeometry(p);
+			fts.add(f);
 			Integer id = (Integer) f.getAttribute("ID");
 			Integer from = (Integer) f.getAttribute("from");
 			Integer to = (Integer) f.getAttribute("to");
@@ -76,6 +89,12 @@ public class NetworkFromShape {
 		
 		new NetworkWriter(net,"./network.xml").write();
 		
+		try {
+			GMLFileWriter.writeGeometries(fts, "");
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

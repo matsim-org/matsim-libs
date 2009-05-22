@@ -52,8 +52,8 @@ public class TimeDependentColorizer implements PostProcessorI, AgentDepartureEve
 
 	public void handleEvent(AgentDepartureEvent event) {
 		EventAgent e = new EventAgent();
-		e.starttime = event.getTime();
-		
+//		e.starttime = event.getTime();
+		e.starttime = 3 * 3600;
 		agents.put(event.getPersonId().toString(), e);
 		
 	}

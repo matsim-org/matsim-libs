@@ -53,6 +53,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.gregor.PATH;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -203,10 +205,10 @@ public class EventFilesEvacuationTimeCompare {
 	}
 	
 	public static void main(final String [] args) {
-		String eventsFile1 = INPUT_BASE + "run320/stage2/output/ITERS/it.0/0.events.txt.gz";
-		String eventsFile2 = INPUT_BASE + "run319/stage2/output/ITERS/it.0/0.events.txt.gz";
+		String eventsFile1 = PATH.OUTPUTS + "output/ITERS/it.200/200.events.txt.gz";
+		String eventsFile2 = PATH.OUTPUTS + "output_delay/ITERS/it.200/200.events.txt.gz";
 		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = INPUT_BASE + "run320/analysis/evacTimeComp.shp";
+		String outfile = PATH.OUTPUTS + "output/analysis/etimcomp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		
@@ -243,7 +245,7 @@ public class EventFilesEvacuationTimeCompare {
 
 		public void handleEvent(final AgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
-			ai.time = event.getTime();
+			ai.time = 3*3600; //event.getTime();
 			Link link = EventFilesEvacuationTimeCompare.this.network.getLink(event.getLinkId().toString());
 			ai.c = new Coordinate(link.getCoord().getX(),link.getCoord().getY());
 			this.ttimes.put(event.getPersonId().toString(), ai);

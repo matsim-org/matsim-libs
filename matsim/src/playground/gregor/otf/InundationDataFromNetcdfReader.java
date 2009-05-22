@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 public class InundationDataFromNetcdfReader {
 
 
-	private final String file = "../../inputs/flooding/flooding00.sww";
+	private final String file = "../../inputs/flooding/flooding_old.sww";
 	//	private final String file = "../../inputs/networks/flooding.sww";
 	//	private final String file = "test/input/playground/gregor/data/flooding.sww";
 	//	private final String file = "/home/laemmel/devel/inputs/flooding/SZ_r018M_m003_092_12_mw9.00_03h__P0_8.sww";
@@ -457,9 +457,9 @@ public class InundationDataFromNetcdfReader {
 		ArrayList<Float> xcoords = new ArrayList<Float>();
 		ArrayList<Float> ycoords = new ArrayList<Float>();
 		ArrayList<float []> walshs = new ArrayList<float[]>();
-		for (int i = 0; i < 8; i++) {
-						String file = BASE + i + ".sww";
-//			String file = this.file;
+		for (int i = 0; i < 1; i++) {
+//						String file = BASE + i + ".sww";
+			String file = this.file;
 			FloodingReader r = new FloodingReader(file);
 			List<int []> triangles = r.getTriangles();
 			Map<Integer,Integer> mapping = r.getIdxMapping();

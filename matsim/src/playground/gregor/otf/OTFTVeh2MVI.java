@@ -32,6 +32,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -75,7 +76,8 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	@Override
 	protected void onAdditionalQuadData(OTFConnectionManager connect) {
 		this.quad.addAdditionalElement(this.writer);
-		this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
+//		this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
+//		this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReader(OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast).createData()));
 		try {
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(LINKS_FILE),linksColor));
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(NODES_FILE),nodesColor));
@@ -94,8 +96,8 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
-		connect.add(InundationDataWriter.class,InundationDataReader.class);
-		connect.add(InundationDataReader.class,Dummy.class);
+//		connect.add(InundationDataWriter.class,InundationDataReader.class);
+//		connect.add(InundationDataReader.class,Dummy.class);
 		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
 		
 //		connect.add(InundationDataWriter.class,InundationDataReader.class);
@@ -172,9 +174,6 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 								Integer.parseInt(result[7]), 
 								Integer.parseInt(result[15]));
 						double t = Double.parseDouble(time);
-						if (t > 15000) {
-							System.out.println(t);
-						}
 						addVehicle(t, position);
 //					}
 				}
@@ -239,7 +238,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		final String vehFileName = "../../outputs/output/colorizedT.veh.txt.gz";
 //		
 //		String vehFileName = "../runs/run301/output/100.T.veh.gz";
-		final String outFileName = "../../outputs/output/ITERS/it.0/0.movie.mvi";
+		final String outFileName = "../../outputs/output/ITERS/it.200/200.movie.mvi";
 		final int intervall_s = 60;
 
 		Gbl.createConfig(null);
