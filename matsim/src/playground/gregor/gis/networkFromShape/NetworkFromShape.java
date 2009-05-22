@@ -16,8 +16,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.GMLFileWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -89,12 +89,7 @@ public class NetworkFromShape {
 		
 		new NetworkWriter(net,"./network.xml").write();
 		
-		try {
-			GMLFileWriter.writeGeometries(fts, "");
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, "");
 	}
 
 }
