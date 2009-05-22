@@ -8,25 +8,19 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.api.basic.v01.TransportMode;
 
 import playground.mmoyo.PTCase2.PTRouter2;
-import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.Pedestrian.Walk;
 
 public class TransitRouteFinder {
-	private NetworkLayer net;
-	private PTTimeTable2 ptTimeTable;
 	private PTRouter2 ptRouter;
-	private static Walk walk;
+	private static Walk walk = new Walk ();
 	
 	public TransitRouteFinder(PTRouter2 ptRouter ){
-		//this.net = net;
-		//this.ptTimeTable = ptTimeTable; 
 		this.ptRouter = ptRouter; 
 	}
 
@@ -42,19 +36,18 @@ public class TransitRouteFinder {
 
 		List <Link> linkList = new ArrayList<Link>();
 		double depTime=0;
-		double travTime=0;
-
+		double travTime= fromAct.getEndTime();
+		
 		for (Link link: path.links){
 			linkType = link.getType();
+			travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
 			
 			if (!first){
-				if (linkType.equals(lastLinkType)){
-					travTime= travTime + 11111;  // -->calculate traveltime of link. maybe read as property 
-				}else{
-					TransportMode mode = selectMode(lastLinkType);
-					createLeg(mode, linkList, depTime, travTime);  
+				if (!linkType.equals(lastLinkType)){
+					Leg newLeg = createLeg(selectMode(lastLinkType), linkList, depTime, travTime);  
+					legList.add(newLeg);
 					
-					depTime=depTime+ travTime;
+					depTime=travTime;
 					linkList = new ArrayList<Link>();
 				}
 			}else{
@@ -76,9 +69,10 @@ public class TransitRouteFinder {
 		return mode;
 	}
 	
-
-	private Leg createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double travTime){
+	private Leg createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null);  
+		double travTime= arrivTime - depTime;
+		
 		legRoute.setLinks(null, routeLinks, null);
 		legRoute.setTravelTime(travTime);
 
@@ -92,9 +86,8 @@ public class TransitRouteFinder {
 		leg.setRoute(legRoute);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(depTime + travTime);
+		leg.setArrivalTime(arrivTime);
 		return leg;
 	}
-	
 	
 }

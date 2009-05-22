@@ -288,7 +288,7 @@ public class PTDijkstra implements LeastCostPathCalculator {
 		if (this.pruneDeadEnds) {
 			ddOutData = getPreProcessData(outNode);
 			for (Link l : outNode.getOutLinks().values()) {
-				if (canPassLink(outData.getPrevLink(), l)) {
+				if (canPassLink(l)) {
 					Node n = l.getToNode();
 					PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
 	
@@ -307,7 +307,7 @@ public class PTDijkstra implements LeastCostPathCalculator {
 		} else { // this.pruneDeadEnds == false
 			for (Link l : outNode.getOutLinks().values()) {
 				
-				if (canPassLink(outData.getPrevLink(),l)) {
+				if (canPassLink(l)) {
 					addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
 				}
 			}
@@ -375,7 +375,9 @@ public class PTDijkstra implements LeastCostPathCalculator {
 	*/
 	
 	//->   Implementation for PT router. Check out the performance of this call 
-	protected boolean canPassLink(final Link lastLink, final Link link) {
+	protected boolean canPassLink(final Link link) {
+		DijkstraNodeData fromNodeData= getData(link.getFromNode());
+		Link lastLink = fromNodeData.getPrevLink();
 		return pathVal.canPassLink(lastLink, link);
 	}
 		

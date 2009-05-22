@@ -9,7 +9,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 /*
  * A sequence of PT-Acts and PT-Activities starts with a leg "walk to PT" and ends with a act "exit PT" and a walk leg 
- * This class deletes them and introduces a null PT leg instead
+ * This class deletes them and introduces a new empty PT leg instead
  */
 
 public class SimplifyPtLegs2 {
@@ -37,8 +37,11 @@ public class SimplifyPtLegs2 {
 	}
 
 	private void deleteElements(Plan plan, List<Integer> ptElements){
-		Leg leg = (Leg)plan.getPlanElements().get(ptElements.get(0)-1);
-		leg.setMode(TransportMode.pt);
+		Leg firstLeg = (Leg)plan.getPlanElements().get(ptElements.get(0)-1);
+		Leg lastLeg = (Leg)plan.getPlanElements().get(ptElements.get(ptElements.size())+1);
+		firstLeg.setMode(TransportMode.pt);
+		firstLeg.setArrivalTime(lastLeg.getArrivalTime());
+		firstLeg.setTravelTime(lastLeg.getArrivalTime() -firstLeg.getDepartureTime());
 		for (Integer i : ptElements) {
 			plan.removeActivity(i.intValue());
 		}

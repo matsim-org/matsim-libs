@@ -14,8 +14,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.router.Dijkstra;
-//import playground.mmoyo.PTRouter.PTDijkstra;
+//import org.matsim.core.router.Dijkstra;
+import playground.mmoyo.PTRouter.PTDijkstra;
 
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -35,8 +35,8 @@ import playground.mmoyo.PTRouter.PTNode;
  */
 public class PTRouter2 {
 	private NetworkLayer net; 
-	private Dijkstra dijkstra;
-	//private PTDijkstra dijkstra;
+	//private Dijkstra dijkstra;
+	private PTDijkstra dijkstra;
 	private PTTravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime;   //> make private 
 	
@@ -49,17 +49,17 @@ public class PTRouter2 {
 		this.net = ptNetworkLayer;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
-		this.dijkstra = new Dijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
+		this.dijkstra = new PTDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 		
 	public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
 		//normal distance
-		Collection <Node> nearStops1 = net.getNearestNodes(coord1, distToWalk);
-		Collection <Node> nearStops2 = net.getNearestNodes(coord2, distToWalk);
+		//Collection <Node> nearStops1 = net.getNearestNodes(coord1, distToWalk);
+		//Collection <Node> nearStops2 = net.getNearestNodes(coord2, distToWalk);
 		
-		//double distOridDest = CoordUtils.calcDistance(coord1,coord2);
-		//Collection <Node> nearStops1 = FindNearStops(coord1, distOridDest, distToWalk);
-		//Collection <Node> nearStops2 = FindNearStops(coord2, distOridDest, distToWalk);
+		double distOridDest = CoordUtils.calcDistance(coord1,coord2);
+		Collection <Node> nearStops1 = FindNearStops(coord1, distOridDest, distToWalk);
+		Collection <Node> nearStops2 = FindNearStops(coord2, distOridDest, distToWalk);
 		
 		Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
 		Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
@@ -78,7 +78,6 @@ public class PTRouter2 {
 			path.nodes.remove(ptNode1);
 			path.nodes.remove(ptNode2);
 		}
-			
 		return path;
 	}
 	

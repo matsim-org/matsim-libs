@@ -93,9 +93,11 @@ public class PTControler2 {
 
 	    	case 3:
 	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
+	    		
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
 	    		//ptActWriter.writePTActsLegs();
-	    		ptActWriter.SimplifyPtLegs();
+	    		//ptActWriter.SimplifyPtLegs();
+	    		ptActWriter.printPTLegs();
 	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;

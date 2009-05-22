@@ -31,6 +31,7 @@ import org.matsim.core.controler.Controler;
 
 import playground.mmoyo.Validators.PathValidator;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs2;
+import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 import playground.mmoyo.Pedestrian.Walk;
 
 public class PTActWriter {
@@ -79,6 +80,23 @@ public class PTActWriter {
 		System.out.println("Done");	
 	}
 
+	public void printPTLegs(){
+		TransitRouteFinder routFinder = new TransitRouteFinder (ptRouter);
+
+		Person person = population.getPersons().get(new IdImpl("2180188"));
+
+		Plan plan = person.getPlans().get(0);
+ 		Activity act1 = (Activity)plan.getPlanElements().get(0);
+		Activity act2 = (Activity)plan.getPlanElements().get(2);
+		List<Leg> legList = routFinder.calculateRoute (act1, act2, person );
+		
+		for (Leg leg : legList){
+			System.out.println(leg);
+		}
+		
+		
+	}
+	
 	
 	public void writePTActsLegs(){
 		
@@ -98,10 +116,10 @@ public class PTActWriter {
 		List<Path> invalidPaths = new ArrayList<Path>();  
 		List<Path> validPaths = new ArrayList<Path>();
 		
-		for (Person person: this.population.getPersons().values()) {
-		//if ( true ) {
+		//for (Person person: this.population.getPersons().values()) {
+		if ( true ) {
 		//Person person = population.getPersons().get(new IdImpl("3937204"));  
-		//Person person = population.getPersons().get(new IdImpl("2180188"));
+		Person person = population.getPersons().get(new IdImpl("2180188"));
 			System.out.println(numPlans + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 
@@ -209,8 +227,6 @@ public class PTActWriter {
 		System.out.println("total " + total + " average: " + (total/durations.size()));
 		*/
 		
-		
-		
 		//for(Path path: invalidPaths){
 		//if (true){
 		if (invalidPaths.size()>0){	
@@ -225,12 +241,12 @@ public class PTActWriter {
 		//}
 		
 		if (validPaths.size()>0){
-			System.out.println("valid");
-			for(Path path: invalidPaths){
-				path = validPaths.get(0);
+			System.out.println("valid:" );
+			for(Path path: validPaths){
 				for(Link link: path.links){
 					System.out.print(link.getType() + "-");
 				}
+				System.out.println("");
 			}
 		}
 		System.out.println("");
@@ -290,7 +306,7 @@ public class PTActWriter {
 					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, arrTime));
 				}
 
-			}else if(link.getType().equals("Transfer") || link.getType().equals("DetTransfer") ){  //add the PTleg and a Transfer Act
+			}else if(link.getType().equals("Transfer") ){  //add the PTleg and a Transfer Act
 				if (lastLinkType.equals("Standard")){
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
@@ -298,8 +314,7 @@ public class PTActWriter {
 					newPlan.addLeg(newPTLeg(TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					double endTime = accumulatedTime + linkTravelTime;
-					endTime=5;
-					newPlan.addActivity(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, endTime ));
+					newPlan.addActivity(newPTAct("Wait pt veh", link.getFromNode().getCoord(), link, accumulatedTime, endTime));
 					first=false;
 				}
 
@@ -327,8 +342,8 @@ public class PTActWriter {
 				newPlan.addLeg(newPTLeg(TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, walkTime, arrTime));
 
 				//like a transfer link
-				if (lastLinkType.equals("Standard")){  //-> how can be validated that the next link must be a standard link?
-					double endActTime= arrTime + linkTravelTime -walkTime; // The ptTravelTime must be calculated it like this: travelTime = walk + transferTime;
+				if (lastLinkType.equals("Standard")){  
+					double endActTime= accumulatedTime + linkTravelTime -walkTime; // The ptTravelTime must be calculated it like this: travelTime = walk + transferTime;
 					newPlan.addActivity(newPTAct("Change ptv", link.getFromNode().getCoord(), link, arrTime, endActTime));
 					first=false;
 				}
