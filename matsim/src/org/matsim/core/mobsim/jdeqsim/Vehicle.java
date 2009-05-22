@@ -128,19 +128,14 @@ public class Vehicle extends SimUnit {
 			List<Link> links = ((NetworkRoute) currentLeg.getRoute()).getLinks();
 			currentLinkRoute = links.toArray(new Link[links.size()]);
 		} else {
-			log.error("currentLinkRoute is set to null - personId:" + getOwnerPerson().getId());
 			currentLinkRoute = null;
 		}
 	}
 
 	private Link[] getCurrentLinkRoute() {
-		if (currentLinkRoute==null){
-			log.error("currentLinkRoute is given back as null - personId:" + getOwnerPerson().getId());
-		}
-		
 		return currentLinkRoute;
 	}
-
+ 
 	public void setLegIndex(int legIndex) {
 		this.legIndex = legIndex;
 	}
