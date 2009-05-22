@@ -27,7 +27,6 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -36,7 +35,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.io.*;
 
 
 /**

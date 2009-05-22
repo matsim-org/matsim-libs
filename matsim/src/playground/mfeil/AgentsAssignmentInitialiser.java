@@ -22,7 +22,6 @@ package playground.mfeil;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.*;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -39,14 +38,14 @@ import java.util.LinkedList;
 public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule{
 	
 	
-	protected final NetworkLayer 				network;
-	protected final Controler					controler;
-	protected final LocationMutatorwChoiceSet locator;
-	protected final PlanScorer 				scorer;
-	protected final RecyclingModule			module;
-	protected final double					minimumTime;
-	protected LinkedList<String>				nonassignedAgents;
-	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
+	protected final NetworkLayer 					network;
+	protected final Controler						controler;
+	protected final LocationMutatorwChoiceSet 		locator;
+	protected final PlanScorer 						scorer;
+	protected final RecyclingModule					module;
+	protected final double							minimumTime;
+	protected LinkedList<String>					nonassignedAgents;
+	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 
 		
 	public AgentsAssignmentInitialiser (final Controler controler, 

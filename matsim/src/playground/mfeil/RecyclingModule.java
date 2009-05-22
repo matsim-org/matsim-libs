@@ -31,18 +31,13 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**

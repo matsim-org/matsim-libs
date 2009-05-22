@@ -66,7 +66,7 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 		double [] startCoefficients = new double [this.noOfSoftCoefficients];
 		for (int i=0;i<startCoefficients.length;i++) startCoefficients[i]=1;
 		this.coefficients 			= new DistanceCoefficients (startCoefficients, this.softCoef, this.allCoef);	
-		this.assignmentModule		= new AgentsAssignmentInitialiser1 (controler, this.tDepDelayCalc, this.locator, this.scorer, this, 
+		this.assignmentModule		= new AgentsAssignmentInitialiser1 (this.controler, this.tDepDelayCalc, this.locator, this.scorer, this, 
 				this.minimumTime, this.coefficients, this.nonassignedAgents);
 		this.list1Pointer 			= new ArrayList<Integer>();
 	}
