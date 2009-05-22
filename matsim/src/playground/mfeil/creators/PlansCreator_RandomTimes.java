@@ -65,7 +65,8 @@ public class PlansCreator_RandomTimes {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.getRandom().nextDouble();
+					 //double ran = MatsimRandom.getRandom().nextDouble();
+					 double ran = 0;
 					 double time1 = MatsimRandom.getRandom().nextDouble()*86400;
 					 double time2 = MatsimRandom.getRandom().nextDouble()*(86400-time1)+time1;
 					 double time3 = MatsimRandom.getRandom().nextDouble()*(86400-time2)+time2;
@@ -135,7 +136,8 @@ public class PlansCreator_RandomTimes {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.getRandom().nextDouble();
+					//double ran = MatsimRandom.getRandom().nextDouble();
+					 double ran = 0;
 					 double time1 = MatsimRandom.getRandom().nextDouble()*86400;
 					 double time2 = MatsimRandom.getRandom().nextDouble()*(86400-time1)+time1;
 					 double time3 = MatsimRandom.getRandom().nextDouble()*(86400-time2)+time2;
@@ -204,7 +206,8 @@ public class PlansCreator_RandomTimes {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.getRandom().nextDouble();
+					//double ran = MatsimRandom.getRandom().nextDouble();
+					 double ran = 0;
 					 double time1 = MatsimRandom.getRandom().nextDouble()*86400;
 					 double time2 = MatsimRandom.getRandom().nextDouble()*(86400-time1)+time1;
 					 double time3 = MatsimRandom.getRandom().nextDouble()*(86400-time2)+time2;
@@ -273,7 +276,8 @@ public class PlansCreator_RandomTimes {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
-					 double ran = MatsimRandom.getRandom().nextDouble();
+					//double ran = MatsimRandom.getRandom().nextDouble();
+					 double ran = 0;
 					 double time1 = MatsimRandom.getRandom().nextDouble()*86400;
 					 double time2 = MatsimRandom.getRandom().nextDouble()*(86400-time1)+time1;
 					 double time3 = MatsimRandom.getRandom().nextDouble()*(86400-time2)+time2;

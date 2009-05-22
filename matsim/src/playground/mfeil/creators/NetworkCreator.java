@@ -35,7 +35,7 @@ public class NetworkCreator {
 		
 		int networkSize 	= 10;
 		double distance 	= 1000;
-		double capacity		= 10.0;
+		double capacity		= 15.0;
 		
 		int nodeID 			= 1;
 		int linkID 			= 1;
