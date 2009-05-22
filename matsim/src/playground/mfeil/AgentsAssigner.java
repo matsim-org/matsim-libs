@@ -38,6 +38,7 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -68,27 +69,22 @@ public class AgentsAssigner implements PlanAlgorithm{
 		
 	
 	
-	public AgentsAssigner (Controler controler, PreProcessLandmarks preProcessRoutingData, 
-			LocationMutatorwChoiceSet locator, PlanScorer scorer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
+	public AgentsAssigner (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc, LocationMutatorwChoiceSet locator, PlanScorer scorer, RecyclingModule recyclingModule,
 			double minimumTime, LinkedList<String> nonassignedAgents){
 		this.controler				= controler;
-		this.router 				= new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(preProcessRoutingData));
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= scorer;
-		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
-				controler.getNetwork(), 
-				controler.getTraveltimeBinSize());
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
-		LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+		LegTravelTimeEstimator legTravelTimeEstimator = controler.getConfig().planomat().getLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
 				tDepDelayCalc, 
-				plansCalcRoute);
+				this.router);
 		this.timer					= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		//this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		this.locator 				= locator;
-		this.cleaner				= cleaner;
 		this.module					= recyclingModule;
 		this.minimumTime			= minimumTime;
 		this.nonassignedAgents		= nonassignedAgents;
+		this.cleaner				= new ScheduleCleaner(legTravelTimeEstimator, this.minimumTime);
 	}
 	
 		

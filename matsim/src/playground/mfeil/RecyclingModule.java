@@ -33,6 +33,7 @@ import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -59,48 +60,36 @@ public class RecyclingModule implements PlanStrategyModule {
 	protected  ArrayList<Plan> []				list;
 	protected final AbstractMultithreadedModule 		schedulingModule;
 	protected final AbstractMultithreadedModule		assignmentModule;
-	protected final PreProcessLandmarks			preProcessRoutingData;
 	protected final LocationMutatorwChoiceSet 	locator;
 	protected final PlanScorer					scorer;
-	protected final LegTravelTimeEstimator		estimator;
 	protected final double						minimumTime;
-	protected final ScheduleCleaner				cleaner;
 	protected final PlanAlgorithm				timer;
 	protected final int							testAgentsNumber;
 	protected String[]							criteria;
 	protected final Controler					controler;
 	protected OptimizedAgents 					agents;
 	protected LinkedList<String>				nonassignedAgents;
-	
+	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
+	protected final NetworkLayer 						network;
 	public static PrintStream 					assignment;
 	
 	
 	
 	public RecyclingModule (ControlerMFeil controler){
 		this.controler=controler;
-		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		this.preProcessRoutingData.run(controler.getNetwork());
-		//this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
-		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
-				controler.getNetwork(), 
-				controler.getTraveltimeBinSize());
-
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
-		this.estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
-				controler.getTravelTimeCalculator(), 
-				tDepDelayCalc, 
-				plansCalcRoute);
-
+		this.network = controler.getNetwork();
+		this.init(network);	
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+	
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.timer					= new TimeModeChoicer1 (controler, this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
+		this.timer					= new TimeModeChoicer1 (controler, this.tDepDelayCalc);
 		//this.timer					= new Planomat (this.estimator, controler.getScoringFunctionFactory());
-		this.schedulingModule 		= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.locator);
-		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.preProcessRoutingData, this.locator,
-			this.scorer, this.cleaner, this, this.minimumTime, this.nonassignedAgents);
-		this.minimumTime			= 3600;
-		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);		
+		this.schedulingModule 		= new PlanomatX12Initialiser(controler);
+		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.tDepDelayCalc, this.locator,
+			this.scorer, this, this.minimumTime, this.nonassignedAgents);
+		this.minimumTime			= 3600;	
 		this.testAgentsNumber		= 5;
 		this.criteria				= new String [2];
 		this.criteria [0]			= "distance";
@@ -117,6 +106,10 @@ public class RecyclingModule implements PlanStrategyModule {
 		}
 		RecyclingModule.assignment = new PrintStream (fileOverview);
 		assignment.println("Agent\tScore\tPlan\n");
+	}
+	
+	private void init(final NetworkLayer network) {
+		this.network.connect();
 	}
 	
 	@SuppressWarnings("unchecked")

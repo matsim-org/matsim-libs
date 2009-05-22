@@ -24,6 +24,7 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import java.util.LinkedList;
 
@@ -40,17 +41,16 @@ public class AgentsAssignmentInitialiser1 extends AgentsAssignmentInitialiser {
 
 		
 	public AgentsAssignmentInitialiser1 (final Controler controler, 
-			final PreProcessLandmarks preProcessRoutingData,
+			final DepartureDelayAverageCalculator 	tDepDelayCalc,
 			final LocationMutatorwChoiceSet locator,
 			final PlanScorer scorer,
-			final ScheduleCleaner cleaner,
 			final RecyclingModule module, 
 			final double minimumTime,
 			final DistanceCoefficients distanceCoefficients,
 			LinkedList<String> nonassignedAgents) {
 		
-		super (controler, preProcessRoutingData, locator, scorer,
-				cleaner, module, minimumTime, nonassignedAgents);
+		super (controler, tDepDelayCalc, locator, scorer,
+				module, minimumTime, nonassignedAgents);
 		this.distanceCoefficients = distanceCoefficients;
 	}
 	
@@ -61,8 +61,8 @@ public class AgentsAssignmentInitialiser1 extends AgentsAssignmentInitialiser {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm agentsAssigner;
 		
-		agentsAssigner = new AgentsAssigner1 (this.controler, this.preProcessRoutingData,
-					this.locator, this.scorer, this.cleaner, this.module, this.minimumTime, this.distanceCoefficients,
+		agentsAssigner = new AgentsAssigner1 (this.controler, this.tDepDelayCalc,
+					this.locator, this.scorer, this.module, this.minimumTime, this.distanceCoefficients,
 					this.nonassignedAgents);
 		
 		return agentsAssigner;

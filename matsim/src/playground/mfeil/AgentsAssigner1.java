@@ -31,6 +31,7 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.ArrayList;
@@ -54,12 +55,12 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, age, sex, license, car_avail, employed;
 	
-	public AgentsAssigner1 (Controler controler, PreProcessLandmarks preProcessRoutingData, 
-			LocationMutatorwChoiceSet locator, PlanScorer scorer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
+	public AgentsAssigner1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc,
+			LocationMutatorwChoiceSet locator, PlanScorer scorer, RecyclingModule recyclingModule,
 			double minimumTime, DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 		
-		super(controler, preProcessRoutingData, locator, scorer,
-				cleaner, recyclingModule, minimumTime, nonassignedAgents);
+		super(controler, tDepDelayCalc, locator, scorer,
+				recyclingModule, minimumTime, nonassignedAgents);
 		this.coefficients = coefficients;
 		this.primActsDistance	="no";
 		this.homeLocation		="no";
