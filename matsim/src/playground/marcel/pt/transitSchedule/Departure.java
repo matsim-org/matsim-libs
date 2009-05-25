@@ -21,11 +21,14 @@
 package playground.marcel.pt.transitSchedule;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
 
 public class Departure {
 
 	private final Id id;
 	private final double departureTime;
+	
+	private BasicVehicle vehicle = null;
 
 	public Departure(final Id id, final double departureTime) {
 		this.id = id;
@@ -38,6 +41,15 @@ public class Departure {
 
 	public double getDepartureTime() {
 		return this.departureTime;
+	}
+	
+	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
+	public void setVehicle(final BasicVehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+	
+	public BasicVehicle getVehicle() {
+		return this.vehicle;
 	}
 
 }
