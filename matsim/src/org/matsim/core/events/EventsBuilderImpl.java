@@ -89,7 +89,13 @@ public class EventsBuilderImpl implements BasicEventsBuilder {
 	public BasicLinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
 		return new LinkLeaveEvent(time, this.scenario.getPopulation().getPersons().get(agentId), this.scenario.getNetwork().getLinks().get(linkId));
 	}
-	
 
+	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+		return new PersonEntersVehicleEvent(time, personId, vehicleId); // TODO [MR] use vehicles once they are available in scenario
+	}
+
+	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+		return new PersonLeavesVehicleEvent(time, personId, vehicleId); // TODO [MR] use vehicles once they are available in scenario
+	}
 
 }

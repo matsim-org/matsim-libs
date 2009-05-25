@@ -29,6 +29,8 @@ import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
+import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
 
 
 /**
@@ -55,5 +57,9 @@ public interface BasicEventsBuilder {
 	BasicActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype);
 
 	BasicAgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
+
+	BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId);
+
+	BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId);
 
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * BasicPersonEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,33 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events;
+package org.matsim.core.basic.v01.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
 
-public class AllTests {
+public interface BasicPersonLeavesVehicleEvent extends BasicPersonEvent {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-
-		suite.addTest(org.matsim.core.events.parallelEventsHandler.AllTests.suite());
-		suite.addTestSuite(ActEndEventTest.class);
-		suite.addTestSuite(ActStartEventTest.class);
-		suite.addTestSuite(AgentArrivalEventTest.class);
-		suite.addTestSuite(AgentDepartureEventTest.class);
-		suite.addTestSuite(AgentMoneyEventTest.class);
-		suite.addTestSuite(AgentStuckEventTest.class);
-		suite.addTestSuite(AgentWait2LinkEventTest.class);
-		suite.addTestSuite(BasicEventsHandlerTest.class);
-		suite.addTestSuite(EventsHandlerHierarchyTest.class);
-		suite.addTestSuite(EventsReadersTest.class);
-		suite.addTestSuite(LinkEnterEventTest.class);
-		suite.addTestSuite(LinkLeaveEventTest.class);
-		suite.addTestSuite(PersonEntersVehicleEventTest.class);
-		suite.addTestSuite(PersonLeavesVehicleEventTest.class);
-
-		return suite;
-	}
+	public Id getVehicleId();
 
 }

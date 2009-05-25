@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.events;
+package org.matsim.core.events;
 
 import org.matsim.core.events.handler.EventHandler;
 

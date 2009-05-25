@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PersonEntersVehicleEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,31 +20,8 @@
 
 package org.matsim.core.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.events.handler.EventHandler;
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-
-		suite.addTest(org.matsim.core.events.parallelEventsHandler.AllTests.suite());
-		suite.addTestSuite(ActEndEventTest.class);
-		suite.addTestSuite(ActStartEventTest.class);
-		suite.addTestSuite(AgentArrivalEventTest.class);
-		suite.addTestSuite(AgentDepartureEventTest.class);
-		suite.addTestSuite(AgentMoneyEventTest.class);
-		suite.addTestSuite(AgentStuckEventTest.class);
-		suite.addTestSuite(AgentWait2LinkEventTest.class);
-		suite.addTestSuite(BasicEventsHandlerTest.class);
-		suite.addTestSuite(EventsHandlerHierarchyTest.class);
-		suite.addTestSuite(EventsReadersTest.class);
-		suite.addTestSuite(LinkEnterEventTest.class);
-		suite.addTestSuite(LinkLeaveEventTest.class);
-		suite.addTestSuite(PersonEntersVehicleEventTest.class);
-		suite.addTestSuite(PersonLeavesVehicleEventTest.class);
-
-		return suite;
-	}
-
+public interface PersonEntersVehicleEventHandler extends EventHandler {
+	public void handleEvent(PersonEntersVehicleEvent event);
 }

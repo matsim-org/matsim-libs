@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonEntersVehicleEventHandler.java
+ * BasicPersonEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,10 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.events;
+package org.matsim.core.basic.v01.events;
 
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
 
-public interface PersonEntersVehicleEventHandler extends EventHandler {
-	public void handleEvent(PersonEntersVehicleEvent event);
+public interface BasicPersonEntersVehicleEvent extends BasicPersonEvent {
+
+	public Id getVehicleId();
+
 }

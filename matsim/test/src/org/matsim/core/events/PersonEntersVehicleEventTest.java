@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonEntersVehicleEvent.java
+ * PersonEntersVehicleEventTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,43 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.events;
-
-import java.util.Map;
+package org.matsim.core.events;
 
 import org.matsim.core.api.population.Person;
-import org.matsim.core.events.PersonEvent;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.testcases.MatsimTestCase;
 
-public class PersonLeavesVehicleEvent extends PersonEvent {
+/**
+ * @author mrieser
+ */
+public class PersonEntersVehicleEventTest extends MatsimTestCase {
 
-	public static final String EVENT_TYPE = "PersonLeavesVehicle";
-
-	final private QueueVehicle vehicle;
-
-	public PersonLeavesVehicleEvent(final double time, final Person person, final QueueVehicle vehicle) {
-		super(time, person);
-		this.vehicle = vehicle;
+	public void testReadWriteXml() {
+		Person person = new PersonImpl(new IdImpl(1));
+		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
+		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(80), vehicleType);
+		PersonEntersVehicleEvent event = new PersonEntersVehicleEvent(5.0 * 3600 + 11.0 * 60, person, vehicle);
+		PersonEntersVehicleEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
+		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), EPSILON);
+		assertEquals("wrong vehicle id.", "80", event2.getVehicleId().toString());
 	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attrs = super.getAttributes();
-		attrs.put("vehicle", this.vehicle.getId().toString());
-		return attrs;
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	public QueueVehicle getVehicle() {
-		return this.vehicle;
-	}
-
-	public String getTextRepresentation() {
-		return "[" + EVENT_TYPE + ": agent: " + this.getPersonId().toString() + "; vehicle: " + this.vehicle.getId() + "]";
-	}
-
 }

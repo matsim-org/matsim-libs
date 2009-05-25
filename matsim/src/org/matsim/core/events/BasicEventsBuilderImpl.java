@@ -72,5 +72,12 @@ public class BasicEventsBuilderImpl implements BasicEventsBuilder {
 	public BasicLinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
 		return new LinkLeaveEvent(time, agentId, linkId);
 	}
-
+	
+	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+		return new PersonEntersVehicleEvent(time, personId, vehicleId);
+	}
+	
+	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+		return new PersonLeavesVehicleEvent(time, personId, vehicleId);
+	}
 }
