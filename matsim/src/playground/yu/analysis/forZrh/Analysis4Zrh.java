@@ -31,6 +31,8 @@ package playground.yu.analysis.forZrh;
  * 
  */
 public interface Analysis4Zrh {
+	static final String KANTON_ZURICH = "Kanton_Zurich", ZURICH = "Zurich";
+
 	public enum ActType {
 		home("h"), work("w"), shopping("s"), education("e"), leisure("l"), others(
 				"o");

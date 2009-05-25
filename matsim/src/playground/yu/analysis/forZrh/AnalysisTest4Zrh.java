@@ -28,14 +28,19 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -53,53 +58,74 @@ import playground.yu.utils.io.SimpleWriter;
  * @author ychen
  * 
  */
-public class AnalysisTest4Zrh {
-	private static final String KANTON_ZURICH = "Kanton_Zurich",
-			ZURICH = "Zurich";
+public class AnalysisTest4Zrh implements Analysis4Zrh {
 
 	private static void printUsage() {
 		System.out.println();
-		System.out.println("AnalysisTest:");
+		System.out.println("AnalysisTest4Zrh:");
 		System.out.println("----------------");
 		System.out
-				.println("Create an additional analysis for the runs, which were done with only org.matsim.controler.Controler");
+				.println("Create an additional analysis for the runs, which were done with only org.matsim.run.Controler");
 		System.out.println();
 		System.out.println("usage: AnalysisTest args");
+		System.out.println(" arg 0:\tname of scenario (for Zurich required)");
+		System.out.println(" arg 1:\trunId");
 		System.out
-				.println(" arg 0: name incl. path to net file (.xml[.gz])(required)");
+				.println(" arg 2:\tname incl. path to net file (.xml[.gz])(required)");
 		System.out
-				.println(" arg 1: name incl. path to events file (.txt[.gz])(required)");
-		System.out.println(" arg 2: path to output file (required)");
+				.println(" arg 3:\tpath to events file, plans file, and analysis files, without the last \"/\"");
+		System.out.println(" args 4:\twhether there is plansfile (true/false)");
 		System.out
-				.println(" arg 3: name incl. path to plans file (.xml[.gz])(optional)");
+				.println(" arg 5:\tsnapshot-period of OTFVis:  Specify how often a snapshot should be taken when reading the events, in seconds.");
 		System.out
-				.println(" arg 4: name of scenario (optional, for Zurich required)");
+				.println(" arg 6:\tname incl. path to facilities file (.xml[.gz])(optional)");
 		System.out
-				.println(" arg 5: name incl. path to toll file (.xml)(optional)");
-		System.out
-				.println(" arg 6: snapshot-period:  Specify how often a snapshot should be taken when reading the events, in seconds.");
-		System.out.println(" arg 7: runId");
+				.println(" arg 7:\tname incl. path to toll file (.xml)(optional)");
 		System.out.println("----------------");
 	}
 
 	private static void runIntern(final String[] args, final String scenario) {
-		final String netFilename = args[0];
-		final String eventsFilename = args[1];
-		String eventsOutputFilename = args[1].replaceFirst("events",
-				"events4mvi");
-		String outputBase = args[2] + args[args.length - 1] + "."
-				+ (scenario.equals("normal") ? "" : scenario + ".");
-		String plansFilename = null;
-		if (args.length >= 4) {
-			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
-				plansFilename = args[3];
-		}
+		final String netFilename = args[2];
+
+		String[] tmp = args[3].split("it.");
+		String outputBase = args[3] + "/" + tmp[tmp.length - 1] + ".";
+		final String eventsFilename = outputBase + "events.txt.gz";
+
+		boolean hasPop = Boolean.parseBoolean(args[4]);
+		String plansFilename = Boolean.parseBoolean(args[4]) ? outputBase
+				+ "plans.xml.gz" : null;
+
+		String eventsOutputFilename = outputBase + "events4mvi.txt.gz";
+		String outputBase4analysis = outputBase + "analysis"
+				+ (scenario.equals(KANTON_ZURICH) ? ".Kanton/" : "/") + args[1]// runId
+				+ "." + (scenario.equals("normal") ? "" : scenario + ".");
+
 		String tollFilename = (!scenario.equals(KANTON_ZURICH)) ? null
-				: args[args.length - 3];
+				: args[args.length - 1];// last parameter, man needs tollFile
+		// only for Kanton_Zurich.
 
-		NetworkLayer network = new NetworkLayer();
+		String facilitiesFilename = null;
+		if (args.length >= 7) {
+			try {
+				if (new MatsimFileTypeGuesser(args[6]).getGuessedFileType()
+						.equals(FileType.Facilities)) {
+					facilitiesFilename = args[6];
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Scenario s = new ScenarioImpl();
+
+		NetworkLayer network = (NetworkLayer) s.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-
+		// facilities
+		ActivityFacilities af = null;
+		if (facilitiesFilename != null) {
+			af = s.getActivityFacilities();
+			new MatsimFacilitiesReader(af).readFile(facilitiesFilename);
+		}
 		// toll
 		RoadPricingScheme toll = null;
 		if (scenario.equals(KANTON_ZURICH)) {
@@ -128,7 +154,7 @@ public class AnalysisTest4Zrh {
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
-			Population population = new PopulationImpl();
+			Population population = s.getPopulation();
 
 			catl = new CalcAverageTripLength();
 			ms = new ModeSplit(toll);
@@ -177,21 +203,22 @@ public class AnalysisTest4Zrh {
 
 		if (orms != null) {
 
-			orms.write(outputBase + "onRoute.txt");
-			orms.writeCharts(outputBase);
+			orms.write(outputBase4analysis + "onRoute.txt");
+			orms.writeCharts(outputBase4analysis);
 		}
 		if (lttms != null) {
-			lttms.write(outputBase + "legtraveltimes.txt.gz");
-			lttms.writeCharts(outputBase + "legtraveltimes");
+			lttms.write(outputBase4analysis + "legtraveltimes.txt.gz");
+			lttms.writeCharts(outputBase4analysis + "legtraveltimes");
 		}
-		clas.write(outputBase + "avgSpeed.txt.gz");
-		clas.writeChart(outputBase + "avgSpeedCityArea.png");
-		ld.write(outputBase + "legDistances.txt.gz");
-		ld.writeCharts(outputBase + "legDistances");
+		clas.write(outputBase4analysis + "avgSpeed.txt.gz");
+		clas.writeChart(outputBase4analysis + "avgSpeedCityArea.png");
+		ld.write(outputBase4analysis + "legDistances.txt.gz");
+		ld.writeCharts(outputBase4analysis + "legDistances");
 
-		SimpleWriter sw = new SimpleWriter(outputBase + "output.txt");
+		SimpleWriter sw = new SimpleWriter(outputBase4analysis + "output.txt");
 		sw.write("netfile:\t" + netFilename + "\neventsFile:\t"
-				+ eventsFilename + "\noutputpath:\t" + outputBase + "\n");
+				+ eventsFilename + "\noutputpath:\t" + outputBase4analysis
+				+ "\n");
 		if (catl != null)
 			sw.write("avg. Trip length:\t" + catl.getAverageTripLength()
 					+ " [m]\n");
@@ -202,11 +229,11 @@ public class AnalysisTest4Zrh {
 		sw.close();
 
 		if (dd != null)
-			dd.write(outputBase);
+			dd.write(outputBase4analysis);
 		if (dert != null)
-			dert.write(outputBase);
+			dert.write(outputBase4analysis);
 		if (ms != null)
-			ms.write(outputBase);
+			ms.write(outputBase4analysis);
 		// otfvis
 		if (toll == null) {
 			SimpleReader sr = new SimpleReader(eventsFilename);
@@ -227,10 +254,11 @@ public class AnalysisTest4Zrh {
 			sw2.close();
 
 			new OTFEvent2MVI(new QueueNetwork(network), eventsOutputFilename,
-					args[2] + "../" + args[args.length - 1] + "."
+					outputBase
 							+ (scenario.equals("normal") ? "" : scenario + ".")
-							+ "vis.mvi", Integer
-							.parseInt(args[args.length - 2])).convert();
+							+ "otfvis.mvi", Integer.parseInt(args[5])// time
+			// interval
+			).convert();
 		}
 		System.out.println("done.");
 	}
@@ -251,13 +279,13 @@ public class AnalysisTest4Zrh {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		if (args.length < 3) {
+		if (args.length < 5) {
+			System.err.println("too few parameters!");
 			printUsage();
-			System.exit(0);
-		} else if (args[3].equals(ZURICH) || args[4].equals(ZURICH)) {
+			System.exit(1);
+		} else if (args[0].equals(ZURICH)) {
 			runZurich(args);
-		} else if (args[3].equals(KANTON_ZURICH)
-				|| args[4].equals(KANTON_ZURICH)) {
+		} else if (args[0].equals(KANTON_ZURICH)) {
 			runKantonZurich(args);
 		} else {
 			run(args);
