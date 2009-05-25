@@ -108,7 +108,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("transitVehicleType"));
 			BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
-			capacity.setSeats(Integer.valueOf(20));
+			capacity.setSeats(Integer.valueOf(21));
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 			
@@ -120,6 +120,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 						TransitQueueVehicle veh = new TransitQueueVehicle(new BasicVehicleImpl(driver.getPerson().getId(), vehicleType), 5);
 						veh.setDriver(driver);
 						driver.setVehicle(veh);
+						departure.setVehicle(veh.getBasicVehicle());
 						QueueLink qlink = this.network.getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 						qlink.addParkedVehicle(veh);
 

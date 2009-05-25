@@ -40,7 +40,7 @@ public class TransitQueueVehicle extends QueueVehicleImpl implements TransitVehi
 	public TransitQueueVehicle(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
 		super(basicVehicle, sizeInEquivalents);
 		BasicVehicleCapacity capacity = basicVehicle.getType().getCapacity();
-		this.passengerCapacity = capacity.getSeats().intValue() + capacity.getStandingRoom().intValue();
+		this.passengerCapacity = capacity.getSeats().intValue() + capacity.getStandingRoom().intValue() - 1; // the driver also takes on seat
 	}
 
 	public boolean addPassenger(final PassengerAgent passenger) {

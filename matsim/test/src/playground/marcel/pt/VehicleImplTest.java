@@ -39,7 +39,7 @@ public class VehicleImplTest extends MatsimTestCase {
 		MockPassengerAgent passenger2 = new MockPassengerAgent(null);
 		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(3));
+		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
 		TransitVehicle vehicle = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(10), vehicleType), 5);
@@ -61,7 +61,7 @@ public class VehicleImplTest extends MatsimTestCase {
 		
 		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(3));
+		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
 		TransitVehicle vehicle = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(55), vehicleType), 5);
