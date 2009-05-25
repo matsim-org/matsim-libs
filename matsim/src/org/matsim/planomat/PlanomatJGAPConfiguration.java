@@ -24,12 +24,12 @@ import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.event.EventManager;
+import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.GABreeder;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
-import org.jgap.impl.WeightedRouletteSelector;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -61,8 +61,14 @@ public class PlanomatJGAPConfiguration extends Configuration {
 
 			// initialize selection:
 			// - weighted roulette wheel selection (standard)
-			WeightedRouletteSelector weightedRouletteSelector = new WeightedRouletteSelector(this);
-			this.addNaturalSelector(weightedRouletteSelector, true);
+//			WeightedRouletteSelector weightedRouletteSelector = new WeightedRouletteSelector(this);
+//			this.addNaturalSelector(weightedRouletteSelector, true);
+			
+			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(
+					this, 0.90d);
+			bestChromsSelector.setDoubletteChromosomesAllowed(false);
+			this.addNaturalSelector(bestChromsSelector, false);
+
 			// - elitism (de Jong, 1975)
 			this.setPreservFittestIndividual(true);
 

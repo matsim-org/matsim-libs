@@ -335,8 +335,10 @@ public class Planomat implements PlanAlgorithm {
 						positionInTimeInterval);
 
 				activityDuration = Math.rint(actLegTimeFrame - anticipatedTravelTime);
-				activityDuration = Math.max(1.0, activityDuration);
-				now += activityDuration;
+//				activityDuration = Math.max(1.0, activityDuration);
+				if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+					now += Math.max(1.0, activityDuration);
+				}
 
 				origin = destination;
 			}

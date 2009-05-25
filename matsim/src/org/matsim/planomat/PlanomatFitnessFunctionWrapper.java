@@ -34,7 +34,20 @@ import org.matsim.planomat.Planomat.StepThroughPlanAction;
  */
 public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
-	private static final double FITNESS_OFFSET = 10000.0;
+	private double m_lastComputedFitnessValue = FitnessFunction.NO_FITNESS_VALUE;
+	
+	@Override
+	public double getFitnessValue(IChromosome a_subject) {
+	    // Delegate to the evaluate() method to actually compute the
+	    // fitness value. If the returned value is less than one,
+	    // then we throw a runtime exception.
+	    // ---------------------------------------------------------
+	    double fitnessValue = evaluate(a_subject);
+	    this.m_lastComputedFitnessValue = fitnessValue;
+	    return fitnessValue;
+	}
+
+//	private static final double FITNESS_OFFSET = 10000.0;
 
 	private static final long serialVersionUID = 1L;
 
@@ -57,7 +70,13 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		// - see that the fitness landscape will not be distorted too much by this, so we will add an offset (this s**ks, but works)
 		// - theoretically is a problem if GA selection is based on score ratio (e.g. weighted roulette wheel selection)
 //		return Math.max(0.0, sf.getScore());
-		return Math.max(0.0, planScore + PlanomatFitnessFunctionWrapper.FITNESS_OFFSET);
+//		return Math.max(0.0, planScore + PlanomatFitnessFunctionWrapper.FITNESS_OFFSET);
+		return planScore;
+	}
+
+	@Override
+	public double getLastComputedFitnessValue() {
+	    return this.m_lastComputedFitnessValue;
 	}
 
 }
