@@ -3,6 +3,7 @@ package playground.mmoyo.PTCase2;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Link;
 
 import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
 import playground.mmoyo.Validators.NetValidator;
@@ -95,9 +96,9 @@ public class PTControler2 {
 	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
-	    		//ptActWriter.writePTActsLegs();
+	    		ptActWriter.writePTActsLegs();
 	    		//ptActWriter.SimplifyPtLegs();
-	    		ptActWriter.printPTLegs();
+	    		//ptActWriter.printPTLegs();
 	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;
@@ -120,9 +121,23 @@ public class PTControler2 {
 	    		//converter.createTransitSchedule(pt.getPtTimeTable(), path + "TransitSim/PtFacilities.xml", path + "TransitSim/transitSchedule.xml");
 	    		//converter.createFacilities("../shared-svn/studies/schweiz-ivtch/pt-experimental/PtFacilities.xml");
 
-//	    		converter.createFacilities(network);
+	    		//converter.createFacilities(network);
 	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "transitSchedule.xml");
-
+	    		break;
+	    	case 9:
+	    		Link l = pt.getPtNetworkLayer().getLink("99");
+	    		System.out.println(pt.getPtTimeTable().GetTransferTime(l, 30701));
+	    		System.out.println("Proximo departure:" + 
+	    		pt.getPtTimeTable().nextDepartureB(l.getToNode().getId(), 30701.0)
+	    		)
+	    		;
+	    		
+	    		/*
+	    		 * link 99 
+					="08:32:41
+					30761
+	    		 * 
+	    		 */
 	    		break;
 		}//switch
 	}//main

@@ -16,7 +16,7 @@ public class PathValidator {
 	
 	/*Conditions:
 	 * No null
-	 * must have at least 3 links
+	 * must have at least 3 links     //-> not necesarly. A path can we also walking
 	 * starts and ends with walking links
 	 * transfer links must be always between standard links
 	 * must not have two adjacent walking links

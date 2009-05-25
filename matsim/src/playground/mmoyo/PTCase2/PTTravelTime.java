@@ -9,10 +9,6 @@ public class PTTravelTime implements TravelTime {
 	double walkSpeed =  Walk.walkingSpeed();
 	private PTTimeTable2 ptTimeTable = new PTTimeTable2();
 	public CostValidator costValidator = new CostValidator();
-	
-	public PTTravelTime() {
-		 
-	}
 
 	public PTTravelTime(PTTimeTable2 ptTimeTable) {
 		this.ptTimeTable = ptTimeTable; 
@@ -32,7 +28,7 @@ public class PTTravelTime implements TravelTime {
 		
 		}else if (type.equals("DetTransfer")){
 			double walkTime=link.getLength()* walkSpeed;
-			double waitingTime= ptTimeTable.GetTransferTime(link.getToNode().getId(), time+walkTime);
+			double waitingTime= transferTime(link, time+walkTime);
 			travelTime= walkTime + waitingTime; 
 			//--> decide if the departures will be saved in map or in Node
 		}

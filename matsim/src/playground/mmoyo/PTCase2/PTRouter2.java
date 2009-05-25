@@ -58,8 +58,8 @@ public class PTRouter2 {
 		//Collection <Node> nearStops2 = net.getNearestNodes(coord2, distToWalk);
 		
 		double distOridDest = CoordUtils.calcDistance(coord1,coord2);
-		Collection <Node> nearStops1 = FindNearStops(coord1, distOridDest, distToWalk);
-		Collection <Node> nearStops2 = FindNearStops(coord2, distOridDest, distToWalk);
+		Collection <Node> nearStops1 = FindNearStops(coord1,  distToWalk);
+		Collection <Node> nearStops2 = FindNearStops(coord2, distToWalk);
 		
 		Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
 		Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
@@ -81,7 +81,8 @@ public class PTRouter2 {
 		return path;
 	}
 	
-	private Collection <Node> FindNearStops (final Coord coord, final double distOrigDestin, final double walkDistance){
+	//if not nodes found in walk range then find the nearest one
+	private Collection <Node> FindNearStops (final Coord coord, final double walkDistance){
 		Collection <Node> NearStops = net.getNearestNodes(coord, walkDistance);
 		if (NearStops.size()==0){
 			Node nearNode = net.getNearestNode(coord);
@@ -90,7 +91,57 @@ public class PTRouter2 {
 			}
 		}
 		return NearStops;
-	}	
+	}
+	
+	//increment walk Range until a path is found!
+	public Path findPTPath(Coord coord1, Coord coord2, double time, double distToWalk){
+		double walkRange= distToWalk; 
+		double OD_Distance = CoordUtils.calcDistance(coord1, coord2);
+		
+		Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
+		Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
+		
+		List <Link> walkingLinkList1 = null;
+		List <Link> walkingLinkList2= null;
+		
+		Collection <Node> nearStops1 = null;
+		Collection <Node> nearStops2 =  null;
+		
+		Path path= null;
+		
+		while (path==null && (walkRange<OD_Distance)){
+			nearStops1 = net.getNearestNodes(coord1, walkRange);
+			nearStops2 = net.getNearestNodes(coord2, walkRange);
+			
+			walkingLinkList1 = CreateWalkingLinks(ptNode1, nearStops1, true);
+			walkingLinkList2 = CreateWalkingLinks(ptNode2, nearStops2, false);
+			
+			path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time); 
+			
+			removeWalkingLinks(walkingLinkList1);
+			removeWalkingLinks(walkingLinkList2);
+			
+			walkRange= walkRange + 300;
+			/*
+			if (walkRange > 1) {
+				System.out.println("coord1:" + coord1 + " coord2:" + coord2 + "distToWalk: " + walkRange + " OD_Distance: " + OD_Distance + " inRange: "+ nearStops1.size() );
+			}
+			*/
+			
+		}
+	
+		if (path!=null){
+			path.nodes.remove(ptNode1);
+			path.nodes.remove(ptNode2);
+		}
+
+		net.removeNode(ptNode1);
+		net.removeNode(ptNode2);
+		
+		return path;
+	}
+	
+	
 	
 	public Node CreateWalkingNode(Id idNode, Coord coord) {
 		Node node = new PTNode(idNode, coord, "Walking");

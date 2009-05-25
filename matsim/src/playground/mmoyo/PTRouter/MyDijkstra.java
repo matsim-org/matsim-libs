@@ -17,16 +17,13 @@ public class MyDijkstra extends Dijkstra{
 	
 	}
 
-	
 	/*
-	 * Make public the inner class Dikjstra.DijkstraNodeData?   or create a public method only to return the prev Link 
-	
+	 // Make public the inner class Dikjstra.DijkstraNodeData?   or create a public method only to return the prev Link 
 	protected boolean canPassLink(final Link link) {
 		DijkstraNodeData fromNodeData= getData(link.getFromNode());
 		Link lastLink = fromNodeData.getPrevLink();
 		return pathVal.canPassLink(lastLink, link);	
 	}
 	*/
-	
 	
 }

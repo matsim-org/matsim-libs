@@ -32,17 +32,16 @@ public class TransitRouteFinder {
 
 		String linkType;
 		String lastLinkType= null;
-		boolean first = true;
 
 		List <Link> linkList = new ArrayList<Link>();
-		double depTime=0;
-		double travTime= fromAct.getEndTime();
+		double depTime=fromAct.getEndTime();
+		double travTime= depTime;
 		
+		int i=1;
 		for (Link link: path.links){
 			linkType = link.getType();
-			travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
 			
-			if (!first){
+			if (i>1){
 				if (!linkType.equals(lastLinkType)){
 					Leg newLeg = createLeg(selectMode(lastLinkType), linkList, depTime, travTime);  
 					legList.add(newLeg);
@@ -50,21 +49,28 @@ public class TransitRouteFinder {
 					depTime=travTime;
 					linkList = new ArrayList<Link>();
 				}
-			}else{
-				first= false;
+				if (i == path.links.size()){
+					//-> check time formats or if it must be converted in seconds
+					
+					travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
+					Leg newLeg = createLeg(selectMode(linkType), linkList, depTime, travTime);  
+					legList.add(newLeg);
+				}
 			}
+			travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
 			linkList.add(link);
 			lastLinkType = linkType;
+			i++;
 		}
 		return legList;
 	}
 	
 	private TransportMode selectMode(String linkType){
 		TransportMode mode = null;
-		if (linkType.equals("Walk") || linkType.equals("DetTransfer")){ 
-			mode=  TransportMode.walk;
-		}else{
+		if (linkType.equals("Standard")){ 
 			mode=  TransportMode.pt;
+		}else{
+			mode=  TransportMode.walk;
 		}
 		return mode;
 	}

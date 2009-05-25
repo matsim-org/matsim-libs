@@ -49,14 +49,18 @@ public class PTTimeTable2{
 				minuteMap.put(idNode, minAfterDep);
 
 				//Fills the map with arrivals for every node
-				//double[] departuresArray =ptLine.getDepartures().toArray(new double[ptLine.getDepartures().size()]);
 				double[] departuresArray =new double[ptLine.getDepartures().size()];					
 				int y=0;
-				
 				for (String departure : ptLine.getDepartures()){
-					departuresArray[y++]=  time.parseTime(departure) + (minAfterDep*60);
+					//It could happen that a departure occurs after 24:00 (86,400 seconds after midnight)
+					//In this case the departure will be set at the beginning as a early departure of the day
+					double dep = time.parseTime(departure) + (minAfterDep*60);
+					if (dep > 86400) dep=dep-86400;
+					departuresArray[y++]=  dep;
 				}
+				Arrays.sort(departuresArray);
 				nodeDeparturesMap.put(idNode, departuresArray);
+
 				x++;
 			
 				/*
@@ -94,11 +98,7 @@ public class PTTimeTable2{
 
 	//minutes
 	public double GetTransferTime(Link link, double time){
-		return GetTransferTime(link.getToNode().getId(),time); 
-	}
-	
-	public double GetTransferTime(Id idPTNode, double time){
-		double nextDeparture = nextDepartureB(idPTNode,time); 
+	 	double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
 		double transferTime= 0;
 		if (nextDeparture>=time){
 			transferTime= nextDeparture-time;
@@ -108,6 +108,7 @@ public class PTTimeTable2{
 		}
 		return transferTime;
 	}
+	
 	
 	/*
 	*If dblTime is greater than the last departure, 
@@ -134,10 +135,25 @@ public class PTTimeTable2{
 		return nextLinkMap;
 	}
 
+	/*
+	 * This should not be necessary
+	 */
 	public void putNextDTLink(Id id, Link link) {
 		nextLinkMap.put(id, link);
 	}
+	
 		
+	public void printDepartures(){
+		for (Map.Entry <Id,double[]> departuresMap : nodeDeparturesMap.entrySet()){
+			System.out.println("\n node:" + departuresMap.getKey());
+			double[] departures = departuresMap.getValue();
+			for (int x=0; x< departures.length; x++){
+				System.out.print(departures[x] + " ");
+				//System.out.print(TimeToString(departures[x])+ " ");	
+			}
+		}
+	}
+	
 		
 }
 

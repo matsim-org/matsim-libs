@@ -120,7 +120,8 @@ public class PTTimeTable {
 				System.out.println("\n Node:"+ idNode + " = Line:" + entry2.getKey());
 				int[] departures = entry2.getValue();
 				for (int x=0; x< departures.length; x++){
-					System.out.print(TimeToString(departures[x])+ " ");	
+					System.out.print(departures[x] + " ");
+					//System.out.print(TimeToString(departures[x])+ " ");	
 				}
 			}
 		}
