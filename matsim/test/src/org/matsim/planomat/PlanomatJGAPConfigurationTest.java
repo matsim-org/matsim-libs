@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.jgap.BaseGeneticOperator;
+import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
-import org.jgap.impl.WeightedRouletteSelector;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
@@ -74,9 +74,9 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		}
 		
 		// test correct setting of natural selector
-		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));
-		assertEquals(1, jgapConfig.getNaturalSelectorsSize(true));
-		assertEquals(WeightedRouletteSelector.class, jgapConfig.getNaturalSelector(true, 0).getClass());
+		assertEquals(1, jgapConfig.getNaturalSelectorsSize(false));
+		assertEquals(0, jgapConfig.getNaturalSelectorsSize(true));
+		assertEquals(BestChromosomesSelector.class, jgapConfig.getNaturalSelector(false, 0).getClass());
 
 		// test correct setting of population size
 		int expectedPopSize = 14;
@@ -127,9 +127,9 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		}
 
 		// test correct setting of natural selector
-		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));
-		assertEquals(1, jgapConfig.getNaturalSelectorsSize(true));
-		assertEquals(WeightedRouletteSelector.class, jgapConfig.getNaturalSelector(true, 0).getClass());
+		assertEquals(1, jgapConfig.getNaturalSelectorsSize(false));
+		assertEquals(0, jgapConfig.getNaturalSelectorsSize(true));
+		assertEquals(BestChromosomesSelector.class, jgapConfig.getNaturalSelector(false, 0).getClass());
 
 		// test correct setting of population size
 		int expectedPopSize = 16;
