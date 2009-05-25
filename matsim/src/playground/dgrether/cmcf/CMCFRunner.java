@@ -54,8 +54,8 @@ public class CMCFRunner {
 		if (!visualizationOnly) {			
 			Controler controler = new Controler(CMCFScenarioGenerator.configOut);
 			final LinkSensorManager lsm = new LinkSensorManager();
-			lsm.addLinkSensor("3");
-			lsm.addLinkSensor("4");
+			lsm.addLinkSensor(new IdImpl("3"));
+			lsm.addLinkSensor(new IdImpl("4"));
 			controler.setOverwriteFiles(true);
 //			controler.addControlerListener(new StartupListener() {
 //				public void notifyStartup(StartupEvent e) {

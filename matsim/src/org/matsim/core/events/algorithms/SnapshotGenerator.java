@@ -28,25 +28,24 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.PersonEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DisplayNetStateWriter;
@@ -55,8 +54,8 @@ import org.matsim.vis.netvis.VisConfig;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
-public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
-		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
+public class SnapshotGenerator implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler,
+		BasicLinkLeaveEventHandler, BasicAgentWait2LinkEventHandler, BasicAgentStuckEventHandler {
 
 	private final Network network;
 	private int lastSnapshotIndex = -1;
@@ -87,32 +86,32 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		return this.snapshotWriters.remove(writer);
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).departure(getEventAgent(event));
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).arrival(getEventAgent(event));
 	}
 
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event));
 	}
 
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event));
 	}
 
-	public void handleEvent(final AgentWait2LinkEvent event) {
+	public void handleEvent(final BasicAgentWait2LinkEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event));
 	}
 
-	public void handleEvent(final AgentStuckEvent event) {
+	public void handleEvent(final BasicAgentStuckEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event));
 	}
@@ -126,10 +125,10 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		this.lastSnapshotIndex = -1;
 	}
 
-	private EventAgent getEventAgent(final PersonEvent event) {
+	private EventAgent getEventAgent(final BasicPersonEvent event) {
 		EventAgent agent = this.eventAgents.get(event.getPersonId());
 		if (agent == null) {
-			agent = new EventAgent(event.getPersonId().toString(), event.getTime());
+			agent = new EventAgent(event.getPersonId(), event.getTime());
 			this.eventAgents.put(event.getPersonId(), agent);
 		}
 		agent.time = event.getTime();
@@ -429,7 +428,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	}
 
 	private static class EventAgent implements Comparable<EventAgent>, DrawableAgentI {
-		protected final IdImpl id;
+		protected final Id id;
 		protected final int intId;
 		protected double time;
 		protected EventLink currentLink = null;
@@ -437,8 +436,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		protected int lane = 1;
 		protected double linkPosition = 0.0;
 
-		protected EventAgent(final String id, final double time) {
-			this.id = new IdImpl(id);
+		protected EventAgent(final Id id, final double time) {
+			this.id = id;
 			this.time = time;
 			this.intId = id.hashCode();
 		}

@@ -23,24 +23,26 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
 
 /**
  * Computes average departure delay on a link in a given time slot.
  *
  * @author meisterk
  */
-public class DepartureDelayAverageCalculator implements AgentDepartureEventHandler, LinkLeaveEventHandler {
+public class DepartureDelayAverageCalculator implements BasicAgentDepartureEventHandler, BasicLinkLeaveEventHandler {
 
-	private Network network;
+	private BasicNetwork<? extends BasicNode, ? extends BasicLink> network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
-	private final HashMap<Link, DepartureDelayData> linkData;
+	private final HashMap<Id, DepartureDelayData> linkData;
 	
 	private static final Logger log = Logger.getLogger(DepartureDelayAverageCalculator.class);
 
@@ -48,11 +50,11 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public DepartureDelayAverageCalculator(Network network, int timeBinSize) {
+	public DepartureDelayAverageCalculator(BasicNetwork<? extends BasicNode, ? extends BasicLink> network, int timeBinSize) {
 		super();
 		this.network = network;
 		this.timeBinSize = timeBinSize;
-		this.linkData = new HashMap<Link, DepartureDelayData>(this.network.getLinks().size());
+		this.linkData = new HashMap<Id, DepartureDelayData>(this.network.getLinks().size());
 		this.resetDepartureDelays();
 	}
 
@@ -63,8 +65,8 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	 * @param departureTime
 	 * @return departure delay estimation
 	 */
-	public double getLinkDepartureDelay(Link link, double departureTime) {
-		DepartureDelayData ddd = this.getDepartureDelayRole(link);
+	public double getLinkDepartureDelay(BasicLink link, double departureTime) {
+		DepartureDelayData ddd = this.getDepartureDelayRole(link.getId());
 		if (ddd == null) {
 			return 0.0;
 		}
@@ -126,20 +128,16 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 
 	}
 
-	private DepartureDelayData getDepartureDelayRole(Link l) {
-		return this.linkData.get(l);
+	private DepartureDelayData getDepartureDelayRole(Id linkId) {
+		return this.linkData.get(linkId);
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of EventAlgorithmI
-	//////////////////////////////////////////////////////////////////////
-
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(BasicAgentDepartureEvent event) {
 		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 		this.departureEventsTimes.put(depEvent, event.getTime());
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		DepartureEvent removeMe = new DepartureEvent(event.getPersonId());
 		Double departureTime = departureEventsTimes.remove(removeMe);
 		if (departureTime != null) {
@@ -147,16 +145,13 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 			if (departureDelay < 0) {
 				throw new RuntimeException("departureDelay cannot be < 0.");
 			}
-			Link link = event.getLink();
-			if (null == link) link = this.network.getLink(event.getLinkId());
-			if (null != link) {
-				DepartureDelayData ddd = this.getDepartureDelayRole(link);
-				if (ddd == null) {
-					ddd = new DepartureDelayData();
-					this.linkData.put(link, ddd);
-				}
-				ddd.addDepartureDelay(departureTime, departureDelay);
+			Id linkId = event.getLinkId();
+			DepartureDelayData ddd = this.getDepartureDelayRole(linkId);
+			if (ddd == null) {
+				ddd = new DepartureDelayData();
+				this.linkData.put(linkId, ddd);
 			}
+			ddd.addDepartureDelay(departureTime, departureDelay);
 		}
 	}
 

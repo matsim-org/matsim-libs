@@ -25,30 +25,32 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
  *
  * @author mrieser
  */
-public class VolumesAnalyzer implements LinkLeaveEventHandler {
+public class VolumesAnalyzer implements BasicLinkLeaveEventHandler {
 
 	private final int timeBinSize;
 	private final int maxTime;
 	private final int maxSlotIndex;
 	private final Map<Id, int[]> links;
 
-	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network) {
+	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final BasicNetwork<? extends BasicNode, ? extends BasicLink> network) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
 		this.links = new HashMap<Id, int[]>((int) (network.getLinks().size() * 1.1), 0.95f);
 	}
 
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		int[] volumes = this.links.get(event.getLinkId());
 		if (volumes == null) {
 			volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs

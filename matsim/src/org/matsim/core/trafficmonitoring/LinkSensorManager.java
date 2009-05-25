@@ -23,8 +23,9 @@ package org.matsim.core.trafficmonitoring;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 
 
 /**
@@ -33,29 +34,22 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
  * appropriate method of this class.
  *
  * @author dgrether
- *
  */
-public class LinkSensorManager implements LinkLeaveEventHandler {
-	/**
-	 * zero
-	 */
+public class LinkSensorManager implements BasicLinkLeaveEventHandler {
+	
 	private static final Integer ZERO = Integer.valueOf(0);
+	
 	/**
 	 * maps the ids of the links to integers, which represent the amount of traffic on
 	 * the link
 	 */
-	private Map<String, Integer> linkCountMap;
-	/**
-	 * Initializes the fields
-	 */
-	public LinkSensorManager() {
-		this.linkCountMap = new HashMap<String, Integer>();
-	}
+	private final Map<Id, Integer> linkCountMap = new HashMap<Id, Integer>();
+
 	/**
 	 * Adds a traffic sensor to the link with the given id.
 	 * @param id
 	 */
-	public void addLinkSensor(final String id) {
+	public void addLinkSensor(final Id id) {
 		this.linkCountMap.put(id, ZERO);
 	}
 	/**
@@ -66,7 +60,7 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 * @param id
 	 * @return the  number of cars for link id since the last time the link traffic was queried by this method
 	 */
-	public int getLinkTraffic(final String id) {
+	public int getLinkTraffic(final Id id) {
 		if (this.linkCountMap.containsKey(id)) {
 			int i = this.linkCountMap.get(id).intValue();
 			this.linkCountMap.put(id, ZERO);
@@ -78,11 +72,11 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 * For each LinkLeaveEvent the corresponding traffic count value is incremented.
 	 * @see org.matsim.core.events.handler.LinkLeaveEventHandler#handleEvent(org.matsim.core.events.LinkLeaveEvent)
 	 */
-	public void handleEvent(final LinkLeaveEvent event) {
-		if (this.linkCountMap.containsKey(event.getLinkId().toString())) {
-			int i = this.linkCountMap.get(event.getLinkId().toString()).intValue();
+	public void handleEvent(final BasicLinkLeaveEvent event) {
+		if (this.linkCountMap.containsKey(event.getLinkId())) {
+			int i = this.linkCountMap.get(event.getLinkId()).intValue();
 			i++;
-			this.linkCountMap.put(event.getLinkId().toString(), Integer.valueOf(i));
+			this.linkCountMap.put(event.getLinkId(), Integer.valueOf(i));
 		}
 
 	}
@@ -92,7 +86,7 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 */
 	public void reset(final int iteration) {
 
-		for (String id : this.linkCountMap.keySet()) {
+		for (Id id : this.linkCountMap.keySet()) {
 			this.linkCountMap.put(id, ZERO);
 		}
 	}

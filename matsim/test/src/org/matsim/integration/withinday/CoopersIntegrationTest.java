@@ -19,6 +19,7 @@
 
 package org.matsim.integration.withinday;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -42,9 +43,6 @@ import org.matsim.withinday.coopers.CoopersControler;
  */
 public class CoopersIntegrationTest extends MatsimTestCase {
 
-	/**
-	 * @see org.matsim.testcases.MatsimTestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -70,15 +68,15 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
-	  lsm.addLinkSensor("5");
-	  lsm.addLinkSensor("7");
+	  lsm.addLinkSensor(new IdImpl("5"));
+	  lsm.addLinkSensor(new IdImpl("7"));
 	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
 		
 		//as no control is used all vehicles have to stay at their initial route 
-		assertEquals(17, lsm.getLinkTraffic("5"));
-		assertEquals(0, lsm.getLinkTraffic("7"));		
+		assertEquals(17, lsm.getLinkTraffic(new IdImpl("5")));
+		assertEquals(0, lsm.getLinkTraffic(new IdImpl("7")));
 	}
 
 	
@@ -101,14 +99,14 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
-	  lsm.addLinkSensor("5");
-	  lsm.addLinkSensor("7");
+	  lsm.addLinkSensor(new IdImpl("5"));
+	  lsm.addLinkSensor(new IdImpl("7"));
 	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
 		//10 cars have to be guided to the alternative route
-		assertEquals(7, lsm.getLinkTraffic("5"));
-		assertEquals(10, lsm.getLinkTraffic("7"));		
+		assertEquals(7, lsm.getLinkTraffic(new IdImpl("5")));
+		assertEquals(10, lsm.getLinkTraffic(new IdImpl("7")));		
 	}
 
 	
@@ -131,13 +129,13 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
-	  lsm.addLinkSensor("10");
-	  lsm.addLinkSensor("20");
+	  lsm.addLinkSensor(new IdImpl("10"));
+	  lsm.addLinkSensor(new IdImpl("20"));
 	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
-		int count10 = lsm.getLinkTraffic("10");
-		int count20 = lsm.getLinkTraffic("20");
+		int count10 = lsm.getLinkTraffic(new IdImpl("10"));
+		int count20 = lsm.getLinkTraffic(new IdImpl("20"));
 		System.out.println("traffic link 10: " + count10);
 		System.out.println("traffic link 20: " + count20);
 		assertEquals(2051, count10);
@@ -163,13 +161,13 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
-	  lsm.addLinkSensor("10");
-	  lsm.addLinkSensor("20");
+	  lsm.addLinkSensor(new IdImpl("10"));
+	  lsm.addLinkSensor(new IdImpl("20"));
 	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
-		int count10 = lsm.getLinkTraffic("10");
-		int count20 = lsm.getLinkTraffic("20");
+		int count10 = lsm.getLinkTraffic(new IdImpl("10"));
+		int count20 = lsm.getLinkTraffic(new IdImpl("20"));
 		System.out.println("traffic link 10: " + count10);
 		System.out.println("traffic link 20: " + count20);
 		assertEquals(3411, count10);
@@ -195,13 +193,13 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
-	  lsm.addLinkSensor("10");
-	  lsm.addLinkSensor("20");
+	  lsm.addLinkSensor(new IdImpl("10"));
+	  lsm.addLinkSensor(new IdImpl("20"));
 	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
-		int count10 = lsm.getLinkTraffic("10");
-		int count20 = lsm.getLinkTraffic("20");
+		int count10 = lsm.getLinkTraffic(new IdImpl("10"));
+		int count20 = lsm.getLinkTraffic(new IdImpl("20"));
 		System.out.println("traffic link 10: " + count10);
 		System.out.println("traffic link 20: " + count20);
 		assertEquals(2538, count10);

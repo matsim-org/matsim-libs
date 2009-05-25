@@ -26,10 +26,11 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -38,24 +39,24 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public class LinkQueueStats implements LinkEnterEventHandler, LinkLeaveEventHandler {
+public class LinkQueueStats implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
 
-	private String linkId;
+	private Id linkId;
 	private SortedSet<Double> enterTimes = new TreeSet<Double>();
 	private SortedSet<Double> leaveTimes = new TreeSet<Double>();
 
-	public LinkQueueStats(String linkId) {
+	public LinkQueueStats(Id linkId) {
 		this.linkId = linkId;
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
-		if (event.getLinkId().toString().equals(this.linkId)) {
+	public void handleEvent(BasicLinkEnterEvent event) {
+		if (event.getLinkId().equals(this.linkId)) {
 			enterTimes.add(event.getTime());
 		}
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
-		if (event.getLinkId().toString().equals(this.linkId)) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
+		if (event.getLinkId().equals(this.linkId)) {
 			leaveTimes.add(event.getTime());
 		}
 	}

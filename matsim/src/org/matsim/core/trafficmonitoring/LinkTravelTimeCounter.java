@@ -24,19 +24,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 /**
  * @author dgrether
  */
-public class LinkTravelTimeCounter implements LinkEnterEventHandler, LinkLeaveEventHandler,
-AgentArrivalEventHandler {
+public class LinkTravelTimeCounter implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler {
 	/**
 	 * singleton variable
 	 */
@@ -55,7 +54,7 @@ AgentArrivalEventHandler {
 		events.addHandler(instance);
 	}
 
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 		this.enterEvents.put(event.getPersonId(), Double.valueOf(event.getTime()));
 	}
 
@@ -64,14 +63,14 @@ AgentArrivalEventHandler {
 		this.travelTimes.clear();
 	}
 
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		Double startTime = this.enterEvents.get(event.getPersonId());
 		if (startTime != null) {
 			this.travelTimes.put(event.getLinkId(), event.getTime() - startTime.doubleValue());
 		}
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		this.enterEvents.remove(event.getPersonId());
 	}
 

@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -45,7 +45,7 @@ import org.matsim.core.utils.misc.Time;
  * Also calculates the average trip duration.
  * Trips ended because of vehicles being stuck are not counted.
  */
-public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
@@ -61,14 +61,17 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		this.population = population;
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 		Integer cnt = this.agentLegs.get(event.getPersonId());
-		if (cnt == null) cnt = 0;
-		this.agentLegs.put(event.getPersonId(), cnt+1);
+		if (cnt == null) {
+			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1));
+		} else {
+			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1 + cnt.intValue()));
+		}
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {

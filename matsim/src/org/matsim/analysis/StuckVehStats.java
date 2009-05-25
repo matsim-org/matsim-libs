@@ -23,40 +23,41 @@ package org.matsim.analysis;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.utils.misc.Time;
 
-public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEventHandler, AgentWait2LinkEventHandler {
+public class StuckVehStats implements BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentWait2LinkEventHandler {
 
-	private TreeMap<String, ArrayList<Double>> stuckLinkTimes = new TreeMap<String, ArrayList<Double>>(); // <Link, <Time>>, the times an agent is stuck for each link
+	private TreeMap<Id, ArrayList<Double>> stuckLinkTimes = new TreeMap<Id, ArrayList<Double>>(); // <Link, <Time>>, the times an agent is stuck for each link
 	private int[] stuckTimes = new int[24*4 + 1]; // the time of day agents get stuck; counts per 15min-slots; up to 24 hours
-	private TreeMap<String, Double> depTimes = new TreeMap<String, Double>(); // the time of an agent's last departure event
-	private TreeMap<String, Double> wait2linkTimes = new TreeMap<String, Double>(); // the time of an agent's last wait2link-event
+	private TreeMap<Id, Double> depTimes = new TreeMap<Id, Double>(); // the time of an agent's last departure event
+	private TreeMap<Id, Double> wait2linkTimes = new TreeMap<Id, Double>(); // the time of an agent's last wait2link-event
 	private int[] waitTimes = new int[2*60 + 1]; // the time an agent spends waiting to enter a link from parking; counts per minute up to 2 hours
 	private int[] driveTimes = new int[2*60 + 1]; // the time an agent spends driving until it is stuck; counts per minute up to 2 hours
 	private int[] travelTimes = new int[2*60 + 1]; // the time an agent spends traveling (wait2link + drive) until it is stuck
-	private Network network = null;
+	private BasicNetwork<? extends BasicNode, ? extends BasicLink> network = null;
 	
-	public StuckVehStats(Network network) {
+	public StuckVehStats(BasicNetwork<? extends BasicNode, ? extends BasicLink> network) {
 		this.network = network;
 		reset(-1);
 	}
 	
-	public void handleEvent(AgentDepartureEvent event) {
-		depTimes.put(event.getPersonId().toString(), event.getTime());
+	public void handleEvent(BasicAgentDepartureEvent event) {
+		depTimes.put(event.getPersonId(), event.getTime());
 	}
 
-	public void handleEvent(AgentWait2LinkEvent event) {
-		wait2linkTimes.put(event.getPersonId().toString(), event.getTime());
-		Double depTime = depTimes.get(event.getPersonId().toString());
+	public void handleEvent(BasicAgentWait2LinkEvent event) {
+		wait2linkTimes.put(event.getPersonId(), event.getTime());
+		Double depTime = depTimes.get(event.getPersonId());
 		if (depTime != null) {
 			int slot = (int)((event.getTime() - depTime) / 60);
 			if (slot > 120) slot = 120;
@@ -64,26 +65,26 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		}
 	}
 
-	public void handleEvent(AgentStuckEvent event) {
-		ArrayList<Double> times = stuckLinkTimes.get(event.getLinkId().toString());			
+	public void handleEvent(BasicAgentStuckEvent event) {
+		ArrayList<Double> times = stuckLinkTimes.get(event.getLinkId());			
 		if (times == null) {
 			times = new ArrayList<Double>(50);
 		}
 		times.add(event.getTime());
-		stuckLinkTimes.put(event.getLinkId().toString(), times);
+		stuckLinkTimes.put(event.getLinkId(), times);
 		
 		int timeslot = (int)(event.getTime() / 900);
 		if (timeslot > 24*4) timeslot = 24*4;
 		stuckTimes[timeslot]++;
 		
-		Double wait2linkTime = wait2linkTimes.remove(event.getPersonId().toString());
+		Double wait2linkTime = wait2linkTimes.remove(event.getPersonId());
 		if (wait2linkTime != null) {
 			int slot = (int)((event.getTime() - wait2linkTime) / 60);
 			if (slot > 120) slot = 120;
 			driveTimes[slot]++;
 		}
 		
-		Double depTime = depTimes.remove(event.getPersonId().toString());
+		Double depTime = depTimes.remove(event.getPersonId());
 		if (depTime != null) {
 			int slot = (int)((event.getTime() - depTime) / 60);
 			if (slot > 120) slot = 120;
@@ -134,10 +135,10 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		System.out.println();
 		System.out.println("Links on which vehicles get stuck");
 		System.out.println("LINK\tCAPACITY\tFREESPEED\tLENGTH\tcountStuck\ttimesStuck");
-		for (String linkId : stuckLinkTimes.keySet()) {
+		for (Id linkId : stuckLinkTimes.keySet()) {
 			ArrayList<Double> times = stuckLinkTimes.get(linkId);
-			Link link = network.getLink(new IdImpl(linkId));
-			System.out.print(linkId + "\t" + link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
+			BasicLink link = network.getLinks().get(linkId);
+			System.out.print(linkId + "\t" + link.getCapacity(Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
 			for (Double time : times) System.out.print(time + " ");
 			System.out.println();
 		}
