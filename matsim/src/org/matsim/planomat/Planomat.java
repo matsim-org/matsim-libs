@@ -80,6 +80,7 @@ public class Planomat implements PlanAlgorithm {
 	private final boolean doLogging = this.config.isDoLogging();
 
 	private PlanAnalyzeSubtours planAnalyzeSubtours = null;
+	private ScoringFunction scoringFunction = null;
 
 	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
 
@@ -89,6 +90,9 @@ public class Planomat implements PlanAlgorithm {
 	}
 
 	public void run(final Plan plan) {
+		
+		this.scoringFunction = this.scoringFunctionFactory.getNewScoringFunction(plan);
+		
 		if (this.doLogging) {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
 		}
@@ -225,9 +229,6 @@ public class Planomat implements PlanAlgorithm {
 		// TODO comment this
 		double positionInTimeInterval = 0.5;
 
-		ScoringFunction scoringFunction = null;
-		scoringFunction = this.scoringFunctionFactory.getNewScoringFunction(plan);
-
 		Route tempRoute = null;
 		Leg leg = null;
 		Activity origin = null;
@@ -236,6 +237,9 @@ public class Planomat implements PlanAlgorithm {
 		List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 		int numLegs = actslegs.size() / 2;
 
+		this.scoringFunction.reset();
+		
+		
 		// TODO this as a quick and dirty implementation that takes a lot of resources
 		// replace activity duration encoding with double [0.0,1.0] or time slots, respectively
 		int sumOfAllActDurs = 0;
@@ -255,11 +259,6 @@ public class Planomat implements PlanAlgorithm {
 		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 			positionInTimeInterval = this.seedGenerator.nextDouble();
 		}
-//		double activityDuration = Math.rint(this.getEffectiveActLegTimeFrame(
-//				((IntegerGene) individual.getGene(0)).intValue(), 
-//				this.numTimeIntervals, 
-//				positionInTimeInterval));
-//		now += activityDuration;
 
 		now += Math.rint(this.getEffectiveActLegTimeFrame(
 				((IntegerGene) individual.getGene(0)).intValue(), 
@@ -341,10 +340,6 @@ public class Planomat implements PlanAlgorithm {
 						sumOfAllActDurs, 
 						positionInTimeInterval);
 
-//				activityDuration = Math.rint(actLegTimeFrame - anticipatedTravelTime);
-//				oldNow = now;
-//				now += activityDuration;
-				
 				oldNow = now;
 				now += Math.rint(actLegTimeFrame - anticipatedTravelTime);
 				
