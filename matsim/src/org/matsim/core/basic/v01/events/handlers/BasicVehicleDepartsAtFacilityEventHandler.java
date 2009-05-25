@@ -20,7 +20,7 @@
 
 package org.matsim.core.basic.v01.events.handlers;
 
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -28,6 +28,6 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public interface BasicVehicleDepartsAtFacilityEventHandler extends EventHandler {
 
-	public void handleEvent(BasicVehicleArrivesAtFacilityEvent event);
+	public void handleEvent(BasicVehicleDepartsAtFacilityEvent event);
 	
 }
