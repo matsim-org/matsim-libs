@@ -29,6 +29,12 @@ import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
+import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
+import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
 
 
 /**
@@ -73,11 +79,19 @@ public class BasicEventsBuilderImpl implements BasicEventsBuilder {
 		return new LinkLeaveEvent(time, agentId, linkId);
 	}
 	
-	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	public BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		return new PersonEntersVehicleEvent(time, personId, vehicleId);
 	}
 	
-	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	public BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		return new PersonLeavesVehicleEvent(time, personId, vehicleId);
+	}
+	
+	public BasicVehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
+		return new BasicVehicleArrivesAtFacilityEventImpl(time, vehicleId, facilityId);
+	}
+	
+	public BasicVehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
+		return new BasicVehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId);
 	}
 }

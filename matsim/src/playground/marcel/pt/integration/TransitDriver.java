@@ -30,6 +30,7 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -144,10 +145,13 @@ public class TransitDriver implements TransitDriverAgent {
 					cntAccess++;
 				}
 			}
+			double stopTime = 0.0;
 			if (cntAccess > 0 || cntEgress > 0) {
-				return 10.0 + cntAccess * 5 + cntEgress * 3;
+				stopTime = 10.0 + cntAccess * 5 + cntEgress * 3;
+				TransitQueueSimulation.getEvents().processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
+				TransitQueueSimulation.getEvents().processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now + stopTime, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 			}
-			return 0.0;
+			return stopTime;
 		}
 
 		public double getDepartureTime() {

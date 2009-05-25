@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * VehicleArrivesAtFacilityEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Map;
 
-public class AllTests {
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.events.BasicEventImpl;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicLinkImplTest.class);
-		suite.addTest(org.matsim.core.basic.v01.events.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.vehicles.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.households.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+/**
+ * @author mrieser
+ */
+public class BasicVehicleArrivesAtFacilityEventImpl extends BasicEventImpl implements
+		BasicVehicleArrivesAtFacilityEvent {
+
+	private final Id vehicleId;
+	private final Id facilityId;
+
+	public BasicVehicleArrivesAtFacilityEventImpl(final double time, final Id vehicleId, final Id facilityId) {
+		super(time);
+		this.vehicleId = vehicleId;
+		this.facilityId = facilityId;
+	}
+
+	public Id getFacilityId() {
+		return this.facilityId;
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attributes = super.getAttributes();
+		attributes.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attributes.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
+		return attributes;
+	}
+
+	@Override
+	public String getTextRepresentation() {
+		throw new UnsupportedOperationException("writing to txt events is not supported.");
 	}
 
 }

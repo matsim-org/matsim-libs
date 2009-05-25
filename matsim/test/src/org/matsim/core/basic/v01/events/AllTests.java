@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.events;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,10 +28,8 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicLinkImplTest.class);
-		suite.addTest(org.matsim.core.basic.v01.events.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.vehicles.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.households.AllTests.suite());
+		suite.addTestSuite(BasicVehicleArrivesAtFacilityEventImplTest.class);
+		suite.addTestSuite(BasicVehicleDepartsAtFacilityEventImplTest.class);
 		//$JUnit-END$
 		return suite;
 	}

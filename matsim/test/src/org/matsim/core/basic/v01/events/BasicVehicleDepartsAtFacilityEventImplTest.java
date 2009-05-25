@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * BasicVehicleArrivesAtFacilityEventTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.XmlEventsTester;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
+public class BasicVehicleDepartsAtFacilityEventImplTest extends MatsimTestCase {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicLinkImplTest.class);
-		suite.addTest(org.matsim.core.basic.v01.events.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.vehicles.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.households.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+	public void testWriteReadXml() {
+		BasicVehicleDepartsAtFacilityEventImpl event = new BasicVehicleDepartsAtFacilityEventImpl(Time.parseTime("10:55:00"), new IdImpl(5), new IdImpl(11));
+		BasicVehicleDepartsAtFacilityEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
+		assertEquals(Time.parseTime("10:55:00"), event2.getTime(), EPSILON);
+		assertEquals(new IdImpl(5), event2.getVehicleId());
+		assertEquals(new IdImpl(11), event2.getFacilityId());
 	}
-
 }

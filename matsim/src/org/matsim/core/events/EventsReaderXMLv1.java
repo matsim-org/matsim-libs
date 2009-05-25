@@ -23,6 +23,8 @@ package org.matsim.core.events;
 import java.util.Stack;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -37,7 +39,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 	public EventsReaderXMLv1(final Events events) {
 		this.events = events;
 		this.builder = events.getBuilder();
-		this.setValidating(false);// events-files have not DTD, thus they cannot validate
+		this.setValidating(false);// events-files have no DTD, thus they cannot validate
 	}
 
 	@Override
@@ -100,7 +102,15 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		} else if (PersonLeavesVehicleEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time,
 					new IdImpl(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_VEHICLE))));			
+					new IdImpl(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_VEHICLE))));
+		} else if (BasicVehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(this.builder.createVehicleArrivesAtFacilityEvent(time,
+					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
+					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
+		} else if (BasicVehicleDepartsAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(this.builder.createVehicleDepartsAtFacilityEvent(time,
+					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
+					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
 		}
 	}
 
