@@ -79,7 +79,7 @@ public class TestIntegration {
 		try {
 //			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 			new TransitScheduleReaderV1(schedule, network).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
-			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
+			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
 			sim.startOTFServer(SERVERNAME);
 			sim.setTransitSchedule(schedule);
 			OTFDemo.ptConnect(SERVERNAME);
@@ -126,7 +126,7 @@ public class TestIntegration {
 		
 		try {
 			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
-			final TransitQueueSimulation sim = new TransitQueueSimulation((NetworkLayer) scenario.getNetwork(), scenario.getPopulation(), events);
+			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
 			sim.startOTFServer(SERVERNAME);
 			sim.setTransitSchedule(schedule);
 			OTFDemo.ptConnect(SERVERNAME);

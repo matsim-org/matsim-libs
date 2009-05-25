@@ -20,7 +20,12 @@
 
 package playground.marcel.pt;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacity;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacityImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.marcel.pt.integration.TransitQueueVehicle;
@@ -32,7 +37,12 @@ public class VehicleImplTest extends MatsimTestCase {
 	public void testAddPassenger() {
 		MockPassengerAgent passenger1 = new MockPassengerAgent(null);
 		MockPassengerAgent passenger2 = new MockPassengerAgent(null);
-		TransitVehicle vehicle = new TransitQueueVehicle(3, new Events());
+		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(3));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
+		TransitVehicle vehicle = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(10), vehicleType), 5);
 
 		vehicle.addPassenger(passenger1);
 		assertEquals("there should be 1 passenger in vehicle.", 1, vehicle.getPassengers().size());
@@ -48,7 +58,13 @@ public class VehicleImplTest extends MatsimTestCase {
 		MockPassengerAgent passenger1 = new MockPassengerAgent(null);
 		MockPassengerAgent passenger2 = new MockPassengerAgent(null);
 		MockPassengerAgent passenger3 = new MockPassengerAgent(null);
-		TransitVehicle vehicle = new TransitQueueVehicle(3, new Events());
+		
+		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(3));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
+		TransitVehicle vehicle = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(55), vehicleType), 5);
 
 		vehicle.addPassenger(passenger1);
 		vehicle.addPassenger(passenger2);

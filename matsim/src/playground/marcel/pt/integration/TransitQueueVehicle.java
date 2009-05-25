@@ -25,21 +25,22 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacity;
+import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.TransitVehicle;
 
-public class TransitQueueVehicle implements TransitVehicle {
+public class TransitQueueVehicle extends QueueVehicleImpl implements TransitVehicle {
 
 	private final int passengerCapacity;
-//	private DriverAgent driver = null;
 	private final List<PassengerAgent> passengers = new LinkedList<PassengerAgent>();
-	private final Events events;
 
-	public TransitQueueVehicle(final int passengerCapacity, final Events events) {
-		this.passengerCapacity = passengerCapacity;
-		this.events = events;
+	public TransitQueueVehicle(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+		super(basicVehicle, sizeInEquivalents);
+		BasicVehicleCapacity capacity = basicVehicle.getType().getCapacity();
+		this.passengerCapacity = capacity.getSeats().intValue() + capacity.getStandingRoom().intValue();
 	}
 
 	public boolean addPassenger(final PassengerAgent passenger) {
@@ -60,17 +61,8 @@ public class TransitQueueVehicle implements TransitVehicle {
 	public boolean removePassenger(final PassengerAgent passenger) {
 		boolean removed = this.passengers.remove(passenger);
 		if (removed) {
-			// create Event, but where to?
 		}
 		return removed;
 	}
-//
-//	public void setDriver(final DriverAgent driver) {
-//		this.driver = driver;
-//	}
-//
-//	public DriverAgent getDriver() {
-//		return this.driver;
-//	}
 
 }

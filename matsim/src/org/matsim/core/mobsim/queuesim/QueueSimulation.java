@@ -55,6 +55,10 @@ import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemContro
 import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -372,10 +376,12 @@ public class QueueSimulation {
 		if (this.plans == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
+		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
+
 		for (Person p : this.plans.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
 
-			QueueVehicle veh = new QueueVehicleImpl(agent.getPerson().getId());
+			QueueVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent);
 			agent.setVehicle(veh);

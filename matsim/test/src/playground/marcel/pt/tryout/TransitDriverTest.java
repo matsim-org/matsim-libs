@@ -29,6 +29,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacity;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacityImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -76,7 +81,13 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);
 
 		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
-		TransitVehicle bus = new TransitQueueVehicle(20, events);
+
+		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(20));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
+		TransitVehicle bus = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(5), vehicleType), 5);
 		driver.setVehicle(bus);
 
 		TransitStopFacility home  = schedule.getFacilities().get(new IdImpl("home"));
@@ -141,7 +152,13 @@ public class TransitDriverTest extends MatsimTestCase {
 		sim.setTransitSchedule(schedule);
 		
 		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
-		TransitVehicle bus = new TransitQueueVehicle(20, events);
+
+		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(20));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
+		TransitVehicle bus = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(11), vehicleType), 5);
 		driver.setVehicle(bus);
 
 		TransitStopFacility work  = schedule.getFacilities().get(new IdImpl("work"));

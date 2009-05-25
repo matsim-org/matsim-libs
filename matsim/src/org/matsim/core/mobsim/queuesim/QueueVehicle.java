@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.basic.v01.Identifiable;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
 
 public interface QueueVehicle extends Identifiable {
 
@@ -43,5 +44,9 @@ public interface QueueVehicle extends Identifiable {
 
 	public void setEarliestLinkExitTime(final double time);
 
+	/**
+	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 */
+	public BasicVehicle getBasicVehicle();
 
 }

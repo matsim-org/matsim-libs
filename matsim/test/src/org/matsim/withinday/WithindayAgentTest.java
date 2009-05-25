@@ -33,6 +33,9 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -164,7 +167,8 @@ public class WithindayAgentTest extends MatsimTestCase {
 		CoopersAgentLogicFactory factory = new CoopersAgentLogicFactory(
 				this.network, scoringFunctionConfig, signs);
 		//create the vehicle
-		QueueVehicleImpl v = new QueueVehicleImpl(p.getId());
+		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
+		QueueVehicleImpl v = new QueueVehicleImpl(new BasicVehicleImpl(p.getId(), vehicleType));
 
 		//create the agent
 		int sightDistance = 1;

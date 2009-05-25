@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
 
 public class QueueVehicleImpl implements QueueVehicle {
 
@@ -35,14 +36,17 @@ public class QueueVehicleImpl implements QueueVehicle {
 	private Link currentLink = null;
 	
 	private final double sizeInEquivalents;
+	
+	private final BasicVehicle basicVehicle;
 
-	public QueueVehicleImpl(final Id id) {
-		this(id, 1.0);
+	public QueueVehicleImpl(final BasicVehicle basicVehicle) {
+		this(basicVehicle, 1.0);
 	}
 	
-	public QueueVehicleImpl(final Id id, final double sizeInEquivalents) {
-		this.id = id;
+	public QueueVehicleImpl(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
+		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
+		this.basicVehicle = basicVehicle;
 	}
 
 	public double getLinkEnterTime() {
@@ -85,6 +89,10 @@ public class QueueVehicleImpl implements QueueVehicle {
 		return this.sizeInEquivalents;
 	}
 
+	public BasicVehicle getBasicVehicle() {
+		return this.basicVehicle;
+	}
+	
 	@Override
 	public String toString() {
 		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()

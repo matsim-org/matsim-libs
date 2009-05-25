@@ -29,12 +29,16 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacity;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacityImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
+import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
@@ -102,14 +106,20 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 		if (this.schedule != null) {
 
+			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("transitVehicleType"));
+			BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+			capacity.setSeats(Integer.valueOf(20));
+			capacity.setStandingRoom(Integer.valueOf(0));
+			vehicleType.setCapacity(capacity);
+			
 			for (TransitLine line : this.schedule.getTransitLines().values()) {
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (Departure departure : route.getDepartures().values()) {
 						TransitDriver driver = new TransitDriver(line, route, departure, this);
 
-						QueueVehicle veh = new QueueVehicleImpl(driver.getPerson().getId());
+						TransitQueueVehicle veh = new TransitQueueVehicle(new BasicVehicleImpl(driver.getPerson().getId(), vehicleType), 5);
 						veh.setDriver(driver);
-						driver.setVehicle(new TransitQueueVehicle(20, getEvents()));
+						driver.setVehicle(veh);
 						QueueLink qlink = this.network.getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 						qlink.addParkedVehicle(veh);
 
@@ -119,7 +129,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 				}
 			}
 		}
-
 	}
 	
 	public void agentDeparts(final DriverAgent agent, final Link link) {

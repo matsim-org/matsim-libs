@@ -22,6 +22,8 @@ package playground.marcel.pt.interfaces;
 
 import java.util.Collection;
 
+import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+
 public interface TransitVehicle {
 //
 //	public void setDriver(final DriverAgent driver);
@@ -52,4 +54,10 @@ public interface TransitVehicle {
 	 * @return number of passengers this vehicle can transport
 	 */
 	public int getPassengerCapacity();
+
+	/**
+	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 */
+	public BasicVehicle getBasicVehicle();
+
 }

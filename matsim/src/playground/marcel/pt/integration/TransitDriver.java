@@ -30,6 +30,8 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
@@ -54,7 +56,6 @@ public class TransitDriver implements TransitDriverAgent {
 		private TransitVehicle vehicle = null;
 
 		private int nextLinkIndex = 0;
-		private Link currentLink = null;
 		private final TransitQueueSimulation sim;
 
 		private final Leg currentLeg = new LegImpl(TransportMode.car);
@@ -98,7 +99,6 @@ public class TransitDriver implements TransitDriverAgent {
 		}
 
 		public void moveOverNode() {
-			this.currentLink = this.linkRoute.get(this.nextLinkIndex);
 			this.nextLinkIndex++;
 		}
 		
@@ -125,6 +125,7 @@ public class TransitDriver implements TransitDriverAgent {
 			for (PassengerAgent passenger : passengersLeaving) {
 				this.vehicle.removePassenger(passenger);
 				DriverAgent agent = (DriverAgent) passenger;
+				TransitQueueSimulation.getEvents().processEvent(new PersonLeavesVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 				System.out.println("passenger exit: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 				agent.teleportToLink(stop.getLink());
 				agent.legEnds(now);
@@ -137,6 +138,7 @@ public class TransitDriver implements TransitDriverAgent {
 				PassengerAgent passenger = (PassengerAgent) agent;
 				if (passenger.ptLineAvailable(this.transitLine)) {
 					this.vehicle.addPassenger(passenger);
+					TransitQueueSimulation.getEvents().processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 					iter.remove();
 					cntAccess++;
