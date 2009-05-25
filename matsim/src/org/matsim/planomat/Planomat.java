@@ -243,9 +243,10 @@ public class Planomat implements PlanAlgorithm {
 			sumOfAllActDurs += ((IntegerGene) individual.getGenes()[geneIndex]).intValue();
 		}
 
-		// solution of first gene, normalized to scenario duration, is end time of first activity 
 		double now = 0.0;
+		double oldNow = 0.0;
 
+		// solution of first gene, normalized to scenario duration, is end time of first activity 
 		origin = plan.getFirstActivity();
 		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 			origin.setStartTime(now);
@@ -254,17 +255,23 @@ public class Planomat implements PlanAlgorithm {
 		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 			positionInTimeInterval = this.seedGenerator.nextDouble();
 		}
-		double activityDuration = Math.rint(this.getEffectiveActLegTimeFrame(
+//		double activityDuration = Math.rint(this.getEffectiveActLegTimeFrame(
+//				((IntegerGene) individual.getGene(0)).intValue(), 
+//				this.numTimeIntervals, 
+//				positionInTimeInterval));
+//		now += activityDuration;
+
+		now += Math.rint(this.getEffectiveActLegTimeFrame(
 				((IntegerGene) individual.getGene(0)).intValue(), 
 				this.numTimeIntervals, 
 				positionInTimeInterval));
-		now += activityDuration;
-
+		
 		for (int geneIndex = 1; geneIndex <= numLegs; geneIndex++) {
 
 			scoringFunction.endActivity(now);
+			now = Math.max(oldNow + 1.0, now);
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-				origin.setDuration(activityDuration);
+				origin.setDuration(now - oldNow);
 				origin.setEndTime(now);
 			}
 			///////////////////////////////////////////////////////////////////////////////////////////
@@ -334,12 +341,13 @@ public class Planomat implements PlanAlgorithm {
 						sumOfAllActDurs, 
 						positionInTimeInterval);
 
-				activityDuration = Math.rint(actLegTimeFrame - anticipatedTravelTime);
-//				activityDuration = Math.max(1.0, activityDuration);
-				if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-					now += Math.max(1.0, activityDuration);
-				}
-
+//				activityDuration = Math.rint(actLegTimeFrame - anticipatedTravelTime);
+//				oldNow = now;
+//				now += activityDuration;
+				
+				oldNow = now;
+				now += Math.rint(actLegTimeFrame - anticipatedTravelTime);
+				
 				origin = destination;
 			}
 
