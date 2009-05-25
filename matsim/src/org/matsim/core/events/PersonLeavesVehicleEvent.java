@@ -36,18 +36,15 @@ public class PersonLeavesVehicleEvent extends PersonEvent implements BasicPerson
 	public static final String EVENT_TYPE = "PersonLeavesVehicle";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
-	private final BasicVehicle vehicle;
 	private final Id vehicleId;
 
 	public PersonLeavesVehicleEvent(final double time, final Person person, final BasicVehicle vehicle) {
 		super(time, person);
-		this.vehicle = vehicle;
 		this.vehicleId = vehicle.getId();
 	}
 	
 	public PersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		super(time, personId);
-		this.vehicle = null;
 		this.vehicleId = vehicleId;
 	}
 
@@ -61,10 +58,6 @@ public class PersonLeavesVehicleEvent extends PersonEvent implements BasicPerson
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
-	}
-
-	public BasicVehicle getVehicle() {
-		return this.vehicle;
 	}
 	
 	public Id getVehicleId() {
