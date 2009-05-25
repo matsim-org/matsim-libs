@@ -42,6 +42,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
+import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
+import playground.marcel.pt.analysis.VehicleTracker;
 import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.transitSchedule.Departure;
@@ -77,6 +79,7 @@ public class AccessEgressDemo {
 	private void prepareConfig() {
 		Config config = scenario.getConfig();
 		config.simulation().setSnapshotStyle("queue");
+		config.simulation().setEndTime(24.0*3600);
 	}
 	
 	private void createNetwork() {
@@ -157,15 +160,24 @@ public class AccessEgressDemo {
 	}
 	
 	private void runSim() {
-		this.sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), new Events());
+		Events events = new Events();
+		
+		VehicleTracker vehTracker = new VehicleTracker();
+		events.addHandler(vehTracker);
+		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(this.schedule.getTransitLines().get(ids[1]).getRoutes().get(ids[1]), vehTracker);
+		events.addHandler(analysis);
+		
+		this.sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
 		this.sim.startOTFServer("access_egress_demo");
 		this.sim.setTransitSchedule(this.schedule);
 		
 		OTFDemo.ptConnect("access_egress_demo");
 		
 		this.sim.run();
+		
+		analysis.printStats();
 	}
-	
+
 	public void run() {
 		createIds();
 		prepareConfig();
@@ -174,9 +186,9 @@ public class AccessEgressDemo {
 		createPopulation();
 		runSim();
 	}
-	
+
 	public static void main(String[] args) {
 		new AccessEgressDemo().run();
 	}
-	
+
 }
