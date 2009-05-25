@@ -116,39 +116,48 @@ public class TransitDriver implements TransitDriverAgent {
 			} else {
 				this.nextStop = null;
 			}
-			// let passengers get out if they want
+			// find out who wants to get out
 			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
 			for (PassengerAgent passenger : this.vehicle.getPassengers()) {
 				if (passenger.arriveAtStop(stop)) {
 					passengersLeaving.add(passenger);
 				}
 			}
-			for (PassengerAgent passenger : passengersLeaving) {
-				this.vehicle.removePassenger(passenger);
-				DriverAgent agent = (DriverAgent) passenger;
-				TransitQueueSimulation.getEvents().processEvent(new PersonLeavesVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
-				System.out.println("passenger exit: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
-				agent.teleportToLink(stop.getLink());
-				agent.legEnds(now);
-			}
-
-			int cntEgress = passengersLeaving.size();
-			int cntAccess = 0;
+			// find out who wnats to get in
+			ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
 			for (Iterator<DriverAgent> iter = this.sim.agentTracker.getAgentsAtStop(stop).iterator(); iter.hasNext(); ) {
 				DriverAgent agent = iter.next();
 				PassengerAgent passenger = (PassengerAgent) agent;
 				if (passenger.ptLineAvailable(this.transitLine)) {
-					this.vehicle.addPassenger(passenger);
-					TransitQueueSimulation.getEvents().processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
-					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 					iter.remove();
-					cntAccess++;
+					passengersEntering.add(passenger);
 				}
 			}
+			
+			// do the handling
 			double stopTime = 0.0;
+			int cntEgress = passengersLeaving.size();
+			int cntAccess = passengersEntering.size();
 			if (cntAccess > 0 || cntEgress > 0) {
 				stopTime = 10.0 + cntAccess * 5 + cntEgress * 3;
 				TransitQueueSimulation.getEvents().processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
+			
+				for (PassengerAgent passenger : passengersLeaving) {
+					this.vehicle.removePassenger(passenger);
+					DriverAgent agent = (DriverAgent) passenger;
+					TransitQueueSimulation.getEvents().processEvent(new PersonLeavesVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+					System.out.println("passenger exit: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
+					agent.teleportToLink(stop.getLink());
+					agent.legEnds(now);
+				}
+
+				for (PassengerAgent passenger : passengersEntering) {
+					this.vehicle.addPassenger(passenger);
+					DriverAgent agent = (DriverAgent) passenger;
+					TransitQueueSimulation.getEvents().processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
+				}
+
 				TransitQueueSimulation.getEvents().processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now + stopTime, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 			}
 			return stopTime;
