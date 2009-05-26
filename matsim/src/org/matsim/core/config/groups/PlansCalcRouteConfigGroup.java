@@ -92,7 +92,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public String getValue(final String key) {
 		try {
 		if (this.paramMethods.containsKey(key))
-			return Double.toString((Double)this.paramMethods.get(key).getFirst().invoke(this, null));
+			return ((Double)this.paramMethods.get(key).getFirst().invoke(this, null)).toString();
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
@@ -107,7 +107,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (this.paramMethods.containsKey(key)){
 			try {
-				this.paramMethods.get(key).getSecond().invoke(this, new Object[] {new Double(Double.valueOf(value))});
+				this.paramMethods.get(key).getSecond().invoke(this, new Object[] {Double.valueOf(value)});
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 				throw new IllegalArgumentException(key);
