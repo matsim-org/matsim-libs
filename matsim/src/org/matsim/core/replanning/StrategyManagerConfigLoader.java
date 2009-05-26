@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -74,7 +73,6 @@ public class StrategyManagerConfigLoader {
 		NetworkLayer network = controler.getNetwork();
 		TravelCost travelCostCalc = controler.getTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
-		ActivityFacilities facilities = controler.getFacilities();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
@@ -122,13 +120,11 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
-//				setDecayingModuleProbability(manager, strategy, 100, rate); // Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
-//				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
@@ -229,50 +225,4 @@ public class StrategyManagerConfigLoader {
 		}
 	}
 
-	/**
-	 * Adds several changeRequests to the StrategyManager such that the given PlanStrategy will be
-	 * chosen with decaying probability over the iterations.
-	 *
-	 * @param manager
-	 * @param strategy
-	 * @param iterationStartDecay
-	 * @param pReplanInit
-	 *
-	 * @author kmeister
-	 * @author mrieser
-	 */
-/*	private static void setDecayingModuleProbability(final StrategyManager manager, final PlanStrategy strategy, final int iterationStartDecay, final double pReplanInit) {
-		// Originally from PlanomatStrategyManagerConfigLoader
-//		double pReplan = 0.0;
-
-		// everything hard wired...
-
-		double pReplanFinal = 0.0;
-		int iterOffset = 0;
-		double slope = 1.0;
-
-		int controlerFirstIteration = Gbl.getConfig().controler().getFirstIteration();
-		int controlerLastIteration = Gbl.getConfig().controler().getLastIteration();
-		for (int iter = controlerFirstIteration; iter <= controlerLastIteration; iter++) {
-
-//			old code:
-//		// at first, use the typical replanning share from the config file
-//			if (iter <= iterationStartDecay) {
-//				pReplan = 0.1; // I think that should be pReplanInit. /marcel,18jan2008
-//			} else {
-//				// then use the decaying replanning share
-//				pReplan = Math.min(pReplanInit, slope / (iter - iterationStartDecay + iterOffset) + pReplanFinal);
-//			}
-//
-//			manager.addChangeRequest(iter, strategy, pReplan);
-
-//			new code: TODO_ [KM] please check that this does the same as the old code above. /marcel,18jan2008
-			if (iter > iterationStartDecay) {
-				double pReplan = Math.min(pReplanInit, slope / (iter - iterationStartDecay + iterOffset) + pReplanFinal);
-				manager.addChangeRequest(iter, strategy, pReplan);
-			}
-
-		}
-	}
-*/
 }
