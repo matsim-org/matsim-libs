@@ -22,25 +22,48 @@ package org.matsim.vis.otfvis.opengl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.XMLEncoder;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.filechooser.FileFilter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
+import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -50,6 +73,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
@@ -57,6 +81,9 @@ import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+
+import de.schlichtherle.io.ArchiveDetector;
+import de.schlichtherle.io.DefaultArchiveDetector;
 
 class OTFFrame extends JFrame {
 	   public OTFFrame(String string) {
@@ -214,8 +241,15 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
 			PreferencesDialog.buildMenu(frame, visconf, this.hostControl, saver);
-
-			if(!hostControl.isLiveHost()) frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);
+			
+			OTFQueryControlBar queryControl = null;
+			
+			if(!hostControl.isLiveHost()) {
+				frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);
+			} else  {
+				queryControl = new OTFQueryControlBar("test", hostControl, visconf);
+				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
+			}
 
 			// Maybe later: connect.add(QueueLink.class, OTFDefaultLinkHandler.Writer.class);
 			// connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
@@ -225,12 +259,14 @@ public class OnTheFlyClientFileQuad extends Thread {
 				drawer.invalidate((int)hostControl.getTime());
 				this.hostControl.addHandler("test", drawer);
 				pane.setLeftComponent(drawer.getComponent());
+				if(queryControl != null) ((OTFOGLDrawer)drawer).setQueryHandler(queryControl);
 			}
 
 			OTFDrawer drawer2 = getRightDrawerComponent(frame);
 			pane.setRightComponent(drawer2.getComponent());
 			this.hostControl.addHandler("test2", drawer2);
 			drawer2.invalidate((int)hostControl.getTime());
+			if(queryControl != null) ((OTFOGLDrawer)drawer2).setQueryHandler(queryControl);
 
 			System.out.println("Finished init");
 			pane.setDividerLocation(0.5);
