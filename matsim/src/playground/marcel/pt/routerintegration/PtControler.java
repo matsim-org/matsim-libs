@@ -20,20 +20,41 @@
 
 package playground.marcel.pt.routerintegration;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.xml.sax.SAXException;
+
+import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 
 public class PtControler extends Controler {
 
+	private final TransitSchedule schedule;
+	
 	public PtControler(String configFileName) {
 		super(configFileName);
+		
+		this.schedule = new TransitSchedule();
+		try {
+			new TransitScheduleReaderV1(this.schedule, this.network).readFile(this.config.getParam("transit", "inputSchedule"));
+		} catch (SAXException e) {
+			throw new RuntimeException("could not read transit schedule.", e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException("could not read transit schedule.", e);
+		} catch (IOException e) {
+			throw new RuntimeException("could not read transit schedule.", e);
+		}
 	}
 
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(TravelCost travelCosts, TravelTime travelTimes) {
-		return new PlansCalcPtRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+		return new PlansCalcPtRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.schedule);
 	}
 	
 }
