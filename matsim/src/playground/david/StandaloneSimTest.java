@@ -20,6 +20,20 @@
 
 package playground.david;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
+
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -32,31 +46,107 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
 
+import de.schlichtherle.io.FileInputStream;
+
 public class StandaloneSimTest {
 
+	public static void outputFile(String netFileName, String popFileName, String outFile){
+		
+	}
 	public static void main(final String[] args) {
 //		String netFileName = "test/simple/equil_net.xml";
 //		String popFileName = "test/simple/equil_plans.xml";
-//		String netFileName = "/TU Berlin/workspace/berlin-wip/network/wip_net.xml";
-//		String popFileName = "/TU Berlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
-		String netFileName = "../../tmp/studies/ivtch/Diss/input/ivtch_red100.xml";
-		String popFileName = "../../tmp/studies/ivtch/Diss/input/plans100p.xml";
+//		String netFileName = "/TUBerlin/workspace/berlin-wip/network/wip_net.xml";
+//		String popFileName = "/TUBerlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
+//		String netFileName = "../../tmp/studies/ivtch/run657/input/ivtch-osm.xml";
+//		String popFileName = "../../tmp/studies/ivtch/run657/input/plans_all_zrh30km_transitincl_10pct.xml.gz";
+		String netFileName = "../../tmp/studies/ivtch/Diss/input/ivtch-osm.xml";
+		String popFileName = "../../tmp/studies/ivtch/Diss/input/plans1p.xml";
 
-		Gbl.startMeasurement();
 		final Config config = Gbl.createConfig(args);
-		Gbl.printElapsedTime();
 
 		String localDtdBase = "./dtd/";
 		config.global().setLocalDtdBase(localDtdBase);
 
 
+		Gbl.startMeasurement();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
 		Population population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
+		Gbl.printElapsedTime();
 
+		if(true){
+//				FileOutputStream fos;
+//				try {
+////					fos = new FileOutputStream("t.tmp");
+////					ObjectOutputStream oos = new ObjectOutputStream(fos);
+////					
+////					oos.writeInt(12345);
+////					//oos.writeObject("Today");
+////					oos.writeObject(network);
+////					oos.writeObject(population);
+////				
+////					oos.close();
+//					Gbl.startMeasurement();
+//					BufferedInputStream fin = new BufferedInputStream(new FileInputStream("t.tmp"),500000);
+//					ObjectInputStream oin = new ObjectInputStream(fin);
+//					int test = oin.readInt();
+//					network = (NetworkLayer)oin.readObject();
+//					PopulationImpl pp = (PopulationImpl)oin.readObject();
+//					test++;
+//					population = pp;
+//					Gbl.printElapsedTime();
+//				} catch (FileNotFoundException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (Throwable e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+
+			ZipOutputStream zos = null;
+			ObjectOutputStream outFile;
+			try {
+				zos = new ZipOutputStream(new BufferedOutputStream(
+						new FileOutputStream("net+population.zip"), 50000));
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+
+			try {
+				zos.putNextEntry(new ZipEntry("net+population.bin"));
+				outFile = new ObjectOutputStream(zos);
+				outFile.writeObject(network);
+				outFile.writeObject(population);
+				zos.closeEntry();
+				zos.close();
+				// END HERE
+				System.exit(0);
+				
+//				
+				Gbl.startMeasurement();
+				File sourceZipFile = new File("testpop.zip");
+				// Open Zip file for reading
+				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipEntry infoEntry = zipFile.getEntry("net+population.bin");
+				BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(infoEntry));
+				ObjectInputStream inFile = new ObjectInputStream(is);
+				network = (NetworkLayer)inFile.readObject();
+				population = (PopulationImpl)inFile.readObject();
+				Gbl.printElapsedTime();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+//			System.exit(0);
+		}
 		Events events = new Events() ;
 //		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
 //		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
