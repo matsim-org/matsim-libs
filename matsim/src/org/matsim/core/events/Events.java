@@ -30,7 +30,25 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -273,35 +291,62 @@ public class Events {
 		if (klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
 			return true;
+		} else if (klass == BasicLinkLeaveEvent.class) {
+				((BasicLinkLeaveEventHandler)handler).handleEvent((BasicLinkLeaveEvent)ev);
+				return true;
 		} else if (klass == LinkEnterEvent.class) {
 			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
+			return true;
+		} else if (klass == BasicLinkEnterEvent.class) {
+			((BasicLinkEnterEventHandler)handler).handleEvent((BasicLinkEnterEvent)ev);
 			return true;
 		} else if (klass == AgentWait2LinkEvent.class) {
 			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEvent)ev);
 			return true;
+		} else if (klass == BasicAgentWait2LinkEvent.class) {
+			((BasicAgentWait2LinkEventHandler)handler).handleEvent((BasicAgentWait2LinkEvent)ev);
+			return true;
 		} else if (klass == AgentArrivalEvent.class) {
 			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEvent)ev);
+			return true;
+		} else if (klass == BasicAgentArrivalEvent.class) {
+			((BasicAgentArrivalEventHandler)handler).handleEvent((BasicAgentArrivalEvent)ev);
 			return true;
 		} else if (klass == AgentDepartureEvent.class) {
 			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEvent)ev);
 			return true;
+		} else if (klass == BasicAgentDepartureEvent.class) {
+			((BasicAgentDepartureEventHandler)handler).handleEvent((BasicAgentDepartureEvent)ev);
+			return true;
 		} else if (klass == ActivityEndEvent.class) {
 			((ActivityEndEventHandler)handler).handleEvent((ActivityEndEvent)ev);
+			return true;
+		} else if (klass == BasicActivityEndEvent.class) {
+			((BasicActivityEndEventHandler)handler).handleEvent((BasicActivityEndEvent)ev);
 			return true;
 		} else if (klass == ActivityStartEvent.class) {
 			((ActivityStartEventHandler)handler).handleEvent((ActivityStartEvent)ev);
 			return true;
+		} else if (klass == BasicActivityStartEvent.class) {
+			((BasicActivityStartEventHandler)handler).handleEvent((BasicActivityStartEvent)ev);
+			return true;
 		} else if (klass == AgentStuckEvent.class) {
 			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);
+			return true;
+		} else if (klass == BasicAgentStuckEvent.class) {
+			((BasicAgentStuckEventHandler)handler).handleEvent((BasicAgentStuckEvent)ev);
 			return true;
 		} else if (klass == AgentMoneyEvent.class) {
 			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEvent)ev);
 			return true;
+		} else if (klass == BasicAgentMoneyEvent.class) {
+			((BasicAgentMoneyEventHandler)handler).handleEvent((BasicAgentMoneyEvent)ev);
+			return true;
 		} else if (klass == AgentReplanEvent.class) {
 			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEvent)ev);
 			return true;
-		} else if (klass == org.matsim.core.events.BasicEventImpl.class) {
-			((BasicEventHandler)handler).handleEvent((org.matsim.core.events.BasicEventImpl) ev);
+		} else if (klass == BasicEventImpl.class) {
+			((BasicEventHandler)handler).handleEvent((BasicEventImpl) ev);
 			return true;
 		} else if (klass == PersonEvent.class) {
 			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);
