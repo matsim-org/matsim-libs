@@ -41,10 +41,10 @@ public class PlansCalcRouteConfigGroup extends Module {
 	
 	public static final String GROUP_NAME = "planscalcroute";
 	
-	private static final String PTSPEEDFACTOR = "ptSpeedFactor";
-	private static final String WALKSPEEDFACTOR = "walkSpeedFactor";
-	private static final String BIKESPEEDFACTOR = "bikeSpeedFactor";
-	private static final String UNDEFINEDMODESPEEDFACTOR = "undefinedModeSpeedFactor";
+	private static final String PT_SPEED_FACTOR = "ptSpeedFactor";
+	private static final String WALK_SPEED_FACTOR = "walkSpeedFactor";
+	private static final String BIKE_SPEED_FACTOR = "bikeSpeedFactor";
+	private static final String UNDEFINED_MODE_SPEED_FACTOR = "undefinedModeSpeedFactor";
 	
 	/**
 	 * Map containing param name, getter + setter
@@ -62,19 +62,19 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public PlansCalcRouteConfigGroup() {
 		super(GROUP_NAME);
 		try {
-			paramMethods.put(PTSPEEDFACTOR, new Tuple<Method, Method>(
+			paramMethods.put(PT_SPEED_FACTOR, new Tuple<Method, Method>(
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("getPtSpeedFactor", null),
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("setPtSpeedFactor", new Class[] {double.class})));
 			
-			paramMethods.put(WALKSPEEDFACTOR, new Tuple<Method, Method>(
+			paramMethods.put(WALK_SPEED_FACTOR, new Tuple<Method, Method>(
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("getWalkSpeedFactor", null),
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("setWalkSpeedFactor", new Class[] {double.class})));
 			
-			paramMethods.put(BIKESPEEDFACTOR, new Tuple<Method, Method>(
+			paramMethods.put(BIKE_SPEED_FACTOR, new Tuple<Method, Method>(
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("getBikeSpeedFactor", null),
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("setBikeSpeedFactor", new Class[] {double.class})));
 			
-			paramMethods.put(UNDEFINEDMODESPEEDFACTOR, new Tuple<Method, Method>(
+			paramMethods.put(UNDEFINED_MODE_SPEED_FACTOR, new Tuple<Method, Method>(
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("getUndefinedModeSpeedFactor", null),
 					PlansCalcRouteConfigGroup.class.getDeclaredMethod("setUndefinedModeSpeedFactor", new Class[] {double.class})));
 			
