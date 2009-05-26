@@ -22,7 +22,9 @@ public class SAZone extends MultiPolygon{
 	private Integer[] minorActivityDurationDetail;
 	private Integer[] majorActivityCountDetail;
 	private Integer[] majorActivityDurationDetail;
-	private static final int TIME_BINS = 24; 
+	private static final int TIME_BINS = 24;
+	private int timeBins;
+
 
 	public SAZone(Polygon[] polygons, GeometryFactory factory, String name, int level) {
 		super(polygons, factory);
@@ -31,12 +33,13 @@ public class SAZone extends MultiPolygon{
 		this.setLevel(level);
 		this.polygonContainer = new ArrayList<SAZone>();
 		this.minorActivityCount = 0;
-		this.majorActivityCount = 0;		
-		this.minorActivityCountDetail = new Integer[TIME_BINS];
-		this.minorActivityDurationDetail = new Integer[TIME_BINS];
-		this.majorActivityCountDetail = new Integer[TIME_BINS];
-		this.majorActivityDurationDetail = new Integer[TIME_BINS];
-		for(int i = 0; i < TIME_BINS; i++ ){
+		this.majorActivityCount = 0;
+		this.timeBins = TIME_BINS;
+		this.minorActivityCountDetail = new Integer[this.timeBins];
+		this.minorActivityDurationDetail = new Integer[this.timeBins];
+		this.majorActivityCountDetail = new Integer[this.timeBins];
+		this.majorActivityDurationDetail = new Integer[this.timeBins];
+		for(int i = 0; i < this.timeBins; i++ ){
 			this.minorActivityCountDetail[i] = 0;
 			this.minorActivityDurationDetail[i] = 0;
 			this.majorActivityCountDetail[i] = 0;
@@ -44,6 +47,10 @@ public class SAZone extends MultiPolygon{
 		}	
 	}
 	
+	public int getTimeBins() {
+		return this.timeBins;
+	}
+
 	public void updateSAZoneCounts(boolean minor){
 		if( minor ){
 			this.setMinorActivityCount();
@@ -66,6 +73,11 @@ public class SAZone extends MultiPolygon{
 	public int getMinorActivityCountDetail(int hour){
 		return this.minorActivityCountDetail[hour];
 	}
+	
+	public void setMinorActivityCountDetail(int hour, int value){
+		this.minorActivityCountDetail[hour] = value;
+	}
+
 
 	public int getMinorActivityDurationDetail(int hour){
 		return this.minorActivityDurationDetail[hour];
@@ -78,7 +90,7 @@ public class SAZone extends MultiPolygon{
 	 * activities.  
 	 */
 	private void calculateAverageDurationMinor(){
-		for (int i = 0; i < TIME_BINS; i++ ) {
+		for (int i = 0; i < this.timeBins; i++ ) {
 			if(this.minorActivityDurationDetail[i] > 0){
 				double x = ((double) this.minorActivityDurationDetail[i] ) / 
 						   ((double) this.minorActivityCountDetail[i] ); 
@@ -113,7 +125,7 @@ public class SAZone extends MultiPolygon{
 	 * activities.  
 	 */
 	private void calculateAverageDurationMajor(){
-		for (int i = 0; i < TIME_BINS; i++ ) {
+		for (int i = 0; i < this.timeBins; i++ ) {
 			if(this.majorActivityDurationDetail[i] > 0){
 				double x = ((double) this.majorActivityDurationDetail[i] ) / 
 						   ((double) this.majorActivityCountDetail[i] ); 
@@ -182,7 +194,7 @@ public class SAZone extends MultiPolygon{
 		this.polygonContainer = new ArrayList<SAZone>();
 		this.minorActivityCount = 0;
 		this.majorActivityCount = 0;		
-		for(int i = 0; i < TIME_BINS; i++ ){
+		for(int i = 0; i < this.timeBins; i++ ){
 			this.minorActivityCountDetail[i] = 0;
 			this.minorActivityDurationDetail[i] = 0;
 			this.majorActivityCountDetail[i] = 0;

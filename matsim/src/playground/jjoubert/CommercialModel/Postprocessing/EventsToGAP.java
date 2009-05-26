@@ -50,14 +50,14 @@ public class EventsToGAP {
 	 */
 	
 	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
 	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
-	final static String INPUT = ROOT + "Commercial/PostProcess/" + "100.eventsTruckMinor.txt";
-	final static String OUTPUT = ROOT + "Commercial/PostProcess/" + "SimulatedCommercialMinorGAP.txt";
+	final static String INPUT = ROOT + "Commercial/PostProcess/" + "10.eventsTruckMinor.txt";
+	final static String OUTPUT = ROOT + "Commercial/PostProcess/" + "SimulatedCommercialMinorGAP_Normalized.txt";
 
 	public static final String DELIMITER = ",";
 	final static int GAP_SEARCH_AREA = 20000; // in METERS
@@ -74,10 +74,31 @@ public class EventsToGAP {
 
 		assignActivityToZone(zoneList, zoneTree );
 		
+		normalizeZoneCounts( zoneList );
+		
 		writeZoneStatsToFile( zoneList );
 	}
 	
 			
+	private static void normalizeZoneCounts(ArrayList<SAZone> zoneList) {
+		System.out.print("Normalizing the minor activity counts... ");
+		double maxActivity = Double.NEGATIVE_INFINITY;
+		for (SAZone zone : zoneList) {
+			for (int i = 0; i < zone.getTimeBins(); i++) {
+				maxActivity = Math.max(maxActivity, zone.getMinorActivityCountDetail(i));
+			}
+		}
+		
+		for (SAZone zone : zoneList) {
+			for (int i = 0; i < zone.getTimeBins(); i++) {
+				double dummy = (double) zone.getMinorActivityCountDetail(i);
+				zone.setMinorActivityCountDetail(i, (int) ((dummy / maxActivity)*100) );
+			}
+		}		
+		System.out.printf("Done.\n\n");
+	}
+
+
 	private static void assignActivityToZone(ArrayList<SAZone> list, QuadTree<SAZone> tree ){
 		System.out.println("Assigning activity locations to GAP mesozones.");
 
@@ -176,11 +197,12 @@ public class EventsToGAP {
 	 * Returns a standard header string for the GAP statistics file.
 	 */
 	private static String createHeaderString(){
-		String headerString = "Name" + DELIMITER + 
-							  "Total_Count" + DELIMITER;
-		for(int i = 0; i < 24; i++){
+		String headerString = "Name" + DELIMITER;
+		for(int i = 0; i < 23; i++){
 			headerString += "H" + i + DELIMITER;
 		}
+		headerString += "H23";
+		
 		return headerString;
 	}
 
@@ -195,8 +217,7 @@ public class EventsToGAP {
 		
 		// Minor activity string
 		String statsStringMinor = zone.getName() + DELIMITER;
-		statsStringMinor += zone.getMinorActivityCount() + DELIMITER;
-		for(int i = 0; i < 24; i++){
+		for(int i = 0; i < 23; i++){
 			statsStringMinor += zone.getMinorActivityCountDetail(i) + DELIMITER;
 		}
 		statsStringMinor += zone.getMinorActivityCountDetail(23);
