@@ -20,7 +20,6 @@
 
 package playground.marcel.pt.demo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Id;
@@ -51,7 +50,6 @@ import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
 
 public class AccessEgressDemo {
 
@@ -121,11 +119,11 @@ public class AccessEgressDemo {
 		for (int i = 0; i < nOfBuses; i++	) {
 			tRoute.addDeparture(new Departure(ids[i], departureTime + i*heading + (i == delayedBus ? delay : 0)));
 		}
-		try {
-			new TransitScheduleWriterV1(this.schedule).write("accessEgressSchedule.xml");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			new TransitScheduleWriterV1(this.schedule).write("accessEgressSchedule.xml");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	private void createPopulation() {
