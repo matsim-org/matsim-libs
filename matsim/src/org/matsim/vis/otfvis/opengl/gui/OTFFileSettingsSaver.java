@@ -23,6 +23,7 @@ package org.matsim.vis.otfvis.opengl.gui;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,6 +53,25 @@ import de.schlichtherle.io.DefaultArchiveDetector;
 public class OTFFileSettingsSaver implements OTFSettingsSaver {
 	String fileName;
 	
+	private interface Writer {
+		void writeObject(Object o) throws IOException;
+		void close()throws IOException;
+	}
+	
+	private class BinWriter extends ObjectOutputStream implements Writer{
+
+		public BinWriter(OutputStream out) throws IOException {
+			super(out);
+		}
+	};
+
+	private class XMLWriter extends XMLEncoder implements Writer{
+
+		public XMLWriter(OutputStream out) {
+			super(out);
+		}
+	};
+		
 	public OTFFileSettingsSaver(String filename) {
 		this.fileName = filename;
 	}
@@ -77,6 +97,18 @@ public class OTFFileSettingsSaver implements OTFSettingsSaver {
 	      @Override public String getDescription() 
 	      { 
 	        return "OTFVis Config File (*.vcfg)"; 
+	      } 
+	    } ); 
+	    fc.setFileFilter( new FileFilter() 
+	    { 
+	      @Override public boolean accept( File f ) 
+	      { 
+	        return f.isDirectory() || 
+	          f.getName().toLowerCase().endsWith( ".vxmlcfg" ); 
+	      } 
+	      @Override public String getDescription() 
+	      { 
+	        return "OTFVis XML Config File (*.vxmlcfg)"; 
 	      } 
 	    } ); 
 	 
@@ -183,6 +215,17 @@ public class OTFFileSettingsSaver implements OTFSettingsSaver {
 			} finally {
 			    out.close(); // ALWAYS close the stream!
 			}
+			out = new de.schlichtherle.io.FileOutputStream(fileName + "/config.xml");
+			try {
+				  // Create XML encoder.
+				XMLEncoder xenc = new XMLEncoder(out);
+				xenc.writeObject(config);
+				xenc.close();
+			} finally {
+			    out.close(); // ALWAYS close the stream!
+			}
+
+
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (IOException e) {
@@ -194,16 +237,19 @@ public class OTFFileSettingsSaver implements OTFSettingsSaver {
 	public void saveSettings() {
 		openAndSaveConfig();
 	}
+	
 	public void saveSettingsAs() {
 		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 		File file = chooseFile(true);
 		if(file != null){
 			OutputStream out;
 			try {
+				boolean asXML = file.getAbsolutePath().endsWith("vxmlcfg");
 				out = new FileOutputStream(file);
-				ObjectOutputStream outFile = new ObjectOutputStream(out);
+				Writer outFile = asXML ? new XMLWriter(out) : new BinWriter(out);
 				config.clearModified(); //the saved version should be cleared already
 				outFile.writeObject(config);
+				outFile.close();
 				out.close();
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
