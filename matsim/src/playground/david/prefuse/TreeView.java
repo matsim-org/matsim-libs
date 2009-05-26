@@ -69,6 +69,7 @@ import prefuse.data.Node;
 import prefuse.data.Tree;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
+import prefuse.data.expression.Predicate;
 import prefuse.data.io.TreeMLReader;
 import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
@@ -107,7 +108,7 @@ public static class MTree extends Tree {
 	public Node createObjectNode(String name, String value, Node parent, Object ob, int layer) {
 		Node child = this.addChild(parent);
 		child.setString("name", name);
-		child.setInt("level", -1);
+		child.setInt("level", layer);
 		child.set("ref", ob);
 		return child;
 	}
@@ -194,7 +195,7 @@ public static class MTree extends Tree {
 		this.addColumn("ref", Object.class);
 		Node root = this.addRoot();
 		root.setString("name", Integer.toString(this.max));
-		generateLayer(this.getRoot(), 0, this.max, (int)Math.log10(this.max)-1, 1);
+		generateLayer(this.getRoot(), 0, this.max, (int)Math.log10(this.max)-1, 0);
 
 	}
 
@@ -229,6 +230,8 @@ public static class MTree extends Tree {
 		if (level == minLevel) return false;
 		int step = (int)Math.pow(10, level);
 		for (int i = start; (i < end) && (i<max); i+=step) {
+			if(!hasPersons(i, Math.min(i+step, end)))continue;
+			
 			Node child = this.addChild(parent);
 			child.setString("name", Integer.toString(i));
 			child.setInt("level", level);
@@ -246,12 +249,29 @@ public static class MTree extends Tree {
 		generateLayer(parent, id, i, j, k);
 		m_vis = null;
 	}
+	
+}
+
+public boolean focusOnId(String id){
+	boolean res = true;
+    String query = id;
+    search.search(query);
+    if ( search.getQuery().length() == 0 )
+        return false;
+    else {
+        int r = search.getTupleCount();
+        if(r == 1) {
+        	int i=0;
+        	i++;
+        }
+    }
+	return res;
 }
 
     public static final String TREE_CHI = "data/chi-ontology.xml.gz";
     
     private static final String tree = "tree";
-    private static final String treeNodes = "tree.nodes";
+    protected static final String treeNodes = "tree.nodes";
     private static final String treeEdges = "tree.edges";
     
     private LabelRenderer m_nodeRenderer;
@@ -259,6 +279,8 @@ public static class MTree extends Tree {
     
     private String m_label = "label";
     private int m_orientation = Constants.ORIENT_LEFT_RIGHT;
+
+	private PrefixSearchTupleSet search;
     
     public TreeView(Tree t, String label) {
         super(new Visualization());
@@ -376,7 +398,7 @@ public static class MTree extends Tree {
         setOrientation(m_orientation);
         m_vis.run("filter");
         
-        TupleSet search = new PrefixSearchTupleSet(); 
+        search = new PrefixSearchTupleSet(); 
         m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, search);
         search.addTupleSetListener(new TupleSetListener() {
             public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
@@ -483,7 +505,7 @@ public static class MTree extends Tree {
 //            e.printStackTrace();
 //            System.exit(1);
 //        }
-        final MTree t2 = new MTree(new PopProviderFile("../MatsimJ/testpop.zip"));
+        final MTree t2 = new MTree(new PopProviderFile("../MatsimJ/net+population.zip"));
         // create a new treemap
         final TreeView tview = new TreeView(t2, label);
         tview.setBackground(BACKGROUND);
@@ -524,7 +546,7 @@ public static class MTree extends Tree {
                 if(item.canGetInt("level")){
                 	String ids = item.getString(label);
                 	int level = item.getInt("level");
-                	if(level<=2){
+                	if(level<=0){
                 		MTree tree = (MTree)t2;
                 		int row = item.getRow();
                 		Node parent = tree.getNode(row);

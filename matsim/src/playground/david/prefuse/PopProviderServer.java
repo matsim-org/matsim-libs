@@ -124,6 +124,8 @@ public class PopProviderServer implements PopulationProvider {
 //			for(Id idl : linkIds) {
 //				clientQ.doQuery(new QueryOb(idl, false));
 //			};
+//			netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
+
 			
 			Runnable loader = new Runnable() {
 				synchronized public void run() {
