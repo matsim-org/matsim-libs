@@ -61,7 +61,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	
 	private LeastCostPathCalculatorFactory factory;
 
-	private PlansCalcRouteConfigGroup configGroup;
+	private PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -78,7 +78,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		this.routeAlgo = this.factory.createPathCalculator(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
 		this.routeAlgoFreeflow = this.factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
-		this.configGroup = new PlansCalcRouteConfigGroup();
 	}
 	
 	/**
@@ -106,8 +105,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
-
-	
 
 	/**
 	 * @param router The routing algorithm to be used for finding routes on the network with actual travel times.
