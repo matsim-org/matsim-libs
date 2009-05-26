@@ -24,20 +24,20 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -50,8 +50,8 @@ import org.matsim.core.gbl.Gbl;
  * 
  * @author mrieser
  */
-public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
-		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
+public class EventsToScore implements BasicAgentArrivalEventHandler, AgentDepartureEventHandler, BasicAgentStuckEventHandler,
+		BasicAgentMoneyEventHandler, ActivityStartEventHandler, BasicActivityEndEventHandler {
 
 	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
@@ -75,23 +75,23 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		getScoringFunctionForAgent(event.getPersonId()).startLeg(event.getTime(), event.getLeg());
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		getScoringFunctionForAgent(event.getPersonId()).endLeg(event.getTime());
 	}
 
-	public void handleEvent(final AgentStuckEvent event) {
+	public void handleEvent(final BasicAgentStuckEvent event) {
 		getScoringFunctionForAgent(event.getPersonId()).agentStuck(event.getTime());
 	}
 
-	public void handleEvent(final AgentMoneyEvent event) {
+	public void handleEvent(final BasicAgentMoneyEvent event) {
 		getScoringFunctionForAgent(event.getPersonId()).addMoney(event.getAmount());
 	}
 
-	public void handleEvent(ActivityStartEvent event) {
+	public void handleEvent(final ActivityStartEvent event) {
 		getScoringFunctionForAgent(event.getPersonId()).startActivity(event.getTime(), event.getAct());
 	}
 
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(final BasicActivityEndEvent event) {
 		getScoringFunctionForAgent(event.getPersonId()).endActivity(event.getTime());
 	}
 

@@ -23,13 +23,13 @@ package org.matsim.core.events.algorithms;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
@@ -37,12 +37,12 @@ import org.matsim.matrices.Matrix;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
 
-public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureEventHandler {
+public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler {
 
 	private final Network network;
 	private final ZoneLayer tvzLayer;
-	private final TreeMap<String, Location> agents = new TreeMap<String, Location>(); // <AgentID, StartLoc>
-	private final TreeMap<String, Double> agentstime = new TreeMap<String, Double>();
+	private final TreeMap<Id, Location> agents = new TreeMap<Id, Location>(); // <AgentID, StartLoc>
+	private final TreeMap<Id, Double> agentsTime = new TreeMap<Id, Double>();
 	private final Matrix matrix;
 	private double minTime = Time.UNDEFINED_TIME; //Integer.MIN_VALUE;
 	private double maxTime = Double.POSITIVE_INFINITY;//Integer.MAX_VALUE;
@@ -54,35 +54,31 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 		this.matrix = Matrices.getSingleton().createMatrix(id, tvzLayer, "od for miv");
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of EventAlgorithmI
-	//////////////////////////////////////////////////////////////////////
-
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		double time = event.getTime();
 		if ((time < this.minTime) || (time >= this.maxTime)) {
 			return;
 		}
-		Location fromLoc = getLocation(event.getLinkId().toString());
+		Location fromLoc = getLocation(event.getLinkId());
 		if (fromLoc != null) {
-			String agentId = event.getPersonId().toString();
+			Id agentId = event.getPersonId();
 			this.agents.put(agentId, fromLoc);
-			this.agentstime.put(agentId, time);
+			this.agentsTime.put(agentId, time);
 		}
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		double time = event.getTime();
 		if (time < this.minTime) {
 			return;
 		}
-		String agentId = event.getPersonId().toString();
+		Id agentId = event.getPersonId();
 		Location fromLoc = this.agents.remove(agentId); // use remove instead of get to make sure one arrival event is not used for multiple departure events
 		if (fromLoc == null) {
 			// we have no information on where the agent started
 			return;
 		}
-		Location toLoc = getLocation(event.getLinkId().toString());
+		Location toLoc = getLocation(event.getLinkId());
 		if (toLoc != null) {
 			this.agents.remove(agentId);
 			Entry entry = this.matrix.getEntry(fromLoc, toLoc);
@@ -115,8 +111,8 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 		// nothing to do
 	}
 
-	private Location getLocation(final String linkId) {
-		Link link = this.network.getLink(new IdImpl(linkId));
+	private Location getLocation(final Id linkId) {
+		Link link = this.network.getLinks().get(linkId);
 
 		ArrayList<Location> locs = this.tvzLayer.getNearestLocations(link.getCoord(), null);
 		if (locs.size() > 0) {
