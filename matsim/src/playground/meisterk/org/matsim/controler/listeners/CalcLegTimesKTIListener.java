@@ -52,7 +52,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 
 		try {
 			this.out = IOUtils.getBufferedWriter(org.matsim.core.controler.Controler.getOutputFilename(this.filename));
-			this.out.write("iteration\tall");
+			this.out.write("#iteration\tall");
 			for (TransportMode mode : TransportMode.values()) {
 				this.out.write("\t" + mode.toString());
 			}
