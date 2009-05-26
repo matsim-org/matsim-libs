@@ -5,7 +5,6 @@ import java.util.TreeMap;
 import java.util.Vector;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
 import org.apache.log4j.Logger;

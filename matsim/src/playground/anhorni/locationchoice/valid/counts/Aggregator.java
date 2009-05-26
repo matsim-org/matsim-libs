@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 public class Aggregator {
 	
-	private final static Logger log = Logger.getLogger(Aggregator.class);
+	//private final static Logger log = Logger.getLogger(Aggregator.class);
 	
 	private TreeMap<Integer, List<Double>> volumes;
 		

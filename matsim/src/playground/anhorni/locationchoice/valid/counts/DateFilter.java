@@ -59,9 +59,29 @@ public class DateFilter {
 	}
 	
 	private boolean isPublicHoliday(RawCount count) {
-		// 2005: only 5.5 on DI-DO!
-		if (count.getMonth()==5 && count.getDay()==5) {
-			return true;
+		
+		// 2004: DI-DO
+		if (count.getYear() == 2004 && count.getMonth()== 1 && count.getDay()== 1) {
+			return true; // Neujahrstag
+		}
+		if (count.getYear() == 2004 && count.getMonth()== 5 && count.getDay()== 20) {
+			return true; // Auffahrt
+		}
+		
+		// 2005: DI-DO!
+		if (count.getYear() == 2005 && count.getMonth()== 5 && count.getDay()== 5) {
+			return true; // Auffahrt
+		}
+		
+		// 2006: DI-DO!
+		if (count.getYear() == 2006 && count.getMonth()== 5 && count.getDay()== 25) {
+			return true; // Auffahrt
+		}
+		if (count.getYear() == 2006 && count.getMonth()== 8 && count.getDay()== 1) {
+			return true; // 1. August
+		}
+		if (count.getYear() == 2006 && count.getMonth()== 12 && count.getDay()== 26) {
+			return true; // Stephanstag
 		}
 		else return false;
 	}
