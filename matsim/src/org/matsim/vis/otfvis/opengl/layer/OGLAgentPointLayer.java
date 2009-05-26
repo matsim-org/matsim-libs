@@ -239,6 +239,20 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 	}
 
+	public class AgentPointDrawerByID extends AgentPointDrawer {
+		public Color getColorFromID(char[] id){
+			int idint = Integer.parseInt(new String(id));
+			int idR = (idint % (1 << 24)) >> 16;
+			int idG = (idint % (1 << 16)) >> 8;
+			int idB = (idint % (1 << 8));
+			return new Color(idR, idG,idB,250);
+		}
+		
+		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
+			drawer.addAgent(id, startX, startY, getColorFromID(id), true);
+		}
+	}
+
 	public class AgentPadangDrawer  extends AgentPointDrawer {
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
 			protected void setAgentSize(){gl.glPointSize(10);}
@@ -289,6 +303,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	private final AgentPointDrawer pointdrawer = this.new AgentPointDrawer();
 	private final AgentPadangTimeDrawer timedrawer = this.new AgentPadangTimeDrawer();
 	private final AgentPadangRegionDrawer regiondrawer = this.new AgentPadangRegionDrawer();
+	private final AgentPointDrawerByID pointIDdrawer = this.new AgentPointDrawerByID();
 
 	@Override
 	public void draw() {
@@ -312,6 +327,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 //		AgentPointDrawer drawer = (AgentPointDrawer)clazz.newInstance(this);
 		if (clazz == AgentPadangTimeDrawer.class) return timedrawer;
 		else if (clazz == AgentPadangRegionDrawer.class) return regiondrawer;
+		else if (clazz == AgentPointDrawerByID.class) return pointIDdrawer;
 		else return pointdrawer;
 	}
 
