@@ -69,17 +69,25 @@ public class OTFAbortGoto extends Thread  {
 				sleep(500);
 				int lastTime = actTime;
 				actTime = host.getLocalTime();
-				if((lastTime > actTime) && (host.isLive())){
+				if(((lastTime > actTime) || (actTime == -1)) && (host.isLive())){
 					actStatus = ((OTFLiveServerRemote)host).getControllerStatus();
 					actIter = OTFVisController.getIteration(actStatus);
+					actStatus = OTFVisController.getStatus(actStatus);
+					if(actTime == -1) actTime = 0;
 				}
 				
 				String message = String.format("Completed to Time: "+ Time.writeTime(actTime));
-				if(actStatus != OTFVisController.NOCONTROL){
+				if(actStatus == OTFVisController.RUNNING){
 					message = String.format("Completed to Time: "+ actIter + "#" + Time.writeTime(actTime));
+				} else if( actStatus == OTFVisController.REPLANNING){
+					message = String.format("Completed to Iteration: "+ actIter + ": REPLANNING");
+				} else {
+					
 				}
 				progressMonitor.setNote(message);
-				progressMonitor.setProgress(actTime+3600*30*actIter);
+				double pastMidnight = (actTime > 24*3600) ? (actTime -24*3600)/3600. : 0;
+				int progress = (pastMidnight>0 ? 24*3600 + (int)(5*3600*(pastMidnight/(pastMidnight+1))) : actTime) + 3600*30*actIter;
+				progressMonitor.setProgress(progress);
 				if ( ((actIter >= toIter) && (actTime >= toTime)) || progressMonitor.isCanceled()) {
 					terminate = true;
 				}
