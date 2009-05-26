@@ -118,7 +118,7 @@ public class PathSetGenerator {
 			nodeDensity += this.network.getNode(nid).getIncidentNodes().size();
 		}
 		this.avLinkDensityPerNonePassNodeNetwork = linkDensity/nodeIds.size();
-		this.avIncidentNodeDensityPerNonePassNodeNetwork = nodeDensity;
+		this.avIncidentNodeDensityPerNonePassNodeNetwork = nodeDensity/nodeIds.size();
 
 	}
 	
@@ -403,7 +403,7 @@ public class PathSetGenerator {
 				"; avLinkDensityPerNodeLCP = "+avLinkDensityPerNodeLCP+
 				"; avIncidentNodeDensityPerNodeLCP = "+avIncidentNodeDensityPerNodeLCP+
 				"; avLinkDensityPerNonePassNodeLCP = "+avLinkDensityPerNonePassNodeLCP+
-				"; avIncidentNodeDensityPerNonePassNodeLCP"+avIncidentNodeDensityPerNonePassNodeLCP+
+				"; avIncidentNodeDensityPerNonePassNodeLCP = "+avIncidentNodeDensityPerNonePassNodeLCP+
 				"; avLinkDensityPerNodeNetwork = "+this.avLinkDensityPerNodeNetwork+
 				"; avIncidentNodeDensityPerNodeNetwork = "+this.avIncidentNodeDensityPerNodeNetwork+
 				"; avLinkDensityPerNonePassNodeNetwork = "+this.avLinkDensityPerNonePassNodeNetwork+
