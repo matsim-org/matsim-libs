@@ -54,7 +54,9 @@ public class PathSetGenerator {
 	private final static Logger log = Logger.getLogger(PathSetGenerator.class);
 
 	private final NetworkLayer network;
+	private final double networkNodeDensity;
 	private final Map<Id,StreetSegment> l2sMapping = new HashMap<Id,StreetSegment>();
+	private final double streetSegmentNodeDensity;
 	private final FreespeedTravelTimeCost frespeedCost;
 	private final LeastCostPathCalculator router;
 
@@ -86,6 +88,25 @@ public class PathSetGenerator {
 		preProcessLandmarks.run(network);
 		this.router = new AStarLandmarks(this.network,preProcessLandmarks,this.frespeedCost);
 		this.initStreetSegments();
+		
+		// calc network node density
+		double density = 0.0;
+		for (Node n : network.getNodes().values()) { density += n.getIncidentLinks().size(); }
+		density /= network.getNodes().size();
+		this.networkNodeDensity = density;
+
+		// calc street segment node density
+		Set<Id> nodeIds = new HashSet<Id>(this.network.getNodes().size());
+		for (StreetSegment s : l2sMapping.values()) {
+			nodeIds.add(s.getFromNode().getId());
+			nodeIds.add(s.getToNode().getId());
+		}
+		density = 0.0;
+		for (Id nid : nodeIds) {
+			density += this.network.getNode(nid).getIncidentLinks().size();
+		}
+		this.streetSegmentNodeDensity = density/nodeIds.size();
+
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -154,7 +175,7 @@ public class PathSetGenerator {
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-
+	
 	private final void initStreetSegments() {
 		log.info("init street segments...");
 		for (Link l : network.getLinks().values()) {
@@ -275,7 +296,7 @@ public class PathSetGenerator {
 					log.debug("  number of paths("+paths.size()+") >= nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
 					log.debug("  ==> found enough paths from node "+origin.getId()+" to node "+destination.getId()+".");
 					log.debug("end level "+level);
-					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "OK");
+					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level,"OK", leastCostPath);
 					return;
 				}
 				
@@ -284,7 +305,7 @@ public class PathSetGenerator {
 					log.debug("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
 					log.debug("  ==> calculation timeout ("+timeout+" msec) reached for from node "+origin.getId()+" to node "+destination.getId()+".");
 					log.debug("end level "+level);
-					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "TIMEOUT");
+					printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "TIMEOUT", leastCostPath);
 					return;
 				}
 				
@@ -316,7 +337,7 @@ public class PathSetGenerator {
 			log.debug("  number of paths("+paths.size()+") < nofPaths("+nofPaths+") * variationFactor("+variationFactor+")");
 			log.debug("  ==> there are no more paths from node "+origin.getId()+" to node "+destination.getId()+".");
 			log.debug("end level "+level);
-			printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "NOMOREPATH");
+			printSummary(origin, destination, System.currentTimeMillis()-startTimeMilliseconds, paths.size(), routeCnt, level, "NOMOREPATH", leastCostPath);
 		}
 		// not enough paths found yet and therefore go into the next tree level
 		else {
@@ -328,7 +349,41 @@ public class PathSetGenerator {
 		}
 	}
 	
-	private final void printSummary(Node o, Node d, long ctime, int pathCnt, int routeCnt, int level, String type) {
-		log.info("PATHSETSUMMARY: o = "+o.getId()+"; d = "+d.getId()+"; comptime = "+ctime+"; pathCnt = "+pathCnt+"; routesCalcCnt = "+routeCnt+"; level = "+level+"; type = "+type);
+	private final void printSummary(Node o, Node d, long ctime, int pathCnt, int routeCnt, int level, String type, Path leastCostPath) {
+		double eDist = Math.sqrt(
+				(d.getCoord().getX()-o.getCoord().getX())*(d.getCoord().getX()-o.getCoord().getX())+
+				(d.getCoord().getY()-o.getCoord().getY())*(d.getCoord().getY()-o.getCoord().getY()));
+		double distLCP = 0.0;
+		for (Link l : leastCostPath.links) { distLCP += l.getLength(); }
+		int nofNonePassNodesLCP = 0;
+		double nodeDensityLCP = 0.0;
+		double nonePassNodesDensityLCP = 0.0;
+		for (Node n : leastCostPath.nodes) {
+			if ((n.getIncidentNodes().size() == 2) &&
+			    (((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) ||
+			     ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)))) {
+				nofNonePassNodesLCP++;
+				nonePassNodesDensityLCP += n.getIncidentLinks().size();
+			}
+			nodeDensityLCP += n.getIncidentLinks().size();
+		}
+		nodeDensityLCP /= leastCostPath.nodes.size();
+		nonePassNodesDensityLCP /= nofNonePassNodesLCP;
+
+		log.info("PATHSETSUMMARY: o = "+o.getId()+
+				"; d = "+d.getId()+
+				"; comptime = "+ctime+
+				"; pathCnt = "+pathCnt+
+				"; routesCalcCnt = "+routeCnt+
+				"; level = "+level+
+				"; type = "+type+
+				"; eDistOD = "+eDist+
+				"; distLCP = "+distLCP+
+				"; nofNodesLCP = "+leastCostPath.nodes.size()+
+				"; nofNonePassNodesLCP = "+nofNonePassNodesLCP+
+				"; nodeDensityLCP = "+nodeDensityLCP+
+				"; nonePassNodesDensityLCP = "+nonePassNodesDensityLCP+
+				"; nodeDensityNetwork = "+this.networkNodeDensity+
+				"; nonePassNodesDensityNetwork = "+this.streetSegmentNodeDensity);
 	}
 }
