@@ -220,6 +220,7 @@ public class QueryAgentPlan implements OTFQuery {
 				this.agentText.setAlpha(0.7f);
 			}
 			//InfoText.showText("Agent selected...");
+			onEndInit();
 		}
 
 		GL gl = drawer.getGL();
@@ -270,6 +271,11 @@ public class QueryAgentPlan implements OTFQuery {
 
 		gl.glDisable(GL.GL_BLEND);
 
+	}
+
+	protected void onEndInit() {
+		// for derived classes
+		
 	}
 
 	public void remove() {
