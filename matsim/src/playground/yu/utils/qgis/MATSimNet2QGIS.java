@@ -81,7 +81,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 		}
 	}
 
-	static double flowCapFactor = 0.1;
+	protected static double flowCapFactor = 0.1;
 	protected NetworkLayer network;
 	protected CoordinateReferenceSystem crs = null;
 	private Network2PolygonGraph n2g = null;

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
@@ -99,11 +100,12 @@ public class NewDemandWithFacilities4Zrh {
 				afMap.put(coord, af);
 			}
 			act.setFacility(af);
-			if (!af.getActivityOptions().containsKey(type)) {
-				currentKnowledge.addActivity(af.createActivityOption(type),
-						(type.startsWith("h") || type.startsWith("w") || type
-								.startsWith("e")));// 3 primary type
-			}
+			ActivityOption ao = af.getActivityOption(type);
+			if (ao == null)
+				ao = af.createActivityOption(type);
+			// 3 primary type in Zurich scenario
+			currentKnowledge.addActivity(ao, (type.startsWith("h")
+					|| type.startsWith("w") || type.startsWith("e")));
 
 		}
 	}
@@ -114,22 +116,18 @@ public class NewDemandWithFacilities4Zrh {
 	 *            outputPopFilename, args3 outputFacilitiesFilename
 	 */
 	public static void main(String[] args) {
-		// String netFilename =
-		// "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		// String inputPopFilename =
-		// "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
+		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		String inputPopFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 		// String facilitiesFilename =
 		// "../schweiz-ivtch-SVN/baseCase/facilities/facilities.xml.gz";
-		// String outputPopFilename =
-		// "../matsimTests/locationChoice/pop.xml.gz";
-		// String outputFacilitiesFilename =
-		// "../matsimTests/locationChoice/facs.xml.gz";
+		String outputPopFilename = "../matsimTests/locationChoice/pop.xml.gz";
+		String outputFacilitiesFilename = "../matsimTests/locationChoice/facs.xml.gz";
 
-		String netFilename = args[0];
-		String inputPopFilename = args[1];
-		// String facilitiesFilename = args[2];
-		String outputPopFilename = args[2];
-		String outputFacilitiesFilename = args[3];
+		// String netFilename = args[0];
+		// String inputPopFilename = args[1];
+		// // String facilitiesFilename = args[2];
+		// String outputPopFilename = args[2];
+		// String outputFacilitiesFilename = args[3];
 
 		Scenario scenario = new ScenarioImpl();
 
