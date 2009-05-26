@@ -45,7 +45,7 @@ public class KnowledgeTools {
 		{		
 			if(person.getKnowledge() != null)
 			{
-				Map<String,Object> customAttributes = person.getKnowledge().getCustomAttributes();
+				Map<String,Object> customAttributes = person.getCustomAttributes();
 				
 				if(customAttributes.containsKey("Nodes"))
 				{
@@ -128,7 +128,7 @@ public class KnowledgeTools {
 		{		
 			if(person.getKnowledge() != null)
 			{
-				Map<String,Object> customAttributes = person.getKnowledge().getCustomAttributes();
+				Map<String,Object> customAttributes = person.getCustomAttributes();
 				
 				if(customAttributes.containsKey("Nodes"))
 				{

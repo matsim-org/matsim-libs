@@ -85,7 +85,7 @@ public class CreateKnownNodesMap {
 			nodesMap = new TreeMap<Id, Node>();
 
 			// add the new created Nodes to the knowledge of the person
-			Map<String,Object> customKnowledgeAttributes = p.getKnowledge().getCustomAttributes();
+			Map<String,Object> customKnowledgeAttributes = p.getCustomAttributes();
 			customKnowledgeAttributes.put("Nodes", nodesMap);
 		}
 		

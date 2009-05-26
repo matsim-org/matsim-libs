@@ -175,7 +175,7 @@ public class ParallelCreateKnownNodesMap {
 					Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 
 					// add the new created Nodes to the knowledge of the person
-					Map<String,Object> customKnowledgeAttributes = person.getKnowledge().getCustomAttributes();
+					Map<String,Object> customKnowledgeAttributes = person.getCustomAttributes();
 					customKnowledgeAttributes.put("Nodes", nodesMap);
 				}
 				

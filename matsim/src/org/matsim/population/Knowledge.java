@@ -27,15 +27,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicKnowledge;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.customize.CustomizableImpl;
 
-public class Knowledge extends CustomizableImpl implements BasicKnowledge<ActivityOption>{
+public class Knowledge implements BasicKnowledge<ActivityOption> {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -62,15 +62,15 @@ public class PersonExchangeKnowledge {
 		List<ActivityOption> act2List = k2.getActivities(facType);
 		if(act2List.size()>=1){
 			ActivityOption activity2=act2List.get(MatsimRandom.getRandom().nextInt( act2List.size()));
-			((MentalMap)k1.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity2);
+			((MentalMap)p1.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity2);
 		}
 
 //		If person2 has an edge pointed toward person1, let p1 share information with p2
-		if(((EgoNet)p2.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p1)){
+		if(((EgoNet)p2.getCustomAttributes().get(EgoNet.NAME)).knows(p1)){
 			List<ActivityOption> act1List = k1.getActivities(facType);
 			if(act1List.size()>=1){
 				ActivityOption activity1=act1List.get(MatsimRandom.getRandom().nextInt( act1List.size()));
-				((MentalMap)k2.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity1);
+				((MentalMap)p2.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity1);
 			}
 		}
 	}
@@ -86,9 +86,8 @@ public class PersonExchangeKnowledge {
 
 		Person p1 = myLink.getPersonFrom();
 		Person p2 = myLink.getPersonTo();
-		Knowledge k1 = p1.getKnowledge();
 
-		Person newFriend = ((EgoNet)k1.getCustomAttributes().get(EgoNet.NAME)).getRandomPerson();
+		Person newFriend = ((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).getRandomPerson();
 		if ((newFriend != null) && (p2 != null)) {
 			net.makeSocialContact(newFriend, p2, iteration, "fof");
 		}

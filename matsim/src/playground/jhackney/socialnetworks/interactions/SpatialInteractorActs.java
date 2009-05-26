@@ -223,7 +223,7 @@ public class SpatialInteractorActs {
 					if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
-						if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
+						if (((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 							net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //							System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 						} else {
@@ -284,7 +284,7 @@ public class SpatialInteractorActs {
 				if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 					// If they know each other, probability is 1.0 that the relationship is reinforced
-					if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
+					if (((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 						net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //						System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 					} else {
@@ -352,7 +352,7 @@ public class SpatialInteractorActs {
 					if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
-						if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
+						if (((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 							net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 							//							System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 						} else {
@@ -437,7 +437,7 @@ public class SpatialInteractorActs {
 										if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 											
 											// If they know each other, probability is 1.0 that the relationship is reinforced
-											if (((EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
+											if (((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).knows(p2)) {
 												net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //										System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 											} else {

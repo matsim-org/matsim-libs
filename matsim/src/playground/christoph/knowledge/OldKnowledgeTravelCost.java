@@ -73,20 +73,20 @@ public class OldKnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		Id ID = link.getId();
 		
 		// kein Check - wir wissen ja, was drinnen steckt...
-		ArrayList<Id> linkIds = (ArrayList<Id>)person.getKnowledge().getCustomAttributes().get("LinkIDs");
-		ArrayList<Double> costs = (ArrayList<Double>)person.getKnowledge().getCustomAttributes().get("Costs");
+		ArrayList<Id> linkIds = (ArrayList<Id>)person.getCustomAttributes().get("LinkIDs");
+		ArrayList<Double> costs = (ArrayList<Double>)person.getCustomAttributes().get("Costs");
 		
 		//System.out.println("Length of stored knowledge... " + linkIds.size());
 		
 		for(int i = 0; i < linkIds.size(); i++)
 		{
 			System.out.println("Comparing... " + ID.toString() + " with " + linkIds.get(i).toString());
-			// falls eine �bereinstimmung gefunden wurde
+			// falls eine uebereinstimmung gefunden wurde
 			if(linkIds.get(i).compareTo(ID) == 0)
 			//if(linkIds.get(i).equals(ID))
 			//if(linkIds.get(i).toString().equals(ID.toString()))
 			{
-				// Derzeit Wert einfach �bernehmen - sp�ter je nach Strategie
+				// Derzeit Wert einfach uebernehmen - spaeter je nach Strategie
 				// addieren, multiplizieren oder whatever!
 				cost = costs.get(i);
 				//System.out.println("Adapting Travelcosts!!!");
@@ -95,7 +95,7 @@ public class OldKnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		}
 		
 		// Der Person bekanntes Verkehrsnetz holen.
-		ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getKnowledge().getCustomAttributes().get("IncludedLinkIDs");
+		ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getCustomAttributes().get("IncludedLinkIDs");
 		
 		for(int i = 0; i < includedLinkIds.size(); i++)
 		{
@@ -127,7 +127,7 @@ public class OldKnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		}
 		*/
 		
-		// ... �berarbeitete Kosten retour geben
+		// ... ueberarbeitete Kosten retour geben
 		return cost;
 	}
 		

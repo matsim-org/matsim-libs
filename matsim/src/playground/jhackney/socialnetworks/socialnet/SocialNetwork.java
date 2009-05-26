@@ -237,7 +237,7 @@ public class SocialNetwork {
 			while (j<Math.min(m,coreSize)){ // the new member links to this many old members. m < m0
 				int pick=MatsimRandom.getRandom().nextInt(coreSize);//start at a random core member
 				Person pJ = core.get(pick);
-				double pIJ= (((EgoNet)pJ.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getOutDegree()+A)/(2*E + coreSize*A);
+				double pIJ= (((EgoNet)pJ.getCustomAttributes().get(EgoNet.NAME)).getOutDegree()+A)/(2*E + coreSize*A);
 				if(coreSize==0){
 					pIJ = 1.;
 				}
@@ -367,10 +367,10 @@ public class SocialNetwork {
 
 //			NOTE this could be made more efficient by directly accessing
 //			the link and testing for null
-			if(((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(person2)){
+			if(((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).knows(person2)){
 
-				newLink = ((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
-				newOpposingLink = ((EgoNet)person2.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person1);
+				newLink = ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
+				newOpposingLink = ((EgoNet)person2.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person1);
 
 				newLink.setTimeLastUsed(iteration);
 				newLink.incrementNumberOfTimesMet();
@@ -378,7 +378,7 @@ public class SocialNetwork {
 				newOpposingLink.incrementNumberOfTimesMet();
 			} else 
 //				They do not know each other, make new link subject to saturation effects	
-				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
+				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration);
 					linksList.add(newLink);
@@ -423,10 +423,10 @@ public class SocialNetwork {
 
 		if (!person1.equals(person2)) {
 
-			if(((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(person2)){
+			if(((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).knows(person2)){
 
-				newLink = ((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
-				newOpposingLink = ((EgoNet)person2.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person1);
+				newLink = ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
+				newOpposingLink = ((EgoNet)person2.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person1);
 
 				newLink.setTimeLastUsed(iteration);
 				newLink.setType(linkType);
@@ -436,7 +436,7 @@ public class SocialNetwork {
 				newOpposingLink.incrementNumberOfTimesMet();
 			} else 
 //				They do not know each other, make new link subject to saturation effects	
-				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
+				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration, linkType);
 					linksList.add(newLink);
@@ -491,10 +491,10 @@ public class SocialNetwork {
 
 //			NOTE this could be made more efficient by directly accessing
 //			the link and testing for null
-			if(((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(person2)){
+			if(((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).knows(person2)){
 
-				newLink = ((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
-				newOpposingLink = ((EgoNet)person2.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person1);
+				newLink = ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
+				newOpposingLink = ((EgoNet)person2.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person1);
 
 				newLink.setTimeLastUsed(iteration);
 				newLink.setType(linkType);
@@ -505,7 +505,7 @@ public class SocialNetwork {
 				status=1; // status=1 means existing link was renewed
 			} else 
 //				They do not know each other, make new link subject to saturation effects	
-				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
+				if(MatsimRandom.getRandom().nextDouble()<Math.exp(this.degree_saturation_rate * ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getOutDegree())){
 					newLink = new SocialNetEdge(person1, person2);
 					addLink(newLink,iteration, linkType);
 					linksList.add(newLink);
@@ -524,13 +524,13 @@ public class SocialNetwork {
 
 	public void addLink(SocialNetEdge myLink, int iteration){
 
-		((EgoNet)myLink.getPersonFrom().getKnowledge().getCustomAttributes().get(EgoNet.NAME)).addEgoLink(myLink);
+		((EgoNet)myLink.getPersonFrom().getCustomAttributes().get(EgoNet.NAME)).addEgoLink(myLink);
 		myLink.setTimeMade(iteration);
 		myLink.setTimeLastUsed(iteration);
 	}
 
 	public void addLink(SocialNetEdge myLink, int iteration, String linkType){
-		((EgoNet)myLink.getPersonFrom().getKnowledge().getCustomAttributes().get(EgoNet.NAME)).addEgoLink(myLink);
+		((EgoNet)myLink.getPersonFrom().getCustomAttributes().get(EgoNet.NAME)).addEgoLink(myLink);
 		myLink.setTimeMade(iteration);
 		myLink.setTimeLastUsed(iteration);
 		myLink.setType(linkType);
@@ -595,7 +595,7 @@ public class SocialNetwork {
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
 				double randremove=MatsimRandom.getRandom().nextDouble();
-				int degree = ((EgoNet)myLink.getPersonFrom().getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getOutDegree();
+				int degree = ((EgoNet)myLink.getPersonFrom().getCustomAttributes().get(EgoNet.NAME)).getOutDegree();
 				if(degree > maxDeg){
 					Gbl.errorMsg(this.getClass()+" degree of person "+myLink.getPersonFrom().getId()+" = "+degree+" > maxDegree="+maxDeg);
 				}
@@ -641,7 +641,7 @@ public class SocialNetwork {
 //					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
 
 					if ((iteration - edge.getTimeLastUsed()) >= remove_age ) {//JH changed here
-						SocialNetEdge opposite_edge= ((EgoNet)edge.getPersonTo().getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(edge.getPersonFrom());
+						SocialNetEdge opposite_edge= ((EgoNet)edge.getPersonTo().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(edge.getPersonFrom());
 						if(!(linksToRemove.contains(opposite_edge) || linksToRemove.contains(edge))){
 							linksToRemove.add(edge);
 							i++;
@@ -664,7 +664,7 @@ public class SocialNetwork {
 
 		for(int i=0;i<myPersons.length;i++){
 			Person myPerson = (Person) myPersons[i];
-			int deg= ((EgoNet)myPerson.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getOutDegree();
+			int deg= ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getOutDegree();
 			if(maxDegree<deg){
 				maxDegree=deg;
 			}
@@ -679,7 +679,7 @@ public class SocialNetwork {
 			this.removeLink(myLink);
 
 			if (UNDIRECTED) {
-				SocialNetEdge myOpposingLink= ((EgoNet)myLink.getPersonTo().getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(myLink.getPersonFrom());
+				SocialNetEdge myOpposingLink= ((EgoNet)myLink.getPersonTo().getCustomAttributes().get(EgoNet.NAME)).getEgoLink(myLink.getPersonFrom());
 				this.removeLink(myOpposingLink);
 			}
 		}
@@ -692,7 +692,7 @@ public class SocialNetwork {
 		if (myLink == null) {
 			log.info("DEBUG STOP");
 		}
-		((EgoNet)myLink.getPersonFrom().getKnowledge().getCustomAttributes().get(EgoNet.NAME)).removeEgoLink(myLink);
+		((EgoNet)myLink.getPersonFrom().getCustomAttributes().get(EgoNet.NAME)).removeEgoLink(myLink);
 
 	}
 

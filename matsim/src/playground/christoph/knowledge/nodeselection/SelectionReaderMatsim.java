@@ -181,7 +181,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 		{
 			if (currentKnowledge != null)
 			{
-				Map<String,Object> customAttributes = currentKnowledge.getCustomAttributes();
+				Map<String,Object> customAttributes = currentPerson.getCustomAttributes();
 	
 				if (customAttributes != null)
 				{

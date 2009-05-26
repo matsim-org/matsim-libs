@@ -44,7 +44,7 @@ public class PersonCalculateActivitySpaces {
 
 		Activity myAct = (Activity) ego.getSelectedPlan().getPlanElements().get(0);
 		Coord egoHomeCoord = myAct.getCoord();
-		EgoNet personNet = (EgoNet)ego.getKnowledge().getCustomAttributes().get(EgoNet.NAME);
+		EgoNet personNet = (EgoNet)ego.getCustomAttributes().get(EgoNet.NAME);
 		ArrayList<Person> alters = personNet.getAlters();
 		for (Person myAlter : alters) {
 			//Coord myAlterCoord = (Coord) pfc.personGetCoords(myAlter,"home").get(0);

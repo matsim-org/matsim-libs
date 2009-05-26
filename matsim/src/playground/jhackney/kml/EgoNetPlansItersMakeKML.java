@@ -262,7 +262,7 @@ public class EgoNetPlansItersMakeKML {
 
 		// load Data into KML folders for myPerson
 		int i=0;
-		ArrayList<Person> persons = ((EgoNet)myPerson.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getAlters();
+		ArrayList<Person> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
 
 		// more colors than in current egonet to allow for adding agents to egonet without repeating colors
 //		nColors=persons.size()*2;

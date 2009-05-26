@@ -32,7 +32,6 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.population.Knowledge;
 
 import playground.christoph.knowledge.utils.GetAllLinks;
 
@@ -100,9 +99,8 @@ public class GenerateKnowledge {
 	// Beschraenkt die Kenntnis der Umgebung der uebergebenen Person.
 	protected void setKnowledge(Person person, ArrayList<Link> links)
 	{		
-		Knowledge knowledge = person.getKnowledge();
 		
-		ArrayList<Id> includedLinkIds = (ArrayList<Id>)knowledge.getCustomAttributes().get("IncludedLinkIDs");
+		ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getCustomAttributes().get("IncludedLinkIDs");
 		
 		// Nodes innerhalb der vorgegebenen Distanz holen...
 		ArrayList<Node> includedNodes = getIncludedNodes(links);

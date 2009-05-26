@@ -37,7 +37,7 @@ public class PersonForgetKnowledge extends AbstractPersonAlgorithm {
 		Plan p = person.getSelectedPlan();
 		if(multiple>0){
 		int max_memory = (int) (p.getPlanElements().size()/2*person.getPlans().size()*multiple);
-		((MentalMap)person.getKnowledge().getCustomAttributes().get(MentalMap.NAME)).manageMemory(max_memory, person.getPlans());
+		((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).manageMemory(max_memory, person.getPlans());
 		}
 	}
 

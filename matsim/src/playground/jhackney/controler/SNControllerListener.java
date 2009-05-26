@@ -339,7 +339,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getPlanElements().size()/2*p.getPlans().size()*1.5);
 //				this.log.info("NOTE that manageMemory is turned off");
-				((MentalMap)p.getKnowledge().getCustomAttributes().get(MentalMap.NAME)).manageMemory(max_memory, p.getPlans());
+				((MentalMap)p.getCustomAttributes().get(MentalMap.NAME)).manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... done");
 
@@ -380,12 +380,12 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				Plan plan = person.getPlans().get(ii);
 
 				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
-				if (k.getCustomAttributes().get(MentalMap.NAME) == null) { k.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
-				if (k.getCustomAttributes().get(EgoNet.NAME) == null) { k.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
+				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
+				if (person.getCustomAttributes().get(EgoNet.NAME) == null) { person.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
 
-				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).prepareActs(plan);// // JH Hack to make sure act types are compatible with social nets
-				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapRandom(plan);
-				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapFromFile(plan,facilities,aar);
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).prepareActs(plan);// // JH Hack to make sure act types are compatible with social nets
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapRandom(plan);
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapFromFile(plan,facilities,aar);
 //				Reset activity spaces because they are not read or written correctly
 				k.resetActivitySpaces();
 			}

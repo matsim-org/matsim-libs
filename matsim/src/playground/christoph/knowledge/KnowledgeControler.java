@@ -136,7 +136,7 @@ public class KnowledgeControler extends Controler {
 			ArrayList<Id> includedLinkIds = new ArrayList<Id>();
 			
 			//Map<String,Object> newAttrib = this.getPopulation().getPerson("1").getCustomAttributes();
-			Map<String,Object> newAttrib = p.getKnowledge().getCustomAttributes();
+			Map<String,Object> newAttrib = p.getCustomAttributes();
 			newAttrib.put("LinkIDs", linkIds);
 			newAttrib.put("Costs", costs);	
 			newAttrib.put("IncludedLinkIDs", includedLinkIds);
@@ -158,8 +158,8 @@ public class KnowledgeControler extends Controler {
 			//Id ID = p.getId();
 			
 			// kein Check - wir wissen ja, was drinnen steckt...
-			ArrayList<Id> linkIds = (ArrayList<Id>)p.getKnowledge().getCustomAttributes().get("LinkIDs");
-			ArrayList<Double> costs = (ArrayList<Double>)p.getKnowledge().getCustomAttributes().get("Costs");
+			ArrayList<Id> linkIds = (ArrayList<Id>)p.getCustomAttributes().get("LinkIDs");
+			ArrayList<Double> costs = (ArrayList<Double>)p.getCustomAttributes().get("Costs");
 
 
 			linkIds.add(new IdImpl("6"));

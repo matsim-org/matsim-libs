@@ -66,7 +66,7 @@ public class CompareTimeWindows {
 					p2 = visits.get(j).person;
 					tw2 = visits.get(j);
 					if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2) && !p1.equals(p2)){
-						EgoNet net = (EgoNet)p1.getKnowledge().getCustomAttributes().get(EgoNet.NAME);
+						EgoNet net = (EgoNet)p1.getCustomAttributes().get(EgoNet.NAME);
 						if(net.getAlters().contains(p2)){
 							friend++;
 							totalTimeWithFriends+=CompareTimeWindows.getTimeWindowOverlapDuration(tw1,tw2);
@@ -133,7 +133,7 @@ public class CompareTimeWindows {
 		Activity act2=tw2.act;
 		boolean overlap=false;
 		if(act2.getFacility().getActivityOption(act2.getType()).equals(act1.getFacility().getActivityOption(act1.getType()))){
-			if(act2.getEndTime() >=act1.getStartTime() && act2.getStartTime()<=act1.getEndTime() && ((EgoNet)tw1.person.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).knows(tw2.person)){
+			if(act2.getEndTime() >=act1.getStartTime() && act2.getStartTime()<=act1.getEndTime() && ((EgoNet)tw1.person.getCustomAttributes().get(EgoNet.NAME)).knows(tw2.person)){
 				overlap=true;
 			}
 		}

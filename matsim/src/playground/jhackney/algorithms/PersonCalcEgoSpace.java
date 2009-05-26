@@ -92,7 +92,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 			throw new RuntimeException("Knowledge is not defined!");
 		}
 
-		final EgoNet egoNet = (EgoNet)know.getCustomAttributes().get(EgoNet.NAME);
+		final EgoNet egoNet = (EgoNet)person.getCustomAttributes().get(EgoNet.NAME);
 		if(egoNet == null){
 			throw new RuntimeException("EgoNet is not defined!");
 		}

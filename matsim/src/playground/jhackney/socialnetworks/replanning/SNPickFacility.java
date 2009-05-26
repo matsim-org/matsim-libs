@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -147,7 +147,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			
 //			Pick a new facility for it from the knowledge of alters and ego (LOGIT)
 //For each alter append its facList to existing facList
-			EgoNet egoNet = (EgoNet)k.getCustomAttributes().get(EgoNet.NAME);
+			EgoNet egoNet = (EgoNet)person.getCustomAttributes().get(EgoNet.NAME);
 			ArrayList<Person> alters=egoNet.getAlters();
 			Iterator<Person> aIt=alters.iterator();
 			while(aIt.hasNext()){
@@ -197,7 +197,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			}
 
 			if(changed){
-				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).addActivity(f.getActivityOption(factype));
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(f.getActivityOption(factype));
 //				System.out.println(" Activity locatoin changed this many activities:"+k.getActivities().size());
 				//		 loop over all <leg>s, remove route-information
 				List<? extends BasicPlanElement> bestactslegs = newPlan.getPlanElements();

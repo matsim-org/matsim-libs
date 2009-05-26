@@ -53,15 +53,15 @@ public class InitializeKnowledge {
 				Plan plan = person.getPlans().get(ii);
 
 				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
-				if (k.getCustomAttributes().get(MentalMap.NAME) == null) { k.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
-				if (k.getCustomAttributes().get(EgoNet.NAME) == null) { k.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
+				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }
+				if (person.getCustomAttributes().get(EgoNet.NAME) == null) { person.getCustomAttributes().put(EgoNet.NAME,new EgoNet()); }
 
 				// JH Hack to make sure act types are compatible with social nets
-				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).prepareActs(plan);
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).prepareActs(plan);
 				// JH If the Acts are not initialized with a Facility they get a random Facility on the Link
-				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapRandom(plan);
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapRandom(plan);
 				// JH If there is a user-supplied file of Facilities for the Act, read it in
-				((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapFromFile(plan,facilities, aar);
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapFromFile(plan,facilities, aar);
 			}
 		}
 		if(aar!=null){

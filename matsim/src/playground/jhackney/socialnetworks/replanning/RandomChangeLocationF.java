@@ -37,7 +37,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -130,9 +129,6 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 		}else{
 			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
-//			Get agent's knowledge
-			Knowledge k = person.getKnowledge();
-
 			// Replace with plan.getRandomActivity(type)
 
 //			Pick a random ACTIVITY of this type from knowledge
@@ -165,7 +161,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					newAct.setLink(fFromFacilities.getLink());
 					newAct.setCoord(fFromFacilities.getCoord());
 					newAct.setFacility(fFromFacilities);
-					((MentalMap)k.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOption(factype));
+					((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOption(factype));
 					changed = true;
 				}
 			}

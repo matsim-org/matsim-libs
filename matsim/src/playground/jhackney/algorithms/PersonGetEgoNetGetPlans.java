@@ -21,7 +21,7 @@ public PersonGetEgoNetGetPlans(){
 		PopulationImpl socialPlans=new PopulationImpl();
 
 		socialPlans.addPerson(ego);
-		ArrayList<Person> alters = ((EgoNet)ego.getKnowledge().getCustomAttributes().get(EgoNet.NAME)).getAlters();
+		ArrayList<Person> alters = ((EgoNet)ego.getCustomAttributes().get(EgoNet.NAME)).getAlters();
 		Iterator<Person> a_it=alters.iterator();
 		while(a_it.hasNext()){
 			socialPlans.addPerson(a_it.next());

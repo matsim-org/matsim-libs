@@ -49,7 +49,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.population.Knowledge;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
@@ -339,15 +338,15 @@ public class KMLPersonWriter {
 		}
 	}
 	
-	private void getKnownNodes()
+	private void getKnownNodes() // TODO bad naming: method is called get*, but doesn't return anything
 	{ 
 		if(this.person != null)
 		{
-			Knowledge knowledge = this.person.getKnowledge();
-		
-			if (knowledge != null)
-			{
-				Map<String,Object> customAttributes = knowledge.getCustomAttributes();
+//			Knowledge knowledge = this.person.getKnowledge();
+//		
+//			if (knowledge != null)
+//			{
+				Map<String,Object> customAttributes = person.getCustomAttributes();
 				
 				if (customAttributes != null)
 				{
@@ -361,8 +360,8 @@ public class KMLPersonWriter {
 				}	// if (customAttributes != null)
 				else nodes = null;
 				
-			}	// if (knowledge  != null)
-			else nodes = null;
+//			}	// if (knowledge  != null)
+//			else nodes = null;
 			
 		}	// if (this.person != null)
 		else nodes = null;
