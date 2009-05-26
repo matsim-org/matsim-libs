@@ -54,9 +54,13 @@ public class PathSetGenerator {
 	private final static Logger log = Logger.getLogger(PathSetGenerator.class);
 
 	private final NetworkLayer network;
-	private final double networkNodeDensity;
+	private final double avLinkDensityPerNodeNetwork;
+	private final double avLinkDensityPerNonePassNodeNetwork;
+
 	private final Map<Id,StreetSegment> l2sMapping = new HashMap<Id,StreetSegment>();
-	private final double streetSegmentNodeDensity;
+	private final double avIncidentNodeDensityPerNodeNetwork;
+	private final double avIncidentNodeDensityPerNonePassNodeNetwork;
+
 	private final FreespeedTravelTimeCost frespeedCost;
 	private final LeastCostPathCalculator router;
 
@@ -89,11 +93,17 @@ public class PathSetGenerator {
 		this.router = new AStarLandmarks(this.network,preProcessLandmarks,this.frespeedCost);
 		this.initStreetSegments();
 		
-		// calc network node density
-		double density = 0.0;
-		for (Node n : network.getNodes().values()) { density += n.getIncidentLinks().size(); }
-		density /= network.getNodes().size();
-		this.networkNodeDensity = density;
+		// calc network densities
+		double linkDensity = 0.0;
+		double nodeDensity = 0.0;
+		for (Node n : network.getNodes().values()) {
+			linkDensity += n.getIncidentLinks().size();
+			nodeDensity += n.getIncidentNodes().size();
+		}
+		linkDensity /= network.getNodes().size();
+		nodeDensity /= network.getNodes().size();
+		this.avLinkDensityPerNodeNetwork = linkDensity;
+		this.avIncidentNodeDensityPerNodeNetwork = nodeDensity;
 
 		// calc street segment node density
 		Set<Id> nodeIds = new HashSet<Id>(this.network.getNodes().size());
@@ -101,11 +111,14 @@ public class PathSetGenerator {
 			nodeIds.add(s.getFromNode().getId());
 			nodeIds.add(s.getToNode().getId());
 		}
-		density = 0.0;
+		linkDensity = 0.0;
+		nodeDensity = 0.0;
 		for (Id nid : nodeIds) {
-			density += this.network.getNode(nid).getIncidentLinks().size();
+			linkDensity += this.network.getNode(nid).getIncidentLinks().size();
+			nodeDensity += this.network.getNode(nid).getIncidentNodes().size();
 		}
-		this.streetSegmentNodeDensity = density/nodeIds.size();
+		this.avLinkDensityPerNonePassNodeNetwork = linkDensity/nodeIds.size();
+		this.avIncidentNodeDensityPerNonePassNodeNetwork = nodeDensity;
 
 	}
 	
@@ -356,19 +369,25 @@ public class PathSetGenerator {
 		double distLCP = 0.0;
 		for (Link l : leastCostPath.links) { distLCP += l.getLength(); }
 		int nofNonePassNodesLCP = 0;
-		double nodeDensityLCP = 0.0;
-		double nonePassNodesDensityLCP = 0.0;
+		double avLinkDensityPerNodeLCP = 0.0;
+		double avIncidentNodeDensityPerNodeLCP = 0.0;
+		double avLinkDensityPerNonePassNodeLCP = 0.0;
+		double avIncidentNodeDensityPerNonePassNodeLCP = 0.0;
 		for (Node n : leastCostPath.nodes) {
 			if ((n.getIncidentNodes().size() == 2) &&
 			    (((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) ||
 			     ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)))) {
 				nofNonePassNodesLCP++;
-				nonePassNodesDensityLCP += n.getIncidentLinks().size();
+				avLinkDensityPerNonePassNodeLCP += n.getIncidentLinks().size();
+				avIncidentNodeDensityPerNonePassNodeLCP += n.getIncidentNodes().size();
 			}
-			nodeDensityLCP += n.getIncidentLinks().size();
+			avLinkDensityPerNodeLCP += n.getIncidentLinks().size();
+			avIncidentNodeDensityPerNodeLCP += n.getIncidentNodes().size();
 		}
-		nodeDensityLCP /= leastCostPath.nodes.size();
-		nonePassNodesDensityLCP /= nofNonePassNodesLCP;
+		avLinkDensityPerNodeLCP /= leastCostPath.nodes.size();
+		avIncidentNodeDensityPerNodeLCP /= leastCostPath.nodes.size();
+		avLinkDensityPerNonePassNodeLCP /= nofNonePassNodesLCP;
+		avIncidentNodeDensityPerNonePassNodeLCP /= nofNonePassNodesLCP;
 
 		log.info("PATHSETSUMMARY: o = "+o.getId()+
 				"; d = "+d.getId()+
@@ -381,9 +400,13 @@ public class PathSetGenerator {
 				"; distLCP = "+distLCP+
 				"; nofNodesLCP = "+leastCostPath.nodes.size()+
 				"; nofNonePassNodesLCP = "+nofNonePassNodesLCP+
-				"; nodeDensityLCP = "+nodeDensityLCP+
-				"; nonePassNodesDensityLCP = "+nonePassNodesDensityLCP+
-				"; nodeDensityNetwork = "+this.networkNodeDensity+
-				"; nonePassNodesDensityNetwork = "+this.streetSegmentNodeDensity);
+				"; avLinkDensityPerNodeLCP = "+avLinkDensityPerNodeLCP+
+				"; avIncidentNodeDensityPerNodeLCP = "+avIncidentNodeDensityPerNodeLCP+
+				"; avLinkDensityPerNonePassNodeLCP = "+avLinkDensityPerNonePassNodeLCP+
+				"; avIncidentNodeDensityPerNonePassNodeLCP"+avIncidentNodeDensityPerNonePassNodeLCP+
+				"; avLinkDensityPerNodeNetwork = "+this.avLinkDensityPerNodeNetwork+
+				"; avIncidentNodeDensityPerNodeNetwork = "+this.avIncidentNodeDensityPerNodeNetwork+
+				"; avLinkDensityPerNonePassNodeNetwork = "+this.avLinkDensityPerNonePassNodeNetwork+
+				"; avIncidentNodeDensityPerNonePassNodeNetwork = "+this.avIncidentNodeDensityPerNonePassNodeNetwork);
 	}
 }
