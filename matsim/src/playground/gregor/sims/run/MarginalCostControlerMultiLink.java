@@ -26,6 +26,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
 import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
+import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorIII;
 import playground.gregor.sims.socialcost.SocialCostCalculator;
 import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLink;
 
@@ -49,7 +50,7 @@ public class MarginalCostControlerMultiLink extends Controler{
 		
 		this.events.addHandler(sc);
 		this.getQueueSimulationListener().add(sc);
-		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
+		this.travelCostCalculator = new MarginalTravelCostCalculatorIII(this.travelTimeCalculator,sc,this.config.travelTimeCalculator().getTraveltimeBinSize());
 		this.strategyManager = loadStrategyManager();
 		this.addControlerListener(sc);
 	}
