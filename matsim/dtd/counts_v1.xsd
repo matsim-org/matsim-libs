@@ -18,7 +18,7 @@
 	<xsd:sequence>
 		<xsd:element name="volume" type="volumeType" minOccurs="1" maxOccurs="unbounded"/>
 	</xsd:sequence>
-	<xsd:attribute name="loc_id" type="xsd:nonNegativeInteger" use="required"/>
+	<xsd:attribute name="loc_id" type="xsd:string" use="required"/>
 	<xsd:attribute name="cs_id" type="xsd:string" use="optional" default="0"/>
 	<xsd:attribute name="x" type="xsd:double" use="optional"/>
 	<xsd:attribute name="y" type="xsd:double" use="optional"/>
