@@ -63,7 +63,7 @@ public class NewDemandWithFacilities4Zrh {
 		private Knowledge currentKnowledge = null;
 		private long facCnt = 0;
 
-		public CreateActFacility(ActivityFacilities activityFacilities) {
+		public CreateActFacility(final ActivityFacilities activityFacilities) {
 			afs = activityFacilities;
 			afMap = new HashMap<Coord, ActivityFacility>();
 		}
@@ -73,7 +73,7 @@ public class NewDemandWithFacilities4Zrh {
 		// }
 
 		@Override
-		public void run(Person person) {
+		public void run(final Person person) {
 			currentPerson = (PersonImpl) person;
 			currentKnowledge = currentPerson.getKnowledge();
 			if (currentKnowledge == null)
@@ -83,7 +83,7 @@ public class NewDemandWithFacilities4Zrh {
 			currentPerson.setKnowledge(currentKnowledge);
 		}
 
-		public void run(Plan plan) {
+		public void run(final Plan plan) {
 			for (PlanElement pe : plan.getPlanElements())
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
@@ -92,7 +92,8 @@ public class NewDemandWithFacilities4Zrh {
 				}
 		}
 
-		private void allocateFacility2PrimaryActs4Zrh(String type, Activity act) {
+		private void allocateFacility2PrimaryActs4Zrh(final String type,
+				final Activity act) {
 			Coord coord = act.getCoord();
 			ActivityFacility af = afMap.get(coord);
 			if (af == null) {
@@ -115,9 +116,9 @@ public class NewDemandWithFacilities4Zrh {
 	 *            - args0 netFilename, args1 inputPopFilename, args2
 	 *            outputPopFilename, args3 outputFacilitiesFilename
 	 */
-	public static void main(String[] args) {
-		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String inputPopFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
+	public static void main(final String[] args) {
+		String netFilename = "examples/equil/network.xml";
+		String inputPopFilename = "../matsimTests/locationChoice/plans2.xml";
 		// String facilitiesFilename =
 		// "../schweiz-ivtch-SVN/baseCase/facilities/facilities.xml.gz";
 		String outputPopFilename = "../matsimTests/locationChoice/pop.xml.gz";
