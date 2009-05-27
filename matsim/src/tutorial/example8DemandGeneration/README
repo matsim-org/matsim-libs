@@ -1,0 +1,8 @@
+One reasonably simple (I think) example is currently in playground/kai/usecases/basicdemandgen.
+
+It is currently (I think) the only example that uses the __basic__ interfaces (i.e. only the API).
+
+It has not yet been moved here since (a) there hasn't been a uniform vote that it belongs here, and (b)
+there is currently no public example on which it can work (a point which is, however, in the process of being resolved).
+
+kai, may09
