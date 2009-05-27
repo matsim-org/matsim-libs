@@ -20,30 +20,18 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.events.Events;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFQuery;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer.SimpleQuadDrawer;
 
 public class CollectDrawLinkId {
@@ -79,14 +67,14 @@ public class CollectDrawLinkId {
 	}
 
 	class AddIdStringExecutor implements Executor<OTFDataReader> {
-		private final boolean nearestOnly;
-		private double minDist = Double.POSITIVE_INFINITY;
-		private static final double epsilon = 0.0001;
-		private final double cellWidth;
+//		private final boolean nearestOnly;
+//		private double minDist = Double.POSITIVE_INFINITY;
+//		private static final double epsilon = 0.0001;
+//		private final double cellWidth;
 		
 		public AddIdStringExecutor(boolean nearestOnly) {
-			this.nearestOnly = nearestOnly;
-			cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+//			this.nearestOnly = nearestOnly;
+//			cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
 		}
 		
 		public void execute(double x, double y, OTFDataReader reader)  {

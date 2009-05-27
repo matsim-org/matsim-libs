@@ -22,13 +22,8 @@ package org.matsim.vis.otfvis.executables;
 
 import java.util.UUID;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
@@ -56,18 +51,16 @@ public class OTFVisController extends Controler {
 		return res;
 	}
 	
-	@Override
-	protected void loadControlerListeners() {
-		// TODO Auto-generated method stub
-		super.loadControlerListeners();
-	}
-
-	@Override
-	protected void loadCoreListeners() {
-		// TODO Auto-generated method stub
-		super.loadCoreListeners();
-	}
-
+//	@Override
+//	protected void loadControlerListeners() {
+//		super.loadControlerListeners();
+//	}
+//
+//	@Override
+//	protected void loadCoreListeners() {
+//		super.loadCoreListeners();
+//	}
+//
 	@Override
 	protected void setUp() {
 		super.setUp();
@@ -96,19 +89,16 @@ public class OTFVisController extends Controler {
 
 	@Override
 	protected void shutdown(boolean unexpected) {
-		// TODO Auto-generated method stub
 		super.shutdown(unexpected);
 		this.myOTFServer.cleanup();
 	}
 
 	public OTFVisController(String[] args) {
 		super(args);
-		// TODO Auto-generated constructor stub
 	}
 
 	public OTFVisController(String configFileName) {
 		super(configFileName);
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -116,13 +106,11 @@ public class OTFVisController extends Controler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		String config = "../../tmp/studies/ivtch/Diss/config1p.xml";
 		OTFVisController controller = new OTFVisController(config);
 		controller.setOverwriteFiles(true);
 		controller.run();
 	}
-
 
 }
 
