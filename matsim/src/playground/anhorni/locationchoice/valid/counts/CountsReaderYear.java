@@ -79,6 +79,8 @@ public class CountsReaderYear {
 					if (vol1.length() == 0) {
 						vol1 = "-1";
 					}
+					
+					//log.info(id + " " + year + " " +  month + " " +  day + " " +  hour);
 
 					RawCount rawCount = new RawCount(id, year, month, day, hour, vol1, vol2);
 					
