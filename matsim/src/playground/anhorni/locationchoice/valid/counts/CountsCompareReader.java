@@ -52,7 +52,7 @@ public class CountsCompareReader {
 				double matsimVol = Double.parseDouble( entries[2].trim());
 				
 				if (!stations.addSimValforLinkId(networkName, linkId, hour, matsimVol)) {
-					log.error("Error with: " + linkId + "\thour:" + hour);
+//					log.error("Error with: " + linkId + "\thour:" + hour);
 				}
 			}	
 			bufferedReader.close();

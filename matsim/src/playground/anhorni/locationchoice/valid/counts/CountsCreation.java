@@ -50,15 +50,16 @@ public class CountsCreation {
 		
 		Converter converter = new Converter();
 		converter.convert(stations.getCountStations());
-				
-		CountsWriter writer = new CountsWriter(converter.getCountsAre(), "output/counts/countsAre.xml");
+		
+		CountsWriter writer = new CountsWriter(converter.getCountsIVTCH(), "output/counts/countsIVTCH.xml");
+		writer.write();
+		writer = new CountsWriter(converter.getCountsAre(), "output/counts/countsAre.xml");
 		writer.write();
 		writer = new CountsWriter(converter.getCountsTeleatlas(), "output/counts/countsTeleatlas.xml");
 		writer.write();
 		writer = new CountsWriter(converter.getCountsNavteq(), "output/counts/countsNAVTEQ.xml");
 		writer.write();
-		writer = new CountsWriter(converter.getCountsIVTCH(), "output/counts/countsIVTCH.xml");
-		writer.write();	
+
 		
 		// Summary:
 		CountsCompareReader countsCompareReader = new CountsCompareReader(stations);
@@ -79,5 +80,17 @@ public class CountsCreation {
 		countsReaderIVTCH.readFile("input/counts/original/countsIVTCH.xml");
 		CountsWriter countsWriterIVTCH = new CountsWriter(countsIVTCH, "output/counts/original/countsIVTCH_original.xml");
 		countsWriterIVTCH.write();	
+		
+		Counts countsARE = new Counts();
+		MatsimCountsReader countsReaderARE = new MatsimCountsReader(countsARE);
+		countsReaderARE.readFile("input/counts/original/countsARE.xml");
+		CountsWriter countsWriterAre = new CountsWriter(countsARE, "output/counts/original/countsAre_original.xml");
+		countsWriterAre.write();
+		
+		Counts countsNAVTEQ = new Counts();
+		MatsimCountsReader countsReaderNAVTEQ = new MatsimCountsReader(countsNAVTEQ);
+		countsReaderNAVTEQ.readFile("input/counts/original/countsNAVTEQ.xml");
+		CountsWriter countsWriterNAVTEQ = new CountsWriter(countsNAVTEQ, "output/counts/original/countsNavteq_original.xml");
+		countsWriterNAVTEQ.write();
 	}
 }

@@ -113,7 +113,7 @@ public class CountsReaderYear {
 				
 				if (rawCount.getVol1() < -0.5 || rawCount.getVol2() < -0.5) {
 					if (!stationDays2ThrowAway.contains(rawCount.getId() + "_" + this.convert(rawCount))) {
-//						stationDays2ThrowAway.add(rawCount.getId() + "_" + this.convert(rawCount));
+						stationDays2ThrowAway.add(rawCount.getId() + "_" + this.convert(rawCount));
 					}
 				}
 			}
