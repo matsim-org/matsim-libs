@@ -29,6 +29,7 @@ import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
 import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorIII;
 import playground.gregor.sims.socialcost.SocialCostCalculator;
 import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLink;
+import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLinkII;
 
 public class MarginalCostControlerMultiLink extends Controler{
 
@@ -46,7 +47,7 @@ public class MarginalCostControlerMultiLink extends Controler{
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		SocialCostCalculator sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
+		SocialCostCalculator sc = new SocialCostCalculatorMultiLinkII(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
 		
 		this.events.addHandler(sc);
 		this.getQueueSimulationListener().add(sc);
