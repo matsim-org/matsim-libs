@@ -20,7 +20,7 @@ package playground.dgrether.tests;
 
 import org.matsim.core.controler.Controler;
 
-import tutorial.MyControlerListener;
+import tutorial.example7ControlerListener.MyControlerListener;
 
 
 /**
