@@ -23,25 +23,22 @@ package playground.kai.usecases.basicmentalmodule;
  */
 
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.events.Events;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 
 public class MyStrategy extends PlanStrategy {
 	
-	public MyStrategy(Controler controler) {
+	public MyStrategy(BasicScenario sc) {
 		super(new RandomPlanSelector());
-		
-		BasicScenario sc = controler.getScenarioData() ;
-		
+				
 		MyModule mod = new MyModule( sc ) ;
 		
 		addStrategyModule(mod) ;
 		
-		Events events = controler.getEvents() ;
-		events.addHandler( mod ) ;
+//		BasicEvents events = sc.getEvents() ;
+//		events.addHandler( mod ) ;
+		// FIXME
 		
 	}
 
