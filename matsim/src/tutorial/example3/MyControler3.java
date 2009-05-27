@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControler2.java
+ * MyControler3.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,10 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial;
+package tutorial.example3;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -29,15 +29,16 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.vis.netvis.NetVis;
 
-public class MyControler2 {
+public class MyControler3 {
 
 	public static void main(final String[] args) {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		Scenario scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+		ScenarioLoader loader = new ScenarioLoader("./examples/tutorial/myConfig.xml");
+		Scenario scenario = loader.getScenario();
 
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		Events events = new Events();

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControler4.java
+ * MyControler5.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial;
+package tutorial.example5;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
@@ -28,13 +28,20 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.ReRouteDijkstra;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.vis.netvis.NetVis;
 
 
-public class MyControler4 {
+public class MyControler5 {
 
 	public static void main(final String[] args) {
 		final String netFilename = "./examples/equil/network.xml";
@@ -56,17 +63,33 @@ public class MyControler4 {
 		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), factory);
 		events.addHandler(scoring);
 
-		QueueSimulation sim = new QueueSimulation(scenario, events);
-		sim.openNetStateWriter("./output/simout", netFilename, 10);
-		sim.run();
+		StrategyManager strategyManager = new StrategyManager();
+		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
+		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+		strategyManager.addStrategy(strategy1, 0.9);
+		strategyManager.addStrategy(strategy2, 0.1);
 
-		scoring.finish();
+		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc, config.charyparNagelScoring());
+		strategy2.addStrategyModule(new ReRouteDijkstra(config.plansCalcRoute(), scenario.getNetwork(), costCalc, ttimeCalc));
+		events.addHandler(ttimeCalc);
 
-		PlanAverageScore average = new PlanAverageScore();
-		average.run(scenario.getPopulation());
-		System.out.println("### the average score is: " + average.getAverage());
+		for (int iteration = 0; iteration <= 10; iteration++) {
+			events.resetHandlers(iteration);
+			eventWriter.init("./output/events.txt");
 
-		eventWriter.closeFile();
+			QueueSimulation sim = new QueueSimulation(scenario, events);
+			sim.openNetStateWriter("./output/simout", netFilename, 10);
+			sim.run();
+
+			scoring.finish();
+
+			PlanAverageScore average = new PlanAverageScore();
+			average.run(scenario.getPopulation());
+			System.out.println("### the average score in iteration " + iteration + " is: " + average.getAverage());
+
+			strategyManager.run(scenario.getPopulation());
+		}
 
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);

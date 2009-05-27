@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventsReader
+ * MyControler2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial;
 
+package tutorial.example2;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.vis.netvis.NetVis;
 
+public class MyControler2 {
 
-/**
- * This class contains a main method to call the 
- * example event handlers MyEventHandler1-3.
- * 
- * @author dgrether
- */
-public class MyEventsHandling {
+	public static void main(final String[] args) {
+		final String netFilename = "./examples/equil/network.xml";
+		final String plansFilename = "./examples/equil/plans100.xml";
 
-	
-	
-	public static void main(String[] args) {
-		//path to events file
-		String inputFile = "output/ITERS/it.10/10.events.txt.gz";
-		//create an event object
+		Scenario scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
+
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
 		Events events = new Events();
-		//create the handler and add it
-		MyEventHandler1 handler = new MyEventHandler1();
-//		MyEventHandler2 handler = new MyEventHandler2(500);
-//		MyEventHandler3 handler = new MyEventHandler3();
-		events.addHandler(handler);
-		//create the reader and read the file
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(inputFile);
-		
-//		System.out.println("average travel time: " + handler.getAverageTravelTime());
-//		handler.writeChart("output/departuresPerHour.png");
-		
-		System.out.println("Events file read!");
+
+		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
+		events.addHandler(eventWriter);
+
+		QueueSimulation sim = new QueueSimulation(scenario, events);
+		sim.openNetStateWriter("./output/simout", netFilename, 10);
+		sim.run();
+
+		eventWriter.closeFile();
+
+		String[] visargs = {"./output/simout"};
+		NetVis.main(visargs);
 	}
 
 }
