@@ -196,7 +196,7 @@ public class EventsToGAP {
 	/*
 	 * Returns a standard header string for the GAP statistics file.
 	 */
-	private static String createHeaderString(){
+	public static String createHeaderString(){
 		String headerString = "Name" + DELIMITER;
 		for(int i = 0; i < 23; i++){
 			headerString += "H" + i + DELIMITER;
