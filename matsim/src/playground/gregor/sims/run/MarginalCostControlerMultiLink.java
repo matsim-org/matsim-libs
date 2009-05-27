@@ -47,7 +47,7 @@ public class MarginalCostControlerMultiLink extends Controler{
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		SocialCostCalculator sc = new SocialCostCalculatorMultiLinkII(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
+		SocialCostCalculator sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
 		
 		this.events.addHandler(sc);
 		this.getQueueSimulationListener().add(sc);
@@ -61,6 +61,7 @@ public class MarginalCostControlerMultiLink extends Controler{
 		System.out.println("DISCOUNT:" + QUICKnDIRTY);
 		String [] args2 = {args[0]}; 
 		final Controler controler = new MarginalCostControlerMultiLink(args2);
+		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
 	}
