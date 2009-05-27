@@ -4,19 +4,19 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Iterator;
-
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.LineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 public class SummaryWriter {
 	
-	private final static Logger log = Logger.getLogger(SummaryWriter.class);
+	//private final static Logger log = Logger.getLogger(SummaryWriter.class);
 	
 	public void write(Stations stations, String outpath) {
 		this.writeRelative(stations, outpath);
 		this.writeAbsoluteDifference(stations, outpath);
 		this.writeAbsolute(stations, outpath);
+		this.writeStats(stations, outpath);
 	}
 	
 	public void writeRelative(Stations stations, String outpath) {	
@@ -129,7 +129,6 @@ public class SummaryWriter {
 		}
 	}
 	
-	
 	public void writeAbsolute(Stations stations, String outpath) {	
 		String header = "Hour\tAVG(SIM)\tAVG(COUNT)\tAVG(StandardDevUpper)\tAVG(StandardDevLower)\t(|AVG(SIM_i) - AVG(COUNT_i)|) / AVG(COUNT_i)\n";
 		try {
@@ -225,5 +224,23 @@ public class SummaryWriter {
 			e.printStackTrace();
 		}
 	}	
+
+	public void writeStats(Stations stations, String outpath) {	
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "Stats.txt");					
+			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
+			while (stations_it.hasNext()) {
+				CountStation station = stations_it.next();
+								
+				//for (int hour = 0; hour < 24; hour++) {	
+					out.write("Station: " + station.getId() + ":\t" + station.getLink1().getAggregator().getSize(0) +"\n");
+				//}
+			}			
+			out.flush();		
+			out.close();	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
 	

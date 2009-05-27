@@ -25,7 +25,7 @@ public class DateFilter {
 			// filter DI-DO
 			// filter summer holidays
 			// filter public holidays			
-			if (this.isDIDO(rawCount) && !this.inSummerHolidays(rawCount) && ! this.isPublicHoliday(rawCount)) {
+			if (this.isDIDO(rawCount) && !this.inSummerHolidays(rawCount) && !this.isPublicHoliday(rawCount)) {
 				filteredRawCounts.add(rawCount);	
 			}
 		}

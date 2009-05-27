@@ -25,6 +25,7 @@ public class NetworkMapper {
 		Iterator<Vector<RawCount>> station_it = rawCounts.values().iterator();
 		while (station_it.hasNext()) {
 			Vector<RawCount>  stationCounts = station_it.next();
+			
 			Iterator<RawCount> rawCount_it = stationCounts.iterator();
 			while (rawCount_it.hasNext()) {
 				RawCount rawCount = rawCount_it.next();
@@ -83,16 +84,16 @@ public class NetworkMapper {
 				CoordImpl coord = new CoordImpl(xs, ys);
 				
 				LinkInfo link = new LinkInfo(direction, linkidTeleatlas, linkidNavteq, linkidAre, linkidIVTCH);
+				String id = dataset + nr;
 
-				if (!stationsTree.containsKey(dataset + nr)) {
-					CountStation station = new CountStation(dataset + nr, coord);
+				if (!stationsTree.containsKey(id)) {
+					CountStation station = new CountStation(id, coord);
 					station.setLink1(link);
-					stationsTree.put(dataset + nr, station);
+					stationsTree.put(id, station);
 				}
 				else {
-					stationsTree.get(dataset + nr).setLink2(link);
+					stationsTree.get(id).setLink2(link);
 				}
-				
 			}	
 			bufferedReader.close();
 			fileReader.close();

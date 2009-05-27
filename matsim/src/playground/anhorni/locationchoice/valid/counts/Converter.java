@@ -2,6 +2,8 @@ package playground.anhorni.locationchoice.valid.counts;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -12,6 +14,8 @@ public class Converter {
 	Counts countsIVTCH = new Counts();
 	Counts countsNavteq = new Counts();
 	Counts countsTeleatlas = new Counts();
+	
+	private final static Logger log = Logger.getLogger(Converter.class);
 	
 	public void convert(List<CountStation> incounts) {
 		
@@ -38,6 +42,14 @@ public class Converter {
 	}
 	
 	private void createCounts(CountStation countStation, Counts counts, IdImpl locId1, IdImpl locId2) {
+		
+		if (countStation.getId().equals("ASTRA108")) {
+			log.info("H"+locId1.toString() + "H" + locId2.toString()+"H");
+		}
+		
+		if (locId1.compareTo(new IdImpl("-")) == 0 || locId2.compareTo(new IdImpl("-")) == 0) {
+			return;
+		}
 		
 		counts.createCount(locId1, String.valueOf(countStation.getId()));
 		Count count0 = counts.getCount(locId1);	

@@ -42,6 +42,8 @@ public class CountsReaderYear {
 				FileReader fileReader = new FileReader(paths.get(i));
 				BufferedReader bufferedReader = new BufferedReader(fileReader);
 				
+				TreeMap<String, Vector<RawCount>> rawCounts_ = new TreeMap<String, Vector<RawCount>>();
+				
 				log.info("Reading: " + paths.get(i));
 				
 				String curr_line = bufferedReader.readLine(); // Skip header
@@ -57,33 +59,51 @@ public class CountsReaderYear {
 					String vol1 = entries[7].trim();
 					String vol2 = entries[8].trim();
 					
+					if (nr.length() == 1) {
+						nr = "0" + nr;
+					}
+					if (month.length() == 1) {
+						month = "0" + month;
+					}
+					if (day.length() == 1) {
+						day = "0" + day;
+					}
+					if (hour.length() == 1) {
+						hour = "0" + hour;
+					}
+					String id = dataset+nr;
+					
 					if (vol2.length() == 0) {
 						vol2 = "-1";
 					}
-												
-					RawCount rawCount = new RawCount(dataset+nr, year, month, day, hour, vol1, vol2);
+					if (vol1.length() == 0) {
+						vol1 = "-1";
+					}
+
+					RawCount rawCount = new RawCount(id, year, month, day, hour, vol1, vol2);
 					
 					//if (Integer.parseInt(vol1) > -0.5 && Integer.parseInt(vol2) > 0.5) {
-						if (rawCounts.get(dataset + nr) == null) {
-							rawCounts.put(dataset + nr, new Vector<RawCount>());
+						if (rawCounts_.get(id) == null) {
+							rawCounts_.put(id, new Vector<RawCount>());
 						}
-						rawCounts.get(dataset + nr).add(rawCount);	
+						rawCounts_.get(id).add(rawCount);	
 					//}
 				}	
 				bufferedReader.close();
 				fileReader.close();
+
+				this.rawCounts.putAll(this.cleanRawCounts(rawCounts_));
 			}
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		this.cleanRawCounts();
 	}
 	
 	
-	private List<String> getStationDays2ThrowAway() {
+	private List<String> getStationDays2ThrowAway(TreeMap<String, Vector<RawCount>> rawCounts_) {
 		List<String> stationDays2ThrowAway = new Vector<String>();
 		
-		Iterator<Vector<RawCount>> rawCountStation_it = this.rawCounts.values().iterator();
+		Iterator<Vector<RawCount>> rawCountStation_it = rawCounts_.values().iterator();
 		while (rawCountStation_it.hasNext()) {
 			Vector<RawCount> rawCountsListPerStation = rawCountStation_it.next();
 			
@@ -93,7 +113,7 @@ public class CountsReaderYear {
 				
 				if (rawCount.getVol1() < -0.5 || rawCount.getVol2() < -0.5) {
 					if (!stationDays2ThrowAway.contains(rawCount.getId() + "_" + this.convert(rawCount))) {
-						stationDays2ThrowAway.add(rawCount.getId() + "_" + this.convert(rawCount));
+//						stationDays2ThrowAway.add(rawCount.getId() + "_" + this.convert(rawCount));
 					}
 				}
 			}
@@ -102,12 +122,13 @@ public class CountsReaderYear {
 	}
 	
 	// clean rawCounts. I.e., throw away days with data gaps
-	private void cleanRawCounts() {		
-		List<String> stationDays2ThrowAway = getStationDays2ThrowAway();
+	private TreeMap<String, Vector<RawCount>> cleanRawCounts(TreeMap<String, Vector<RawCount>> rawCounts_) {
+		
+		List<String> stationDays2ThrowAway = getStationDays2ThrowAway(rawCounts_);
 		log.info("StationDays to throw away: \t" + stationDays2ThrowAway.size());
 		TreeMap<String, Vector<RawCount>> rawCountsFiltered = new TreeMap<String, Vector<RawCount>>();
 		
-		Iterator<Vector<RawCount>> rawCountStation_it = this.rawCounts.values().iterator();
+		Iterator<Vector<RawCount>> rawCountStation_it = rawCounts_.values().iterator();
 		while (rawCountStation_it.hasNext()) {
 			Vector<RawCount> rawCountsListPerStation = rawCountStation_it.next();
 			
@@ -123,7 +144,8 @@ public class CountsReaderYear {
 				}
 			}
 		}
-		this.rawCounts = rawCountsFiltered;
+		log.info("cleaning finished");
+		return rawCountsFiltered;
 	}
 
 	public TreeMap<String, Vector<RawCount>> getRawCounts() {

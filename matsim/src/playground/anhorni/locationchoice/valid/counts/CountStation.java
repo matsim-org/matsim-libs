@@ -3,12 +3,12 @@ package playground.anhorni.locationchoice.valid.counts;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CountStation {
 	
-	private final static Logger log = Logger.getLogger(CountStation.class);
+	//private final static Logger log = Logger.getLogger(CountStation.class);
 	
 	private String csId;
 	private LinkInfo link1;

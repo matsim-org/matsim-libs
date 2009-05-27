@@ -32,6 +32,10 @@ public class Aggregator {
 		this.median();	
 	}
 	
+	public int getSize(int hour) {
+		return this.volumes.get(hour).size();
+	}
+	
 		
 	private void removeOutliers() {
 				
@@ -42,27 +46,32 @@ public class Aggregator {
 			
 				//This exactly reproduces the former PERL script
 						
-						int numberOfElements = volumesTemp.size();
-						int numberOfElements2Remove = (int)Math.ceil(numberOfElements * 0.05);
+//						int numberOfElements = volumesTemp.size();
+//						int numberOfElements2Remove = (int)Math.ceil(numberOfElements * 0.05);
+//			
+//						if (volumesTemp.size() > 0) {			
+//							filteredVolumes.addAll(volumesTemp.subList(
+//									(int)Math.ceil(numberOfElements2Remove/2.0), (int)Math.floor(numberOfElements - numberOfElements2Remove/2.0)));	
+//							
+//							volumes.get(hour).clear();
+//							volumes.get(hour).addAll(filteredVolumes);
+//						}
 			
-						if (volumesTemp.size() > 0) {			
-							filteredVolumes.addAll(volumesTemp.subList(
-									(int)Math.ceil(numberOfElements2Remove/2.0), (int)Math.floor(numberOfElements - numberOfElements2Remove/2.0)));	
-							
-							volumes.get(hour).clear();
-							volumes.get(hour).addAll(filteredVolumes);
-						}
-			
-//			int numberOfElements = volumesTemp.size();
-//			int numberOfElements2RemovePerSide = (int)Math.round(numberOfElements * 0.05 / 2.0);
-//
-//			if (volumesTemp.size() > 0) {			
-//				filteredVolumes.addAll(volumesTemp.subList(
-//						numberOfElements2RemovePerSide, (int)Math.round(numberOfElements - 1 - numberOfElements2RemovePerSide)));	
-//				
-//				volumes.get(hour).clear();
-//				volumes.get(hour).addAll(filteredVolumes);
-//			}
+			int numberOfElements = volumesTemp.size();
+			int numberOfElements2RemovePerSide = (int)Math.round(numberOfElements * 0.05 / 2.0);
+
+			if (volumesTemp.size() > 0) {
+				
+				// List<E> subList(int fromIndex, int toIndex);
+				// @param fromIndex low endpoint (inclusive) of the subList.
+			    // @param toIndex high endpoint (exclusive) of the subList.
+				
+				filteredVolumes.addAll(volumesTemp.subList(
+						numberOfElements2RemovePerSide, (int)Math.round(numberOfElements - numberOfElements2RemovePerSide)));	
+								
+				volumes.get(hour).clear();
+				volumes.get(hour).addAll(filteredVolumes);
+			}
 		}
 	}
 	
