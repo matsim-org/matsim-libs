@@ -39,8 +39,8 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -300,7 +300,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	}
 	
 	public void handleEvent(AgentDepartureEvent event) {
-		if(event.getLink().getId().toString().equals("1"))
+		if(event.getLinkId().toString().equals("1"))
 			events.put(event.getPerson(), event);
 		else
 			eventsReturn.put(event.getPerson(), event);

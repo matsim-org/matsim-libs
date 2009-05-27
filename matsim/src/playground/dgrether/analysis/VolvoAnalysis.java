@@ -149,10 +149,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		if (depTime.doubleValue() == -1.0)
 			return;
 
-		Link link = event.getLink();
-		if (link == null) {
-			link = this.network.getLink(event.getLinkId().toString());
-		}
+		Link link = this.network.getLinks().get(event.getLinkId());
 		if (this.hundekopfLinkIds.contains(link.getId())) {
 			this.timeHundekopf[hour] += (event.getTime() - depTime.doubleValue());
 		}
@@ -165,11 +162,8 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		Link link = event.getLink();
 		int hour = getTimestep(event.getTime());
-		if (link == null) {
-			link = this.network.getLink(event.getLinkId().toString());
-		}
+		Link link = this.network.getLinks().get(event.getLinkId());
 		if (this.hundekopfLinkIds.contains(link.getId())) {
 			this.tripsHundekopf[hour]++;
 		}

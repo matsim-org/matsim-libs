@@ -222,10 +222,10 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, collector.events.get(1).getTime(), EPSILON);
 		assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, collector.events.get(2).getTime(), EPSILON);
 		assertEquals("wrong time in 4th event.", 6.0*3600 + 0, collector.events.get(3).getTime(), EPSILON);
-		assertEquals("wrong link in 1st event.", f.link1, ((ActivityEndEvent) collector.events.get(0)).getLink());
-		assertEquals("wrong link in 2nd event.", f.link1, ((AgentDepartureEvent) collector.events.get(1)).getLink());
-		assertEquals("wrong link in 3rd event.", f.link1, ((AgentArrivalEvent) collector.events.get(2)).getLink());
-		assertEquals("wrong link in 4th event.", f.link1, ((ActivityStartEvent) collector.events.get(3)).getLink());
+		assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) collector.events.get(0)).getLinkId());
+		assertEquals("wrong link in 2nd event.", f.link1.getId(), ((AgentDepartureEvent) collector.events.get(1)).getLinkId());
+		assertEquals("wrong link in 3rd event.", f.link1.getId(), ((AgentArrivalEvent) collector.events.get(2)).getLinkId());
+		assertEquals("wrong link in 4th event.", f.link1.getId(), ((ActivityStartEvent) collector.events.get(3)).getLinkId());
 	}
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {

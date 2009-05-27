@@ -180,10 +180,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	public void handleEvent(AgentStuckEvent event) {
 		LinkEnterEvent e = this.linkEnterEvents.remove(event.getPersonId());
 		if (e != null) {
-			Link link = event.getLink();
-			if (link == null) {
-				link = network.getLink(e.getLinkId());
-			}
+			Link link = network.getLink(e.getLinkId());
 			DataContainer data = getTravelTimeData(link, true);
 			data.needsConsolidation = true;
 			this.getTravelTimeAggregator().addStuckEventTravelTime(data.ttData, e.getTime(), event.getTime());
