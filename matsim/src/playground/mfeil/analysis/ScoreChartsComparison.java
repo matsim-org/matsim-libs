@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelCharts.java
+ * TravelChartsComparison.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -33,7 +33,7 @@ import java.util.StringTokenizer;
  *
  * @author mfeil
  */
-public class ComparisonCharts {	
+public class ScoreChartsComparison {	
 	
 	double [] xaxis = new double [101];
 	double [] best1 = new double [xaxis.length];
@@ -102,7 +102,7 @@ public class ComparisonCharts {
 	
 	public static void main(final String [] args) {
 		
-		ComparisonCharts msc = new ComparisonCharts();
+		ScoreChartsComparison msc = new ScoreChartsComparison();
 		
 		msc.readData("./plans/scorestats.txt");
 		for (int i=0; i<msc.xaxis.length;i++){

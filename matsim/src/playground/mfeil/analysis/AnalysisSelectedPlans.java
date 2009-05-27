@@ -100,13 +100,13 @@ public class AnalysisSelectedPlans {
 			for (int j=0;j<this.plans.get(i).size();j++){
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
 					if (k==0){
-						if ((((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration())<=this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) {
+						if ((((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration())<this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
 							log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration()));
 							break;
 						}
 					}
-					else if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()<=this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) {
-						log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2));
+					else if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()<this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
+						log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()));
 						break;
 					}
 				}
@@ -234,12 +234,12 @@ public class AnalysisSelectedPlans {
 		// FIXME hard-coded file names; does this class really need a main-method?
 //		final String populationFilename = "./examples/equil/plans100.xml";
 //		final String networkFilename = "./examples/equil/network.xml";
-		final String populationFilename = "./output/Test1_TMC_30_5_100iter_2/output_plans.xml.gz";
+		final String populationFilename = "./output/Test2/output_plans.xml.gz";
 //		final String populationFilename = "./output/Test1/ITERS/it.0/0.plans.xml.gz";
 		final String networkFilename = "./test/scenarios/chessboard/network.xml";
 		final String facilitiesFilename = "./test/scenarios/chessboard/facilities.xml";
 
-		final String outputDir = "./plans/";
+		final String outputDir = "./output/Test2/";
 
 		Scenario scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
