@@ -99,14 +99,6 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 		return this.getPersons().get(personId);
 	}
 
-	@Override
-	public
-	final void clearPersons() {
-		super.clearPersons();
-		this.counter = 0;
-		this.nextMsg = 1;
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////

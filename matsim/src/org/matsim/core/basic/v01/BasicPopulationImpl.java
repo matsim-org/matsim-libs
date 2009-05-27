@@ -44,10 +44,6 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 		persons.put(person.getId(), person);
 	}
 
-	protected void clearPersons() {
-		persons.clear();
-	}
-	
 	public final String getName() {
 		return this.name;
 	}
