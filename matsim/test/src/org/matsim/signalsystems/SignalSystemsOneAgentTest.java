@@ -21,8 +21,10 @@ package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
@@ -34,32 +36,24 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Simple test case for the QueueSim signal system implementation.
  * One agent drives one round in the signal system default simple test
  * network.
- * @author dgrether
  * 
+ * @author dgrether
  */
 public class SignalSystemsOneAgentTest extends MatsimTestCase implements
-		LinkEnterEventHandler {
+		BasicLinkEnterEventHandler {
 
 	
-	private static final Logger log = Logger
-			.getLogger(SignalSystemsOneAgentTest.class);
+	private static final Logger log = Logger.getLogger(SignalSystemsOneAgentTest.class);
 	
 	private Id id1 = new IdImpl(1);
 	private Id id2 = new IdImpl(2);
-//	private Id id3 = new IdImpl(3);
-//	private Id id4 = new IdImpl(4);
-//	private Id id5 = new IdImpl(5);
-	
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -107,26 +101,21 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 			group.setDropping(60);
 		}
 
-		QueueSimulation sim = new QueueSimulation((NetworkLayer) data.getNetwork(), data
-				.getPopulation(), events);
+		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 		sim.setLaneDefinitions(lanedefs);
 		sim.setSignalSystems(signalSystems, lssConfigs);
 		sim.run();
 		
-		
-		sim = new QueueSimulation((NetworkLayer) data.getNetwork(), data
-				.getPopulation(), events);
+		sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 		sim.run();
-		
-		
 	}
 
-	public void handleEvent(LinkEnterEvent e) {
+	public void handleEvent(BasicLinkEnterEvent e) {
 		log.info("LinkEnter: " + e.getLinkId().toString() + " time: " + e.getTime());
-		if (e.getLink().getId().equals(id1)){
+		if (e.getLinkId().equals(id1)){
 			assertEquals(1.0, e.getTime(), EPSILON);
 		}
-		else if (e.getLink().getId().equals(id2)){
+		else if (e.getLinkId().equals(id2)){
 			assertEquals(38.0, e.getTime(), EPSILON);
 		}
 	}

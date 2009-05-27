@@ -38,11 +38,9 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -96,10 +94,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		Events events = new Events();
 		List<BasicEventImpl> eventsList = new LinkedList<BasicEventImpl>();
-		events.addHandler(new EventsConverter(eventsList, network));
+		events.addHandler(new EventsCollector(eventsList));
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
-
 		
 		Events events2 = new Events();
 		
@@ -230,13 +227,11 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTime(link10, 6.25 * 3600), EPSILON);
 	}
 	
-	private static class EventsConverter implements BasicEventHandler {
+	private static class EventsCollector implements BasicEventHandler {
 		 
-		private Network network;
 		private List<BasicEventImpl> eventsList;
 		
-		public EventsConverter(List<BasicEventImpl> eventsList, Network network) {
-			this.network = network;
+		public EventsCollector(List<BasicEventImpl> eventsList) {
 			this.eventsList = eventsList;
 		}
 
@@ -244,21 +239,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		public void handleEvent(BasicEventImpl event) {
-			if (event instanceof LinkEvent){
-				LinkEvent e = (LinkEvent) event;
-				Link l = this.network.getLink(e.getLinkId());
-				e.setLink(l);
-			}
-			else if (event instanceof AgentStuckEvent){
-				AgentStuckEvent e = (AgentStuckEvent)event;
-				Link l = this.network.getLink(e.getLinkId());
-				e.setLink(l);
-				
-			}
 			this.eventsList.add(event);
 		}
-		
-	};
+	}
  
 
 }

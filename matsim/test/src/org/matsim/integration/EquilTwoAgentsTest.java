@@ -21,17 +21,17 @@ package org.matsim.integration;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -84,7 +84,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	}
 	
 	
-	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
+	private class TestSingleIterationEventHandler implements BasicLinkEnterEventHandler, BasicActivityStartEventHandler, BasicActivityEndEventHandler {
 
 		private final double agent1LeaveHomeTime, agent2LeaveHomeTime;
 
@@ -97,42 +97,42 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			this.agent2LeaveHomeTime = agent2LeaveHomeTime;
 		}
 
-		public void handleEvent(final LinkEnterEvent e) {
+		public void handleEvent(final BasicLinkEnterEvent e) {
 			log.debug("Enter Link:" + e.getLinkId().toString() + " at Time: " + e.getTime());
-			if (e.getLink().getId().equals(id6)) {
+			if (e.getLinkId().equals(id6)) {
 				this.agentOneTime = this.agent1LeaveHomeTime + 1.0;
 				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
-			else if (e.getLink().getId().equals(id15)) {
+			else if (e.getLinkId().equals(id15)) {
 				this.agentOneTime = this.agentOneTime + 359.0 + 1.0;
 				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
-			else if (e.getLink().getId().equals(id20)) {
+			else if (e.getLinkId().equals(id20)) {
 				this.agentOneTime = this.agentOneTime + 179.0 + 1.0;
 				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
-			else if (e.getLink().getId().equals(id21)) {
+			else if (e.getLinkId().equals(id21)) {
 				this.agentOneTime = this.agentOneTime + 1.0;
 				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
-			else if (e.getLink().getId().equals(id22)) {
+			else if (e.getLinkId().equals(id22)) {
 				this.agentOneTime = this.agentOneTime + 359.0 + 1.0;
 				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
-			else if (e.getLink().getId().equals(id23)) {
+			else if (e.getLinkId().equals(id23)) {
 				this.agentOneTime = this.agentOneTime + 1259.0 + 1.0;
 				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
-			else if (e.getLink().getId().equals(id1)) {
+			else if (e.getLinkId().equals(id1)) {
 				this.agentOneTime = this.agentOneTime + 359.0 + 1.0;
 				assertEquals(this.agentOneTime, e.getTime(), EPSILON);
 			}
 		}
 
-		public void handleEvent(final ActivityStartEvent e) {
+		public void handleEvent(final BasicActivityStartEvent e) {
 			log.debug("Start Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
-			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()));
-			if (e.getPerson().getId().equals(id1)) {
+			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
+			if (e.getPersonId().equals(id1)) {
 				if (e.getActType().equalsIgnoreCase("w")) {
 					//test the time
 					//time is time till link 15 + freespeed of link 20
@@ -143,7 +143,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					//test the score
 					//0.25 h = 15 min = 900 s fstt of agent 1 (car)
 					this.agentOneScore = 0.25 * -6.0;
-					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()), EPSILON);
+					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 				}
 				else { // it is home
 					//test the time
@@ -158,10 +158,10 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentOneScore = this.agentOneScore + deltaScore;
 					//plus negative score for traveling home 39 minutes
 					this.agentOneScore = this.agentOneScore + (39.0/60.0 * -6.0);
-					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()), EPSILON);
+					assertEquals(this.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 				}
 			}
-			else if (e.getPerson().getId().equals(id2)) {
+			else if (e.getPersonId().equals(id2)) {
 				if (e.getActType().equalsIgnoreCase("w")) {
 					//test the time
 					//this is the version used in speech:	agentTwoTime = agentTwoTime + 30.0 * 60.0;
@@ -172,7 +172,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					//test the score
 					//1097s free speed travel time of agent 2 (non-car)
 					this.agentTwoScore = 1797.0/3600.0 * -3.0;
-					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()), EPSILON);
+					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 				}
 				else {
 					//test the time
@@ -189,20 +189,20 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					this.agentTwoScore = this.agentTwoScore + (this.agent2LeaveHomeTime + 1797.0 - 7.0*3600) * (-18.0 / 3600.0);
 					//plus negative score for traveling home 4677.0 seconds by non-car mode (should be 78 min but is less!)
 					this.agentTwoScore = this.agentTwoScore + (4677.0/3600.0 * -3.0);
-					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()), EPSILON);
+					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()), EPSILON);
 
 					EquilTwoAgentsTest.this.planScorer.finish();
 					log.debug("Score 1: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(id1));
-					log.debug("Score 2: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()));
+					log.debug("Score 2: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
 				}
 			}
 		}
 
-		public void handleEvent(final ActivityEndEvent e) {
+		public void handleEvent(final BasicActivityEndEvent e) {
 			log.debug("End Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
-			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPerson().getId()));
+			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
 
-			if (e.getPerson().getId().equals(id1)) {
+			if (e.getPersonId().equals(id1)) {
 				if (e.getActType().equalsIgnoreCase("w")) {
 					this.agentOneTime = this.agentOneTime + 8.0 * 3600;
 					assertEquals(this.agentOneTime, e.getTime(), EPSILON);
@@ -211,7 +211,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					assertEquals(this.agent1LeaveHomeTime, e.getTime(), EPSILON);
 				}
 			}
-			else if (e.getPerson().getId().equals(id2)) {
+			else if (e.getPersonId().equals(id2)) {
 				if (e.getActType().equalsIgnoreCase("w")) {
 					this.agentTwoTime = this.agentTwoTime + 8.0 * 3600;
 					assertEquals(this.agentTwoTime, e.getTime(), EPSILON);

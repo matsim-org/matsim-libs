@@ -23,7 +23,12 @@ package org.matsim.integration.timevariantnetworks;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -34,10 +39,6 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactory;
@@ -77,12 +78,12 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		Population plans = new PopulationImpl();
 		Person person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
 		Person person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
-		plans.addPerson(person1);
-		plans.addPerson(person2);
+		plans.getPersons().put(person1.getId(), person1);
+		plans.getPersons().put(person2.getId(), person2);
 
 		// run the simulation with the timevariant network and the two persons
 		Events events = new Events();
-		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2);
+		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 		QueueSimulation qsim = new QueueSimulation(network, plans, events);
 		qsim.run();
@@ -127,20 +128,22 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		 */
 		Population plans = new PopulationImpl();
 		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
-		for(Person p : persons1)
-			plans.addPerson(p);
+		for(Person p : persons1) {
+			plans.getPersons().put(p.getId(), p);
+		}
 		Person person1 = persons1.get(personsPerWave - 1);
 
 		List<Person> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
-		for(Person p : persons2)
-			plans.addPerson(p);
+		for(Person p : persons2) {
+			plans.getPersons().put(p.getId(), p);
+		}
 		Person person2 = persons2.get(personsPerWave - 1);
 		/*
 		 * Run the simulation with the time-variant network and the two waves of
 		 * persons. Observe the last person of each wave.
 		 */
 		Events events = new Events();
-		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2);
+		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 		QueueSimulation qsim = new QueueSimulation(network, plans, events);
 		qsim.run();
@@ -220,40 +223,40 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class TestTravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class TestTravelTimeCalculator implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
 
 		private final Person person1;
 		private final Person person2;
-		private final Link link;
+		private final Id linkId;
 		protected double person1enterTime = Time.UNDEFINED_TIME;
 		protected double person1leaveTime = Time.UNDEFINED_TIME;
 		protected double person2enterTime = Time.UNDEFINED_TIME;
 		protected double person2leaveTime = Time.UNDEFINED_TIME;
 
-		protected TestTravelTimeCalculator(final Person person1, final Person person2, final Link link) {
+		protected TestTravelTimeCalculator(final Person person1, final Person person2, final Id linkId) {
 			this.person1 = person1;
 			this.person2 = person2;
-			this.link = link;
+			this.linkId = linkId;
 		}
 
-		public void handleEvent(final LinkEnterEvent event) {
-			if (event.getLink() != this.link) {
+		public void handleEvent(final BasicLinkEnterEvent event) {
+			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPerson() == this.person1) {
+			if (event.getPersonId() == this.person1.getId()) {
 				this.person1enterTime = event.getTime();
-			} else if (event.getPerson() == this.person2) {
+			} else if (event.getPersonId() == this.person2.getId()) {
 				this.person2enterTime = event.getTime();
 			}
 		}
 
-		public void handleEvent(final LinkLeaveEvent event) {
-			if (event.getLink() != this.link) {
+		public void handleEvent(final BasicLinkLeaveEvent event) {
+			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPerson() == this.person1) {
+			if (event.getPersonId() == this.person1.getId()) {
 				this.person1leaveTime = event.getTime();
-			} else if (event.getPerson() == this.person2) {
+			} else if (event.getPersonId() == this.person2.getId()) {
 				this.person2leaveTime = event.getTime();
 			}
 		}
