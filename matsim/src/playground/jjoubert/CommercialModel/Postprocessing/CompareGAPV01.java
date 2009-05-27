@@ -92,7 +92,7 @@ public class CompareGAPV01 {
 				/*
 				 * For the scatter plot out file, it writes a basic header. 
 				 */
-				outputScatter.write("Name" + DELIMITER + "Hour" + DELIMITER + "Simulated" + DELIMITER + "Actual");
+				outputScatter.write("Name" + DELIMITER + "Hour" + DELIMITER + "Actual" + DELIMITER + "Simulated");
 				outputScatter.newLine();
 				
 				while(inputActual.hasNextLine() && inputSim.hasNextLine()){
@@ -131,7 +131,7 @@ public class CompareGAPV01 {
 							 * GAP_ID is written to the new line.
 							 */
 							outputScatter.write( String.valueOf(a-1) + DELIMITER );
-							outputScatter.write(String.valueOf(valueSim) + DELIMITER + String.valueOf(valueActual) );
+							outputScatter.write(String.valueOf(valueActual) + DELIMITER + String.valueOf(valueSim) );
 							outputScatter.newLine();
 							outputScatter.write( String.valueOf(lineActual[0]) + DELIMITER);
 						}
@@ -145,7 +145,7 @@ public class CompareGAPV01 {
 						outputGIS.write(diff);
 						outputGIS.newLine();
 						outputScatter.write( String.valueOf(lineActual.length - 2 ) + DELIMITER );
-						outputScatter.write(String.valueOf(valueSim) + DELIMITER + String.valueOf(valueActual) );
+						outputScatter.write(String.valueOf(valueActual) + DELIMITER + String.valueOf(valueSim) );
 						outputScatter.newLine();
 					}
 				}					
