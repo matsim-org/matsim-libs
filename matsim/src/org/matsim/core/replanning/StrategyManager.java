@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2009 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -26,9 +26,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 /**
  * Manages and applies strategies to agents for re-planning.
@@ -41,6 +44,8 @@ public class StrategyManager {
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	private int maxPlansPerAgent = 0;
+	
+	private PlanSelector removePlanSelector = new WorstPlanForRemovalSelector();
 
 	private final TreeMap<Integer, Map<PlanStrategy, Double>> changeRequests =
 			new TreeMap<Integer, Map<PlanStrategy, Double>>();
@@ -121,8 +126,8 @@ public class StrategyManager {
 		}
 		// then go through the population and assign each person to a strategy
 		for (Person person : population.getPersons().values()) {
-			if (this.maxPlansPerAgent > 0) {
-				person.removeWorstPlans(this.maxPlansPerAgent);
+			if ((this.maxPlansPerAgent > 0) && (person.getPlans().size() > this.maxPlansPerAgent)) {
+				removePlans(person, this.maxPlansPerAgent);
 			}
 			PlanStrategy strategy = this.chooseStrategy();
 			if (strategy != null) {
@@ -134,6 +139,16 @@ public class StrategyManager {
 		// finally make sure all strategies have finished there work
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.finish();
+		}
+	}
+	
+	private void removePlans(final Person person, final int maxNumberOfPlans) {
+		while (person.getPlans().size() > maxNumberOfPlans) {
+			Plan plan = this.removePlanSelector.selectPlan(person);
+			person.getPlans().remove(plan);
+			if (plan == person.getSelectedPlan()) {
+				person.setSelectedPlan(person.getRandomPlan());
+			}
 		}
 	}
 
