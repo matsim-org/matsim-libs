@@ -4,11 +4,15 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.api.network.Link;
-
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.input.PTLineAggregator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.api.network.Node;
+
 
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
@@ -92,6 +96,19 @@ public class PTControler2 {
 	    		ptActWriter3.writePTActsLegs();
 				break;
 
+			case 2:
+				Coord coord1 = new CoordImpl(747420, 262794);   //Coord coord1 = new CoordImpl(701700, 265800);
+				Coord coord2 = new CoordImpl(685862, 254136);
+				Node nodeA = pt.getPtNetworkLayer().getNode("_8506000");
+				Node nodeB = pt.getPtNetworkLayer().getNode("_8503309");
+				//Path path2 = pt.getPtRouter2().findRoute(nodeA, nodeB, 45386);
+				Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
+				System.out.println(path2.links.size());
+				
+				for (Link l : path2.links){
+					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + l.getType() + l.getToNode().getId() );
+				}
+				break;
 	    	case 3:
 	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		
@@ -124,21 +141,7 @@ public class PTControler2 {
 	    		//converter.createFacilities(network);
 	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "transitSchedule.xml");
 	    		break;
-	    	case 9:
-	    		Link l = pt.getPtNetworkLayer().getLink("99");
-	    		System.out.println(pt.getPtTimeTable().GetTransferTime(l, 30701));
-	    		System.out.println("Proximo departure:" + 
-	    		pt.getPtTimeTable().nextDepartureB(l.getToNode().getId(), 30701.0)
-	    		)
-	    		;
-	    		
-	    		/*
-	    		 * link 99 
-					="08:32:41
-					30761
-	    		 * 
-	    		 */
-	    		break;
+	  
 		}//switch
 	}//main
 

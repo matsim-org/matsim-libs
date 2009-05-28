@@ -98,7 +98,7 @@ public class PTActWriter {
 	public void writePTActsLegs(){
 		
 		Population newPopulation = new PopulationImpl();
-		int numPlans=1;
+		int numPlans=0;
 
 		PathValidator ptPathValidator = new PathValidator ();
 		int trips=0;
@@ -115,7 +115,7 @@ public class PTActWriter {
 		
 		for (Person person: this.population.getPersons().values()) {
 		//if ( true ) {
-		//Person person = population.getPersons().get(new IdImpl("2180188")); //"3937204"
+		//Person person = population.getPersons().get(new IdImpl("6789794")); //"3937204"
 			System.out.println(numPlans + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 
@@ -143,16 +143,13 @@ public class PTActWriter {
 		    		//if (true){
 		    			newPlan.addLeg(walkLeg(lastAct,thisAct));
 		    			inWalkRange++;
-		    		
 		    		}else{
 			    		startTime = System.currentTimeMillis();
 
 			    		Path path=null;
-			    		//distToWalk = distToWalk*2;    //-->20 may
-			    		//distToWalk = 3000;
+
 			    		//This one is the original
 			    		//path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-			    		
 			    		// test 25 may 2009
 			    		path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 			    		
@@ -222,16 +219,15 @@ public class PTActWriter {
 		System.out.println("plans:        " + numPlans + "\n--------------");
 			
 		System.out.println("\nTrips:      " + trips +  "\nvalid:        " + valid +  "\ninvalid:      " + invalid + "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);
-		/*
+		
 		System.out.println("===Printing routing durations");
-		int cont=0;
+		
 		double total=0;
 		for (double d : durations ){
-			System.out.println(d);
 			total=total+d;
 		}
 		System.out.println("total " + total + " average: " + (total/durations.size()));
-		*/
+		
 		
 		//for(Path path: invalidPaths){
 		//if (true){
