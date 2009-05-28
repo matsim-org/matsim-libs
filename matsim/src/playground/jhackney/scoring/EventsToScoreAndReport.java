@@ -137,8 +137,10 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			try {
 				uout = new BufferedWriter(new FileWriter(ufname));
 				muout = new BufferedWriter(new FileWriter(mufname));
-				uout.write("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc");
-				muout.write("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc");
+				uout.write("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc\r\n");
+				muout.write("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc\r\n");
+//				uout.write("agentId\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc\tUlegt\r\n");
+//				muout.write("agentId\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc\tUlegt\r\n");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -154,32 +156,69 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 				int actNumber=0;
 				int legNumber=-1;
 
+//				try {
+////					muout.write("\t"+actNumber+"\t"+act.getType()+"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
+////					uout.write("\t"+actNumber+"\t"+act.getType()+"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+//					muout.write(agentId+"\t"+actNumber+"\t"+act.getType()+"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
+//					uout.write(agentId+"\t"+actNumber+"\t"+act.getType()+"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+//
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+				
 				while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 					Object o = actLegIter.next();
-					if (o instanceof Leg) {
+					if (o instanceof Leg ) {
 						Leg leg = (Leg) o;
-						legNumber++;
-	
-						try {
-							muout.write(agentId+"\t"+sf.getDulegt(leg));
-							uout.write(agentId+"\t"+sf.getDulegt(leg));
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					} else if (o instanceof Activity) {
+//						if(act.equals(plan.getFirstActivity())){
+//							try {
+//								muout.write("\t"+0.0);
+//								uout.write("\t"+0.0);
+//								muout.newLine();
+//								uout.newLine();
+//							} catch (IOException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+//
+//						} else {
+							try {
+								muout.write(agentId+"\t"+sf.getDulegt(leg));
+								uout.write(agentId+"\t"+sf.getUlegt(leg));
+//								uout.write("\t"+sf.getUlegt(leg));
+//								uout.newLine();
+//								muout.write("\t"+sf.getDulegt(leg));
+//								muout.newLine();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							legNumber++;
+					}else if (o instanceof Activity && !(act.equals(plan.getLastActivity()))) {
 						act = (Activity) o;
-						actNumber++;
-	
 						try {
-							muout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
-							uout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+							muout.write("\t"+actNumber+"\t"+act.getType()+"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
+							muout.newLine();
+							uout.write("\t"+actNumber+"\t"+act.getType()+"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+							uout.newLine();
+//							muout.write(agentId+"\t"+actNumber+"\t"+act.getType()+"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
+//							uout.write(agentId+"\t"+actNumber+"\t"+act.getType()+"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						actNumber++;
+
 					}
 				}
+//				try{
+//				muout.write("\r\n");
+//				uout.write("\r\n");
+//				} catch (IOException e){
+//				e.printStackTrace();
+//				}
 			}
 			try {
 				muout.close();
