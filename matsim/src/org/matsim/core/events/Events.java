@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2009 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -75,6 +75,9 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
  * <li>(optional) add an appropriate line in callHandlerFast() for speeding
  * up execution!</li>
  * </ol>
+ * 
+ * @author dstrippgen
+ * @author mrieser
  */
 public class Events {
 
@@ -227,6 +230,7 @@ public class Events {
 				Class<?>[] params = method.getParameterTypes();
 				if (params.length == 1) {
 					Class<?> eventClass = params[0];
+					log.info("    > " + eventClass.getName());
 					HandlerData dat = findHandler(eventClass);
 					if (dat == null) {
 						dat = new HandlerData(eventClass, method);
@@ -272,7 +276,7 @@ public class Events {
 			klass = klass.getSuperclass();
 		}
 		// now search in implemented interfaces
-		for (Class<?> intfc : eventClass.getInterfaces()) {
+		for (Class<?> intfc : getAllInterfaces(eventClass)) {
 			HandlerData dat = findHandler(intfc);
 			if (dat != null) {
 				for(EventHandler handler: dat.handlerList) {
@@ -284,6 +288,22 @@ public class Events {
 		cache = info.toArray(new HandlerInfo[info.size()]);
 		this.cacheHandlers.put(eventClass, cache);
 		return cache;
+	}
+	
+	private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
+		Set<Class<?>> intfs = new HashSet<Class<?>>();
+		for (Class<?> intf : klass.getInterfaces()) {
+			intfs.add(intf);
+			intfs.addAll(getAllInterfaces(intf));
+		}
+		if (!klass.isInterface()) {
+			Class<?> superclass = klass.getSuperclass();
+			while (superclass != Object.class) {
+				intfs.addAll(getAllInterfaces(superclass));
+				superclass = superclass.getSuperclass();
+			}
+		}
+		return intfs;
 	}
 
 	// this method is purely for performance reasons and need not be implemented
@@ -346,8 +366,8 @@ public class Events {
 		} else if (klass == AgentReplanEvent.class) {
 			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEvent)ev);
 			return true;
-		} else if (klass == BasicEventImpl.class) {
-			((BasicEventHandler)handler).handleEvent((BasicEventImpl) ev);
+		} else if (klass == BasicEvent.class) {
+			((BasicEventHandler)handler).handleEvent(ev);
 			return true;
 		} else if (klass == BasicPersonEvent.class) {
 			((BasicPersonEventHandler)handler).handleEvent((BasicPersonEvent)ev);
