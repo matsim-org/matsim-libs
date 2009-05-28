@@ -31,7 +31,6 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
-import org.matsim.core.scoring.CharyparNagelScoringFunction;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 
@@ -61,7 +60,7 @@ public class BKickScoringFunction implements ScoringFunction {
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	private static boolean scoreActs = true;
 
-	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
+	private static final Logger log = Logger.getLogger(BKickScoringFunction.class);
 
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...

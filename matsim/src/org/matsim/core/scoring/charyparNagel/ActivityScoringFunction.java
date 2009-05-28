@@ -25,7 +25,6 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.scoring.ActivityUtilityParameters;
-import org.matsim.core.scoring.CharyparNagelScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
@@ -59,7 +58,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 	
-	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
+	private static final Logger log = Logger.getLogger(ActivityScoringFunction.class);
 
 	public ActivityScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
 		this.params = params;
