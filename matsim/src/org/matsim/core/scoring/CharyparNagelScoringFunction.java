@@ -26,6 +26,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -75,8 +76,9 @@ import org.matsim.core.utils.misc.Time;
  * </dl>
  *
  * @author mrieser
+ * 
+ * @deprecated please use the newer, more modular approach, see {@link CharyparNagelScoringFunctionFactory}
  */
-
 public class CharyparNagelScoringFunction implements ScoringFunction {
 	protected final Plan plan;
 
