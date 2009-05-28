@@ -22,12 +22,14 @@ package org.matsim.core.scoring;
 
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
+import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
 /**
  * Generates {@link CharyparNagelOpenTimesScoringFunction}s.
  * 
  * @author meisterk
- *
  */
 public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -38,7 +40,13 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 	}
 
 	public ScoringFunction getNewScoringFunction(Plan plan) {
-		return new CharyparNagelOpenTimesScoringFunction(plan, this.params);
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+
+		return scoringFunctionAccumulator;
 	}
 
 	
