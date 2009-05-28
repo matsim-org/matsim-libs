@@ -60,45 +60,20 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 					}
 				}
 			}
-		
-		
-//		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
-//		// initialize list of types
-//		for (Plan plan : person.getPlans()) {
-//			Integer cnt = typeCounts.get(plan.getType());
-//			if (cnt == null) {
-//				typeCounts.put(plan.getType(), Integer.valueOf(1));
-//			} else {
-//				typeCounts.put(plan.getType(), Integer.valueOf(cnt.intValue() + 1));
-//			}
-//		}
-//
-//		Plan worst = null;
-//		double worstScore = Double.POSITIVE_INFINITY;
-//		for (Plan plan : person.getPlans()) {
-//			if (typeCounts.get(plan.getType()).intValue() > 1) {
-//				if (plan.getScore() == null) {
-//					return plan;
-//				}
-//				if (plan.getScore().doubleValue() < worstScore) {
-//					worst = plan;
-//					worstScore = plan.getScore().doubleValue();
-//				}
-//			}
-//		}
-//		if (worst == null) {
-//			// there is exactly one plan, or we have of each plan-type exactly one
-//			// select the one with worst score globally
-//			for (Plan plan : person.getPlans()) {
-//				if (plan.getScore() == null) {
-//					return plan;
-//				}
-//				if (plan.getScore().doubleValue() < worstScore) {
-//					worst = plan;
-//					worstScore = plan.getScore().doubleValue();
-//				}
-//			}
-//		}
+
+		if (worst == null) {
+			// there is exactly one plan, or we have of each plan-type exactly one.
+			// select the one with worst score globally
+			for (Plan plan : person.getPlans()) {
+				if (plan.getScore() == null) {
+					return plan;
+				}
+				if (plan.getScore().doubleValue() < worstScore) {
+					worst = plan;
+					worstScore = plan.getScore().doubleValue();
+				}
+			}
+		}
 		return worst;
 	}
 

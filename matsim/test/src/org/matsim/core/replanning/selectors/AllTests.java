@@ -34,6 +34,7 @@ public class AllTests {
 		suite.addTestSuite(KeepSelectedTest.class);
 		suite.addTestSuite(PathSizeLogitSelectorTest.class); 
 		suite.addTestSuite(RandomPlanSelectorTest.class);
+		suite.addTestSuite(WorstPlanForRemovalSelectorTest.class);
 		//$JUnit-END$
 		return suite;
 	}
