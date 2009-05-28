@@ -24,7 +24,13 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 
 /**
- * A factory to create {@link CharyparNagelScoringFunction}s.
+ * A factory to create scoring functions as described by D. Charypar and K. Nagel.
+ * 
+ * <blockquote>
+ *  <p>Charypar, D. und K. Nagel (2005) <br>
+ *  Generating complete all-day activity plans with genetic algorithms,<br>
+ *  Transportation, 32 (4) 369–397.</p>
+ * </blockquote>
  *
  * @author mrieser
  */
