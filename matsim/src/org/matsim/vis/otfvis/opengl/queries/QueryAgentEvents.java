@@ -29,14 +29,13 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.PersonEvent;
-import org.matsim.core.events.handler.PersonEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
@@ -54,7 +53,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 	private static final long serialVersionUID = -7388598935268835323L;
 
-	public static class MyEventsHandler implements PersonEventHandler, Serializable{
+	public static class MyEventsHandler implements BasicPersonEventHandler, Serializable{
 
 		private static final long serialVersionUID = 1L;
 		public final static List<String> events = new ArrayList<String>();
@@ -64,7 +63,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			this.agentId = agentId;
 		}
 
-		public void handleEvent(PersonEvent event) {
+		public void handleEvent(BasicPersonEvent event) {
 			if(event.getPersonId().toString().equals(this.agentId)){
 				events.add(event.toString());
 			}

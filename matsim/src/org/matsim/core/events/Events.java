@@ -40,6 +40,7 @@ import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
@@ -49,6 +50,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -61,7 +63,6 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.handler.PersonEventHandler;
 
 /**
  * EventHandling
@@ -348,8 +349,8 @@ public class Events {
 		} else if (klass == BasicEventImpl.class) {
 			((BasicEventHandler)handler).handleEvent((BasicEventImpl) ev);
 			return true;
-		} else if (klass == PersonEvent.class) {
-			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);
+		} else if (klass == BasicPersonEvent.class) {
+			((BasicPersonEventHandler)handler).handleEvent((BasicPersonEvent)ev);
 			return true;
 		}
 		return false;

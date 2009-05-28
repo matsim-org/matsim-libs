@@ -28,6 +28,8 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Person;
@@ -38,8 +40,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsBuilderImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.PersonEvent;
-import org.matsim.core.events.handler.PersonEventHandler;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -306,7 +306,7 @@ public class PlanomatTest extends MatsimTestCase {
 		super.tearDown();
 	}
 
-	private static final class ScenarioCreatePersonEventHandler implements PersonEventHandler{
+	private static final class ScenarioCreatePersonEventHandler implements BasicPersonEventHandler{
 
 		private Scenario scenario;
 
@@ -314,7 +314,7 @@ public class PlanomatTest extends MatsimTestCase {
 			this.scenario = scenario;
 		}
 
-		public void handleEvent(PersonEvent event) {
+		public void handleEvent(BasicPersonEvent event) {
 			this.scenario.getPopulation().getPersons().put(event.getPersonId(), this.scenario.getPopulation().getPopulationBuilder().createPerson(event.getPersonId()));
 		}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicEventHandler.java
+ * AgentMoneyEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,10 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events.handler;
+package org.matsim.api.basic.v01.events.handler;
 
-import org.matsim.core.events.PersonEvent;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-public interface PersonEventHandler extends EventHandler {
-	public void handleEvent (PersonEvent event);
+public interface BasicPersonEventHandler extends EventHandler {
+	public void handleEvent (BasicPersonEvent event);
 }

@@ -3,9 +3,9 @@ package org.matsim.core.mobsim.jdeqsim.util;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.PersonEvent;
 
 /**
  * This class is used to calculate statistical values (used among others in some tests).
@@ -18,7 +18,7 @@ public class EventLibrary {
 	 * Get the travel time of one person. This means the time, between starting
 	 * each leg end its end.
 	 */
-	public static double getTravelTime(LinkedList<PersonEvent> events,
+	public static double getTravelTime(LinkedList<BasicPersonEvent> events,
 			int agentId) {
 		double travelTime = 0;
 		double startLegTime = 0;
@@ -40,12 +40,12 @@ public class EventLibrary {
 	 * Get the sum of the travel time of all agents (time between each departure
 	 * and arrival)
 	 */
-	public static double getSumTravelTime(LinkedList<PersonEvent> events) {
+	public static double getSumTravelTime(LinkedList<BasicPersonEvent> events) {
 		double travelTime = 0;
 
 		// key=vehicleId, value=starting time of last leg
 		HashMap<String, Double> startingTime = new HashMap<String, Double>();
-		PersonEvent currentEvent = null;
+		BasicPersonEvent currentEvent = null;
 		for (int i = 0; i < events.size(); i++) {
 			currentEvent = events.get(i);
 			if (currentEvent instanceof AgentDepartureEvent) {

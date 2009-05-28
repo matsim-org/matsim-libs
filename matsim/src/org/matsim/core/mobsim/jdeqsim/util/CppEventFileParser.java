@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.PersonEvent;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 
@@ -113,7 +113,7 @@ public class CppEventFileParser {
 	/*
 	 * Compares events produced by java and by C++ simulation
 	 */
-	public static boolean equals(final PersonEvent personEvent, final EventLog deqSimEvent) {
+	public static boolean equals(final BasicPersonEvent personEvent, final EventLog deqSimEvent) {
 		if (Integer.parseInt(personEvent.getPersonId().toString()) != deqSimEvent.getVehicleId()) {
 			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
@@ -174,7 +174,7 @@ public class CppEventFileParser {
 		return true;
 	}
 
-	private static void printNotEqualEvents(final PersonEvent personEvent, final EventLog deqSimEvent) {
+	private static void printNotEqualEvents(final BasicPersonEvent personEvent, final EventLog deqSimEvent) {
 		System.out.println("POSSIBLE PROBLEM: EVENTS NOT EQUAL");
 		System.out.println(personEvent.toString());
 		deqSimEvent.print();

@@ -2,17 +2,16 @@ package org.matsim.core.mobsim.jdeqsim.util;
 
 import java.util.LinkedList;
 
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.PersonEvent;
-import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestEventLibrary extends MatsimTestCase {
 	
 	public void testGetTravelTime(){
-		LinkedList<PersonEvent> events=new LinkedList<PersonEvent>();
+		LinkedList<BasicPersonEvent> events=new LinkedList<BasicPersonEvent>();
 		events.add(new AgentDepartureEvent(20, new IdImpl("2"), new IdImpl("0")));
 		events.add(new AgentArrivalEvent(30, new IdImpl("2"), new IdImpl("0")));
 		events.add(new AgentDepartureEvent(90, new IdImpl("1"), new IdImpl("0")));
@@ -22,7 +21,7 @@ public class TestEventLibrary extends MatsimTestCase {
 	}
 	
 	public void testGetAverageTravelTime(){
-		LinkedList<PersonEvent> events=new LinkedList<PersonEvent>();
+		LinkedList<BasicPersonEvent> events=new LinkedList<BasicPersonEvent>();
 		events.add(new AgentDepartureEvent(20, new IdImpl("2"), new IdImpl("0")));
 		events.add(new AgentArrivalEvent(30, new IdImpl("2"), new IdImpl("0")));
 		events.add(new AgentDepartureEvent(90, new IdImpl("1"), new IdImpl("0")));

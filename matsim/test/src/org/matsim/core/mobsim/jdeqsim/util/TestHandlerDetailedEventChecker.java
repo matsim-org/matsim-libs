@@ -5,6 +5,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Link;
@@ -24,17 +26,15 @@ import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.PersonEvent;
-import org.matsim.core.events.handler.PersonEventHandler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 
-public class TestHandlerDetailedEventChecker extends MatsimTestCase implements PersonEventHandler {
+public class TestHandlerDetailedEventChecker extends MatsimTestCase implements BasicPersonEventHandler {
 
-	protected HashMap<Id, LinkedList<PersonEvent>> events = new HashMap<Id, LinkedList<PersonEvent>>();
-	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
+	protected HashMap<Id, LinkedList<BasicPersonEvent>> events = new HashMap<Id, LinkedList<BasicPersonEvent>>();
+	public LinkedList<BasicPersonEvent> allEvents = new LinkedList<BasicPersonEvent>();
 //	private HashMap<Id, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<Id, ExpectedNumberOfEvents>();
 	protected boolean printEvent = true;
 
@@ -45,7 +45,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
-		for (LinkedList<PersonEvent> list : events.values()) {
+		for (LinkedList<BasicPersonEvent> list : events.values()) {
 			lastTimeStamp = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < list.size(); i++) {
 				if (lastTimeStamp > list.get(i).getTime()) {
@@ -64,7 +64,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 
 		// compare plan and events for each agent
 		// compare: type of events, linkId
-		for (LinkedList<PersonEvent> list : events.values()) {
+		for (LinkedList<BasicPersonEvent> list : events.values()) {
 			Person p = population.getPersons().get(list.get(0).getPersonId());
 			// printEvents(list.get(0).agentId);
 			Plan plan = p.getSelectedPlan();
@@ -134,9 +134,9 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 		}
 	}
 
-	public void handleEvent(PersonEvent event) {
+	public void handleEvent(BasicPersonEvent event) {
 		if (!events.containsKey(event.getPersonId())) {
-			events.put(event.getPersonId(), new LinkedList<PersonEvent>());
+			events.put(event.getPersonId(), new LinkedList<BasicPersonEvent>());
 		}
 		events.get(event.getPersonId()).add(event);
 		if (printEvent) {
