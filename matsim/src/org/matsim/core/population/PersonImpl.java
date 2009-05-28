@@ -140,20 +140,14 @@ public class PersonImpl implements Person {
 	}
 
 	public Plan copySelectedPlan() {
-		int i=0;
 		Plan oldPlan = this.getSelectedPlan();
 		if (oldPlan == null) {
 			return null;
 		}
 		Plan newPlan = new PlanImpl(oldPlan.getPerson());
-		try {
-			newPlan.copyPlan(oldPlan);
-			this.delegate.getPlans().add(newPlan);
-			this.setSelectedPlan(newPlan);
-		} catch (Exception e) {
-			log.warn("plan# " + i +" went wrong:", e);
-			newPlan = oldPlan; // give old plan back??
-		}
+		newPlan.copyPlan(oldPlan);
+		this.delegate.getPlans().add(newPlan);
+		this.setSelectedPlan(newPlan);
 		return newPlan;
 	}
 
