@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import playground.jjoubert.DateString;
 import playground.jjoubert.CommercialModel.Postprocessing.EventsToGAP;
 
 public class NormalizeGAPDensity {
@@ -42,7 +43,8 @@ public class NormalizeGAPDensity {
 //	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String INPUT = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorGapStats.txt";
-	final static String OUTPUT = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorGapStats_Normalized.txt";
+	final static String OUTPUT_PRE = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorGapStats_Normalized_";
+	final static String OUTPUT_POST = ".txt";
 
 	public static final String DELIMITER = ",";
 
@@ -50,12 +52,17 @@ public class NormalizeGAPDensity {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		DateString date = new DateString();
+		date.setTimeInMillis(System.currentTimeMillis());
+		String now = date.toString();
+		String OUTPUT = OUTPUT_PRE + now + OUTPUT_POST;
 
 		System.out.println("==================================================================");
 		System.out.printf("Normalizing the GAP Density for %s.\n", PROVINCE);
 		System.out.printf("==================================================================\n\n");
 		
-		ArrayList<ArrayList<Integer>> allLists = new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Double>> allLists = new ArrayList<ArrayList<Double>>();
 		double maxValue = Double.NEGATIVE_INFINITY;
 		/*
 		 * Read the GAP statistics file.
@@ -65,14 +72,14 @@ public class NormalizeGAPDensity {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( INPUT ))));
 			@SuppressWarnings("unused")
 			String header = input.nextLine();
-			ArrayList<Integer> list = null;
+			ArrayList<Double> list = null;
 			while(input.hasNextLine()){
 				String [] line = input.nextLine().split(DELIMITER);
-				list = new ArrayList<Integer>();
+				list = new ArrayList<Double>();
 				if( line.length > 25){
-					list.add( Integer.parseInt( line[0] ));		// Add the GAP ID
+					list.add( Double.parseDouble( line[0] ));		// Add the GAP ID
 					for(int i = 2; i <= 25; i++){
-						list.add( Integer.parseInt( line[i] )); // Add each of the 24-hour bin values 
+						list.add( Double.parseDouble( line[i] )); // Add each of the 24-hour bin values 
 						maxValue = Math.max(maxValue, Double.parseDouble( line[i] ));
 					}
 					allLists.add(list);
@@ -90,8 +97,8 @@ public class NormalizeGAPDensity {
 		if( (allLists.size() > 0) && maxValue > Double.NEGATIVE_INFINITY ){
 			for (int a = 0; a < allLists.size(); a++) {
 				for (int b = 1; b < allLists.get(a).size(); b++) { // Only from index 1; not the GAP ID
-					int dummy = allLists.get(a).get(b);
-					allLists.get(a).set(b, (int) (( ( (double) dummy )/ ( (double) maxValue) )*100) ); 
+					double dummy = allLists.get(a).get(b);
+					allLists.get(a).set(b, (( ( (double) dummy )/ ( (double) maxValue) )*100) ); 
 				}
 			}
 		}
@@ -109,9 +116,11 @@ public class NormalizeGAPDensity {
 				output.newLine();
 
 				String line = null;
-				for (ArrayList<Integer> arrayList : allLists) {
+				for (ArrayList<Double> arrayList : allLists) {
 					line = new String();
-					for(int i = 0; i < arrayList.size()-1; i++){
+					Integer gapID = (int) Math.floor(arrayList.get(0));
+					line += gapID.toString() + DELIMITER;
+					for(int i = 1; i < arrayList.size()-1; i++){
 						line += arrayList.get(i).toString();
 						line += DELIMITER;
 					}

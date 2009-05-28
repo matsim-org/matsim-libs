@@ -30,6 +30,7 @@ import java.util.Scanner;
 
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.jjoubert.DateString;
 import playground.jjoubert.CommercialTraffic.AnalyseGAPDensity;
 import playground.jjoubert.CommercialTraffic.SAZone;
 
@@ -50,14 +51,15 @@ public class EventsToGAP {
 	 */
 	
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
 	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
-	final static String INPUT = ROOT + "Commercial/PostProcess/" + "10.eventsTruckMinor.txt";
-	final static String OUTPUT = ROOT + "Commercial/PostProcess/" + "SimulatedCommercialMinorGAP_Normalized.txt";
+	final static String INPUT = ROOT + "Commercial/PostProcess/" + "100.eventsTruckMinor.txt";
+	final static String OUTPUT_PRE = ROOT + "Commercial/PostProcess/" + "SimulatedCommercialMinorGAP_Normalized_";
+	final static String OUTPUT_POST = ".txt";
 
 	public static final String DELIMITER = ",";
 	final static int GAP_SEARCH_AREA = 20000; // in METERS
@@ -68,19 +70,26 @@ public class EventsToGAP {
 		System.out.println("   Converting " + PROVINCE + " MATSim simulation events ('minor') to GAP densities" );
 		System.out.println();
 		
+		DateString date = new DateString();
+		date.setTimeInMillis(System.currentTimeMillis());
+		String now = date.toString();
+		String output = OUTPUT_PRE + now + OUTPUT_POST;
+		
 		ArrayList<SAZone> zoneList = AnalyseGAPDensity.readGAPShapeFile( GAP_SHAPEFILE, GAP_ID_INDEX );
 	
 		QuadTree<SAZone> zoneTree = AnalyseGAPDensity.buildQuadTree( zoneList, SHAPEFILE, PROVINCE );
 
 		assignActivityToZone(zoneList, zoneTree );
 		
-		normalizeZoneCounts( zoneList );
+		ArrayList<ArrayList<Double>> normalizedList = normalizeZoneCounts( zoneList );
 		
-		writeZoneStatsToFile( zoneList );
+		writeZoneStatsToFile( normalizedList, output );
 	}
 	
 			
-	private static void normalizeZoneCounts(ArrayList<SAZone> zoneList) {
+	private static ArrayList<ArrayList<Double>> normalizeZoneCounts(ArrayList<SAZone> zoneList) {
+		ArrayList<ArrayList<Double>> allZones = new ArrayList<ArrayList<Double>>();
+		
 		System.out.print("Normalizing the minor activity counts... ");
 		double maxActivity = Double.NEGATIVE_INFINITY;
 		for (SAZone zone : zoneList) {
@@ -89,13 +98,22 @@ public class EventsToGAP {
 			}
 		}
 		
+		ArrayList<Double> thisZone = null;
 		for (SAZone zone : zoneList) {
+			thisZone = new ArrayList<Double>();
+			/*
+			 * Add GAP_ID
+			 */
+			thisZone.add(Double.parseDouble(zone.getName()));
+			
 			for (int i = 0; i < zone.getTimeBins(); i++) {
 				double dummy = (double) zone.getMinorActivityCountDetail(i);
-				zone.setMinorActivityCountDetail(i, (int) ((dummy / maxActivity)*100) );
+				thisZone.add((dummy / maxActivity)*100);
 			}
+			allZones.add(thisZone);
 		}		
 		System.out.printf("Done.\n\n");
+		return allZones;
 	}
 
 
@@ -161,28 +179,37 @@ public class EventsToGAP {
 	return zone;
 }
 	
-	private static void writeZoneStatsToFile(ArrayList<SAZone> zoneList) {
+	private static void writeZoneStatsToFile(ArrayList<ArrayList<Double>> allZones, String output) {
 		System.out.print("Writing mesozone statistics to file... ");
 		try{
-			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( OUTPUT ) ) );
+			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( output ) ) );
 			
 			String header = createHeaderString();
-			
-			// Update zone activity counts
-			for (SAZone zone : zoneList) {
-				zone.updateSAZoneCounts(true); // Update minor
-				zone.updateSAZoneCounts(false); // Update major
-			}
-
+	
 			// Write minor activities
 			try{
+				/*
+				 * Write the output header.
+				 */
 				outputMinor.write( header );
 				outputMinor.newLine();
-				for(int j = 0; j < zoneList.size()-1; j++ ){
-					outputMinor.write( createStatsString( zoneList.get(j) ).get(0) );
+				for (ArrayList<Double> thisZone : allZones) {
+					String thisLine = new String();
+					/*
+					 * Convert the GAP_ID to integer, and add to output string.
+					 */
+					int gapID = (int) Math.floor(thisZone.get(0));
+					thisLine += Integer.valueOf(gapID) + DELIMITER;	
+					/*
+					 * Add the double values for hours 0 through 22 to output string.
+					 */
+					for(int i = 1; i < thisZone.size()-1; i++ ){
+						thisLine += thisZone.get(i).toString() + DELIMITER;
+					}
+					thisLine += thisZone.get(thisZone.size()-1);
+					outputMinor.write( thisLine );
 					outputMinor.newLine();
 				}
-				outputMinor.write( createStatsString( zoneList.get( zoneList.size()-1 ) ).get(0) );
 			} finally{
 				outputMinor.close();
 			}
@@ -194,7 +221,9 @@ public class EventsToGAP {
 	}
 		
 	/*
-	 * Returns a standard header string for the GAP statistics file.
+	 * Returns a standard header string for the normalized GAP statistics file:
+	 * 		GAP_ID; and
+	 * 		One column for each hour, starting with 0 and ending with 23. 
 	 */
 	public static String createHeaderString(){
 		String headerString = "Name" + DELIMITER;
@@ -205,26 +234,5 @@ public class EventsToGAP {
 		
 		return headerString;
 	}
-
-	/*
-	 * Method to create statistics strings. The first string in the array
-	 * relates to 'minor' activities, and the second string to 'major' 
-	 * activities.
-	 */
-	private static ArrayList<String> createStatsString(SAZone zone){
-		
-		ArrayList<String> statsString = new ArrayList<String>();
-		
-		// Minor activity string
-		String statsStringMinor = zone.getName() + DELIMITER;
-		for(int i = 0; i < 23; i++){
-			statsStringMinor += zone.getMinorActivityCountDetail(i) + DELIMITER;
-		}
-		statsStringMinor += zone.getMinorActivityCountDetail(23);
-		
-		statsString.add( statsStringMinor );
-		
-		return statsString;
-	}
-
+	
 }
