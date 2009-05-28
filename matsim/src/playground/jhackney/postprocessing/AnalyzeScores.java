@@ -30,9 +30,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.EventsToScore;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -41,7 +38,6 @@ import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
-import playground.jhackney.socialnetworks.scoring.EventSocScoringFactory;
 import playground.jhackney.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
