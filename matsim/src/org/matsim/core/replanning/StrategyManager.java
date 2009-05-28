@@ -45,7 +45,7 @@ public class StrategyManager {
 	private double totalWeights = 0.0;
 	private int maxPlansPerAgent = 0;
 	
-	private PlanSelector removePlanSelector = new WorstPlanForRemovalSelector();
+	private PlanSelector removalPlanSelector = new WorstPlanForRemovalSelector();
 
 	private final TreeMap<Integer, Map<PlanStrategy, Double>> changeRequests =
 			new TreeMap<Integer, Map<PlanStrategy, Double>>();
@@ -144,7 +144,7 @@ public class StrategyManager {
 	
 	private void removePlans(final Person person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
-			Plan plan = this.removePlanSelector.selectPlan(person);
+			Plan plan = this.removalPlanSelector.selectPlan(person);
 			person.getPlans().remove(plan);
 			if (plan == person.getSelectedPlan()) {
 				person.setSelectedPlan(person.getRandomPlan());
@@ -216,6 +216,19 @@ public class StrategyManager {
 			this.changeRequests.put(iter, iterationRequests);
 		}
 		iterationRequests.put(strategy, Double.valueOf(newWeight));
+	}
+	
+	/**
+	 * Sets a plan selector to be used for choosing plans for removal, if they
+	 * have more plans than the specified maximum. This defaults to 
+	 * {@link WorstPlanForRemovalSelector}. 
+	 * 
+	 * @param planSelector
+	 * 
+	 * @see #setMaxPlansPerAgent(int)
+	 */
+	public void setPlanSelectorForRemoval(final PlanSelector planSelector) {
+		this.removalPlanSelector = planSelector;
 	}
 
 }
