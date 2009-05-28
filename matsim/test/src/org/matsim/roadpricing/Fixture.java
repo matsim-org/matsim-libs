@@ -40,8 +40,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
-import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -147,18 +147,22 @@ import org.matsim.core.utils.misc.Time;
 		Link link2 = network.getLink(new IdImpl(2));
 		Link link3 = network.getLink(new IdImpl(3));
 		Link link4 = network.getLink(new IdImpl(4));
-		population.addPerson(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 1st time slot
-		population.addPerson(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 2nd time slot
-		population.addPerson(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 3rd time slot
-		population.addPerson(Fixture.createPerson1( 4, "09:59:50", link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4)); // toll in 1st and 2nd time slot
-		population.addPerson(Fixture.createPerson1( 5, "08:00:00", link1, NetworkUtils.getNodes(network, "3 4 5"), link4)); // starts on the 2nd link
-		population.addPerson(Fixture.createPerson1( 6, "09:00:00", link0, NetworkUtils.getNodes(network, "2 3 4"), link3)); // ends not on the last link
-		population.addPerson(Fixture.createPerson1( 7, "08:30:00", link1, NetworkUtils.getNodes(network, "3 4"), link3)); // starts and ends not on the first/last link
-		population.addPerson(Fixture.createPerson1( 8, "08:35:00", link1, NetworkUtils.getNodes(network, "3"), link2)); // starts and ends not on the first/last link
-		population.addPerson(Fixture.createPerson1( 9, "08:40:00", link1, NetworkUtils.getNodes(network, ""), link1)); // two acts on the same link
-		population.addPerson(Fixture.createPerson1(10, "08:45:00", link2, NetworkUtils.getNodes(network, "4"), link3));
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 1st time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 2nd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 3rd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 4, "09:59:50", link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 1st and 2nd time slot
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 5, "08:00:00", link1, NetworkUtils.getNodes(network, "3 4 5"), link4), population); // starts on the 2nd link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 6, "09:00:00", link0, NetworkUtils.getNodes(network, "2 3 4"), link3), population); // ends not on the last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 7, "08:30:00", link1, NetworkUtils.getNodes(network, "3 4"), link3), population); // starts and ends not on the first/last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 8, "08:35:00", link1, NetworkUtils.getNodes(network, "3"), link2), population); // starts and ends not on the first/last link
+		Fixture.addPersonToPopulation(Fixture.createPerson1( 9, "08:40:00", link1, NetworkUtils.getNodes(network, ""), link1), population); // two acts on the same link
+		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2, NetworkUtils.getNodes(network, "4"), link3), population);
 
 		return population;
+	}
+	
+	private static void addPersonToPopulation(final Person person, final Population population) {
+		population.getPersons().put(person.getId(), person);
 	}
 
 	/**
@@ -168,7 +172,7 @@ import org.matsim.core.utils.misc.Time;
 	protected static Population createPopulation2(final NetworkLayer network) {
 		Population population = new PopulationImpl();
 
-		population.addPerson(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")));
+		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")), population);
 
 		return population;
 	}

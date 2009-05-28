@@ -20,66 +20,46 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatModuleTest extends MatsimTestCase {
 
-	private Config config = null;
-	private NetworkLayer network = null;
-	private ActivityFacilities facilities = null;
-	private Population population = null;
-	
-	private static final Logger log = Logger.getLogger(PlanomatModuleTest.class);
+	private Scenario scenario = null;
 
 	@Override
 	protected void setUp() throws Exception {
 
 		super.setUp();
-		this.config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
+		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
-		log.info("Reading facilities xml file...");
-		this.facilities = (ActivityFacilities)Gbl.createWorld().createLayer(ActivityFacilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(this.facilities).readFile(config.facilities().getInputFile());
-		log.info("Reading facilities xml file...done.");
-
-		log.info("Reading network xml file...");
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(config.network().getInputFile());
-		log.info("Reading network xml file...done.");
-
-		log.info("Reading plans xml file...");
-		this.population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(this.population, this.network);
-		plansReader.readFile(config.plans().getInputFile());
-		log.info("Reading plans xml file...done.");
-
+		this.scenario = new ScenarioImpl(config);
+		
+		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(config.facilities().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
+		new MatsimPopulationReader(scenario.getPopulation(), scenario.getNetwork()).readFile(config.plans().getInputFile());
 	}
 
 	public void testGenerateRandomDemand() {
-
+		Config config = scenario.getConfig();
 		final int TEST_PLAN_NR = 0;
 
 		// the planomat can be used to generate random demand with respect to the dimensions that are optimized by it
@@ -92,23 +72,23 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		config.planomat().setPossibleModes("car,pt");
 
 		Events emptyEvents = new Events();
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, 900, config.travelTimeCalculator());
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), 900, config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
 		
-		Controler dummyControler = new Controler(this.config, this.network, this.population);
+		Controler dummyControler = new Controler(this.scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
 		
 		PlanomatModule testee = new PlanomatModule(
 				dummyControler, 
 				emptyEvents, 
-				this.network, 
+				(NetworkLayer) this.scenario.getNetwork(), 
 				scoringFunctionFactory, 
 				travelCostEstimator, 
 				tTravelEstimator);
 		
 		testee.prepareReplanning();
-		for (Person person : this.population.getPersons().values()) {
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 
 			Plan plan = person.getPlans().get(TEST_PLAN_NR);
 			testee.handlePlan(plan);
@@ -116,16 +96,13 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		}
 		testee.finishReplanning();
 		
-		System.out.println("Writing plans file...");
-		PopulationWriter plans_writer = new PopulationWriter(this.population, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
+		PopulationWriter plans_writer = new PopulationWriter(this.scenario.getPopulation(), this.getOutputDirectory() + "output_plans.xml.gz", "v4");
 		plans_writer.write();
-		System.out.println("Writing plans file...DONE.");
 
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "plans.xml.gz");
 		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "output_plans.xml.gz");
 		assertEquals("different plans files.", expectedChecksum, actualChecksum);
-
 	}
 	
 	
@@ -133,9 +110,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		this.population = null;
-		this.network = null;
-		this.facilities = null;
+		this.scenario = null;
 	}
 
 }

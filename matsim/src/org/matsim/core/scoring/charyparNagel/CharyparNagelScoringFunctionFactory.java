@@ -28,9 +28,14 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
- * @see http://www.matsim.org/node/263
+ * A factory to create scoring functions as described by D. Charypar and K. Nagel.
+ * 
+ * <blockquote>
+ *  <p>Charypar, D. und K. Nagel (2005) <br>
+ *  Generating complete all-day activity plans with genetic algorithms,<br>
+ *  Transportation, 32 (4) 369–397.</p>
+ * </blockquote>
+ * 
  * @author rashid_waraich
  */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
@@ -46,20 +51,14 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	 * CharyparScoringFunction
 	 * 
 	 * @param plan
-	 * @return
+	 * @return new ScoringFunction
 	 */
 	public ScoringFunction getNewScoringFunction(Plan plan) {
-
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
-
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));
-
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
-
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
-
 		return scoringFunctionAccumulator;
 	}
 

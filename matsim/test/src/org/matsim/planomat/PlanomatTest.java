@@ -46,8 +46,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
@@ -81,7 +81,7 @@ public class PlanomatTest extends MatsimTestCase {
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
 		//store the only existing person
-		Person p = scenario.getPopulation().getPerson(TEST_PERSON_ID);
+		Person p = scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		//read the events once to create a complete test population
 		Events events = new Events(new EventsBuilderImpl(this.scenario));
 		events.addHandler(new ScenarioCreatePersonEventHandler(this.scenario));
@@ -165,7 +165,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		// write out the test person and the modified plan into a file
 		Population outputPopulation = new PopulationImpl();
-		outputPopulation.addPerson(testPerson);
+		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
 
 		log.info("Writing plans file...");
 		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
@@ -283,7 +283,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		// write out the test person and the modified plan into a file
 		Population outputPopulation = new PopulationImpl();
-		outputPopulation.addPerson(testPerson);
+		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
 
 		System.out.println("Writing plans file...");
 		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");

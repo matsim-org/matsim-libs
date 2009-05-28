@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.beliefs.AgentBeliefsImpl;
