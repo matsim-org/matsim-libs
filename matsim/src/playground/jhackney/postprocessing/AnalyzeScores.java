@@ -22,6 +22,7 @@ package playground.jhackney.postprocessing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Population;
@@ -29,13 +30,18 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.ScenarioConfig;
+import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
+import playground.jhackney.socialnetworks.scoring.EventSocScoringFactory;
 import playground.jhackney.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
@@ -51,6 +57,9 @@ public class AnalyzeScores {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
+	static Population plans;
+	static ActivityFacilities facilities;
+	
 	public static void run() throws Exception {
 
 		System.out.println("Make friend face to face scores each 10 iters:");
@@ -60,17 +69,22 @@ public class AnalyzeScores {
 		Config config = ScenarioConfig.readConfig();
 
 		World world = ScenarioConfig.readWorld();
-		ScenarioConfig.readFacilities();
+		facilities = ScenarioConfig.readFacilities();
 		NetworkLayer network =ScenarioConfig.readNetwork();
 		new WorldConnectLocations().run(world);
-		int i=500;
-		Population plans = ScenarioConfig.readPlans(network, i);
+		int iplans=500;
+		int isoc=500;
+		plans = ScenarioConfig.readPlans(network, iplans);
 		System.out.println(" Initializing the social network ...");
+		
+		System.out.println(" Initializing agent knowledge about geography ...");
+		initializeKnowledge();
+		System.out.println("... done");
 		
 		// Override the config to take the last iteration
 		config.socnetmodule().setReadMentalMap("true");
 		config.socnetmodule().setSocNetGraphAlgo("read");
-		config.socnetmodule().setInitIter(Integer.toString(i));
+		config.socnetmodule().setInitIter(Integer.toString(isoc));
 		config.socnetmodule().setInDirName(ScenarioConfig.getSNInDir());
 		
 		SocialNetwork snet=new SocialNetwork(plans);
@@ -80,14 +94,10 @@ public class AnalyzeScores {
 		LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
 		LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;
 		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
+//		EventsToScore scoring=null;
 		
 		//Register scoring function and other events handlers
-//		playground.jhackney.scoring.CharyparNagelScoringFunctionFactory scoringFf=new playground.jhackney.scoring.CharyparNagelScoringFunctionFactory();
 		
-		//TODO superfluous in 0th iteration and not necessary anymore except that scoring function needs it (can null be passed?)
-//		teo=new MakeTimeWindowsFromEvents(epp);
-//		twm=teo.getTimeWindowMap();
-
 		System.out.println(" ... Instantiation of events overlap tracking done");
 		epp=new EventsMapStartEndTimes(plans);
 		teo=new MakeTimeWindowsFromEvents();
@@ -95,16 +105,15 @@ public class AnalyzeScores {
 		twm=teo.getTimeWindowMap();
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 		playground.jhackney.scoring.EventSocScoringFactory factory = new playground.jhackney.scoring.EventSocScoringFactory("leisure",actStats);
+//		ScoringFunctionFactory cnfactory = new CharyparNagelScoringFunctionFactory(ScenarioConfig.getConfig().charyparNagelScoring());
+//		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", cnfactory,actStats);
 		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(plans, factory);
 		System.out.println("  Instantiating social network EventsToScore for scoring the plans");
 //		scoring = new EventsToScore(plans, factory);
 
 		// read in events
-//		TrackEventsOverlap teo = new TrackEventsOverlap();
-//		epp=new EventsPostProcess(plans);
-
 		System.out.println(" Initializing the events ...");
-		events = ScenarioConfig.readEvents(i, epp, scoring);
+		events = ScenarioConfig.readEvents(iplans, epp, scoring);
 		System.out.println("... done");
 
 		System.out.println("  Handling events");
@@ -116,6 +125,10 @@ public class AnalyzeScores {
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 //		scoring = new EventsToScore(plans, factory);
 		scoring.finish();
+		
+//		System.out.println("writing out output plans");
+//		ScenarioConfig.writePlans(plans);
+//		
 		System.out.println(" ... done");
 
 //		for(int i=0; i<501; i+=10){
@@ -177,6 +190,8 @@ public class AnalyzeScores {
 
 		Gbl.printElapsedTime();
 	}
-
+	protected static void initializeKnowledge() {
+		new InitializeKnowledge(plans, facilities);
+	}
 }
 

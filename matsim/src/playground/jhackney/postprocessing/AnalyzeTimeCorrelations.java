@@ -20,6 +20,7 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -29,6 +30,7 @@ import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
+import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.algorithms.TimeWindowCalcTimeCorrelations;
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 import playground.jhackney.socialnetworks.scoring.MakeTimeWindowsFromEvents;
@@ -40,6 +42,9 @@ public class AnalyzeTimeCorrelations {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
+	static Population plans;
+	static ActivityFacilities facilities;
+	
 	public static void run() throws Exception {
 
 		System.out.println("Make friend face to face scores each 10 iters:");
@@ -48,16 +53,21 @@ public class AnalyzeTimeCorrelations {
 		Config config = Scenario.getConfig();
 
 		World world = Scenario.readWorld();
-		Scenario.readFacilities();
+		facilities= Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldConnectLocations().run(world);
 
-		int i=500;
+		int iplan=500;
+		int isoc=0;
 //		read in plans
 		System.out.println(" Initializing the plans ...");
-		Population plans = Scenario.readPlans(network, i);
+		plans = Scenario.readPlans(network, iplan);
 		System.out.println("... done");
 
+		System.out.println(" Initializing agent knowledge about geography ...");
+		initializeKnowledge();
+		System.out.println("... done");
+		
 		// read in events
 		Events events = new Events();
 //		TrackEventsOverlap teo = new TrackEventsOverlap();
@@ -65,7 +75,7 @@ public class AnalyzeTimeCorrelations {
 		//Fill timeWindowMap
 
 		System.out.println(" Initializing the events ...");
-		events = Scenario.readEvents(i, epp);
+		events = Scenario.readEvents(iplan, epp);
 		System.out.println("... done");
 
 		System.out.println("  Handling events");
@@ -73,7 +83,7 @@ public class AnalyzeTimeCorrelations {
 		System.out.println(" ... done");
 
 		//read in social network
-		config.socnetmodule().setInitIter(Integer.toString(i));
+		config.socnetmodule().setInitIter(Integer.toString(isoc));
 		System.out.println(" Initializing the social network ...");
 		SocialNetwork snet=new SocialNetwork(plans);
 		System.out.println("... done");
@@ -109,6 +119,8 @@ public class AnalyzeTimeCorrelations {
 
 		Gbl.printElapsedTime();
 	}
-
+	protected static void initializeKnowledge() {
+		new InitializeKnowledge(plans, facilities);
+	}
 }
 
