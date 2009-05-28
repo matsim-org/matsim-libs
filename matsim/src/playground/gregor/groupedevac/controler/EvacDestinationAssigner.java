@@ -39,7 +39,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -158,8 +157,20 @@ public class EvacDestinationAssigner implements ScoringListener {
 			}
 
 			Person pers = plan.getPerson();
-			((PersonImpl)pers).removeWorstPlans(0);
-			plan = pers.getSelectedPlan();
+			// keep best plan only
+			Plan bestPlan = null;
+			double bestScore = Double.NEGATIVE_INFINITY;
+			for (Plan plan2 : pers.getPlans()) {
+				if (plan2.getScore().doubleValue() > bestScore) {
+					bestScore = plan2.getScore().doubleValue();
+					bestPlan = plan2;
+				}
+			}
+			pers.getPlans().clear();
+			pers.getPlans().add(bestPlan);
+			pers.setSelectedPlan(bestPlan);
+//			((PersonImpl)pers).removeWorstPlans(0);
+			plan = bestPlan;
 			plan.removeLeg(1);
 			plan.addLeg(leg);
 			plan.addActivity(act);

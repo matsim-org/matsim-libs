@@ -20,7 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -180,68 +179,6 @@ public class PersonImpl implements Person {
 			this.setSelectedPlan(this.getRandomPlan());
 		}
 		return result;
-	}
-
-	/** Removes the plans with the worst score until only <code>maxSize</code> plans are left.
-	 * Plans with undefined scores are treated as plans with very bad scores and thus removed
-	 * first. If there are several plans with the same bad score, it can not be predicted which
-	 * one of them will be removed.<br>
-	 * This method insures that if there are different types of plans (see
-	 * {@link org.matsim.core.api.population.Plan#getType()}),
-	 * at least one plan of each type remains. This could lead to the worst plan being kept if
-	 * it is the only one of it's type. Plans with type <code>null</code> are handled like any
-	 * other type, and are differentiated from plans with the type set to an empty String.<br>
-	 *
-	 * If there are more plan-types than <code>maxSize</code>, it is not possible to reduce the
-	 * number of plans to the requested size.<br>
-	 *
-	 * If the selected plan is on of the deleted ones, a randomly chosen plan will be selected.
-	 *
-	 * @param maxSize The number of plans that should be left.
-	 * 
-	 * @deprecated
-	 **/
-	public void removeWorstPlans(final int maxSize) {
-		if (this.delegate.getPlans().size() <= maxSize) {
-			return;
-		}
-		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
-		// initialize list of types
-		for (Plan plan : this.getPlans()) {
-			Integer cnt = typeCounts.get(plan.getType());
-			if (cnt == null) {
-				typeCounts.put(plan.getType(), Integer.valueOf(1));
-			} else {
-				typeCounts.put(plan.getType(), Integer.valueOf(cnt.intValue() + 1));
-			}
-		}
-		while (this.delegate.getPlans().size() > maxSize) {
-			Plan worst = null;
-			double worstScore = Double.POSITIVE_INFINITY;
-			for (Plan plan : this.getPlans()) {
-				if (typeCounts.get(plan.getType()).intValue() > 1) {
-					if (plan.getScore() == null) {
-						worst = plan;
-						// make sure no other score could be less than this
-						worstScore = Double.NEGATIVE_INFINITY;
-					} else if (plan.getScore().doubleValue() < worstScore) {
-						worst = plan;
-						worstScore = plan.getScore().doubleValue();
-					}
-				}
-			}
-			if (worst != null) {
-				this.delegate.getPlans().remove(worst);
-				if (worst.isSelected()) {
-					this.setSelectedPlan(this.getRandomPlan());
-				}
-				// reduce the number of plans of this type
-				Integer cnt = typeCounts.get(worst.getType());
-				typeCounts.put(worst.getType(), Integer.valueOf(cnt.intValue() - 1));
-			} else {
-				return; // should only happen if we have more different plan-types than maxSize
-			}
-		}
 	}
 
 	public Id getHouseholdId() {
