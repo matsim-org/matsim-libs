@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
@@ -38,7 +39,6 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
@@ -93,7 +93,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile(networkFile);
 
 		Events events = new Events();
-		List<BasicEventImpl> eventsList = new LinkedList<BasicEventImpl>();
+		List<BasicEvent> eventsList = new LinkedList<BasicEvent>();
 		events.addHandler(new EventsCollector(eventsList));
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
@@ -102,7 +102,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory, scenario.getConfig().travelTimeCalculator());
 		events2.addHandler(ttcalc);
-		for (BasicEventImpl e : eventsList){
+		for (BasicEvent e : eventsList){
 			events2.processEvent(e);
 		}
 		
@@ -229,16 +229,16 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	
 	private static class EventsCollector implements BasicEventHandler {
 		 
-		private List<BasicEventImpl> eventsList;
+		private List<BasicEvent> eventsList;
 		
-		public EventsCollector(List<BasicEventImpl> eventsList) {
+		public EventsCollector(List<BasicEvent> eventsList) {
 			this.eventsList = eventsList;
 		}
 
 		public void reset(int iteration) {
 		}
 
-		public void handleEvent(BasicEventImpl event) {
+		public void handleEvent(BasicEvent event) {
 			this.eventsList.add(event);
 		}
 	}

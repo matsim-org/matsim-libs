@@ -1,6 +1,6 @@
 package playground.yu.visum.filter;
 
-import org.matsim.core.events.BasicEventImpl;
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
@@ -24,11 +24,11 @@ public class EventFilterAlgorithm implements BasicEventHandler, EventFilterI {
 		return this.count;
 	}
 
-	public boolean judge(BasicEventImpl event) {
+	public boolean judge(BasicEvent event) {
 		return true;
 	}
 
-	public void handleEvent(BasicEventImpl event) {
+	public void handleEvent(BasicEvent event) {
 		count();
 		this.nextFilter.handleEvent(event);
 	}

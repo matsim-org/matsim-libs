@@ -45,7 +45,6 @@ import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
@@ -240,7 +239,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 	/*package*/ static class BasicEventCollector implements BasicEventHandler {
 		public final ArrayList<BasicEvent> events = new ArrayList<BasicEvent>();
-		public void handleEvent(final BasicEventImpl event) {
+		public void handleEvent(final BasicEvent event) {
 			this.events.add(event);
 		}
 		public void reset(final int iteration) {

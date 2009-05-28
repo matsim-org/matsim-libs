@@ -3,7 +3,7 @@
  */
 package playground.yu.visum.filter;
 
-import org.matsim.core.events.BasicEventImpl;
+import org.matsim.api.basic.v01.events.BasicEvent;
 
 /**
  * This interface extends interface:
@@ -22,7 +22,7 @@ public interface EventFilterI extends FilterI {
 	 *            which is being judged
 	 * @return true if the Person meets the criterion of the EventFilterA
 	 */
-	boolean judge(BasicEventImpl event);
+	boolean judge(BasicEvent event);
 
 	/**
 	 * sends the person to the next EventFilterA
@@ -31,7 +31,7 @@ public interface EventFilterI extends FilterI {
 	 * @param event -
 	 *            an event being handled
 	 */
-	void handleEvent(BasicEventImpl event);
+	void handleEvent(BasicEvent event);
 
 	/**
 	 * sets the next Filter, who will handle BasicEvent-object.

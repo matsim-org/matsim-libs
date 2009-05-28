@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -61,20 +62,22 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		closeFile();
 	}
 
-	public void handleEvent(final BasicEventImpl event) {
-		StringBuilder eventXML = new StringBuilder("\t<event ");
-		Map<String, String> attr = event.getAttributes();
-		for (Map.Entry<String, String> entry : attr.entrySet()) {
-			eventXML.append(entry.getKey());
-			eventXML.append("=\"");
-			eventXML.append(entry.getValue());
-			eventXML.append("\" ");
-		}
-		eventXML.append(" />\n");
-		try {
-			this.out.write(eventXML.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void handleEvent(final BasicEvent event) {
+		if (event instanceof BasicEventImpl) {
+			StringBuilder eventXML = new StringBuilder("\t<event ");
+			Map<String, String> attr = ((BasicEventImpl)event).getAttributes();
+			for (Map.Entry<String, String> entry : attr.entrySet()) {
+				eventXML.append(entry.getKey());
+				eventXML.append("=\"");
+				eventXML.append(entry.getValue());
+				eventXML.append("\" ");
+			}
+			eventXML.append(" />\n");
+			try {
+				this.out.write(eventXML.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -27,9 +27,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.matsim.core.events.BasicEventImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -63,11 +61,11 @@ public abstract class XmlEventsTester extends TestCase {
 		new MatsimEventsReader(events).readFile(eventsFile);
 
 		assertEquals("there must be 1 event.", 1, collector.events.size());
-		BasicEventImpl readEvent = collector.events.iterator().next();
+		BasicEvent readEvent = collector.events.iterator().next();
 		assertEquals("event has wrong class.", event.getClass(), readEvent.getClass());
 
 		Map<String, String> writtenAttributes = event.getAttributes();
-		Map<String, String> readAttributes = readEvent.getAttributes();
+		Map<String, String> readAttributes = ((T)readEvent).getAttributes();
 		for (Map.Entry<String, String> attribute : writtenAttributes.entrySet()) {
 			assertEquals("attribute '" + attribute.getKey() + "' is different after reading the event.",
 					attribute.getValue(), readAttributes.get(attribute.getKey()));
@@ -82,9 +80,9 @@ public abstract class XmlEventsTester extends TestCase {
 	 * @author mrieser
 	 */
 	/*package*/ static class EventsCollector implements BasicEventHandler {
-		/*package*/ final Collection<BasicEventImpl> events = new LinkedList<BasicEventImpl>();
+		/*package*/ final Collection<BasicEvent> events = new LinkedList<BasicEvent>();
 
-		public void handleEvent(final BasicEventImpl event) {
+		public void handleEvent(final BasicEvent event) {
 			this.events.add(event);
 		}
 

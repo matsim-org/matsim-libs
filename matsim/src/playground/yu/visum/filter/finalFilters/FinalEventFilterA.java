@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.network.NetworkLayer;
 
@@ -84,7 +84,7 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	public abstract Map<String, List<Double>> UDAWexport();
 
 	@Override
-	public boolean judge(BasicEventImpl event) {
+	public boolean judge(BasicEvent event) {
 		return false;
 	}
 
