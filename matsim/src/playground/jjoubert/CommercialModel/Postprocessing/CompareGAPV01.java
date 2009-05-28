@@ -111,20 +111,20 @@ public class CompareGAPV01 {
 						 */
 						outputGIS.write( lineActual[0] + DELIMITER );
 						outputScatter.write( lineActual[0] + DELIMITER );
-						int valueActual = Integer.MIN_VALUE;
-						int valueSim = Integer.MAX_VALUE;
-						int difference = Integer.MAX_VALUE; 
+						Double valueActual = Double.NEGATIVE_INFINITY;
+						Double valueSim = Double.POSITIVE_INFINITY;
+						Double difference = Double.POSITIVE_INFINITY; 
 						/*
 						 * Repeat for hours 0 through 22
 						 */
 						for (int a = 1; a < lineActual.length - 1; a++) {
-							valueActual = Integer.parseInt(lineActual[a]);
-							valueSim = Integer.parseInt( lineSim[a]);
+							valueActual = Double.parseDouble(lineActual[a]);
+							valueSim = Double.parseDouble(lineSim[a]);
 							difference = valueSim - valueActual;
 							/*
 							 * Writes the difference for the specific hour to the GIS file. 
 							 */
-							outputGIS.write(difference + DELIMITER);
+							outputGIS.write(difference.toString() + DELIMITER);
 							/*
 							 * Writes the simulated, then the actual value to the scatter plot output
 							 * file for THIS hour only. Afterwards, a new line is created, and the current
@@ -138,8 +138,8 @@ public class CompareGAPV01 {
 						/*
 						 * Repeat only for hour 23 (no delimiter at the end).
 						 */
-						valueActual = Integer.parseInt(lineActual[lineActual.length - 1]);
-						valueSim = Integer.parseInt(lineSim[lineSim.length - 1]);
+						valueActual = Double.parseDouble(lineActual[lineActual.length - 1]);
+						valueSim = Double.parseDouble(lineSim[lineSim.length - 1]);
 						difference = valueSim - valueActual;
 						String diff = String.valueOf(difference);
 						outputGIS.write(diff);
