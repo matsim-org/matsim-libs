@@ -21,6 +21,8 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -30,10 +32,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.CharyparNagelScoringFunction;
-import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -47,8 +47,9 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 
 	/**
 	 * Sets up the configuration to be useful for scoring plans. This implementation
-	 * sets the parameters for the {@link CharyparNagelScoringFunction}, overwrite
-	 * it to test your own custom scoring function.
+	 * sets the parameters for scoring functions returned by 
+	 * {@link CharyparNagelScoringFunctionFactory}, overwrite it to test your own 
+	 * custom scoring function.
 	 *
 	 * @param config
 	 */
@@ -60,7 +61,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		scoring.setPerforming(6.0);
 		scoring.setTraveling(-6.0);
 		scoring.setTravelingPt(0.0);
-		scoring.setMarginalUtlOfDistance(0.0);
+		scoring.setMarginalUtlOfDistanceCar(0.0);
 		scoring.setWaiting(0.0);
 
 		// setup activity types h and w for scoring
@@ -79,11 +80,10 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	 * and a car-leg in between. It then tests the scoring function by calling
 	 * several methods on an instance of the scoring function with the
 	 * aforementioned plan.
-	 *
-	 * @throws Exception in case something goes wrong with creating the agent, should never happen
 	 */
-	public void testAddMoney() throws Exception {
-		setupScoringConfig(Gbl.getConfig());
+	public void testAddMoney() {
+		Scenario scenario = new ScenarioImpl();
+		setupScoringConfig(scenario.getConfig());
 
 		// score the same plan twice
 		Person person1 = new PersonImpl(new IdImpl(1));

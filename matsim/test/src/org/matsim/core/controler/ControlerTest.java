@@ -35,15 +35,13 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scoring.CharyparNagelScoringFunction;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -79,7 +77,7 @@ public class ControlerTest extends MatsimTestCase {
 		nodes.add(f.node3);
 		route1.setNodes(f.link1, nodes, f.link3);
 		plan1.createActivity("h", f.link3);
-		population.addPerson(person1);
+		population.getPersons().put(person1.getId(), person1);
 
 		Person person2 = new PersonImpl(new IdImpl(2));
 		Plan plan2 = person2.createPlan(true);
@@ -90,7 +88,7 @@ public class ControlerTest extends MatsimTestCase {
 		leg2.setRoute(route2);
 		route2.setNodes(f.link1, nodes, f.link3);
 		plan2.createActivity("h", f.link3);
-		population.addPerson(person2);
+		population.getPersons().put(person2.getId(), person2);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters
@@ -152,7 +150,7 @@ public class ControlerTest extends MatsimTestCase {
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
-		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory(config.charyparNagelScoring()));
+		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
 		assertTrue("Custom ScoringFunctionFactory was not set.",
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
 
@@ -193,7 +191,7 @@ public class ControlerTest extends MatsimTestCase {
 		leg2 = plan2.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		plan2.createActivity("h", f.link3);
-		population.addPerson(person1);
+		population.getPersons().put(person1.getId(), person1);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters
@@ -253,7 +251,7 @@ public class ControlerTest extends MatsimTestCase {
 		leg2 = plan2.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		act2b = plan2.createActivity("h", new CoordImpl(1111.1, 10.0));
-		population.addPerson(person1);
+		population.getPersons().put(person1.getId(), person1);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters
@@ -384,15 +382,10 @@ public class ControlerTest extends MatsimTestCase {
 	}
 
 	/** A helper class for testSetScoringFunctionFactory() */
-	private static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
-		private final CharyparNagelScoringParameters params; 
-		
-		protected DummyScoringFunctionFactory(final CharyparNagelScoringConfigGroup config) {
-			this.params = new CharyparNagelScoringParameters(config);
-		}
+	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
 
 		public ScoringFunction getNewScoringFunction(final Plan plan) {
-			return new CharyparNagelScoringFunction(plan, this.params);
+			return new ScoringFunctionAccumulator();
 		}
 	}
 
