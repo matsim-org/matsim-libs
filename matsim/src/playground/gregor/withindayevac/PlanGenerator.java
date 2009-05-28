@@ -47,6 +47,7 @@ import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 
 import playground.gregor.withindayevac.debug.DebugDecisionTree;
@@ -140,7 +141,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 		plan.addActivity(b);
 		plan.setScore(null);
 		
-		pers.removeWorstPlans(Gbl.getConfig().strategy().getMaxAgentPlanMemorySize()-1);
+		((PersonImpl)pers).removeWorstPlans(Gbl.getConfig().strategy().getMaxAgentPlanMemorySize()-1);
 		pers.exchangeSelectedPlan(plan, true);
 		return true;
 	}

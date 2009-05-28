@@ -83,25 +83,6 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	 * @return <code>true</code> if the plan was removed from the person
 	 */
 	public boolean removePlan(final Plan plan);
-	
-	/** Removes the plans with the worst score until only <code>maxSize</code> plans are left.
-	 * Plans with undefined scores are treated as plans with very bad scores and thus removed
-	 * first. If there are several plans with the same bad score, it can not be predicted which
-	 * one of them will be removed.<br>
-	 * This method insures that if there are different types of plans (see
-	 * {@link org.matsim.core.api.population.Plan#getType()}),
-	 * at least one plan of each type remains. This could lead to the worst plan being kept if
-	 * it is the only one of it's type. Plans with type <code>null</code> are handled like any
-	 * other type, and are differentiated from plans with the type set to an empty String.<br>
-	 *
-	 * If there are more plan-types than <code>maxSize</code>, it is not possible to reduce the
-	 * number of plans to the requested size.<br>
-	 *
-	 * If the selected plan is on of the deleted ones, a randomly chosen plan will be selected.
-	 *
-	 * @param maxSize The number of plans that should be left.
-	 */
-	public void removeWorstPlans(final int maxSize);
 
 	public Knowledge createKnowledge(final String desc);
 	

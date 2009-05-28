@@ -39,6 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -157,7 +158,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			}
 
 			Person pers = plan.getPerson();
-			pers.removeWorstPlans(0);
+			((PersonImpl)pers).removeWorstPlans(0);
 			plan = pers.getSelectedPlan();
 			plan.removeLeg(1);
 			plan.addLeg(leg);
