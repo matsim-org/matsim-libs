@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -53,6 +54,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -168,7 +170,7 @@ public class Controler {
 	/* default analyses */
 	/*package*/ CalcLinkStats linkStats = null;
 	/*package*/ CalcLegTimes legTimes = null;
-	/*package*/ private VolumesAnalyzer volumes = null;
+	/*package*/ VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
 
@@ -1133,7 +1135,7 @@ public class Controler {
 	 */
 	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ShutdownListener {
 
-		private EventWriter eventWriter = null;
+		private List<EventWriter> eventWriters = new LinkedList<EventWriter>();
 
 		public CoreControlerListener() {
 			// empty public constructor for protected class
@@ -1156,18 +1158,21 @@ public class Controler {
 			controler.travelTimeCalculator.resetTravelTimes();
 
 			if ((controler.writeEventsInterval > 0) && (event.getIteration() % controler.writeEventsInterval == 0)) {
-				switch (controler.config.controler().getEventsFileFormat()) {
-					case txt:
-						this.eventWriter = new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS_TXT));
-						break;
-					case xml:
-						this.eventWriter = new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML));
-						break;
-					default:
-						log.warn("Unknown events file format specified: " + controler.config.controler().getEventsFileFormat() + ". Using xml-format instead.");
-						this.eventWriter = new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML));
+				for (EventsFileFormat format : controler.config.controler().getEventsFileFormats()) {
+					switch (format) {
+						case txt:
+							this.eventWriters.add(new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS_TXT)));
+							break;
+						case xml:
+							this.eventWriters.add(new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML)));
+							break;
+						default:
+							log.warn("Unknown events file format specified: " + format.toString() + ".");
+					}
 				}
-				controler.getEvents().addHandler(this.eventWriter);
+				for (EventWriter writer : this.eventWriters) {
+					controler.getEvents().addHandler(writer);
+				}
 			}
 
 			if (event.getIteration() % 10 == 6) {
@@ -1186,11 +1191,11 @@ public class Controler {
 			// prepare for finishing iteration
 			controler.events.finishProcessing();
 
-			if (this.eventWriter != null) {
-				this.eventWriter.closeFile();
-				event.getControler().getEvents().removeHandler(this.eventWriter);
-				this.eventWriter = null;
+			for (EventWriter writer : this.eventWriters) {
+				writer.closeFile();
+				event.getControler().getEvents().removeHandler(writer);
 			}
+			this.eventWriters.clear();
 
 			if (((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) || (iteration % 10 >= 6)) {
 				controler.linkStats.addData(controler.volumes, controler.travelTimeCalculator);
@@ -1211,8 +1216,8 @@ public class Controler {
 		}
 
 		public void notifyShutdown(final ShutdownEvent event) {
-			if (this.eventWriter != null) {
-				this.eventWriter.closeFile();
+			for (EventWriter writer : this.eventWriters) {
+				writer.closeFile();
 			}
 		}
 		

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
+import org.matsim.core.utils.misc.StringUtils;
 
 public class ControlerConfigGroup extends Module {
 
@@ -52,7 +53,7 @@ public class ControlerConfigGroup extends Module {
 	
 	private String runId = null;
 	
-	private EventsFileFormat eventsFileFormat = EventsFileFormat.txt;
+	private EventsFileFormat[] eventsFileFormats = new EventsFileFormat[] {EventsFileFormat.txt};
 	
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -73,7 +74,16 @@ public class ControlerConfigGroup extends Module {
 		} else if (LINKTOLINK_ROUTING_ENABLED.equals(key)){
 			return Boolean.toString(this.linkToLinkRoutingEnabled);
 		} else if (EVENTS_FILE_FORMAT.equals(key)) {
-			return this.eventsFileFormat.toString();
+			boolean isFirst = true;
+			StringBuilder str = new StringBuilder();
+			for (EventsFileFormat format : this.eventsFileFormats) {
+				str.append(format.toString());
+				if (!isFirst) {
+					str.append(',');
+					isFirst = false;
+				}
+			}
+			return str.toString();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -104,7 +114,13 @@ public class ControlerConfigGroup extends Module {
 				this.linkToLinkRoutingEnabled = Boolean.getBoolean(value.trim());
 			}
 		} else if (EVENTS_FILE_FORMAT.equals(key)) {
-			this.eventsFileFormat = EventsFileFormat.valueOf(value);
+			String[] parts = StringUtils.explode(value, ',');
+			EventsFileFormat[] formats = new EventsFileFormat[parts.length];
+			int i = 0;
+			for (String part : parts) {
+				formats[i++] = EventsFileFormat.valueOf(part.trim());
+			}
+			this.eventsFileFormats = formats;
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -128,7 +144,7 @@ public class ControlerConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
-		map.put(EVENTS_FILE_FORMAT, "Specifies the file format for writing events. Currently supported: txt, xml");
+		map.put(EVENTS_FILE_FORMAT, "Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (',').");
 		return map;
 	}
 
@@ -182,12 +198,12 @@ public class ControlerConfigGroup extends Module {
 		this.linkToLinkRoutingEnabled = enabled;
 	}
 
-	public EventsFileFormat getEventsFileFormat() {
-		return this.eventsFileFormat;
+	public EventsFileFormat[] getEventsFileFormats() {
+		return this.eventsFileFormats.clone();
 	}
 
-	public void setEventsFileFormat(final EventsFileFormat eventsFileFormat) {
-		this.eventsFileFormat = eventsFileFormat;
+	public void setEventsFileFormats(final EventsFileFormat[] eventsFileFormats) {
+		this.eventsFileFormats = eventsFileFormats.clone();
 	}
 
 }

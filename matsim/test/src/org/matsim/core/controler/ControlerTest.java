@@ -353,7 +353,7 @@ public class ControlerTest extends MatsimTestCase {
 	public void testSetWriteEventsTxt() {
 		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
-		config.controler().setEventsFileFormat(EventsFileFormat.txt);
+		config.controler().setEventsFileFormats(new EventsFileFormat[] {EventsFileFormat.txt});
 
 		final Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
@@ -362,6 +362,7 @@ public class ControlerTest extends MatsimTestCase {
 		controler.run();
 
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
 	}
 	
 	/**
@@ -370,7 +371,7 @@ public class ControlerTest extends MatsimTestCase {
 	public void testSetWriteEventsXml() {
 		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
-		config.controler().setEventsFileFormat(EventsFileFormat.xml);
+		config.controler().setEventsFileFormats(new EventsFileFormat[] {EventsFileFormat.xml});
 		
 		final Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
@@ -378,8 +379,28 @@ public class ControlerTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
 	}
+
+	/**
+	 * @author mrieser
+	 */
+	public void testSetWriteEventsTxtXml() {
+		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(0);
+		config.controler().setEventsFileFormats(new EventsFileFormat[] {EventsFileFormat.txt, EventsFileFormat.xml});
+		
+		final Controler controler = new Controler(config);
+		controler.setWriteEventsInterval(1);
+		assertEquals(1, controler.getWriteEventsInterval());
+		controler.setCreateGraphs(false);
+		controler.run();
+		
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
+	}
+	
 
 	/** A helper class for testSetScoringFunctionFactory() */
 	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
