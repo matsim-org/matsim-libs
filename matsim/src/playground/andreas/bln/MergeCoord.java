@@ -42,22 +42,27 @@ public class MergeCoord {
 			MergeCoord myMergeCoord = new MergeCoord();
 
 			ArrayList<String[]> tripMap = myMergeCoord.readTrips("Z:/population/input/WEGE.csv");
-			HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap = myMergeCoord.readCoord("Z:/population/input/coord25");
+			HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap = myMergeCoord.readCoord("Z:/population/input/coord32");
 
-//			 Renew coordinates if within perimeter of old ones
+			// 1 Renew coordinates if within perimeter of old ones
 			myMergeCoord.nearOldCoord(tripMap, coordMap, 5000.0);
 
 			// Renew coordinates if person is still on travel after 24 hours
 //			myMergeCoord.getCoordForLateArrivals(tripMap, coordMap, 
 //					"C:/Users/aneumann/Java/eclwrk/matsim_20071126/0.events.txt");
 
-			// Renew coordinates if person get leg with mode walk which take more than 20 minutes
+			// 2 Renew coordinates if person get leg with mode walk which take more than 20 minutes
 			myMergeCoord.getCoordForWalkingTooMuch(tripMap, coordMap, 
 					"C:/Users/aneumann/Java/eclwrk/matsim_20071126/bb_cl.xml.gz",
 					"C:/Users/aneumann/Java/eclwrk/matsim_20071126/0.plans.xml.gz");
+			
+			// 3 Set all transport modes to car, if person still walks more than 60 min
+			myMergeCoord.setAllstillWalkingTooMuchToCar(tripMap, coordMap, 
+					"C:/Users/aneumann/Java/eclwrk/matsim_20071126/bb_cl.xml.gz",
+					"C:/Users/aneumann/Java/eclwrk/matsim_20071126/1.plans.xml.gz");
 
 			// Write it out
-			myMergeCoord.writeTripsToFile(tripMap, "Z:/population/input/WEGE_peri_walk_1h.csv");
+			myMergeCoord.writeTripsToFile(tripMap, "Z:/population/input/WEGE3.csv");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -120,7 +125,7 @@ public class MergeCoord {
 
 					if(Integer.parseInt(trip[48]) == 3 || Integer.parseInt(trip[48]) == 0 || Integer.parseInt(trip[48]) == 1 || Integer.parseInt(trip[48]) == 2 
 							|| Integer.parseInt(trip[48]) == 4 || Integer.parseInt(trip[48]) == 5 || Integer.parseInt(trip[48]) == 6 || Integer.parseInt(trip[48]) == 7){
-						if(newCoord.getX() < 4700000 && newCoord.getX() > 4400000 && newCoord.getY() > 5700000 && newCoord.getY() < 5900000){
+						if(newCoord.getX() < 4700000.0 && newCoord.getX() > 4400000.0 && newCoord.getY() > 5690000.0 && newCoord.getY() < 5910000.0){
 							trip[11] = String.valueOf(newCoord.getX());
 							trip[12] = String.valueOf(newCoord.getY());
 							changed++;
@@ -164,7 +169,7 @@ public class MergeCoord {
 		plansReader.readFile(plansFilename);
 
 
-		// Find persons with walking trips over 20 minutes long
+		// Find persons with walking trips over 60 minutes long
 		for (Person person : population.getPersons().values()) {
 			for(Plan plan : person.getPlans()){
 				for (PlanElement planelement : plan.getPlanElements()) {
@@ -202,7 +207,7 @@ public class MergeCoord {
 
 //					if(Integer.parseInt(trip[48]) == 3 || Integer.parseInt(trip[48]) == 0 || Integer.parseInt(trip[48]) == 1 || Integer.parseInt(trip[48]) == 2 
 //							|| Integer.parseInt(trip[48]) == 4 || Integer.parseInt(trip[48]) == 5 || Integer.parseInt(trip[48]) == 6 || Integer.parseInt(trip[48]) == 7){
-					if(newCoord.getX() < 4700000 && newCoord.getX() > 4400000 && newCoord.getY() > 5700000 && newCoord.getY() < 5900000){
+					if(newCoord.getX() < 4700000.0 && newCoord.getX() > 4460000.0 && newCoord.getY() > 5690000.0 && newCoord.getY() < 5910000.0){
 						trip[11] = String.valueOf(newCoord.getX());
 						trip[12] = String.valueOf(newCoord.getY());
 						changed++;
@@ -224,6 +229,67 @@ public class MergeCoord {
 
 		}
 		log.info("Walking too much: Finished merging coord. " + unchanged + " unchanged + " + changed + " changed entries + " + tripNonWalking + " non walking = " + (changed + unchanged + tripNonWalking));
+	}
+	
+	private void setAllstillWalkingTooMuchToCar(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap, String networkFilename, String plansFilename){
+
+		TreeSet<Integer> agentIds = new TreeSet<Integer>();	
+
+		int unchanged = 0;
+		int changed = 0;
+
+		log.info("Start reading file " + plansFilename);
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(networkFilename);
+
+		log.info("Start reading file " + plansFilename);
+		Population population = new PopulationImpl();
+		PopulationReader plansReader = new MatsimPopulationReader(population,
+				network);
+		plansReader.readFile(plansFilename);
+
+
+		// Find persons with walking trips over 60 minutes long
+		for (Person person : population.getPersons().values()) {
+			for(Plan plan : person.getPlans()){
+				for (PlanElement planelement : plan.getPlanElements()) {
+					
+					if(planelement instanceof Leg){					
+						if(((Leg) planelement).getMode() == TransportMode.walk){
+							if(((Leg) planelement).getTravelTime() > 60 * 60){
+								try {
+									Integer.valueOf(person.getId().toString());
+									agentIds.add(Integer.valueOf(person.getId().toString()));
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+							}
+						}
+					}
+				
+				}
+			}
+		}
+
+		log.info("Found " + agentIds.size() + " person ids to fix, cause of STILL walking too much.");
+
+		// Try to fix them
+		for (String[] trip : tripMap) {
+
+			Integer personId = Integer.valueOf(trip[1]);
+
+			if(agentIds.contains(personId)){
+				trip[48] = "3";
+				changed++;
+			} else {
+				unchanged++;
+			}
+			
+			//	info:	Integer.parseInt(trip[48]), 0: "keine Angabe", 1: "Fuss", 2: "Rad"
+			//			3: "MIV", 4: "OEV", 5: "Rad/OEV", 6: "IV/OEV", 7: "sonstiges"
+
+		}
+		log.info("STILL Walking too much: Finished merging coord. " + unchanged + " unchanged + " + changed + " changed entries = " + (changed + unchanged));
 	}
 
 	private ArrayList<String[]> readTrips(String filename) throws IOException{
