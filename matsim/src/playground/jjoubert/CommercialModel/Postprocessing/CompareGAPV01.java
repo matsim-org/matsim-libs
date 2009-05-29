@@ -45,6 +45,7 @@ public class CompareGAPV01 {
 	final static String OUTPUT_PRE = ROOT + "Commercial/PostProcess/CompareGAP_Normalized_";
 	final static String OUTPUT_POST_GIS = "_GIS.txt";
 	final static String OUTPUT_POST_SCATTER = "_Scatter.txt";
+	final static String OUTPUT_POST_BOXPLOT_HOUR = "_BoxPlotHour.txt";
 
 	public static final String DELIMITER = ",";
 
@@ -55,13 +56,15 @@ public class CompareGAPV01 {
 	 *   	<li>the normalized simulated number of activities.
 	 *   	</ul>
 	 * 
-	 * It then compares the activity densities of the two input files and produces two output files:
+	 * It then compares the activity densities of the two input files and produces three output files:
 	 * 		<ul>
 	 * 		<li>a file with the GAP_ID, and a column for each hour of the day. This file is suitable
 	 * 			for reading it into ArcGIS for the geographic representation of the differences; and
 	 *  	<li>a file with an entry for each unique GAP_ID and hour combination, and two columns: one
 	 *  		one for the simulated activities, and one for the actual activities. This file is 
 	 *  		suitable for generating a scatter plot comparison of the actual vs simulated activities.
+	 *  	<li>a file for generating a box plot in R. It has only two values per entry: the hour, and 
+	 *  		the normalized difference. There is an entry for each unique GAP_ID hour combination.
 	 *		</ul>
 	 * @author johanwjoubert
 	 */
@@ -73,6 +76,7 @@ public class CompareGAPV01 {
 		date.setTimeInMillis(System.currentTimeMillis());
 		String outputStringGIS = OUTPUT_PRE + date.toString() + OUTPUT_POST_GIS;
 		String outputStringScatter = OUTPUT_PRE + date.toString() + OUTPUT_POST_SCATTER;
+		String outputStringBoxHour = OUTPUT_PRE + date.toString() + OUTPUT_POST_BOXPLOT_HOUR;
 		
 		try {
 			Scanner inputActual = new Scanner(new BufferedReader(new FileReader(new File(IN_ACTUAL))));
@@ -82,6 +86,7 @@ public class CompareGAPV01 {
 
 			BufferedWriter outputGIS = new BufferedWriter(new FileWriter(new File (outputStringGIS)));
 			BufferedWriter outputScatter = new BufferedWriter(new FileWriter(new File (outputStringScatter)));
+			BufferedWriter outputBoxHour = new BufferedWriter(new FileWriter(new File (outputStringBoxHour)));
 			try{
 				/*
 				 * For the GIS output file, it writes the same header string as the input file(s). The 
@@ -94,6 +99,11 @@ public class CompareGAPV01 {
 				 */
 				outputScatter.write("Name" + DELIMITER + "Hour" + DELIMITER + "Actual" + DELIMITER + "Simulated");
 				outputScatter.newLine();
+				/*
+				 * For the box plot output file, it writes a header similar to the input file.
+				 */
+				outputBoxHour.write(header);
+				outputBoxHour.newLine();
 				
 				while(inputActual.hasNextLine() && inputSim.hasNextLine()){
 					String [] lineActual = inputActual.nextLine().split( DELIMITER );
@@ -111,6 +121,7 @@ public class CompareGAPV01 {
 						 */
 						outputGIS.write( lineActual[0] + DELIMITER );
 						outputScatter.write( lineActual[0] + DELIMITER );
+						outputBoxHour.write( lineActual[0] + DELIMITER );
 						Double valueActual = Double.NEGATIVE_INFINITY;
 						Double valueSim = Double.POSITIVE_INFINITY;
 						Double difference = Double.POSITIVE_INFINITY; 
@@ -134,6 +145,12 @@ public class CompareGAPV01 {
 							outputScatter.write(String.valueOf(valueActual) + DELIMITER + String.valueOf(valueSim) );
 							outputScatter.newLine();
 							outputScatter.write( String.valueOf(lineActual[0]) + DELIMITER);
+							/*
+							 * Writes the difference to the box plot output file; similar to the GIS file. 
+							 * BUT, if both the actual and the simulated values are zero, write 'NA'. 
+							 */
+							String writeDifference = (valueActual == 0 && valueSim == 0) ? "NA" : String.valueOf(difference);
+							outputBoxHour.write( writeDifference + DELIMITER );
 						}
 						/*
 						 * Repeat only for hour 23 (no delimiter at the end).
@@ -142,16 +159,29 @@ public class CompareGAPV01 {
 						valueSim = Double.parseDouble(lineSim[lineSim.length - 1]);
 						difference = valueSim - valueActual;
 						String diff = String.valueOf(difference);
+						/*
+						 * GIS output
+						 */
 						outputGIS.write(diff);
 						outputGIS.newLine();
+						/*
+						 * Scatter plot
+						 */
 						outputScatter.write( String.valueOf(lineActual.length - 2 ) + DELIMITER );
 						outputScatter.write(String.valueOf(valueActual) + DELIMITER + String.valueOf(valueSim) );
 						outputScatter.newLine();
+						/*
+						 * Boxplot
+						 */
+						String writeDifference23 = (valueActual == 0 && valueSim == 0) ? "NA" : String.valueOf(difference);
+						outputBoxHour.write( writeDifference23 );
+						outputBoxHour.newLine();
 					}
 				}					
 			} finally{
 				outputGIS.close();
 				outputScatter.close();
+				outputBoxHour.close();
 			}
 			
 		} catch (FileNotFoundException e) {
