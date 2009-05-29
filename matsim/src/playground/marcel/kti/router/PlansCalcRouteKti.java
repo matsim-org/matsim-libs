@@ -59,7 +59,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			final TravelCost costCalculator, final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost timeCostCalc,
 			final Matrix ptTravelTimes, final SwissHaltestellen haltestellen, final Layer municipalities) {
-		super(new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
+		super(network, new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
 				new AStarLandmarks(network, preProcessData, timeCostCalc, timeCostCalc));
 		this.network = network;
 		this.ptTravelTimes = ptTravelTimes;

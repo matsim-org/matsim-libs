@@ -138,10 +138,10 @@ public class EventControler extends Controler{
 		
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
-		replanners.add(new KnowledgePlansCalcRoute(new RandomRoute(), new RandomRoute()));
-		replanners.add(new KnowledgePlansCalcRoute(new TabuRoute(), new TabuRoute()));
-		replanners.add(new KnowledgePlansCalcRoute(new CompassRoute(), new CompassRoute()));
-		replanners.add(new KnowledgePlansCalcRoute(new RandomCompassRoute(), new RandomCompassRoute()));
+		replanners.add(new KnowledgePlansCalcRoute(network, new RandomRoute(), new RandomRoute()));
+		replanners.add(new KnowledgePlansCalcRoute(network, new TabuRoute(), new TabuRoute()));
+		replanners.add(new KnowledgePlansCalcRoute(network, new CompassRoute(), new CompassRoute()));
+		replanners.add(new KnowledgePlansCalcRoute(network, new RandomCompassRoute(), new RandomCompassRoute()));
 		
 		// Dijkstra for Replanning
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
@@ -156,7 +156,7 @@ public class EventControler extends Controler{
 		
 		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(dijkstraWrapper, dijkstraWrapper);
+		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
 		replanners.add(dijkstraRouter);
 		

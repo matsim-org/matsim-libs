@@ -21,6 +21,7 @@
 package playground.christoph.router;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
@@ -44,9 +45,9 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		super(network, costCalculator, timeCalculator);
 	}
 	
-	public KnowledgePlansCalcRoute(final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) 
+	public KnowledgePlansCalcRoute(final Network network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) 
 	{
-		super(router, routerFreeflow);
+		super(network, router, routerFreeflow);
 	}
 	
 	/*
@@ -151,11 +152,11 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		KnowledgePlansCalcRoute clone;
 		if(this.getLeastCostPathCalculator() == this.getPtFreeflowLeastCostPathCalculator())
 		{
-			clone = new KnowledgePlansCalcRoute(routeAlgoClone, routeAlgoClone);
+			clone = new KnowledgePlansCalcRoute(this.queueNetwork.getNetworkLayer(), routeAlgoClone, routeAlgoClone);
 		}
 		else
 		{
-			clone = new KnowledgePlansCalcRoute(routeAlgoClone, routeAlgoFreeflowClone);
+			clone = new KnowledgePlansCalcRoute(this.queueNetwork.getNetworkLayer(), routeAlgoClone, routeAlgoFreeflowClone);
 		}
 		
 		clone.setQueueNetwork(this.queueNetwork);

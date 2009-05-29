@@ -65,7 +65,7 @@ public class EUTReRoute2 extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		EUTRouter2 router = new EUTRouter2(network, provider, utilFunction);
 		router.setAnalyzer(analyzer);
-		return new PlanAlgorithmDecorator(new PlansCalcRoute(router, router));
+		return new PlanAlgorithmDecorator(new PlansCalcRoute(network, router, router));
 	}
 
 //	@Override

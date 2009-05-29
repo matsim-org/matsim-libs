@@ -34,7 +34,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	@SuppressWarnings("deprecation")
 	private PlansCalcRouteDijkstra(final Network originalNetwork, final NetworkLayer wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost freespeedTimeCost) {
-		super(new Dijkstra(wrappedNetwork, costCalculator, timeCalculator),
+		super(wrappedNetwork, new Dijkstra(wrappedNetwork, costCalculator, timeCalculator),
 				new Dijkstra(wrappedNetwork, freespeedTimeCost, freespeedTimeCost));
 		this.originalNetwork = originalNetwork;
 		this.wrappedNetwork = wrappedNetwork;

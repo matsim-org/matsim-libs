@@ -134,7 +134,7 @@ public class RoutingTest extends MatsimTestCase {
 		LeastCostPathCalculator routingAlgo = provider.getRouter(network, calculator, calculator);
 
 		PlansCalcRoute router = null;
-		router = new PlansCalcRoute(routingAlgo, routingAlgo);
+		router = new PlansCalcRoute(network, routingAlgo, routingAlgo);
 		long now = System.currentTimeMillis();
 		router.run(population);
 
