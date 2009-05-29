@@ -95,7 +95,7 @@ public class PlansConfigGroup extends Module {
 		} else if (OUTPUT_VERSION.equals(key)) {
 			setOutputVersion(value);
 		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key)) {
-			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+			log.warn("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}
