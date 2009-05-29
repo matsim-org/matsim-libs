@@ -57,7 +57,10 @@ public class BKickIncomeControler extends Controler {
 		return pop;
 	}
 	
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
+		String config = "../bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+		String[] args2 = {config};
+		args = args2;
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
