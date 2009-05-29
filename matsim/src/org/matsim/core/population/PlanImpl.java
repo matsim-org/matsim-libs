@@ -39,8 +39,8 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl implements Plan {
@@ -229,9 +229,13 @@ public class PlanImpl implements Plan {
 					Route route = l.getRoute();
 					if (route != null) {
 						if (route instanceof NetworkRoute) {
-							NetworkRoute r = new NodeNetworkRoute((NetworkRoute) route);
-							l2.setRoute(r);
-						} else if (l.getRoute() instanceof GenericRoute) {
+							NetworkLayer net = (NetworkLayer) route.getStartLink().getLayer();
+							NetworkRoute r2 = (NetworkRoute) net.getFactory().createRoute(TransportMode.car, route.getStartLink(), route.getEndLink());
+							r2.setLinks(route.getStartLink(), ((NetworkRoute) route).getLinks(), route.getEndLink());
+							r2.setDistance(route.getDistance());
+							r2.setTravelTime(route.getTravelTime());
+							l2.setRoute(r2);
+						} else if (route instanceof GenericRoute) {
 							GenericRoute r = new GenericRouteImpl(route.getStartLink(), route.getEndLink());
 							r.setRouteDescription(route.getStartLink(), ((GenericRoute) route).getRouteDescription(), route.getEndLink());
 							l2.setRoute(r);

@@ -21,11 +21,12 @@
 package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicLegImpl;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class LegImpl extends BasicLegImpl implements Leg {
@@ -44,13 +45,15 @@ public class LegImpl extends BasicLegImpl implements Leg {
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
-		//FIXME the copy of a leg should contain the same subtype
-		// of CarRoute as the original
-		if (leg.getRoute() instanceof NodeNetworkRoute) {
-			this.route = new NodeNetworkRoute((NodeNetworkRoute) leg.getRoute());
+		if (leg.getRoute() instanceof NetworkRoute) {
+			NetworkRoute route2 = (NetworkRoute) leg.getRoute();
+			NetworkLayer net = (NetworkLayer) route2.getStartLink().getLayer();
+			this.route = net.getFactory().createRoute(TransportMode.car, route2.getStartLink(), route2.getEndLink());
+			((NetworkRoute) this.route).setLinks(route2.getStartLink(), route2.getLinks(), route2.getEndLink());
+			this.route.setDistance(route.getDistance());
+			this.route.setTravelTime(route.getTravelTime());
 		} else {
-			this.route = new NodeNetworkRoute(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
-			((NetworkRoute)this.route).setNodes(leg.getRoute().getStartLink(), ((NetworkRoute) (leg.getRoute())).getNodes(), leg.getRoute().getEndLink());
+			this.route = new GenericRouteImpl(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
 		}
 	}
 
