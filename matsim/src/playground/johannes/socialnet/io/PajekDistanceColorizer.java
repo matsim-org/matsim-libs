@@ -47,7 +47,7 @@ import playground.johannes.statistics.Distribution;
  * @author illenberger
  *
  */
-public class PajekDistanceColorizer<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends PajekColorizer<Ego<P>, SocialTie> {
+public class PajekDistanceColorizer<P extends BasicPerson<?>> extends PajekColorizer<Ego<P>, SocialTie> {
 
 	private double d_min;
 	

@@ -48,7 +48,7 @@ import playground.johannes.socialnet.util.ColorUtils;
  * @author illenberger
  *
  */
-public class SNKMLDegreeStyle<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> implements SNKMLObjectStyle<Ego<P>, P> {
+public class SNKMLDegreeStyle<P extends BasicPerson<?>> implements SNKMLObjectStyle<Ego<P>, P> {
 
 	private static final String VERTEX_STYLE_PREFIX = "vertex.style.";
 	

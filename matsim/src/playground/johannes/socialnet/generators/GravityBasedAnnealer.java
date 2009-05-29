@@ -53,6 +53,7 @@ import playground.johannes.socialnet.io.SNPajekWriter;
 import playground.johannes.socialnet.mcmc.ErgmDistance;
 import playground.johannes.socialnet.mcmc.ErgmDistanceLocal;
 import playground.johannes.socialnet.mcmc.SNAdjacencyMatrix;
+import playground.johannes.socialnet.spatial.SpatialGrid;
 import playground.johannes.statistics.Distribution;
 
 /**
@@ -107,7 +108,8 @@ public class GravityBasedAnnealer {
 		
 		GibbsEdgeSwitcher sampler = new GibbsEdgeSwitcher();
 		sampler.setInterval(1000000);
-		Handler handler = new Handler(outputDir, args[1]);
+		SpatialGrid<Double> densityGrid = SpatialGrid.readFromFile(args[1]);
+		Handler handler = new Handler(outputDir, densityGrid);
 		handler.setSampleSize(samplesize);
 		handler.setSampleInterval(sampleinterval);
 		

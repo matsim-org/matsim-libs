@@ -57,7 +57,7 @@ public class SpatialStatistics {
 			vertexValues.put(e, e.getEdges().size());
 		}
 		
-		return getDensityCorrelation(vertexValues, densityGrid, 500);
+		return getDensityCorrelation(vertexValues, densityGrid, 10);
 	}
 	
 	public static <V extends Ego<? extends BasicPerson<?>>> TDoubleDoubleHashMap clusteringDensityCorrelation(Collection<V> vertices, SpatialGrid<Double> densityGrid) {
@@ -86,7 +86,10 @@ public class SpatialStatistics {
 		TDoubleObjectHashMap<TDoubleArrayList> rho_values = new TDoubleObjectHashMap<TDoubleArrayList>();
 		for(int row = 0; row < densityGrid.getNumRows(); row++) {
 			for(int col = 0; col < densityGrid.getNumCols(row); col++) {
-				double rho = densityGrid.getValue(row, col);
+				Double rho = densityGrid.getValue(row, col);
+				if(rho == null)
+					rho = 0.0;
+				
 				TDoubleArrayList values = rho_values.get(rho);
 				if(values == null) {
 					values = new TDoubleArrayList();

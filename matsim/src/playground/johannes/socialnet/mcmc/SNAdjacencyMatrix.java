@@ -44,7 +44,7 @@ import playground.johannes.socialnet.SocialTie;
  * @author illenberger
  *
  */
-public class SNAdjacencyMatrix<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends AdjacencyMatrix {
+public class SNAdjacencyMatrix<P extends BasicPerson<?>> extends AdjacencyMatrix {
 
 	private List<Ego<P>> egoList;
 	

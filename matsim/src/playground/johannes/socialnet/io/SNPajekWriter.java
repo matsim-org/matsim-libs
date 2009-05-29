@@ -42,7 +42,7 @@ import playground.johannes.socialnet.SocialTie;
  * @author illenberger
  *
  */
-public class SNPajekWriter<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends
+public class SNPajekWriter<P extends BasicPerson<?>> extends
 		PajekWriter<SocialNetwork<P>,
 		Ego<P>, SocialTie>
 		implements PajekAttributes<Ego<P>, SocialTie> {

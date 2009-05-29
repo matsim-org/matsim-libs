@@ -99,7 +99,7 @@ public class FindNashGG {
 //			} else {
 //				tt_pred_i[k] = tt_pred_i[k] - STEP;
 //			}
-			STEP = Math.pow(error_i, 1.0)/10000.0;
+			STEP = 100;//Math.pow(error_i, 1.0)/10000.0;
 			tt_pred_i[k] = tt_pred_i[k] + ((random.nextDouble() * 2 * STEP) - STEP);
 		}
 		writer.close();

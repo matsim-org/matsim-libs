@@ -24,6 +24,7 @@
 package playground.johannes.socialnet.mcmc;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TIntObjectHashMap;
 
 import org.apache.log4j.Logger;
@@ -41,18 +42,18 @@ public class ErgmDistanceLocal extends ErgmTerm {
 	
 	private static final Logger logger = Logger.getLogger(ErgmDistanceLocal.class);
 
-	private double scale = 0.001;
+//	private double scale = 1;
 	
-	private double normBinSize = 500;
+	private double normBinSize = 1;
 	
-	private double area = 1000 * 1000 * Math.PI;
+//	private double area = 5 * 5 * Math.PI;
 	
 	private TIntObjectHashMap<TDoubleDoubleHashMap> normConstants;
 		
 	private int totalVertices;
 	
 	public ErgmDistanceLocal(SNAdjacencyMatrix<?> m) {
-		logger.info("Initializing ergm distance term...");
+		logger.info("Initializing ERGM distance term...");
 		int n = m.getVertexCount();
 		totalVertices = n;
 		normConstants = new TIntObjectHashMap<TDoubleDoubleHashMap>();
@@ -65,10 +66,18 @@ public class ErgmDistanceLocal extends ErgmTerm {
 				if(j != i) {
 					Coord c_j = m.getEgo(j).getCoord();
 					double d = CoordUtils.calcDistance(c_i, c_j);
-//					double a = Math.PI * d *d;
 					double bin = getBin(d);
 					norm_i.adjustOrPutValue(bin, 1, 1);
 				}
+			}
+			
+			TDoubleDoubleIterator it = norm_i.iterator();
+			for(int k = 0; k < norm_i.size(); k++) {
+				it.advance();
+				double a = 2 * Math.PI * it.key() - Math.PI;
+				double count = it.value();
+//				count = Math.max(count, 1);
+				it.setValue(count/a);
 			}
 			
 			if(i % 1000 == 0)
@@ -107,11 +116,12 @@ public class ErgmDistanceLocal extends ErgmTerm {
 //	}
 	
 	public double getScalingFactor() {
-		return scale;
+		return 0;
+//		return scale;
 	}
 
 	public void setScalingFactor(double scale) {
-		this.scale = scale;
+//		this.scale = scale;
 	}
 
 	public double getNormBinSize() {
@@ -123,8 +133,9 @@ public class ErgmDistanceLocal extends ErgmTerm {
 	}
 
 	private double getBin(double d) {
-		double a = Math.PI * d *d;
-		return Math.ceil(a / area);
+//		double a = Math.PI * d *d;
+//		return Math.ceil(a / area);
+		return Math.ceil(d/normBinSize);
 	}
 	
 	@Override
@@ -134,19 +145,21 @@ public class ErgmDistanceLocal extends ErgmTerm {
 		
 		double d = CoordUtils.calcDistance(c_i, c_j);
 		
+		
 		double norm_i = normConstants.get(i).get(getBin(d));
 		if(norm_i == 0)
-			System.err.println("norm = 0");
-		norm_i = Math.max(norm_i, 1.0);
-		norm_i = norm_i/(double)totalVertices;
+			throw new IllegalArgumentException("Norm must no be zero!");
+//		norm_i = Math.max(norm_i, 1.0);
+//		norm_i = norm_i/(double)totalVertices;
 		
-		double norm_j = normConstants.get(j).get(getBin(d));
-		if(norm_j == 0)
-			System.err.println("norm = 0");
-		norm_j = Math.max(norm_j, 1.0);
-		norm_j = norm_j/(double)totalVertices;
-		
-		double H_1 = - getTheta() * (Math.log(1 / (scale * d * norm_i)) + Math.log(1 / (scale * d * norm_j)));
+//		double norm_j = normConstants.get(j).get(getBin(d));
+//		if(norm_j == 0)
+//			System.err.println("norm = 0");
+//		norm_j = Math.max(norm_j, 1.0);
+//		norm_j = norm_j/(double)totalVertices;
+		d=d/1000.0;
+		double H_1 = - getTheta() * (Math.log(1 / (d * d * norm_i)));// + Math.log(1 / (scale * d * norm_j)));
+//		double H_1 = - getTheta() * (Math.log(1 / (scale * d)) + Math.log(1 / (scale * d)));
 	
 		
 		return H_1;// + H_2;

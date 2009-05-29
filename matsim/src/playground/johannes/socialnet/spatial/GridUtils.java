@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphML2KML.java
+ * KMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,42 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnet.spatial;
 
-/**
- * 
- */
-package playground.johannes.socialnet.util;
-
-import java.io.IOException;
-
-import org.matsim.core.api.population.Person;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-
-import playground.johannes.socialnet.Ego;
-import playground.johannes.socialnet.SocialNetwork;
-import playground.johannes.socialnet.io.SNGraphMLReader;
-import playground.johannes.socialnet.io.SNKMLDegreeStyle;
-import playground.johannes.socialnet.io.SNKMLObjectStyle;
-import playground.johannes.socialnet.io.SNKMLWriter;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPopulation;
 
 /**
  * @author illenberger
  *
  */
-public class GraphML2KMLDegree {
+public class GridUtils {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		SocialNetwork<Person> socialnet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
+	public static SpatialGrid<Double> createDensityGrid(BasicPopulation<?> population, double resolution) {
+		double maxX = 0;
+		double maxY = 0;
+		double minX = Double.MAX_VALUE;
+		double minY = Double.MAX_VALUE;
+		for(BasicPerson<?> person : population.getPersons().values()) {
+			Coord homeLoc = ((BasicActivity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
+			maxX = Math.max(maxX, homeLoc.getX());
+			maxY = Math.max(maxY, homeLoc.getY());
+			minX = Math.min(minX, homeLoc.getX());
+			minY = Math.min(minY, homeLoc.getY());
+		}
 		
-		SNKMLWriter<Person> writer = new SNKMLWriter<Person>();
-		SNKMLDegreeStyle<Person> vertexStyle = new SNKMLDegreeStyle<Person>(writer.getVertexIconLink());
-		vertexStyle.setLogscale(true);
-		writer.setVertexStyle(vertexStyle);
-		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
-		writer.write(socialnet, args[2]);
+		SpatialGrid<Double> grid = new SpatialGrid<Double>(minX, minY, maxX, maxY, resolution);
+		for(BasicPerson<?> person : population.getPersons().values()) {
+			Coord homeLoc = ((BasicActivity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
+			Double count = grid.getValue(homeLoc);
+			if(count == null)
+				count = 0.0;
+			count++;
+			grid.setValue(count, homeLoc);
+		}
+		
+		return grid;
 	}
 }

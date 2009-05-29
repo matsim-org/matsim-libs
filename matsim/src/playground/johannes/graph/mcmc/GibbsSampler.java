@@ -71,7 +71,7 @@ public class GibbsSampler {
 		}
 		
 		logger.info(String.format("Drawing %1$s samples in %2$s steps...", handler.getSampleSize(), handler.getSampleInterval()));
-		for(int it = 0; it < ((handler.getSampleSize() - 1) * handler.getSampleInterval()); it++) {
+		for(int it = 0; it < (handler.getSampleSize() * handler.getSampleInterval()); it++) {
 			if(step(y, d))
 				accept++;
 			

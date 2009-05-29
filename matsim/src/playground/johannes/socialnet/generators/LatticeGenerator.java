@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphML2KML.java
+ * KMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,42 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnet.generators;
 
-/**
- * 
- */
-package playground.johannes.socialnet.util;
-
-import java.io.IOException;
-
-import org.matsim.core.api.population.Person;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-
-import playground.johannes.socialnet.Ego;
-import playground.johannes.socialnet.SocialNetwork;
-import playground.johannes.socialnet.io.SNGraphMLReader;
-import playground.johannes.socialnet.io.SNKMLDegreeStyle;
-import playground.johannes.socialnet.io.SNKMLObjectStyle;
-import playground.johannes.socialnet.io.SNKMLWriter;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.basic.v01.BasicPersonImpl;
+import org.matsim.core.basic.v01.BasicPlanImpl;
+import org.matsim.core.basic.v01.BasicPopulationImpl;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author illenberger
  *
  */
-public class GraphML2KMLDegree {
+public class LatticeGenerator {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		SocialNetwork<Person> socialnet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
-		
-		SNKMLWriter<Person> writer = new SNKMLWriter<Person>();
-		SNKMLDegreeStyle<Person> vertexStyle = new SNKMLDegreeStyle<Person>(writer.getVertexIconLink());
-		vertexStyle.setLogscale(true);
-		writer.setVertexStyle(vertexStyle);
-		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
-		writer.write(socialnet, args[2]);
+	public BasicPopulation<BasicPerson<?>> generate(int width, int hight) {
+//		SocialNetwork<BasicPerson<?>> socialnet = new SocialNetwork<BasicPerson<?>>();
+		BasicPopulation<BasicPerson<?>> population = new BasicPopulationImpl<BasicPerson<?>>();
+		int counter = 0;
+		for(int row = 1; row < hight; row+=1) {
+			for(int col = 1; col < width; col+=1) {
+				BasicPerson<BasicPlan<?>> person = new BasicPersonImpl<BasicPlan<?>>(new IdImpl(counter));
+				counter++;
+				
+				BasicPlan<?> plan = new BasicPlanImpl(person);
+				BasicActivityImpl act = new BasicActivityImpl("home");
+				act.setCoord(new CoordImpl(col, row));
+				plan.addActivity(act);
+				person.getPlans().add(plan);
+				
+				population.getPersons().put(person.getId(), person);
+//				socialnet.addEgo(person);
+			}
+		}
+		return population;
 	}
 }
