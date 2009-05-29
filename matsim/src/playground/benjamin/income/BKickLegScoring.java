@@ -60,14 +60,14 @@ public class BKickLegScoring extends LegScoringFunction {
 			Route route = leg.getRoute();
 			dist = route.getDistance();
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist
-					* betaIncomeCar / this.incomePerTrip;
+					* betaIncomeCar / this.incomePerTrip + betaIncomeCar * Math.log(this.incomePerTrip);
 		}
 		else
 			if (TransportMode.pt.equals(leg.getMode())) {
 				dist = leg.getRoute().getDistance();
 				log.error("dist: " + dist);
 				tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt
-						* dist * betaIncomePt / this.incomePerTrip;
+						* dist * betaIncomePt / this.incomePerTrip + betaIncomePt * Math.log(this.incomePerTrip);
 			}
 			else {
 				throw new IllegalStateException("Scoring funtion not defined for other modes than pt and car!");

@@ -138,8 +138,8 @@ public class BKickScoringTest extends MatsimTestCase {
 		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		System.out.println("Agent 001: " + this.planScorer.getAgentScore(id1));
 		System.out.println("Agent 002: " + this.planScorer.getAgentScore(id2));
-		assertEquals(64.13118800263055, this.planScorer.getAgentScore(id1), EPSILON);
-		assertEquals(63.447655580611, this.planScorer.getAgentScore(id2), EPSILON);
+		assertEquals(77.13122224303883, this.planScorer.getAgentScore(id1), EPSILON);
+		assertEquals(73.56932562470882, this.planScorer.getAgentScore(id2), EPSILON);
 		
 	}
 
