@@ -1,20 +1,16 @@
 package playground.anhorni.locationchoice.valid.counts;
 
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 public class DateFilter {
 	
 	GregorianCalendar calendar = new GregorianCalendar();
-	private final static Logger log = Logger.getLogger(DateFilter.class);
+	//private final static Logger log = Logger.getLogger(DateFilter.class);
 	
 	public List<RawCount> filter(List<RawCount> rawCounts) {		
 		List<RawCount> filteredRawCounts = new Vector<RawCount>();	
