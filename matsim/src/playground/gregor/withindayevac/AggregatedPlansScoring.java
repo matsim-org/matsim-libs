@@ -25,6 +25,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -37,20 +41,16 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class AggregatedPlansScoring implements StartupListener, ScoringListener, IterationStartsListener,
-AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, LinkEnterEventHandler {
+AgentArrivalEventHandler, AgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentMoneyEventHandler, LinkEnterEventHandler {
 
 
 	protected Population population;
@@ -204,12 +204,12 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 		this.getScoringFunctionForAgent(event.getPersonId().toString()).startActivity(event.getTime(), null);
 	}
 
-	public void handleEvent(final AgentStuckEvent event) {
+	public void handleEvent(final BasicAgentStuckEvent event) {
 		getScoringFunctionForAgent(event.getPersonId().toString()).agentStuck(event.getTime());
 		this.agentMappings.put(event.getPersonId().toString(), "stuckAndAbord");
 	}
 
-	public void handleEvent(final AgentMoneyEvent event) {
+	public void handleEvent(final BasicAgentMoneyEvent event) {
 		getScoringFunctionForAgent(event.getPersonId().toString()).addMoney(event.getAmount());
 	}
 

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
+import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.ActivityEndEvent;
@@ -16,7 +18,6 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.PersonEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
@@ -24,7 +25,7 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 public class ElectricCostHandler implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
-		AgentMoneyEventHandler {
+		BasicAgentMoneyEventHandler {
 	// key: agentId
 	// value: energyState
 	private HashMap<String, EnergyApplicatonSpecificState> energyLevel = new HashMap<String, EnergyApplicatonSpecificState>();
@@ -291,7 +292,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 	}
 
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(BasicAgentMoneyEvent event) {
 		// System.out.println("money:"+event.amount);
 	}
 
