@@ -131,10 +131,6 @@ implements BasicLink
 		return this.nofLanes;
 	}
 
-	public int getLanesAsInt(final double time) {
-		return Math.round((float)Math.max(this.nofLanes,1.0d));
-	}
-
 	public void setNumberOfLanes(final double lanes) {
 		this.nofLanes = lanes;
 	}
@@ -148,10 +144,8 @@ implements BasicLink
 		return this.allowedModes.clone();
 	}
 	
-	private void readObject(ObjectInputStream ois)    throws ClassNotFoundException, IOException 
-	{
+	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
 		ois.defaultReadObject();
-		
 		this.from.addOutLink(this);
 		this.to.addInLink(this);
 	}

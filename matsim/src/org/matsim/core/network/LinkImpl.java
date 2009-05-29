@@ -158,6 +158,10 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		return this.euklideanDist;
 	}
 
+	public int getLanesAsInt(final double time) {
+		return Math.round((float)Math.max(this.nofLanes,1.0d));
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
