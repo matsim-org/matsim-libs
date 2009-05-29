@@ -26,34 +26,36 @@ public class OSM2MATSim {
 		osmReader.setKeepPaths(false);
 		osmReader.setScaleMaxSpeed(true);
 		
-//		String inputFile = "z:/osm_net/20090316_berlinbrandenburg.fused.gz";
-//		String outputFile = "z:/osm_net/wech";
+//		String inputFile = "./berlin.osm.gz";
+//		String outputFile = "./test_lanes";
 		
 		String inputFile = args[0];
 		String outputFile = args[1];
 		
+		// Anmerkung trunk, primary und secondary sollten in Bln als ein Typ behandelt werden
+		
 		// Autobahn
-		osmReader.setHighwayDefaults(1, "motorway",      2,  80.0/3.6, 1.0, 2000, true); // 70
-		osmReader.setHighwayDefaults(1, "motorway_link", 1,  60.0/3.6, 1.0, 1500, true); // 60
+		osmReader.setHighwayDefaults(1, "motorway",      2,  100.0/3.6, 1.2, 2000, true); // 70
+		osmReader.setHighwayDefaults(1, "motorway_link", 1,  60.0/3.6, 1.2, 1500, true); // 60
 		// Pseudoautobahn
-		osmReader.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 1.0, 2000); // 45
-		osmReader.setHighwayDefaults(2, "trunk_link",    1,  40.0/3.6, 1.0, 1500); // 40
+		osmReader.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 0.6, 1000); // 45
+		osmReader.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 0.6, 1000); // 40
 		// Durchgangsstrassen
-		osmReader.setHighwayDefaults(3, "primary",       1,  35.0/3.6, 1.0, 1500); // 35
-		osmReader.setHighwayDefaults(3, "primary_link",  1,  30.0/3.6, 1.0, 1500); // 30
+		osmReader.setHighwayDefaults(3, "primary",       1,  50.0/3.6, 0.6, 1000); // 35
+		osmReader.setHighwayDefaults(3, "primary_link",  1,  50.0/3.6, 0.6, 1000); // 30
 		
 		// Hauptstrassen
-		osmReader.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000); // 30
+		osmReader.setHighwayDefaults(4, "secondary",     1,  50.0/3.6, 0.6, 1000); // 30
 		// Weitere Hauptstrassen
-		osmReader.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 1.0,  600); // 25 
+		osmReader.setHighwayDefaults(5, "tertiary",      1,  30.0/3.6, 0.8,  600); // 25 
 		// bis hier ca wip
 		
 		// Nebenstrassen
-		osmReader.setHighwayDefaults(6, "minor",         1,  25.0/3.6, 1.0,  600); // nix
+		osmReader.setHighwayDefaults(6, "minor",         1,  30.0/3.6, 0.8,  600); // nix
 		// Alles Moegliche, vor allem Nebenstrassen auf dem Land, meist keine 30er Zone 
-		osmReader.setHighwayDefaults(6, "unclassified",  1,  25.0/3.6, 1.0,  600);
+		osmReader.setHighwayDefaults(6, "unclassified",  1,  30.0/3.6, 0.8,  600);
 		// Nebenstrassen, meist 30er Zone
-		osmReader.setHighwayDefaults(6, "residential",   1,  20.0/3.6, 1.0,  600);
+		osmReader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 0.6,  600);
 		// Spielstrassen
 		osmReader.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 		
@@ -66,10 +68,16 @@ public class OSM2MATSim {
 		osmReader.setHighwayDefaults(8, "steps", 1,  3.0/3.6, 1.0,  300);
 		
 //		osmReader.setHierarchyLayer(55.5, 4.5, 47.5, 15.5, 1); // Deutschland
-		osmReader.setHierarchyLayer(54.3, 10.0, 50.8, 15.0, 2); // Brandenburg mit Autobahnstummeln
-		osmReader.setHierarchyLayer(53.6, 11.2, 51.2, 15.0, 4); // BerlinBrandenburg
-		osmReader.setHierarchyLayer(52.62, 13.2, 52.4, 13.7, 6); // Stadtbereich Bln
-		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 6); // Potsdam
+//		osmReader.setHierarchyLayer(54.3, 10.0, 50.8, 15.0, 2); // Brandenburg mit Autobahnstummeln
+//		osmReader.setHierarchyLayer(53.6, 11.2, 51.2, 15.0, 4); // BerlinBrandenburg
+		
+//		osmReader.setHierarchyLayer(53.6, 11.5, 52.8, 14.5, 4); // BerlinBrandenburg - Streifen 1
+//		osmReader.setHierarchyLayer(53.0, 12.1, 52.0, 14.9, 4); // BerlinBrandenburg - Quadrat
+//		osmReader.setHierarchyLayer(52.0, 13.0, 51.4, 14.9, 4); // BerlinBrandenburg - Streifen 2
+		
+//		osmReader.setHierarchyLayer(52.62, 13.2, 52.37, 13.7, 6); // Stadtbereich Bln
+//		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 6); // Potsdam
+//		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 6); // Spandau
 		
 //		osmReader.setHierarchyLayer(52.642299, 13.304882, 52.527397, 13.805398, 5);
 //		osmReader.setHierarchyLayer(52.537028, 13.410000, 52.520000, 13.443527, 8);
@@ -80,8 +88,14 @@ public class OSM2MATSim {
 //		
 //		osmReader.setHierarchyLayer(52.642299, 13.304882, 52.527397, 13.805398, 5);
 //		osmReader.setHierarchyLayer(52.537028, 13.410000, 52.520000, 13.443527, 8);
-//		
 		
+		// POA Berlin Hundekopf
+		osmReader.setHierarchyLayer(52.565, 13.265, 52.45, 13.5, 1);
+		osmReader.setHierarchyLayer(52.56, 13.27, 52.458, 13.485, 4);
+		// POA Berlin Korridor
+//		osmReader.setHierarchyLayer(52.52, 13.145, 52.504, 13.38, 4);
+		// POA Berlin Korridor Ana
+//		osmReader.setHierarchyLayer(52.491, 13.315, 52.53, 13.433, 8);
 		
 		try {
 			osmReader.parse(inputFile);
