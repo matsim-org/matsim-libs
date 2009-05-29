@@ -38,7 +38,6 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.Time;
@@ -212,42 +211,33 @@ public class PlanImpl implements Plan {
 		setScore(in.getScore());
 		this.setType(in.getType());
 //		setPerson(in.getPerson()); // do not copy person, but keep the person we're assigned to
-		List<?> actl = in.getPlanElements();
-		for (int i= 0; i< actl.size() ; i++) {
-			try {
-				if (i % 2 == 0) {
-					// activity
-					Activity a = (Activity)actl.get(i);
-					getPlanElements().add(new ActivityImpl(a));
-				} else {
-					// Leg
-					Leg l = (Leg) actl.get(i);
-					Leg l2 = createLeg(l.getMode());
-					l2.setDepartureTime(l.getDepartureTime());
-					l2.setTravelTime(l.getTravelTime());
-					l2.setArrivalTime(l.getArrivalTime());
-					Route route = l.getRoute();
-					if (route != null) {
-						if (route instanceof NetworkRoute) {
-							NetworkLayer net = (NetworkLayer) route.getStartLink().getLayer();
-							NetworkRoute r2 = (NetworkRoute) net.getFactory().createRoute(TransportMode.car, route.getStartLink(), route.getEndLink());
-							r2.setLinks(route.getStartLink(), ((NetworkRoute) route).getLinks(), route.getEndLink());
-							r2.setDistance(route.getDistance());
-							r2.setTravelTime(route.getTravelTime());
-							l2.setRoute(r2);
-						} else if (route instanceof GenericRoute) {
-							GenericRoute r = new GenericRouteImpl(route.getStartLink(), route.getEndLink());
-							r.setRouteDescription(route.getStartLink(), ((GenericRoute) route).getRouteDescription(), route.getEndLink());
-							l2.setRoute(r);
-						} else {
-							log.warn("could not fully copy plan to agent " + this.getPerson().getId() + " because of unknown Route-type.");
-						}
+		for (PlanElement pe : in.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity a = (Activity) pe;
+				getPlanElements().add(new ActivityImpl(a));
+			} else if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
+				Leg l2 = createLeg(l.getMode());
+				l2.setDepartureTime(l.getDepartureTime());
+				l2.setTravelTime(l.getTravelTime());
+				l2.setArrivalTime(l.getArrivalTime());
+				Route route = l.getRoute();
+				if (route != null) {
+					if (route instanceof NetworkRoute) {
+						NetworkLayer net = (NetworkLayer) route.getStartLink().getLayer();
+						NetworkRoute r2 = (NetworkRoute) net.getFactory().createRoute(TransportMode.car, route.getStartLink(), route.getEndLink());
+						r2.setLinks(route.getStartLink(), ((NetworkRoute) route).getLinks(), route.getEndLink());
+						r2.setDistance(route.getDistance());
+						r2.setTravelTime(route.getTravelTime());
+						l2.setRoute(r2);
+					} else if (route instanceof GenericRoute) {
+						GenericRoute r = new GenericRouteImpl(route.getStartLink(), route.getEndLink());
+						r.setRouteDescription(route.getStartLink(), ((GenericRoute) route).getRouteDescription(), route.getEndLink());
+						l2.setRoute(r);
+					} else {
+						log.warn("could not fully copy plan to agent " + this.getPerson().getId() + " because of unknown Route-type.");
 					}
 				}
-			} catch (Exception e) {
-				// copying a plan is fairly basic. if an exception occurs here, something
-				// must be definitively wrong -- exit with an error
-				Gbl.errorMsg(e);
 			}
 		}
 	}
