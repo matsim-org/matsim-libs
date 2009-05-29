@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.utils.io;
+package playground.yu.utils.io.txt2chart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import java.util.List;
 import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.yu.utils.CollectionSum;
+import playground.yu.utils.io.SimpleReader;
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
