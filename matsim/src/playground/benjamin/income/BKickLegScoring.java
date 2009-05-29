@@ -65,7 +65,7 @@ public class BKickLegScoring extends LegScoringFunction {
 		else
 			if (TransportMode.pt.equals(leg.getMode())) {
 				dist = leg.getRoute().getDistance();
-				log.error("dist: " + dist);
+//				log.error("dist: " + dist);
 				tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt
 						* dist * betaIncomePt / this.incomePerTrip + betaIncomePt * Math.log(this.incomePerTrip);
 			}
@@ -80,7 +80,7 @@ public class BKickLegScoring extends LegScoringFunction {
 		double ipt = Double.NaN;
 		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
 			ipt = income.getIncome() / (240 * 3.5);
-			log.debug("income: " + ipt);
+//			log.debug("income: " + ipt);
 		}
 		else {
 			throw new UnsupportedOperationException("Can't calculate income per trip");
