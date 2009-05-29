@@ -20,19 +20,23 @@
 
 package org.matsim.locationchoice;
 
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 
 
+
+/**RandomLocationMutator macht wirklich nichts anderes als einer bestimmten Aktivität eine neue Facility vom richtigen Typ 
+ * zuzuweisen (zufällig ausgewählt aus allen Facilities). Der einzige Mehrwert entsteht durch die Iterationen. (ahorni, 30jan09)
+
+ * @author ahorni
+ *
+ */
 public class RandomLocationMutator extends LocationMutator {
 
 	//private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
