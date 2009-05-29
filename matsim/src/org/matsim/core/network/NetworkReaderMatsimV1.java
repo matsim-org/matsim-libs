@@ -21,24 +21,19 @@
 package org.matsim.core.network;
 
 import java.io.IOException;
-import java.util.EnumSet;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.*;
+
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.api.network.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.core.utils.misc.Time;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import org.matsim.core.utils.misc.*;
 
 /**
  * A reader for network-files of MATSim according to <code>network_v1.dtd</code>.
@@ -121,7 +116,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		if (capperiod == null) {
 			// TODO [balmermi] sometime we should define the default by 1 hour!!!
 			capperiod = "12:00:00";
-			log.info("capperiod was not defined. Using default value of 12:00:00.");
+			log.warn("capperiod was not defined. Using default value of 12:00:00.");
 		}
 		this.network.setCapacityPeriod(Time.parseTime(capperiod));
 
@@ -140,7 +135,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		}
 
 		if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
-			log.warn("capPeriod, capDivider and/or capdivider are set in the network file. They will be ignored.");
+			log.warn("Found capPeriod, capDivider and/or capdivider in the links element.  They will be ignored, since they should be set in the network element.");
 		}
 	}
 
