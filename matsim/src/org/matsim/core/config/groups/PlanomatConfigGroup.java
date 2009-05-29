@@ -266,6 +266,10 @@ public class PlanomatConfigGroup extends Module {
 		return Boolean.parseBoolean(PlanomatConfigParameter.DO_LOGGING.getActualValue());
 	}
 
+	public void setDoLogging(boolean doLogging) {
+		PlanomatConfigParameter.DO_LOGGING.setActualValue(Boolean.toString(doLogging));
+	}
+	
 //	public String getOptimizationToolbox() {
 //	return PlanomatConfigParameter.OPTIMIZATION_TOOLBOX.getActualValue();
 //	}
