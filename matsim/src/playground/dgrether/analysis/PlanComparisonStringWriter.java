@@ -65,9 +65,15 @@ public class PlanComparisonStringWriter implements PlanComparisonWriter {
 				coordinates = pc.getHomeLocation(i).getCoord();
 				_buffer.append(i.toString());
 				_buffer.append("\t");
-				_buffer.append(coordinates.getX());
+				if ((coordinates != null) && !Double.isNaN(coordinates.getX()))
+						_buffer.append(coordinates.getX());
+				else 
+					_buffer.append("");
 				_buffer.append("\t");
-				_buffer.append(coordinates.getY());
+				if ((coordinates != null) && !Double.isNaN(coordinates.getY()))
+						_buffer.append(coordinates.getY());
+				else 
+					_buffer.append("");
 				_buffer.append("\t");
 				_buffer.append(score1);
 				_buffer.append("\t");
