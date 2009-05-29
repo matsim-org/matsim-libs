@@ -20,33 +20,17 @@
 
 package playground.kai.otfvis;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
+import java.rmi.*;
 
 import javax.swing.JFrame;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.OTFHostControlBar;
+import org.matsim.vis.otfvis.data.*;
 import org.matsim.vis.otfvis.gui.OTFSlaveHost;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.handler.*;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
-import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
-import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.*;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 public class OTFDoubleMVI extends OnTheFlyClientFileQuad {
@@ -107,6 +91,10 @@ public class OTFDoubleMVI extends OnTheFlyClientFileQuad {
 			filename = args[0];
 			filename2 = args[1];
 		} else {
+			
+			// use myDoubleOTFVis instead !!!!
+			
+			
 //			filename = "../MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi.gz";
 			filename2 = "output/OTFQuadfile10p.mvi";
 			filename = "testCUDA10p.mvi";
