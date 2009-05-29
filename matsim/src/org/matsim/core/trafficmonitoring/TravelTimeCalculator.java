@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -52,11 +53,11 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	
 	private static final Logger log = Logger.getLogger(TravelTimeCalculator.class);
 	
-	private HashMap<Link, DataContainer> linkData;
+	private Map<Link, DataContainer> linkData;
 	
-	private HashMap<Tuple<Link, Link>, DataContainer> linkToLinkData;
+	private Map<Tuple<Link, Link>, DataContainer> linkToLinkData;
 	
-	private HashMap<Id, LinkEnterEvent> linkEnterEvents;
+	private Map<Id, LinkEnterEvent> linkEnterEvents;
 
 	private final boolean calculateLinkTravelTimes;
 
@@ -109,31 +110,15 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
 		if (this.calculateLinkTravelTimes){
-			this.linkData = new HashMap<Link, DataContainer>((int) (network.getLinks().size() * 1.4));
+			this.linkData = new ConcurrentHashMap<Link, DataContainer>((int) (network.getLinks().size() * 1.4));
 		}
 		if (this.calculateLinkToLinkTravelTimes){
 			// assume that every link has 2 outgoing links 
-			this.linkToLinkData = new HashMap<Tuple<Link, Link>, DataContainer>((int) (network.getLinks().size() * 1.4 * 2));
+			this.linkToLinkData = new ConcurrentHashMap<Tuple<Link, Link>, DataContainer>((int) (network.getLinks().size() * 1.4 * 2));
 		}
-		this.linkEnterEvents = new HashMap<Id, LinkEnterEvent>();
+		this.linkEnterEvents = new ConcurrentHashMap<Id, LinkEnterEvent>();
 		
-		this.resetTravelTimes();
-	}
-	
-	@Override
-	public void resetTravelTimes(){
-		if (this.calculateLinkTravelTimes) {
-			for (DataContainer data : this.linkData.values()){
-				data.ttData.resetTravelTimes();
-			}
-		}
-		if (this.calculateLinkToLinkTravelTimes){
-			for (DataContainer data : this.linkToLinkData.values()){
-				data.ttData.resetTravelTimes();
-				data.needsConsolidation = false;
-			}
-		}
-		this.linkEnterEvents.clear();
+		this.reset(0);
 	}
 
 	public void handleEvent(final LinkEnterEvent e) {
@@ -235,12 +220,19 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	}
 
 	public void reset(int iteration) {
-		/* DO NOT CALL resetTravelTimes here!
-		 * reset(iteration) is called at the beginning of an iteration, but we still
-		 * need the travel times from the last iteration for the replanning!
-		 * That's why there is a separat method resetTravelTimes() which can
-		 * be called after the replanning.      -marcel/20jan2008
-		 */
+		if (this.calculateLinkTravelTimes) {
+			for (DataContainer data : this.linkData.values()){
+				data.ttData.resetTravelTimes();
+				data.needsConsolidation = false;
+			}
+		}
+		if (this.calculateLinkToLinkTravelTimes){
+			for (DataContainer data : this.linkToLinkData.values()){
+				data.ttData.resetTravelTimes();
+				data.needsConsolidation = false;
+			}
+		}
+		this.linkEnterEvents.clear();
 	}
 	
 	/**

@@ -71,5 +71,4 @@ public abstract class AbstractTravelTimeCalculator implements TravelTime, EventH
 	
 	public abstract double getLinkTravelTime(Link link, double time);
 	
-	public abstract void resetTravelTimes();
 }

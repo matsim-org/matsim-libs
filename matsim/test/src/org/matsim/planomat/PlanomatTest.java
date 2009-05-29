@@ -141,7 +141,7 @@ public class PlanomatTest extends MatsimTestCase {
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
 		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
 
-		tTravelEstimator.resetTravelTimes();
+		tTravelEstimator.reset(1);
 		depDelayCalc.resetDepartureDelays();
 		if (
 				PlanomatTestRun.WITHEVENTS_CAR.equals(testRun) ||

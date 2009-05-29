@@ -1155,7 +1155,6 @@ public class Controler {
 			Controler controler = event.getControler();
 			controler.events.resetHandlers(event.getIteration());
 			controler.events.resetCounter();
-			controler.travelTimeCalculator.resetTravelTimes();
 
 			if ((controler.writeEventsInterval > 0) && (event.getIteration() % controler.writeEventsInterval == 0)) {
 				for (EventsFileFormat format : controler.config.controler().getEventsFileFormats()) {
