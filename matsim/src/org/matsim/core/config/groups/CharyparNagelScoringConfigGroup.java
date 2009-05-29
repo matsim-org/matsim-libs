@@ -20,13 +20,13 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.core.config.Module;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 public class CharyparNagelScoringConfigGroup extends Module {
@@ -415,10 +415,12 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	public double getWaiting() {
 		return this.waiting;
 	}
+	private static int setWaitingCnt=0 ;
 	public void setWaiting(final double waiting) {
-		if ( earlyDeparture != 0. ) {
+		if ( earlyDeparture != 0. && setWaitingCnt<1 ) {
+			setWaitingCnt++ ;
 			log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
-					"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08");
+					"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
 		}
 		this.waiting = waiting;
 	}
@@ -471,10 +473,12 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		public double getMinimalDuration() {
 			return this.minimalDuration;
 		}
+		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
-			if (minimalDuration != Time.UNDEFINED_TIME) {
+			if (minimalDuration != Time.UNDEFINED_TIME && minDurCnt<1 ) {
+				minDurCnt++ ;
 				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
-						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08");
+						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08" + Gbl.ONLYONCE );
 			}
 			this.minimalDuration = minimalDuration;
 		}
