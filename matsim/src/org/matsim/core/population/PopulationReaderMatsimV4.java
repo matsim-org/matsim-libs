@@ -371,10 +371,12 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.curract.setFacility(f);
 		}
 		if (this.routeDescription != null) {
-			if (this.currleg.getMode() == TransportMode.pt) {
+			if (this.currRoute instanceof GenericRoute) {
 				((GenericRoute) this.currRoute).setRouteDescription(this.prevAct.getLink(), this.routeDescription.trim(), this.curract.getLink());
-			} else {
+			} else if (this.currRoute instanceof NetworkRoute) {
 				((NetworkRoute) this.currRoute).setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeDescription), this.curract.getLink());
+			} else {
+				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
 			}
 			this.routeDescription = null;
 			this.currRoute = null;
@@ -389,11 +391,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		if (this.currleg.getMode() == TransportMode.pt) {
-			this.currRoute = this.network.getFactory().createRoute(this.currleg.getMode(), this.prevAct.getLink(), this.prevAct.getLink());
-		} else {
-			this.currRoute = this.network.getFactory().createRoute(TransportMode.car, this.prevAct.getLink(), this.prevAct.getLink());
-		}
+		this.currRoute = this.network.getFactory().createRoute(this.currleg.getMode(), this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));
