@@ -199,7 +199,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setCoord(link.getCoord());
 	}
 
-	public void testPlanomatPerformance() {
+	public void xtestPlanomatPerformance() {
+		/* disabled this test as it does not contain a single assert-statement.
+		 * So, besides that the code doesn't crash, it doesn'r really test anything.
+		 * JUnit is (sadly) not suitable for performance tests. This method could
+		 * be run more or less the same way also in its own main-class. marcel/29may2009
+		 */
 
 		final int TEST_PLAN_NR = 0;
 
