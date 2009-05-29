@@ -239,19 +239,24 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		this.route.clear();
 		setStartLink(startLink);
 		setEndLink(endLink);
-
 		Link previousLink = getStartLink();
 		Node previousNode = previousLink.getToNode();
 		Iterator<Node> iter = srcRoute.iterator();
 		if (iter.hasNext()) {
 			iter.next(); // ignore the first part, it should be the same as previousNode
 		} else {
-			// empty srcRoute, nothing else to do
+			// empty srcRoute, nothing else to do than a check
+		// check that this route is complete, so it will be possible to decompress it again without problems
+			if ((startLink != endLink) && (startLink.getToNode() != endLink.getFromNode())) {
+				throw new IllegalArgumentException("The last node must be the fromNode of the endLink. endLink=" + endLink.getId());
+			}
+
 			this.uncompressedLength = 0;
 			return;
 		}
+		Node node = startLink.getToNode();
 		while (iter.hasNext()) {
-			Node node = iter.next();
+			node = iter.next();
 			// find link from prevNode to node
 			Link link = null;
 			for (Link tmpLink : previousNode.getOutLinks().values()) {
@@ -263,14 +268,19 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 			if (link == null) {
 				throw new IllegalArgumentException("Could not find any link from node " + previousNode.getId() + " to " + node.getId());
 			}
-
-			if (this.subsequentLinks.get(previousLink) != link) {
+			Link subsequent = this.subsequentLinks.get(previousLink);
+			if (subsequent != link) {
 				this.route.add(link);
 			}
 			previousLink = link;
 			previousNode = link.getToNode();
 		}
 
+		// check that this route is complete, so it will be possible to uncompress it again without problems
+		if (node != endLink.getFromNode()) {
+			throw new IllegalArgumentException("The last node must be the fromNode of the endLink. endLink=" + endLink.getId());
+		}
+		
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size() - 1;
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
