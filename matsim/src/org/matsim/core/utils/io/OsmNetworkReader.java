@@ -401,6 +401,14 @@ public class OsmNetworkReader {
 			}
 		}
 		
+		// In case trunks, primary and secondary roads are marked as oneway,
+		// the default number of lanes should be two instead of one.
+		if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")){
+			if(oneway && nofLanes == 1.0){
+				nofLanes = 2.0;
+			}
+		}
+		
 		if (way.tags.containsKey("maxspeed")) {        
 			try {
 				double maxspeed = Double.parseDouble(way.tags.get("maxspeed"));
