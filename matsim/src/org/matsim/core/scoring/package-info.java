@@ -6,7 +6,7 @@
  * the score of a plan based on information about how long an activity was
  * executed or how much time an agent spent traveling. MATSim provides a
  * default scoring function,
- * {@link org.matsim.core.scoring.CharyparNagelScoringFunction}, which takes
+ * {@link org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory}, which takes
  * performing activities and traveling into account for the calculation of the
  * score. Advanced scoring functions could be thought of where where the
  * distance, people traveling along, people met at activities etc. have an

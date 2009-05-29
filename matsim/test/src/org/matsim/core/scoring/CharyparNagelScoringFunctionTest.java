@@ -24,8 +24,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -34,22 +34,21 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.CharyparNagelScoringFunction;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
- * Test the correct working of {@link CharyparNagelScoringFunction} according to the formulas in:
+ * Test the correct working of the CharyparNagelScoringFunction according to the formulas in:
  * <blockquote>
  *  <p>Charypar, D. und K. Nagel (2005) <br>
  *  Generating complete all-day activity plans with genetic algorithms,<br>
  *  Transportation, 32 (4) 369–397.</p>
  * </blockquote>
  * TODO dg march 09: when walk mode is tested add a walk mode leg and modify at least testMarginalUtilityOfDistance
+ * 
+ * TODO [MR] split this into multiple test classes for the specific parts, according to the newer, more modular scoring function
  * @author mrieser
  */
-public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
+public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 	protected Config config = null;
 	private NetworkLayer network = null;
@@ -120,11 +119,6 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		this.person = null;
 		this.plan = null;
 		super.tearDown();
-	}
-
-	@Override
-	protected ScoringFunction getScoringFunctionInstance(final Plan somePlan) {
-		return new CharyparNagelScoringFunction(somePlan, new CharyparNagelScoringParameters(this.config.charyparNagelScoring()));
 	}
 
 	private double calcScore() {
