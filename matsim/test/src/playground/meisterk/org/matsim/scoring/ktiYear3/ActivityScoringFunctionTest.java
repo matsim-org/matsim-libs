@@ -21,6 +21,7 @@
 package playground.meisterk.org.matsim.scoring.ktiYear3;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -36,24 +37,39 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.planomat.Planomat;
+import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
 
-	private Person person;
+	private final static Id TEST_PERSON_ID = new IdImpl("123");
+
+	private Population population;
 	private Plan plan;
 	private Config config;
 	private ActivityFacilities facilities;
@@ -76,8 +92,14 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		scoring.setMarginalUtlOfDistanceCar(0.0);
 		scoring.setWaiting(0.0);
 		
+		this.config.planomat().setDoLogging(false);
+//		this.config.planomat().setJgapMaxGenerations(10000);
+		
 		// generate person
-		this.person = new PersonImpl(new IdImpl("123"));
+		this.population = new PopulationImpl();
+//		Id personId = new IdImpl("123");
+		Person person = new PersonImpl(TEST_PERSON_ID);
+		this.population.getPersons().put(person.getId(), person);
 
 		// generate facilities
 		this.facilities = new ActivityFacilitiesImpl();
@@ -92,21 +114,20 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		
 		// generate network
 		this.network = new NetworkLayer();
+		
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
 		Node node3 = network.createNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
 		Node node4 = network.createNode(new IdImpl(4), new CoordImpl( 6000.0, 0.0));
 		Node node5 = network.createNode(new IdImpl(5), new CoordImpl(11000.0, 0.0));
-		Node node6 = network.createNode(new IdImpl(6), new CoordImpl(11500.0, 0.0));
-		Node node10 = network.createNode(new IdImpl(10), new CoordImpl(250.0, 0.0));
-		Node node11 = network.createNode(new IdImpl(11), new CoordImpl(500.0, 0.0));
-		Link link1 = network.createLink(new IdImpl(1), node1, node2, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(2), node2, node3, 5000, 50, 3600, 1);
-		Link link3 = network.createLink(new IdImpl(3), node3, node4, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(4), node4, node5, 5000, 50, 3600, 1);
-		Link link5 = network.createLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(10), node1, node10, 500, 25, 3600, 1);
-		Link link11 = network.createLink(new IdImpl(11), node10, node11, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(1020), node1, node2, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(2010), node2, node1, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(2030), node2, node3, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(3020), node3, node2, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(3040), node3, node4, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(4030), node4, node3, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(4050), node4, node5, 500, 25, 3600, 1);
+		network.createLink(new IdImpl(5040), node5, node4, 500, 25, 3600, 1);
 		
 		// generate desires
 		Desires desires = person.createDesires("test desires");
@@ -119,57 +140,116 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		plan = person.createPlan(true);
 
 		Activity act = plan.createActivity("home", facilityHome);
-		act.setLink(link1);
+		Link link = this.network.getLink("2030");
+		act.setLink(link);
+		act.setCoord(link.getCoord());
 		Leg leg = this.plan.createLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link3);
+		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
 		leg.setRoute(route);
-		route.setDistance(25000.0);
 		route.setTravelTime(Time.parseTime("00:30:00"));
 
 		act = plan.createActivity("work_sector3", facilityWork);
-		act.setLink(link3);
+		link = this.network.getLink("3040");
+		act.setLink(link);
+		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.pt);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3, link5);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("4050"));
 		leg.setRoute(route);
-		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
 		act = plan.createActivity("leisure", facilityLeisure);
-		act.setLink(link5);
+		link = this.network.getLink("4050");
+		act.setLink(link);
+		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.pt);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link5, link3);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("4050"), this.network.getLink("3040"));
 		leg.setRoute(route);
-		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
 		act = plan.createActivity("work_sector3", facilityWork);
-		act.setLink(link3);
+		link = this.network.getLink("3040");
+		act.setLink(link);
+		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3, link1);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
 		leg.setRoute(route);
-		route.setDistance(25000.0);
 		route.setTravelTime(Time.parseTime("00:30:00"));
 		
 		act = plan.createActivity("home", facilityHome);
-		act.setLink(link1);
+		link = this.network.getLink("2030");
+		act.setLink(link);
+		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.bike);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link11);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("1020"));
 		leg.setRoute(route);
-		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("04:00:00"));
 
 		act = plan.createActivity("shop", facilityShop);
-		act.setLink(link11);
+		link = this.network.getLink("1020");
+		act.setLink(link);
+		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.bike);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link11, link1);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("1020"), this.network.getLink("2030"));
 		leg.setRoute(route);
-		route.setDistance(2000.0);
 		route.setTravelTime(Time.parseTime("04:00:00"));
 
 		act = plan.createActivity("home", facilityHome);
-		act.setLink(link1);
+		link = this.network.getLink("2030");
+		act.setLink(link);
+		act.setCoord(link.getCoord());
 	}
 
+	public void testPlanomatPerformance() {
+
+		final int TEST_PLAN_NR = 0;
+
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, 900, this.config.travelTimeCalculator());
+		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.config.charyparNagelScoring());
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, 900);
+
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCostEstimator, tTravelEstimator);
+		
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
+		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
+
+		Person testPerson = this.population.getPersons().get(TEST_PERSON_ID);
+		// only plan of that person
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+
+		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+				this.config.charyparNagelScoring(), facilityPenalties);
+		// init Planomat, which loads config!
+		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
+
+		Random random = MatsimRandom.getLocalInstance();
+		
+		int check = 1;
+		for (int i = 0; i < 1000; i++) {
+			testee.getSeedGenerator().setSeed(random.nextLong());
+			tTravelEstimator.reset(0);
+			depDelayCalc.resetDepartureDelays();
+			
+			// actual test
+			testee.run(testPlan);
+			
+			if (i % check == 0) {
+				logger.info("Processed test person " + check + " times.");
+				check *= 2;
+				
+			}
+		}
+		// write out the test person and the modified plan into a file
+		Population outputPopulation = new PopulationImpl();
+		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
+		
+		logger.info("Writing plans file...");
+		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
+		plans_writer.write();
+		logger.info("Writing plans file...DONE.");
+
+		
+	}
+	
 	public void testAlwaysOpen() {
 		
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
@@ -393,7 +473,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		double duration, zeroUtilityDuration, typicalDuration;
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				typicalDuration = this.person.getDesires().getActivityDuration(actType);
+				typicalDuration = this.population.getPersons().get(TEST_PERSON_ID).getDesires().getActivityDuration(actType);
 				duration = Time.parseTime(expectedAccumulatedActivityDurations.get(actType)[7]);
 				zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
 				double utilPerf = factory.getParams().marginalUtilityOfPerforming * typicalDuration * Math.log((duration / 3600.0) / zeroUtilityDuration);
@@ -423,7 +503,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		this.person = null;
+		this.population = null;
 		this.plan = null;
 		this.config = null;
 		this.facilities = null;

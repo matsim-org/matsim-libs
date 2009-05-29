@@ -91,12 +91,23 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		this.facilityPenalties = facilityPenalties;
 	}
 
+	
+	// variables that are used by calcActScore, which is called very often
+	double fromArrivalToDeparture;				// the difference between departure time and arrival time
+	double duration;							// the share of fromArrivalToDeparture which  could be spent performing in relation to a BasicOpeningTime
+	double accumulatedDuration;					// time spent performing in this activity type so far
+	SortedSet<BasicOpeningTime> openTimes;
+	ActivityOption actOpt;
+	double timeSpentPerforming = 0.0; 			// accumulates performance intervals for this activity
+	double activityStart, activityEnd; 			// hold effective activity start and end due to facility opening times
+	double scoreImprovement; 					// calculate score improvement only as basis for facility load penalties
+	double openingTime, closingTime; 			// hold time information of an opening time interval
+	
 	@Override
 	protected double calcActScore(double arrivalTime, double departureTime,
 			Activity act) {
 
-		double fromArrivalToDeparture = departureTime - arrivalTime;
-		
+		fromArrivalToDeparture = departureTime - arrivalTime;
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
 		// also: negative duration is also too short
@@ -112,10 +123,10 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		///////////////////////////////////////////////////////////////////
 		else {
 
-			SortedSet<BasicOpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
+			openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
 			// assume facility is always open
-			ActivityOption actOpt = act.getFacility().getActivityOption(act.getType());
+			actOpt = act.getFacility().getActivityOption(act.getType());
 			if (actOpt != null) {
 				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
 				if (openTimes == null) {
@@ -129,10 +140,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			}
 
 			// calculate effective activity duration bounded by opening times
-			double timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
-			double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
-			double scoreImprovement; // calculate score improvement only as basis for facility load penalties
-			double openingTime, closingTime; // hold time information of an opening time interval
+			timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
 			for (BasicOpeningTime openTime : openTimes) {
 
 				// see explanation comments for processing opening time intervals in super class
@@ -148,7 +156,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 					activityEnd = departureTime;
 				}
 
-				double duration = activityEnd - activityStart;
+				duration = activityEnd - activityStart;
 
 				// calculate penalty due to facility load only when:
 				// - activity type is penalized (currently only shop and leisure-type activities)
@@ -156,7 +164,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 				if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
 					if (duration > 0) {
 
-						double accumulatedDuration = 0.0;
+						accumulatedDuration = 0.0;
 						if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
 							accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
 						}
@@ -186,7 +194,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			this.timeSpentWaiting += (fromArrivalToDeparture - timeSpentPerforming);
 
 			// accumulate time spent performing
-			double accumulatedDuration = 0.0;
+			accumulatedDuration = 0.0;
 			if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
 				accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
 			}
@@ -229,30 +237,38 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		return facilityPenaltiesScore;
 	}
 
+	// variables that are used by getPerformanceScore, which is called very often
+	double getPerformanceScore_typicalDuration;
+	double getPerformanceScore_performanceScore;
+	double getPerformanceScore_utilPerf;
+	double getPerformanceScore_utilWait;
+	
 	protected double getPerformanceScore(String actType, double duration) {
 
-		double typicalDuration = this.person.getDesires().getActivityDuration(actType);
+		getPerformanceScore_typicalDuration = this.person.getDesires().getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability, because we only need them here
-		double zeroUtilityDuration;
-		if (this.zeroUtilityDurations.containsKey(actType)) {
-			zeroUtilityDuration = this.zeroUtilityDurations.get(actType);
-		} else {
-			zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
-			this.zeroUtilityDurations.put(actType, zeroUtilityDuration);
+		if (!this.zeroUtilityDurations.containsKey(actType)) {
+			this.zeroUtilityDurations.put(
+					actType,
+					(getPerformanceScore_typicalDuration / 3600.0) * Math.exp( -10.0 / (getPerformanceScore_typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY));
 		}
 
-		double tmpScore = 0.0;
+		getPerformanceScore_performanceScore = 0.0;
 		if (duration > 0.0) {
-			double utilPerf = this.params.marginalUtilityOfPerforming * typicalDuration
-			* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
-			double utilWait = this.params.marginalUtilityOfWaiting * duration;
-			tmpScore = Math.max(0, Math.max(utilPerf, utilWait));
+			getPerformanceScore_utilPerf = 
+				this.params.marginalUtilityOfPerforming * getPerformanceScore_typicalDuration * Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
+			getPerformanceScore_utilWait = this.params.marginalUtilityOfWaiting * duration;
+			
+			getPerformanceScore_performanceScore = Math.max(0, Math.max(getPerformanceScore_utilPerf, getPerformanceScore_utilWait));
+			
 		} else if (duration < 0.0) {
 			logger.error("Accumulated activity durations < 0.0 must not happen.");
+			
 		}
 
-		return tmpScore;
+		return getPerformanceScore_performanceScore;
+		
 	}
 
 	public double getTooShortDurationScore() {
