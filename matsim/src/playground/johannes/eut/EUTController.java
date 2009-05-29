@@ -100,7 +100,7 @@ public class EUTController extends WithindayControler {
 		this.ttmemory = new TwoStateTTKnowledge();
 		this.ttmemory.setLearningRate(this.ttLearningRate);
 		this.ttmemory.setMaxMemorySlots(this.maxMemorySlots);
-		TimevariantTTStorage storage = this.ttmemory.makeTTStorage(getTravelTimeCalculator(), this.network, getTraveltimeBinSize(), 0, 86400);
+		TimevariantTTStorage storage = this.ttmemory.makeTTStorage(getTravelTimeCalculator(), this.network, config.travelTimeCalculator().getTraveltimeBinSize(), 0, 86400);
 		this.ttmemory.appendNewStorage(storage);
 		/*
 		 * Load the strategy manager.
@@ -235,7 +235,7 @@ public class EUTController extends WithindayControler {
 	private class TTMemotyUpdater implements IterationEndsListener {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			TimevariantTTStorage storage = EUTController.this.ttmemory.makeTTStorage(getTravelTimeCalculator(), EUTController.this.network, getTraveltimeBinSize(), 0, 86400);
+			TimevariantTTStorage storage = EUTController.this.ttmemory.makeTTStorage(getTravelTimeCalculator(), EUTController.this.network, config.travelTimeCalculator().getTraveltimeBinSize(), 0, 86400);
 			EUTController.this.ttmemory.appendNewStorage(storage);
 
 		}

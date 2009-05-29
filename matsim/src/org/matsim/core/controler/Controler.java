@@ -579,12 +579,8 @@ public class Controler {
 
 	/** Load all the required data. Currently, this only calls {@link #loadNetwork()} and {@link #loadPopulation()},
 	 * if this data was not given in the Constructor.
-	 * <br>
-	 * <strong>It is highly recommended NOT to overwrite this method!</strong> This method should be private, but is
-	 * only protected at the moment because of backward-compatibility with the old Controler class. In the future,
-	 * additional data should be loaded by implementing a {@link org.matsim.core.controler.listener.StartupListener}.
 	 */
-	protected void loadData() {
+	private void loadData() {
 		if (this.scenarioData == null){
 			this.scenarioData = new ScenarioImpl(this.config);
 			((NetworkLayer)this.scenarioData.getNetwork()).setFactory(this.getNetworkFactory());
@@ -842,17 +838,6 @@ public class Controler {
 	 */
 	public final boolean getOverwriteFiles() {
 		return this.overwriteFiles;
-	}
-
-
-	/**
-	 * Returns the size of the time-window used to accumulate and average travel times.
-	 * @deprecated Read the value set in the ControlerConfigGroup directly
-	 * @return The size of the time-window in seconds.
-	 */
-	@Deprecated
-	public final int getTraveltimeBinSize() {
-		return this.config.travelTimeCalculator().getTraveltimeBinSize();
 	}
 
 	/**
