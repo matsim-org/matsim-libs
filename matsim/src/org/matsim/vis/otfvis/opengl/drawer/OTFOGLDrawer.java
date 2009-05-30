@@ -500,18 +500,17 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return this.frame.getHeight();
 	}
 	
-	protected Component createGLCanvas(OTFOGLDrawer drawer, GLCapabilities caps,  GLContext motherContext) {
+	protected Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps, final GLContext motherContext) {
 		GLCanvas canvas = null;
 		if (motherContext == null) {
 			canvas = new GLCanvas(caps);
-			motherContext = canvas.getContext();
+//			motherContext = canvas.getContext();
 		} else {
 			canvas = new GLCanvas(caps, null, motherContext, null);
 		}
 		
 		canvas.addGLEventListener(drawer);
 		return canvas;
-		
 	}
 	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
@@ -545,13 +544,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.overlayItems.add(new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false));
 	}
 
-	public static GLContext getMotherContext() {
-		return motherContext;
-	}
-
-	public static void setMotherContext(GLContext motherContext) {
-		OTFOGLDrawer.motherContext = motherContext;
-	}
+//	public static GLContext getMotherContext() {
+//		return motherContext;
+//	}
+//
+//	public static void setMotherContext(GLContext motherContext) {
+//		OTFOGLDrawer.motherContext = motherContext;
+//	}
 
 	public static void addItem(OTFGLDrawable item) {
 		newItems.add(item);
