@@ -35,7 +35,7 @@ public class TransitRoute {
 
 	private final Id routeId;
 	private NetworkRoute route;
-	private final List<TransitRouteStop> stops;
+	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 	private String description = null;
 	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
 	private TransportMode transportMode;
@@ -43,7 +43,7 @@ public class TransitRoute {
 	public TransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
 		this.routeId = id;
 		this.route = route;
-		this.stops = stops;
+		this.stops.addAll(stops);
 		this.transportMode = mode;
 	}
 
@@ -62,17 +62,17 @@ public class TransitRoute {
 	/**
 	 * Sets the transport mode with which this transit route is handled, e.g.
 	 * {@link TransportMode#bus} or {@link TransportMode#train}.
-	 * 
+	 *
 	 * @param mode
 	 */
 	public void setTransportMode(final TransportMode mode) {
 		this.transportMode = mode;
 	}
-	
+
 	public TransportMode getTransportMode() {
 		return this.transportMode;
 	}
-	
+
 	public void addDeparture(final Departure departure) {
 		final Id id = departure.getId();
 		if (this.departures.containsKey(id)) {
@@ -88,8 +88,8 @@ public class TransitRoute {
 	public NetworkRoute getRoute() {
 		return this.route;
 	}
-	
-	public void setRoute(NetworkRoute route) {
+
+	public void setRoute(final NetworkRoute route) {
 		this.route = route;
 	}
 
