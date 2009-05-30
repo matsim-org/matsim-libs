@@ -35,16 +35,22 @@ public class TransitStopFacility implements Facility {
 	private final Id id;
 	private final Coord coord;
 	private Link link = null;
-	
+	private final boolean isBlockingLane;
+
 	public TransitStopFacility(final Id id, final Coord coord) {
+		this(id, coord, false);
+	}
+
+	public TransitStopFacility(final Id id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;
 		this.coord = coord;
+		this.isBlockingLane = isBlockingLane;
 	}
-	
+
 	public Link getLink() {
 		return this.link;
 	}
-	
+
 	public void setLink(final Link link) {
 		this.link = link;
 	}
@@ -62,6 +68,10 @@ public class TransitStopFacility implements Facility {
 
 	public Id getId() {
 		return this.id;
+	}
+
+	public boolean getIsBlockingLane() {
+		return this.isBlockingLane;
 	}
 
 }
