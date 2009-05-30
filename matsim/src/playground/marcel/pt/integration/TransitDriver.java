@@ -49,7 +49,6 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 
 public class TransitDriver implements TransitDriverAgent {
 
-		private final List<TransitStopFacility> stops;
 		private final List<Link> linkRoute;
 		private final NetworkRoute carRoute;
 		private final double departureTime;
@@ -61,30 +60,22 @@ public class TransitDriver implements TransitDriverAgent {
 
 		private final Leg currentLeg = new LegImpl(TransportMode.car);
 		private final Person dummyPerson;
-		
-		private final Iterator<TransitStopFacility> stopIterator;
-		private TransitStopFacility nextStop;
-		
+
+		private final Iterator<TransitRouteStop> stopIterator;
+		private TransitRouteStop nextStop;
+
 		private final TransitLine transitLine;
-		
+
 		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
 			this.transitLine = line;
 			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + departure.getId().toString()));
-			this.stops = new ArrayList<TransitStopFacility>(route.getStops().size());
-			for (TransitRouteStop stop : route.getStops()) {
-				this.stops.add(stop.getStopFacility());
-			}
-			this.stopIterator = this.stops.iterator();
-			this.nextStop = stopIterator.next();
+			this.stopIterator = route.getStops().iterator();
+			this.nextStop = this.stopIterator.next();
 			this.sim = sim;
 			this.departureTime = departure.getDepartureTime();
 			this.carRoute = route.getRoute();
-			List<Link> links = carRoute.getLinks();
-			this.linkRoute = new ArrayList<Link>(2 + links.size());
-			this.linkRoute.add(carRoute.getStartLink());
-			this.linkRoute.addAll(links);
-			this.linkRoute.add(carRoute.getEndLink());
-			
+			this.linkRoute = this.carRoute.getLinks();
+
 			this.currentLeg.setRoute(this.carRoute);
 		}
 
@@ -96,19 +87,25 @@ public class TransitDriver implements TransitDriverAgent {
 			if (this.nextLinkIndex < this.linkRoute.size()) {
 				return this.linkRoute.get(this.nextLinkIndex);
 			}
+			if (this.nextLinkIndex == this.linkRoute.size()) {
+				return this.carRoute.getEndLink();
+			}
 			return null;
 		}
 
 		public void moveOverNode() {
 			this.nextLinkIndex++;
 		}
-		
+
 		public TransitStopFacility getNextTransitStop() {
-			return this.nextStop;
+			if (this.nextStop == null) {
+				return null;
+			}
+			return this.nextStop.getStopFacility();
 		}
 
 		public double handleTransitStop(final TransitStopFacility stop, final double now) {
-			if (stop != this.nextStop) {
+			if (stop != this.nextStop.getStopFacility()) {
 				throw new RuntimeException("Expected different stop.");
 			}
 			if (this.stopIterator.hasNext()) {
@@ -123,7 +120,7 @@ public class TransitDriver implements TransitDriverAgent {
 					passengersLeaving.add(passenger);
 				}
 			}
-			// find out who wnats to get in
+			// find out who wants to get in
 			ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
 			for (Iterator<DriverAgent> iter = this.sim.agentTracker.getAgentsAtStop(stop).iterator(); iter.hasNext(); ) {
 				DriverAgent agent = iter.next();
@@ -133,7 +130,7 @@ public class TransitDriver implements TransitDriverAgent {
 					passengersEntering.add(passenger);
 				}
 			}
-			
+
 			// do the handling
 			double stopTime = 0.0;
 			int cntEgress = passengersLeaving.size();
@@ -141,7 +138,7 @@ public class TransitDriver implements TransitDriverAgent {
 			if (cntAccess > 0 || cntEgress > 0) {
 				stopTime = 10.0 + cntAccess * 5 + cntEgress * 3;
 				TransitQueueSimulation.getEvents().processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
-			
+
 				for (PassengerAgent passenger : passengersLeaving) {
 					this.vehicle.removePassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
@@ -167,7 +164,7 @@ public class TransitDriver implements TransitDriverAgent {
 			return this.departureTime;
 		}
 
-		public void activityEnds(double now) {
+		public void activityEnds(final double now) {
 			this.sim.agentDeparts(this, this.currentLeg.getRoute().getStartLink());
 		}
 
@@ -183,10 +180,10 @@ public class TransitDriver implements TransitDriverAgent {
 			return this.dummyPerson;
 		}
 
-		public void legEnds(double now) {
+		public void legEnds(final double now) {
 			Simulation.decLiving();
 		}
 
-		public void teleportToLink(Link link) {
+		public void teleportToLink(final Link link) {
 		}
 }
