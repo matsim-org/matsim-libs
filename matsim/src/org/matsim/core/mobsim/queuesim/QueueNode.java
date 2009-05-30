@@ -91,24 +91,22 @@ public class QueueNode {
 	 * @param veh
 	 * @param currentLane
 	 * @param now
-	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code> 
+	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
 	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
 		Link nextLink = veh.getDriver().chooseNextLink();
-		Link currentLink = veh.getCurrentLink();
+		Link currentLink = currentLane.queueLink.getLink();
+
 		// veh has to move over node
 		if (nextLink != null) {
 
+			if (currentLink.getToNode() != nextLink.getFromNode()) {
+				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
+						" from link " + currentLink.getId() + " to link " + nextLink.getId());
+			}
+
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
-			// _FIXME: Ich haette gerne die alte Konstruktion wieder, dass explizit ueber den Knoten nach den outgoing links
-			// gesucht wird.  Ansonsten kann man hier naemlich teleportieren.  kai, nov08
-			/* This is done in PersonAgent.chooseNextLink() (see few lines above).
-			 * The line here only does the lookup from Link to QueueLink. If one
-			 * still wants to have the check, I propose to use
-			 * currentQueueLink.getToNode() == nextQueueLink.getFromNode(), which should be
-			 * more efficient then looping through all outgoing links.  marcel/04dec2008
-			 */
 
 			if (nextQueueLink.hasSpace()) {
 				currentLane.popFirstFromBuffer();
@@ -228,24 +226,24 @@ public class QueueNode {
 			}
 		}
 	}
-	
-	private void clearLaneBuffer(QueueLane lane, double now){
+
+	private void clearLaneBuffer(final QueueLane lane, final double now){
 		while (!lane.bufferIsEmpty()) {
 			QueueVehicle veh = lane.getFirstFromBuffer();
 			if (!moveVehicleOverNode(veh, lane, now)) {
 				break;
 			}
-		}	
+		}
 	}
 
 	public void setSignalized(final boolean b) {
 		this.signalized = b;
 	}
-	
+
 	public boolean isSignalized(){
 		return this.signalized;
 	}
-	
+
 	protected static class QueueLinkIdComparator implements Comparator<QueueLink>, Serializable {
 		private static final long serialVersionUID = 1L;
 		public int compare(final QueueLink o1, final QueueLink o2) {
