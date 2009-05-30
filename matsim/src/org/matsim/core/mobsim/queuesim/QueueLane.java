@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -64,7 +66,9 @@ public class QueueLane {
 	private static final Logger log = Logger.getLogger(QueueLane.class);
 
 	private static int spaceCapWarningCount = 0;
-	
+
+	private static final Comparator<QueueVehicle> VEHICLE_EXIT_COMPARATOR = new QueueVehicleEarliestLinkExitTimeComparator();
+
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
@@ -76,7 +80,13 @@ public class QueueLane {
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	/*package*/ final Queue<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
+	/*package*/ final LinkedList<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
+
+	/**
+	 * A list containing all transit vehicles that are at a stop but not
+	 * blocking other traffic on the lane.
+	 */
+	/*package*/ final Queue<QueueVehicle> transitVehicleStopQueue = new PriorityQueue<QueueVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
@@ -84,7 +94,7 @@ public class QueueLane {
 	/*package*/ final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 
 	private double storageCapacity;
-	
+
 	private double usedStorageCapacity;
 
 	/**
@@ -164,16 +174,16 @@ public class QueueLane {
 		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
 		this.length = ql.getLink().getLength();
 		this.meterFromLinkEnd = 0.0;
-		
+
 		if (this.originalLane){
 			this.laneId = new  IdImpl(this.queueLink.getLink().getId().toString() + ".ol");
 		}
-		
+
 		/*
 		 * moved capacity calculation to two methods, to be able to call it from
 		 * outside e.g. for reducing cap in case of an incident
 		 */
-		this.calculateCapacities();		
+		this.calculateCapacities();
 	}
 
 	public Id getLaneId(){
@@ -205,12 +215,12 @@ public class QueueLane {
 			/*
 			 * Without lanes a Link has a flow capacity that describes the flow on a certain number of
 			 * lanes. If lanes are given the following is assumed:
-			 * 
+			 *
 			 * Flow of a Lane is given by the flow of the link divided by the number of lanes represented by the link.
-			 * 
-			 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes 
-			 * of the Lane definition. The flow of a lane is scaled by this number.  
-			 *   
+			 *
+			 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes
+			 * of the Lane definition. The flow of a lane is scaled by this number.
+			 *
 			 */
 			double queueLinksNumberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(time);
 			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
@@ -226,7 +236,7 @@ public class QueueLane {
 	private void calculateStorageCapacity(final double time) {
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
-		
+
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
 		//TODO dg think about the combination of several number lanes in link and in lane might be a bug
 		if (this.laneData != null) {
@@ -269,23 +279,23 @@ public class QueueLane {
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);
 	}
-	
-	void setLaneLength(double laneLengthMeters){
+
+	void setLaneLength(final double laneLengthMeters) {
 		this.length = laneLengthMeters;
 		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 	}
 
-	
+
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
 		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 	}
-	
-	void setMetersFromLinkEnd(double meters) {
+
+	void setMetersFromLinkEnd(final double meters) {
 		this.meterFromLinkEnd = meters;
 	}
-	
+
 	protected double getMeterFromLinkEnd(){
 		return this.meterFromLinkEnd;
 	}
@@ -331,6 +341,17 @@ public class QueueLane {
 			if (veh == null) {
 				return;
 			}
+
+			if (veh.getDriver() instanceof TransitDriverAgent) {
+				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
+				TransitStopFacility stop = driver.getNextTransitStop();
+				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
+				/* ignore delay from handleTransitStop, obviously, the transit
+				 * vehicle was parked here, so everybody should have border by now */
+					driver.handleTransitStop(stop, now);
+				}
+			}
+
 			addToBuffer(veh, now);
 			QueueSimulation.getEvents().processEvent(
 					new AgentWait2LinkEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
@@ -347,6 +368,28 @@ public class QueueLane {
 	 */
 	protected void moveLaneToBuffer(final double now) {
 		QueueVehicle veh;
+
+		// handle transit traffic
+		List<QueueVehicle> departingTransitVehicles = null;
+		while ((veh = this.transitVehicleStopQueue.peek()) != null) {
+			// there is a transit vehicle.
+			if (veh.getEarliestLinkExitTime() > now) {
+				break;
+			}
+			if (departingTransitVehicles == null) {
+				departingTransitVehicles = new LinkedList<QueueVehicle>();
+			}
+			departingTransitVehicles.add(this.transitVehicleStopQueue.poll());
+		}
+		if (departingTransitVehicles != null) {
+			// add all departing transit vehicles at the front of the vehQueue
+			ListIterator<QueueVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
+			while (iter.hasPrevious()) {
+				this.vehQueue.addFirst(iter.previous());
+			}
+		}
+
+		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
 			if ((veh.getEarliestLinkExitTime() > now) && this.originalLane && (this.meterFromLinkEnd == 0.0)){
@@ -365,22 +408,25 @@ public class QueueLane {
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
 				continue;
 			}
-			
+
 			if (veh.getDriver() instanceof TransitDriverAgent) {
 				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 				TransitStopFacility stop = driver.getNextTransitStop();
 				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
-					double delay = driver.handleTransitStop(driver.getNextTransitStop(), now);
+					double delay = driver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
 						veh.setEarliestLinkExitTime(veh.getEarliestLinkExitTime() + delay);
 					}
-					/* start over: either this veh is still first in line, 
+					if (!stop.getIsBlockingLane()) {
+						this.vehQueue.poll(); // remove the bus from the queue
+						this.transitVehicleStopQueue.add(veh); // and add it to the stop queue
+					}
+					/* start over: either this veh is still first in line,
 					 * but has another stop on this link, or on another link, then it is moved on
 					 */
-					continue; 
+					continue;
 				}
 			}
-			
 
 			/* is there still room left in the buffer, or is it overcrowded from the
 			 * last time steps? */
@@ -401,7 +447,7 @@ public class QueueLane {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty());
+		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty() || (!this.transitVehicleStopQueue.isEmpty()));
 		return active;
 	}
 
@@ -776,9 +822,10 @@ public class QueueLane {
 			double now = SimulationTimer.getTime();
 			double queueEnd = QueueLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+			double cellSize = ((NetworkLayer)QueueLane.this.queueLink.getLink().getLayer()).getEffectiveCellSize();
 			double vehLen = Math.min( // the length of a vehicle in visualization
 					QueueLane.this.queueLink.getLink().getLength() / (QueueLane.this.storageCapacity + QueueLane.this.bufferStorageCapacity), // all vehicles must have place on the link
-					((NetworkLayer)QueueLane.this.queueLink.getLink().getLayer()).getEffectiveCellSize() / storageCapFactor); // a vehicle should not be larger than it's actual size
+					cellSize / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 			// put all cars in the buffer one after the other
 			for (QueueVehicle veh : QueueLane.this.buffer) {
@@ -841,9 +888,22 @@ public class QueueLane {
 			int lane = QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME) + 1; // place them next to the link
 			for (QueueVehicle veh : QueueLane.this.waitingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
-						((NetworkLayer) QueueLane.this.queueLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-						PositionInfo.VehicleState.Parking, null);
+						/*positionOnLink*/cellSize, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
+			}
+
+			/*
+			 * Put the transit vehicles from the transit stop list in positions.
+			 */
+			if (QueueLane.this.transitVehicleStopQueue.size() > 0) {
+				lane++; // place them one lane further away
+				double vehPosition = QueueLane.this.queueLink.getLink().getLength();
+				for (QueueVehicle veh : QueueLane.this.transitVehicleStopQueue) {
+					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
+							vehPosition, lane, 0.0, 	PositionInfo.VehicleState.Driving, null);
+					positions.add(position);
+					vehPosition -= veh.getSizeInEquivalents() * cellSize;
+				}
 			}
 
 		}
@@ -892,7 +952,7 @@ public class QueueLane {
 
 	public static class FromLinkEndComparator implements Comparator<QueueLane>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(QueueLane o1, QueueLane o2) {
+		public int compare(final QueueLane o1, final QueueLane o2) {
 			if (o1.getMeterFromLinkEnd() < o2.getMeterFromLinkEnd()) {
 				return -1;
 			} else if (o1.getMeterFromLinkEnd() > o2.getMeterFromLinkEnd()) {
@@ -903,7 +963,7 @@ public class QueueLane {
 		}
 	}
 
-	void setLaneData(BasicLane signalLane) {
+	void setLaneData(final BasicLane signalLane) {
 		this.laneData = signalLane;
 	}
 }
