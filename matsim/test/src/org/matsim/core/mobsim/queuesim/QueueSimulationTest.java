@@ -83,7 +83,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
 		plan.createActivity("w", f.link3);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
 		Events events = new Events();
@@ -120,7 +120,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
 			plan.createActivity("w", f.link3);
-			f.plans.addPerson(person);
+			f.plans.getPersons().put(person.getId(), person);
 		}
 
 		/* build events */
@@ -158,7 +158,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		leg.setRoute(route);
 		leg.setTravelTime(15.0);
 		plan.createActivity("w", f.link3);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
 		Events events = new Events();
@@ -200,7 +200,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route.setNodes(f.link1, new ArrayList<Node>(0), f.link1);
 		leg.setRoute(route);
 		plan.createActivity("w", f.link1);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
 		Events events = new Events();
@@ -256,7 +256,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl(1));
 		Plan plan = person.createPlan(true);
 		plan.createActivity("home", f.link1);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 		
 		/* build events */
 		Events events = new Events();
@@ -281,7 +281,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		Activity act = plan.createActivity("home", f.link1);
 		act.setEndTime(6.0 * 3600);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 		
 		/* build events */
 		Events events = new Events();
@@ -310,7 +310,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		leg.setRoute(new GenericRouteImpl(f.link1, f.link2));
 		act = plan.createActivity("work", f.link2);
 		act.setEndTime(6.0 * 3600 + 60);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 		
 		/* build events */
 		Events events = new Events();
@@ -344,7 +344,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
 		plan.createActivity("w", f.link3);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 
 		// add a lot of other persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -367,7 +367,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
 			plan.createActivity("w", f.link3);
-			f.plans.addPerson(person);
+			f.plans.getPersons().put(person.getId(), person);
 		}
 
 		/* build events */
@@ -411,7 +411,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
 		plan.createActivity("w", f.link3);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
@@ -424,7 +424,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			route.setNodes(f.link2, f.nodes3, f.link3);
 			leg.setRoute(route);
 			plan.createActivity("w", f.link3);
-			f.plans.addPerson(person);
+			f.plans.getPersons().put(person.getId(), person);
 		}
 
 		/* build events */
@@ -467,7 +467,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
 		plan.createActivity("w", f.link3);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
@@ -480,7 +480,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			route.setNodes(f.link2, f.nodes3, f.link3);
 			leg.setRoute(route);
 			plan.createActivity("w", f.link3);
-			f.plans.addPerson(person);
+			f.plans.getPersons().put(person.getId(), person);
 		}
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
@@ -493,7 +493,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
 			plan.createActivity("w", f.link3);
-			f.plans.addPerson(person);
+			f.plans.getPersons().put(person.getId(), person);
 		}
 
 		/* build events */
@@ -532,7 +532,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route2.setNodes(f.link2, f.nodes3, f.link3);
 		l2.setRoute(route2);
 		plan.createActivity("l", f.link3);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 		
 		/* build events */
 		Events events = new Events();
@@ -576,7 +576,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route2.setNodes(f.link2, f.nodes3, f.link3);
 		l2.setRoute(route2);
 		plan.createActivity("l", f.link3);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 		
 		/* build events */
 		Events events = new Events();
@@ -719,7 +719,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		route.setLinks(link5, null, link6);
 		leg.setRoute(route);
 		plan.createActivity("h", link6);
-		f.plans.addPerson(person);
+		f.plans.getPersons().put(person.getId(), person);
 
 		/* run sim with special logger */		
 		LogCounter logger = new LogCounter();

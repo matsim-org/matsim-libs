@@ -59,7 +59,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", new IdImpl(1)));
 		person.addPlan(plan);
-		pop.addPerson(person);
+		pop.getPersons().put(person.getId(), person);
 		
 		String filename = getOutputDirectory() + "population.xml";
 		new BasicPopulationWriter(pop).writeV4(filename);

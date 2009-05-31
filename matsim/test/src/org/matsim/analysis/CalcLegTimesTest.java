@@ -56,7 +56,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		
 		this.population = new PopulationImpl();
 		Person person = new PersonImpl(DEFAULT_PERSON_ID);
-		this.population.addPerson(person);
+		this.population.getPersons().put(person.getId(), person);
 		Plan plan = person.createPlan(true);
 		plan.createActivity("act1", new CoordImpl(100.0, 100.0));
 		plan.createLeg(TransportMode.undefined);
