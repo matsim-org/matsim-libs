@@ -34,14 +34,6 @@ import org.matsim.core.api.network.Node;
  */
 public interface NetworkRoute extends Route {
 
-	/**
-	 * Never use String arguments as parameter except they contain a real String, i.e.
-	 * textual information like a word or phrase.
-	 * @param route
-	 */
-	@Deprecated
-	public abstract void setNodes(final String route);
-
 	public abstract List<Node> getNodes();
 
 	public abstract void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink);

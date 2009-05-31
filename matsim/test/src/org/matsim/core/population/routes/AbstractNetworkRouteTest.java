@@ -64,30 +64,6 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		assertEquals(network.getLink(new IdImpl("3")), links.get(2));
 	}
 
-	public void testSetNodes_asString() {
-		NetworkLayer network = createTestNetwork();
-		NetworkRoute route = getCarRouteInstance(network.getLink(new IdImpl("1")), network.getLink(new IdImpl("4")), network);
-		route.setNodes("2 12 13 3 4");
-
-		List<Link> links = route.getLinks();
-		assertEquals("number of links in route.", 4, links.size());
-		assertEquals(network.getLink(new IdImpl("22")), links.get(0));
-		assertEquals(network.getLink(new IdImpl("12")), links.get(1));
-		assertEquals(network.getLink(new IdImpl("-23")), links.get(2));
-		assertEquals(network.getLink(new IdImpl("3")), links.get(3));
-	}
-
-	public void testSetNodes_asString_empty() {
-		NetworkLayer network = createTestNetwork();
-		Link link = network.getLink(new IdImpl("3"));
-		NetworkRoute route = getCarRouteInstance(link, link, network);
-		route.setNodes("");
-
-		assertEquals("number of nodes in route.", 0, route.getNodes().size());
-		assertEquals("number of links in route.", 0, route.getLinks().size());
-		assertEquals("number of link ids in route.", 0, route.getLinkIds().size());
-	}
-
 	public void testSetLinks() {
 		NetworkLayer network = createTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "-22 2 3 24 14");
@@ -142,21 +118,15 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 	 */
 	public void testSetNodesSetLinksOverwrites() {
 		NetworkLayer network = createTestNetwork();
-		NetworkRoute route = getCarRouteInstance(network.getLink(new IdImpl("1")), network.getLink(new IdImpl("4")), network);
-		route.setNodes("2 12 13 3 4");
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link4 = network.getLink(new IdImpl("4"));
+		NetworkRoute route = getCarRouteInstance(link1, link4, network);
+		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		assertEquals("number of nodes in route.", 5, route.getNodes().size());
 
 		route.setEndLink(network.getLink(new IdImpl("13")));
-		route.setNodes("2 12 13");
-		assertEquals("setRoute(String) does likely not clear existing route.", 3, route.getNodes().size());
-
-		List<Node> nodes = new ArrayList<Node>();
-		nodes.add(network.getNode(new IdImpl("12")));
-		nodes.add(network.getNode(new IdImpl("13")));
-		nodes.add(network.getNode(new IdImpl("3")));
-		nodes.add(network.getNode(new IdImpl("4")));
-		route.setNodes(network.getLink(new IdImpl("11")), nodes, network.getLink(new IdImpl("4")));
-		assertEquals("setRoute(List<Node>) does likely not clear existing route.", 4, route.getNodes().size());
+		route.setNodes(NetworkUtils.getNodes(network, "2 12 13"));
+		assertEquals("setRoute(List<Node>) does likely not clear existing route.", 3, route.getNodes().size());
 
 		List<Link> links = new ArrayList<Link>();
 		links.add(network.getLink(new IdImpl("-22")));

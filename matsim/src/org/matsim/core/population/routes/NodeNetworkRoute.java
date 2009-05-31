@@ -26,12 +26,8 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
 public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
@@ -67,37 +63,6 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 				"level in the inheritance hierachy! If the Interfaces Link/Node/Route are used you " +
 				"have to set the route by object references not by Ids.");
 	}
-
-	public final void setNodes(final String route) {
-		Network layer = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-		if (layer == null) {
-			throw new RuntimeException("NetworkLayer does not exist in world.");
-		}
-
-		this.route.clear();
-		String[] parts = route.split("[ \t\n]+");
-		// IMPORTANT NOTE:
-		// split does not always work as one would expect!
-		// if a string starts with one of the delimiters, then
-		// parts[0] is equal to ""!!! if not, then parts[0] holds the first
-		// string one is intended to keep.
-		// Example:
-		// route=" 0 1   2 " -> parts = ["","0","1","2"]
-		// route="0 1   2 "  -> parts = ["0","1","2"]
-		int min = 0;
-		if ((parts.length > 0) && (parts[0].equals(""))) { min = 1; }
-
-		for (int i = min; i < parts.length; i++) {
-			Node n = layer.getNode(new IdImpl(parts[i]));
-			if (n == null) {
-				throw new RuntimeException("Node not found in network. node id = " + parts[i]);
-			}
-			this.route.add(n);
-		}
-		this.route.trimToSize();
-		this.cost = Double.NaN;
-	}
-
 
 	public List<Node> getNodes() {
 		return this.route;

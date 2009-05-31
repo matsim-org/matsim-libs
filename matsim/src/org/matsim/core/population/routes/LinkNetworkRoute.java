@@ -188,32 +188,6 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 		this.route.trimToSize();
 	}
 
-	public void setNodes(final String route) {
-		this.route.clear();
-		String[] parts = route.trim().split("[ \t\n]+");
-
-		Node prevNode = null;
-		for (String id : parts) {
-			if (prevNode != null) {
-				// find link from prevNode to node
-				for (Link link : prevNode.getOutLinks().values()) {
-					if (id.equals(link.getToNode().getId().toString())) {
-						this.route.add(link);
-						prevNode = link.getToNode();
-						break;
-					}
-				}
-			} else {
-				NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-				if (network == null) {
-					throw new RuntimeException("NetworkLayer does not exist in world.");
-				}
-				prevNode = network.getNode(id);
-			}
-		}
-		this.route.trimToSize();
-	}
-
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		setStartLink(startLink);
 		setEndLink(endLink);

@@ -193,43 +193,6 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
 	}
 
-	public void setNodes(final String route) {
-		this.route.clear();
-		String[] parts = route.trim().split("[ \t\n]+");
-		if (parts.length == 1) {
-			// exactly one node, so the route must be defined by the start and end leg
-			this.uncompressedLength = 0;
-			return;
-		}
-
-		Link previousLink = getStartLink();
-		Node previousNode = previousLink.getToNode();
-		for (int i = 1, n = parts.length; i < n; i++) { // skip the first id, as it should be equal to previousNode
-			String id = parts[i];
-			// find link from prevNode to node
-			Link link = null;
-			for (Link tmpLink : previousNode.getOutLinks().values()) {
-				if (id.equals(tmpLink.getToNode().getId().toString())) {
-					link = tmpLink;
-					break;
-				}
-			}
-			if (link == null) {
-				throw new IllegalArgumentException("Could not find any link from node " + previousNode.getId() + " to " + id);
-			}
-
-			if (this.subsequentLinks.get(previousLink) != link) {
-				this.route.add(link);
-			}
-			previousLink = link;
-			previousNode = link.getToNode();
-		}
-
-		this.route.trimToSize();
-		this.uncompressedLength = parts.length - 1;
-//		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
-	}
-
 	@Deprecated
 	public void setNodes(final List<Node> srcRoute) {
 		setNodes(null, srcRoute, null);
@@ -237,8 +200,12 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		this.route.clear();
-		setStartLink(startLink);
-		setEndLink(endLink);
+		if (startLink != null) {
+			setStartLink(startLink);
+		}
+		if (endLink != null) {
+			setEndLink(endLink);
+		}
 		Link previousLink = getStartLink();
 		Node previousNode = previousLink.getToNode();
 		Iterator<Node> iter = srcRoute.iterator();
@@ -254,7 +221,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 			this.uncompressedLength = 0;
 			return;
 		}
-		Node node = startLink.getToNode();
+		Node node = getStartLink().getToNode();
 		while (iter.hasNext()) {
 			node = iter.next();
 			// find link from prevNode to node
@@ -277,7 +244,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		}
 
 		// check that this route is complete, so it will be possible to uncompress it again without problems
-		if (node != endLink.getFromNode()) {
+		if (node != getEndLink().getFromNode()) {
 			throw new IllegalArgumentException("The last node must be the fromNode of the endLink. endLink=" + endLink.getId());
 		}
 		
