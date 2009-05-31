@@ -21,10 +21,10 @@
 package playground.mfeil;
 
 
-import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
@@ -101,7 +101,7 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 		assignment.println("Iteration "+Controler.getIteration());
 		assignment.println("Individual optimization");
 		for (int i=0;i<list[0].size();i++){
-			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScoreAsPrimitiveType()+"\t");
+			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");
 			for (int j=0;j<list[0].get(i).getPlanElements().size();j+=2){
 				assignment.print(((Activity)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
@@ -171,7 +171,7 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 				String st = naa.next();
 				for (int x=0;x<this.list[1].size();x++){
 					if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
-						assignment.print(this.list[1].get(x).getPerson().getId()+"\t\t"+this.list[1].get(x).getScoreAsPrimitiveType()+"\t");
+						assignment.print(this.list[1].get(x).getPerson().getId()+"\t\t"+this.list[1].get(x).getScore()+"\t");
 						for (int j=0;j<this.list[1].get(x).getPlanElements().size();j+=2){
 							assignment.print(((Activity)(this.list[1].get(x).getPlanElements().get(j))).getType()+"\t");
 						}
@@ -344,7 +344,7 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 		}
 		assignmentModule.finishReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
-			score += this.list[1].get(j).getScoreAsPrimitiveType(); 
+			score += this.list[1].get(j).getScore().doubleValue(); 
 		}
 		return score;
 	}

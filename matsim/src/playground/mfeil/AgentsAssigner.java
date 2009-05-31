@@ -124,9 +124,9 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.timer.run(plan);
 		
 		ArrayList<String> prt = new ArrayList<String>();
-		prt.add(""+plan.getPerson().getId().toString());
-		prt.add(""+agents.getAgentPerson(assignedAgent).getId().toString());
-		prt.add(""+plan.getScoreAsPrimitiveType());
+		prt.add(plan.getPerson().getId().toString());
+		prt.add(agents.getAgentPerson(assignedAgent).getId().toString());
+		prt.add(plan.getScore().toString());
 		Statistics.list.add(prt);	
 				
 	}	

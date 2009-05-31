@@ -42,13 +42,14 @@ public class PlanomatXPlan extends PlanImpl implements Comparable<PlanomatXPlan>
 	}
 	
 	public final int compareTo(PlanomatXPlan p){
-		if (this.getScoreAsPrimitiveType() == p.getScoreAsPrimitiveType()) {
-			return 0;
-		}
-		else if (this.getScoreAsPrimitiveType() - p.getScoreAsPrimitiveType() > 0.0){
-			return 1;
-		}
-		else return -1;
+		return this.getScore().compareTo(p.getScore());
+//		if (this.getScoreAsPrimitiveType() == p.getScoreAsPrimitiveType()) {
+//			return 0;
+//		}
+//		else if (this.getScoreAsPrimitiveType() - p.getScoreAsPrimitiveType() > 0.0){
+//			return 1;
+//		}
+//		else return -1;
 	}
 	
 	public void setActsLegs (List<? extends BasicPlanElement> actslegs){

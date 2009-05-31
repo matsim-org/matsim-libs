@@ -75,7 +75,7 @@ public class PlanComparator {
 		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPersons().get(id).getSelectedPlan();
 			act = plan.getFirstActivity();
-			this._result.addFirstPlansData(id, plan.getScoreAsPrimitiveType(), act);
+			this._result.addFirstPlansData(id, plan.getScore().doubleValue(), act);
 		}
 		// many people can be in one pop -> care about memory
 		this.population = null;
@@ -84,7 +84,7 @@ public class PlanComparator {
 		this.population = loadPlansFile(secondPlanPath, sl.getScenario().getNetwork());
 		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPersons().get(id).getSelectedPlan();
-			this._result.addSecondPlansData(id, plan.getScoreAsPrimitiveType());
+			this._result.addSecondPlansData(id, plan.getScore().doubleValue());
 		}
 
 		if (outpath == null) {

@@ -108,9 +108,6 @@ public interface Plan extends BasicPlan<PlanElement> {
 
 	public Activity getLastActivity();
 
-	@Deprecated // use getScore()
-	public double getScoreAsPrimitiveType();
-
 	@Deprecated
 	public void setType(Plan.Type type);
 	@Deprecated

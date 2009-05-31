@@ -202,7 +202,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		this.locator.run(plan);
 		this.router.run(plan);
 		this.timer.run(plan);
-		while (plan.getScoreAsPrimitiveType()==-100000){
+		while (plan.getScore().doubleValue()==-100000){
 			
 			/* Remove last secondary activity to make plan shorter*/
 			for (int z=plan.getPlanElements().size()-3;z>=2;z=z-2){
@@ -240,9 +240,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//	stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
 	//	ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 		
-		// TODO muss dann wieder raus! Nur f�r Planomat!
+		// TODO muss dann wieder raus! Nur fuer Planomat!
 		plan.setScore(scorer.getScore(plan));
-		double bestScore = plan.getScoreAsPrimitiveType();
+		double bestScore = plan.getScore().doubleValue();
 		scoreStat.add(bestScore);
 		
 		
@@ -345,7 +345,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			/* Statistics*/	
 	//		ys[currentIteration]=bestIterSolution.getScore();
 	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());	
-			if (bestIterSolution.getScoreAsPrimitiveType()>bestScore) bestScore=bestIterSolution.getScoreAsPrimitiveType();
+			if (bestIterSolution.getScore().doubleValue()>bestScore) bestScore=bestIterSolution.getScore().doubleValue();
 			if (currentIteration%5==0) scoreStat.add(bestScore);
 			
 			if (this.MAX_ITERATIONS==currentIteration){
@@ -368,7 +368,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		
 		// TODO must be removed before putting into core!
-		plan.setScore(tabuList.get(tabuList.size()-1).getScoreAsPrimitiveType());
+		plan.setScore(tabuList.get(tabuList.size()-1).getScore());
 		
 		
 	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
@@ -379,7 +379,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		if (!this.finalOpt.equals("none")){
 			this.finalTimer.run(tabuList.get(tabuList.size()-1));
 			tabuList.get(tabuList.size()-1).setScore(this.scorer.getScore(tabuList.get(tabuList.size()-1)));
-			scoreStat.add(tabuList.get(tabuList.size()-1).getScoreAsPrimitiveType());
+			scoreStat.add(tabuList.get(tabuList.size()-1).getScore());
 	/*		stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
 			for (int i= 0;i<tabuList.get(tabuList.size()-1).getPlanElements().size();i=i+2){
 				Activity act = (Activity)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
@@ -741,7 +741,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					for (int i = 0; i<solution3.size();i++) {
 						if (checkForEquality3(neighbourhood[x], solution3.get(solution3.size()-1-i))){
 							nonTabuNeighbourhood.add(solution3.get(solution3.size()-1-i));
-							neighbourhood[x].setScore(solution3.get(solution3.size()-1-i).getScoreAsPrimitiveType());
+							neighbourhood[x].setScore(solution3.get(solution3.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
 						//	log.info("Solution3 recycled!");
 							break;
@@ -753,7 +753,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					for (int i = 0; i<solution5.size();i++) {
 						if (checkForEquality3(neighbourhood[x], solution5.get(solution5.size()-1-i))){
 							nonTabuNeighbourhood.add(solution5.get(solution5.size()-1-i));
-							neighbourhood[x].setScore(solution5.get(solution5.size()-1-i).getScoreAsPrimitiveType());
+							neighbourhood[x].setScore(solution5.get(solution5.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
 						//	log.info("Solution5 recycled!");
 							break;
@@ -766,7 +766,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					for (int i = 0; i<solution7.size();i++) {
 						if (checkForEquality3(neighbourhood[x], solution7.get(solution7.size()-1-i))){
 							nonTabuNeighbourhood.add(solution7.get(solution7.size()-1-i));
-							neighbourhood[x].setScore(solution7.get(solution7.size()-1-i).getScoreAsPrimitiveType());
+							neighbourhood[x].setScore(solution7.get(solution7.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
 						//	log.info("Solution7 recycled!");
 							break;
@@ -779,7 +779,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					for (int i = 0; i<solution9.size();i++) {
 						if (checkForEquality3(neighbourhood[x], solution9.get(solution9.size()-1-i))){
 							nonTabuNeighbourhood.add(solution9.get(solution9.size()-1-i));
-							neighbourhood[x].setScore(solution9.get(solution9.size()-1-i).getScoreAsPrimitiveType());
+							neighbourhood[x].setScore(solution9.get(solution9.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
 						//	log.info("Solution9 recycled!");
 							break;
@@ -792,7 +792,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					for (int i = 0; i<solution11.size();i++) {
 						if (checkForEquality3(neighbourhood[x], solution11.get(solution11.size()-1-i))){
 							nonTabuNeighbourhood.add(solution11.get(solution11.size()-1-i));
-							neighbourhood[x].setScore(solution11.get(solution11.size()-1-i).getScoreAsPrimitiveType());
+							neighbourhood[x].setScore(solution11.get(solution11.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
 						//	log.info("Solution11 recycled!");
 							break;
@@ -805,7 +805,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					for (int i = 0; i<solution13.size();i++) {
 						if (checkForEquality3(neighbourhood[x], solution13.get(solution13.size()-1-i))){
 							nonTabuNeighbourhood.add(solution13.get(solution13.size()-1-i));
-							neighbourhood[x].setScore(solution13.get(solution13.size()-1-i).getScoreAsPrimitiveType());
+							neighbourhood[x].setScore(solution13.get(solution13.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
 						//	log.info("Solution13 recycled!");
 							break;
@@ -818,7 +818,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					for (int i = 0; i<solutionLong.size();i++) {
 						if (checkForEquality(neighbourhood[x], solutionLong.get(solutionLong.size()-1-i))){
 							nonTabuNeighbourhood.add(solutionLong.get(solutionLong.size()-1-i));
-							neighbourhood[x].setScore(solutionLong.get(solutionLong.size()-1-i).getScoreAsPrimitiveType());
+							neighbourhood[x].setScore(solutionLong.get(solutionLong.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
 						//	log.info("SolutionLong recycled!");
 							break;
@@ -1026,12 +1026,12 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			this.timer.run(LCset[i]);
 			//LCset[i].setScore(scorer.getScore(LCset[i]));	
 			if (bestScore==-1){
-				if (plan.getScoreAsPrimitiveType()<LCset[i].getScoreAsPrimitiveType()) {
+				if (plan.getScore().doubleValue()<LCset[i].getScore().doubleValue()) {
 					bestScore=i;
 					//log.info("Besser als neighbourhood: "+(LCset[i].getScore()-plan.getScore()));
 				}
 			}
-			else if (LCset[bestScore].getScoreAsPrimitiveType()<LCset[i].getScoreAsPrimitiveType()) {
+			else if (LCset[bestScore].getScore().doubleValue()<LCset[i].getScore().doubleValue()) {
 				//log.info("Besser als voriges LCset: "+(LCset[i].getScore()-LCset[bestScore].getScore()));
 				bestScore=i;
 			}

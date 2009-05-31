@@ -21,6 +21,9 @@ package playground.mfeil;
 
 
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -32,9 +35,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 
 /**
@@ -235,9 +235,9 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		
 		if (Statistics.prt==true) {
 			ArrayList<String> prt = new ArrayList<String>();
-			prt.add(""+plan.getPerson().getId().toString());
-			prt.add(""+agents.getAgentPerson(assignedAgent).getId().toString());
-			prt.add(""+plan.getScoreAsPrimitiveType());
+			prt.add(plan.getPerson().getId().toString());
+			prt.add(agents.getAgentPerson(assignedAgent).getId().toString());
+			prt.add(plan.getScore().toString());
 			for (int y=0;y<plan.getPlanElements().size();y+=2){
 				prt.add(((Activity)(plan.getPlanElements().get(y))).getType());
 			}

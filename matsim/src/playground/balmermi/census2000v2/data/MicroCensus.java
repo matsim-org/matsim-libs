@@ -47,7 +47,7 @@ public class MicroCensus {
 	private static final String FEMALE = "f";
 	private static final String YES = "yes";
 	private static final String NO = "no";
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ public class MicroCensus {
 			Tuple<Double,Person> t = new Tuple<Double, Person>(weight,person);
 			list.add(t);
 		}
-		
+
 		private final void setWeight(double weight, int index) {
 			Tuple<Double,Person> t = list.remove(index);
 			if (t == null) { Gbl.errorMsg("No tuple at index "+ index); }
@@ -83,7 +83,7 @@ public class MicroCensus {
 				System.out.println(i+": ("+t.getFirst()+","+t.getSecond().getId()+")");
 			}
 		}
-		
+
 		private final Person getRandomPerson() {
 			int i = MatsimRandom.getRandom().nextInt(list.size());
 			return list.get(i).getSecond();
@@ -100,7 +100,7 @@ public class MicroCensus {
 			return null;
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
@@ -112,14 +112,14 @@ public class MicroCensus {
 		else if (age < 18) { index += 2; }
 		else if (age < 66) { index += 3; }
 		else { index += 4; }
-		
+
 		if (sex.equals(MALE)) { index += 8; }
 		if (lic.equals(YES)) { index += 16; }
 		if (has_work) { index += 32; }
 		if (has_educ) { index += 64; }
 		return index;
 	}
-	
+
 	private final String index2group(final int index, int age, String sex, String lic, boolean has_work, boolean has_educ) {
 		int i = index;
 		if (i/64 == 1) { has_educ = true; } else { has_educ = false; }
@@ -138,11 +138,11 @@ public class MicroCensus {
 		else { Gbl.errorMsg("index="+index+" not allowed!"); }
 		return "e("+has_educ+");w("+has_work+");lic("+lic+");sex("+sex+");age("+age+")";
 	}
-	
+
 	private final void create(Population pop) {
 		double weight_sum = 0.0;
 		for (Person p : pop.getPersons().values()) {
-			weight_sum += p.getSelectedPlan().getScoreAsPrimitiveType();
+			weight_sum += p.getSelectedPlan().getScore().doubleValue();
 		}
 		for (Person p : pop.getPersons().values()) {
 			int age = p.getAge();
@@ -161,9 +161,9 @@ public class MicroCensus {
 			int index = this.group2index(age,sex,lic,has_work,has_educ);
 			Group g = groups[index];
 			if (g == null) { g = new Group(); groups[index] = g; }
-			g.addTuple(p.getSelectedPlan().getScoreAsPrimitiveType()/weight_sum,p);
+			g.addTuple(p.getSelectedPlan().getScore().doubleValue()/weight_sum,p);
 		}
-		
+
 		for (int i=0; i<this.groups.length; i++) {
 			Group g = this.groups[i];
 			if (g != null) {
@@ -178,7 +178,7 @@ public class MicroCensus {
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ public class MicroCensus {
 		}
 		return g.getRandomPerson();
 	}
-	
+
 	public final Person getRandomWeightedMZPerson(int age, String sex, String lic, boolean has_work, boolean has_educ) {
 		int index = this.group2index(age,sex,lic,has_work,has_educ);
 		Group g = groups[index];
@@ -202,11 +202,11 @@ public class MicroCensus {
 		}
 		return g.getRandomWeightedPerson();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// set/create methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// public methods
 	//////////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ public class MicroCensus {
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void print() {
 		for (int i=0; i<groups.length; i++) {
 			Group g = groups[i];

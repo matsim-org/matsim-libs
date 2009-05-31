@@ -195,8 +195,8 @@ public class EvacDestinationAssigner implements ScoringListener {
 		Plan bestPlan = null;
 		double bestScore = Double.NEGATIVE_INFINITY;
 		for (Plan plan : this.linkPlanMapping.get(link)) {
-			if (plan.getScoreAsPrimitiveType() > bestScore) {
-				bestScore = plan.getScoreAsPrimitiveType();
+			if (plan.getScore().doubleValue() > bestScore) {
+				bestScore = plan.getScore().doubleValue();
 				bestPlan = plan;
 			}
 		}
@@ -275,7 +275,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		
 		double scoreSum = 0;
 		for (Plan plan : plans) {
-			scoreSum += plan.getScoreAsPrimitiveType();
+			scoreSum += plan.getScore().doubleValue();
 		}
 		
 		return scoreSum / plans.size();

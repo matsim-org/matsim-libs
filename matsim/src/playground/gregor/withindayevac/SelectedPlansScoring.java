@@ -127,16 +127,10 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ba
 			}
 			
 			final Plan plan = this.population.getPersons().get(new IdImpl(guideId)).getSelectedPlan();
-			final double oldScore = plan.getScoreAsPrimitiveType();
-//			if (Double.isNaN(oldScore)) {
-//				plan.setScore(scoreSum);
-//			} else {
-//				plan.setScore(this.learningRate * scoreSum + (1-this.learningRate) * oldScore);
-//			}
-			if (Double.isNaN(oldScore)) {
+			if (plan.getScore() == null) {
 				plan.setScore(this.scoreSum + scoreSum);
 			} else {
-				plan.setScore(this.learningRate * (this.scoreSum + scoreSum) + (1-this.learningRate) * oldScore);
+				plan.setScore(this.learningRate * (this.scoreSum + scoreSum) + (1-this.learningRate) * plan.getScore().doubleValue());
 			}
 		}
 	}

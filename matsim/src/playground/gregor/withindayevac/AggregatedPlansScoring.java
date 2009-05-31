@@ -117,12 +117,11 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, BasicAgentStuckEventHandle
 			final GroupScore g = this.gs.get(mapping);
 			final GroupScore nullG = this.gs.get("stuckAndAbord"); 
 			final double score = (g.scoreSum + nullG.scoreSum ) / (g.nagents + nullG.nagents);
-			final Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
-			final double oldScore = plan.getScoreAsPrimitiveType();
-			if (Double.isNaN(oldScore)) {
+			final Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
+			if (plan.getScore() == null) {
 				plan.setScore(score);
 			} else {
-				plan.setScore(this.learningRate * score + (1-this.learningRate) * oldScore);
+				plan.setScore(this.learningRate * score + (1-this.learningRate) * plan.getScore().doubleValue());
 			}
 		}
 	}

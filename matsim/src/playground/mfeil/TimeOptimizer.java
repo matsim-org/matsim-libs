@@ -165,7 +165,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		
 		/* Set the given plan as bestSolution */
 		bestSolution = this.copyActsLegs(plan.getPlanElements());
-		double bestScore = plan.getScoreAsPrimitiveType();
+		double bestScore = plan.getScore().doubleValue();
 		
 		
 		/* Iteration 1 */

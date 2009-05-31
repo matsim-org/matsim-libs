@@ -15,8 +15,8 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.planomat.costestimators.*;
-import org.matsim.planomat.*;
+import org.matsim.planomat.Planomat;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
@@ -50,7 +50,7 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 				e.printStackTrace();
 				return;
 			}
-			stream.print(plan.getScoreAsPrimitiveType()+"\t");
+			stream.print(plan.getScore()+"\t");
 			for (int z= 0;z<plan.getPlanElements().size();z=z+2){
 			Activity act = (Activity)plan.getPlanElements().get(z);
 				stream.print(act.getType()+"\t");
@@ -105,10 +105,10 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 				
 				
 				variation[i].setScore(scorer.getScore(variation[i]));
-				statistics[i][0] = variation[i].getScoreAsPrimitiveType();
+				statistics[i][0] = variation[i].getScore().doubleValue();
 				mean+=statistics[i][0];
 				
-				stream.print(variation[i].getScoreAsPrimitiveType()+"\t");
+				stream.print(variation[i].getScore()+"\t");
 				for (int z= 0;z<plan.getPlanElements().size();z=z+2){
 					stream.print(((Activity)(variation[i].getPlanElements()).get(z)).getDuration()+"\t");
 				}

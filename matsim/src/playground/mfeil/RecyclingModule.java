@@ -128,7 +128,7 @@ public class RecyclingModule implements PlanStrategyModule {
 		schedulingModule.finishReplanning();
 		
 		for (int i=0;i<list[0].size();i++){
-			assignment.print(list[0].get(i).getPerson().getId()+"\t"+list[0].get(i).getScoreAsPrimitiveType()+"\t");
+			assignment.print(list[0].get(i).getPerson().getId()+"\t"+list[0].get(i).getScore()+"\t");
 			for (int j=0;j<list[0].get(i).getPlanElements().size();j+=2){
 				assignment.print(((Activity)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}

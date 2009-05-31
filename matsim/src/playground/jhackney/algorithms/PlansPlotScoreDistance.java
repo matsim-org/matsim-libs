@@ -25,7 +25,7 @@ public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements P
 		// TODO Auto-generated method stub
 		Plan p = person.getSelectedPlan();
 		dist[i]=0;
-		score[i]= p.getScoreAsPrimitiveType();
+		score[i]= p.getScore().doubleValue();
 		for (PlanElement pe : p.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg l = (Leg) pe;

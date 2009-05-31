@@ -42,11 +42,12 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
@@ -234,7 +235,7 @@ public class DistanceAnalysis {
 			dests[dest]++;
 
 			dist[0] +=  l1;
-			dist[2] += person.getSelectedPlan().getScoreAsPrimitiveType();
+			dist[2] += person.getSelectedPlan().getScore().doubleValue();
 			Plan plan = new org.matsim.core.population.PlanImpl(person);
 			plan.addActivity(person.getSelectedPlan().getFirstActivity());
 			Leg ll = new org.matsim.core.population.LegImpl(TransportMode.car);
@@ -354,24 +355,20 @@ public class DistanceAnalysis {
 
 		String district_shape_file;
 
-
-
 		if (args.length != 2) {
 			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
-		} else {
-			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
-			district_shape_file = args[1];
-
 		}
+		Config config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
+		district_shape_file = args[1];
 
 		World world = Gbl.createWorld();
 
-		log.info("loading network from " + Gbl.getConfig().network().getInputFile());
+		log.info("loading network from " + config.network().getInputFile());
 		NetworkFactory fc = new NetworkFactory();
 		fc.setLinkFactory(new TimeVariantLinkFactory());
 
 		NetworkLayer network = new NetworkLayer(fc);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		world.setNetworkLayer(network);
 		world.complete();
 		log.info("done.");
@@ -389,10 +386,10 @@ public class DistanceAnalysis {
 		log.info("done");
 
 
-		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
+		log.info("loading population from " + config.plans().getInputFile());
 		Population population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 //		plansReader.readFile("./badPersons.xml");
 		log.info("done.");
 

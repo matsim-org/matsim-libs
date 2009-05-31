@@ -316,14 +316,6 @@ public class PlanImpl implements Plan {
 		return (Activity) getPlanElements().get(getPlanElements().size() - 1);
 	}
 
-	@Deprecated // use getScore()
-	public final double getScoreAsPrimitiveType() {
-		if (getScore() == null) {
-			return Plan.UNDEF_SCORE;
-		}
-		return getScore().doubleValue();
-	}
-
 	public void addActivity(BasicActivity act) {
 		delegate.addActivity(act);
 	}

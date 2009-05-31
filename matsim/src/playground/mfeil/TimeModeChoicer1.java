@@ -288,7 +288,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		/* Set the given plan as bestSolution */
 		bestSolution = this.copyActsLegs(plan.getPlanElements());
-		double bestScore = plan.getScoreAsPrimitiveType();
+		double bestScore = plan.getScore().doubleValue();
 		
 		
 		/* Iteration 1 */

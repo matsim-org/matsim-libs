@@ -172,8 +172,8 @@ public class PlanScoreAnalysis {
 			for (Person person : plans.getPersons().values()) {
 				plan = person.getSelectedPlan();
 				id = person.getId();
-				score1 = plan.getScoreAsPrimitiveType();
-				score2 = plans2.getPerson(id).getSelectedPlan().getScoreAsPrimitiveType();
+				score1 = plan.getScore().doubleValue();
+				score2 = plans2.getPersons().get(id).getSelectedPlan().getScore().doubleValue();
 				loc = ((Activity) plan.getPlanElements().get(0)).getCoord();
 				writer.addLine(id.toString(), Double.toString(loc.getX()), Double
 						.toString(loc.getY()), Double.toString(score1), Double
