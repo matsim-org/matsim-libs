@@ -56,26 +56,11 @@ public class Zone extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
-	protected Zone(final ZoneLayer layer, final Id id, final Coord center) {
-		super(layer,id,center);
-		this.setMin(center);
-		this.setMax(center);
-		this.setArea(0.0);
-		this.setName(null);
-	}
-
-	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
-	protected Zone(final ZoneLayer layer, final Id id, final Coord center,
-			final Coord min, final Coord max) {
-		this(layer, id, center);
-		this.setMin(min);
-		this.setMax(max);
-	}
-
-	@Deprecated // use of current matsim zone object is discouraged; use geotools instead
 	public Zone(final ZoneLayer layer, final Id id, final Coord center,
 	               final Coord min, final Coord max, final double area, final String name) {
-		this(layer, id, center, min, max);
+		super(layer,id,center);
+		this.setMin(min);
+		this.setMax(max);
 		this.setArea(area);
 		this.setName(name);
 	}

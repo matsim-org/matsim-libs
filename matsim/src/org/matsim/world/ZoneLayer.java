@@ -64,11 +64,10 @@ public class ZoneLayer extends Layer {
 		if ((center_x != null) && (center_y != null)) { center = new CoordImpl(center_x, center_y); }
 		if ((min_x != null) && (min_y != null)) { min = new CoordImpl(min_x, min_y); }
 		if ((max_x != null) && (max_y != null)) { max = new CoordImpl(max_x, max_y); }
-		Zone z = new Zone(this, new IdImpl(id), center, min, max);
+		Zone z = new Zone(this, new IdImpl(id), center, min, max, 0.0, zoneName);
 		if (area != null) {
 			z.setArea(Double.parseDouble(area));
 		}
-		z.setName(zoneName);
 		this.locations.put(i,z);
 		return z;
 	}
