@@ -141,7 +141,7 @@ public class ModdedConverterE {
 						// this line is about the same person as the line before.
 						// "extend" the plan of that person with a Leg and an Act
 
-						Plan pl = this.pop.getPerson(new IdImpl(personId)).getSelectedPlan();
+						Plan pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
@@ -169,7 +169,7 @@ public class ModdedConverterE {
 						// then start the new person
 
 						if (!this.pop.getPersons().isEmpty()) {
-							Person p = this.pop.getPerson(new IdImpl(this.tmpPersonId));
+							Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
 							Plan tmpPl = p.getSelectedPlan();
 
 							Leg leg = tmpPl.createLeg(TransportMode.car);

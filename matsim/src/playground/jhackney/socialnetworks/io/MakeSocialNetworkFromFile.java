@@ -64,8 +64,8 @@ public class MakeSocialNetworkFromFile {
 
 					if(iterToLoad == iter){
 						//fill the social network
-						Person person1 = plans.getPerson(new IdImpl(egoId));
-						Person person2 = plans.getPerson(new IdImpl(alterId));
+						Person person1 = plans.getPersons().get(new IdImpl(egoId));
+						Person person2 = plans.getPersons().get(new IdImpl(alterId));
 						snet.makeSocialContact(person1, person2, 0, purpose);
 						SocialNetEdge thisEdge = ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
 						thisEdge.setNumberOfTimesMet(timesmet);

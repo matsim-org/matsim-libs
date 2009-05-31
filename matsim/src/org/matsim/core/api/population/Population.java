@@ -35,10 +35,6 @@ public interface Population extends BasicPopulation<Person> {
 	@Deprecated
 	public void addPerson(final Person p);
 
-	/** @deprecated please use getPersons().get(personId) instead. */
-	@Deprecated
-	public Person getPerson(Id personId);
-
 	public PopulationBuilder getPopulationBuilder();
 
 	public Map<Id, Person> getPersons();

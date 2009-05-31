@@ -211,7 +211,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ba
 	protected ScoringFunction getScoringFunctionForAgent(final String agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(new IdImpl(agentId)).getSelectedPlan());
+			sf = this.sfFactory.getNewScoringFunction(this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;

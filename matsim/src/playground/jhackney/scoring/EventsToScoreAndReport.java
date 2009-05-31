@@ -114,7 +114,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			sf.finish();
 
 			double score = sf.getScore();
-			Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
+			Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 			Double oldScore = plan.getScore();
 			if (oldScore == null) {
 				plan.setScore(score);
@@ -149,7 +149,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			for (Map.Entry<String, playground.jhackney.scoring.EventSocScoringFunction> entry : this.agentScorers.entrySet()) {
 				String agentId = entry.getKey();
 				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
-				Plan plan = this.population.getPerson(new IdImpl(agentId)).getSelectedPlan();
+				Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 				Iterator actLegIter = plan.getPlanElements().iterator();
 				Activity act = (Activity) actLegIter.next(); // assume first plan element is always an Activity
 
@@ -272,7 +272,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	private playground.jhackney.scoring.EventSocScoringFunction getScoringFunctionForAgent(final String agentId) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(new IdImpl(agentId)).getSelectedPlan());
+			sf = this.sfFactory.getNewScoringFunction(this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;

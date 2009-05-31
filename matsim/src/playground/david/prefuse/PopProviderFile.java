@@ -83,7 +83,7 @@ public class PopProviderFile implements PopulationProvider {
 	}
 
 	public Person getPerson(int id) {
-		Person p = population.getPerson(new IdImpl(id));
+		Person p = population.getPersons().get(new IdImpl(id));
 		return p;
 	}
 

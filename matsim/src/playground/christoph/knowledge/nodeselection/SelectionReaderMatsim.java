@@ -146,7 +146,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 			
 			if (personId != null)
 			{
-				currentPerson = population.getPerson(personId);	
+				currentPerson = population.getPersons().get(personId);	
 			}
 			else
 			{

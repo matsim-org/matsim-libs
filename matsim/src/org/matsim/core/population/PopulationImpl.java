@@ -94,11 +94,6 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 		}
 	}
 
-	/** @deprecated use getPersons().get(Id) instead. */
-	public final Person getPerson(Id personId) {
-		return this.getPersons().get(personId);
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////

@@ -63,7 +63,7 @@ public class CMCFPlansMerger {
 			String idstring = person.getId().toString();
 			String[] idLegNumber = idstring.split("leg");
 			Id id = new IdImpl(idLegNumber[0]);
-			Person p = plans.getPerson(id);
+			Person p = plans.getPersons().get(id);
 			Plan plan = p.getSelectedPlan();
 			int legNumber = Integer.parseInt(idLegNumber[1]);
 			legNumber = (legNumber * 2) + 1;

@@ -159,7 +159,7 @@ public class ReadFromUrbansimParcelModel {
 				Id personId = new IdImpl( parts[idxFromKey.get("person_id")] ) ;
 				Person newPerson = new PersonImpl( personId ) ;
 
-				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPerson( personId))!=null ) ) {
+				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
 					continue ;
 				}
 				flag = false ;
@@ -207,11 +207,11 @@ public class ReadFromUrbansimParcelModel {
 					if ( oldPop==null ) { // no pre-existing population.  Accept:
 						newPop.addPerson(newPerson) ;
 						break ;
-					} else if ( (oldPerson=oldPop.getPerson(personId))==null ) { // did not find person.  Put in backup:
+					} else if ( (oldPerson=oldPop.getPersons().get(personId))==null ) { // did not find person.  Put in backup:
 						backupPop.addPerson( newPerson) ;
 						notFoundCnt++ ;
 						break ;
-					} else if ( !oldPerson.getEmployed().equals( newPerson.getEmployed() ) ) { // employment status changed.  Accept new person:
+					} else if ( oldPerson.isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
@@ -223,7 +223,7 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if new person works
-					if ( newPerson.getEmployed().equals("no") ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
+					if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
 						newPop.addPerson(newPerson) ;
 						break ;
 					}

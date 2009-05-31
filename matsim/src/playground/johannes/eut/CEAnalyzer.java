@@ -97,7 +97,7 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 			BufferedReader reader = IOUtils.getBufferedReader(file);
 			String personId;
 			while ((personId = reader.readLine()) != null) {
-				Person p = plans.getPerson(new IdImpl(personId));
+				Person p = plans.getPersons().get(new IdImpl(personId));
 				if (p != null)
 					persons.add(p);
 			}

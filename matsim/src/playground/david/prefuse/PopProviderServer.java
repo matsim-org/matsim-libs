@@ -72,7 +72,7 @@ public class PopProviderServer implements PopulationProvider {
 		}
 		public void query(QueueNetwork net, Population population, Events events,
 				OTFServerQuad quad) {
-			person  = population.getPerson(new IdImpl(id));
+			person  = population.getPersons().get(new IdImpl(id));
 		}
 	}
 

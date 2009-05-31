@@ -54,7 +54,7 @@ public class CMCFFirstActPlansMerger {
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();
 			Leg l = pl.getNextLeg(pl.getFirstActivity());
-			Plan plcmcf = plansCmcf.getPerson(p.getId()).getSelectedPlan();
+			Plan plcmcf = plansCmcf.getPersons().get(p.getId()).getSelectedPlan();
 			Leg lcmcf = plcmcf.getNextLeg(plcmcf.getFirstActivity());
 			l.setRoute(lcmcf.getRoute());
 		}

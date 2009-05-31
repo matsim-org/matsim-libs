@@ -77,7 +77,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 		
 		int count = 0;
 		for (Entry<String,ArrayList<String>> e : this.traces.entrySet()) {
-			Person pers = this.population.getPerson(new IdImpl(e.getKey()));
+			Person pers = this.population.getPersons().get(new IdImpl(e.getKey()));
 			Plan plan = pers.getSelectedPlan();
 		
 			List<Link> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();

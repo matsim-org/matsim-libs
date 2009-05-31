@@ -111,7 +111,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 		if (controler == null) {
 			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
-			event.setPerson(controler2.getPopulation().getPerson(new IdImpl(event.getPersonId().toString())));
+			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// change properties of roads
@@ -190,8 +190,8 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		if (controler == null) {
-			event.setLink(controler2.getNetwork().getLink(event.getLinkId()));
-			event.setPerson(controler2.getPopulation().getPerson(new IdImpl(event.getPersonId().toString())));
+			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
+			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// initialize the energyLevel at the beginning to full energy
@@ -209,8 +209,8 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		if (controler == null) {
-			event.setLink(controler2.getNetwork().getLink(event.getLinkId()));
-			event.setPerson(controler2.getPopulation().getPerson(new IdImpl(event.getPersonId().toString())));
+			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
+			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// initialize the energyLevel at the beginning to full energy

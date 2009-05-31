@@ -74,8 +74,8 @@ public class PopulationAddCustomAttributes {
 				Integer aperw = Integer.valueOf(entries[CAtts.I_APERW]);
 				Integer wkata = Integer.valueOf(entries[CAtts.I_WKATA]);
 
-				Person p = pop.getPerson(new IdImpl(entries[CAtts.I_PERSON_ID]));
-				if (p == null) { p = pop.getPerson(new IdImpl(entries[CAtts.I_PARTNR])); }
+				Person p = pop.getPersons().get(new IdImpl(entries[CAtts.I_PERSON_ID]));
+				if (p == null) { p = pop.getPersons().get(new IdImpl(entries[CAtts.I_PARTNR])); }
 				if (p != null) {
 					p.getCustomAttributes().put(CAtts.P_HMAT,nat);
 					p.getCustomAttributes().put(CAtts.P_APERZ,aperz);
