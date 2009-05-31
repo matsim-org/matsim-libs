@@ -66,24 +66,12 @@ public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 		this.startLink = link;
 	}
 
-	@Override 
-	@Deprecated
-	public void setStartLinkId(final Id linkId) {
-		throw new UnsupportedOperationException("Please use setStartLink(Link). Setting the link-id is only supported for BasicRoute, but not higher in the class hierarchy.");
-	}
-
 	@Override
 	public Id getStartLinkId() {
 		return (this.startLink == null ? null : this.startLink.getId());
 	}
 
 	@Override
-	public void setEndLinkId(final Id linkId) {
-		throw new UnsupportedOperationException("Please use setEndLink(Link). Setting the link-id is only supported for BasicRoute, but not higher in the class hierarchy.");
-	}
-
-	@Override
-	@Deprecated
 	public Id getEndLinkId() {
 		return (this.endLink == null ? null : this.endLink.getId());
 	}

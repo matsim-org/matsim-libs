@@ -75,25 +75,8 @@ public class BasicRouteImpl implements BasicRoute {
 		return this.linkIds;
 	}
 
-	/**
-	 * Deprecated: Use constructor instead.
-	 * @param linkId
-	 */
-	@Deprecated 
-	public void setStartLinkId(final Id linkId) {
-		this.startLinkId = linkId;
-	}
-	
 	public Id getStartLinkId() {
 		return this.startLinkId;
-	}
-	/**
-	 * Deprecated: Use constructor instead.
-	 * @param linkId
-	 */
-	@Deprecated 	
-	public void setEndLinkId(final Id linkId) {
-		this.endLinkId = linkId;
 	}
 	
 	public Id getEndLinkId() {
