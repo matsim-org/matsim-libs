@@ -1,17 +1,14 @@
 package playground.mmoyo.PTCase2;
 
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.api.network.Link;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
-import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
-import playground.mmoyo.Validators.NetValidator;
-import playground.mmoyo.Validators.PlanValidator;
-import playground.mmoyo.input.PTLineAggregator;
+import org.matsim.core.api.network.*;
+import org.matsim.core.network.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
+import playground.mmoyo.Validators.*;
+import playground.mmoyo.input.PTLineAggregator;
 
 
 public class PTControler2 {
@@ -31,6 +28,8 @@ public class PTControler2 {
 	
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
+		// seems that INPTNETFILE is never used in PTOb and should be removed as a parameter so that it 
+		// becomes clear that all conversions are done somewhere else.  kai, may'09
 		
 		int option =3;
 		
