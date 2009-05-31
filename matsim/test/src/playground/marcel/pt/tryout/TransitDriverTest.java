@@ -106,10 +106,15 @@ public class TransitDriverTest extends MatsimTestCase {
 		bus.addPassenger(agent3);
 		bus.addPassenger(agent4);
 		bus.addPassenger(agent5);
-		
-		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
 
-		Link link = driver.chooseNextLink();
+		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
+		Link link = driver.getCurrentLeg().getRoute().getStartLink();
+		// handle first link
+		if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
+			driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
+		}
+		// handle all other links
+		link = driver.chooseNextLink();
 		driver.moveOverNode();
 		while (link != null) {
 			if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
@@ -150,7 +155,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Events events = new Events();
 		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);
 		sim.setTransitSchedule(schedule);
-		
+
 		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
 
 		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
@@ -177,10 +182,16 @@ public class TransitDriverTest extends MatsimTestCase {
 		sim.agentDeparts(agent3, stop4.getLink());
 		sim.agentDeparts(agent4, stop3.getLink());
 		sim.agentDeparts(agent5, stop6.getLink());
-		
+
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 
-		Link link = driver.chooseNextLink();
+		Link link = driver.getCurrentLeg().getRoute().getStartLink();
+		// handle first link
+		if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
+			driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
+		}
+		// handle all other links
+		link = driver.chooseNextLink();
 		driver.moveOverNode();
 		while (link != null) {
 			if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
