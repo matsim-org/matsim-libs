@@ -81,7 +81,6 @@ public class Planomat implements PlanAlgorithm {
 
 	private PlanAnalyzeSubtours planAnalyzeSubtours = null;
 	private ScoringFunction scoringFunction = null;
-	private List<? extends BasicPlanElement> actslegs = null;
 
 	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
 
@@ -120,7 +119,7 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running evolution...done.");
 			logger.info("Writing solution back to Plan object...");
 		}
-		this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan);
+		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan);
 		if (this.doLogging) {
 			logger.info("Writing solution back to Plan object...done.");
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
@@ -225,51 +224,43 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
-	// variables that are used by stepThroughPlan, which is called very often
-	private Route tempRoute = null;
-	private Leg leg = null;
-	private Activity origin = null;
-	private Activity destination = null;
-
-	private double positionInTimeInterval;
-	private double anticipatedTravelTime, actLegTimeFrame;
-
-	private double now, oldNow;
-	private int numLegs;
-	private int sumOfAllActDurs;
-
 	protected double stepThroughPlan(final StepThroughPlanAction action, final IChromosome individual, final Plan plan) {
 
 		// TODO comment this
-		this.positionInTimeInterval = 0.5;
+		double positionInTimeInterval = 0.5;
 
-		this.actslegs = plan.getPlanElements();
-		this.numLegs = this.actslegs.size() / 2;
+		Route tempRoute = null;
+		Leg leg = null;
+		Activity origin = null;
+		Activity destination = null;
+
+		List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
+		int numLegs = actslegs.size() / 2;
 
 		if (action.equals(StepThroughPlanAction.EVALUATE)) {
 			this.scoringFunction.reset();
 		}
 		// TODO this as a quick and dirty implementation that takes a lot of resources
 		// replace activity duration encoding with double [0.0,1.0] or time slots, respectively
-		this.sumOfAllActDurs = 0;
+		int sumOfAllActDurs = 0;
 		for (int geneIndex = 1; geneIndex <= numLegs; geneIndex++) {
-			this.sumOfAllActDurs += ((IntegerGene) individual.getGenes()[geneIndex]).intValue();
+			sumOfAllActDurs += ((IntegerGene) individual.getGenes()[geneIndex]).intValue();
 		}
 
-		this.now = 0.0;
-		this.oldNow = 0.0;
+		double now = 0.0;
+		double oldNow = 0.0;
 
 		// solution of first gene, normalized to scenario duration, is end time of first activity 
-		this.origin = plan.getFirstActivity();
+		origin = plan.getFirstActivity();
 		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-			this.origin.setStartTime(now);
+			origin.setStartTime(now);
 		}
 
 		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-			this.positionInTimeInterval = this.seedGenerator.nextDouble();
+			positionInTimeInterval = this.seedGenerator.nextDouble();
 		}
 
-		this.now += Math.rint(this.getEffectiveActLegTimeFrame(
+		now += Math.rint(this.getEffectiveActLegTimeFrame(
 				((IntegerGene) individual.getGene(0)).intValue(), 
 				this.numTimeIntervals, 
 				positionInTimeInterval));
@@ -288,11 +279,12 @@ public class Planomat implements PlanAlgorithm {
 			// move agent forward in time according to anticipated travel time...
 			///////////////////////////////////////////////////////////////////////////////////////////
 			leg = ((Leg) actslegs.get(geneIndex * 2 - 1));
-			this.destination = plan.getNextActivity(leg);
+			destination = plan.getNextActivity(leg);
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
 				scoringFunction.startLeg(now, null);
-			} else if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+			}
+			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				leg.setDepartureTime(now);
 			}
 
@@ -308,25 +300,26 @@ public class Planomat implements PlanAlgorithm {
 				tempRoute = leg.getRoute();
 			}
 
-			this.anticipatedTravelTime = Math.rint(this.legTravelTimeEstimator.getLegTravelTimeEstimation(
+			double anticipatedTravelTime = Math.rint(this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(),
 					now,
 					origin,
 					destination,
 					leg));
 
-			this.now += this.anticipatedTravelTime;
+			now += anticipatedTravelTime;
 
 			if (!leg.getMode().equals(TransportMode.car)) {
 				// recover original route
 				leg.setRoute(tempRoute);
 			}
-			leg.getRoute().setTravelTime(this.anticipatedTravelTime);
+			leg.getRoute().setTravelTime(anticipatedTravelTime);
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
 				scoringFunction.endLeg(now);
-			} else if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-				leg.setTravelTime(this.anticipatedTravelTime);
+			}
+			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+				leg.setTravelTime(anticipatedTravelTime);
 				leg.setArrivalTime(now);
 			}
 			///////////////////////////////////////////////////////////////////////////////////////////
@@ -341,7 +334,8 @@ public class Planomat implements PlanAlgorithm {
 			///////////////////////////////////////////////////////////////////////////////////////////
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
 				scoringFunction.startActivity(now, null);
-			} else if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
+			}
+			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				destination.setStartTime(now);
 			}
 
@@ -349,52 +343,38 @@ public class Planomat implements PlanAlgorithm {
 				if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 					positionInTimeInterval = this.seedGenerator.nextDouble();
 				}
-				this.actLegTimeFrame = this.getEffectiveActLegTimeFrame(
+				double actLegTimeFrame = this.getEffectiveActLegTimeFrame(
 						((IntegerGene) individual.getGene(geneIndex)).intValue(), 
 						sumOfAllActDurs, 
 						positionInTimeInterval);
 
-				this.oldNow = this.now;
-				this.now += Math.rint(this.actLegTimeFrame - this.anticipatedTravelTime);
+				oldNow = now;
+				now += Math.rint(actLegTimeFrame - anticipatedTravelTime);
 
-				this.origin = this.destination;
+				origin = destination;
 			}
 
 		}
 
 		if (action.equals(StepThroughPlanAction.EVALUATE)) {
-			this.scoringFunction.finish();
+			scoringFunction.finish();
 //			logger.info("score: " + scoringFunction.getScore());
-			return this.scoringFunction.getScore();
+			return scoringFunction.getScore();
 		}
 
 		return 0.0;
 	}
-
-	private double normalizeBy;
-	private double effectiveActDur;
 
 	public double getEffectiveActLegTimeFrame(
 			final int actDurInTimeSlots, 
 			final int overallTimeSlots, 
 			final double offsetWithinTimeSlot) {
 
-//		logger.info("overallTimeSlots = " + Integer.toString(overallTimeSlots));
+		double normalizeBy = (((double) this.numTimeIntervals) / ((double) overallTimeSlots));
 
-		this.normalizeBy = (((double) this.numTimeIntervals) / ((double) overallTimeSlots));
-
-//		logger.info("normalizeBy = " + Double.toString(normalizeBy));
-
-		this.effectiveActDur = actDurInTimeSlots * this.normalizeBy;
-
-//		logger.info("actDurInTimeSlots = " + Integer.toString(actDurInTimeSlots));
-//		logger.info("effectiveActDur = " + Double.toString(effectiveActDur));
-//		logger.info("offsetWithinTimeSlot = " + Double.toString(offsetWithinTimeSlot));
-
-//		logger.info("effectiveActLegTimeFrame = " + Double.toString(effectiveActLegTimeFrame));
-//		logger.info("");
-
-		return (((int) this.effectiveActDur) + offsetWithinTimeSlot) * this.timeIntervalSize;
+		double effectiveActDur = actDurInTimeSlots * normalizeBy;
+		
+		return (((int) effectiveActDur) + offsetWithinTimeSlot) * this.timeIntervalSize;
 
 	}
 
