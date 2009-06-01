@@ -20,24 +20,21 @@
 
 package playground.gregor.sims.run;
 
-import java.io.IOException;
-import java.util.HashMap;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
-import org.xml.sax.SAXException;
 
 import playground.gregor.flooding.FloodingReader;
 import playground.gregor.flooding.RiskCostFromFloodingData;
-import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
-import playground.gregor.sims.evacbase.EvacuationAreaLink;
+import playground.gregor.sims.evacbase.Building;
+import playground.gregor.sims.evacbase.BuildingsShapeReader;
 import playground.gregor.sims.evacbase.EvacuationNetGenerator;
 import playground.gregor.sims.evacbase.EvacuationPlansGenerator;
+import playground.gregor.sims.evacbase.EvacuationPopulationFromShapeFileLoader;
 import playground.gregor.sims.riskaversion.RiskAverseTravelCostCalculator;
 import playground.gregor.sims.riskaversion.RiskCostCalculator;
 
@@ -46,8 +43,7 @@ public class RiskCostController extends Controler{
 	
 	private final static Logger log = Logger.getLogger(RiskCostController.class);
 	
-	private final HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
-
+	private List<Building> buildings;
 	
 	public RiskCostController(final String[] args) {
 		super(args);
@@ -83,15 +79,6 @@ public class RiskCostController extends Controler{
 		
 		
 
-		log.info("generating initial evacuation plans... ");
-		new EvacuationNetGenerator(this.network,this.config).run();
-		log.info("done");
-		
-		log.info("generating initial evacuation plans... ");
-		EvacuationPlansGenerator e = new EvacuationPlansGenerator(this.population,this.network,this.network.getLink("el1"));
-		e.setTravelCostCalculator(this.getTravelCostCalculator());
-		e.run();
-		log.info("done");
 
 //		log.info("writing network xml file... ");
 //		new NetworkWriter(this.network, getOutputFilename("evacuation_net.xml")).write();
@@ -105,10 +92,30 @@ public class RiskCostController extends Controler{
 		this.strategyManager = loadStrategyManager();
 //		this.addControlerListener(sc);
 	}
+	@Override
+	protected NetworkLayer loadNetwork() {
+		NetworkLayer net =  super.loadNetwork();
+		new EvacuationNetGenerator(net,this.config).run();
+		return net;
+	}
+
+	@Override
+	protected Population loadPopulation() {
+		if (this.buildings == null) {
+			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
+		}
+		if (this.travelCostCalculator == null) {
+			
+		}
+		EvacuationPopulationFromShapeFileLoader popGen = new EvacuationPopulationFromShapeFileLoader(this.buildings,this.network,this.config);
+//		popGen.setTravelCostCalculator(this.travelCostCalculator);
+		return popGen.getPopulation();
+	}
 	
 	
 	public static void main(final String [] args) {
 		final Controler controler = new RiskCostController(args);
+		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
 	}

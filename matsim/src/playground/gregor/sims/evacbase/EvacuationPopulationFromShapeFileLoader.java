@@ -100,7 +100,7 @@ public class EvacuationPopulationFromShapeFileLoader {
 				Activity act2 = new ActivityImpl("h", saveLink);
 				plan.addActivity(act2);
 				
-				router.run(plan);
+//				router.run(plan);
 				pers.addPlan(plan);
 				pop.addPerson(pers);
 				
@@ -163,6 +163,7 @@ public class EvacuationPopulationFromShapeFileLoader {
 	 * will be instantiated automatically  
 	 * @param tc
 	 */
+	@Deprecated
 	public void setTravelCostCalculator(final TravelCost tc) {
 		this.tc  = tc;
 	}

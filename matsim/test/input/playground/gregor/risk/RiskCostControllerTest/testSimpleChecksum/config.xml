@@ -23,6 +23,8 @@
 	<!-- Params for EvacuationQSimControler -->
 	<module name="evacuation">
 		<param name="inputEvacuationAreaLinksFile" value = "&INPUTBASE;/evacuationArea.xml"/> 
+		<param name="buildingsFile" value = "&INPUTBASE;/buildings.shp" />
+		<param name="scenario" value = "night" />
 		<param name="floodingDataFile" value = "&INPUTBASE;/flooding.sww" />
 	</module>
 
