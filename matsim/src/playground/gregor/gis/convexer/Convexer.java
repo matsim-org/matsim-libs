@@ -133,8 +133,8 @@ public class Convexer {
 
 	public static void main(final String [] args) throws Exception {
 		String root = "../../../workspace/vsp-cvs/studies/padang/gis/";
-		final String input = root +"./buildings_v20090403/shelters_v20090403.shp";
-		final String output = "../../inputs/gis/shelters.shp";
+		final String input = "./tmp/regionII.shp";
+		final String output = "../../inputs/gis/region.shp";
 		final FeatureSource inFt = ShapeFileReader.readDataFile(input);
 		new Convexer(inFt,output).convex();
 

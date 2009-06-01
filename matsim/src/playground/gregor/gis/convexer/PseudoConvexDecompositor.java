@@ -34,7 +34,7 @@ public class PseudoConvexDecompositor {
 	
 	private final static GeometryFactory geofac = new GeometryFactory();
 	private static final double CONVEXITY_THRESHOLD = 1.5;
-	private static final double AREA_THRESHOLD = 2.0;
+	private static final double AREA_THRESHOLD = 1.5;
 	public Collection<Polygon> decompose(final Polygon polygon) {
 		
 		if (polygon.getNumInteriorRing() > 0) {

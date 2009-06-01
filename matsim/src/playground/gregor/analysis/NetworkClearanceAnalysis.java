@@ -60,7 +60,7 @@ public class NetworkClearanceAnalysis {
 	private static final Logger log = Logger.getLogger(NetworkClearanceAnalysis.class);
 	
 //	private static final String INPUT_BASE="../../arbeit/svn/shared-svn/runs/";
-	private static final String INPUT_BASE="../outputs/";
+	private static final String INPUT_BASE="../../outputs/";
 	private final String ev2;
 	private final String ev1;
 	private final NetworkLayer network;
@@ -242,7 +242,7 @@ public class NetworkClearanceAnalysis {
 //		String eventsFile2 = INPUT_BASE + "run317/output/ITERS/it.200/200.events.txt.gz";
 		String eventsFile1 = INPUT_BASE + "output_100m_so/ITERS/it.0/0.events.txt.gz";
 		String eventsFile2 = INPUT_BASE + "output_100m/ITERS/it.0/0.events.txt.gz";
-		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
+		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
 		String outfile = INPUT_BASE + "output_100m_so/analysis/runComp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);

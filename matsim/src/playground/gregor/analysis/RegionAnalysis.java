@@ -52,7 +52,7 @@ import org.matsim.world.World;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.snapshots.postprocessor.processors.DestinationDependentColorizer;
+import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

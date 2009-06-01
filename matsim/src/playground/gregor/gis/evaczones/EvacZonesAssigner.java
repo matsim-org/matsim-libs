@@ -51,7 +51,7 @@ import org.matsim.world.World;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.gis.convexer.Concaver;
-import playground.gregor.snapshots.postprocessor.processors.DestinationDependentColorizer;
+import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
