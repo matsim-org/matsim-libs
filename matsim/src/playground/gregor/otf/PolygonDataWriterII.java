@@ -9,7 +9,7 @@ import org.geotools.data.FeatureSource;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
 
-public class PolygonDataWriter extends OTFDataWriter {
+public class PolygonDataWriterII extends OTFDataWriter {
 
 
 	
@@ -17,12 +17,12 @@ public class PolygonDataWriter extends OTFDataWriter {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7454644070258134874L;
+	private static final long serialVersionUID = -8002026386705884799L;
 	private SimpleBackgroundFeatureDrawer data;
 
 
 
-	public PolygonDataWriter(FeatureSource fs, float [] color ) {
+	public PolygonDataWriterII(FeatureSource fs, float [] color ) {
 		try {
 			this.data = new SimpleBackgroundFeatureDrawer(fs,color);
 		} catch (IOException e) {

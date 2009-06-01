@@ -24,17 +24,16 @@ import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.vis.snapshots.writers.PositionInfo;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
 
 import com.vividsolutions.jts.geom.LineSegment;
 
-public class GregorsPositionInfo extends PositionInfo {
+public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo {
 	
 	
 
-		
+	public static LineStringTree lsTree;	
 
 
 	//	public enum VehicleState {Driving, Parking};
@@ -46,8 +45,8 @@ public class GregorsPositionInfo extends PositionInfo {
 	private static final double TWO_PI = 2.0 * Math.PI;
 
 	final private Id agentId;
-	final private double easting;
-	final private double northing;
+	private double easting;
+	private double northing;
 	final private double elevation;
 	final private double azimuth;
 	final private double distanceOnLink;
@@ -55,11 +54,15 @@ public class GregorsPositionInfo extends PositionInfo {
 	final private double speed;
 	final private VehicleState vehicleState;
 	final private Link link;
+
+
+	private int type = 0;
+	private int usr = 0;
 	
 	
 	
-	public GregorsPositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed,
-			final VehicleState vehicleState, final String visualizerData, final LineStringTree lsTree) {
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed,
+			final VehicleState vehicleState, final String visualizerData) {
 		super(agentId, 0, 0, 0, 0, 0, PositionInfo.VehicleState.Driving,	null);
 		this.agentId = agentId;
 		this.link = link;
@@ -171,6 +174,33 @@ public class GregorsPositionInfo extends PositionInfo {
 	@Override
 	public String getVisualizerData() {
 		return this.visualizerData;
+	}
+
+	public void setEasting(double teleportationX) {
+		this.easting = teleportationX;
+		
+	}
+
+	public void setNorthing(double teleportationY) {
+		this.northing = teleportationY;
+		
+	}
+
+	public void setType(int type) {
+		this.type  = type;
+		
+	}
+
+	public int getType() {
+		return this.type;
+	}
+	
+	public void setUserData(int usr) {
+		this.usr = usr;
+	}
+	
+	public int getUserData() {
+		return this.usr;
 	}
 
 }

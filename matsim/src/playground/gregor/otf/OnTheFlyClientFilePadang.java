@@ -6,7 +6,13 @@ import java.rmi.RemoteException;
 import javax.swing.JFrame;
 
 import org.geotools.data.FeatureSource;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -35,9 +41,11 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
 //	final String LINKS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_links.shp";
 //	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
+	final String REGION_FILE =  "../../inputs/gis/region.shp";
 	final String BUILDINGS_FILE =  "../../inputs/gis/shelters.shp";
 	final String LINKS_FILE = "../../inputs/gis/links.shp";
 	final String NODES_FILE = "../../inputs/gis/nodes.shp";
+	final private static float [] regionColor = new float [] {.8f,.85f,.8f,1.f};
 	final private static float [] buildingsColor = new float [] {.0f,0.f,1.0f,.8f};
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
@@ -108,13 +116,14 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		loadTilesFromServer();
 		
 		
-//		try {
+		try {
+//			loadFeatureLayer(this.REGION_FILE,regionColor);
 //			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
 //			loadFeatureLayer(this.NODES_FILE,linksColor);
 //			loadFeatureLayer(this.LINKS_FILE,nodesColor);
-//		} catch (final Exception e) {
-//			e.printStackTrace();
-//		}
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 //		FloodingReader fr = new FloodingReader("../../inputs/networks/flooding.sww");
 		
 //		OTFInundationDrawer x = new OTFInundationDrawer(fr,clientQ2.offsetEast,clientQ2.offsetNorth);
@@ -131,6 +140,18 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		OGLSimpleBackgroundLayer.addPersistentItem(x);
 //		n = null;
+		
+//		SimpleBackgroundTextureDrawer sbg = new SimpleBackgroundTextureDrawer("./res/arrow.png");
+//		NetworkLayer network = new NetworkLayer();
+//		new NetworkReaderMatsimV1(network).readFile("../../outputs/output/output_network.xml.gz");
+//		ConfluenceArrowsFromEvents c = new ConfluenceArrowsFromEvents(sbg,network);
+//		Events e = new Events();
+//		e.addHandler(c);
+//		new EventsReaderTXTv1(e).readFile("../../outputs/output/ITERS/it.500/500.events.txt.gz"); 
+//		c.createArrows();
+		
+//		OGLSimpleBackgroundLayer.addPersistentItem(sbg);
+		
 		drawer2.addOverlay(new OTFScaleBarDrawer("./res/sb_background.png","./res/scalebar.png"));
 		return drawer2;
 	}
@@ -154,7 +175,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		filename =  "../../outputs/output/ITERS/it.200/200.movie.mvi";
+		filename =  "../../outputs/output/movie.mvi";
 //		filename =  "../../outputs/output_shelter_noWave/ITERS/it.200/200.movie.mvi";
 //			filename =  "../../outputs/output/ITERS/it.0/0.movie.mvi";
 //		final String filename =  "/home/laemmel/arbeit/svn/runs-svn/run316/stage2/output/ITERS/it.201/201.movie.mvi";

@@ -18,12 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.snapshots.postprocessor.processors;
+package playground.gregor.snapshots.postprocessors;
 
 import java.util.HashMap;
 
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
+
+import playground.gregor.snapshots.writers.PositionInfo;
 
 
 public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler {
@@ -45,6 +47,11 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 		String color = getColor(id);
 		event[15] = color;
 		return event;
+	}
+
+	public void processPositionInfo(PositionInfo pos) {
+		String color = getColor(pos.getAgentId().toString());
+		pos.setUserData(Integer.parseInt(color));
 	}
 
 	public String getColor(final String id) {
@@ -85,6 +92,7 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 		// TODO Auto-generated method stub
 		
 	}
+
 
 //	public void handleEvent(final AgentArrivalEvent event) {
 //		

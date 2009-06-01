@@ -30,7 +30,7 @@ public class InundationDataFromNetcdfReader {
 
 	private final String file = "../../inputs/flooding/flooding_old.sww";
 	//	private final String file = "../../inputs/networks/flooding.sww";
-	//	private final String file = "test/input/playground/gregor/data/flooding.sww";
+//		private final String file = "test/input/playground/gregor/data/flooding.sww";
 	//	private final String file = "/home/laemmel/devel/inputs/flooding/SZ_r018M_m003_092_12_mw9.00_03h__P0_8.sww";
 
 	public static final float[] cvdeep = new float[] { 0.f, 0.f, 1.f };
@@ -46,8 +46,8 @@ public class InundationDataFromNetcdfReader {
 	//	private final HashMap<Double, ArrayList<Integer>> indexing = new HashMap<Double, ArrayList<Integer>>();
 	// private FloodingReader fr;
 
-	private final double offsetEast;
-	private final double offsetNorth;
+	private  double offsetEast = 0;
+	private  double offsetNorth = 0;
 
 	private InundationData inundationData;
 
@@ -63,6 +63,7 @@ public class InundationDataFromNetcdfReader {
 
 	private QuadTree<Integer> coordinateQuadTree;
 
+	
 	public InundationDataFromNetcdfReader(double on, double oe) {
 		this.offsetNorth = on;
 		this.offsetEast = oe;
@@ -201,6 +202,9 @@ public class InundationDataFromNetcdfReader {
 				
 				toGo = geos.size();
 				minSize--;
+				if (minSize < 3) {
+					break;
+				}
 				System.out.println("minSize: " + minSize + " toGo: " + toGo);
 			}
 			if (removed.contains(p)) {

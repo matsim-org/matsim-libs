@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.snapshots.postprocessor.processors;
+package playground.gregor.snapshots.postprocessors;
 
 
 import java.util.HashMap;
@@ -29,6 +29,8 @@ import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
+
+import playground.gregor.snapshots.writers.PositionInfo;
 
 
 
@@ -48,6 +50,12 @@ public class TimeDependentColorizer implements PostProcessorI, AgentDepartureEve
 		int time =  (int) ((e.endtime-e.starttime) / 60);
 		event[7] = Integer.toString(Math.min(time,255));
 		return event;
+	}
+
+	public void processPositionInfo(PositionInfo pos) {
+		EventAgent e = this.agents.get(pos.getAgentId().toString());
+		int time =  (int) ((e.endtime-e.starttime) / 60);
+		pos.setType(Math.min(time,255));
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
@@ -82,4 +90,5 @@ public class TimeDependentColorizer implements PostProcessorI, AgentDepartureEve
 		e.endtime = 30 * 3600;
 		
 	}
+
 }

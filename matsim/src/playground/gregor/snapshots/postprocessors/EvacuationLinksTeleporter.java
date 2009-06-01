@@ -18,13 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.snapshots.postprocessor.processors;
+package playground.gregor.snapshots.postprocessors;
+
+import playground.gregor.snapshots.writers.PositionInfo;
 
 public class EvacuationLinksTeleporter implements PostProcessorI{
 
 	private final static double TELEPORTATION_SPEED = 1000.0;
 	private final static String TELEPORTATION_X = "0.0";
 	private final static String TELEPORTATION_Y = "0.0";
+	private final static double D_TELEPORTATION_X = 0.0;
+	private final static double D_TELEPORTATION_Y = 0.0;
 	public String[] processEvent(String[] event) {
 		double  velocity = Double.parseDouble(event[6]);
 		if (velocity >= TELEPORTATION_SPEED){
@@ -34,4 +38,12 @@ public class EvacuationLinksTeleporter implements PostProcessorI{
 		return event;
 	}
 
+	public void processPositionInfo(PositionInfo pos) {
+		if (pos.getSpeed() > TELEPORTATION_SPEED) {
+			pos.setEasting(D_TELEPORTATION_X);
+			pos.setNorthing(D_TELEPORTATION_Y);
+		}
+		
+		
+	}
 }

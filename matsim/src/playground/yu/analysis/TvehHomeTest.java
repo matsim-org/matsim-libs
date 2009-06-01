@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.gregor.snapshots.postprocessor.TransimsSnapshotFileReader;
 
 public class TvehHomeTest {
 

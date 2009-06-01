@@ -3,21 +3,30 @@ package playground.gregor.otf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.jfree.util.Log;
+
 import com.sun.opengl.util.texture.TextureIO;
 
-public class TileLoader extends Thread {
+public class TileLoader extends Thread implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1656742752661670725L;
 	PriorityBlockingQueue<TileRequest> requests = new PriorityBlockingQueue<TileRequest>();
 	private final Map<String, Tile> tiles;
 	private final Queue<Tile> tilesQueue;
+	private long oldTime = 0;
 //	private long oldTime;
 	private static final int MAX_CACHE = 512;
+	private boolean running = true;
 	public TileLoader(Map<String,Tile> tiles) {
 //		this.tiles = Collections.synchronizedMap(tiles);
 		this.tiles = tiles;
@@ -26,11 +35,11 @@ public class TileLoader extends Thread {
 
 	@Override
 	public void run(){
-		while (true) {
-//			if (System.currentTimeMillis() > this.oldTime + 2000){
-//				this.oldTime = System.currentTimeMillis();
-//				System.out.println("dynamic cache:" + this.tilesQueue.size()  + " static cache:" + this.tiles.size() + " requests:" + this.requests.size());
-//			}
+		while (running) {
+			if (System.currentTimeMillis() > this.oldTime  + 2000){
+				this.oldTime = System.currentTimeMillis();
+				System.out.println("dynamic cache:" + this.tilesQueue.size()  + " static cache:" + this.tiles.size() + " requests:" + this.requests.size());
+			}
 			if (this.requests.size() == 0) {
 				try {
 					sleep(100);
@@ -51,6 +60,9 @@ public class TileLoader extends Thread {
 
 	}
 
+	public void kill() {
+		this.running = false;
+	}
 	private void handleRequest(TileRequest tr) {
 
 		if (this.tiles.containsKey(tr.tile.id)) {
@@ -60,13 +72,11 @@ public class TileLoader extends Thread {
 		InputStream is = null;
 		try {
 			is = getBGImageStream(tr.refCoordX, tr.refCoordY, tr.geoWidth, tr.geoWidth, Tile.LENGTH, Tile.LENGTH);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
 			tr.tile.tx = TextureIO.newTextureData(is,false,"png");
 		} catch (IOException e) {
-			e.printStackTrace();
+			
+			this.requests.clear();
+			tr.tile.tx = null;
 		}
 //		try {
 //			is.close();
@@ -142,4 +152,5 @@ public class TileLoader extends Thread {
 
 
 	}
+
 }

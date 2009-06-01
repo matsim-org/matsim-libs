@@ -5,6 +5,7 @@ import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
 import static javax.media.opengl.GL.GL_QUADS;
 import static javax.media.opengl.GL.GL_VIEWPORT;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +16,7 @@ import java.util.TreeSet;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
@@ -22,8 +24,14 @@ import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
 
-public class TileDrawer extends AbstractBackgroundDrawer{
+public class TileDrawer extends AbstractBackgroundDrawer implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8732378231241446615L;
+	
+	private static final Logger log = Logger.getLogger(TileDrawer.class);
 	double[] modelview = new double[16];
 	double[] projection = new double[16];
 	int[] viewport = new int[4];
@@ -43,6 +51,7 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 	private boolean viewLocked;
 	private float oTy;
 	private float oTx;
+	private boolean stopped = false;
 	
 	
 	public TileDrawer() {
@@ -57,7 +66,9 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 	}
 	
 	public void onDraw(GL gl) {
-		
+		if (this.stopped) {
+			return;
+		}
 		updateMatrices(gl);
 		calcCurrentZoom();
 				
@@ -158,10 +169,19 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 
 	private void drawTile(Tile t, GL gl) {
 		if (t.tex == null) {
+			if (t.tx == null) {
+				this.loader.kill();
+				this.stopped  = true;
+				log.error("Could not fetch tile from server. Most probably there is no tiles server running on localhost:8080.\nOTFVis will continue without background image drawing.");
+				return;
+			}
 			t.tex = TextureIO.newTexture(t.tx);
 			t.tx = null;
 		}
 		
+		if (this.stopped) {
+			return;
+		}
 		final TextureCoords tc = t.tex.getImageTexCoords();
 		final float tx1 = tc.left();
 		final float ty1 = tc.top();
@@ -260,7 +280,12 @@ public class TileDrawer extends AbstractBackgroundDrawer{
 		return new float []{posX, posY};
 	}
 	
-	private static class Comper implements Comparator<Tile> {
+	private static class Comper implements Comparator<Tile>, Serializable {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2522220167848088766L;
 
 		public int compare(Tile o1, Tile o2) {
 			if (o1.key < o2.key) {

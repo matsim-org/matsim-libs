@@ -11,6 +11,8 @@ import java.util.Collection;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import org.apache.log4j.Logger;
+import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
@@ -18,12 +20,15 @@ import playground.gregor.otf.InundationData.InundationGeometry;
 
 public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 
+	
+	private static final Logger log = Logger.getLogger(OTFInundationDrawer.class);
+	
 	double[] modelview = new double[16];
 	double[] projection = new double[16];
 	int[] viewport = new int[4];
 	
 
-
+	
 
 	
 
@@ -39,17 +44,14 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 //		this.drawer2 = drawer2;
 //	}
 
-//	public OTFInundationDrawer() {
-//		int wtf = 0;
-//		wtf++;
-//	}
-
 	public void onDraw(GL gl) {
 //		onDraw(gl,this.drawer2.now);
 		
 	}
+	
 
 	public void onDraw(GL gl, int time) {
+
 
 		
 		this.timeSlotIdx = (short) (((short) ((time - 3*3600)/60)));

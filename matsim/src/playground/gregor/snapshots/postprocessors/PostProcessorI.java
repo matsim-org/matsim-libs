@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * transimsSnapshotFileReader.java
+ * PostProcessorI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,47 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.snapshots.postprocessor;
+package playground.gregor.snapshots.postprocessors;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.sun.corba.se.pept.transport.EventHandler;
 
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.StringUtils;
+import playground.gregor.snapshots.writers.PositionInfo;
 
-public class TransimsSnapshotFileReader {
+public interface PostProcessorI {
 
-	private BufferedReader infile = null;
-	public TransimsSnapshotFileReader(final String filename){
-		try {
-			this.infile = IOUtils.getBufferedReader(filename);
-		} catch (FileNotFoundException e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}		
-	}
-	
-	public String [] readLine() {
-		String [] tokline = null;
-		try {
-			String line = this.infile.readLine();
-			if (line == null){
-				this.infile.close();
-			} else {
-				tokline = StringUtils.explode(line, '\t', 16);
-			}
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return tokline;
-	}
+	public String[] processEvent(String [] event);
+	public void processPositionInfo(PositionInfo pos);
 }
-
-

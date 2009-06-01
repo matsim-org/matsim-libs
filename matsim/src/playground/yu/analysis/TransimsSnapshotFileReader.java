@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransimsSnapshotFileWriter.java
+ * transimsSnapshotFileReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,63 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.snapshots.postprocessor;
+package playground.yu.analysis;
 
-import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
 
-public class TransimsSnapshotFileWriter {
-	private BufferedWriter out = null;	
-	public TransimsSnapshotFileWriter(final String filename){
+public class TransimsSnapshotFileReader {
+
+	private BufferedReader infile = null;
+	public TransimsSnapshotFileReader(final String filename){
 		try {
-			this.out = IOUtils.getBufferedWriter(filename, true);
-//			String header = "VEHICLE"
-//            + "\tTIME"
-//            + "\tLINK"
-//            + "\tNODE"
-//            + "\tLANE"
-//            + "\tDISTANCE"
-//            + "\tVELOCITY"
-//            + "\tVEHTYPE"
-//            + "\tACCELER"
-//            + "\tDRIVER"
-//            + "\tPASSENGERS"
-//            + "\tEASTING"
-//            + "\tNORTHING"
-//            + "\tELEVATION"
-//            + "\tAZIMUTH"
-//            + "\tUSER\n";
-//			this.out.write(header);
-		} catch (Exception e) {
+			this.infile = IOUtils.getBufferedReader(filename);
+		} catch (FileNotFoundException e) {
+
 			e.printStackTrace();
-		}
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}		
 	}
 	
-	public void writeLine(final String [] line){
-		StringBuffer buff = new StringBuffer();
-		buff.append(line[0]);
-		for (int i = 1; i < line.length; i++){
-			buff.append("\t");
-			buff.append(line[i]);
-		}
-		buff.append("\n");
+	public String [] readLine() {
+		String [] tokline = null;
 		try {
-			this.out.write(buff.toString());
+			String line = this.infile.readLine();
+			if (line == null){
+				this.infile.close();
+			} else {
+				tokline = StringUtils.explode(line, '\t', 16);
+			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	public void finish() {
-		if (this.out != null) {
-			try {
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		
+		return tokline;
 	}
 }
+
+
