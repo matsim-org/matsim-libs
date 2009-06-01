@@ -153,7 +153,7 @@ public class Controler {
 	protected NetworkLayer network = null;
 	protected Population population = null;
 	private Counts counts = null;
-	private final NetworkFactory networkFactory = new NetworkFactory();
+	private final NetworkFactory networkFactory = new NetworkFactory(this.network);
 
 	protected AbstractTravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;

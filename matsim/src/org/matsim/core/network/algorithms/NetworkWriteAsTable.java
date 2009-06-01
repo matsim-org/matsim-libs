@@ -100,7 +100,7 @@ public class NetworkWriteAsTable {
 	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		int capperiod = network.getCapacityPeriod();
+		double capperiod = network.getCapacityPeriod();
 		capperiod = capperiod / 3600;
 		System.out.println("      capperiod = " + capperiod);
 

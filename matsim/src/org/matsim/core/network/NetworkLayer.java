@@ -31,6 +31,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.NetworkBuilder;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -68,22 +69,26 @@ public class NetworkLayer extends Layer implements Network {
 
 	public NetworkLayer() {
 		super(LAYER_TYPE, null);
-		this.factory = new NetworkFactory();
+		this.factory = new NetworkFactory(this);
 	}
 
 	public NetworkLayer(final NetworkFactory factory) {
 		super(LAYER_TYPE, null);
 		this.factory = factory;
+		this.factory.setNetwork(this);
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// create methods
-	// ////////////////////////////////////////////////////////////////////
-
+	/**
+	 * @deprecated use builder instead 
+	 */
+	@Deprecated
 	public final Node createNode(final Id id, final Coord coord) {
 		return createNode(id, coord, null);
 	}
-
+	/**
+	 * @deprecated use builder instead 
+	 */
+	@Deprecated
 	public final Node createNode(final Id id, final Coord coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
@@ -97,11 +102,17 @@ public class NetworkLayer extends Layer implements Network {
 		}
 		return n;
 	}
-
+	/**
+	 * @deprecated use builder instead 
+	 */
+	@Deprecated
 	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 		return createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
-
+	/**
+	 * @deprecated use builder instead 
+	 */
+	@Deprecated
 	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
 
 		if (this.nodes.get(fromNode.getId()) == null) {
@@ -205,11 +216,7 @@ public class NetworkLayer extends Layer implements Network {
 		}
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// get methods
-	// ////////////////////////////////////////////////////////////////////
-
-	public final int getCapacityPeriod() {
+	public final double getCapacityPeriod() {
 		return this.capperiod;
 	}
 
@@ -549,6 +556,10 @@ public class NetworkLayer extends Layer implements Network {
 
 	public void setFactory(NetworkFactory networkFactory) {
 		this.factory = networkFactory;
+	}
+
+	public NetworkBuilder getBuilder() {
+		return this.factory;
 	}
 
 }

@@ -1,6 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * BasicNetI.java
+ * project: org.matsim.*																															*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -30,7 +29,12 @@ import org.matsim.api.basic.v01.Id;
  * A topological network representation.
  */
 public interface BasicNetwork<N extends BasicNode, L extends BasicLink> extends Serializable{
-
+		/**
+		 * Returns the builder for network elements
+		 * @return
+		 */
+		public BasicNetworkBuilder getBuilder();
+	
     /**
      * Returns a set of this network's nodes. This set might be empty, but it
      * must not be <code>null</code>.
@@ -46,5 +50,23 @@ public interface BasicNetwork<N extends BasicNode, L extends BasicLink> extends 
      * @return a set of this network's links
      */
     public Map<Id, L> getLinks();
+    
+    /**
+     * Returns the time period over which
+     * the capacity of the given links has been measured. 
+     * The default is set to one hour, i.e. 3600.0 sec.
+     * @return the time period in seconds, default 3600.0 sec.
+     */
+    public double getCapacityPeriod();
+    
+    
+    /**
+     * Returns the lane width of the network's links.
+     * @return the lane width in meter
+     */
+    public double getEffectiveLaneWidth();
+    
 
+    
+    
 }

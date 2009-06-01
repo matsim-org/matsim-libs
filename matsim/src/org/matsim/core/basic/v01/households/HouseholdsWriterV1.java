@@ -27,6 +27,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.households.Households;
 
 
 /**
@@ -42,6 +43,10 @@ public class HouseholdsWriterV1 extends MatsimXmlWriter {
 		this.households = households;
 	}
 	
+	public HouseholdsWriterV1(Households hhs) {
+		this((BasicHouseholds)hhs);
+	}
+
 	public void writeFile(String filename) throws FileNotFoundException, IOException {
 		this.openFile(filename);
 		this.writeXmlHead();

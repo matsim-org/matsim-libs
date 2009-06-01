@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*																															*
+ * project: org.matsim.*
+ * BasicNetworkBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,25 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.api.basic.v01.network;
 
-package org.matsim.api.basic.v01;
+import org.matsim.api.basic.v01.Id;
 
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.config.Config;
+
 /**
+ * Builder for network elements
  * @author dgrether
  */
-public interface BasicScenario {
-
-	public BasicNetwork getNetwork() ;
-
-	public BasicPopulation getPopulation() ;
-
-	public Config getConfig();
-
-	public Id createId(String string);
-
-	public Coord createCoord(double x, double y);
-
+public interface BasicNetworkBuilder {
+	/**
+	 * creates a node
+	 * @param id
+	 * @return
+	 */
+	public BasicNode createNode(final Id id);
+	
+	public BasicLink createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	
 }

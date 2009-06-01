@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*																															*
+ * project: org.matsim.*
+ * ListUtils
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,25 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.benjamin.income;
 
-package org.matsim.api.basic.v01;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.config.Config;
+
 /**
  * @author dgrether
+ *
  */
-public interface BasicScenario {
+public class ListUtils {
 
-	public BasicNetwork getNetwork() ;
-
-	public BasicPopulation getPopulation() ;
-
-	public Config getConfig();
-
-	public Id createId(String string);
-
-	public Coord createCoord(double x, double y);
-
+	static <T> List<T> makeList(T...ts ){
+		List<T> l = new ArrayList<T>();
+		for (T t : ts){
+			l.add(t);
+		}
+		return l;
+	}
 }

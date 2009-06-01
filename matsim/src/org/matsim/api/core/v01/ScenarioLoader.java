@@ -24,20 +24,15 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Network;
+import org.matsim.api.basic.v01.BasicScenarioLoader;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimLaneDefinitionsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
@@ -58,37 +53,30 @@ import org.xml.sax.SAXException;
  * 
  * @author dgrether
  */
-public class ScenarioLoader {
+public class ScenarioLoader extends BasicScenarioLoader {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
 
-	private Config config;
-
-	private Scenario scenario;
-
 	public ScenarioLoader(Config config) {
-		this.config = config;
-		this.scenario = new ScenarioImpl(this.config);
+		super(config);
+		super.setScenario(new ScenarioImpl(this.config));
 	}
 
 	public ScenarioLoader(Scenario scenario) {
-		this.scenario = scenario;
-		this.config = this.scenario.getConfig();
+		super(scenario);
 	}
 
 	public ScenarioLoader(String configFilename) {
-		this.config = new Config();
-		this.config.addCoreModules();
+		super(configFilename);
 		Gbl.setConfig(this.config);
-		MatsimConfigReader reader = new MatsimConfigReader(this.config);
-		reader.readFile(configFilename);
 		MatsimRandom.reset(config.global().getRandomSeed());
-		this.scenario = new ScenarioImpl(this.config);
+		super.setScenario(new ScenarioImpl(this.config));
 	}
 
 	
+	@Override
 	public Scenario getScenario() {
-		return this.scenario;
+		return (Scenario)super.getScenario();
 	}
 
 	/**
@@ -111,7 +99,7 @@ public class ScenarioLoader {
 			this.loadSignalSystems();
 			this.loadSignalSystemConfigurations();
 		}
-		return this.scenario;
+		return getScenario();
 	}
 
 	private void loadHouseholds() {
@@ -119,7 +107,7 @@ public class ScenarioLoader {
 			String hhFileName = this.config.households().getInputFile();
 			log.info("loading households from " + hhFileName);
 			try {
-				new HouseholdsReaderV10((ScenarioImpl) this.scenario).parse(hhFileName);
+				new HouseholdsReaderV10((ScenarioImpl) this.getScenario()).parse(hhFileName);
 			} catch (SAXException e) {
 				throw new RuntimeException(e);
 			} catch (ParserConfigurationException e) {
@@ -134,10 +122,10 @@ public class ScenarioLoader {
 	}
 
 	private void loadSignalSystemConfigurations() {
-		if (this.scenario instanceof ScenarioImpl) {
-			if ((((ScenarioImpl) this.scenario).getSignalSystemConfigurations() != null)
+		if (this.getScenario() instanceof ScenarioImpl) {
+			if ((((ScenarioImpl) this.getScenario()).getSignalSystemConfigurations() != null)
 					&& (this.config.signalSystems().getSignalSystemConfigFile() != null)) {
-				BasicSignalSystemConfigurations signalSystemConfigurations = ((ScenarioImpl) this.scenario)
+				BasicSignalSystemConfigurations signalSystemConfigurations = ((ScenarioImpl) this.getScenario())
 						.getSignalSystemConfigurations();
 				MatsimSignalSystemConfigurationsReader reader = new MatsimSignalSystemConfigurationsReader(
 						signalSystemConfigurations);
@@ -151,10 +139,10 @@ public class ScenarioLoader {
 	}
 
 	private void loadSignalSystems() {
-		if (this.scenario instanceof ScenarioImpl) {
-			if ((((ScenarioImpl) this.scenario).getSignalSystems() != null)
+		if (this.getScenario() instanceof ScenarioImpl) {
+			if ((((ScenarioImpl) this.getScenario()).getSignalSystems() != null)
 					&& (this.config.signalSystems().getSignalSystemFile() != null)) {
-				BasicSignalSystems signalSystems = ((ScenarioImpl) this.scenario).getSignalSystems();
+				BasicSignalSystems signalSystems = ((ScenarioImpl) this.getScenario()).getSignalSystems();
 				MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(signalSystems);
 				log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
 				reader.readFile(this.config.signalSystems().getSignalSystemFile());
@@ -166,11 +154,11 @@ public class ScenarioLoader {
 	}
 
 	private void loadLanes() {
-		if (this.scenario instanceof ScenarioImpl) {
+		if (this.getScenario() instanceof ScenarioImpl) {
 			BasicLaneDefinitions laneDefinitions;
-			if ((((ScenarioImpl) this.scenario).getLaneDefinitions() != null)
+			if ((((ScenarioImpl) this.getScenario()).getLaneDefinitions() != null)
 					&& (this.config.network().getLaneDefinitionsFile() != null)) {
-				laneDefinitions = ((ScenarioImpl) this.scenario).getLaneDefinitions();
+				laneDefinitions = ((ScenarioImpl) this.getScenario()).getLaneDefinitions();
 				MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefinitions);
 				reader.readFile(this.config.network().getLaneDefinitionsFile());
 			}
@@ -200,49 +188,7 @@ public class ScenarioLoader {
 		}
 	}
 
-	/**
-	 * Loads the network into the scenario of this class
-	 */
-	public void loadNetwork() {
-		String networkFileName = null;
-		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
-			networkFileName = this.config.network().getInputFile();
-			log.info("loading network from " + networkFileName);
-			Network network = this.scenario.getNetwork();
-			if (this.config.network().isTimeVariantNetwork()) {
-				log.info("use TimeVariantLinks in NetworkFactory.");
-				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
-			}
-				if (network instanceof NetworkLayer) {
-					try {
-						new MatsimNetworkReader(network).parse(networkFileName);
-					} catch (SAXException e) {
-						throw new RuntimeException(e);
-					} catch (ParserConfigurationException e) {
-						throw new RuntimeException(e);
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				} else {
-					throw new IllegalStateException(
-							"Implementation of Network interface not supported, a specific parser is needed for this implementation of Network interface!");
-				}
-			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
-				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
-				NetworkChangeEventsParser parser = new NetworkChangeEventsParser((NetworkLayer) network);
-				try {
-					parser.parse(config.network().getChangeEventsInputFile());
-				} catch (SAXException e) {
-					e.printStackTrace();
-				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				((NetworkLayer) network).setNetworkChangeEvents(parser.getEvents());
-			}
-		}
-	}
+
 
 	@SuppressWarnings("deprecation")
 	public void loadActivityFacilities() {
@@ -250,12 +196,12 @@ public class ScenarioLoader {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
-				new MatsimFacilitiesReader(this.scenario.getActivityFacilities()).parse(facilitiesFileName);
+				new MatsimFacilitiesReader(this.getScenario().getActivityFacilities()).parse(facilitiesFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			if (((ScenarioImpl) this.scenario).getWorld() != null) {
-				((ScenarioImpl) this.scenario).getWorld().complete();
+			if (((ScenarioImpl) this.getScenario()).getWorld() != null) {
+				((ScenarioImpl) this.getScenario()).getWorld().complete();
 			}
 		}
 		else {
@@ -269,7 +215,7 @@ public class ScenarioLoader {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
 			try {
-				new MatsimPopulationReader(this.scenario).parse(populationFileName);
+				new MatsimPopulationReader(this.getScenario()).parse(populationFileName);
 			} catch (SAXException e) {
 				throw new RuntimeException(e);
 			} catch (ParserConfigurationException e) {

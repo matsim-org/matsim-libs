@@ -30,6 +30,7 @@ import org.matsim.core.network.NetworkFactory;
 // FIXME [MR] still imports NetworkFactory from outside interface
 public interface Network extends BasicNetwork<Node, Link> {
 
+	
 	public String getName();
 	
 	/**
@@ -41,7 +42,7 @@ public interface Network extends BasicNetwork<Node, Link> {
 
 	public void setEffectiveLaneWidth(final double effectiveLaneWidth);
 
-	public int getCapacityPeriod();
+	public double getCapacityPeriod();
 
 	public double getEffectiveCellSize();
 
@@ -70,6 +71,9 @@ public interface Network extends BasicNetwork<Node, Link> {
 
 	public NetworkFactory getFactory();
 
+	public NetworkBuilder getBuilder();
+
+	
 	/**
 	 * removes a link from the network.<p>
 	 *

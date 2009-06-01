@@ -118,7 +118,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public double getFreespeed(final double time) {
 		
-		if (this.aFreespeedTimes == null || this.aFreespeedTimes.length != this.aFreespeedEvents) {
+		if ((this.aFreespeedTimes == null) || (this.aFreespeedTimes.length != this.aFreespeedEvents)) {
 			initFreespeedEventsArrays();
 		}
 		
@@ -146,7 +146,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public double getFlowCapacity(final double time) {
 		
-		if (this.aFlowCapacityTimes == null || this.aFlowCapacityTimes.length != this.aFlowCapacityEvents) {
+		if ((this.aFlowCapacityTimes == null) || (this.aFlowCapacityTimes.length != this.aFlowCapacityEvents)) {
 			initFlowCapacityEventsArrays();
 		}
 		
@@ -167,14 +167,14 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public double getCapacity(final double time) {
 	
-		if (this.aFlowCapacityTimes == null || this.aFlowCapacityTimes.length != this.aFlowCapacityEvents) {
+		if ((this.aFlowCapacityTimes == null) || (this.aFlowCapacityTimes.length != this.aFlowCapacityEvents)) {
 			initFlowCapacityEventsArrays();
 		}
 		
 		int key = Arrays.binarySearch(this.aFlowCapacityTimes, time);
 		key = key >= 0 ? key : -key - 2;
 		
-		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		double capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 		return this.aFlowCapacityValues[key] * capacityPeriod;
 
 		
@@ -195,7 +195,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	public double getNumberOfLanes(final double time) {
 		
 		
-		if (this.aLanesTimes == null || this.aLanesTimes.length != this.aLanesEvents) {
+		if ((this.aLanesTimes == null) || (this.aLanesTimes.length != this.aLanesEvents)) {
 			initLanesEventsArrays();
 		}
 		
@@ -217,7 +217,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public int getLanesAsInt(final double time) {
 		
-		if (this.aLanesTimes == null || this.aLanesTimes.length != this.aLanesEvents) {
+		if ((this.aLanesTimes == null) || (this.aLanesTimes.length != this.aLanesEvents)) {
 			initLanesEventsArrays();
 		}
 		
@@ -264,7 +264,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		this.aFlowCapacityTimes = new double [this.aFlowCapacityEvents];
 		this.aFlowCapacityValues = new double [this.aFlowCapacityEvents];
 		this.aFlowCapacityTimes[0] = Double.NEGATIVE_INFINITY;
-		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		double capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 		this.aFlowCapacityValues[0] = this.capacity / capacityPeriod;
 
 		int numEvent = 0;

@@ -124,8 +124,8 @@ public class NetworkWriteETwithCounts {
 	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		int capperiod = network.getCapacityPeriod();
-		capperiod = capperiod / 3600;
+		double capperiod = network.getCapacityPeriod();
+		capperiod = capperiod / 3600.0;
 		System.out.println("      capperiod = " + capperiod);
 
 		try {

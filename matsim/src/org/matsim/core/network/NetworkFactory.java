@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.NetworkBuilder;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.population.routes.GenericRouteFactory;
@@ -37,19 +38,40 @@ import org.matsim.core.population.routes.RouteFactory;
 /**
  * @author dgrether
  */
-public class NetworkFactory implements Serializable{
+public class NetworkFactory implements Serializable, NetworkBuilder {
 
 	private LinkFactory linkFactory = null;
 
 	private final Map<TransportMode, RouteFactory> routeFactories = new HashMap<TransportMode, RouteFactory>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 
+	private Network network;
+
+	public NetworkFactory(Network network) {
+		this();
+		this.network = network;
+	}
+	
 	public NetworkFactory() {
 		this.linkFactory = new LinkFactoryImpl();
 		this.routeFactories.put(TransportMode.car, new NodeNetworkRouteFactory());
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 
+	public Node createNode(final Id id){
+		return new NodeImpl(id);
+	}
+	
+	/**
+	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
+	 */
+	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
+		return this.linkFactory.createLink(id, this.network.getNode(fromNodeId), this.network.getNode(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
+	}
+	/**
+	 * @deprecated use createNode(Id id) instead and set the rest yourself
+	 */
+	@Deprecated
 	public Node createNode(final Id id, final Coord coord, final String type) {
 		return new NodeImpl(id, coord, type);
 	}
@@ -111,6 +133,10 @@ public class NetworkFactory implements Serializable{
 
 	public boolean isTimeVariant() {
 		return (this.linkFactory instanceof TimeVariantLinkFactory);
+	}
+
+	public void setNetwork(NetworkLayer networkLayer) {
+		this.network = networkLayer;
 	}
 
 }

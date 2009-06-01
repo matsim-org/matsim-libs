@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*																															*
+ * project: org.matsim.*
+ * IncomeCalculator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,25 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.benjamin.income;
 
-package org.matsim.api.basic.v01;
+import java.util.Random;
 
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.config.Config;
+import org.apache.log4j.Logger;
+
+
 /**
  * @author dgrether
+ *
  */
-public interface BasicScenario {
+public class IncomeCalculator {
 
-	public BasicNetwork getNetwork() ;
+	private static final Logger log = Logger.getLogger(IncomeCalculator.class);
+	
+	private Random random;
 
-	public BasicPopulation getPopulation() ;
+	public IncomeCalculator() {
+		long seed = 984521478;
+		this.random = new Random(seed);
+	}
+	
+	
+	public double calculateIncome(double median){
+		double medianLorenz = calculateLorenzValue(0.5);
+	  double totalIncome =  median / medianLorenz;
+		
+		double rnd = this.random.nextDouble();
+		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
 
-	public Config getConfig();
+		double income = lorenzDerivative * median;
 
-	public Id createId(String string);
+		return income;
+	}
+	
+	
+	private double calculateLorenzValue(double x){
+		return 0.9916 * Math.pow(x, 3) - 0.2398 * Math.pow(x, 2) + 0.2056 * x;
+	}
+	
 
-	public Coord createCoord(double x, double y);
+	private double calculateLorenzDerivativeValue(double x){
+		return 2.9748 * Math.pow(x, 2.0) - 0.4796 * x + 0.2056;
+	}
 
+	
 }

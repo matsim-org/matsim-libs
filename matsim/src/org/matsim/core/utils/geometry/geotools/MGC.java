@@ -94,7 +94,16 @@ public class MGC {
 	public static final Coord point2Coord(final Point point) {
 		return new CoordImpl(point.getX(), point.getY());
 	}
-
+	
+	/**
+	 * Converts x, y Coordinates to Geotool
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Point xy2Point(double x, double y) {
+		return geoFac.createPoint(new Coordinate(x, y));
+	}
 
 	/**
 	 * Generates a Geotools <code>CoordinateReferenceSystem</code> from a coordinate system <code>String</code>. The coordinate system
@@ -115,4 +124,5 @@ public class MGC {
 			throw new IllegalArgumentException(e);
 		}
 	}
+
 }

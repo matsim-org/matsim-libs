@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
@@ -48,10 +49,12 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 
 	private final Map<Id, DisplayNode> nodes = new TreeMap<Id, DisplayNode>();
 	private final Map<Id, DisplayLink> links = new TreeMap<Id, DisplayLink>();
+	private double capacityPeriod;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public DisplayNet(NetworkLayer layer) {
+		this.capacityPeriod = layer.getCapacityPeriod();
 		// first create nodes
 		for (BasicNode node : layer.getNodes().values()) {
 			DisplayNode node2 = new DisplayNode(node.getId(), this);
@@ -79,6 +82,10 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 
 		// third, build/complete the network
 		this.build();
+	}
+	
+	public double getCapacityPeriod() {
+		return this.capacityPeriod;
 	}
 
 	// -------------------- IMPLEMENTATION OF BasicNetworkI --------------------
@@ -126,5 +133,15 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 	public double maxNorthing() {
 		return maxNorthing;
 	}
+
+	public BasicNetworkBuilder getBuilder() {
+		throw new UnsupportedOperationException("Not available in this class");
+	}
+
+	public double getEffectiveLaneWidth() {
+		throw new UnsupportedOperationException("Not available in this class");
+	}
+
+
 
 }

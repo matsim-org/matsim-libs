@@ -29,27 +29,21 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.gbl.Gbl;
 
 public class BasicNodeImpl implements BasicNode {
 	protected transient  Map<Id, BasicLink> inlinks  = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
 	protected transient  Map<Id, BasicLink> outlinks = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
 
-	/* TODO [balmermi]: Since the basic link is a location, it MUST have
-	 * defined some geographical information (coords). These are defined
-	 * by its from- and to-node. Therefore, the BasicNode MUST have a coordinate
-	 * defined. See also BasicLink. If this is not O.K., then the BasicLink must
-	 * not extend Location. 
-	 * 
-	 * This is an area where a traffic deviates from a generalized network simulation (see, e.g., how repast does it).  
-	 * Not sure what is the reasonable approach.  kai, feb09
-	 * */
-	protected final Coord coord;
+	protected Coord coord;
 	protected final Id id;
 
-	public BasicNodeImpl(Id id, Coord coord) {
+
+	public BasicNodeImpl(Id id){
 		this.id = id;
-		if (coord == null) { Gbl.errorMsg("Coord must be defined!"); }
+	}
+	
+	public BasicNodeImpl(Id id, Coord coord) {
+		this(id);
 		this.coord = coord;
 	}
 
@@ -70,8 +64,11 @@ public class BasicNodeImpl implements BasicNode {
 	public Map<Id, ? extends BasicLink> getOutLinks() {
 		return this.outlinks;
 	}
+	
+	public void setCoord(final Coord coord){
+		this.coord = coord;
+	}
 
-	// TODO [balmermi] see above why ...
 	public Coord getCoord() {
 		return this.coord;
 	}

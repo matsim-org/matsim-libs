@@ -24,11 +24,22 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.households.BasicHousehold;
 import org.matsim.core.basic.v01.households.BasicHouseholdBuilder;
 import org.matsim.core.basic.v01.households.BasicHouseholds;
 import org.matsim.core.basic.v01.households.BasicIncome;
+import org.matsim.core.basic.v01.households.HouseholdBuilder;
 import org.matsim.core.basic.v01.households.HouseholdsWriterV1;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+
+import playground.dgrether.DgPaths;
 
 
 /**
@@ -37,18 +48,15 @@ import org.matsim.core.basic.v01.households.HouseholdsWriterV1;
  */
 public class BKickHouseholdsCreator {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	
+	
+	public static void createHHForTestCase() throws FileNotFoundException, IOException {
     BasicScenarioImpl sc = new BasicScenarioImpl();
     Id id1 = sc.createId("1");
     Id id2 = sc.createId("2");
     BasicHouseholds<BasicHousehold> hhs = sc.getHouseholds();
     BasicHouseholdBuilder b = hhs.getHouseholdBuilder();
-    
+
     BasicHousehold hh = b.createHousehold(id1);
     hh.setIncome(b.createIncome(120000, BasicIncome.IncomePeriod.year));
     hh.getMemberIds().add(id1);
@@ -60,9 +68,56 @@ public class BKickHouseholdsCreator {
     hhs.getHouseholds().put(id2, hh);
     
     HouseholdsWriterV1 hhwriter = new HouseholdsWriterV1(hhs);
-    hhwriter.writeFile("test/input/playground/benjamin/BKickScoringTest/households.xml");
+    hhwriter.writeFile(DgPaths.SHAREDSVN + "test/input/playground/benjamin/BKickScoringTest/households.xml");
+    System.out.println("Households written!");
+	}
+
+	public static void createHHForTestScenario() throws FileNotFoundException, IOException {
+		String outdir = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/";
+		String plansFile = outdir + "plans.xml";
+		String networkFile =outdir + "../oneRouteNoModeTest/network.xml";
+		
+		ScenarioImpl sc = new ScenarioImpl();
+		Network network = sc.getNetwork();
+		MatsimNetworkReader netreader = new MatsimNetworkReader(network);
+		netreader.readFile(networkFile);
+		
+    Population pop = sc.getPopulation();
+    MatsimPopulationReader popReader = new MatsimPopulationReader(pop, network);
+    popReader.readFile(plansFile);
+    
+    Households hhs = sc.getHouseholds();
+    HouseholdBuilder b = hhs.getHouseholdBuilder();
+
+    IncomeCalculator incomeCalculator = new IncomeCalculator();
+    
+    for (Person p : pop.getPersons().values()){
+      Household hh = b.createHousehold(p.getId());
+      hh.setIncome(b.createIncome(incomeCalculator.calculateIncome(46300), BasicIncome.IncomePeriod.year));
+      hh.getMembers().put(p.getId(), p);
+      p.setHousehold(hh);
+      hhs.getHouseholds().put(p.getId(), hh);
+    }
+    
+    HouseholdsWriterV1 hhwriter = new HouseholdsWriterV1(hhs);
+    hhwriter.writeFile(outdir + "households.xml");
     System.out.println("Households written!");
     
+    IncomeStats stats = new IncomeStats(hhs);
+    
+    
+	}
+
+	
+	
+	/**
+	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 */
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+//    createHHForTestCase();
+		createHHForTestScenario();
 	}
 
 }

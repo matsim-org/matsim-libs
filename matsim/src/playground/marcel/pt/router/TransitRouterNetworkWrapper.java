@@ -35,6 +35,7 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.NetworkBuilder;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactory;
@@ -103,8 +104,8 @@ public class TransitRouterNetworkWrapper implements Network {
 		return this.linksLookup.get(link);
 	}
 
-	public int getCapacityPeriod() {
-		return 3600;
+	public double getCapacityPeriod() {
+		return 3600.0;
 	}
 
 	public double getEffectiveCellSize() {
@@ -116,6 +117,10 @@ public class TransitRouterNetworkWrapper implements Network {
 	}
 
 	public NetworkFactory getFactory() {
+		throw new UnsupportedOperationException();
+	}
+	
+	public NetworkBuilder getBuilder() {
 		throw new UnsupportedOperationException();
 	}
 

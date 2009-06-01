@@ -56,6 +56,10 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 	// interface methods
 	//////////////////////////////////////////////////////////////////////
 
+	public NodeImpl(Id id) {
+		super(id);
+	}
+
 	public int compareTo(final Node o) {
 		return this.id.toString().compareTo(o.getId().toString());
 	}

@@ -11,6 +11,13 @@
 		<param name="inputNetworkFile" value="../studies/bkickhoefer/scoreTest/network.xml" />
 	</module>
 
+  <module name="planscalcroute" >
+    <param name="bikeSpeedFactor" value="4.166666666666667" />
+    <param name="ptSpeedFactor" value="2.0" />
+    <param name="undefinedModeSpeedFactor" value="13.88888888888889" />
+    <param name="walkSpeedFactor" value="0.8333333333333333" />
+  </module>
+
 	<module name="plans">
 		<param name="inputPlansFile" value="../studies/bkickhoefer/scoreTest/plansScoreTestV4.xml" />
 	</module>
