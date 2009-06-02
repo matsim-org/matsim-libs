@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
@@ -38,6 +39,7 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.api.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -174,8 +176,6 @@ public class DEQSim extends ExternalMobsim {
 			Activity act = nextAct;
 			nextAct = (Activity) plan.getPlanElements().get(i+1);
 
-			// TODO [MR] this is functionality that's regularly used, maybe generalize it?
-			// also see below
 			if (act.getEndTime() != Time.UNDEFINED_TIME && act.getDuration() != Time.UNDEFINED_TIME) {
 				// use min (endtime, time + dur)
 				time = Math.min(act.getEndTime(), time + act.getDuration());
@@ -192,10 +192,14 @@ public class DEQSim extends ExternalMobsim {
 			// departuretime, double, 64bit
 			out.writeDouble(time);
 
-			NetworkRoute route = (NetworkRoute) leg.getRoute();
-			// in the binary format, we write the link-ids instead of the node-ids
-			List<Link> linkRoute = route.getLinks();
-
+			Route route = leg.getRoute();
+			List<Link> linkRoute = null;
+			if (route instanceof NetworkRoute) {
+				// in the binary format, we write the link-ids instead of the node-ids
+				 linkRoute = ((NetworkRoute) route).getLinks();
+			} else {
+				linkRoute = new LinkedList<Link>();
+			}
 			// # links, int, 32bit
 			out.writeInt(linkRoute.size() + 2);
 			// the first link where the departure happens
@@ -205,13 +209,11 @@ public class DEQSim extends ExternalMobsim {
 				out.writeInt(Integer.parseInt(link.getId().toString()));
 			}
 			// the last link where the next activity is
-			out.writeInt(Integer.parseInt(nextAct.getLink().getId().toString()));
-
-			// TODO [MR] see above
+			out.writeInt(Integer.parseInt(nextAct.getLink().getId().toString()));	
+			
 			if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
 				time += leg.getTravelTime();
 			}
-
 		}
 	}
 
