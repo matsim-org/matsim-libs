@@ -20,7 +20,6 @@
 
 package playground.gregor.snapshots.postprocessors;
 
-import com.sun.corba.se.pept.transport.EventHandler;
 
 import playground.gregor.snapshots.writers.PositionInfo;
 
