@@ -1,25 +1,14 @@
 package playground.mmoyo.PTRouter;
 
-import java.util.PriorityQueue;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+
+import org.matsim.api.basic.v01.*;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.api.network.*;
+import org.matsim.core.router.util.*;
 
 import playground.mmoyo.Validators.PathValidator;
 
@@ -446,7 +435,8 @@ public class PTDijkstra implements LeastCostPathCalculator {
 	}
 
 	/**
-	 * @return iterationID
+	 * @return iterationID. This is (presumably) the counter of the calls to calcLeastCostPath, and therefore the value that is
+	 * used to get around resetting all nodes to cost infty at the beginning of every call.
 	 */
 	int getIterationID() {
 		return this.iterationID;
