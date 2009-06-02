@@ -88,6 +88,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
 	/*package*/ static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
+	
+	private static int margUtlDistCnt = 0 ;
 
 	@Override
 	public String getValue(final String key) {
@@ -110,8 +112,11 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		} else if (TRAVELING_WALK.equals(key)) {
 			return Double.toString(getTravelingWalk());
 		} else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
-			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
-			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
+			if ( margUtlDistCnt < 1 ) {
+				margUtlDistCnt++ ;
+				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead." + Gbl.ONLYONCE );
+				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!" + Gbl.ONLYONCE );
+			}
 			return Double.toString(getMarginalUtlOfDistance());
 		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
 			return Double.toString(this.getMarginalUtlOfDistanceCar());
@@ -177,8 +182,11 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
 			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
 		}	else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
-			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
-			log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
+			if ( margUtlDistCnt < 1 ) {
+				margUtlDistCnt++ ;
+				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
+				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
+			}
 			setMarginalUtlOfDistance(Double.parseDouble(value));
 		} else if (DISTANCE_COST.equals(key)) {
 			log.warn("The parameter " + DISTANCE_COST + " in module " + GROUP_NAME + " should be replaced by the parameter " + MARGINAL_UTL_OF_DISTANCE + ".");
@@ -277,14 +285,18 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	@Override
 	public void checkConsistency() {
 		boolean hasOpeningAndClosingTime = false;
+		boolean hasOpeningTimeAndLatePenalty = false ;
 
 		for (ActivityParams actType : this.activityTypes.values()) {
 			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
 				hasOpeningAndClosingTime = true;
 			}
+			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival() > 0.001)) {
+				hasOpeningTimeAndLatePenalty = true;
+			}
 		}
-		if (!hasOpeningAndClosingTime) {
-			log.error("NO OPENING OR CLOSING TIMES DEFINED!\n\n\nThere is no activity type that has an opening *and* closing time defined.\nThis usually means that the activity chains can be shifted by an arbitrary\nnumber of hours without having an effect on the score of the plans, and thus\nresulting in wrong results / traffic patterns.\n\n\n");
+		if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
+			log.error("NO OPENING OR CLOSING TIMES DEFINED!\n\n\nThere is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\nThis usually means that the activity chains can be shifted by an arbitrary\nnumber of hours without having an effect on the score of the plans, and thus\nresulting in wrong results / traffic patterns.\n\n\n");
 		}
 	}
 
