@@ -20,17 +20,20 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 public class CharyparNagelScoringConfigGroup extends Module {
 
+	private static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
+	
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "planCalcScore"; // TODO [MR] switch to better name
@@ -87,9 +90,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private final HashMap<String, ActivityParams> activityTypes = new HashMap<String, ActivityParams>();
 	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
-	/*package*/ static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
-	
-	private static int margUtlDistCnt = 0 ;
+	private int margUtlDistCnt = 0 ;
 
 	@Override
 	public String getValue(final String key) {
@@ -429,7 +430,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	}
 	private static int setWaitingCnt=0 ;
 	public void setWaiting(final double waiting) {
-		if ( earlyDeparture != 0. && setWaitingCnt<1 ) {
+		if ( (earlyDeparture != 0.) && (setWaitingCnt<1) ) {
 			setWaitingCnt++ ;
 			log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
 					"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
@@ -487,7 +488,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		}
 		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
-			if (minimalDuration != Time.UNDEFINED_TIME && minDurCnt<1 ) {
+			if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt<1) ) {
 				minDurCnt++ ;
 				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
 						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08" + Gbl.ONLYONCE );
