@@ -439,10 +439,11 @@ public class Controler {
 				new FacilitiesWriter(facilities, getOutputFilename("output_facilities.xml.gz")).write();
 			}
 
-			Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
 			} else {
+				// only remove hook when regular shutdown, otherwise we can't as the shutdown is already in progress...
+				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
 				log.info("S H U T D O W N   ---   regular shutdown completed.");
 			}
 			IOUtils.closeOutputDirLogging();
