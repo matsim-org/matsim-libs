@@ -278,6 +278,8 @@ public class BlnPlansGenerator {
 
 	private void addPlansToPersons(HashMap<Id,PersonImpl> personList, HashMap<Id,ArrayList<String[]>> tripData) {
 
+		double numberOfPlansFound = 0;
+		
 		log.info("Adding Plans to Person, spreading time is " + BlnPlansGenerator.spreadingTime + "s");
 		for (Id personId : tripData.keySet()) {
 
@@ -301,9 +303,19 @@ public class BlnPlansGenerator {
 
 				Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 
+				double startTime = Time.parseTime(tripEntry[5]);
+				
+				if(startTime == 60.0){
+					numberOfPlansFound++;
+					if(lastAct != null){
+						startTime = lastAct.getEndTime();
+					} else {
+						log.error("LastAct is null - Shouldn't be possible - " + curPerson.getId());
+					}										
+				}				
+				
 				// Since data is from survey, it is more likely to get x:00, x:15, x:30, x:45 as answer,
 				// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
-				double startTime = Time.parseTime(tripEntry[5]);
 				if (startTime % (15*60) == 0){
 					startTime = (startTime - (spreadingTime / 2)) + Math.random() * spreadingTime;
 					startTime = Math.max(0.0, startTime);
@@ -316,6 +328,10 @@ public class BlnPlansGenerator {
 					// Since data is from survey, it is more likely to get x:00, x:15, x:30, x:45 as answer,
 					// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
 					double endTime = Time.parseTime(tripEntry[0]);
+					if(endTime == 60.0){
+						endTime = lastAct.getStartTime();
+					}
+					
 					if (endTime % (15*60) == 0){
 						endTime = (endTime - (spreadingTime / 2)) + Math.random() * spreadingTime;
 						endTime = Math.max(0.0, endTime);
@@ -325,12 +341,12 @@ public class BlnPlansGenerator {
 					}
 
 					curPlan.addLeg(this.createLeg(tripEntry));
-
+					
 					if(!iterator.hasNext()){
 						newAct.setEndTime(86400.0);
 					}
 				}
-
+			
 				curPlan.addActivity(newAct);	
 				lastAct = newAct;				 
 			}
