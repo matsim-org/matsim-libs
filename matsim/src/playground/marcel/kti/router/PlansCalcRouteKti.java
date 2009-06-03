@@ -26,7 +26,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.api.population.Route;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
@@ -94,13 +94,13 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		final double walkTime = walkDistance / WALK_SPEED;
 //		System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + "min + " + (walkTime / 60) + "min (" + walkDistance + "m walk); beeLine: " + beeLineWalkTime/60 + "min walk");
 
-		NetworkRoute newRoute;
+		Route newRoute;
 		if (beeLineWalkTime < (timeInVehicle + walkTime)) {
-			newRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
+			newRoute = this.network.getFactory().createRoute(TransportMode.walk, fromAct.getLink(), toAct.getLink());
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(beeLineWalkTime);
 		} else {
-			newRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
+			newRoute = this.network.getFactory().createRoute(TransportMode.pt, fromAct.getLink(), toAct.getLink());
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(timeInVehicle + walkTime);
 		}
