@@ -72,8 +72,8 @@ public class MATSimNet2QGIS implements X2QGIS {
 		public static void writeGeometries(final Collection<Feature> features,
 				final String filename) throws IOException, FactoryException,
 				SchemaException {
-			ShapefileDataStore datastore = new ShapefileDataStore((new File(
-					filename)).toURI().toURL());
+			ShapefileDataStore datastore = new ShapefileDataStore(new File(
+					filename).toURI().toURL());
 			FeatureType ft = features.iterator().next().getFeatureType();
 			datastore.createSchema(ft);
 			((FeatureStore) datastore.getFeatureSource(ft.getTypeName()))
@@ -87,8 +87,8 @@ public class MATSimNet2QGIS implements X2QGIS {
 	private Network2PolygonGraph n2g = null;
 
 	public void readNetwork(final String netFilename) {
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(netFilename);
+		network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
 	}
 
 	/**
@@ -96,8 +96,8 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 *            the crs to set
 	 */
 	public void setCrs(final String wkt) {
-		this.crs = MGC.getCRS(wkt);
-		this.n2g = new Network2PolygonGraph(this.network, this.crs);
+		crs = MGC.getCRS(wkt);
+		n2g = new Network2PolygonGraph(network, crs);
 	}// TODO override e.g. set(N2g)
 
 	/**
@@ -114,8 +114,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 */
 	public void writeShapeFile(final String ShapeFilename) {
 		try {
-			ShapeFileWriter2.writeGeometries(this.n2g.getFeatures(),
-					ShapeFilename);
+			ShapeFileWriter2.writeGeometries(n2g.getFeatures(), ShapeFilename);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
@@ -132,7 +131,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	// /////////////////////////////
 	public void addParameter(final String paraName, final Class<?> clazz,
 			final Map<Id, ?> parameters) {
-		this.n2g.addParameter(paraName, clazz, parameters);
+		n2g.addParameter(paraName, clazz, parameters);
 	}
 
 	// /////////////////////////////
@@ -140,27 +139,26 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 * @return the network
 	 */
 	public NetworkLayer getNetwork() {
-		return this.network;
+		return network;
 	}
 
 	public void readEvents(final String eventsFilename,
 			final EventHandler[] handlers) {
 		Events events = new Events();
-		for (int i = 0; i < handlers.length; i++)
-			events.addHandler(handlers[i]);
+		for (EventHandler handler : handlers)
+			events.addHandler(handler);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 	}
 
 	public void readPlans(final String plansFilename,
 			final AbstractPersonAlgorithm pa) {
 		Population population = new PopulationImpl();
-		new MatsimPopulationReader(population, this.network)
-				.readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 		pa.run(population);
 	}
 
 	public CoordinateReferenceSystem getCrs() {
-		return this.crs;
+		return crs;
 	}
 
 	/**
@@ -172,11 +170,11 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "test/input/playground/yu/test/ChangeLegModeWithParkLocationTest/network.xml.gz";
+		String netFilename = "../berlin/network/bb_cl.xml.gz";
 
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		mn2q.readNetwork(netFilename);
 		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../matsimTests/changeLegModeTests/network.shp");
+		mn2q.writeShapeFile("../matsimTests/berlinQGIS/bb_cl.shp");
 	}
 }

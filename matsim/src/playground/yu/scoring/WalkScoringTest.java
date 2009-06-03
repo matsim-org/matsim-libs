@@ -19,8 +19,8 @@ public class WalkScoringTest {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		if ((args == null) || (args.length == 0)) {
+	public static void main(final String[] args) {
+		if (args == null || args.length == 0) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
@@ -31,6 +31,7 @@ public class WalkScoringTest {
 			controler
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
 							config.charyparNagelScoring()));
+			controler.setWriteEventsInterval(100);
 			controler.run();
 		}
 		System.exit(0);
