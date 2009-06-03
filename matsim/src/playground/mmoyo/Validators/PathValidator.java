@@ -3,7 +3,7 @@ package playground.mmoyo.Validators;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-/* Validates a given path with the next conditions:
+/** Validates a given path with the next conditions:
  * No null
  * must have at least 3 links     //-> not absolutely. A path can we also only walking
  * starts and ends with walking links

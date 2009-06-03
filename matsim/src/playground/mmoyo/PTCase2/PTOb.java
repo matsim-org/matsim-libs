@@ -4,7 +4,7 @@ import org.matsim.core.network.NetworkLayer;
 
 import playground.mmoyo.input.PTNetworkFactory2;
 
-/*
+/**
  * Contains the common objects for the route search: network, PTTimetable, PtRouter
  */
 public class PTOb {

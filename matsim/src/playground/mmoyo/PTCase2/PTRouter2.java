@@ -42,7 +42,6 @@ public class PTRouter2 {
 	private PTTravelTime1 ptTravelTime1;
 	//private int x=0;//--> Should be part of the method if the simulation strategy is set to re-route.
 	
-
 	public PTRouter2(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimetable) {
 		this.net = ptNetworkLayer;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
@@ -51,7 +50,7 @@ public class PTRouter2 {
 		this.expressDijkstra = new PTDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime1);
 	}
 	
-	/*
+	/**
 	 * Main method to be invoked by other classes 
 	 */
 	public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
@@ -83,8 +82,8 @@ public class PTRouter2 {
 		return path;
 	}
 	
-	/*
-	if not nodes found in walk range then find the nearest one
+	/**
+	*if not nodes found in walk range then find the nearest one
 	*/
 	private Collection <Node> FindNearStops (final Coord coord, final double walkDistance){
 		Collection <Node> NearStops = net.getNearestNodes(coord, walkDistance);
@@ -98,8 +97,8 @@ public class PTRouter2 {
 	}
 	
 	
-	/*
-	 *increment walk Range until a path is found
+	/**
+	 *increments walk Range until a path is found
 	 */
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
 		double walkRange= distToWalk; 
@@ -149,7 +148,7 @@ public class PTRouter2 {
 		return path;
 	}
 	
-	/*
+	/**
 	 * expands station search until a number of them is found
 	 */
 	private Collection <Node> FindnStations(Node node, double walkRange){
@@ -224,8 +223,6 @@ public class PTRouter2 {
 		return PTdijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 	}
 	
-	
-		
 	public void PrintRoute(Path path){
 		if (path!=null){
 			System.out.print("\nLinks: ");
@@ -247,9 +244,8 @@ public class PTRouter2 {
 			System.out.println("\nTravel cost of route=" + path.travelCost + "  time of route:" + path.travelTime);
 		}else{
 			System.out.println("The route is null");
-		}//if path
-	}//printroute
-
+		}
+	}
 }//class
 
 

@@ -10,10 +10,9 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mmoyo.PTRouter.PTLine;
 
-/*
- * a map containing all nodes with same coordinates in order to create transfer links between them
+/**
+ * a map containing all nodes with same coordinates of a station in order to create transfer links between them
  */
-
 public class PTStationMap {
 
 	Map<String, List<Id>> IntersectionMap = new TreeMap<String, List<Id>>(); 

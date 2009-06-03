@@ -12,8 +12,9 @@ import org.matsim.core.utils.misc.Time;
 import playground.mmoyo.input.PTLinesReader2;
 import playground.mmoyo.PTRouter.*;
 
-/*
+/**
  * Contains the information of departures for every station and PTLine
+ * @param TimeTableFile path of file with departure information
  */
 public class PTTimeTable2{
 	private PTLinesReader2 ptLinesReader = new PTLinesReader2();
@@ -31,6 +32,9 @@ public class PTTimeTable2{
 	public PTTimeTable2(){
 	}
 	
+	/**
+	 * gets the map with travel time information for standard links
+	 */
 	public void setMaps(Map<Id,Double> linkTravelTimeMap){
 		this.linkTravelTimeMap = linkTravelTimeMap;
 	}
@@ -39,6 +43,11 @@ public class PTTimeTable2{
 		this.ptLineList= ptLineList;
 	}
 	
+	/**
+	 * Reads every ptline information and creates  
+	 * Minutemap to save average travel time from the fist station to any station of the ptLine 
+	 * NodeDepartureTime to save all departures times in a day for each node   
+	 */
 	public void calculateTravelTimes(NetworkLayer networklayer){
 		Map<Id,Double> minuteMap = new TreeMap<Id,Double>();
 		
@@ -46,12 +55,12 @@ public class PTTimeTable2{
 			int x= 0;
 			for (String strIdNode:  ptLine.getRoute()){
 			
-				//Create a map with nodes-minutes after departure
+				/**Create a map with nodes-minutes after departure*/
 				Id idNode = new IdImpl(strIdNode);
 				double minAfterDep = new Double(ptLine.getMinutes().get(x));
 				minuteMap.put(idNode, minAfterDep);
 
-				//Fills the map with arrivals for every node
+				/**Fills the map with arrivals for every node*/
 				double[] departuresArray =new double[ptLine.getDepartures().size()];					
 				int y=0;
 				for (String departure : ptLine.getDepartures()){
@@ -63,7 +72,6 @@ public class PTTimeTable2{
 				}
 				Arrays.sort(departuresArray);
 				nodeDeparturesMap.put(idNode, departuresArray);
-
 				x++;
 			
 				/*
@@ -99,8 +107,8 @@ public class PTTimeTable2{
 		return linkTravelTimeMap.get(link.getId()); 
 	}
 
-	/*
-	 * Return the waiting time in a transfer link head node after a given time //minutes
+	/**
+	 * Returns the waiting time in a transfer link head node after a given time //minutes
 	 */
 	public double GetTransferTime(Link link, double time){
 	 	double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
@@ -114,16 +122,15 @@ public class PTTimeTable2{
 		return transferTime;
 	}
 	
-	
-	/*
-	*A binary search returns the next departure in a node after a given time
-	*If dblTime is greater than the last departure, 
+	/**
+	*A binary search returns the next departure in a node after a given time 
+	*If the time is greater than the last departure, 
 	*returns the first departure(of the next day)
 	*/
-	public double nextDepartureB(Id idPTNode,  double dblTime){//,
+	public double nextDepartureB(Id idPTNode,  double time){//,
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
 		int length = arrDep.length;
-		int index =  Arrays.binarySearch(arrDep, dblTime);
+		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){
 			index = -index;
 			if (index <= length)index--; else index=0;	

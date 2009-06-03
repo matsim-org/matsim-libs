@@ -53,7 +53,7 @@ public class PTControler2 {
 				pt.writeNet(ZURICHPTN);
 				pt.createRouter();
 				PTActWriter ptActWriter1 = new PTActWriter(pt);
-	    		ptActWriter1.writePTActsLegs();
+	    		ptActWriter1.findRouteForActivities();
 				break;
 			
 			case-4:
@@ -88,13 +88,13 @@ public class PTControler2 {
 				break;
 			
 			case -1:
-				/*Creates and writes detached transfer links. This is necessary before routing to get better results */  
+				/**Creates and writes detached transfer links. This is necessary before routing to get better results */  
 				pt.createPTNetWithTLinks(INPTNETFILE);
 				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
 				pt.writeNet(ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
 	    		PTActWriter ptActWriter2 = new PTActWriter(pt);
-	    		ptActWriter2.writePTActsLegs();
+	    		ptActWriter2.findRouteForActivities();
 				break;
 			
 		/************the positive cases need the network already loaded in memory*/
@@ -105,7 +105,7 @@ public class PTControler2 {
 	    		break;
 	    	
 			case 1:
-				/*searches and shows a PT path between two coordinates or nodes */
+				/**searches and shows a PT path between two coordinates or nodes */
 				Coord coord1 = new CoordImpl(747420, 262794);   
 				Coord coord2 = new CoordImpl(685862, 254136);
 				Node nodeA = pt.getPtNetworkLayer().getNode("_8506000");
@@ -119,10 +119,10 @@ public class PTControler2 {
 				break;
 
 			case 2:
-				/* invokes the ptActWriter to create a out_plan file with pt_legs and pt_acts and tries a simulation run*/
+				/**invokes the ptActWriter to create a out_plan file with pt_legs and pt_acts and tries a simulation run*/
 				//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
-	    		ptActWriter.writePTActsLegs();
+	    		ptActWriter.findRouteForActivities();
 	    		//ptActWriter.SimplifyPtLegs();
 	    		//ptActWriter.printPTLegs();
 	    		//ptActWriter.ptTravelTime.costValidator.printNegativeVaues();

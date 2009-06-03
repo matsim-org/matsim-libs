@@ -15,11 +15,11 @@ import playground.mmoyo.PTCase2.PTTimeTable2;
 import java.util.TreeMap;
 
 /** 
- * Add in memory new PTLines from an independent file to the existing network and PTTimetable
-  * @param filePath  path of the file containing new PTLines description
+ * Adds in memory new PTLines from an independent file to the existing network and PTTimetable
+ * @param filePath  path of the file containing new PTLines description
  * @param net existing network 
  * @param timeTable existing Departure information
-*/
+ */
 public class PTLineAggregator {
 	private NetworkLayer net; 
 	private PTTimeTable2 timeTable;
@@ -31,9 +31,9 @@ public class PTLineAggregator {
 		this.filePath=filePath;
 	}
 		
-	/* 
+	/** 
 	 * Add new nodes for every new PTline and assign them new Id with prefixes/sufixes
-	 * */
+	 */
 	public void AddLine(){
 		PTNodeReader ptNodeReader = new PTNodeReader();
 		ptNodeReader.readFile (filePath);
@@ -71,10 +71,10 @@ public class PTLineAggregator {
 		System.out.println("created Nodes:" + finNodes);
 		System.out.println("created Links:" + finLinks);
 		
-		//-->and after creating the new nodes and links, we must create the transfers and detached again
+		//-->and after creating the new nodes and links, transfers and detached must be created again
 	}
 	
-	/* 
+	/** 
 	 * Add new nodes for every new PTline and creates for them: 
 	 * new id`s, standard links and ficticious constant travel times.
 	 */
@@ -139,7 +139,7 @@ public class PTLineAggregator {
 				if (!first){
 					Link link;
 					
-					// create links between nodes
+					/**create links between nodes*/
 					double length = CoordUtils.calcDistance(lastPTNode1.getCoord(), ptNode1.getCoord());
 					Id idLink1= new IdImpl(intLinkId++);
 					link = net.createLink(idLink1, lastPTNode1, ptNode1, length, 1.0, 1.0, 1.0, "1", "Standard");
@@ -168,7 +168,7 @@ public class PTLineAggregator {
 			char lineType = 'b';
 			String direction1 = "H";
 			String direction2 = "R";
-			//ficticious timetable for the being time
+			/**ficticious timetable for the being time*/
 			for(int time = 18000; time< 82800; time= time+900 ){
 				departures.add(String.valueOf(time));
 			}

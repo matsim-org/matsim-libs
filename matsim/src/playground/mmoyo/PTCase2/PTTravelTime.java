@@ -5,7 +5,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.mmoyo.Validators.CostValidator;
 import playground.mmoyo.Pedestrian.Walk;
 
-/*
+/**
  * Calculates the travel time of each link depending on its type
  */
 public class PTTravelTime implements TravelTime {
@@ -47,6 +47,6 @@ public class PTTravelTime implements TravelTime {
 			costValidator.pushNegativeValue(link.getId(), t, transTime);
 			transTime = 600;
 		}
-		return transTime;  //->> Transfer factor
+		return transTime;  //-> Transfer factor
 	}
 }

@@ -8,7 +8,9 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import playground.mmoyo.PTRouter.PTNode;;
-
+/**
+ * First basic version of PT router for the PTCase1 scenario
+ */
 public class PTRouter{
 	public PTNode[] route;
 	private PTNetworkLayer ptNetworkLayer;
@@ -26,22 +28,17 @@ public class PTRouter{
 		printRoute();
 	}
 
-    /* 
-     * Validates the existence of start and origin nodes
-     * Create the walking links
-     * Invoke the routing algorithm
-     * Destroy the walking links
+    /**
+     * Main router: validates the existence of start and origin nodes, 
+     * creates the walking links, invokes the routing algorithm, destroys the walking links
      */
     private void findRoute(Id startNode, Id endNode, int time){
-		
-		///////////////Validates that nodes exist in citiNetwork
 		if (!cityNetworkLayer.getNodes().containsKey(startNode)){
 			throw new NullPointerException("Starting node does not exist");
 		}
 		if (!cityNetworkLayer.getNodes().containsKey(endNode)){
 			throw new NullPointerException("Destination node does not exist");
 		}
-		///////////////////////////////////////////////////////////////////////
 
 		List<String> newLinks = ptNetworkLayer.createWalkingLinks(startNode,endNode);
 		List<Link> ll = Arrays.asList(ptNetworkLayer.getLinks().values().toArray(new Link[ptNetworkLayer.getLinks().size()]));	
@@ -58,9 +55,10 @@ public class PTRouter{
 		ptNetworkLayer.removeWalkingNodes(startNode,endNode);	
     }
 
-    /*
+    /**
 	 *Times the calculation of shortest path algorithm and prints the result 
-	*///based on intervals periods
+	 *based on intervals periods
+	 */
     public void timeComputation2(int numIterations1, String n1, String n2, int time){
     	long startTime=0;
     	long endTime=0;
@@ -81,9 +79,10 @@ public class PTRouter{
     }
 
 
-	/*
+	/**
 	 *Times the calculation of shortest path algorithm and prints the result 
-	*///based on individual iteration
+	 *based on individual iteration
+	 */
     public void timeComputation(long numIterations, String n1, String n2, int time){
     	long startTime=0;
     	long endTime=0;

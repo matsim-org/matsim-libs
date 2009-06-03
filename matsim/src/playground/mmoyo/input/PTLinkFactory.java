@@ -4,14 +4,13 @@ import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
-import java.util.Map;
 
-/*
- * Creates the links for the class PTLineAggregator 
+/**
+ * Creates the links for the class PTLineAggregator
+ * @param net current PT network 
  */
 public class PTLinkFactory {
 	NetworkLayer net;
@@ -22,8 +21,8 @@ public class PTLinkFactory {
 		intNextId = getNextLinkId();
 	}
 
-	/*
-	 * Gets a a ptline list of nodes and creates directed links between them
+	/**
+	 * Gets a ptline as a list of nodes and creates directed links (standard) between them
 	 */
 	public void AddNewLinks (List<BasicNode> nodeList){
 		boolean isFirst= true;
@@ -39,9 +38,9 @@ public class PTLinkFactory {
 		lastNode = null;
 	}
 
-	/*
-	 * Creates Standard links for the pt layer with temporay irrelevant values for freespeed, capacity, numlanes and OrigId
-	*/
+	/**
+	 * Creates a standard link for the pt layer, with calculated length
+	 */
 	private void createPTLink(int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
 		Id id =  new IdImpl(intId);
 		Link  link = this.net.getFactory().createLink(id, fromBasicNode.getId(), toBasicNode.getId() );
@@ -49,8 +48,8 @@ public class PTLinkFactory {
 		link.setType(type);
 	}
 	
-	/*
-	 * returns the maximal Id Number of standard links plus one
+	/**
+	 * returns the current maximal Id Number of standard links plus one.
 	 */
 	public int getNextLinkId(){
 		int maxId = -1; 

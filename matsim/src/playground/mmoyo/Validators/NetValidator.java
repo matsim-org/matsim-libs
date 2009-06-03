@@ -7,9 +7,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTCase2.PTTimeTable2;
 
-	/*
-	 * Validates all links in a network for valid cost values and lengths
-	 */
+/**
+ * Validates all links in a network for correct cost values and lengths
+ */
 
 public class NetValidator {
 	

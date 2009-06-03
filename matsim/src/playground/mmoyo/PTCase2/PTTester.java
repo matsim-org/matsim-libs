@@ -11,17 +11,17 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import playground.mmoyo.Pedestrian.Walk;
 
-/*
- * Returns the number of found paths in a plan
- *
- */
+/**
+ * counts the found paths for a plan
+ * @param ptOb pt Object containing all important elements or route search: timetable, network.
+ * */
 public class PTTester {
 	private Walk walk = new Walk();
-	private final PTOb pt;
+	private final PTOb ptOb;
 
-	public PTTester(final PTOb pt) {
+	public PTTester(final PTOb ptOb) {
 		super();
-		this.pt = pt;
+		this.ptOb = ptOb;
 	}
 
 	public void countRoutes(){
@@ -29,8 +29,8 @@ public class PTTester {
 		int routes=0;
 		int intPersonNum=0;
 		Population population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, pt.getPtNetworkLayer());
-		plansReader.readFile(this.pt.getPlansFile());
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, ptOb.getPtNetworkLayer());
+		plansReader.readFile(this.ptOb.getPlansFile());
 
 		for (Person person: population.getPersons().values()) {
 			//Person person = population.getPerson("1003717");
@@ -48,19 +48,18 @@ public class PTTester {
 						Coord lastActCoord = lastAct.getCoord();
 						Coord actCoord = thisAct.getCoord();
 						int distToWalk= walk.distToWalk(person.getAge());
-						Path path = this.pt.getPtRouter2().findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+						Path path = this.ptOb.getPtRouter2().findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 						if(path!=null){
 							routes++;
 						}
-					}//if val
+					}
 					lastAct = thisAct;
 					val=true;
 					acts++;
 				}
 			}
 			intPersonNum++;
-		}//for person
+		}
 		System.out.println("acts:" + acts + " routes:"+ routes);
-	}//countRoutes
-
+	}
 }

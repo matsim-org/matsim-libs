@@ -18,15 +18,15 @@ import playground.mmoyo.PTRouter.*;
 /** 
  * First version of network factory for the PTCase1 (with a main node for station) 
  * Represent a network layer with independent route with transfer links at intersections 
+ * @param cityNet City layer with streets description 	
  */
 public class PTNetworkFactory {
 	int maxNodekey = 24;  	// -> Get these values should be got from the city network, not from here 
 	int maxLinkKey = 79;    //  but these are temporary values for the 5x5 scenario
-
 	private NetworkLayer cityNet;
 	public NetworkLayer ptNetworkLayer;
 	
-	// This map stores the children nodes of each father node, necessary to create the transfer between them
+	/** This map stores the children nodes of each father node, necessary to create the transfer between them*/
 	public Map<Id, ArrayList<String>> childrenList = new TreeMap<Id, ArrayList<String>>();
 	
 	public PTNetworkFactory(NetworkLayer cityNet) {
@@ -34,9 +34,10 @@ public class PTNetworkFactory {
 		this.cityNet = cityNet;
 	}
 
+	/**
+	 * Read the route of every PTline and adds the corresponding links and nodes
+	 */
 	public void createPTNetwork(List<PTLine> ptLineList) {
-		// Read the route of every PTline and adds the corresponding links and
-		// nodes
 		for (PTLine ptLine: ptLineList) {
 			boolean firstLink = true;
 			String idFromNode = "";
@@ -49,11 +50,10 @@ public class PTNetworkFactory {
 		createTransferlinks();
 	}
 
-	/*
+	/**
 	 *  Creates a copy of the original nodes and link in the PTN layer 
 	 */
 	public String addPTLinks(Link l, String idFromNode, boolean firstLink,Id IdPTLine) {
-
 		// Create FromNode
 		if (firstLink) {
 			maxNodekey++;
@@ -77,7 +77,6 @@ public class PTNetworkFactory {
 		if (this.ptNetworkLayer.getNodes().containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
-		
 		Node n = this.cityNet.getNode(id);
 		PTNode node = new PTNode(id, n.getCoord(), n.getType());
 		node.setIdStation(id);        //All ptnodes must have a father, including fathers (themselves)
@@ -86,7 +85,7 @@ public class PTNetworkFactory {
 		n= null;
 	}
 
-	/*
+	/**
 	 * Create a PTNode out from a Node. Same coordinates different id
 	 */
 	private void addPTNode(String strId, Node original, Id IdPTLine) {
@@ -112,7 +111,7 @@ public class PTNetworkFactory {
 		ptNode = null;
 	}
 
-	/*
+	/**
 	 * TreeMap printer, meant to be used to show father node and all its children 
 	 */
 	public static void showMap(Map map) {
@@ -124,15 +123,15 @@ public class PTNetworkFactory {
 		iter = null;
 	}
 	
-	/*
-	 * 	Create transfer links that join all children nodes of a station
-	*/
+	/**
+	 *Creates transfer links that join all children nodes of a station
+	 */
 	private void createTransferlinks() {
 		for(ArrayList<String> chList: childrenList.values() ){
 			ArrayList<String> chList2 = chList; 
 			if (chList.size() > 1) {
 				for (String strId1 : chList) {
-					for (String strId2 : chList2) {// Create links between children nodes lines
+					for (String strId2 : chList2) {
 						if (strId1.equals(strId2)) {
 							maxLinkKey++;
 							this.createLink(maxLinkKey, strId1, strId2,"Transfer");
@@ -143,8 +142,8 @@ public class PTNetworkFactory {
 		}
 	}
 
-	/*
-	*Adds temporarly the origin and destination nodes and create new temporary links between 
+	/**
+	*Adds temporarily the origin and destination nodes and create new temporary links between 
 	*they and its respective children to start the routing process
 	*/
 	public List<String> createWalkingLinks(Id idFromNode, Id idToNode ){
@@ -160,7 +159,6 @@ public class PTNetworkFactory {
 			this.createLink(--i, idFromNode.toString(), uChild , "Walking");
 			WalkingLinkList.add(String.valueOf(i));
 		}
-		
 		//Endings links
 		uChildren = this.childrenList.get(idToNode);
 		for (String uChild: uChildren) {
@@ -170,8 +168,8 @@ public class PTNetworkFactory {
 		return WalkingLinkList;
 	}
 	
-	/*
-	 * Removes temporal walk links at the end of the each individual routing process so that they do not interfere in the next one 
+	/**
+	 * Removes temporal walk links at the end of the each individual routing process so that they do not interfere in the next route request 
 	 */
 	public void removeWalkinkLinks(List<String> WalkingLinkList){
 		for (String strWalkLink : WalkingLinkList) {
@@ -179,17 +177,16 @@ public class PTNetworkFactory {
 		}
 	}
 
-	/*
-	 *Removes temporal links at the end of the routing process 
+	/**
+	 *Removes temporal walk nodes  at the end of the each individual routing process so that they do not interfere in the next route request
 	 */
 	public void removeWalkingNodes(Id node1, Id node2){
-
 		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode(node1));
 		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode(node2));
 	}
 	
 
-	/*
+	/**
 	 * Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
 	 */
 	private void createLink(int intId, String strIdFromNode, String strToNode, String type){
@@ -205,8 +202,10 @@ public class PTNetworkFactory {
 		this.ptNetworkLayer.createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type); 
 	}
 	
+	/**
+	 * Displays a quick visualization of links with from- and to- nodes
+	 */
 	public void printLinks() {
-		//Displays a quick visualization of links with from- and to- nodes
 		for (Link l : this.ptNetworkLayer.getLinks().values()) {
 			System.out.print("\n(" ); 
 			System.out.print(l.getFromNode().getId().toString()); 

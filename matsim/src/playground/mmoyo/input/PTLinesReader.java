@@ -16,8 +16,7 @@ import playground.mmoyo.PTRouter.PTLine;
 
 /** 
  * First version of parser xml PTLines for the PTCase1 with a upper hierarchical node to identify the station
-  */
-
+ */
 public class PTLinesReader extends MatsimXmlParser {
 	private final static String PTLINES = "ptLines";
 	private final static String LINE = "ptLine";

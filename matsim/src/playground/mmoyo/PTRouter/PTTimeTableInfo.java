@@ -15,7 +15,9 @@ public class PTTimeTableInfo {
 		this.ptTimeTable =timeTable;
 	}
 
-	//Reports the next departure to matsim
+	/**
+	 *Reports the next departure to matsim 
+	 */
 	public int nextDeparture(Link l, int time){
 		return ptTimeTable.nextDeparture(((PTNode)l.getFromNode()).getIdStation(),time );
 	}

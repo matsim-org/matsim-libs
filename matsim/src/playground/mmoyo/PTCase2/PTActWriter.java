@@ -16,14 +16,13 @@ import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.controler.Controler;
-
+//import org.matsim.core.controler.Controler;
 import playground.mmoyo.Validators.PathValidator;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs2;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 import playground.mmoyo.Pedestrian.Walk;
 
-/*
+/**
  * Reads a plan file, finds a PT connection between two acts creating new PT legs and acts between them
  * and writes a output_plan file
  */
@@ -73,8 +72,8 @@ public class PTActWriter {
 		System.out.println("Done");	
 	}
 
-	/*
-	 * Shows in console the legs that are created between two activities 
+	/**
+	 * Shows in console the legs that are created between the plan activities 
 	 */
 	public void printPTLegs(){
 		TransitRouteFinder routFinder = new TransitRouteFinder (ptRouter);
@@ -90,8 +89,7 @@ public class PTActWriter {
 	}
 	
 	
-	public void writePTActsLegs(){
-		
+	public void findRouteForActivities(){
 		Population newPopulation = new PopulationImpl();
 		int numPlans=0;
 

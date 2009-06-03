@@ -17,11 +17,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 
 /** 
- * Second version of parser for xml PTLines file. 
- * Used for PTCase 2 with no upper (father) Node describing the station but a set of nodes with prefix-sufixes
+ * Second version of parser for PTLines file. 
+ * Used for PTCase2 with no upper (father) node describing the station but a set of nodes with prefix-sufixes
  * to represent each PTline lane in the station
  */
-
 public class PTLinesReader2 extends MatsimXmlParser {
 	private final static String PTLINES = "ptLines";
 	private final static String LINE = "ptLine";

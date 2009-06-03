@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-/*
+/**
  * This class makes sure that there are not negative values in standard links
  * That is possible when a PTLine has several profiles
  */

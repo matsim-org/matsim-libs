@@ -8,7 +8,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.api.network.Link;
 
 import playground.mmoyo.Validators.PathValidator;
-/*
+
+/**
  * Matsim implementation of Dijkstra algorithm adapted to the PT network Model 
  */
 
@@ -21,12 +22,11 @@ public class MyDijkstra extends Dijkstra{
 	}
 
 	/*
-	 // Make public the inner class Dikjstra.DijkstraNodeData?   or create a public method only to return the prev Link 
+	// Make public the inner class Dikjstra.DijkstraNodeData?   or create a public method only to return the prev Link 
 	protected boolean canPassLink(final Link link) {
 		DijkstraNodeData fromNodeData= getData(link.getFromNode());
 		Link lastLink = fromNodeData.getPrevLink();
 		return pathVal.canPassLink(lastLink, link);	
 	}
 	*/
-	
 }

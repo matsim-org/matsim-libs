@@ -9,7 +9,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.api.basic.v01.Coord;
 
-/*
+/**
  * Represents a station as a hierarchy with a Main node and so many children nodes as PTLines traveling through it
  */
 public class PTStation {
@@ -64,8 +64,6 @@ public class PTStation {
 		this.idFareZone = idFareZone;
 	}
 
-
-	
 	/*
 	//-> eliminate this method from factory
 	public void createIntersecionMap(PTTimeTable2 ptTimeTable){
@@ -102,7 +100,7 @@ public class PTStation {
 		return this.IntersectionMap;
 	}
 	
-	/*
+	/**
 	 * Gets a child node with prefix and suffix and returns the Main node Id
 	 */
 	public String getNodeBaseId(String strId){

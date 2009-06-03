@@ -9,9 +9,9 @@ import org.matsim.core.api.network.Node;
 import playground.mmoyo.PTRouter.PTNode;
 
 /** 
- * * Determines the optimal path of a passenger in a Public transport Network 
+ * Determines the optimal path of a passenger in a Public transport Network 
  * according to the information of timetables
- *  *
+ * 
  * @param nodeList  PTNodes in stored a a Node-List
  * @param linkList  Collection of org.matsim.network.Link
  * @param OriginNode Node where the trip begins

@@ -7,8 +7,8 @@ import playground.mmoyo.PTRouter.*;
 import playground.mmoyo.input.PTLinesReader;
 import playground.mmoyo.input.PTTimeTableReader;
 
-/*
- * Set of option to route in the PTCase1. This structure watch a relationship with the city network
+/**
+ * Set of options to route in the PTCase1. This approaches watches a relationship with the city network
  */
 public class PTControler {
 	private static final String NETWORKFILENAME="C://Users/manuel/Desktop/berlinOEV/network.xml";
@@ -26,13 +26,13 @@ public class PTControler {
 	    switch (option) {
 	    	case 0:   //
 	    		break;
-	    	case 1:  //creation of PTNetwork to visualize
+	    	case 1:  /**creation of PTNetwork to visualize*/
 	    	 	readCityNetwork();
 	    		ptLinesReader.readFile(PTLINES);
 	    		createPTView(); 
 	            break;
 	            
-	    	case 3: // new version of router
+	    	case 3: /**new version of router*/
 	    		readCityNetwork();
 	    		createPTNetwork();
 	    		createTimetable();
@@ -43,13 +43,13 @@ public class PTControler {
 	    		//ptTimeTableInfo.printTimeTable();
 	    		break;
 
-	    	case 4: //Print Ptnetwork view
+	    	case 4: /**Print Ptnetwork view*/
 	    		readCityNetwork();
 	    		createPTNetwork();
 	    		ptNetworkLayer.printLinks();	
 	    		break;
 	    	
-	    	case 5: //Test with the Matsim Disjktra
+	    	case 5: /**Test with the Matsim Disjktra*/
 	    		readCityNetwork();
 	    		createPTNetwork();
 	    		createTimetable();

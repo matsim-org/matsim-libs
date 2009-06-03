@@ -11,9 +11,8 @@ import org.matsim.core.api.network.*;
 import org.matsim.core.router.util.*;
 
 import playground.mmoyo.Validators.PathValidator;
-
-/*
- * Temporary copy version of Dijsktra class. 
+ /**
+ * Temporary copy version of Dijsktra class. Will be replaced by a better implentation in myDijstra 
  */
 
 /**

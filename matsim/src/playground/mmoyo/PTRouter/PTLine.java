@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.matsim.api.basic.v01.Id;
 
-/*
- * Representation of a PT Line containing the sequence of stations and departures for every one of them 
- */
 /** 
- * Describes a Public Transport Network Line
+ * Representation of a PT Line containing the sequence of stations and departures for every one of them
  * @param id  Unique Identifier 
  * @param type Describes if the line is Bus, Trolley, Subway. etc.
  * @param withDedicatedTracks Points out if the line has own rails or interacts with normal city traffic
@@ -17,9 +14,9 @@ public class PTLine {
 	private Id id;
 	private PTLineType ptLineType;
 	private String direction;
-	private List<String> route = new ArrayList<String>();  //List of nodes
-	private List<Double> minute = new ArrayList<Double>();
-	private List<String> departures = new ArrayList<String>();
+	private List<String> route = new ArrayList<String>();      /**List of sequential nodes*/
+	private List<Double> minute = new ArrayList<Double>();     /**average arrival time to each station after departure of first station*/
+	private List<String> departures = new ArrayList<String>(); /**average arrival time to each station after first departure*/
 
 	public PTLine(Id id, char lineType, List<String> route) {
 		this.id = id;
@@ -67,5 +64,4 @@ public class PTLine {
 	public List<String> getDepartures() {
 		return departures;
 	}
-
-}// class
+}

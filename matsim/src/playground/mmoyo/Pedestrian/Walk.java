@@ -1,7 +1,7 @@
 package playground.mmoyo.Pedestrian;
 
-/*
- * This class contains constant and variable values to pedestrian simulation
+/**
+ * This class contains constant variables a constant values to pedestrian simulation
  */
 
 public class Walk {
@@ -30,8 +30,7 @@ public class Walk {
 	
 	public double walkSpeed(byte age, double time, double lenght){
 		double speed=AV_WALKING_SPEED;
-		//--> complete values according to Weidmann 1993 
-		
+		//-> complete values according to Weidmann 1993 
 		return speed;
 	}
 

@@ -16,8 +16,7 @@ import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
 
 /**
- * Represent a network layer with independent sequence of nodes and links for every PTLine
- * and transfer links at intersections
+ * Represents a network layer with independent sequence of nodes and links for every PTLine and transfer links at intersections
  * @param cityNet complete network from which the PT network is extracted
  */
 public class PTNetworkLayer extends NetworkLayer {

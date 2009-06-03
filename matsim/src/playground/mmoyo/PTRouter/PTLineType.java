@@ -3,12 +3,10 @@ package playground.mmoyo.PTRouter;
 /**
  * Describes the type of Public Transport Line in a scenario
  * The abbreviation of values is
- *
  * B= "Bus"
  * T= "Trolley"  also "Tramway", "Tram", "Street car" ("Straﬂenbahn" in German speaking countries)
  * S= "Subway"     
  * C= "Commuter Rail"  also Suburban Metro ("S-Bahn" in German speaking countries)
- *
  * @param chrType The abbreviation of the name of the type
  * @param withDedicatedTracks  If has dedicated rails or interacts with normal vehicles 
  */

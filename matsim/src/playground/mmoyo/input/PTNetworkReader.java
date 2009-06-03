@@ -4,6 +4,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 
+/**
+ * Reads a network and converts its nodes into PTNodes
+ */
 public class PTNetworkReader{
 	
 	public PTNetworkReader() {

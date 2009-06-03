@@ -20,6 +20,13 @@ import playground.mmoyo.PTCase2.PTStation;
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.PTRouter.PTLine;
 
+/** 
+ * Second version of network factory for the PTCase2 (with no relationship to street network) 
+ * Represent a network layer with independent route with transfer links at intersections 
+ * @param inFileName path of file with ptlines information 
+ * @param ptTimeTable empty timetable object to be filled with inFileName data 
+ * @param outFileName path of network file to be created
+ */ 
 public class PTNetworkFactory2 {
 	public Map <Id,Double> linkTravelTimeMap = new TreeMap <Id,Double>();
 
@@ -27,7 +34,7 @@ public class PTNetworkFactory2 {
 		super();
 	}
 	
-	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
+	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String outFileName){
 		NetworkLayer ptNetworkLayer1 = readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer1, ptTimeTable);
 		createTransferLinks(ptNetworkLayer1, ptTimeTable);
@@ -86,8 +93,8 @@ public class PTNetworkFactory2 {
 	}
 	*/
 	
-	/*
-	 * Read the timetable File, validates that every node exists and loads the data in the ptTimeTable object
+	/**
+	 * Reads the timetable File, validates that every node exists and loads the data in the ptTimeTable object
 	 */	
 	private PTTimeTable2 readTimeTable(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
 		PTNode ptLastNode = null;
@@ -118,7 +125,7 @@ public class PTNetworkFactory2 {
 					for (Link link : (ptNode.getInLinks().values())) {
 						if (link.getFromNode().equals(ptLastNode)){
 							linkTravelTimeMap.put(link.getId(), travelTime);
-							//-->30 march check if this temporary stuff improves the performance
+							//-->check if this temporary assignment improves the performance
 							link.setCapacity(travelTime);
 						}
 					}
@@ -139,7 +146,6 @@ public class PTNetworkFactory2 {
 	
 	public void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
 		PTStation stationMap = new PTStation(ptTimeTable);
-		//stationMap.print();
 		int maxLinkKey=0;
 		for (List<Id> chList : stationMap.getIntersecionMap().values()) {
 			if (chList.size() > 1) {
@@ -154,7 +160,6 @@ public class PTNetworkFactory2 {
 		}
 	}
 	
-	
 	public void createPTLink(NetworkLayer net, String strIdLink, Id idFromNode, Id idToNode, String type){
 		PTNode fromNode= (PTNode)net.getNode(idFromNode);
 		PTNode toNode= (PTNode)net.getNode(idToNode);
@@ -162,15 +167,13 @@ public class PTNetworkFactory2 {
 	}
 	
 	public void createPTLink(NetworkLayer net, String strIdLink, PTNode fromNode, PTNode toNode, String type){
+		//->move to link factory
 		if (fromNode==null)
 			throw new java.lang.NullPointerException("fromNode does not exist in link:" + strIdLink); 
-
 		if (toNode==null)
 			throw new java.lang.NullPointerException("toNode does not exist in link:" + strIdLink); 
-
 		Id idLink = new IdImpl(strIdLink);
 		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-		//For the time being these values are irrelevant 
 		double freespeed= 1;
 		double capacity = 1;
 		double numLanes = 1;
@@ -178,23 +181,22 @@ public class PTNetworkFactory2 {
 		net.createLink(idLink, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type);
 	}
 	
-	//-> use this unique method and eliminate the last two
 	private void createPTLink(NetworkLayer net, int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
+		//-> use this unique method and eliminate the last two
 		Id id =  new IdImpl(intId);
 		Link  link = net.getFactory().createLink(id, fromBasicNode.getId(), toBasicNode.getId() );
 		link.setLength(CoordUtils.calcDistance(fromBasicNode.getCoord(), toBasicNode.getCoord()));
 		link.setType(type);
 	}
 
-	
 	public void writeNet(NetworkLayer net, String fileName){
 		System.out.println("writing pt network...");
 		new NetworkWriter(net, fileName).write();
 		System.out.println("done.");
 	}
 	
-	//--> move this to class Linkfactory
 	public void CreateDetachedTransfers (NetworkLayer net, double distance){
+		//--> move this to class Linkfactory
 		int x=0;
 		String strId;
 		for (Node node: net.getNodes().values()){
@@ -215,7 +217,7 @@ public class PTNetworkFactory2 {
 		}
 	}
 
-	/*
+	/**
 	 * Set the next standard link of a detTransfer link. 
 	 * This was the first intent to get valid paths 
 	 */
@@ -250,10 +252,11 @@ public class PTNetworkFactory2 {
 		}
 	}
 
-	/*
+	/**
 	 * Displays a quick visualization of links with from- and to- nodes 
 	 */
 	public static void printLinks(NetworkLayer ptNetworkLayer) {
+		//-> unify with first version of ptNetFactory
 		for (Link l : ptNetworkLayer.getLinks().values()) {
 			System.out.print("\n(" ); 
 			System.out.print(l.getFromNode().getId().toString()); 

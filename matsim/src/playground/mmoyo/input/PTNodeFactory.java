@@ -31,8 +31,8 @@ public class PTNodeFactory {
 		this.sValidator.hasValidCoordinates(this.ptStation);
 	}
 
-	/*
-	 * all org.matsim.core.api.network.Node's from the network into PTNodes 
+	/**
+	 * converts all nodes from the network into PTNodes 
 	 */
 	public NetworkLayer TransformToPTNodes(NetworkLayer NetWithNodes, NetworkLayer NetWithPTNodes){
 		for (Node node: NetWithNodes.getNodes().values()){

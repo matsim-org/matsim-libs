@@ -8,8 +8,8 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-/*
- *   return counts of a plan for performance analysis
+/**
+ *   returns counts of a plan for performance analysis
  */
 public class PlanValidator {
 	PathValidator pathValidator= new PathValidator (); 

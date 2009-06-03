@@ -62,7 +62,6 @@ public class PTTimeTableReader extends MatsimXmlParser {
 		}
 	}
 
-	/////////Start methods//////////////////////////////
 	private void startNodes() {
 	}
 
@@ -74,7 +73,6 @@ public class PTTimeTableReader extends MatsimXmlParser {
 		strIdPTLine= atts.getValue("id");
 	}
 
-	//////////// End methods/////////////////////////////
 	private void endNodes(){
 	}
 	
@@ -102,4 +100,3 @@ public class PTTimeTableReader extends MatsimXmlParser {
 		return this.ptTimeTable;
 	}
 }
-

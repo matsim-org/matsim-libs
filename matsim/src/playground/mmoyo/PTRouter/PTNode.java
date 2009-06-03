@@ -32,7 +32,6 @@ public class PTNode extends NodeImpl {
 		this.idPTLine = idPTLine;
 		this.lineSequenceindex= lineSequenceindex;
 		
-		//30 april
 		//ficticious timetable for the being time
 		//-> eliminate this	
 		int x=0;
