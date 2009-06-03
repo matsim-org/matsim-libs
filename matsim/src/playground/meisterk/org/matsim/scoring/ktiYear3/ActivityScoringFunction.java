@@ -72,6 +72,12 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	private List<ScoringPenalty> penalty = new Vector<ScoringPenalty>();
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
+	
+	/**
+	 * Stores scores by activity type.
+	 */
+	private HashMap<String, Double> accumulatedScores = new HashMap<String, Double>();
+	
 	private HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private double accumulatedTooShortDuration;
 	private double timeSpentWaiting;
@@ -96,7 +102,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			Activity act) {
 
 		double fromArrivalToDeparture = departureTime - arrivalTime;
-		
+
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
 		// also: negative duration is also too short
@@ -131,39 +137,42 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			// calculate effective activity duration bounded by opening times
 			double timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
 			double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
-			double scoreImprovement; // calculate score improvement only as basis for facility load penalties
-			double openingTime, closingTime; // hold time information of an opening time interval
 			for (BasicOpeningTime openTime : openTimes) {
 
-				// see explanation comments for processing opening time intervals in super class
-				openingTime = openTime.getStartTime();
-				closingTime = openTime.getEndTime();
-
-				activityStart = Math.max(arrivalTime, openingTime);
-				activityEnd = Math.min(departureTime, closingTime);
-
-				if ((openingTime > departureTime) || (closingTime < arrivalTime)) {
-					// agent could not perform action
+				if ((openTime.getStartTime() >= departureTime) || (openTime.getEndTime() <= arrivalTime)) {
+					
+					// location was closed during the entire activity time, so duration = 0.0
+					// no further score computation necessary
 					activityStart = departureTime;
 					activityEnd = departureTime;
-				}
+					
+				} else {
+					
+					// location was, at least partly, opened during the activity time, so duration > 0.0
+					activityStart = Math.max(arrivalTime, openTime.getStartTime());
+					activityEnd = Math.min(departureTime, openTime.getEndTime());
 
-				double duration = activityEnd - activityStart;
+					double duration = activityEnd - activityStart;
 
-				// calculate penalty due to facility load only when:
-				// - activity type is penalized (currently only shop and leisure-type activities)
-				// - duration is bigger than 0
-				if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
-					if (duration > 0) {
-
-						double accumulatedDuration = 0.0;
-						if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
-							accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
-						}
-
-						scoreImprovement = 
-							this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
-							this.getPerformanceScore(act.getType(), accumulatedDuration);
+					
+					// calculate score achieved with this duration
+					double oldScore;
+					if (this.accumulatedScores.containsKey(act.getType())) {
+						oldScore = this.accumulatedScores.get(act.getType());
+					} else {
+						oldScore = this.getPerformanceScore(act.getType(), 0.0);
+					}
+					double accumulatedDuration = 0.0;
+					if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
+						accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
+					}
+					
+					double scoreImprovement = 
+						this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
+						oldScore;
+					
+					// calculate penalty due to facility load only when activity type is penalized (currently only shop and leisure-type activities)
+					if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
 
 						/* Penalty due to facility load:
 						 * Store the temporary score to reduce it in finish() proportionally 
@@ -174,23 +183,18 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 								activityEnd, 
 								this.facilityPenalties.get(act.getFacility().getId()), 
 								scoreImprovement));
+
 					}
 
+					timeSpentPerforming += duration;
+					this.accumulatedScores.put(act.getType(), oldScore + scoreImprovement);
+					this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + duration);
 				}
-
-				timeSpentPerforming += duration;
-
+				
 			}
 
 			// accumulated waiting time, which is the time that could not be performed in activities due to closed facilities
 			this.timeSpentWaiting += (fromArrivalToDeparture - timeSpentPerforming);
-
-			// accumulate time spent performing
-			double accumulatedDuration = 0.0;
-			if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
-				accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
-			}
-			this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
 
 			// disutility if duration of that activity was too short
 			if (timeSpentPerforming < ActivityScoringFunction.MINIMUM_DURATION) {
@@ -265,8 +269,8 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	public double getPerformanceScore() {
 		double performanceScore = 0.0;
-		for (String actType : this.accumulatedTimeSpentPerforming.keySet()) {
-			performanceScore += this.getPerformanceScore(actType, this.accumulatedTimeSpentPerforming.get(actType));
+		for (Double actTypeScore : this.accumulatedScores.values()) {
+			performanceScore += actTypeScore;
 		}
 		return performanceScore;
 	}
