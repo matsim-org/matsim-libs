@@ -20,26 +20,24 @@
 
 package playground.mohit;
 
-import java.util.Collection;
-import java.util.Collections;
+
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.utils.collections.QuadTree;
 
-import playground.marcel.pt.transitSchedule.TransitRoute;
 
 public class VisumNetwork {
 
 	public final Map<Id, Stop> stops = new TreeMap<Id, Stop>();
-	public final Map<Id, StopPoint> stopPoints = new TreeMap<Id, StopPoint>();
+	public final Map<Id, StopArea> stopAreas = new TreeMap<Id, StopArea>();
+	public final Map<String, StopPoint> stopPoints = new TreeMap<String, StopPoint>();
 	public final Map<Id, TransitLine> lines = new TreeMap<Id, TransitLine>();
-	public final Map<Id, TransitLineRoute> lineRoutes = new TreeMap<Id, TransitLineRoute>();
+	public final Map<String, TransitLineRoute> lineRoutes = new TreeMap<String, TransitLineRoute>();
 	public final Map<String , LineRouteItem> lineRouteItems = new TreeMap<String, LineRouteItem>();
 	public final Map<String , TimeProfile> timeProfiles = new TreeMap<String, TimeProfile>();
 	public final Map<String , TimeProfileItem> timeProfileItems = new TreeMap<String, TimeProfileItem>();
@@ -53,17 +51,27 @@ public class VisumNetwork {
 			// there was already a stop with the same id
 			// re-do the insertion
 			this.stops.put(oldStop.id, oldStop);
-			throw new IllegalArgumentException("There is already a stop with the same id.");
+			throw new IllegalArgumentException("There is already a stop with the same Name");
+		}
+	
+	}
+    public void addStopArea(final StopArea stopAr) {
+		StopArea oldStopAr = this.stopAreas.put(stopAr.id, stopAr);
+		if (oldStopAr != null) {
+			// there was already a stop point with the same id
+			// re-do the insertion
+			this.stopAreas.put(oldStopAr.id, oldStopAr);
+			throw new IllegalArgumentException("There is already a stop area with the same id.");
 		}
 	
 	}
 
 	public void addStopPoint(final StopPoint stopPt) {
-		StopPoint oldStopPt = this.stopPoints.put(stopPt.id, stopPt);
+		StopPoint oldStopPt = this.stopPoints.put(stopPt.stopAreaId.toString()+stopPt.id.toString(), stopPt);
 		if (oldStopPt != null) {
 			// there was already a stop point with the same id
 			// re-do the insertion
-			this.stopPoints.put(oldStopPt.id, oldStopPt);
+			this.stopPoints.put(oldStopPt.stopAreaId.toString()+oldStopPt.id.toString(), oldStopPt);
 			throw new IllegalArgumentException("There is already a stop with the same id.");
 		}
 	
@@ -79,61 +87,56 @@ public class VisumNetwork {
 		
 	}
 	public void addLineRoute(final TransitLineRoute lr1) {
-		TransitLineRoute oldlr = this.lineRoutes.put(lr1.id, lr1);
+		TransitLineRoute oldlr = this.lineRoutes.put(lr1.lineName.toString()+"/"+lr1.id.toString()+"/"+lr1.DCode.toString(), lr1);
 		if (oldlr != null) {
 			// there was already a line route with the same id
 			// re-do the insertion
-			this.lineRoutes.put(oldlr.id, oldlr);
-			throw new IllegalArgumentException("There is already a route with the same id.");
+			this.lineRoutes.put(oldlr.lineName.toString()+"/"+oldlr.id.toString()+"/"+oldlr.DCode.toString(), oldlr);
+			throw new IllegalArgumentException("There is already a line route with the same id.");
 		}
 		
 	}
 	public void addLineRouteItem(final LineRouteItem lri1) {
-		LineRouteItem oldlri = this.lineRouteItems.put(lri1.lineName + lri1.lineRouteName + lri1.index, lri1);
+		LineRouteItem oldlri = this.lineRouteItems.put(lri1.lineName +"/"+ lri1.lineRouteName +"/"+lri1.index+"/"+lri1.DCode, lri1);
 		if (oldlri != null) {
-			// there was already a stop with the same id
+			// there was already a Line Route Item with the same id
 			// re-do the insertion
-			this.lineRouteItems.put(oldlri.lineName + oldlri.lineRouteName + oldlri.index, oldlri);
-		throw new IllegalArgumentException("There is already a route item with the same id.");
+			this.lineRouteItems.put(oldlri.lineName +"/"+oldlri.lineRouteName+"/"+oldlri.index+"/"+oldlri.DCode, oldlri);
+		throw new IllegalArgumentException("There is already a route item with the same id."+oldlri.lineName +"/"+ oldlri.lineRouteName +"/"+oldlri.index+"/"+ oldlri.DCode);
 		}
 		
 	}
 	public void addTimeProfile(final TimeProfile tp1) {
-		TimeProfile oldtp = this.timeProfiles.put(tp1.lineRouteName.toString() + tp1.index.toString(), tp1);
+		TimeProfile oldtp = this.timeProfiles.put(tp1.lineName.toString()+"/"+tp1.lineRouteName.toString() +"/"+tp1.DCode.toString()+"/"+ tp1.index.toString(), tp1);
 		if (oldtp != null) {
 			// there was already a stop with the same id
 			// re-do the insertion
-			this.timeProfiles.put(oldtp.lineRouteName.toString() + oldtp.index.toString(), oldtp);
-		throw new IllegalArgumentException("There is already a route item with the same id.");
+			this.timeProfiles.put(oldtp.lineName.toString()+"/"+oldtp.lineRouteName.toString() +"/"+oldtp.DCode.toString()+"/"+ oldtp.index.toString(), oldtp);
+		throw new IllegalArgumentException("There is already a time profile with the same id."+oldtp.lineRouteName.toString() +"/"+ oldtp.index.toString());
 		}
 		
 	}
 	public void addTimeProfileItem(final TimeProfileItem tpi1) {
-		TimeProfileItem oldtpi = this.timeProfileItems.put(tpi1.lineName + tpi1.lineRouteName + tpi1.timeProfileName + tpi1.index, tpi1);
+		TimeProfileItem oldtpi = this.timeProfileItems.put(tpi1.lineName+"/"+tpi1.lineRouteName+"/"+tpi1.timeProfileName+"/"+tpi1.DCode+"/"+tpi1.index, tpi1);
 		if (oldtpi != null) {
 			// there was already a stop with the same id
 			// re-do the insertion
-			this.timeProfileItems.put(oldtpi.lineName + oldtpi.lineRouteName + oldtpi.index, oldtpi);
-		throw new IllegalArgumentException("There is already a route item with the same id.");
+			this.timeProfileItems.put(oldtpi.lineName+"/"+oldtpi.lineRouteName+"/"+oldtpi.timeProfileName+"/"+oldtpi.DCode+"/"+oldtpi.index, oldtpi);
+		throw new IllegalArgumentException("There is already a time profile item with the same id.");
 		}
 		
 	}
 	public void addDeparture(final Departure d) {
-		Departure oldD = this.departures.put(d.lineName + d.lineRouteName + d.index, d);
+		Departure oldD = this.departures.put(d.lineName +"/"+ d.lineRouteName +"/"+ d.index, d);
 		if (oldD != null) {
 			// there was already a stop with the same id
 			// re-do the insertion
-			this.departures.put(oldD.lineName + oldD.lineRouteName + oldD.index, oldD);
-		throw new IllegalArgumentException("There is already a route item with the same id.");
+			this.departures.put(oldD.lineName+"/"+ oldD.lineRouteName +"/"+ oldD.index, oldD);
+		throw new IllegalArgumentException("There is already a departure with the same id.");
 		}
 		
 	}
-	public double toDouble(String s)
-	{   Double d;
-		d = Integer.parseInt(s.substring(0, 1))*60 + Integer.parseInt(s.substring(3, 4)) + Double.parseDouble(s.substring(6, 7))/60;
-		return d;
-	}
-	
+
 	
 	public static class Stop {
 		public final Id id;
@@ -146,15 +149,26 @@ public class VisumNetwork {
 			this.coord = coord;
 		}
 	}
+	public static class StopArea {
+		public final Id id;
+		public final Id StopId;
+		
+
+		public StopArea(final Id id, final Id StopId) {
+			this.id = id;
+			this.StopId = StopId;
+		
+		}
+	}
 	public static class StopPoint {
-		public final Id id,stopId;
-		//public final String stopId;
+		public final Id id,stopAreaId;
+		
 		public final String name;
 		public final Id refLinkNo;
 
-		public StopPoint(final Id id, final Id stopId, final String name, final Id refLinkNo) {
+		public StopPoint(final Id id, final Id stopAreaId, final String name, final Id refLinkNo) {
 			this.id = id;
-			this.stopId = stopId;
+			this.stopAreaId = stopAreaId;
 			this.name = name;
 			this.refLinkNo = refLinkNo;
 		}
@@ -163,12 +177,14 @@ public class VisumNetwork {
 
 		public final Id id;
 		public final Id lineName;
+		public final Id DCode;
 		
 		
 
-		public TransitLineRoute(final Id id,final Id lineName) {
+		public TransitLineRoute(final Id id,final Id lineName,final Id DCode) {
 		this.id = id;;
 		this.lineName = lineName;
+		this.DCode = DCode;
 		}
 	}
 	
@@ -188,15 +204,17 @@ public class VisumNetwork {
 		public final String lineName;
 		public final String lineRouteName;
 		public final String index;
+		public final String DCode;
 		public final Id stopPointNo;
 		
 		
 
-		public LineRouteItem(final String lineName, final String lineRouteName, final String index, final Id stopPointNo) {
+		public LineRouteItem(final String lineName, final String lineRouteName, final String index,final String DCode, final Id stopPointNo) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.index = index;
 			this.stopPointNo = stopPointNo;
+			this.DCode = DCode;
 		}
 	}
 	
@@ -204,13 +222,15 @@ public class VisumNetwork {
 		public final Id lineName;
 		public final Id lineRouteName;
 		public final Id index;
+		public final Id DCode;
+		
 		
 
-		public TimeProfile(final Id lineName, final Id lineRouteName, final Id index) {
+		public TimeProfile(final Id lineName, final Id lineRouteName, final Id index,final Id DCode) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.index = index;
-			
+			this.DCode = DCode;
 		}
 	}
 	
@@ -222,12 +242,13 @@ public class VisumNetwork {
 		public final String arr;
 		public final String dep;
 		public final Id lRIIndex;
-		
+		public final String DCode;
 
-		public TimeProfileItem(final String lineName, final String lineRouteName,  final String timeProfileName,final String index, final String arr, final String dep, final Id lRIIndex) {
+		public TimeProfileItem(final String lineName, final String lineRouteName,  final String timeProfileName,final String DCode,final String index, final String arr, final String dep, final Id lRIIndex) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.timeProfileName = timeProfileName;
+			this.DCode = DCode;
 			this.index = index;
 			this.arr = arr;
 			this.dep = dep;

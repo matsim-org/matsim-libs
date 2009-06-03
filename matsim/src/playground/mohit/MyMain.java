@@ -35,7 +35,7 @@ public class MyMain {
 		final VisumNetwork vNetwork = new VisumNetwork();
 		  
 		try {
-			new VisumNetworkReader(vNetwork).read("C:\\Dokumente und Einstellungen\\shah\\Desktop\\netw6.net"); // yalcin
+			new VisumNetworkReader(vNetwork).read("C:\\Dokumente und Einstellungen\\shah\\Desktop\\netwF.net"); // yalcin
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
@@ -47,7 +47,7 @@ public class MyMain {
 		}
 		System.out.println("Stop Points......." );
 		for (StopPoint sp1 : vNetwork.stopPoints.values()) {
-			System.out.println("> " + sp1.id + "  " + sp1.stopId + "   " + sp1.name+ "   " + sp1.refLinkNo);
+			System.out.println("> " + sp1.id + "  " + sp1.stopAreaId + "   " + sp1.name+ "   " + sp1.refLinkNo);
 		}
 		System.out.println("Lines......." );
 		for (TransitLine l1 : vNetwork.lines.values()) {
@@ -80,7 +80,7 @@ public class MyMain {
 		new Visum2TransitSchedule(vNetwork, schedule).convert();
 		
 		try {
-			new TransitScheduleWriterV1(schedule).write("C:\\Dokumente und Einstellungen\\shah\\Desktop\\transitSchedule2.xml");
+			new TransitScheduleWriterV1(schedule).write("C:\\Dokumente und Einstellungen\\shah\\Desktop\\transitScheduleF.xml");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
