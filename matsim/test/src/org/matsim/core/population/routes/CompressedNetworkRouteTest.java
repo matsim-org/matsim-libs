@@ -36,7 +36,7 @@ import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 /**
  * @author mrieser
  */
-public class CompressedCarRouteTest extends AbstractNetworkRouteTest {
+public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
 	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, Network network) {
