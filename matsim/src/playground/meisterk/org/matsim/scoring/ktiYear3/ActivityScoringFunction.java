@@ -288,6 +288,9 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		if (this.accumulatedTimeSpentPerforming != null) {
 			this.accumulatedTimeSpentPerforming.clear();
 		}
+		if (this.accumulatedScores != null) {
+			this.accumulatedScores.clear();
+		}
 		this.accumulatedTooShortDuration = 0.0;
 		this.timeSpentWaiting = 0.0;
 		this.accumulatedNegativeDuration = 0.0;
