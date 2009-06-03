@@ -32,9 +32,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
@@ -62,13 +62,13 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private static final String DEPARTURE_OFFSET = "departureOffset";
 
 	private final TransitSchedule schedule;
-	private final NetworkLayer network;
+	private final Network network;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final NetworkLayer network) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
 		this.schedule = schedule;
 		this.network = network;
 	}
@@ -83,7 +83,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			TransitStopFacility stop = new TransitStopFacility(
 					new IdImpl(atts.getValue(ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
 			if (atts.getValue(LINK_REF_ID) != null) {
-				Link link = this.network.getLink(atts.getValue(LINK_REF_ID));
+				Link link = this.network.getLinks().get(new IdImpl(atts.getValue(LINK_REF_ID)));
 				if (link == null) {
 					throw new RuntimeException("no link with id " + atts.getValue(REF_ID));
 				}
@@ -104,7 +104,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRoute();
 		} else if (LINK.equals(name)) {
-			Link link = this.network.getLink(atts.getValue(REF_ID));
+			Link link = this.network.getLinks().get(new IdImpl(atts.getValue(REF_ID)));
 			if (link == null) {
 				throw new RuntimeException("no link with id " + atts.getValue(REF_ID));
 			}
