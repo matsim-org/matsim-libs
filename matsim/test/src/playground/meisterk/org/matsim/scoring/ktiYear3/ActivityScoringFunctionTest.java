@@ -92,8 +92,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		scoring.setMarginalUtlOfDistanceCar(0.0);
 		scoring.setWaiting(0.0);
 		
-		this.config.planomat().setDoLogging(false);
-//		this.config.planomat().setJgapMaxGenerations(10000);
+//		this.config.planomat().setDoLogging(true);
+//		this.config.planomat().setJgapMaxGenerations(1);
+//		this.config.planomat().setPopSize(4);
 		
 		// generate person
 		this.population = new PopulationImpl();

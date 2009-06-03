@@ -59,6 +59,8 @@ public class PlanomatJGAPConfiguration extends Configuration {
 
 			setEventManager(new EventManager());
 
+			this.setBreeder(new PlanomatGABreeder());
+			
 			// initialize selection:
 			// - weighted roulette wheel selection (standard)
 //			WeightedRouletteSelector weightedRouletteSelector = new WeightedRouletteSelector(this);
