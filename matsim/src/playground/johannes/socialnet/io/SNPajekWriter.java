@@ -61,12 +61,12 @@ public class SNPajekWriter<P extends BasicPerson<?>> extends
 
 	@Override
 	protected String getVertexX(Ego<P> v) {
-		return String.valueOf(v.getCoord().getX());
+		return String.valueOf(v.getCoordinate().getX());
 	}
 
 	@Override
 	protected String getVertexY(Ego<P> v) {
-		return String.valueOf(v.getCoord().getY());
+		return String.valueOf(v.getCoordinate().getY());
 	}
 
 	@Override

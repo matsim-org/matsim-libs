@@ -50,7 +50,7 @@ public class GraphML2KMLDegree {
 		
 		SNKMLWriter<Person> writer = new SNKMLWriter<Person>();
 		SNKMLDegreeStyle<Person> vertexStyle = new SNKMLDegreeStyle<Person>(writer.getVertexIconLink());
-		vertexStyle.setLogscale(true);
+		vertexStyle.setLogscale(false);
 		writer.setVertexStyle(vertexStyle);
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
 		writer.write(socialnet, args[2]);

@@ -50,7 +50,7 @@ public class SocialNetworkStatistics {
 		Distribution stats = new Distribution();
 		for(Ego<?> e : vertices) {
 			for(Ego<?> e2 : e.getNeighbours()) {
-				double d = CoordUtils.calcDistance(e.getCoord(), e2.getCoord());
+				double d = CoordUtils.calcDistance(e.getCoordinate(), e2.getCoordinate());
 				stats.add(d);
 			}
 		}
@@ -88,7 +88,7 @@ public class SocialNetworkStatistics {
 		for(Ego<?> e : vertices) {
 			double sum = 0;
 			for(Ego<?> e2 : e.getNeighbours()) {
-				sum += CoordUtils.calcDistance(e.getCoord(), e2.getCoord());
+				sum += CoordUtils.calcDistance(e.getCoordinate(), e2.getCoordinate());
 			}
 			d_distr.put(e, sum/(double)e.getNeighbours().size());
 		}
@@ -107,7 +107,7 @@ public class SocialNetworkStatistics {
 				double sum_d = 0;
 				for (Ego<P> j : i.getNeighbours()) {
 					sum_d += CoordUtils
-							.calcDistance(i.getCoord(), j.getCoord());
+							.calcDistance(i.getCoordinate(), j.getCoordinate());
 				}
 				double d_mean = sum_d / (double) i.getNeighbours().size();
 				values.put(i, d_mean);
@@ -121,9 +121,9 @@ public class SocialNetworkStatistics {
 		TDoubleDoubleHashMap globalDistr = edgeLengthDistribution(vertices).normalizedDistribution(1000);
 		for(T v : vertices) {
 			Distribution localDistr = new Distribution();
-			Coord c1 = v.getCoord();
+			Coord c1 = v.getCoordinate();
 			for(Ego<?> t : v.getNeighbours()) {
-				Coord c2 = t.getCoord();
+				Coord c2 = t.getCoordinate();
 				double d = CoordUtils.calcDistance(c1, c2);
 				localDistr.add(d);
 			}

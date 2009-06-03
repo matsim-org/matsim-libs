@@ -32,9 +32,9 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -60,7 +60,6 @@ import playground.johannes.socialnet.io.SNKMLWriter;
 import playground.johannes.socialnet.io.SNPajekWriter;
 import playground.johannes.socialnet.mcmc.ErgmDistanceLocal;
 import playground.johannes.socialnet.mcmc.SNAdjacencyMatrix;
-import playground.johannes.socialnet.spatial.GridUtils;
 import playground.johannes.socialnet.spatial.SpatialGrid;
 import playground.johannes.statistics.Distribution;
 
@@ -74,9 +73,6 @@ public class GravityBasedGenerator {
 	
 	private static final String MODULE_NAME = "gravityGenerator";
 	
-//	private static String outputDir;
-	
-	private static SpatialGrid<Double> densityGrid;
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -90,63 +86,64 @@ public class GravityBasedGenerator {
 		Population population = scenario.getPopulation();
 //		LatticeGenerator generator = new LatticeGenerator();
 //		BasicPopulation<BasicPerson<?>> population = generator.generate(100, 100);
-		String outputDir = config.getParam(MODULE_NAME, "output");
-		/*
-		 * Setup social network and adjacency matrix.
-		 */
-//		SocialNetworkFactory<Person> factory = new SocialNetworkFactory<Person>(population);
-//		ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie> generator = new ErdosRenyiGenerator<SocialNetwork<Person>, Ego<Person>, SocialTie>(factory);
-//		SocialNetwork<Person> socialnet = generator.generate(population.getPersons().size(), 0.00001, config.global().getRandomSeed());
-		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
+		
+
+		GravityBasedGenerator generator = new GravityBasedGenerator();
+		generator.thetaDensity = Double.parseDouble(config.getParam(MODULE_NAME, "theta_density"));
+		generator.burnin = (long)Double.parseDouble(config.getParam(MODULE_NAME, "burnin"));
+		generator.sampleSize = Integer.parseInt(config.getParam(MODULE_NAME, "samplesize"));
+		generator.sampleInterval = Integer.parseInt(config.getParam(MODULE_NAME, "sampleinterval"));
+		generator.outputDir = config.getParam(MODULE_NAME, "output"); 
+		SpatialGrid<Double> densityGrid = SpatialGrid.readFromFile(args[1]);
+//		SpatialGrid<Double> densityGrid = GridUtils.createDensityGrid(population, 10);
+		
+		generator.generate(population, densityGrid);
+
+	}
+
+	private long burnin;
+	
+	private int sampleSize;
+	
+	private int sampleInterval;
+	
+	private String outputDir;
+	
+	private double thetaDensity;
+	
+	private final double thetaGravity = 1;
+	
+	public <P extends BasicPerson<?>> void generate(BasicPopulation<P> population, SpatialGrid<Double> densityGrid) {
+		SocialNetwork<P> socialnet = new SocialNetwork<P>(population);
 		
 		
-		SNAdjacencyMatrix<Person> matrix = new SNAdjacencyMatrix<Person>(socialnet);
+		SNAdjacencyMatrix<P> matrix = new SNAdjacencyMatrix<P>(socialnet);
 		/*
 		 * Setup ergm terms.
 		 */
-		double theta_density = Double.parseDouble(config.getParam(MODULE_NAME, "theta_density"));
-		double theta_distance = Double.parseDouble(config.getParam(MODULE_NAME, "theta_distance"));;
-		
 		Ergm ergm = new Ergm();
 		ErgmTerm[] terms = new ErgmTerm[2];
 		terms[0] = new ErgmDensity();
-		terms[0].setTheta(theta_density);
+		terms[0].setTheta(thetaDensity);
 		terms[1] = new ErgmDistanceLocal(matrix);
-		terms[1].setTheta(theta_distance);
+		terms[1].setTheta(thetaGravity);
 		
 		ergm.setErgmTerms(terms);
 		/*
 		 * Setup gibbs sampler.
 		 */
-		long burnin = (long)Double.parseDouble(config.getParam(MODULE_NAME, "burnin"));
-		int samplesize = Integer.parseInt(config.getParam(MODULE_NAME, "samplesize"));
-		int sampleinterval = Integer.parseInt(config.getParam(MODULE_NAME, "sampleinterval"));
-		
 		GibbsSampler sampler = new GibbsSampler();
 		sampler.setInterval(1000000);
-		SpatialGrid<Double> densityGrid = SpatialGrid.readFromFile(args[1]);
-//		SpatialGrid<Double> densityGrid = GridUtils.createDensityGrid(population, 10);
 		Handler handler = new Handler(outputDir, densityGrid);
-		handler.setSampleSize(samplesize);
-		handler.setSampleInterval(sampleinterval);
+		handler.setSampleSize(sampleSize);
+		handler.setSampleInterval(sampleInterval);
 		
 		logger.info(String.format("Starting gibbs sampler. Burnin time: %1$s iterations.", burnin));
 		sampler.sample(matrix, ergm, burnin, handler);
 		logger.info("Gibbs sampler terminated.");
 		logger.info(handler.toString());
-		/*
-		 * Output results...
-		 */
-//		socialnet = matrix.getGraph();
-//		SNGraphMLWriter writer = new SNGraphMLWriter();
-//		writer.write(socialnet, outputDir + "socialnet.graphml");
-//		
-//		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(socialnet, false, 0).absoluteDistribution(1000), outputDir + "edgelength.hist.txt");
-//		WeightedStatistics.writeHistogram(GraphStatistics.getDegreeDistribution(socialnet).absoluteDistribution(), outputDir + "degree.hist.txt");
-//		
-//		GraphAnalyser.main(new String[]{outputDir + "socialnet.graphml", outputDir + "socialnet.txt", "-e"});
 	}
-
+	
 	public static class Handler implements MCMCSampleDelegate {
 		
 		private static final Logger logger = Logger.getLogger(Handler.class);

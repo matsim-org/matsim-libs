@@ -80,8 +80,8 @@ public class SNGraphMLWriter extends GraphMLWriter {
 		
 		Ego<?> e = (Ego<?>)v;
 		attrs.add(new Tuple<String, String>(SNGraphML.PERSON_ID_TAG, e.getPerson().getId().toString()));
-		attrs.add(new Tuple<String, String>(SNGraphML.COORD_X_TAG, String.valueOf(e.getCoord().getX())));
-		attrs.add(new Tuple<String, String>(SNGraphML.COORD_Y_TAG, String.valueOf(e.getCoord().getY())));
+		attrs.add(new Tuple<String, String>(SNGraphML.COORD_X_TAG, String.valueOf(e.getCoordinate().getX())));
+		attrs.add(new Tuple<String, String>(SNGraphML.COORD_Y_TAG, String.valueOf(e.getCoordinate().getY())));
 		
 		return attrs;
 	}

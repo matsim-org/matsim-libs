@@ -61,10 +61,10 @@ public class ErgmDistanceLocal extends ErgmTerm {
 		for(int i = 0; i < n; i++) {
 			TDoubleDoubleHashMap norm_i = new TDoubleDoubleHashMap();
 			
-			Coord c_i = m.getEgo(i).getCoord();
+			Coord c_i = m.getEgo(i).getCoordinate();
 			for(int j = 0; j < n; j++) {
 				if(j != i) {
-					Coord c_j = m.getEgo(j).getCoord();
+					Coord c_j = m.getEgo(j).getCoordinate();
 					double d = CoordUtils.calcDistance(c_i, c_j);
 					double bin = getBin(d);
 					norm_i.adjustOrPutValue(bin, 1, 1);
@@ -140,8 +140,8 @@ public class ErgmDistanceLocal extends ErgmTerm {
 	
 	@Override
 	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
-		Coord c_i = ((SNAdjacencyMatrix<?>)m).getEgo(i).getCoord();
-		Coord c_j = ((SNAdjacencyMatrix<?>)m).getEgo(j).getCoord();
+		Coord c_i = ((SNAdjacencyMatrix<?>)m).getEgo(i).getCoordinate();
+		Coord c_j = ((SNAdjacencyMatrix<?>)m).getEgo(j).getCoordinate();
 		
 		double d = CoordUtils.calcDistance(c_i, c_j);
 		

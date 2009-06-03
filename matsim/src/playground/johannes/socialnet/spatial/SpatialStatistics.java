@@ -70,7 +70,7 @@ public class SpatialStatistics {
 		 * Create a grid where each cell contains an array with the values of the vertices within a cell.
 		 */
 		for(Object e : vertexValues.keys()) {
-			Coord c = ((Ego<?>) e).getCoord();
+			Coord c = ((Ego<?>) e).getCoordinate();
 			if(valuesGrid.isInBounds(c)) {
 				TDoubleArrayList values = valuesGrid.getValue(c);
 				if(values == null) {
@@ -143,8 +143,8 @@ public class SpatialStatistics {
 	public static <V extends Ego<? extends BasicPerson<?>>> TDoubleObjectHashMap<Set<V>> createDensityPartitions(Set<V> vertices, SpatialGrid<Double> densityGrid, double binsize) {
 		TObjectDoubleHashMap<V> vertexValues = new TObjectDoubleHashMap<V>();
 		for(V v : vertices) {
-			if(densityGrid.isInBounds(v.getCoord())) {
-				double rho = densityGrid.getValue(v.getCoord());
+			if(densityGrid.isInBounds(v.getCoordinate())) {
+				double rho = densityGrid.getValue(v.getCoordinate());
 				vertexValues.put(v, rho);
 			}
 		}

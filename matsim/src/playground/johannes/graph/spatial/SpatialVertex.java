@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialTie.java
+ * SpatialVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,62 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.graph.spatial;
 
-/**
- * 
- */
-package playground.johannes.socialnet;
+import java.util.List;
 
-import gnu.trove.TIntArrayList;
+import org.matsim.api.basic.v01.Coord;
 
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.graph.spatial.SpatialEdge;
+import playground.johannes.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SocialTie extends SpatialEdge {
+public class SpatialVertex extends SparseVertex {
 
-	private int created;
+	private Coord coord;
 	
-	private TIntArrayList usage;
-	
-	private int lastUsed;
-	
-	protected SocialTie(Ego<?> v1, Ego<?> v2) {
-		this(v1, v2, 0);
-	}
-	
-	protected SocialTie(Ego<?> v1, Ego<?> v2, int created) {
-		super(v1, v2);
-		this.created = created;
-		usage = new TIntArrayList();
-		usage.add(created);
-		lastUsed = created;
+	protected SpatialVertex(Coord coord) {
+		this.coord = coord;
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Tuple<? extends Ego<?>, ? extends Ego<?>> getVertices() {
-		return (Tuple<? extends Ego<?>, ? extends Ego<?>>) super.getVertices();
+	public List<? extends SpatialVertex> getNeighbours() {
+		return (List<? extends SpatialVertex>) super.getNeighbours();
 	}
 
-	public int getCreated() {
-		return created;
-	}
-	
-	public int getLastUsed() {
-		return lastUsed;
-	}
-	
-	public TIntArrayList getUsage() {
-		return usage;
-	}
-
-	public void use(int iteration) {
-		usage.add(iteration);
-		lastUsed = iteration;
+	public Coord getCoordinate() {
+		return coord;
 	}
 }

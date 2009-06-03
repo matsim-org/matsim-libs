@@ -137,14 +137,14 @@ public class SocialNetworkAnalyzer {
 //						Distribution.writeHistogram(SocialNetworkStatistics.edgeLengthDistribution(partition).absoluteDistribution(10), output + "edgelength.rho="+rho+".hist.txt");
 //				}
 				
-//				double xmin = 8.298482309439372;
-//				double xmax = 8.848994325098269;
-//				double ymin = 47.20737601071456;
-//				double ymax = 47.50074681594523;
-				double xmin = 40;
-				double xmax = 60;
-				double ymin = 40;
-				double ymax = 60;
+				double xmin = 8.298482309439372;
+				double xmax = 8.848994325098269;
+				double ymin = 47.20737601071456;
+				double ymax = 47.50074681594523;
+//				double xmin = 40;
+//				double xmax = 60;
+//				double ymin = 40;
+//				double ymax = 60;
 				Coord c1 = new CoordImpl(xmin, ymin);
 				Coord c2 = new CoordImpl(xmax, ymax);
 //				CoordinateTransformation trans = new WGS84toCH1903LV03();
@@ -153,7 +153,7 @@ public class SocialNetworkAnalyzer {
 				
 				Set<Ego<?>> egos = new HashSet<Ego<?>>();
 				for(Ego<?> e : socialnet.getVertices()) {
-					Coord c = e.getCoord();
+					Coord c = e.getCoordinate();
 					
 					if(c.getX() >= c1.getX() && c.getX() <= c2.getX() && c.getY() >= c1.getY() && c.getY() <= c2.getY()) {
 						egos.add(e);

@@ -173,9 +173,9 @@ public class SNKMLWriter<P extends BasicPerson<?>> {
 				 * create a point geometry
 				 */
 				PointType point = objectFactory.createPointType();
-				Coord coord = e.getCoord();
+				Coord coord = e.getCoordinate();
 				if(transformation != null)
-					coord = transformation.transform(e.getCoord());
+					coord = transformation.transform(e.getCoordinate());
 				point.getCoordinates().add(String.format("%1$s,%2$s", Double.toString(coord.getX()), Double.toString(coord.getY())));
 				/*
 				 * create placemark
@@ -219,8 +219,8 @@ public class SNKMLWriter<P extends BasicPerson<?>> {
 				LineStringType lineString = objectFactory.createLineStringType();
 				Ego<?> e1 = tie.getVertices().getFirst();
 				Ego<?> e2 = tie.getVertices().getSecond();
-				Coord c1 = e1.getCoord();
-				Coord c2 = e2.getCoord();
+				Coord c1 = e1.getCoordinate();
+				Coord c2 = e2.getCoordinate();
 				if (transformation != null) {
 					c1 = transformation.transform(c1);
 					c2 = transformation.transform(c2);

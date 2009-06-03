@@ -52,9 +52,9 @@ public class ErgmDistance extends ErgmTerm {
 		normConstants = new TDoubleDoubleHashMap();
 		
 		for(int i = 0; i < n; i++) {
-			Coord c_i = m.getEgo(i).getCoord();
+			Coord c_i = m.getEgo(i).getCoordinate();
 			for(int j = i+1; j < n; j++) {
-					Coord c_j = m.getEgo(j).getCoord();
+					Coord c_j = m.getEgo(j).getCoordinate();
 					double d = CoordUtils.calcDistance(c_i, c_j);
 					double bin = Math.ceil(d / normBinSize);
 					double count = normConstants.get(bin);
@@ -82,8 +82,8 @@ public class ErgmDistance extends ErgmTerm {
 
 	@Override
 	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
-		Coord c_i = ((SNAdjacencyMatrix<?>)m).getEgo(i).getCoord();
-		Coord c_j = ((SNAdjacencyMatrix<?>)m).getEgo(j).getCoord();
+		Coord c_i = ((SNAdjacencyMatrix<?>)m).getEgo(i).getCoordinate();
+		Coord c_j = ((SNAdjacencyMatrix<?>)m).getEgo(j).getCoordinate();
 		
 		double d = CoordUtils.calcDistance(c_i, c_j);
 		double norm = normConstants.get(Math.ceil(d/normBinSize));

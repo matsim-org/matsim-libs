@@ -32,12 +32,13 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 
 import playground.johannes.graph.AbstractSparseGraph;
 import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.spatial.SpatialGraph;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetwork<P extends BasicPerson<?>> extends AbstractSparseGraph {
+public class SocialNetwork<P extends BasicPerson<?>> extends SpatialGraph {
 	
 	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	

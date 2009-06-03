@@ -25,30 +25,26 @@ package playground.johannes.socialnet;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 
-import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.spatial.SpatialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<?>> extends SparseVertex {
+public class Ego<P extends BasicPerson<?>> extends SpatialVertex {
 
 	private P person;
 	
 	protected Ego(P person) {
+		super(((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord());
 		this.person = person;
 	}
 	
 	public P getPerson() {
 		return person;
-	}
-	
-	public Coord getCoord() {
-		return ((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord();
 	}
 
 	@SuppressWarnings("unchecked")
