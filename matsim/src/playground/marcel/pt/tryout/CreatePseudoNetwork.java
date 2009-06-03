@@ -20,60 +20,58 @@
 
 package playground.marcel.pt.tryout;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.TransitStopFacility;
-import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
 
 public class CreatePseudoNetwork {
 
-	public static final String INPUT_SCHEDULE = "../thesis-data/examples/berta/schedule.xml";
-	public static final String OUTPUT_SCHEDULE = "../thesis-data/examples/berta/pseudoSchedule.xml";
-	public static final String OUTPUT_NETWORK = "../thesis-data/examples/berta/pseudoNetwork.xml";
+//	public static final String INPUT_SCHEDULE = "../thesis-data/examples/berta/schedule.xml";
+//	public static final String OUTPUT_SCHEDULE = "../thesis-data/examples/berta/pseudoSchedule.xml";
+//	public static final String OUTPUT_NETWORK = "../thesis-data/examples/berta/pseudoNetwork.xml";
 	
 	private Map<Tuple<TransitStopFacility, TransitStopFacility>, Link> links = null;
 	private Map<TransitStopFacility, Node> nodes = null;
-	private NetworkLayer network = null;
+	private final NetworkLayer network;
+	private final TransitSchedule schedule;
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
 	
-	public void run() {
-		network = new NetworkLayer();
+	public CreatePseudoNetwork(final TransitSchedule schedule) {
+		this.network = new NetworkLayer();
+		this.schedule = schedule;
+	}
+	
+	public Network run() {
 		this.linkIdCounter = 0;
 		this.nodeIdCounter = 0;
-		TransitSchedule schedule = new TransitSchedule();
-		try {
-			new TransitScheduleReaderV1(schedule, null).readFile(INPUT_SCHEDULE);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			new TransitScheduleReaderV1(schedule, null).readFile(INPUT_SCHEDULE);
+//		} catch (SAXException e) {
+//			e.printStackTrace();
+//		} catch (ParserConfigurationException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		this.links = new HashMap<Tuple<TransitStopFacility, TransitStopFacility>, Link>();
 		this.nodes = new HashMap<TransitStopFacility, Node>();
@@ -112,13 +110,13 @@ public class CreatePseudoNetwork {
 			remove.getFirst().removeRoute(remove.getSecond());
 		}
 		
-		new NetworkWriter(network, OUTPUT_NETWORK).write();
-		try {
-			new TransitScheduleWriterV1(schedule).write(OUTPUT_SCHEDULE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+//		new NetworkWriter(network, OUTPUT_NETWORK).write();
+//		try {
+//			new TransitScheduleWriterV1(schedule).write(OUTPUT_SCHEDULE);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		return network;
 	}
 	
 	private Link getNetworkLink(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
@@ -139,9 +137,5 @@ public class CreatePseudoNetwork {
 			links.put(new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop), link);
 		}
 		return link;
-	}
-	
-	public static void main(final String[] args) {
-		new CreatePseudoNetwork().run();
 	}
 }

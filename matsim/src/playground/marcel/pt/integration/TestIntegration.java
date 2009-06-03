@@ -38,7 +38,6 @@ import playground.marcel.OTFDemo;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderBerta;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.marcel.pt.tryout.CreatePseudoNetwork;
 
 
 public class TestIntegration {
@@ -55,7 +54,7 @@ public class TestIntegration {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		new CreatePseudoNetwork().run();
+//		new CreatePseudoNetwork().run();
 		
 		ScenarioLoader sl = new ScenarioLoader("test/input/playground/marcel/pt/config.xml");
 		Scenario scenario = sl.getScenario();
