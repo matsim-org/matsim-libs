@@ -214,51 +214,51 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			}
 		}
 		else if (NUMBEROFEVENTSDETECTION.equalsIgnoreCase(name)) {
-			int events = Integer.parseInt(atts.getValue("value".intern()));
+			int nOfEvents = Integer.parseInt(atts.getValue("value".intern()));
 			if (this.controlInput instanceof ControlInputMB) {
-				((ControlInputMB)this.controlInput).setNumberOfEventsDetection(events);
+				((ControlInputMB)this.controlInput).setNumberOfEventsDetection(nOfEvents);
 			}
 
 		}
 
 	}
 	@Override
-	public void endTag(final String name, String content, final Stack<String> context) {
-		content = content.trim();
+	public void endTag(final String name, final String content, final Stack<String> context) {
+		String content2 = content.trim();
 		if (name.equalsIgnoreCase(MAINROUTE)) {
-			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
-			route.setNodes(this.currentRouteNodes);
+			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
+			route.setNodes(null, this.currentRouteNodes, null);
 			this.controlInput.setMainRoute(route);
 		} else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
-			route.setNodes(this.currentRouteNodes);
+			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
+			route.setNodes(null, this.currentRouteNodes, null);
 			this.controlInput.setAlternativeRoute(route);
 		}
 		else if (name.equalsIgnoreCase(CONTROLINPUTCLASS)) {
-			this.controlInput = createControlInput(content);
+			this.controlInput = createControlInput(content2);
 			this.vdsSign.setControlInput(this.controlInput);
 		}
 		else if (name.equalsIgnoreCase(FEEDBACKCONTROLER)) {
-			FeedbackControler controler = createControlTheoryControler(content);
+			FeedbackControler controler = createControlTheoryControler(content2);
 			this.vdsSign.setControler(controler);
 		}
 		else if (name.equalsIgnoreCase(MESSAGEHOLDTIME)) {
-			this.vdsSign.setMessageHoldTime(Integer.valueOf(content));
+			this.vdsSign.setMessageHoldTime(Integer.parseInt(content2));
 		}
 		else if (name.equalsIgnoreCase(CONTROLEVENTS)) {
-			this.vdsSign.setControlEvents(Integer.valueOf(content));
+			this.vdsSign.setControlEvents(Integer.parseInt(content2));
 		}
 		else if (name.equalsIgnoreCase(NOMINALSPLITTING)) {
-			this.vdsSign.setNominalSplitting(Double.parseDouble(content));
+			this.vdsSign.setNominalSplitting(Double.parseDouble(content2));
 		}
 		else if (name.equalsIgnoreCase(DEADZONESYSIN)) {
-			this.vdsSign.setDeadZoneSystemInput(Double.parseDouble(content));
+			this.vdsSign.setDeadZoneSystemInput(Double.parseDouble(content2));
 		}
 		else if (name.equalsIgnoreCase(DEADZONESYSOUT)) {
-			this.vdsSign.setDeadZoneSystemOutput(Double.parseDouble(content));
+			this.vdsSign.setDeadZoneSystemOutput(Double.parseDouble(content2));
 		}
 		else if (name.equalsIgnoreCase(SIGNLINK)) {
-			Link l = this.network.getLink(content);
+			Link l = this.network.getLink(content2);
 			if (l != null) {
 				this.vdsSign.setSignLink(l);
 			}
@@ -267,7 +267,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			}
 		}
 		else if (name.equalsIgnoreCase(DIRECTIONLINKS)) {
-			Link l = this.network.getLink(content);
+			Link l = this.network.getLink(content2);
 			if (l != null) {
 				this.vdsSign.setDirectionLink(l);
 			}
@@ -276,10 +276,10 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			}
 		}
 		else if (name.equalsIgnoreCase(COMPLIANCE)) {
-			this.vdsSign.setCompliance(Double.parseDouble(content));
+			this.vdsSign.setCompliance(Double.parseDouble(content2));
 		}
 		else if (name.equalsIgnoreCase(BENEFITCONTROL)) {
-			this.vdsSign.setBenefitControl(Boolean.parseBoolean(content));
+			this.vdsSign.setBenefitControl(Boolean.parseBoolean(content2));
 		}
 		else if (name.equalsIgnoreCase(GUIDANCEDEVICE)) {
 			this.trafficManagement.addVDSSign(this.vdsSign);
@@ -288,7 +288,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.controlInput.init();
 		}
 		else if (name.equalsIgnoreCase(SPREADSHEETFILE)) {
-			this.vdsSignOutput.setSpreadsheetFile(content);
+			this.vdsSignOutput.setSpreadsheetFile(content2);
 		}
 		else if (name.equalsIgnoreCase(OUTPUT)) {
 			this.vdsSign.setOutput(this.vdsSignOutput);
@@ -307,21 +307,21 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private ControlInput createControlInput(final String content) {
 		if (content.trim().compareTo(CONTROLINPUT1) == 0) {
-			ControlInputImpl1 controlInput = new ControlInputImpl1();
-			this.events.addHandler(controlInput);
-			return controlInput;
+			ControlInputImpl1 cI = new ControlInputImpl1();
+			this.events.addHandler(cI);
+			return cI;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTSB) == 0) {
-			ControlInputSB controlInput = new ControlInputSB(this.simulationConfig);
-			controlInput.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
-			this.events.addHandler(controlInput);
-			return controlInput;
+			ControlInputSB cI = new ControlInputSB(this.simulationConfig);
+			cI.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
+			this.events.addHandler(cI);
+			return cI;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTMB) == 0) {
-			ControlInputMB controlInput = new ControlInputMB(this.simulationConfig);
-			controlInput.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
-			this.events.addHandler(controlInput);
-			return controlInput;
+			ControlInputMB cI = new ControlInputMB(this.simulationConfig);
+			cI.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
+			this.events.addHandler(cI);
+			return cI;
 		}
 
 		throw new IllegalArgumentException("The ControlInput of xml is not known in the TrafficManagementConfiguration.");

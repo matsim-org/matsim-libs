@@ -98,15 +98,6 @@ public class NetworkFactory implements Serializable, NetworkBuilder {
 		return factory.createRoute(startLink, endLink);
 	}
 
-	@Deprecated
-	public Route createRoute(final TransportMode mode) {
-		RouteFactory factory = this.routeFactories.get(mode);
-		if (factory == null) {
-			factory = this.defaultFactory;
-		}
-		return factory.createRoute(null, null);
-	}
-
 	/**
 	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
 	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,

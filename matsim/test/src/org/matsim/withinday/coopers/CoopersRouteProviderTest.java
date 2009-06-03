@@ -93,19 +93,19 @@ public class CoopersRouteProviderTest extends TestCase {
 		EmptyControlInputImpl controlInput = new EmptyControlInputImpl();
 		controlInput.setNashTime(0);
 
-		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
+		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
-		this.route1.setNodes(list);
+		this.route1.setNodes(null, list, null);
 		controlInput.setMainRoute(this.route1);
-		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
+		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
 		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
-		this.route2.setNodes(list);
+		this.route2.setNodes(null, list, null);
 		controlInput.setAlternativeRoute(this.route2);
 		//set control input
 		sign.setControlInput(controlInput);
@@ -128,13 +128,13 @@ public class CoopersRouteProviderTest extends TestCase {
 	 */
 	public void testProvidesRoute() {
 	  //create route which is driven by the person in the real simulated world
-		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
+		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
 	  ArrayList<Node> nodes = new ArrayList<Node>();
 	  nodes.add(this.network.getNode("3"));
 	  nodes.add(this.network.getNode("32"));
 	  nodes.add(this.network.getNode("4"));
 	  nodes.add(this.network.getNode("5"));
-	  agentRoute.setNodes(nodes);
+	  agentRoute.setNodes(null, nodes, null);
 	  //test the provider
 	  //first the cases in which it should not provide a route
 	  CoopersRouteProvider provider = this.createRouteProvider();
@@ -147,17 +147,17 @@ public class CoopersRouteProviderTest extends TestCase {
 	  assertFalse("As the sign is set to link no 1 the provider should not provide a route!", provider.providesRoute(this.network.getLink("8"), agentRoute));
 	  //second: now a route should be provided
 	  nodes.add(0, this.network.getNode("2"));
-	  agentRoute.setNodes(nodes);
+	  agentRoute.setNodes(null, nodes, null);
 	  Link linkNo1 = this.network.getLink("1");
 	  assertTrue(provider.providesRoute(linkNo1, agentRoute));
 	  //add another node to the route
 	  nodes.add(this.network.getNode("6"));
-	  agentRoute.setNodes(nodes);
+	  agentRoute.setNodes(null, nodes, null);
 	  assertTrue(provider.providesRoute(linkNo1, agentRoute));
 	  //test a shorter route
 	  nodes.remove(nodes.size() -1);
 	  nodes.remove(nodes.size() -1);
-	  agentRoute.setNodes(nodes);
+	  agentRoute.setNodes(null, nodes, null);
 	  assertTrue(provider.providesRoute(linkNo1, agentRoute));
 
 	}
@@ -167,21 +167,21 @@ public class CoopersRouteProviderTest extends TestCase {
 	 */
 	public void testRequestRouteLinkLinkDouble() {
 	  //create route which is driven by the person in the real simulated world
-		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
+		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
 	  ArrayList<Node> agentRouteNodes = new ArrayList<Node>();
 	  agentRouteNodes.add(this.network.getNode("2"));
 	  agentRouteNodes.add(this.network.getNode("3"));
 	  agentRouteNodes.add(this.network.getNode("32"));
 	  agentRouteNodes.add(this.network.getNode("4"));
-	  agentRoute.setNodes(agentRouteNodes);
+	  agentRoute.setNodes(null, agentRouteNodes, null);
 	  //create the route which should be returned by the provider
-	  NetworkRoute providerRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car);
+	  NetworkRoute providerRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
 	  ArrayList<Node> providerRouteNodes = new ArrayList<Node>();
 	  providerRouteNodes.add(this.network.getNode("2"));
 	  providerRouteNodes.add(this.network.getNode("3"));
 	  providerRouteNodes.add(this.network.getNode("31"));
 	  providerRouteNodes.add(this.network.getNode("4"));
-	  providerRoute.setNodes(providerRouteNodes);
+	  providerRoute.setNodes(null, providerRouteNodes, null);
 	  //finish the setup for this test
 	  CoopersRouteProvider provider = this.createRouteProvider();
 	  Link linkNo1 = this.network.getLink("1");
