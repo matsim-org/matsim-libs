@@ -78,17 +78,10 @@ public class NetworkLayer extends Layer implements Network {
 		this.factory.setNetwork(this);
 	}
 
-	/**
-	 * @deprecated use builder instead 
-	 */
-	@Deprecated
 	public final Node createNode(final Id id, final Coord coord) {
 		return createNode(id, coord, null);
 	}
-	/**
-	 * @deprecated use builder instead 
-	 */
-	@Deprecated
+
 	public final Node createNode(final Id id, final Coord coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
@@ -102,17 +95,11 @@ public class NetworkLayer extends Layer implements Network {
 		}
 		return n;
 	}
-	/**
-	 * @deprecated use builder instead 
-	 */
-	@Deprecated
+
 	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 		return createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
-	/**
-	 * @deprecated use builder instead 
-	 */
-	@Deprecated
+
 	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
 
 		if (this.nodes.get(fromNode.getId()) == null) {
