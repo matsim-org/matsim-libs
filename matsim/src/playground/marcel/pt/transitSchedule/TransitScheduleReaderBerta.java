@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -50,7 +49,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import playground.marcel.SoldnerBerlinToWGS84;
-import playground.marcel.pt.tryout.CreatePseudoNetwork;
 
 public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
@@ -94,7 +92,6 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 
 	private final TransitSchedule schedule;
-	private final Map<Id, TransitStopFacility> facilities;
 	private TransitLine currentTransitLine = null;
 	private BLinie tmpLinie = null;
 	private BHaltepunkt tmpHaltepunkt = null;
@@ -112,7 +109,6 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	
 	public TransitScheduleReaderBerta(final TransitSchedule schedule, final CoordinateTransformation coordTransformation) {
 		this.schedule = schedule;
-		this.facilities = new TreeMap<Id, TransitStopFacility>();
 		this.wgs84ToRBS = coordTransformation;
 	}
 
@@ -263,11 +259,11 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	}
 
 	private TransitStopFacility getStopFacility(final BHaltepunkt hp) {
-		TransitStopFacility facility = this.facilities.get(hp.id);
+		TransitStopFacility facility = this.schedule.getFacilities().get(hp.id);
 		if (facility == null) {
 			Coord coord = this.wgs84ToRBS.transform(this.soldnerToWgs84.transform(new CoordImpl(hp.x/1000.0, hp.y/1000.0)));
 			facility = new TransitStopFacility(hp.id, coord);
-			this.facilities.put(hp.id, facility);
+			this.schedule.addStopFacility(facility);
 		}
 		return facility;
 	}
@@ -328,9 +324,9 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		log.info("writing schedule.xml");
 		new TransitScheduleWriterV1(schedule).write("../thesis-data/examples/berta/schedule.xml");
 
-		log.info("creating routing network.xml");
+//		log.info("creating routing network.xml");
 //		new TransitRouter(schedule); // writes out "wrappedNetwork.xml" for debugging
-		new CreatePseudoNetwork().run();// writes out "pseudoNetwork.xml" for debugging
+//		new CreatePseudoNetwork().run();// writes out "pseudoNetwork.xml" for debugging
 	}
 
 }
