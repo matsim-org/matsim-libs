@@ -18,7 +18,7 @@ public class PTNode extends NodeImpl {
 	private Id idPTLine;
 	private int lineSequenceindex; 
 	private int minutesAfterDeparture;
-	private double[]arrDep = new double[72];  //30 april
+	private double[]arrDep = new double[72];  //30 april  //-> eliminate this
 		
 	public PTNode(final Id id, final Coord coord, final String type, final Id idStation, final Id idPTLine) {
 		super(id, coord, type);
@@ -34,12 +34,12 @@ public class PTNode extends NodeImpl {
 		
 		//30 april
 		//ficticious timetable for the being time
-		
+		//-> eliminate this	
 		int x=0;
 		for(double time = 18000; time< 82800; time= time+900 ){
 			arrDep[x++] = time;
 		}
-		
+		//**********************
 	}
 	
 	public PTNode(final Id id, final Coord coord, final String type){
@@ -87,6 +87,7 @@ public class PTNode extends NodeImpl {
 	}
 	
 	public String getStrIdStation(){
+		
 		String baseID = this.id.toString();
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
 			baseID= baseID.substring(1,baseID.length());

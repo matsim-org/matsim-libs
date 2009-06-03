@@ -5,12 +5,17 @@ import org.matsim.core.api.network.*;
 import org.matsim.core.network.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
 import playground.mmoyo.Validators.*;
 import playground.mmoyo.input.PTLineAggregator;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
+
+/** 
+ * Executable class to perform data input, validations and routing test according to timetable information
+ */
 public class PTControler2 {
     private static String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
     //private static String path = "C://Users/manuel/Desktop/TU/scenarios/Zuerich/";
@@ -27,59 +32,72 @@ public class PTControler2 {
 	private static final String DIVNODES= path + "TestCase/DivNodes.xml";
 	
 	public static void main(String[] args){
-		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
+		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		// seems that INPTNETFILE is never used in PTOb and should be removed as a parameter so that it 
-		// becomes clear that all conversions are done somewhere else.  kai, may'09
+		// becomes clear that all conversions are done somewhere else.  kai, may'09 //  DONE
 		
-		int option =3;
+		int option =2;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
-			case -6:
-				PlanValidator planValidator = new PlanValidator(); 
-				int num = planValidator.PlanCounter(pt.getPtNetworkLayer(), ZURICHPTPLANS);
-				System.out.println(num);
-				break;
-			case -5:  //create net from diva and route agents
+			case -5: 
+				/*creates net from ZVV diva2Web database, periodic departures as timetable and route agents */  
 				NetworkLayer net = new NetworkLayer();
 				pt.setPtNetworkLayer(net);
 				PTLineAggregator ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLines();
 	
 				pt.getPtNetworkFactory().createTransferLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
-				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
+				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
 				
 				pt.writeNet(ZURICHPTN);
 				pt.createRouter();
 				PTActWriter ptActWriter1 = new PTActWriter(pt);
 	    		ptActWriter1.writePTActsLegs();
 				break;
-			case -4:
 			
+			case-4:
+	    		/* validates the id assignation for nodes of ZVV diva2Web database*/
+				NetworkLayer netDiv= new NetworkLayer(new NetworkFactory());
+	    		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(netDiv);
+	    		matsimNetworkReader.readFile(DIVNODES);
+	    		
+	    		StationValidator StationValidator = new StationValidator(pt.getPtNetworkLayer());
+	    		StationValidator.validateIds(netDiv);
 				break;
-			case -3:
+
+			case -3: 
+				/* add in memory extra PTlines from a separate file creating alias nodes but 
+				does not write the new network*/
 				pt.createPTNetWithTLinks(INPTNETFILE);
 	    		pt.readPTNet(INPTNETFILE);
 				ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLine();
 	    		pt.writeNet(ZURICHPTN);
 				break;
-			case -2:
+				
+			case -2:  
+				/* validates that the network does not have standard links with negative values. 
+				 * This is possible when a PTL has two or more profiles and a intermediate station of a profil 
+				 * has a greater value than the same stretch in other profile*/
 				pt.createPTNetWithTLinks(INPTNETFILE);
 				pt.writeNet(ZURICHPTN);
 				pt.readPTNet(ZURICHPTN);
 	    		NetValidator netValidator = new NetValidator(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		netValidator.printNegativeTransferCosts(28800);
 				break;
+			
 			case -1:
+				/*Creates and writes detached transfer links. This is necessary before routing to get better results */  
 				pt.createPTNetWithTLinks(INPTNETFILE);
-				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
+				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
 				pt.writeNet(ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
 	    		PTActWriter ptActWriter2 = new PTActWriter(pt);
 	    		ptActWriter2.writePTActsLegs();
-	    		
 				break;
+			
+		/************the positive cases need the network already loaded in memory*/
 			case 0: 
 	    		pt.createPTNetWithTLinks(INPTNETFILE);
 	    		//Map<String, List<IdImpl>> intersecionMap = pt.getPtNetworkFactory().createIntersecionMap(pt.getPtTimeTable());
@@ -87,30 +105,22 @@ public class PTControler2 {
 	    		break;
 	    	
 			case 1:
-				pt.createPTNetWithTLinks(INPTNETFILE);
-				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300, pt.getPtTimeTable());
-				pt.writeNet(ZURICHPTN);
-	    		pt.readPTNet(ZURICHPTN);
-	    		PTActWriter ptActWriter3 = new PTActWriter(pt);
-	    		ptActWriter3.writePTActsLegs();
-				break;
-
-			case 2:
-				Coord coord1 = new CoordImpl(747420, 262794);   //Coord coord1 = new CoordImpl(701700, 265800);
+				/*searches and shows a PT path between two coordinates or nodes */
+				Coord coord1 = new CoordImpl(747420, 262794);   
 				Coord coord2 = new CoordImpl(685862, 254136);
 				Node nodeA = pt.getPtNetworkLayer().getNode("_8506000");
 				Node nodeB = pt.getPtNetworkLayer().getNode("_8503309");
 				//Path path2 = pt.getPtRouter2().findRoute(nodeA, nodeB, 45386);
 				Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
 				System.out.println(path2.links.size());
-				
 				for (Link l : path2.links){
 					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + l.getType() + l.getToNode().getId() );
 				}
 				break;
-	    	case 3:
-	    		//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
-	    		
+
+			case 2:
+				/* invokes the ptActWriter to create a out_plan file with pt_legs and pt_acts and tries a simulation run*/
+				//pt.getPtNetworkFactory().setDetNextLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
 	    		ptActWriter.writePTActsLegs();
 	    		//ptActWriter.SimplifyPtLegs();
@@ -119,30 +129,26 @@ public class PTControler2 {
 	    		//System.out.println(ptActWriter.ptTravelTime.costValidator==null);
 	    		break;
 	 
-	    	case 4:
+	    	case 3:
+	    		/*counts the number of routes found for a population */
 	    		PTTester pttester= new PTTester(pt);
 	    		pttester.countRoutes();
 	    		break;
-	    	case 7:
-	    		NetworkLayer netDiv= new NetworkLayer(new NetworkFactory());
-	    		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(netDiv);
-	    		matsimNetworkReader.readFile(DIVNODES);
-	    		
-	    		playground.mmoyo.Validators.StationValidator sv = new playground.mmoyo.Validators.StationValidator(pt.getPtNetworkLayer());
-	    		sv.validateIds(netDiv);
-	    		break;
-	    	case 8:
-	    		ToTransitScheduleConverter converter = new ToTransitScheduleConverter();	    		
 
+	    	case 4:
+	    		/* Converter: creates marcel.pt.transitSchedule.transitSchedule's out from mmoyo.PTCase2.PTTimeTable2 */
+	    		ToTransitScheduleConverter converter = new ToTransitScheduleConverter();	    		
 	    		//converter.createTransitSchedule(pt.getPtTimeTable(), path + "TransitSim/PtFacilities.xml", path + "TransitSim/transitSchedule.xml");
 	    		//converter.createFacilities("../shared-svn/studies/schweiz-ivtch/pt-experimental/PtFacilities.xml");
-
 	    		//converter.createFacilities(network);
 	    		converter.createTransitSchedule(pt.getPtTimeTable(), path + "transitSchedule.xml");
 	    		break;
-	  
-		}//switch
-	}//main
+		}
+	}
+}
 
-	
-}//Class
+
+
+
+
+

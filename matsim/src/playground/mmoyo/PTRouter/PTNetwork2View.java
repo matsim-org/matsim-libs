@@ -7,6 +7,10 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 
+/*
+ * A simple representation for small networks to visualize
+ */
+
 public class PTNetwork2View extends NetworkLayer {
 	private static final String NETWORKFILENAME="c://PTnetwork.xml";
 	private NetworkLayer cityNet;

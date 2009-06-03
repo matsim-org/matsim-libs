@@ -1,4 +1,4 @@
-package playground.mmoyo.TransitSimulation;
+package playground.mmoyo.PTTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,9 @@ import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Pedestrian.Walk;
 import playground.mmoyo.Validators.PathValidator;
 
+/*
+ *  
+ */
 public class SimplifyPtLegs implements PlanAlgorithm{
 	private Walk walk = new Walk();
 	private PTRouter2 ptRouter;
@@ -45,6 +48,8 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 	private Node destinationNode;
 	private Link walkLink1;
 	private Link walkLink2;
+	
+	private final String STANDARD = "Standard";
 	
 	///////////Performance variables//////////////////
 	private int numPlans=0;
@@ -179,13 +184,13 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 			linkTravelTime=this.ptRouter.ptTravelTime.getLinkTravelTime(link,accumulatedTime)*60;
 			linkDistance = link.getLength();
 
-			if (link.getType().equals("Standard")){
+			if (link.getType().equals(STANDARD)){
 				if (first){ //first PTAct: getting on
 					newPlan.addActivity(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , accumulatedTime + linkTravelTime));
 					accumulatedTime =accumulatedTime+ linkTravelTime;
 					first=false;
 				}
-				if (!lastLinkType.equals("Standard")){  //reset to start a new ptLeg
+				if (!lastLinkType.equals(STANDARD)){  //reset to start a new ptLeg
 					legRouteLinks.clear();
 					depTime=accumulatedTime;
 					legTravelTime=0;
@@ -208,7 +213,7 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 				}
 
 			}else if(link.getType().equals("Transfer") || link.getType().equals("DetTransfer") ){  //add the PTleg and a Transfer Act
-				if (lastLinkType.equals("Standard")){
+				if (lastLinkType.equals(STANDARD)){
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
 					//-->: The legMode car is temporal only for visualization purposes
@@ -230,7 +235,7 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 				newPlan.addLeg(newPTLeg( TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, walkTime, arrTime));
 
 				//like a transfer link
-				if (lastLinkType.equals("Standard")){  //-> how can be validated that the next link must be a standard link?
+				if (lastLinkType.equals(STANDARD)){  //-> how can be validated that the next link must be a standard link?
 					double endActTime= arrTime + linkTravelTime -walkTime; // The ptTravelTime must be calculated it like this: travelTime = walk + transferTime;
 					newPlan.addActivity(newPTAct("Change ptv", link.getFromNode().getCoord(), link, arrTime, endActTime));
 					first=false;

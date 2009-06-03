@@ -70,7 +70,7 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 
 		PTNetworkFactory2 ptNetFactory = new PTNetworkFactory2();
 		ptNetFactory.createTransferLinks(net, timeTable);
-		ptNetFactory.CreateDetachedTransfers(net, 300, timeTable);
+		ptNetFactory.CreateDetachedTransfers(net, 300);
 
 		this.ptRouter = new TransitRouteFinder(new PTRouter2(net, timeTable));
 	}

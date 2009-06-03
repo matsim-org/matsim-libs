@@ -31,6 +31,9 @@ public class PTNodeFactory {
 		this.sValidator.hasValidCoordinates(this.ptStation);
 	}
 
+	/*
+	 * all org.matsim.core.api.network.Node's from the network into PTNodes 
+	 */
 	public NetworkLayer TransformToPTNodes(NetworkLayer NetWithNodes, NetworkLayer NetWithPTNodes){
 		for (Node node: NetWithNodes.getNodes().values()){
 			PTNode ptNode = new PTNode(node.getId(),node.getCoord(),node.getType());
@@ -44,6 +47,9 @@ public class PTNodeFactory {
 		
 	}
 	
+	/*
+	 * Receives a original Basicnode and creates a pair of PTNodes with prefix indicating both directions and sufix to differentiate from other PTL's 
+	 */
 	public BasicNode[] CreatePTNodes(BasicNode basicNode){
 		BasicNode[] pair = new BasicNode[2];
 		
@@ -87,6 +93,9 @@ public class PTNodeFactory {
 		return pair;
 	}
 
+	/*
+	 * Creates a new PTNode and put it in the network
+	 */
 	private BasicNode insertNode(String strIdStation, String strId, Coord coord){
 		Id idPTNode = new IdImpl(strId);
 		PTNode ptNode = new PTNode(idPTNode, coord, "");

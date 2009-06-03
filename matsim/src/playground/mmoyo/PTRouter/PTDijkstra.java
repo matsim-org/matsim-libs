@@ -12,6 +12,10 @@ import org.matsim.core.router.util.*;
 
 import playground.mmoyo.Validators.PathValidator;
 
+/*
+ * Temporary copy version of Dijsktra class. 
+ */
+
 /**
  * Implementation of <a
  * href="http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra's

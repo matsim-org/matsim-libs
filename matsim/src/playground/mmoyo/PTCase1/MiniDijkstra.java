@@ -9,7 +9,7 @@ import org.matsim.core.api.network.Node;
 import playground.mmoyo.PTRouter.PTNode;
 
 /** 
- * Determines the optimal path of a passenger in a Public transport Network 
+ * * Determines the optimal path of a passenger in a Public transport Network 
  * according to the information of timetables
  *  *
  * @param nodeList  PTNodes in stored a a Node-List
@@ -20,6 +20,7 @@ import playground.mmoyo.PTRouter.PTNode;
  * @param time Milliseconds after the midnight in which the trip must begin
  */
 
+@Deprecated
 public class MiniDijkstra {
 	public PTNode[] route;
 	public int tripTime=0;

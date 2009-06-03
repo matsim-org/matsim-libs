@@ -3,21 +3,23 @@ package playground.mmoyo.input;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
-import org.matsim.core.api.network.Node;
 import playground.mmoyo.PTCase2.PTTimeTable2;
-import playground.mmoyo.PTCase2.PTStationMap;
 import java.util.TreeMap;
 
+/** 
+ * Add in memory new PTLines from an independent file to the existing network and PTTimetable
+  * @param filePath  path of the file containing new PTLines description
+ * @param net existing network 
+ * @param timeTable existing Departure information
+*/
 public class PTLineAggregator {
 	private NetworkLayer net; 
 	private PTTimeTable2 timeTable;
@@ -29,6 +31,9 @@ public class PTLineAggregator {
 		this.filePath=filePath;
 	}
 		
+	/* 
+	 * Add new nodes for every new PTline and assign them new Id with prefixes/sufixes
+	 * */
 	public void AddLine(){
 		PTNodeReader ptNodeReader = new PTNodeReader();
 		ptNodeReader.readFile (filePath);
@@ -69,6 +74,10 @@ public class PTLineAggregator {
 		//-->and after creating the new nodes and links, we must create the transfers and detached again
 	}
 	
+	/* 
+	 * Add new nodes for every new PTline and creates for them: 
+	 * new id`s, standard links and ficticious constant travel times.
+	 */
 	public void AddLines(){
 		PTNodeReader ptNodeReader = new PTNodeReader();
 		ptNodeReader.readFile (filePath);

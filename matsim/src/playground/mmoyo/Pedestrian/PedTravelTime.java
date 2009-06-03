@@ -2,7 +2,6 @@ package playground.mmoyo.Pedestrian;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelTime;
-import playground.mmoyo.Pedestrian.Walk;
 
 public class PedTravelTime implements TravelTime {
 	double walkSpeed =  Walk.walkingSpeed();

@@ -22,8 +22,11 @@ import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
 import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 
+/*
+ * From PTtimeTable to transitShcedule converter 
+ */
+
 public class ToTransitScheduleConverter {
-	
 	final TransitSchedule transitSchedule = new TransitSchedule();
 	
 	public ToTransitScheduleConverter (){

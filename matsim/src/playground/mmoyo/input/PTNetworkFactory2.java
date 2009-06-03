@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -68,7 +69,7 @@ public class PTNetworkFactory2 {
 	}
 
 	/*
-	//This should be the new vrsion
+	//->This should be the new version
 	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
 		PTNetworkReader ptNetworkReader = new PTNetworkReader();
 		NetworkLayer ptNetworkLayer = ptNetworkReader.readNetFile(inFileName);
@@ -85,7 +86,9 @@ public class PTNetworkFactory2 {
 	}
 	*/
 	
-		
+	/*
+	 * Read the timetable File, validates that every node exists and loads the data in the ptTimeTable object
+	 */	
 	private PTTimeTable2 readTimeTable(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
 		PTNode ptLastNode = null;
 		for (PTLine ptLine :  ptTimeTable.getPtLineList()) {
@@ -136,9 +139,7 @@ public class PTNetworkFactory2 {
 	
 	public void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
 		PTStation stationMap = new PTStation(ptTimeTable);
-		
 		//stationMap.print();
-		
 		int maxLinkKey=0;
 		for (List<Id> chList : stationMap.getIntersecionMap().values()) {
 			if (chList.size() > 1) {
@@ -152,6 +153,7 @@ public class PTNetworkFactory2 {
 			}
 		}
 	}
+	
 	
 	public void createPTLink(NetworkLayer net, String strIdLink, Id idFromNode, Id idToNode, String type){
 		PTNode fromNode= (PTNode)net.getNode(idFromNode);
@@ -176,21 +178,29 @@ public class PTNetworkFactory2 {
 		net.createLink(idLink, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type);
 	}
 	
+	//-> use this unique method and eliminate the last two
+	private void createPTLink(NetworkLayer net, int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
+		Id id =  new IdImpl(intId);
+		Link  link = net.getFactory().createLink(id, fromBasicNode.getId(), toBasicNode.getId() );
+		link.setLength(CoordUtils.calcDistance(fromBasicNode.getCoord(), toBasicNode.getCoord()));
+		link.setType(type);
+	}
+
+	
 	public void writeNet(NetworkLayer net, String fileName){
 		System.out.println("writing pt network...");
 		new NetworkWriter(net, fileName).write();
 		System.out.println("done.");
 	}
 	
-	public void CreateDetachedTransfers (NetworkLayer net, double distance, PTTimeTable2 ptTimeTable){
+	//--> move this to class Linkfactory
+	public void CreateDetachedTransfers (NetworkLayer net, double distance){
 		int x=0;
 		String strId;
-		
 		for (Node node: net.getNodes().values()){
 			for (Node nearNode : net.getNearestNodes(node.getCoord(), distance)){
 				PTNode ptn1 = (PTNode) node;
 				PTNode ptn2 = (PTNode) nearNode;
-
 				//if(!ptn1.getIdStation().equals(ptn2.getIdStation())){   
 					if (!node.getCoord().equals(nearNode.getCoord())){  //Validate this in the station validator!      
 						if (!node.getOutNodes().containsValue(nearNode)){
@@ -205,8 +215,13 @@ public class PTNetworkFactory2 {
 		}
 	}
 
+	/*
+	 * Set the next standard link of a detTransfer link. 
+	 * This was the first intent to get valid paths 
+	 */
+	@Deprecated
 	public void setDetNextLinks (NetworkLayer net, PTTimeTable2 ptTimeTable){
-		List <Link> eliminar = new ArrayList<Link>();
+		List <Link> eliminateList = new ArrayList<Link>();
 		for (Link link: net.getLinks().values()){
 			if (link.getType().equals("DetTransfer")){
 				Link nextLink= null;
@@ -223,21 +238,22 @@ public class PTNetworkFactory2 {
 				if (nextLink!=null){
 					ptTimeTable.putNextDTLink(link.getId(), nextLink);
 				}else{
-					eliminar.add(link);
+					eliminateList.add(link);
 				}
 				
 			}
 		}
 
-		System.out.println("eliminar " + eliminar.size());
-		for (Link link:eliminar){
+		System.out.println("eliminate" + eliminateList.size());
+		for (Link link:eliminateList){
 			net.removeLink(link);
 		}
-	
 	}
 
+	/*
+	 * Displays a quick visualization of links with from- and to- nodes 
+	 */
 	public static void printLinks(NetworkLayer ptNetworkLayer) {
-		//Displays a quick visualization of links with from- and to- nodes
 		for (Link l : ptNetworkLayer.getLinks().values()) {
 			System.out.print("\n(" ); 
 			System.out.print(l.getFromNode().getId().toString()); 

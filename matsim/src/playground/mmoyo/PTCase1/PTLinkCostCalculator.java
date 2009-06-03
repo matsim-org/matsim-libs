@@ -11,6 +11,7 @@ import playground.mmoyo.PTRouter.PTTimeTableInfo;;
 * @param ptTimeTableInfo Retrieves information of departures at nodes
 *  
 */
+@Deprecated
 public class PTLinkCostCalculator{
 	private final int TRANSFER_RATE = 1200 ; // This must be changed for each passenger, for each trip distance
 	private final int WALKING_RATE = 1; //We add a value  so that the agent avoid indiscriminate walking transfers in a PTSation

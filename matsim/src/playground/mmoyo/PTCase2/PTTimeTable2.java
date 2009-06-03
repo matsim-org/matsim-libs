@@ -12,9 +12,12 @@ import org.matsim.core.utils.misc.Time;
 import playground.mmoyo.input.PTLinesReader2;
 import playground.mmoyo.PTRouter.*;
 
+/*
+ * Contains the information of departures for every station and PTLine
+ */
 public class PTTimeTable2{
 	private PTLinesReader2 ptLinesReader = new PTLinesReader2();
-	private List<PTLine> ptLineList; // = new ArrayList<PTLine>();
+	private List<PTLine> ptLineList; 
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
@@ -96,7 +99,9 @@ public class PTTimeTable2{
 		return linkTravelTimeMap.get(link.getId()); 
 	}
 
-	//minutes
+	/*
+	 * Return the waiting time in a transfer link head node after a given time //minutes
+	 */
 	public double GetTransferTime(Link link, double time){
 	 	double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
 		double transferTime= 0;
@@ -111,6 +116,7 @@ public class PTTimeTable2{
 	
 	
 	/*
+	*A binary search returns the next departure in a node after a given time
 	*If dblTime is greater than the last departure, 
 	*returns the first departure(of the next day)
 	*/
@@ -135,10 +141,9 @@ public class PTTimeTable2{
 		return nextLinkMap;
 	}
 
-	/*
-	 * This should not be necessary
-	 */
+	
 	public void putNextDTLink(Id id, Link link) {
+		//->This should not be necessary
 		nextLinkMap.put(id, link);
 	}
 	
@@ -149,7 +154,6 @@ public class PTTimeTable2{
 			double[] departures = departuresMap.getValue();
 			for (int x=0; x< departures.length; x++){
 				System.out.print(departures[x] + " ");
-				//System.out.print(TimeToString(departures[x])+ " ");	
 			}
 		}
 	}

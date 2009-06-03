@@ -3,6 +3,14 @@ package playground.mmoyo.Validators;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+/* Validates a given path with the next conditions:
+ * No null
+ * must have at least 3 links     //-> not absolutely. A path can we also only walking
+ * starts and ends with walking links
+ * transfer links must be always between standard links
+ * must not have two adjacent walking links
+ */
+ 
 public class PathValidator {
 	final String TRANSFERTYPE = "Transfer";
 	final String STANDARDTYPE = "Standard";
@@ -14,13 +22,7 @@ public class PathValidator {
 	
 	}
 	
-	/*Conditions:
-	 * No null
-	 * must have at least 3 links     //-> not necesarly. A path can we also walking
-	 * starts and ends with walking links
-	 * transfer links must be always between standard links
-	 * must not have two adjacent walking links
-	 */
+	@Deprecated
 	public boolean isValid(Path path) {
 		boolean valid = true;
 		

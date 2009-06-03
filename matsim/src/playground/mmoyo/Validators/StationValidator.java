@@ -8,7 +8,9 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.mmoyo.PTCase2.PTStation;
-
+/*
+ * Validates that all nodes in an intersection have the same coordinate and the valid id`s
+*/
 public class StationValidator {
 	NetworkLayer net;
 	
@@ -16,9 +18,6 @@ public class StationValidator {
 		this.net = net;
 	}
 	
-	/*
-	 * Validates that all nodes in an intersection have the same coordinate
-	*/
 	public boolean hasValidCoordinates(PTStation ptStation){
 		for (List<Id> list : ptStation.getIntersecionMap().values()) {
 			Id firstId= list.get(0);
@@ -33,7 +32,6 @@ public class StationValidator {
 		}
 		return true;
 	}
-	
 	
 	public void validateIds(final NetworkLayer netDiv){
 		int x=0;
@@ -52,13 +50,9 @@ public class StationValidator {
 				}
 			}
 			System.out.println("diferent " + diferent);
-			
-			
 			//Coord coord = node.getCoord();
-			
 			//find the correct id database;
 			//correct it
-			
 			//print the changes in screen or log file
 		}
 	}

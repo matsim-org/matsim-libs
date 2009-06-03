@@ -8,6 +8,9 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.api.network.Link;
 
 import playground.mmoyo.Validators.PathValidator;
+/*
+ * Matsim implementation of Dijkstra algorithm adapted to the PT network Model 
+ */
 
 public class MyDijkstra extends Dijkstra{
 	private PathValidator pathVal = new PathValidator(); 

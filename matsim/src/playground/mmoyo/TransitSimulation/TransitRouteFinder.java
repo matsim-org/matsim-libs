@@ -15,6 +15,9 @@ import org.matsim.api.basic.v01.TransportMode;
 
 import playground.mmoyo.PTCase2.PTRouter2;
 import playground.mmoyo.Pedestrian.Walk;
+/*
+ * Receives two acts and return a list of PT legs that join their coordinates 
+ */
 
 public class TransitRouteFinder {
 	private PTRouter2 ptRouter;

@@ -10,17 +10,20 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mmoyo.PTRouter.PTLine;
 
+/*
+ * a map containing all nodes with same coordinates in order to create transfer links between them
+ */
+
 public class PTStationMap {
 
 	Map<String, List<Id>> IntersectionMap = new TreeMap<String, List<Id>>(); 
 		
-	
 	public PTStationMap(PTTimeTable2 ptTimeTable) {
 		this.createIntersecionMap(ptTimeTable);
 	}
 	
-	//-> eliminate this method from factory
 	public void createIntersecionMap(PTTimeTable2 ptTimeTable){
+		//-> eliminate this method from factory
 		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
 			for (String strIdNode: ptLine.getRoute()) {
 				insertNode(strIdNode);
@@ -42,8 +45,8 @@ public class PTStationMap {
 		return this.IntersectionMap;
 	}
 	
-	//-> eliminate this method from networkFactory
 	public String getNodeBaseId(String strId){
+		//-> eliminate this method from networkFactory and PTStation
 		String baseID = strId;
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
 			baseID= baseID.substring(1,baseID.length());

@@ -4,6 +4,9 @@ import org.matsim.core.network.NetworkLayer;
 
 import playground.mmoyo.input.PTNetworkFactory2;
 
+/*
+ * Contains the common objects for the route search: network, PTTimetable, PtRouter
+ */
 public class PTOb {
 	private NetworkLayer ptNetworkLayer; 
 	public  PTRouter2 ptRouter2;  //-->: make private
@@ -14,7 +17,7 @@ public class PTOb {
 	private String ptNetFile; 
 	private PTNetworkFactory2 ptNetworkFactory =new PTNetworkFactory2();
 	
-	public PTOb(String configFile, String inNetFileName, String ptNetFileName, String timeTableFile, String plansFile, String outPutPlansFile){
+	public PTOb(String configFile, String ptNetFileName, String timeTableFile, String plansFile, String outPutPlansFile){
 		this.outPutPlanFile= outPutPlansFile;
 		this.config = configFile;
 	    this.plansFile= plansFile;

@@ -16,19 +16,16 @@ import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
 
 /**
- * Represent a network layer with independent route with special (transfer) links at intersections
- * *
+ * Represent a network layer with independent sequence of nodes and links for every PTLine
+ * and transfer links at intersections
  * @param cityNet complete network from which the PT network is extracted
  */
-
 public class PTNetworkLayer extends NetworkLayer {
 	//--> Get these values out from the city network
 	// These are temporary values for the 5x5 scenario
 	int maxNodekey = 24;
 	int maxLinkKey = 79;
-
 	private final NetworkLayer cityNet;
-
 	public Map<Id, ArrayList<String>> childrenList = new TreeMap<Id, ArrayList<String>>();
 
 	public PTNetworkLayer(final NetworkLayer cityNet) {
@@ -42,14 +39,14 @@ public class PTNetworkLayer extends NetworkLayer {
 			String idFromNode = "";
 			for (String strId : ptLine.getRoute()) {
 				Link l = this.cityNet.getLink(strId);
-				idFromNode = addToSubwayPTN(l, idFromNode, firstLink, ptLine.getId());
+				idFromNode = createPTNodeLinks(l, idFromNode, firstLink, ptLine.getId());
 				firstLink = false;
 			}
 		}
 		createTransferlinks();
 	}
 
-	public String addToSubwayPTN(final Link l, String idFromNode, final boolean firstLink,final Id IdPTLine) {
+	public String createPTNodeLinks(final Link l, String idFromNode, final boolean firstLink,final Id IdPTLine) {
 		if (firstLink) {
 			this.maxNodekey++;
 			idFromNode = String.valueOf(this.maxNodekey);
@@ -68,7 +65,6 @@ public class PTNetworkLayer extends NetworkLayer {
 
 	private void addWalkingNode(final Id id) {
 		//System.out.print(idImpl.toString() + " " + this.nodes.containsKey(idImpl) + " " );
-
 		if (this.getNodes().containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
@@ -106,8 +102,11 @@ public class PTNetworkLayer extends NetworkLayer {
 		i = null;
 	}
 
-	// To print nodes and his respective children
-	public static void showMap(final Map<Object, Object> map) {
+	/*
+	 * print nodes and his respective children 
+	 */
+	public void printNodeMap(final Map<Object, Object> map) {
+		
 		for(Map.Entry <Object, Object> entry: map.entrySet() ){
 			Object key = entry.getKey(); 
 			Object value = entry.getValue();
@@ -115,29 +114,31 @@ public class PTNetworkLayer extends NetworkLayer {
 		}
 	}
 
-	private void createTransferlinks() {
+	
+	private void createTransferlinks() {  
+		//-> this exist too in factory, create a unique factory for both approaches
 		for (List<String> chList : childrenList.values()){
 			List<String> chList1 = chList;
 			List<String> chList2 = chList;
-
 			if (chList1.size() > 1) {
 				for (String n1 : chList1) {
 					for (String n2 : chList2) {
 						if (n1 != n2) {
 							this.maxLinkKey++;
 							this.createLink(this.maxLinkKey, n1, n2,"Transfer");
-						}//if n1
-					}//for iter2
-				}// for iter1
-			}// if chlist
-		}// while
-	}// CreateTransfer
+						}
+					}
+				}
+			}
+		}
+	}
 
 
+	/*
+	 *Adds temporary the origin and destination node and create new temporary links between
+	 *between them  and its respective children to the routing process
+	 */
 	public List<String> createWalkingLinks(final Id idFromNode, final Id idToNode ){
-		//Adds temporary the origin and destination node and create new temporary links between
-		//between them  and its respective children to the routing process
-
 		addWalkingNode(idFromNode);
 		addWalkingNode(idToNode);
 
@@ -160,22 +161,25 @@ public class PTNetworkLayer extends NetworkLayer {
 		return WalkingLinkList;
 	}
 
+	/*
+	 * Deletes temporal links at the end of the routing process
+	 */
 	public void removeWalkinkLinks(final List<String> WalkingLinkList){
-		//Removes temporal links at the end of the ruting process
 		for (String strWalkLink :  WalkingLinkList) {
 			this.removeLink(this.getLink(strWalkLink));
 		}
 	}
 
+	/*
+	 * Deletes temporal links at the end of every individual routing process
+	 */
 	public void removeWalkingNodes(final Id node1, final Id node2){
-		//Removes temporal links at the end of the routing process
 		this.removeNode(this.getNode(node1));
 		this.removeNode(this.getNode(node2));
 	}
 
-	// Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
 	private void createLink(final int intId, final String from, final String to, final String ptType ){
-
+		//--> this exist in factory. Create a unique method
 		Id id = new IdImpl(String.valueOf(intId)); 
 		Node fromNode = this.getNode(from);
 		Node toNode = this.getNode(to);
@@ -187,21 +191,11 @@ public class PTNetworkLayer extends NetworkLayer {
 		this.createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, origId, ptType);
 	}
 
-		/*
-	private void createLink(final int id, final String from, final String to, final String ptType ){
-		String length = "1";
-		String freespeed= "1";
-		String capacity = "1";
-		String permlanes = "1";
-		String origid = "0";
-		this.createLink(String.valueOf(id), from, to, length, freespeed, capacity, permlanes, origid, ptType);
->>>>>>> .r5540
-	}
-*/
-
-
+	/*
+	 * Displays a quick visualization of links with from- and to- nodes
+	 */
 	public void printLinks() {
-		//Displays a quick visualization of links with from- and to- nodes
+		//--> this exist in factory. Create a unique method
 		for (org.matsim.core.api.network.Link l : this.getLinks().values()) {
 			System.out.print("\n(" );
 			System.out.print(l.getFromNode().getId().toString());

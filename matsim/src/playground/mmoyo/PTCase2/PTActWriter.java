@@ -7,23 +7,12 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PlanElement;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -34,6 +23,10 @@ import playground.mmoyo.TransitSimulation.SimplifyPtLegs2;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 import playground.mmoyo.Pedestrian.Walk;
 
+/*
+ * Reads a plan file, finds a PT connection between two acts creating new PT legs and acts between them
+ * and writes a output_plan file
+ */
 public class PTActWriter {
 	private Walk walk = new Walk();
 	private final Population population;
@@ -80,6 +73,9 @@ public class PTActWriter {
 		System.out.println("Done");	
 	}
 
+	/*
+	 * Shows in console the legs that are created between two activities 
+	 */
 	public void printPTLegs(){
 		TransitRouteFinder routFinder = new TransitRouteFinder (ptRouter);
 		Person person = population.getPersons().get(new IdImpl("2180188"));
@@ -88,7 +84,6 @@ public class PTActWriter {
  		Activity act1 = (Activity)plan.getPlanElements().get(0);
 		Activity act2 = (Activity)plan.getPlanElements().get(2);
 		List<Leg> legList = routFinder.calculateRoute (act1, act2, person );
-		
 		for (Leg leg : legList){
 			System.out.println(leg);
 		}
@@ -115,7 +110,7 @@ public class PTActWriter {
 		
 		for (Person person: this.population.getPersons().values()) {
 		//if ( true ) {
-		//Person person = population.getPersons().get(new IdImpl("6789794")); //"3937204"
+		//Person person = population.getPersons().get(new IdImpl("4261166")); //"3937204"
 			System.out.println(numPlans + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 
@@ -215,11 +210,8 @@ public class PTActWriter {
 		System.out.println("writing output plan file...");
 		new PopulationWriter(newPopulation, outputFile, "v4").write();
 		System.out.println("Done");
-				
 		System.out.println("plans:        " + numPlans + "\n--------------");
-			
 		System.out.println("\nTrips:      " + trips +  "\nvalid:        " + valid +  "\ninvalid:      " + invalid + "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);
-		
 		System.out.println("===Printing routing durations");
 		
 		double total=0;
@@ -266,6 +258,10 @@ public class PTActWriter {
 			
 	}//createPTActs
 	
+	
+	/*
+	 * Cuts up the found path into acts and legs according to the type of links contained in the path
+	 */
 	public void insertLegActs(final Path path, double depTime, final Plan newPlan){
 		List<Link> routeLinks = path.links;
 		List<Link> legRouteLinks = new ArrayList<Link>();
@@ -359,6 +355,7 @@ public class PTActWriter {
 		}//for Link
 	}//insert
 
+	
 	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
 		Activity ptAct= new ActivityImpl(type, coord);
 		ptAct.setStartTime(startTime);
@@ -396,6 +393,7 @@ public class PTActWriter {
 	}
 	
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
+		//-> move an use it in Link factory
 		originNode= ptRouter.CreateWalkingNode(new IdImpl("w1"), coord1);
 		destinationNode= ptRouter.CreateWalkingNode(new IdImpl("w2"), coord2);
 		path.nodes.add(0, originNode);

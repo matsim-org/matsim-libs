@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.matsim.api.basic.v01.Id;
 
+/*
+ * Representation of a PT Line containing the sequence of stations and departures for every one of them 
+ */
 /** 
  * Describes a Public Transport Network Line
  * @param id  Unique Identifier 

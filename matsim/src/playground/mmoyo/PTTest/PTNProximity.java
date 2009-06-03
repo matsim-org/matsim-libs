@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase1;
+package playground.mmoyo.PTTest;
 
 import java.util.ArrayList;
 import org.matsim.core.api.network.Node;
@@ -12,6 +12,7 @@ import playground.mmoyo.PTRouter.PTNode;
  *  Replaces the search within an euclidian distance
  *	@param ptNetworkLayer 
  */
+@Deprecated
 public class PTNProximity
 {
 	private QuadTree<Node> ptQuadTree;

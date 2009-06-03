@@ -11,6 +11,10 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import playground.mmoyo.Pedestrian.Walk;
 
+/*
+ * Returns the number of found paths in a plan
+ *
+ */
 public class PTTester {
 	private Walk walk = new Walk();
 	private final PTOb pt;
