@@ -85,7 +85,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			if (atts.getValue(LINK_REF_ID) != null) {
 				Link link = this.network.getLinks().get(new IdImpl(atts.getValue(LINK_REF_ID)));
 				if (link == null) {
-					throw new RuntimeException("no link with id " + atts.getValue(REF_ID));
+					throw new RuntimeException("no link with id " + atts.getValue(LINK_REF_ID));
 				}
 				stop.setLink(link);
 			}
