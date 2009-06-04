@@ -55,8 +55,8 @@ public class CreatePseudoNetwork {
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
 	
-	public CreatePseudoNetwork(final TransitSchedule schedule) {
-		this.network = new NetworkLayer();
+	public CreatePseudoNetwork(final TransitSchedule schedule, final NetworkLayer network) {
+		this.network = network;
 		this.schedule = schedule;
 	}
 	

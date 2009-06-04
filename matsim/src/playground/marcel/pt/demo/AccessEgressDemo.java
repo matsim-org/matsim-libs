@@ -63,11 +63,11 @@ public class AccessEgressDemo {
 	private static final double departureTime = 7.0*3600;
 	private static final boolean stopsBlockLane = true;
 
+	private static final String SERVERNAME = "access_egress_demo";
+	
 	private final Scenario scenario = new ScenarioImpl();
 	private final TransitSchedule schedule = new TransitSchedule();
 	private final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];
-
-	private TransitQueueSimulation sim = null;
 
 	private void createIds() {
 		for (int i = 0; i < this.ids.length; i++) {
@@ -90,6 +90,14 @@ public class AccessEgressDemo {
 		}
 		for (int i = 0; i < nOfLinks; i++) {
 			network.createLink(this.ids[i], nodes[i], nodes[i+1], 500.0, 10.0, 1000.0, 1);
+//			Link link = network.getBuilder().createLink(this.ids[i], nodes[i].getId(), nodes[i+1].getId());
+//			network.getLinks().put(link.getId(), link);
+//			nodes[i].addOutLink(link);
+//			nodes[i+1].addInLink(link);
+//			link.setLength(500.0);
+//			link.setFreespeed(10.0);
+//			link.setCapacity(1000.0);
+//			link.setNumberOfLanes(1.0);
 		}
 	}
 
@@ -166,13 +174,11 @@ public class AccessEgressDemo {
 		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(this.schedule.getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]), vehTracker);
 		events.addHandler(analysis);
 
-		this.sim = new TransitQueueSimulation(this.scenario.getNetwork(), this.scenario.getPopulation(), events);
-		this.sim.startOTFServer("access_egress_demo");
-		this.sim.setTransitSchedule(this.schedule);
-
-		OTFDemo.ptConnect("access_egress_demo");
-
-		this.sim.run();
+		final TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario.getNetwork(), this.scenario.getPopulation(), events);
+		sim.startOTFServer(SERVERNAME);
+		sim.setTransitSchedule(this.schedule);
+		OTFDemo.ptConnect(SERVERNAME);
+		sim.run();
 
 		analysis.printStats();
 	}
