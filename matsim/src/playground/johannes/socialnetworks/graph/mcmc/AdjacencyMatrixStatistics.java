@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AdjacencyMatrixStatistics.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,48 @@
 /**
  * 
  */
-package playground.johannes;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.johannes.socialnetworks.graph.mcmc;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class AdjacencyMatrixStatistics {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	public static double getDensity(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
+		return 2 * y.getEdgeCount()/ (double)(N * (N - 1));
 	}
-
+	
+	public static double getMeanDegree(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
+		int sum = 0;
+		for(int i = 0; i < N; i++) {
+			sum += y.getNeighbours(i).size();
+		}
+		
+		return sum/(double)N;
+	}
+	
+	public static double getLocalClusteringCoefficient(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
+		double sum = 0;
+		for(int i = 0; i < N; i++) {
+			int k = y.getNeighbours(i).size();
+			if(k > 1)
+				sum += 2 * y.countTriangles(i) / (double)(k * (k-1));
+		}
+		return sum / (double)N;
+	}
+	
+	public static double getGlobalClusteringCoefficient(AdjacencyMatrix y) {
+		int N = y.getVertexCount();
+		int triangles = 0;
+		int tripples = 0;
+		for(int i = 0; i < N; i++) {
+			triangles += y.countTriangles(i);
+			tripples += y.countTripples(i);
+		}
+		return triangles/(double)tripples;
+	}
 }

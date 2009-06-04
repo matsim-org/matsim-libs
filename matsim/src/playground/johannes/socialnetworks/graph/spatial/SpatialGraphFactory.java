@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SpatialGraphFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.spatial;
 
-/**
- * 
- */
-package playground.johannes;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import playground.johannes.socialnetworks.graph.GraphFactory;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SpatialGraphFactory implements GraphFactory<SpatialGraph, SpatialVertex, SpatialEdge> {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	public SpatialEdge addEdge(SpatialGraph g, SpatialVertex v1, SpatialVertex v2) {
+		SpatialEdge e = new SpatialEdge(v1, v2);
+		if(g.insertEdge(e, v1, v2))
+			return e;
+		else
+			return null;
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	public SpatialVertex addVertex(SpatialGraph g) {
+		SpatialVertex v = new SpatialVertex(new CoordImpl(0.0, 0.0));
+		if(g.insertVertex(v))
+			return v;
+		else
+			return null;
+	}
 
-		return suite;
+	public SpatialVertex addVertex(SpatialGraph g, Coord c) {
+		SpatialVertex v = new SpatialVertex(c);
+		if(g.insertVertex(v))
+			return v;
+		else
+			return null;
+	}
+	
+	public SpatialGraph createGraph() {
+		return new SpatialGraph();
 	}
 
 }

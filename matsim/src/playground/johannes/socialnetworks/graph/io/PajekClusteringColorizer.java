@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PajekClusteringColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,44 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.io;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import gnu.trove.TObjectDoubleHashMap;
+
+import org.apache.commons.math.stat.StatUtils;
+
+import playground.johannes.socialnetworks.graph.Edge;
+import playground.johannes.socialnetworks.graph.Graph;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class PajekClusteringColorizer<V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	private double c_min;
+	
+	private double c_max;
+	
+	private TObjectDoubleHashMap<V> clustering;
+	
+	public PajekClusteringColorizer(Graph g) {
+		super();
+		clustering = (TObjectDoubleHashMap<V>) GraphStatistics.localClusteringCoefficients(g);		
+		c_min = StatUtils.min(clustering.getValues());
+		c_max = StatUtils.max(clustering.getValues());
+	}
+	
+	public String getEdgeColor(E e) {
+		return getColor(-1);
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	public String getVertexFillColor(V ego) {
+		double c = clustering.get(ego);
+		double color = (c - c_min) / (c_max - c_min);
+		return getColor(color);
 	}
 
 }

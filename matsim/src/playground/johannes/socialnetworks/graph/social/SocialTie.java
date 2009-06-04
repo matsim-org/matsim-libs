@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SocialTie.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,58 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.social;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import gnu.trove.TIntArrayList;
+
+import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SocialTie extends SpatialEdge {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	private int created;
+	
+	private TIntArrayList usage;
+	
+	private int lastUsed;
+	
+	protected SocialTie(Ego<?> v1, Ego<?> v2) {
+		this(v1, v2, 0);
+	}
+	
+	protected SocialTie(Ego<?> v1, Ego<?> v2, int created) {
+		super(v1, v2);
+		this.created = created;
+		usage = new TIntArrayList();
+		usage.add(created);
+		lastUsed = created;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends Ego<?>, ? extends Ego<?>> getVertices() {
+		return (Tuple<? extends Ego<?>, ? extends Ego<?>>) super.getVertices();
 	}
 
+	public int getCreated() {
+		return created;
+	}
+	
+	public int getLastUsed() {
+		return lastUsed;
+	}
+	
+	public TIntArrayList getUsage() {
+		return usage;
+	}
+
+	public void use(int iteration) {
+		usage.add(iteration);
+		lastUsed = iteration;
+	}
 }

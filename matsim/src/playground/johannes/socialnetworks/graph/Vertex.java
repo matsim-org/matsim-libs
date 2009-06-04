@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Vertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.johannes.socialnetworks.graph;
+
+import java.util.List;
+import java.util.RandomAccess;
+
 /**
+ * Basic representation of a vertex.
+ * 
+ * @author illenberger
  * 
  */
-package playground.johannes;
+public interface Vertex {
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+	/**
+	 * Returns the list of edges connected to this vertex. Although, the
+	 * returned collection is a list, it must not contain duplicate entries. The
+	 * list implementation should implement the {@linkplain RandomAccess}
+	 * interface to allow fast iterating over the collection.
+	 * 
+	 * @return the list of edges connected to this vertex.
+	 */
+	public List<? extends Edge> getEdges();
 
-/**
- * @author illenberger
- *
- */
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
-	}
+	/**
+	 * Returns the list of adjacent vertices. Although, the returned collection
+	 * is a list, it must not contain duplicate entries. The list implementation
+	 * should implement the {@linkplain RandomAccess} interface to allow fast
+	 * iterating over the collection.
+	 * 
+	 * @return the list of adjacent vertices.
+	 */
+	public List<? extends Vertex> getNeighbours();
 
 }

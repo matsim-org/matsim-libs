@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PajekAttributes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,27 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.io;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.List;
+
+import playground.johannes.socialnetworks.graph.Edge;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public interface PajekAttributes<V extends Vertex, E extends Edge> {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
-	}
-
+	public final static String VERTEX_FILL_COLOR = "ic";
+	
+	public List<String> getVertexAttributes();
+	
+	public List<String> getEdgeAttributes();
+	
+	public String getVertexValue(V v, String attribute);
+	
+	public String getEdgeValue(E e, String attribute);
+	
 }

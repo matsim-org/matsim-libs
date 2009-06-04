@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * GraphML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,24 +21,38 @@
 /**
  * 
  */
-package playground.johannes;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.johannes.socialnetworks.graph.io;
 
 /**
+ * Constants used by {@link AbstractGraphMLReader} and {@link GraphMLWriter}.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class AllTests {
+interface GraphML {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	static final String GRAPHML_TAG = "graphml";
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	static final String XMLNS_TAG = "xmlns";
 
-		return suite;
-	}
+	static final String XMLNS_URL = "http://graphml.graphdrawing.org/xmlns";
+
+	static final String GRAPH_TAG = "graph";
+
+	static final String EDGEDEFAULT_TAG = "edgedefault";
+
+	static final String UNDIRECTED = "undirected";
+
+	static final String DIRECTED = "directed";
+
+	static final String ID_TAG = "id";
+
+	static final String SOURCE_TAG = "source";
+
+	static final String TARGET_TAG = "target";
+
+	static final String NODE_TAG = "node";
+
+	static final String EDGE_TAG = "edge";
 
 }

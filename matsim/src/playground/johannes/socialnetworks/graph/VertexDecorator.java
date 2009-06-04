@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AbstractVertexDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,35 @@
 /**
  * 
  */
-package playground.johannes;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.johannes.socialnetworks.graph;
 
 /**
+ * Decorator class for any type of {@link Vertex}.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class AllTests {
+public class VertexDecorator<V extends Vertex> extends SparseVertex {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	private V delegate;
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	/**
+	 * Creates a new decorator for <tt>delegate</tt>.
+	 * 
+	 * @param delegate
+	 *            the vertex to be decorated.
+	 */
+	protected VertexDecorator(V delegate) {
+		super();
+		this.delegate = delegate;
 	}
 
+	/**
+	 * Returns the decorated vertex.
+	 * 
+	 * @return the decorated vertex.
+	 */
+	public V getDelegate() {
+		return delegate;
+	}
 }

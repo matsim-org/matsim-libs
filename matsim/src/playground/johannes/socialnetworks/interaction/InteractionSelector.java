@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * InteractionSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,16 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.interaction;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Collection;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public interface InteractionSelector {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
-	}
-
+	public Collection<Visitor> select(Visitor v, Collection<Visitor> choiceSet);
+	
 }

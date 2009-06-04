@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ErgmTerm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,25 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.mcmc;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public abstract class ErgmTerm {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	private double theta;
+	
+	public void setTheta(double theta) {
+		this.theta = theta;
 	}
-
+	
+	public double getTheta() {
+		return theta;
+	}
+	
+	abstract public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	
 }

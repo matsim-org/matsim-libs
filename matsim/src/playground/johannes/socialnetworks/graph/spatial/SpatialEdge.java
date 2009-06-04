@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SpatialEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.spatial;
 
-/**
- * 
- */
-package playground.johannes;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import playground.johannes.socialnetworks.graph.SparseEdge;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SpatialEdge extends SparseEdge {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	public SpatialEdge(SpatialVertex v1, SpatialVertex v2) {
+		super(v1, v2);
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	public double length() {
+		Coord c1 = getVertices().getFirst().getCoordinate();
+		Coord c2 = getVertices().getSecond().getCoordinate();
+		return CoordUtils.calcDistance(c1, c2);
+	}
+	
+	@Override
+	public SpatialVertex getOpposite(Vertex v) {
+		return (SpatialVertex) super.getOpposite(v);
+	}
 
-		return suite;
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends SpatialVertex, ? extends SpatialVertex> getVertices() {
+		return (Tuple<? extends SpatialVertex, ? extends SpatialVertex>) super.getVertices();
 	}
 
 }

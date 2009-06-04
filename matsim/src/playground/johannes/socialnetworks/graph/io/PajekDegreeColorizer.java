@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PajekScalarColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,53 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.io;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import playground.johannes.socialnetworks.graph.Edge;
+import playground.johannes.socialnetworks.graph.Graph;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.Vertex;
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+public class PajekDegreeColorizer<V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+	
+	private double k_min;
+	
+	private double k_max;
+	
+	private boolean logScale;
+	
+	public PajekDegreeColorizer(Graph g, boolean logScale) {
+		super();
+		setLogScale(logScale);
+		Distribution stats = GraphStatistics.degreeDistribution(g);
+		k_min = stats.min();
+		k_max = stats.max();
+	}
+	
+	public void setLogScale(boolean flag) {
+		logScale = flag;
+	}
+	
+	public String getEdgeColor(E e) {
+		return getColor(-1);
 	}
 
+	public String getVertexFillColor(V ego) {
+		int k = ego.getNeighbours().size();
+		double color = -1;
+		if(logScale) {
+			double min = Math.log(k_min + 1);
+			double max = Math.log(k_max + 1);
+			color = (Math.log(k + 1) - min) / (max - min);
+		} else {
+			color = (k - k_min) / (k_max - k_min);
+		}
+		
+		return getColor(color);
+	}
 }

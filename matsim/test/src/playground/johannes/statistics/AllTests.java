@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.statistics;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -33,10 +33,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+		TestSuite suite = new TestSuite("Tests for playground.johannes.statistics");
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+		suite.addTestSuite(playground.johannes.statistics.CorrelationsTest.class);
+		
 
 		return suite;
 	}

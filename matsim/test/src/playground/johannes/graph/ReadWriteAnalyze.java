@@ -28,9 +28,12 @@ import java.io.IOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.johannes.graph.GraphStatistics.GraphDistance;
-import playground.johannes.graph.io.GraphMLWriter;
-import playground.johannes.graph.io.PlainGraphMLReader;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.Partitions;
+import playground.johannes.socialnetworks.graph.SparseGraph;
+import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
+import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
+import playground.johannes.socialnetworks.graph.io.SparseGraphMLReader;
 
 /**
  * @author illenberger
@@ -69,18 +72,18 @@ public class ReadWriteAnalyze extends MatsimTestCase {
 	 * 
 	 */
 	public void testReadWriteAnalyze() {
-		PlainGraph g = new PlainGraphMLReader().readGraph(getPackageInputDirectory() + GRAPH_INPUT_FILE);
+		SparseGraph g = new SparseGraphMLReader().readGraph(getPackageInputDirectory() + GRAPH_INPUT_FILE);
 		
 		assertEquals(NUM_VERTICES, g.getVertices().size());
 		assertEquals(NUM_EDGES, g.getEdges().size());
 		
-		assertEquals(MEAN_DEGREE, GraphStatistics.getDegreeStatistics(g).getMean(), ASSERT_DELTA);
-		assertEquals(MEAN_CLUSTERING, GraphStatistics.getClusteringStatistics(g).getMean(), ASSERT_DELTA);
-		assertEquals(MUTUALITY, GraphStatistics.getMutuality(g), ASSERT_DELTA);
-		assertEquals(DEGREECORRELATION, GraphStatistics.getDegreeCorrelation(g), ASSERT_DELTA);
-		assertEquals(NUM_COMPONENTS, GraphStatistics.getComponents(g).size());
+		assertEquals(MEAN_DEGREE, GraphStatistics.degreeDistribution(g).mean(), ASSERT_DELTA);
+		assertEquals(MEAN_CLUSTERING, GraphStatistics.localClusteringDistribution(g).mean(), ASSERT_DELTA);
+		assertEquals(MUTUALITY, GraphStatistics.mutuality(g), ASSERT_DELTA);
+		assertEquals(DEGREECORRELATION, GraphStatistics.degreeDegreeCorrelation(g), ASSERT_DELTA);
+		assertEquals(NUM_COMPONENTS, Partitions.disconnectedComponents(g).size());
 		
-		GraphDistance gd = GraphStatistics.getCentrality(g);
+		GraphDistance gd = GraphStatistics.centrality(g);
 		assertEquals(CLOSENESS, gd.getGraphCloseness(), ASSERT_DELTA);
 		assertEquals(BETWEENNESS, gd.getGraphBetweenness(), 0.0000000001);
 		assertEquals(DIAMETER, gd.getDiameter());

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Visitor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,37 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.interaction;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.api.population.Person;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class Visitor {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	private Person p;
+	
+	private double enterTime;
+	
+	private double leaveTime;
+	
+	Visitor(Person p, double enterTime) {
+		this.p = p;
+		this.enterTime = enterTime;
+		this.leaveTime = Double.NaN;
 	}
-
+	
+	public Person getPerson() {
+		return p;
+	}
+	
+	public double getEnterTime() {
+		return enterTime;
+	}
+	
+	public double getLeaveTime() {
+		return leaveTime;
+	}
 }

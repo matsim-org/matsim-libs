@@ -28,9 +28,15 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.johannes.graph.generators.ErdosRenyiGenerator;
-import playground.johannes.graph.generators.PlainGraphFactory;
-import playground.johannes.graph.mcmc.AdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.Graph;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.SparseEdge;
+import playground.johannes.socialnetworks.graph.SparseGraph;
+import playground.johannes.socialnetworks.graph.SparseGraphFactory;
+import playground.johannes.socialnetworks.graph.SparseVertex;
+import playground.johannes.socialnetworks.graph.Vertex;
+import playground.johannes.socialnetworks.graph.generators.ErdosRenyiGenerator;
+import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 
 /**
  * @author illenberger
@@ -39,16 +45,16 @@ import playground.johannes.graph.mcmc.AdjacencyMatrix;
 public class AdjacencyMatrixTest extends MatsimTestCase {
 
 	public void testConvert() {
-		ErdosRenyiGenerator<PlainGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<PlainGraph, SparseVertex, SparseEdge>(new PlainGraphFactory());
+		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
 		Graph g1 = generator.generate(1000, 0.01, 0);
 		
 		AdjacencyMatrix m = new AdjacencyMatrix(g1);
 		
-		Graph g2 = m.getGraph(new PlainGraphFactory());
+		Graph g2 = m.getGraph(new SparseGraphFactory());
 		
 		assertEquals(g2.getVertices().size(), g1.getVertices().size());
 		assertEquals(g2.getEdges().size(), g1.getEdges().size());
-		assertEquals(GraphStatistics.getDegreeStatistics(g2).getMean(), GraphStatistics.getDegreeStatistics(g1).getMean());
+		assertEquals(GraphStatistics.degreeDistribution(g2).mean(), GraphStatistics.degreeDistribution(g1).mean());
 		
 //		int addCount = 0;
 		for(int i = 0; i < 100; i+=2) {
@@ -65,48 +71,49 @@ public class AdjacencyMatrixTest extends MatsimTestCase {
 //				removeCount++;
 		}
 		
-		Graph g4 = m.getGraph(new PlainGraphFactory());
+		Graph g4 = m.getGraph(new SparseGraphFactory());
 		assertEquals(g4.getEdges().size(), g1.getEdges().size());
 		
-		assertEquals(GraphStatistics.getDegreeStatistics(g2).getMean(), GraphStatistics.getDegreeStatistics(g4).getMean());
+		assertEquals(GraphStatistics.degreeDistribution(g2).mean(), GraphStatistics.degreeDistribution(g4).mean());
 	}
 
 	public void testCommonNeighbours() {
 		AdjacencyMatrix m = new AdjacencyMatrix();
-		PlainGraph g = new PlainGraph();
+		SparseGraphFactory factory = new SparseGraphFactory();
+		SparseGraph g = factory.createGraph();
 		
 		m.addVertex();
-		SparseVertex v0 = g.addVertex();
+		SparseVertex v0 = factory.addVertex(g);
 		
 		m.addVertex();
-		SparseVertex v1 = g.addVertex();
+		SparseVertex v1 = factory.addVertex(g);
 		
 		m.addVertex();
-		SparseVertex v2 = g.addVertex();
+		SparseVertex v2 = factory.addVertex(g);
 		
 		m.addVertex();
-		SparseVertex v3 = g.addVertex();
+		SparseVertex v3 = factory.addVertex(g);
 		
 		m.addVertex();
-		SparseVertex v4 = g.addVertex();
+		SparseVertex v4 = factory.addVertex(g);
 		
 		m.addEdge(0, 1);
-		g.addEdge(v0, v1);
+		factory.addEdge(g, v0, v1);
 		
 		m.addEdge(0, 2);
-		g.addEdge(v0, v2);
+		factory.addEdge(g, v0, v2);
 		
 		m.addEdge(0, 3);
-		g.addEdge(v0, v3);
+		factory.addEdge(g, v0, v3);
 		
 		m.addEdge(2, 1);
-		g.addEdge(v2, v1);
+		factory.addEdge(g, v2, v1);
 		
 		m.addEdge(3, 1);
-		g.addEdge(v3, v1);
+		factory.addEdge(g, v3, v1);
 		
 		m.addEdge(4, 1);
-		g.addEdge(v4, v1);
+		factory.addEdge(g, v4, v1);
 		
 		assertEquals(m.countCommonNeighbours(0, 1), 2);
 		assertEquals(m.countCommonNeighbours(1, 0), 2);

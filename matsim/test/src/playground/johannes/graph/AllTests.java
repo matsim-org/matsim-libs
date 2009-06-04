@@ -36,6 +36,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for playground.johannes.graph");
 
 		suite.addTestSuite(playground.johannes.graph.ReadWriteAnalyze.class);
+		suite.addTestSuite(playground.johannes.graph.AdjacencyMatrixTest.class);
 
 		return suite;
 	}

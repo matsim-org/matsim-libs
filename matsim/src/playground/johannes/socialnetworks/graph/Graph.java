@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Graph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,33 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Set;
 
 /**
+ * Basic representation of a mathematical graph.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class AllTests {
+/*
+ * joh 28/11/09: Think about, if we also allow adjacency matrices for dense graphs... 
+ */
+public interface Graph {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	/**
+	 * Returns the set of vertices. The set should be read-only.
+	 * 
+	 * @return the set of vertices.
+	 */
+	public Set<? extends Vertex> getVertices();
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
-	}
+	/**
+	 * Returns the set of edges. The set should be read-only.
+	 * 
+	 * @return the set of edges.
+	 */
+	public Set<? extends Edge> getEdges();
 
 }

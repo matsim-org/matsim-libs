@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SampledGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,51 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.snowball;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Set;
+
+import playground.johannes.socialnetworks.graph.SparseGraph;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SampledGraph extends SparseGraph {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	public SampledEdge addEdge(SampledVertex v1, SampledVertex v2) {
+		SampledEdge e = new SampledEdge(v1, v2);
+		if(insertEdge(e, v1, v2))
+			return e;
+		else
+			return null;
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	public SampledVertex addVertex() {
+		SampledVertex v = new SampledVertex();
+		if(insertVertex(v))
+			return v;
+		else
+			return null;
+	}
 
-		return suite;
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledEdge> getEdges() {
+		return (Set<? extends SampledEdge>) super.getEdges();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledVertex> getVertices() {
+		return (Set<? extends SampledVertex>) super.getVertices();
+	}
+	
+	public void reset() {
+		for(SampledVertex v : getVertices())
+			v.reset();
+		for(SampledEdge e : getEdges())
+			e.reset();
 	}
 
 }

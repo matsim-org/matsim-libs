@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SpatialAdjacencyMatrix.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.spatial;
 
-/**
- * 
- */
-package playground.johannes;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntObjectHashMap;
+import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+public class SpatialAdjacencyMatrix extends AdjacencyMatrixDecorator<SpatialVertex> {
+	
+	public SpatialAdjacencyMatrix(SpatialGraph g) {
+		super(g);
 	}
 
+	public SpatialGraph getGraph() {
+		SpatialGraphFactory factory = new SpatialGraphFactory();
+		SpatialGraph g = new SpatialGraph();
+
+		TIntObjectHashMap<SpatialVertex> vertexIdx = new TIntObjectHashMap<SpatialVertex>();
+		for (int i = 0; i < getVertexCount(); i++) {
+			SpatialVertex ego = factory.addVertex(g, getVertex(i).getCoordinate());
+			vertexIdx.put(i, ego);
+		}
+
+		for (int i = 0; i < getVertexCount(); i++) {
+			TIntArrayList row = getNeighbours(i);
+			if (row != null) {
+				for (int idx = 0; idx < row.size(); idx++) {
+					int j = row.get(idx);
+					if (j > i) {
+						if (factory.addEdge(g, vertexIdx.get(i), vertexIdx
+								.get(j)) == null)
+							throw new RuntimeException();
+					}
+				}
+			}
+		}
+
+		return g;
+	}
 }

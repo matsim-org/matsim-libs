@@ -59,7 +59,7 @@ import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.johannes.statistics.Distribution;
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger

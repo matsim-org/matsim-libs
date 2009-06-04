@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SparseEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,49 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
+ * Representation of an undirected an unweighted edge.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class AllTests {
+public class SparseEdge implements Edge {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	private Tuple<SparseVertex, SparseVertex> vertices;
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	/**
+	 * Creates a new edge with <tt>v1</tt> and <tt>v2</tt> as its end points.
+	 * 
+	 * @param v1
+	 *            one of the two vertices the edge is to be connected to.
+	 * @param v2
+	 *            one of the two vertices the edge is to be connected to.
+	 */
+	public SparseEdge(SparseVertex v1, SparseVertex v2) {
+		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
+	}
 
-		return suite;
+	/**
+	 * @see {@link Edge#getOpposite(Vertex)}
+	 */
+	public SparseVertex getOpposite(Vertex v) {
+		if (vertices.getFirst().equals(v))
+			return vertices.getSecond();
+		else if (vertices.getSecond().equals(v))
+			return vertices.getFirst();
+		else
+			return null;
+	}
+
+	/**
+	 * @see {@link Edge#getVertices()}
+	 */
+	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
+		return vertices;
 	}
 
 }

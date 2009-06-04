@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Ego.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,24 +21,35 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.social;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.List;
+
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicPerson;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class Ego<P extends BasicPerson<?>> extends SpatialVertex {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	private P person;
+	
+	protected Ego(P person) {
+		super(((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord());
+		this.person = person;
+	}
+	
+	public P getPerson() {
+		return person;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends Ego<P>> getNeighbours() {
+		return (List<? extends Ego<P>>) super.getNeighbours();
+	}
 }

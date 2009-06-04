@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * FreespeedTravelTimeCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes;
+package playground.johannes.socialnetworks.ivtsurveys;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.Time;
 
-/**
- * @author illenberger
- *
- */
-public class AllTests {
+public class FreespeedTravelTime implements TravelMinCost, TravelTime {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	public double getLinkTravelCost(Link link, double time) {
+		return (link.getLength() / link.getFreespeed(time));
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	public double getLinkTravelTime(Link link, double time) {
+		return link.getLength() / link.getFreespeed(time);
+	}
 
-		return suite;
+	public double getLinkMinimumTravelCost(Link link) {
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
 	}
 
 }

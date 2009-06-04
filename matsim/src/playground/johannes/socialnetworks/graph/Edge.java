@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Edge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,34 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
+ * Basic representation of an undirected and unweighted edge.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class AllTests {
+public interface Edge {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	/**
+	 * Returns a tuple of vertices connected to this edge. The order of the
+	 * vertices is arbitrary.
+	 * 
+	 * @return a tuple of vertices connected to this edge.
+	 */
+	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
-	}
+	/**
+	 * Returns the vertex that is opposing to vertex <tt>v</tt>.
+	 * 
+	 * @param v
+	 *            a vertex connected to this edge.
+	 * @return the vertex that is opposing to vertex <tt>v</tt>, or
+	 *         <tt>null</tt> if <tt>v</tt> is not connected to this edge.
+	 */
+	public Vertex getOpposite(Vertex v);
 
 }

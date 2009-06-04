@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SocialNetworkStatistics.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,37 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.social;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+
+
+import org.matsim.core.api.population.Person;
+
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SocialNetworkStatistics {
+	
+	@SuppressWarnings("unchecked")
+	public static double ageCorrelation(SocialNetwork<Person> g) {
+		double product = 0;
+		double sum = 0;
+		double squareSum = 0;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+		for (SocialTie e : g.getEdges()) {
+			Ego<Person> v1 = (Ego<Person>) e.getVertices().getFirst();
+			Ego<Person> v2 = (Ego<Person>) e.getVertices().getSecond();
+			int age1 = v1.getPerson().getAge();
+			int age2 = v2.getPerson().getAge();
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+			sum += 0.5 * (age1 + age2);
+			squareSum += 0.5 * (Math.pow(age1, 2) + Math.pow(age2, 2));
+			product += age1 * age2;			
+		}
+		
+		double norm = 1 / (double)g.getEdges().size();
+		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
 	}
-
 }

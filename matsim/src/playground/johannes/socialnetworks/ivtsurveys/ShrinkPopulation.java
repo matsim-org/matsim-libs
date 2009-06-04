@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ShrinkPopulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,24 +21,35 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.ivtsurveys;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationWriter;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class ShrinkPopulation {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Config config = Gbl.createConfig(new String[]{args[0]});
+		ScenarioLoader loader = new ScenarioLoader(config);
+		loader.loadScenario();
+		Scenario data = loader.getScenario();
+		loader.loadPopulation();
+		Population population = data.getPopulation();
+		double sample = Double.parseDouble(args[2]);
+		PopulationWriter writer = new PopulationWriter(population, args[1], "v4", sample);
+		writer.write();
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
 	}
 
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SpatialGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.spatial;
 
-/**
- * 
- */
-package playground.johannes;
+import java.util.Set;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import playground.johannes.socialnetworks.graph.SparseEdge;
+import playground.johannes.socialnetworks.graph.SparseGraph;
+import playground.johannes.socialnetworks.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SpatialGraph extends SparseGraph {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SpatialEdge> getEdges() {
+		return (Set<? extends SpatialEdge>) super.getEdges();
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SpatialVertex> getVertices() {
+		return (Set<? extends SpatialVertex>) super.getVertices();
+	}
 
-		return suite;
+	@Override
+	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
+		return super.insertEdge(e, v1, v2);
+	}
+
+	@Override
+	protected boolean insertVertex(SparseVertex v) {
+		return super.insertVertex(v);
 	}
 
 }

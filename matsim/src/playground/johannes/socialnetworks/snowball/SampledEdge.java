@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SampledEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,46 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.snowball;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.socialnetworks.graph.EdgeDecorator;
+import playground.johannes.socialnetworks.graph.SparseEdge;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SampledEdge extends SparseEdge {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	private EdgeDecorator<SampledEdge> projection;
+	
+	protected SampledEdge(SampledVertex v1, SampledVertex v2) {
+		super(v1, v2);
 	}
 
+	@Override
+	public SampledVertex getOpposite(Vertex v) {
+		return (SampledVertex) super.getOpposite(v);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<SampledVertex, SampledVertex> getVertices() {
+		return (Tuple<SampledVertex, SampledVertex>) super.getVertices();
+	}
+	
+	void setProjection(EdgeDecorator<SampledEdge> projection) {
+		this.projection = projection;
+	}
+	
+	public EdgeDecorator<SampledEdge> getProjection() {
+		return projection;
+	}
+	
+	void reset() {
+		projection = null;
+	}
 }

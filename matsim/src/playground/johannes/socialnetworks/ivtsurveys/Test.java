@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Test.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,27 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes;
+package playground.johannes.socialnetworks.ivtsurveys;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public class Test {
 
-/**
- * @author illenberger
- *
- */
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		double x = 0;
+		for(int i=1; i< 1000000; i++) {
+			x += Math.pow(i/1.2, -2);
+		}
+		System.out.println(x);
+		
 	}
 
 }

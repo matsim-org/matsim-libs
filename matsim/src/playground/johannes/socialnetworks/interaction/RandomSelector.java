@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * RandomSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,45 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.interaction;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class RandomSelector implements InteractionSelector {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	private int maxInteractions;
+	
+	private Random random;
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	public RandomSelector(int maxInteractions, long randomSeed) {
+		this.maxInteractions = maxInteractions;
+		random = new Random(randomSeed);
+	}
+	
+	public Collection<Visitor> select(Visitor v, Collection<Visitor> choiceSet) {
+		List<Visitor> targets = new LinkedList<Visitor>();
+		
+		if(choiceSet.isEmpty())
+			return targets;
+		
+		if(maxInteractions == 1)
+			targets.add(selectSingleTarget(v, choiceSet));
+		else if(maxInteractions > 1)
+			throw new UnsupportedOperationException("Not implemented yet!");
+		
+		return targets;
+	}
+	
+	private Visitor selectSingleTarget(Visitor v, Collection<Visitor> choiceSet) {
+		List<Visitor> visitors = new LinkedList<Visitor>(choiceSet);
+		return visitors.get(random.nextInt(choiceSet.size()));
 	}
 
 }

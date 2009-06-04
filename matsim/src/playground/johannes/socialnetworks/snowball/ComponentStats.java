@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ComponentStats.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,24 +21,44 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.snowball;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Set;
+import java.util.SortedSet;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
+import playground.johannes.socialnetworks.graph.GraphProjection;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.Partitions;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class ComponentStats extends GraphPropertyEstimator {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	/**
+	 * @param outputDir
+	 */
+	public ComponentStats(String outputDir) {
+		super(outputDir);
+		openStatsWriters("components");
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	/* (non-Javadoc)
+	 * @see playground.johannes.snowball.GraphPropertyEstimator#calculate(playground.johannes.graph.GraphProjection, int)
+	 */
+	@Override
+	public DescriptiveStatistics calculate(
+			GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph,
+			int iteration) {
+		SortedSet<Set<Vertex>> components = Partitions.disconnectedComponents(graph);
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		stats.addValue(components.size());
+		dumpObservedStatistics(getStatisticsMap(stats), iteration);
+		return stats;
 	}
 
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * GraphML2KML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,36 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.social.util;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.io.IOException;
+
+import org.matsim.core.api.population.Person;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+
+import playground.johannes.socialnetworks.graph.social.SocialNetwork;
+import playground.johannes.socialnetworks.graph.social.io.SNGraphMLReader;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class GraphML2KMLDegree {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		SocialNetwork<Person> socialnet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
+		
+		KMLWriter writer = new KMLWriter();
+		KMLDegreeStyle vertexStyle = new KMLDegreeStyle(writer.getVertexIconLink());
+		vertexStyle.setLogscale(false);
+		writer.setVertexStyle(vertexStyle);
+		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
+		writer.write(socialnet, args[2]);
 	}
-
 }

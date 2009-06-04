@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SNGraphML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,22 @@
 /**
  * 
  */
-package playground.johannes;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.johannes.socialnetworks.graph.social.io;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public interface SNGraphML {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
-	}
-
+	public static final String CREATED_TAG = "created";
+	
+	public static final String USAGE_TAG = "usage";
+	
+	public static final String PERSON_ID_TAG = "personid";
+	
+//	public static final String COORD_X_TAG = "x";
+//	
+//	public static final String COORD_Y_TAG = "y";
+	
 }

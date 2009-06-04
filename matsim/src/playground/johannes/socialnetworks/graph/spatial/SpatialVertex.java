@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SpatialVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.graph.spatial;
 
-/**
- * 
- */
-package playground.johannes;
+import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.api.basic.v01.Coord;
+
+import playground.johannes.socialnetworks.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SpatialVertex extends SparseVertex {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	private Coord coord;
+	
+	protected SpatialVertex(Coord coord) {
+		this.coord = coord;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends SpatialVertex> getNeighbours() {
+		return (List<? extends SpatialVertex>) super.getNeighbours();
 	}
 
+	public Coord getCoordinate() {
+		return coord;
+	}
 }

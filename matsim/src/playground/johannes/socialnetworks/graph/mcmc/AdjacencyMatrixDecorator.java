@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SNAdjacencyMatrix.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,51 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.mcmc;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.socialnetworks.graph.Edge;
+import playground.johannes.socialnetworks.graph.Graph;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class AdjacencyMatrixDecorator<V extends Vertex> extends AdjacencyMatrix {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	private List<V> vertices;
+	
+	@SuppressWarnings("unchecked")
+	public AdjacencyMatrixDecorator(Graph g) {
+		super();
+		vertices = new ArrayList<V>(g.getVertices().size());
+		
+		int idx = 0;
+		for(Vertex v : g.getVertices()) {
+			vertices.add((V)v);
+			addVertex();
+			idx++;
+		}
+		
+		for(Edge e : g.getEdges()) {
+			Tuple<? extends Vertex, ? extends Vertex> p = e.getVertices();
+			int i = vertices.indexOf(p.getFirst());
+			int j = vertices.indexOf(p.getSecond());
+			
+			if(i > -1 && j > -1) {
+				addEdge(i, j);
+			} else {
+				throw new IllegalArgumentException(String.format("Indices i=%1$s, j=%2$s not allowed!", i, j));
+			}
+		}
 	}
-
+	
+	public V getVertex(int i) {
+		return vertices.get(i);
+	}
 }

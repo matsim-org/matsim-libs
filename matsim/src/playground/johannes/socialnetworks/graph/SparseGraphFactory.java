@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PlainGraphFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,33 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public class SparseGraphFactory implements GraphFactory<SparseGraph, SparseVertex, SparseEdge> {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	public SparseEdge addEdge(SparseGraph g, SparseVertex v1, SparseVertex v2) {
+		SparseEdge e = new SparseEdge(v1, v2);
+		if (g.insertEdge(e, v1, v2))
+			return e;
+		else
+			return null;
+	}
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
+	public SparseVertex addVertex(SparseGraph g) {
+		SparseVertex v = new SparseVertex();
+		if (g.insertVertex(v))
+			return v;
+		else
+			return null;
+	}
 
-		return suite;
+	public SparseGraph createGraph() {
+		return new SparseGraph();
 	}
 
 }

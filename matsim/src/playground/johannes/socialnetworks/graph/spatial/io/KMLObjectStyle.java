@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SNKMLStyles.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,21 @@
 /**
  * 
  */
-package playground.johannes;
+package playground.johannes.socialnetworks.graph.spatial.io;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.List;
+
+import net.opengis.kml._2.StyleType;
+import playground.johannes.socialnetworks.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class AllTests {
+public interface KMLObjectStyle<G extends Graph, T>{
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
-
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
-	}
-
+	public List<StyleType> getObjectStyle(G graph);
+	
+	public String getObjectSytleId(T object);
+	
 }

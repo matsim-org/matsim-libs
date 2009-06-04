@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * EdgeDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,24 +21,38 @@
 /**
  * 
  */
-package playground.johannes;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.johannes.socialnetworks.graph;
 
 /**
+ * Decorator class for any type of {@link Edge}.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class AllTests {
+public class EdgeDecorator<E extends Edge> extends SparseEdge {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.johannes");
+	private E delegate;
 
-		suite.addTest(playground.johannes.graph.AllTests.suite());
-		suite.addTest(playground.johannes.statistics.AllTests.suite());
-
-		return suite;
+	/**
+	 * Creates a new decorator for edge <tt>delegate</tt>.
+	 * 
+	 * @param v1
+	 *            one of the two vertices this edge is connected to.
+	 * @param v2
+	 *            one of the two vertices this edge is connected to.
+	 */
+	protected EdgeDecorator(VertexDecorator<?> v1, VertexDecorator<?> v2,
+			E delegate) {
+		super(v1, v2);
+		this.delegate = delegate;
 	}
 
+	/**
+	 * Returns the decorated edge.
+	 * 
+	 * @return the decorated edge.
+	 */
+	public E getDelegate() {
+		return delegate;
+	}
 }
