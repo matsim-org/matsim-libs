@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
@@ -41,11 +42,15 @@ import org.matsim.core.api.population.NetworkRoute;
  */
 public class CompressedNetworkRoute extends AbstractRoute implements NetworkRoute {
 
+	private final static Logger log = Logger.getLogger(CompressedNetworkRoute.class);
+	
 	private final ArrayList<Link> route = new ArrayList<Link>(0);
 	private final Map<Link, Link> subsequentLinks;
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
 	private int uncompressedLength = 0;
+	private int modCount = 0;
+	private int routeModCountState = 0;
 
 	public CompressedNetworkRoute(Link startLink, Link endLink, final Map<Link, Link> subsequentLinks) {
 		super(startLink, endLink);
@@ -54,6 +59,10 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 
 	public List<Link> getLinks() {
 		ArrayList<Link> links = new ArrayList<Link>(this.uncompressedLength);
+		if (this.modCount != this.routeModCountState) {
+			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
+			return links;
+		}
 		Link previousLink = getStartLink();
 		Link endLink = getEndLink();
 		if (previousLink == endLink) {
@@ -72,6 +81,9 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	private void getLinksTillLink(final List<Link> links, final Link nextLink, final Link startLink) {
 		Link link = startLink;
 		while (true) { // loop until we hit "return;"
+			if (links.size() > this.uncompressedLength) {
+				throw new RuntimeException("bad route data.");
+			}
 			for (Link outLink : link.getToNode().getOutLinks().values()) {
 				if (outLink == nextLink) {
 					return;
@@ -82,6 +94,18 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		}
 	}
 
+	@Override
+	public void setEndLink(Link link) {
+		this.modCount++;
+		super.setEndLink(link);
+	}
+	
+	@Override
+	public void setStartLink(Link link) {
+		this.modCount++;
+		super.setStartLink(link);
+	}
+	
 	@Override
 	public List<Id> getLinkIds() {
 		List<Link> links = getLinks();
@@ -94,6 +118,10 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 
 	public List<Node> getNodes() {
 		ArrayList<Node> nodes = new ArrayList<Node>(this.uncompressedLength + 1);
+		if (this.modCount != this.routeModCountState) {
+			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
+			return nodes;
+		}
 
 		Link startLink = getStartLink();
 		Link endLink = getEndLink();
@@ -177,6 +205,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		this.route.clear();
 		setStartLink(startLink);
 		setEndLink(endLink);
+		this.routeModCountState = this.modCount;
 		if ((srcRoute == null) || (srcRoute.size() == 0)) {
 			this.uncompressedLength = 0;
 			return;
@@ -206,6 +235,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		if (endLink != null) {
 			setEndLink(endLink);
 		}
+		this.routeModCountState = this.modCount;
 		Link previousLink = getStartLink();
 		Node previousNode = previousLink.getToNode();
 		Iterator<Node> iter = srcRoute.iterator();
@@ -213,7 +243,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 			iter.next(); // ignore the first part, it should be the same as previousNode
 		} else {
 			// empty srcRoute, nothing else to do than a check
-		// check that this route is complete, so it will be possible to decompress it again without problems
+			// check that this route is complete, so it will be possible to decompress it again without problems
 			if ((startLink != endLink) && (startLink.getToNode() != endLink.getFromNode())) {
 				throw new IllegalArgumentException("The last node must be the fromNode of the endLink. endLink=" + endLink.getId());
 			}
@@ -263,6 +293,10 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	}
 
 	private double calcDistance() {
+		if (this.modCount != this.routeModCountState) {
+			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
+			return 99999.999;
+		}
 		double dist = 0;
 		for (Link link : getLinks()) {
 			dist += link.getLength();
