@@ -113,6 +113,8 @@ public class TransitDriver implements TransitDriverAgent {
 			} else {
 				this.nextStop = null;
 			}
+			
+			int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size();
 			// find out who wants to get out
 			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
 			for (PassengerAgent passenger : this.vehicle.getPassengers()) {
@@ -120,14 +122,19 @@ public class TransitDriver implements TransitDriverAgent {
 					passengersLeaving.add(passenger);
 				}
 			}
+			freeCapacity += passengersLeaving.size();
 			// find out who wants to get in
 			ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
 			for (Iterator<DriverAgent> iter = this.sim.agentTracker.getAgentsAtStop(stop).iterator(); iter.hasNext(); ) {
+				if (freeCapacity == 0) {
+					break;
+				}
 				DriverAgent agent = iter.next();
 				PassengerAgent passenger = (PassengerAgent) agent;
 				if (passenger.ptLineAvailable(this.transitLine)) {
 					iter.remove();
 					passengersEntering.add(passenger);
+					freeCapacity--;
 				}
 			}
 

@@ -108,7 +108,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("transitVehicleType"));
 			BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
-			capacity.setSeats(Integer.valueOf(21));
+			capacity.setSeats(Integer.valueOf(101));
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 			
