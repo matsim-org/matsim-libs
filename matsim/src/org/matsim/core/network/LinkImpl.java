@@ -39,8 +39,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 
 	private final double flowCapacity;
 
-	private final double freespeedTravelTime;
-
 	protected String type = null;
 
 	protected String origid = null;
@@ -63,7 +61,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		super.capacity = capacity;
 		super.nofLanes = lanes;
 
-		this.freespeedTravelTime = length / freespeed;
 		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
@@ -139,7 +136,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	}
 
 	public double getFreespeedTravelTime(final double time) {
-		return this.freespeedTravelTime;
+		return this.length / this.freespeed;
 	}
 
 	public double getFlowCapacity(final double time) {
