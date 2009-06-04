@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.jgap.Chromosome;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
@@ -214,7 +215,7 @@ public class Planomat implements PlanAlgorithm {
 
 		IChromosome sampleChromosome = null;
 		try {
-			sampleChromosome = new PlanomatJGAPChromosome( jgapConfiguration, sampleGenes );
+			sampleChromosome = new Chromosome( jgapConfiguration, sampleGenes );
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}

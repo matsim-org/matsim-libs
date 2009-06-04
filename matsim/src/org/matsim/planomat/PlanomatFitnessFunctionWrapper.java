@@ -34,17 +34,20 @@ import org.matsim.planomat.Planomat.StepThroughPlanAction;
  */
 public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
-	/**
-	 * A replacement for FitnessFunction.NO_FITNESS_VALUE, which is -1.000...
-	 * This default value signalling a fitness value that has not been computed yet doesn't work here because we operate also with negative fitness values
-	 * which is not intended by JGAP.
-	 */
-	public static final double NO_FITNESS_VALUE = Double.NEGATIVE_INFINITY;
+	private double m_lastComputedFitnessValue = FitnessFunction.NO_FITNESS_VALUE;
 	
 	@Override
 	public double getFitnessValue(IChromosome a_subject) {
-	    return evaluate(a_subject);
+	    // Delegate to the evaluate() method to actually compute the
+	    // fitness value. If the returned value is less than one,
+	    // then we throw a runtime exception.
+	    // ---------------------------------------------------------
+	    double fitnessValue = evaluate(a_subject);
+	    this.m_lastComputedFitnessValue = fitnessValue;
+	    return fitnessValue;
 	}
+
+//	private static final double FITNESS_OFFSET = 10000.0;
 
 	private static final long serialVersionUID = 1L;
 
@@ -62,7 +65,18 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 		double planScore = this.planomat.stepThroughPlan(StepThroughPlanAction.EVALUATE, a_subject, this.plan);
 
+		// JGAP accepts only fitness values >= 0. bad plans often have negative scores. So we have to
+		// - make sure a fitness value will be >= 0, but
+		// - see that the fitness landscape will not be distorted too much by this, so we will add an offset (this s**ks, but works)
+		// - theoretically is a problem if GA selection is based on score ratio (e.g. weighted roulette wheel selection)
+//		return Math.max(0.0, sf.getScore());
+//		return Math.max(0.0, planScore + PlanomatFitnessFunctionWrapper.FITNESS_OFFSET);
 		return planScore;
+	}
+
+	@Override
+	public double getLastComputedFitnessValue() {
+	    return this.m_lastComputedFitnessValue;
 	}
 
 }
