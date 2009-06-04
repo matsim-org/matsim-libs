@@ -99,7 +99,7 @@ public class FacilityDrawer {
 				stop.id = ByteBufferUtils.getString(in);
 				stop.x = in.getDouble();
 				stop.y = in.getDouble();
-				System.out.println("Facility " + stop.id + " at " + stop.x + "/" + stop.y);
+//				System.out.println("Facility " + stop.id + " at " + stop.x + "/" + stop.y);
 				if (this.drawer != null) {
 					this.drawer.stops.add(stop);
 				}
