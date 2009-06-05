@@ -29,7 +29,7 @@ public class PTRouter{
 	}
 
     /**
-     * Main router: validates the existence of start and origin nodes, 
+     * Main router method: validates the existence of start and origin nodes, 
      * creates the walking links, invokes the routing algorithm, destroys the walking links
      */
     private void findRoute(Id startNode, Id endNode, int time){

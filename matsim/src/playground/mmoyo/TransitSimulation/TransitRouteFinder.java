@@ -15,10 +15,10 @@ import org.matsim.api.basic.v01.TransportMode;
 
 import playground.mmoyo.PTCase2.PTRouter2;
 import playground.mmoyo.Pedestrian.Walk;
-/*
- * Receives two acts and return a list of PT legs that join their coordinates 
- */
 
+/**
+ * Receives two acts and returns a list of PT legs that join their coordinates 
+ */
 public class TransitRouteFinder {
 	private PTRouter2 ptRouter;
 	private static Walk walk = new Walk ();
@@ -31,7 +31,7 @@ public class TransitRouteFinder {
 		List<Leg> legList = new ArrayList<Leg>();
 
 		double distToWalk = walk.distToWalk(person.getAge());
-		Path path = ptRouter.findRoute(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
+		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
 
 		String linkType;
 		String lastLinkType= null;

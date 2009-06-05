@@ -48,7 +48,7 @@ public class PTTester {
 						Coord lastActCoord = lastAct.getCoord();
 						Coord actCoord = thisAct.getCoord();
 						int distToWalk= walk.distToWalk(person.getAge());
-						Path path = this.ptOb.getPtRouter2().findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+						Path path = this.ptOb.getPtRouter2().findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 						if(path!=null){
 							routes++;
 						}

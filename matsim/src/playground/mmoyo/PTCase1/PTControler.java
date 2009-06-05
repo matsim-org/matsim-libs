@@ -3,12 +3,13 @@ package playground.mmoyo.PTCase1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
-import playground.mmoyo.PTRouter.*;
+//import playground.mmoyo.PTRouter.*;
 import playground.mmoyo.input.PTLinesReader;
 import playground.mmoyo.input.PTTimeTableReader;
+import playground.mmoyo.input.PTNetwork2View;
 
 /**
- * Set of options to route in the PTCase1. This approaches watches a relationship with the city network
+ * Set of options to route in the PTCase1. This approach watches a relationship with the city network
  */
 public class PTControler {
 	private static final String NETWORKFILENAME="C://Users/manuel/Desktop/berlinOEV/network.xml";

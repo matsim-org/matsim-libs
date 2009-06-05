@@ -12,6 +12,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;   //-->use interfaces
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -96,7 +97,7 @@ public class PTNetworkFactory2 {
 	/**
 	 * Reads the timetable File, validates that every node exists and loads the data in the ptTimeTable object
 	 */	
-	private PTTimeTable2 readTimeTable(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
+	public void readTimeTable(final NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
 		PTNode ptLastNode = null;
 		for (PTLine ptLine :  ptTimeTable.getPtLineList()) {
 			//Test code
@@ -112,10 +113,10 @@ public class PTNetworkFactory2 {
 			double lastTravelTime=0;
 			boolean first=true;
 			
-			for (String strIdNode : ptLine.getRoute()) {
-				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
+			for (Id idNode : ptLine.getNodeRoute()) {
+				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(idNode));
 				if (ptNode==null){
-					throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
+					throw new java.lang.NullPointerException("Node does not exist:" + idNode); 
 				}
 				ptNode.setIdPTLine(ptLine.getId());
 				double min = ptLine.getMinutes().get(indexMin);
@@ -130,7 +131,7 @@ public class PTNetworkFactory2 {
 						}
 					}
 				}
-				ptLastNode= ((PTNode)ptNetworkLayer.getNode(strIdNode));
+				ptLastNode= ((PTNode)ptNetworkLayer.getNode(idNode));
 				lastTravelTime= min;
 				first=false;
 				indexMin++;
@@ -140,7 +141,7 @@ public class PTNetworkFactory2 {
 		//Calculates the travel time of each link and stores these data in ptTimeTable
 		ptTimeTable.calculateTravelTimes(ptNetworkLayer);  //??
 		ptTimeTable.setMaps(linkTravelTimeMap);
-		return ptTimeTable;
+		//return ptTimeTable;
 	}
 	
 	

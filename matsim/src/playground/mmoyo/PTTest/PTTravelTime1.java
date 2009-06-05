@@ -1,11 +1,11 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.PTTest;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelTime;
 
 /**
  * A simple ficticious time calculator for a express route search
- * a express Dijstra will be used temporarily no to find optimal path but only to find a path
+ * a express Dijstra will be used temporarily not to find optimal path but only to find out if there is a path
  */
 public class PTTravelTime1 implements TravelTime {
 	

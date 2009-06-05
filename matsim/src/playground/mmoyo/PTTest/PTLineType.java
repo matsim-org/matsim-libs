@@ -1,4 +1,4 @@
-package playground.mmoyo.PTRouter;
+package playground.mmoyo.PTTest;
 
 /**
  * Describes the type of Public Transport Line in a scenario
@@ -10,7 +10,6 @@ package playground.mmoyo.PTRouter;
  * @param chrType The abbreviation of the name of the type
  * @param withDedicatedTracks  If has dedicated rails or interacts with normal vehicles 
  */
-
 public class PTLineType {
 	boolean hasDedicatedTracks;
 	private char chrType;

@@ -111,7 +111,7 @@ public class SimplifyPtLegs implements PlanAlgorithm{
 						inWalkRange++;
 					}else{
 						startTime = System.currentTimeMillis();
-						Path path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+						Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 						duration= System.currentTimeMillis()-startTime;
 						pathSearchDuration += duration;
 						if(path!=null){

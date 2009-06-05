@@ -3,6 +3,7 @@ package playground.mmoyo.PTRouter;
 import java.util.ArrayList;
 import java.util.List;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 
 /** 
  * Representation of a PT Line containing the sequence of stations and departures for every one of them
@@ -12,22 +13,22 @@ import org.matsim.api.basic.v01.Id;
  */
 public class PTLine {
 	private Id id;
-	private PTLineType ptLineType;
+	private TransportMode transportMode ;
 	private String direction;
-	private List<String> route = new ArrayList<String>();      /**List of sequential nodes*/
-	private List<Double> minute = new ArrayList<Double>();     /**average arrival time to each station after departure of first station*/
-	private List<String> departures = new ArrayList<String>(); /**average arrival time to each station after first departure*/
+	private List<Id> nodeRoute = new ArrayList<Id>();      /**List of sequential nodes Id*/
+	private List<Double> minute = new ArrayList<Double>();     /**average arrival time to each station after departure from first station*/
+	private List<String> departures = new ArrayList<String>(); /**Departures from first stations during the day in format "hh:mm" */
 
-	public PTLine(Id id, char lineType, List<String> route) {
+	public PTLine(Id id, char lineType, List<Id> nodeRoute) {
 		this.id = id;
-		this.ptLineType = new PTLineType(lineType);
-		this.route = route;
+		//this.ptLineType = new PTLineType(lineType);
+		this.nodeRoute = nodeRoute;
 	}
 
-	public PTLine(Id id, char lineType, String direction, List<String> route, List<Double> minute, List<String> departures) {
+	public PTLine(Id id, TransportMode transportMode, String direction, List<Id> nodeRoute, List<Double> minute, List<String> departures) {
 		this.id = id;
-		this.ptLineType = new PTLineType(lineType);
-		this.route = route;
+		this.transportMode = transportMode;
+		this.nodeRoute = nodeRoute;
 		this.minute = minute;
 		this.direction = direction;
 		this.departures=departures;
@@ -41,6 +42,7 @@ public class PTLine {
 		this.id = id;
 	}
 
+	/*
 	public PTLineType getPtLineType() {
 		return ptLineType;
 	}
@@ -48,9 +50,10 @@ public class PTLine {
 	public void setPtLineType(PTLineType ptLineType) {
 		this.ptLineType = ptLineType;
 	}
+	*/
 
-	public List<String> getRoute() {
-		return route;
+	public List<Id> getNodeRoute() {
+		return nodeRoute;
 	}
 
 	public String getDirection() {

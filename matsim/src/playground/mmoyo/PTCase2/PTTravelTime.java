@@ -22,6 +22,13 @@ public class PTTravelTime implements TravelTime {
 		this.ptTimeTable = ptTimeTable; 
 	}
 	
+	/**
+	 * Calculation of travel time for each link type:
+	 * Standard link: (toNode arrival- fromNode arrival)
+	 * Walking link : (distance* walk speed)
+	 * Transfer link: (2° veh departure - 1° veh arrival)
+	 * Detached transfer: (distance*walk speed) + (veh departure - walk arrival)  
+	 */
 	public double getLinkTravelTime(Link link, double time) {
 		type = link.getType();
 		if (type.equals("Transfer")){

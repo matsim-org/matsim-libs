@@ -7,17 +7,19 @@ import org.matsim.core.router.util.TravelCost;
  * Calculates the cost of travel in different travel zones of the city
  */
 public class PTTravelCost implements TravelCost {
-	//PTTimeTable2 ptTimeTable;
-	//PTTravelTime ptTravelTime;
+	PTTimeTable2 ptTimeTable;
+	PTTravelTime ptTravelTime;
 	
 	public PTTravelCost(PTTimeTable2 ptTimeTable) {
-		//this.ptTimeTable = ptTimeTable; 
-		//this.ptTravelTime= new PTTravelTime(ptTimeTable);
+		this.ptTimeTable = ptTimeTable; 
+		this.ptTravelTime= new PTTravelTime(ptTimeTable);
 	}
 
 	public double getLinkTravelCost(Link link, double time) {
+		return 1;
+		//return link.getLength();
+		//return ptTravelTime.getLinkTravelTime(link, time);
 		//--> Compare fare zone from toNode and fromNode. If They are different then a extra cost is to be charged 
-		return 0;
 	}
-	
+		
 }

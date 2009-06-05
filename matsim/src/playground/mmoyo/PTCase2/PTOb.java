@@ -78,4 +78,7 @@ public class PTOb {
 		this.ptRouter2 = ptRouter2;
 	}	
 		
+	public void setPTTimeTable(PTTimeTable2 ptTimeTable) {
+		this.ptTimeTable= ptTimeTable;
+	}	
 }

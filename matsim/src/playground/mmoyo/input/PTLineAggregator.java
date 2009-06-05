@@ -1,6 +1,7 @@
 package playground.mmoyo.input;
 
 import java.util.ArrayList;
+import org.matsim.api.basic.v01.TransportMode;
 import java.util.List;
 import java.util.Map;
 import org.matsim.core.network.NetworkLayer;
@@ -93,8 +94,8 @@ public class PTLineAggregator {
 			String strIdPtLine = entry.getKey(); 
 			List<BasicNode> nodeList = entry.getValue();
 			
-			List<String> route1 = new ArrayList<String>();
-			List<String> route2 = new ArrayList<String>();
+			List<Id> route1 = new ArrayList<Id>();
+			List<Id> route2 = new ArrayList<Id>();
 			List<Double> minute = new ArrayList<Double>();
 			List<String> departures = new ArrayList<String>();
 			
@@ -156,8 +157,8 @@ public class PTLineAggregator {
 				
 				lastPTNode1 = ptNode1;
 				lastPTNode2 = ptNode2;
-				route1.add(newId1.toString());
-				route2.add(newId2.toString());
+				route1.add(newId1);
+				route2.add(newId2);
 				min= (double)seqIndex1++;
 				minute.add(min);
 				first = false;
@@ -165,15 +166,16 @@ public class PTLineAggregator {
 
 			Id id1 = new IdImpl (strIdPtLine + "H");
 			Id id2 = new IdImpl (strIdPtLine + "R");
-			char lineType = 'b';
+			TransportMode transportMode = TransportMode.bus;   //->this should be read
+			//char lineType = 'b';
 			String direction1 = "H";
 			String direction2 = "R";
 			/**ficticious timetable for the being time*/
 			for(int time = 18000; time< 82800; time= time+900 ){
 				departures.add(String.valueOf(time));
 			}
-			PTLine ptLine = new PTLine(id1, lineType, direction1, route1, minute, departures);
-			PTLine ptLine2 = new PTLine(id2, lineType, direction2, route2, minute, departures);
+			PTLine ptLine = new PTLine(id1, transportMode, direction1, route1, minute, departures);
+			PTLine ptLine2 = new PTLine(id2, transportMode, direction2, route2, minute, departures);
 			ptLineList.add(ptLine);
 			ptLineList.add(ptLine2);
 		}

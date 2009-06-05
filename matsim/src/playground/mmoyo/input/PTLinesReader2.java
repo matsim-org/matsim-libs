@@ -15,7 +15,7 @@ import org.xml.sax.SAXException;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
-
+import org.matsim.api.basic.v01.TransportMode;
 /** 
  * Second version of parser for PTLines file. 
  * Used for PTCase2 with no upper (father) node describing the station but a set of nodes with prefix-sufixes
@@ -29,9 +29,10 @@ public class PTLinesReader2 extends MatsimXmlParser {
 	private Id idPTLine;
 	private char type;
 	private String direction;
-	private List<String> route;
+	private List<Id> route;
 	private List<Double> minutes;
 	private List<String> departureList;
+	private TransportMode transportMode;
 	public List<PTLine> ptLineList = new ArrayList<PTLine>();
 	
 	public PTLinesReader2() {
@@ -76,10 +77,11 @@ public class PTLinesReader2 extends MatsimXmlParser {
 
 	private void startLine(final Attributes atts) {
 		idPTLine = new IdImpl(atts.getValue("id"));
-		type = atts.getValue("id").charAt(0);
+		type = atts.getValue("id").charAt(0); //-> Read from atts.getValue("type")
+		transportMode = getTransportMode(type);
 		direction =atts.getValue("direction");
 		minutes= new ArrayList<Double>();
-		route = new ArrayList<String>();
+		route = new ArrayList<Id>();
 		departureList = new ArrayList <String>(); 
 	}
 	
@@ -94,12 +96,12 @@ public class PTLinesReader2 extends MatsimXmlParser {
 		departureList = Arrays.asList(departures.split("[ \t\n]+"));
 	}
 	
-	private void endNode(String idNode) {
-		route.add(idNode);
+	private void endNode(String strIdNode) {
+		route.add(new IdImpl(strIdNode));
 	}
 	
 	private void endLine() {	
-		this.ptLineList.add(new PTLine(idPTLine, type, direction, route, minutes, departureList));
+		this.ptLineList.add(new PTLine(idPTLine, transportMode, direction, route, minutes, departureList));
 	}
 
 	private void endLines(){
@@ -109,6 +111,17 @@ public class PTLinesReader2 extends MatsimXmlParser {
 		minutes= null;
 		route = null;
 		departureList = null;
+	}
+	
+	//-> write this value directly in ptTimeTable file
+	private TransportMode getTransportMode(char type){
+		TransportMode transportMode = TransportMode.pt;
+		if (type =='T'){
+			transportMode = TransportMode.tram;
+		}else if(type =='S'){
+			transportMode = TransportMode.train;
+		}
+		return transportMode;
 	}
 
 }// class

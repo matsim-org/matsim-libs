@@ -10,7 +10,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  * transfer links must be always between standard links
  * must not have two adjacent walking links
  */
- 
 public class PathValidator {
 	final String TRANSFERTYPE = "Transfer";
 	final String STANDARDTYPE = "Standard";

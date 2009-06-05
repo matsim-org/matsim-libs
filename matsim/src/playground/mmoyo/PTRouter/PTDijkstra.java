@@ -12,7 +12,7 @@ import org.matsim.core.router.util.*;
 
 import playground.mmoyo.Validators.PathValidator;
  /**
- * Temporary copy version of Dijsktra class. Will be replaced by a better implentation in myDijstra 
+ * Temporary copy version of Dijsktra class. Will be replaced by a better implementation in myDijstra 
  */
 
 /**
@@ -207,7 +207,9 @@ public class PTDijkstra implements LeastCostPathCalculator {
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
+				/** this warning is not necessary for pt routing
 				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId());
+				*/
 				return null;
 			}
 

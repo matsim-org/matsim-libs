@@ -36,9 +36,11 @@ public class PTNetworkLayer extends NetworkLayer {
 		for (PTLine ptLine : ptLineList) {
 			boolean firstLink = true;
 			String idFromNode = "";
-			for (String strId : ptLine.getRoute()) {
+			for (Id idNode : ptLine.getNodeRoute()) {
+				/* TODO : WRONG!
 				Link l = this.cityNet.getLink(strId);
 				idFromNode = createPTNodeLinks(l, idFromNode, firstLink, ptLine.getId());
+				*/
 				firstLink = false;
 			}
 		}
@@ -88,7 +90,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		}
 		this.getNodes().put(i, ptNode);
 
-		// updates this list of childrenNodes
+		/**updates this list of childrenNodes */
 		if (!this.childrenList.containsKey(idFather)) {
 			ArrayList<String> ch = new ArrayList<String>();
 			this.childrenList.put(idFather, ch);
@@ -101,8 +103,8 @@ public class PTNetworkLayer extends NetworkLayer {
 		i = null;
 	}
 
-	/*
-	 * print nodes and his respective children 
+	/**
+	 * print main nodes and his respective children 
 	 */
 	public void printNodeMap(final Map<Object, Object> map) {
 		
@@ -115,7 +117,7 @@ public class PTNetworkLayer extends NetworkLayer {
 
 	
 	private void createTransferlinks() {  
-		//-> this exist too in factory, create a unique factory for both approaches
+		//-> this exist too in factory, create a unique factory for both
 		for (List<String> chList : childrenList.values()){
 			List<String> chList1 = chList;
 			List<String> chList2 = chList;
@@ -133,7 +135,7 @@ public class PTNetworkLayer extends NetworkLayer {
 	}
 
 
-	/*
+	/**
 	 *Adds temporary the origin and destination node and create new temporary links between
 	 *between them  and its respective children to the routing process
 	 */
@@ -144,14 +146,14 @@ public class PTNetworkLayer extends NetworkLayer {
 		int i = 0;
 		List<String> WalkingLinkList = new ArrayList<String>();
 
-		//Starting links
+		/**Starting links */
 		List<String> uChildren = this.childrenList.get(idFromNode);
 		for (String strChild : uChildren) {
 			this.createLink(--i, idFromNode.toString(), strChild, "Walking");
 			WalkingLinkList.add(String.valueOf(i));
 		}
 
-		//Endings links
+		/**Endings links */
 		uChildren = this.childrenList.get(idToNode);
 		for (String uChild : uChildren) {
 			this.createLink(--i, uChild, idToNode.toString(), "Walking");
@@ -160,7 +162,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		return WalkingLinkList;
 	}
 
-	/*
+	/**
 	 * Deletes temporal links at the end of the routing process
 	 */
 	public void removeWalkinkLinks(final List<String> WalkingLinkList){
@@ -169,7 +171,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		}
 	}
 
-	/*
+	/**
 	 * Deletes temporal links at the end of every individual routing process
 	 */
 	public void removeWalkingNodes(final Id node1, final Id node2){
@@ -190,7 +192,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		this.createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, origId, ptType);
 	}
 
-	/*
+	/**
 	 * Displays a quick visualization of links with from- and to- nodes
 	 */
 	public void printLinks() {

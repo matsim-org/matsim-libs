@@ -6,7 +6,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
-import playground.mmoyo.PTRouter.PTTimeTable;
+import playground.mmoyo.PTCase1.PTTimeTable;
 /** 
  * Parses the xml file with the information of departures
  */

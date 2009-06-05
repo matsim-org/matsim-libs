@@ -2,7 +2,7 @@ package playground.mmoyo.PTCase1;
 
 import org.matsim.core.api.network.Link;
 
-import playground.mmoyo.PTRouter.PTTimeTableInfo;;
+import playground.mmoyo.PTCase1.PTTimeTableInfo;;
 
 /**
 * Determines dynamically the cost of each link according to his type 

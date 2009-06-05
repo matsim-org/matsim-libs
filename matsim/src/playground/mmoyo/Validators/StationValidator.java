@@ -8,9 +8,10 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.mmoyo.PTCase2.PTStation;
+
 /**
  * Validates that all nodes in an intersection have the same coordinate and correct id`s
-*/
+ */
 public class StationValidator {
 	NetworkLayer net;
 	

@@ -55,7 +55,7 @@ public class PTconnectionfinder {
 			ptConnection.setLength(distanceToDestination);
 			ptConnection.setStretches(stretches);
 		}else{
-			Path path = ptRouter.findRoute(coord1, coord2, time, distToWalk);
+			Path path = ptRouter.findPTPath(coord1, coord2, time, distToWalk);
 			
 			double dw1 = net.getLink("linkW1").getLength();
 			double dw2 = net.getLink("linkW2").getLength();

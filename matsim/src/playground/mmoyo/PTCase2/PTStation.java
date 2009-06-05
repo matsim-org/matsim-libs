@@ -15,7 +15,7 @@ import org.matsim.api.basic.v01.Coord;
 public class PTStation {
 	Map<String, List<Id>> IntersectionMap = new TreeMap<String, List<Id>>(); 
 	
-	String id;  //the idNode asigned by the transit firm
+	String id;  /**the idNode asigned by the transit firm*/
 	String stationName;
 	Coord coord;
 	Id idFareZone;
@@ -83,13 +83,12 @@ public class PTStation {
 	public void createIntersecionMap(PTTimeTable2 ptTimeTable){
 		//-> Use idImpl or PTnode types instead of String??
 		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
-			for (String strIdNode : ptLine.getRoute()) {
-				String keyNode = getNodeBaseId(strIdNode);
+			for (Id idNode : ptLine.getNodeRoute()) {
+				String keyNode = getNodeBaseId(idNode);
 	    		if (!IntersectionMap.containsKey(keyNode)){
 	    			ArrayList<Id> ch = new ArrayList<Id>();
 	    			IntersectionMap.put(keyNode, ch);
 	    		}
-	    		Id idNode = new IdImpl(strIdNode);
 	    		IntersectionMap.get(keyNode).add(idNode);
 			}
 		}
@@ -103,9 +102,9 @@ public class PTStation {
 	/**
 	 * Gets a child node with prefix and suffix and returns the Main node Id
 	 */
-	public String getNodeBaseId(String strId){
+	public String getNodeBaseId(Id id){
 		//-> eliminate this method from networkFactory
-		String baseID = strId;
+		String baseID = id.toString();
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
 			baseID= baseID.substring(1,baseID.length());
 		if(Character.isLetter(baseID.charAt(baseID.length()-1))) 	//example of possible node values at intersection:   999, _999, 999b, _999b

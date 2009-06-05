@@ -6,21 +6,16 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-//import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-//import org.matsim.core.api.population.Activity;
-//import org.matsim.core.api.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-//import org.matsim.core.population.routes.LinkNetworkRoute;
-//import org.matsim.core.router.Dijkstra;
-import playground.mmoyo.PTRouter.PTDijkstra;
-
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.mmoyo.PTRouter.PTDijkstra;
 import playground.mmoyo.PTRouter.PTNode;
+
 
 /** 
  * Second version of Router using Matsims Class Dijkstra  
@@ -36,10 +31,8 @@ import playground.mmoyo.PTRouter.PTNode;
 public class PTRouter2 {
 	private NetworkLayer net; 
 	private PTDijkstra PTdijkstra;
-	private PTDijkstra expressDijkstra;
 	private PTTravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime;   //> make private 
-	private PTTravelTime1 ptTravelTime1;
 	//private int x=0;//--> Should be part of the method if the simulation strategy is set to re-route.
 	
 	public PTRouter2(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimetable) {
@@ -47,124 +40,48 @@ public class PTRouter2 {
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
 		this.PTdijkstra = new PTDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
-		this.expressDijkstra = new PTDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime1);
 	}
 	
-	/**
-	 * Main method to be invoked by other classes 
-	 */
-	public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
-		//normal distance
-		//Collection <Node> nearStops1 = net.getNearestNodes(coord1, distToWalk);
-		//Collection <Node> nearStops2 = net.getNearestNodes(coord2, distToWalk);
-		
-		double distOridDest = CoordUtils.calcDistance(coord1,coord2);
-		Collection <Node> nearStops1 = FindNearStops(coord1,  distToWalk);
-		Collection <Node> nearStops2 = FindNearStops(coord2, distToWalk);
-		
-		Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
-		Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
-
-		List <Link> walkingLinkList1 = CreateWalkingLinks(ptNode1, nearStops1, true);
-		List <Link> walkingLinkList2 = CreateWalkingLinks(ptNode2, nearStops2, false);
-
-		Path path = PTdijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
-		
-		removeWalkingLinks(walkingLinkList1);
-		removeWalkingLinks(walkingLinkList2);
-		net.removeNode(ptNode1);
-		net.removeNode(ptNode2);
-		
-		if (path!=null){
-			path.nodes.remove(ptNode1);
-			path.nodes.remove(ptNode2);
-		}
-		return path;
-	}
-	
-	/**
-	*if not nodes found in walk range then find the nearest one
-	*/
-	private Collection <Node> FindNearStops (final Coord coord, final double walkDistance){
-		Collection <Node> NearStops = net.getNearestNodes(coord, walkDistance);
-		if (NearStops.size()==0){
-			Node nearNode = net.getNearestNode(coord);
-			if (CoordUtils.calcDistance(coord, nearNode.getCoord())< walkDistance){
-				NearStops.add(nearNode);
-			}
-		}
-		return NearStops;
-	}
-	
-	
-	/**
-	 *increments walk Range until a path is found
-	 */
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
 		double walkRange= distToWalk; 
-		double OD_Distance = CoordUtils.calcDistance(coord1, coord2);
-		
 		Node origin= CreateWalkingNode(new IdImpl("W1"), coord1);
 		Node destination=CreateWalkingNode(new IdImpl("W2"), coord2);
+
+		Collection <Node> nearStops1 = FindnStations (coord1, walkRange);
+		Collection <Node> nearStops2 = FindnStations (coord2, walkRange);
 		
-		List <Link> walkingLinkList1 = null;
-		List <Link> walkingLinkList2= null;
-		
-		Collection <Node> nearStops1 =  net.getNearestNodes(coord1, walkRange);  
-		Collection <Node> nearStops2 =  net.getNearestNodes(coord2, walkRange);	
-		
-		Path path= null;
-		
-		while (path==null && (walkRange<OD_Distance) && !nearStops1.contains(destination) && !nearStops2.contains(origin) ){
-			//nearStops1 = net.getNearestNodes(coord1, walkRange);  
-			//nearStops2 = net.getNearestNodes(coord2, walkRange);
-			nearStops1 = FindnStations (origin, walkRange);
-			nearStops2 = FindnStations (destination, walkRange);
+		List <Link> walkingLinkList1 = CreateWalkingLinks(origin, nearStops1, true);
+		List <Link> walkingLinkList2 = CreateWalkingLinks(destination, nearStops2, false);
 			
-			walkingLinkList1 = CreateWalkingLinks(origin, nearStops1, true);
-			walkingLinkList2 = CreateWalkingLinks(destination, nearStops2, false);
+		Path path = PTdijkstra.calcLeastCostPath(origin, destination, time); 
 			
-			path = PTdijkstra.calcLeastCostPath(origin, destination, time); 
-			
-			removeWalkingLinks(walkingLinkList1);
-			removeWalkingLinks(walkingLinkList2);
-			
-			walkRange= walkRange + 300;
-			/*
-			if (walkRange > 1) {
-				System.out.println("coord1:" + coord1 + " coord2:" + coord2 + "distToWalk: " + walkRange + " OD_Distance: " + OD_Distance + " inRange: "+ nearStops1.size() );
-			}
-			*/
-		}
-	
+		removeWalkingLinks(walkingLinkList1);
+		removeWalkingLinks(walkingLinkList2);
 		if (path!=null){
 			path.nodes.remove(origin);
 			path.nodes.remove(destination);
 		}
-
 		net.removeNode(origin);
 		net.removeNode(destination);
-		
 		return path;
 	}
-	
-	/**
-	 * expands station search until a number of them is found
-	 */
-	private Collection <Node> FindnStations(Node node, double walkRange){
-		Collection <Node> stations = net.getNearestNodes(node.getCoord(), walkRange);
-		while (stations.size()<3){
-			stations = net.getNearestNodes(node.getCoord(), walkRange);
-			walkRange= walkRange+ 300;
-			//System.out.println("Coord: " + coord + " walkRange: " + walkRange);
-		}
+
+	private Collection <Node> FindnStations(Coord coord, double walkRange){
+		Collection <Node> stations;
+		do{
+			stations = net.getNearestNodes(coord, walkRange);
+			walkRange= walkRange + 300;
+		} while (stations.size()<2);
 		return stations;
 	}
-	
+
+	/**
+	 * Creates a temporary origin or destination node
+	 * avoids the method net.createNode because it is not necessary to rebuild the quadtree
+	 */
 	public Node CreateWalkingNode(Id idNode, Coord coord) {
 		//-> use node factory
 		Node node = new PTNode(idNode, coord, "Walking");
-		//ptNode.setIdPTLine(new IdImpl("Walk"));
 		net.getNodes().put(idNode, node);
 		return node;
 	}
@@ -248,6 +165,54 @@ public class PTRouter2 {
 	}
 }//class
 
+
+
+/**
+ * Main method to be invoked by other classes 
+ */
+/*
+public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
+
+	double distOridDest = CoordUtils.calcDistance(coord1,coord2);
+	Collection <Node> nearStops1 = findNearStops(coord1,  distToWalk);
+	Collection <Node> nearStops2 = findNearStops(coord2, distToWalk);
+	
+	Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
+	Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
+
+	List <Link> walkingLinkList1 = CreateWalkingLinks(ptNode1, nearStops1, true);
+	List <Link> walkingLinkList2 = CreateWalkingLinks(ptNode2, nearStops2, false);
+
+	Path path = PTdijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
+	
+	removeWalkingLinks(walkingLinkList1);
+	removeWalkingLinks(walkingLinkList2);
+	net.removeNode(ptNode1);
+	net.removeNode(ptNode2);
+	
+	if (path!=null){
+		path.nodes.remove(ptNode1);
+		path.nodes.remove(ptNode2);
+	}
+	return path;
+}
+*/
+
+/*
+ * searches nodes in walk range or else the nearest one
+*/
+/*
+private Collection <Node> findNearStops (final Coord coord, final double walkDistance){
+	Collection <Node> NearStops = net.getNearestNodes(coord, walkDistance);
+	if (NearStops.size()==0){
+		Node nearNode = net.getNearestNode(coord);
+		if (CoordUtils.calcDistance(coord, nearNode.getCoord())< walkDistance){
+			NearStops.add(nearNode);
+		}
+	}
+	return NearStops;
+}
+*/
 
 /*
 public List<Object> findLegActs(Path path, double depTime){

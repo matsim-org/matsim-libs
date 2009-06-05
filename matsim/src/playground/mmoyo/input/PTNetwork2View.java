@@ -1,4 +1,4 @@
-package playground.mmoyo.PTRouter;
+package playground.mmoyo.input;
 
 import java.util.List;
 
@@ -6,6 +6,9 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.api.basic.v01.Id;
+import playground.mmoyo.PTRouter.PTLine;
+import playground.mmoyo.PTRouter.PTNode;
 
 /**
  * A simple console visualizer for small networks
@@ -26,13 +29,15 @@ public class PTNetwork2View extends NetworkLayer {
 	public void createPTNView(List<PTLine> ptLineList) {
 		for (PTLine ptLine : ptLineList) {
 			boolean firstLink = true;
-			for (String strIdLink : ptLine.getRoute()) {
+			for (Id idNode : ptLine.getNodeRoute()) {
+				/* WRONG!
 				Link l = this.cityNet.getLink(strIdLink);
 				if (firstLink) {
 					addNode(l.getFromNode());
 				}
 				addNode(l.getToNode());
 				addLink(l);
+				*/
 				firstLink = false;
 			}
 		}

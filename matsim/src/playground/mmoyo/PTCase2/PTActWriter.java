@@ -108,7 +108,7 @@ public class PTActWriter {
 		
 		for (Person person: this.population.getPersons().values()) {
 		//if ( true ) {
-		//Person person = population.getPersons().get(new IdImpl("4261166")); //"3937204"
+		//Person person = population.getPersons().get(new IdImpl("812233"));
 			System.out.println(numPlans + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 
@@ -138,14 +138,7 @@ public class PTActWriter {
 		    			inWalkRange++;
 		    		}else{
 			    		startTime = System.currentTimeMillis();
-
-			    		Path path=null;
-
-			    		//This one is the original
-			    		//path = ptRouter.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-			    		// test 25 may 2009
-			    		path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-			    		
+			    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 			    		duration= System.currentTimeMillis()-startTime;
 
 			    		if(path!=null){
@@ -155,24 +148,25 @@ public class PTActWriter {
 				    			createWlinks(lastActCoord, path, actCoord);
 				    			double dw1 = walkLink1.getLength();
 								double dw2 = walkLink2.getLength();
-			    				if ((dw1+dw2)>=(distanceToDestination)){
-			    					newPlan.addLeg(walkLeg(lastAct,thisAct));
-			    					inWalkRange++;
-			    				}else{
-			    					if (ptPathValidator.isValid(path)){
+			    				///if ((dw1+dw2)>=(distanceToDestination)){
+			    				///	newPlan.addLeg(walkLeg(lastAct,thisAct));
+			    				///	inWalkRange++;
+			    				///}else{
+			    					//if (ptPathValidator.isValid(path)){   /** all paths are valid now */
 			    			    		durations.add(duration);
 			    						insertLegActs(path, lastAct.getEndTime(), newPlan);
 			    						valid++;
 			    						validPaths.add(path);
-			    					}else{
-			    						newPlan.addLeg(walkLeg(lastAct,thisAct));
-			    						invalid++;
-			    						//addPerson=false;    //18 may
-			    						invalidPaths.add(path);
-			    					}
+			    					
+			    				    //}else{
+			    					//	newPlan.addLeg(walkLeg(lastAct,thisAct));
+			    					//	invalid++;
+			    				    //		//addPerson=false;    //18 may
+			    					//	//invalidPaths.add(path);
+			    					//}
 			    					
 			    					//legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
-			    				}
+			    				///}
 			   				removeWlinks();
 			    			}else{
 			    				newPlan.addLeg(walkLeg(lastAct, thisAct));
@@ -210,12 +204,23 @@ public class PTActWriter {
 		System.out.println("Done");
 		System.out.println("plans:        " + numPlans + "\n--------------");
 		System.out.println("\nTrips:      " + trips +  "\nvalid:        " + valid +  "\ninvalid:      " + invalid + "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);
-		System.out.println("===Printing routing durations");
 		
+		
+		System.out.println("===Printing routing durations");
 		double total=0;
+		double average100=0;
+		int x=1;
 		for (double d : durations ){
 			total=total+d;
+			average100= average100 + d;
+			if(x==100){
+				//System.out.println(average100/100);
+				average100=0;
+				x=0;
+			}
+			x++;
 		}
+				
 		System.out.println("total " + total + " average: " + (total/durations.size()));
 		
 		
@@ -257,7 +262,7 @@ public class PTActWriter {
 	}//createPTActs
 	
 	
-	/*
+	/**
 	 * Cuts up the found path into acts and legs according to the type of links contained in the path
 	 */
 	public void insertLegActs(final Path path, double depTime, final Plan newPlan){
@@ -391,7 +396,7 @@ public class PTActWriter {
 	}
 	
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
-		//-> move an use it in Link factory
+		//-> move and use it in Link factory
 		originNode= ptRouter.CreateWalkingNode(new IdImpl("w1"), coord1);
 		destinationNode= ptRouter.CreateWalkingNode(new IdImpl("w2"), coord2);
 		path.nodes.add(0, originNode);

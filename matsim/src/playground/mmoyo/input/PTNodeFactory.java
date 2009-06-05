@@ -47,7 +47,7 @@ public class PTNodeFactory {
 		
 	}
 	
-	/*
+	/**
 	 * Receives a original Basicnode and creates a pair of PTNodes with prefix indicating both directions and sufix to differentiate from other PTL's 
 	 */
 	public BasicNode[] CreatePTNodes(BasicNode basicNode){
@@ -93,7 +93,7 @@ public class PTNodeFactory {
 		return pair;
 	}
 
-	/*
+	/**
 	 * Creates a new PTNode and put it in the network
 	 */
 	private BasicNode insertNode(String strIdStation, String strId, Coord coord){

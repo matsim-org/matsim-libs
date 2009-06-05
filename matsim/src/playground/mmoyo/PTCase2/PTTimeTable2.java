@@ -49,14 +49,14 @@ public class PTTimeTable2{
 	 * NodeDepartureTime to save all departures times in a day for each node   
 	 */
 	public void calculateTravelTimes(NetworkLayer networklayer){
+		// make it own class in inout and the pttimetable gets this extern data
 		Map<Id,Double> minuteMap = new TreeMap<Id,Double>();
 		
 		for (PTLine ptLine : ptLineList){
 			int x= 0;
-			for (String strIdNode:  ptLine.getRoute()){
+			for (Id idNode:  ptLine.getNodeRoute()){
 			
 				/**Create a map with nodes-minutes after departure*/
-				Id idNode = new IdImpl(strIdNode);
 				double minAfterDep = new Double(ptLine.getMinutes().get(x));
 				minuteMap.put(idNode, minAfterDep);
 

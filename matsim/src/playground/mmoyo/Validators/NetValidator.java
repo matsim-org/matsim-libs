@@ -6,11 +6,12 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTCase2.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTNode;
+import playground.mmoyo.PTRouter.PTLine;
 
 /**
  * Validates all links in a network for correct cost values and lengths
  */
-
 public class NetValidator {
 	
 	private NetworkLayer net;
@@ -62,6 +63,4 @@ public class NetValidator {
 		}
 		return true;
 	}
-	
-	
 }

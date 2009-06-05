@@ -39,12 +39,14 @@ public class PTNetworkFactory {
 	 */
 	public void createPTNetwork(List<PTLine> ptLineList) {
 		for (PTLine ptLine: ptLineList) {
-			boolean firstLink = true;
+			boolean first = true;
 			String idFromNode = "";
-			for (String strId : ptLine.getRoute()) {
-				Link l = this.cityNet.getLink(strId);
+			for (Id idNode : ptLine.getNodeRoute()) {
+				Node n = this.cityNet.getNode(idNode);
+				/* WRONG!
 				idFromNode = addPTLinks(l, idFromNode, firstLink, ptLine.getId());
-				firstLink = false;
+				*/
+				first = false;
 			}
 		}
 		createTransferlinks();

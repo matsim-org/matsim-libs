@@ -13,6 +13,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import playground.mmoyo.PTRouter.PTLine;
+import org.matsim.core.basic.v01.IdImpl;
 
 /** 
  * First version of parser xml PTLines for the PTCase1 with a upper hierarchical node to identify the station
@@ -93,14 +94,14 @@ public class PTLinesReader extends MatsimXmlParser {
 		}
 	}
 	
-	private List<String> convertBufferToList() {
-		List<String> lstRoute = new ArrayList <String>();
+	private List<Id> convertBufferToList() {
+		List<Id> lstRoute = new ArrayList <Id>();
 		
 		String [] strRoute = bufferLineRoute.toString().split("[ \t\n]+");
 		int ini = 0;
 		if ((strRoute.length > 0) && (strRoute[0].equals(""))) { ini = 1; }
 		for (int i = ini; i < strRoute.length; i++) {
-			lstRoute.add(strRoute[i]);
+			lstRoute.add(new IdImpl(strRoute[i]));
 		}
 		return lstRoute;
 	}

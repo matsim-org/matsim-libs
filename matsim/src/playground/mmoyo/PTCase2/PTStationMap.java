@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -24,19 +23,19 @@ public class PTStationMap {
 	public void createIntersecionMap(PTTimeTable2 ptTimeTable){
 		//-> eliminate this method from factory
 		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
-			for (String strIdNode: ptLine.getRoute()) {
-				insertNode(strIdNode);
+			for (Id idNode: ptLine.getNodeRoute()) {
+				insertNode(idNode);
 			}
 		}
 	}
 
-	public void insertNode(String strIdNode){
-		String strNodeBaseId =  getNodeBaseId(strIdNode);
+	public void insertNode(Id idNode){
+		String strNodeBaseId =  getNodeBaseId(idNode);
 		if (!IntersectionMap.containsKey(strNodeBaseId)){
 			List<Id> ch = new ArrayList<Id>();
 			IntersectionMap.put(strNodeBaseId, ch);
 		}
-		IntersectionMap.get(strNodeBaseId).add(new IdImpl(strIdNode));
+		IntersectionMap.get(strNodeBaseId).add(idNode);
 	}
 	
 
@@ -44,9 +43,9 @@ public class PTStationMap {
 		return this.IntersectionMap;
 	}
 	
-	public String getNodeBaseId(String strId){
+	public String getNodeBaseId(Id id){
 		//-> eliminate this method from networkFactory and PTStation
-		String baseID = strId;
+		String baseID = id.toString();
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
 			baseID= baseID.substring(1,baseID.length());
 		if(Character.isLetter(baseID.charAt(baseID.length()-1))) 	//example of possible node values at intersection:   999, _999, 999b, _999b
