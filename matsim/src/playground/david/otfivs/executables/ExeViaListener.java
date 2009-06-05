@@ -21,11 +21,19 @@
 package playground.david.otfivs.executables;
 
 import java.io.File;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -48,9 +56,81 @@ import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
-//import playground.david.prefuse.OTFVisDualView;
+import playground.david.prefuse.OTFVisDualView;
 
 public class ExeViaListener {
+	public static class SimCanceledException extends RuntimeException{
+		
+	};
+	
+
+	public static class ResetableMobsimControler extends Controler{
+		protected boolean useResetable = true;
+		
+		public static class MyEvents extends Events{
+			List<BasicEvent> events = new ArrayList<BasicEvent>();
+
+			@Override
+			public void processEvent(BasicEvent event) {
+				events.add(event);
+			}
+			
+		}
+
+		protected void loadCoreListeners() {
+			this.addCoreControlerListener(new CoreControlerListener());
+
+			// the default handling of plans
+			this.plansScoring = new PlansScoring();
+			this.addCoreControlerListener(this.plansScoring);
+
+			this.addCoreControlerListener(new PlansReplanning());
+			
+			setWriteEventsInterval(0);
+		}
+
+
+		protected void onRunMobsim() {
+			super.runMobSim();
+		}
+		
+		@Override
+		protected void runMobSim() {
+			// just behave like an regular controler
+			if(!useResetable){
+				onRunMobsim();
+				return;
+			}
+			
+			boolean simIsFinished = false;
+			Events events = this.events;
+			this.events = new MyEvents();
+			
+			while(!simIsFinished) {
+				try {
+					
+					onRunMobsim();
+					simIsFinished = true;
+				} catch (SimCanceledException e) {
+					System.out.println("Sim canceled... Restarting!");
+				}
+			}
+
+			List<BasicEvent> myEvents = ((MyEvents)this.events).events;
+			for(BasicEvent event : myEvents) events.processEvent(event);
+			this.events = events;
+		}
+	
+		public ResetableMobsimControler(Config config) {
+			super(config);
+		}
+
+		public ResetableMobsimControler(String configFileName) {
+			super(configFileName);
+		}
+		
+	
+		}
 	
 public static class OTFControlerListener implements 
 StartupListener,
@@ -60,7 +140,7 @@ QueueSimulationInitializedListener,
 QueueSimulationAfterSimStepListener {
 
 	private QueueNetwork queueNetwork;
-	private OnTheFlyServer myOTFServer;
+	protected OnTheFlyServer myOTFServer;
 	private Population population;
 	private Events events;
 
@@ -76,6 +156,17 @@ QueueSimulationAfterSimStepListener {
 
 	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
 		int status = myOTFServer.updateStatus(e.getSimulationTime());
+		if(myOTFServer.getRequestStatus() == OTFVisController.CANCEL) {
+			try {
+				myOTFServer.requestControllerStatus(0);
+				myOTFServer.reset();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} // reset status!
+			myOTFServer.reset();
+			throw new SimCanceledException();
+		}
 	}
 
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
@@ -84,15 +175,19 @@ QueueSimulationAfterSimStepListener {
 		myOTFServer.replaceQueueNetwork(q.getQueueNetwork());
 	}
 
+	protected void createServer(final UUID idOne, StartupEvent event) {
+		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, this.events, false);
+		myOTFServer.setControllerStatus(OTFVisController.STARTUP);
+	}
 	public void notifyStartup(StartupEvent event) {
 		UUID idOne = UUID.randomUUID();
 		Controler cont = event.getControler();
 		this.population = cont.getPopulation();
 		this.events = cont.getEvents();
 		this.queueNetwork = new QueueNetwork(cont.getNetwork());
+		
+		createServer(idOne, event);
 		// DSTODO take care of Event somewhat later
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, this.events, false);
-		myOTFServer.setControllerStatus(OTFVisController.STARTUP);
 		// FOR TESTING ONLY!
 		startupClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
 	}
@@ -161,9 +256,9 @@ QueueSimulationAfterSimStepListener {
 		deleteTmp();
 		Gbl.getConfig().controler().setOutputDirectory("tmp_delete_this");
 
-		Controler controler = new Controler(cfg);
-		controlListener = new OTFControlerListener();
-//		controlListener = new OTFPopShowListener();
+		Controler controler = new ResetableMobsimControler(cfg);
+//		controlListener = new OTFControlerListener();
+		controlListener = new OTFPopShowListener();
 		controler.addControlerListener(controlListener);
 		controler.getQueueSimulationListener().add(controlListener);
 		controler.run();
