@@ -40,6 +40,7 @@ public class OTFVisController extends Controler {
 	public static final int STARTUP = 0x01000000;
 	public static final int RUNNING = 0x02000000;
 	public static final int REPLANNING = 0x04000000;
+	public static final int CANCEL = 0x08000000;
 	public static final int ALL_FLAGS = 0xff000000;
 
 	public static int getStatus(int flags) {
