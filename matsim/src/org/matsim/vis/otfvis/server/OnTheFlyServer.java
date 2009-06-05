@@ -165,6 +165,21 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return 	result;
 	}
 
+	public void reset() {
+		status = PAUSE;
+		localTime = 0;
+		controllerStatus = OTFVisController.RUNNING;
+		controllerIteration = 0;
+		stepToIteration = 0;
+		requestStatus = 0;
+		stepToTime = 0;
+		synchronized (stepDone) {
+			stepDone.notifyAll();
+		}
+		synchronized (paused) {
+			paused.notifyAll();
+		}
+	}
 	public void cleanup() {
 		try {
 			//Naming.unbind("DSOTFServer_" + UserReadableName);
@@ -395,14 +410,20 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	protected int controllerStatus = OTFVisController.NOCONTROL;
 	protected int controllerIteration = 0;
 	protected int stepToIteration = 0;
+	protected int requestStatus = 0;
 
 	public boolean requestControllerStatus(int status) throws RemoteException {
 		stepToIteration = status & 0xffffff;
+		requestStatus = status & OTFVisController.ALL_FLAGS;
 		return true;
 	}
 
 	public int getControllerStatus() {
 		return controllerStatus;
+	}
+
+	public int getRequestStatus() {
+		return requestStatus;
 	}
 
 	public void setControllerStatus(int controllerStatus) {
