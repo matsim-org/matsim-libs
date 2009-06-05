@@ -7,7 +7,7 @@ public class SynchronizedLockTestA {
 		int endTime = 10000000;
 
 		Object object = new Object();
-		int numberOfThreads = 4;//Integer.parseInt(args[0]);
+		int numberOfThreads = 2;//Integer.parseInt(args[0]);
 
 		// synchronized (score: 10.7sec)
 		Thread[] threads = new Thread[numberOfThreads];
@@ -35,6 +35,9 @@ public class SynchronizedLockTestA {
 				synchronized (lock) {
 					// Satawal needs for this code much less, than local my host...
 					// in particular, as the number is varying.
+					
+					// need to take the average of the ratios between the threads, as fluctuating.
+					// 
 					if (globalCounter < endTime) {
 						counter++;
 						globalCounter += 1;
