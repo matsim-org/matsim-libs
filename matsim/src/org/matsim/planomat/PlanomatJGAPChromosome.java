@@ -60,19 +60,19 @@ public class PlanomatJGAPChromosome extends Chromosome {
 //	return this.hashValue;
 //	}
 
-	@Override
-	public int hashCode() {
-		if (!this.isHashValueComputed) {
-			this.hashValue = super.hashCode();
-			this.isHashValueComputed = true;
-		} 
-		return this.hashValue;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		return (this.hashCode() == other.hashCode());
-	}
+//	@Override
+//	public int hashCode() {
+//		if (!this.isHashValueComputed) {
+//			this.hashValue = super.hashCode();
+//			this.isHashValueComputed = true;
+//		} 
+//		return this.hashValue;
+//	}
+//
+//	@Override
+//	public boolean equals(Object other) {
+//		return (this.hashCode() == other.hashCode());
+//	}
 
 	@Override
 	public synchronized Object clone() {
@@ -225,31 +225,14 @@ public class PlanomatJGAPChromosome extends Chromosome {
 
 	}
 
-
-
-//	@Override
-//	public double getFitnessValue() {
-//	if (m_fitnessValue >= 0.000d) {
-////	System.out.println("Directly returning fitness value... " + Double.toString(m_fitnessValue));
-//	return m_fitnessValue;
-//	}
-//	else {
-////	System.out.println("calling calcFitnessValue()... " + Double.toString(m_fitnessValue));
-//	return calcFitnessValue();
-//	}
-//	}
-
 	@Override
 	public double getFitnessValue() {
 		if ((PlanomatFitnessFunctionWrapper.NO_FITNESS_VALUE != super.m_fitnessValue)) {
-//			System.out.println(Double.toString(super.m_fitnessValue));
 			return super.m_fitnessValue;
 		}
 		else {
 			return super.calcFitnessValue();
 		}
-//		System.out.println(super.getFitnessValue());
-//		return super.getFitnessValue();
 	}
 
 	@Override
