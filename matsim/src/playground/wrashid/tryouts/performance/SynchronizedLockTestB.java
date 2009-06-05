@@ -33,7 +33,8 @@ public class SynchronizedLockTestB {
 					// threads come into this part in quite fair way
 					// perhaps one could look at the sequence of how each of the hosts
 					// lets the different threads in here...
-					System.out.print(Thread.currentThread().getId());
+					// # the number of times, the threads have been in here (counter)
+					// more than needed (endTime), shows this effect.
 					counter++;
 					if (t2.nv % 2 == parameter) {
 						t2.nv += 1;
