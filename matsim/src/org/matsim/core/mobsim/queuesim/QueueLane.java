@@ -238,7 +238,6 @@ public class QueueLane {
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
-		//TODO dg think about the combination of several number lanes in link and in lane might be a bug
 		if (this.laneData != null) {
 			numberOfLanes = this.laneData.getNumberOfRepresentedLanes();
 		}
