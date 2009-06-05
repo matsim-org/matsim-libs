@@ -425,7 +425,9 @@ public class OsmNetworkReader {
 		// check tag "lanes"
 		if (way.tags.containsKey("lanes")) {
 			try {
-				nofLanes = Double.parseDouble(way.tags.get("lanes"));
+				if(Double.parseDouble(way.tags.get("lanes")) > 0){
+					nofLanes = Double.parseDouble(way.tags.get("lanes"));
+				}
 			} catch (Exception e) {
 				log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
 			}			
