@@ -33,8 +33,8 @@ public class SynchronizedLockTestA {
 			int counter = 0;
 			while (globalCounter < endTime) {
 				synchronized (lock) {
-					// satawal needs for this code much longer, than for the
-					// code above (loses factor 10)
+					// Satawal needs for this code much less, than local my host...
+					// in particular, as the number is varying.
 					if (globalCounter < endTime) {
 						counter++;
 						globalCounter += 1;
