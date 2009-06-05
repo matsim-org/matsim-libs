@@ -57,6 +57,7 @@ public class PajekWriter<G extends Graph, V extends Vertex, E extends Edge> {
 		write(g, new EmptyAttributes(), file);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void write(G g, PajekAttributes<V, E> attrs, String file) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		

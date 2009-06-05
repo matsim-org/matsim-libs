@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PajekClusteringColorizer.java
+ * Population2SpatialGraphTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.graph;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.io;
+import org.matsim.testcases.MatsimTestCase;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import org.apache.commons.math.stat.StatUtils;
-
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.Vertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 /**
  * @author illenberger
  *
  */
-public class PajekClusteringColorizer<V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+public class Population2SpatialGraphTest extends MatsimTestCase {
 
-	private double c_min;
+	private static final String PLANS_FILE = "plans.01.xml.gz";
 	
-	private double c_max;
+	private static final int numVertex = 2827;
 	
-	private TObjectDoubleHashMap<V> clustering;
-	
-	@SuppressWarnings("unchecked")
-	public PajekClusteringColorizer(Graph g) {
-		super();
-		clustering = (TObjectDoubleHashMap<V>) GraphStatistics.localClusteringCoefficients(g);		
-		c_min = StatUtils.min(clustering.getValues());
-		c_max = StatUtils.max(clustering.getValues());
+	public void testRead() {
+		Population2SpatialGraph reader = new Population2SpatialGraph();
+		SpatialGraph graph = reader.read(getPackageInputDirectory() + PLANS_FILE);
+		
+		assertEquals(numVertex, graph.getVertices().size());
 	}
-	
-	public String getEdgeColor(E e) {
-		return getColor(-1);
-	}
-
-	public String getVertexFillColor(V ego) {
-		double c = clustering.get(ego);
-		double color = (c - c_min) / (c_max - c_min);
-		return getColor(color);
-	}
-
 }

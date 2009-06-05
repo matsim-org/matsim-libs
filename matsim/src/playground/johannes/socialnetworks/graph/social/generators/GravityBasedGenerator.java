@@ -30,6 +30,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulation;
@@ -37,7 +39,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
+import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
@@ -50,17 +54,20 @@ import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.mcmc.MCMCSampleDelegate;
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialNetworkAnalyzer;
 import playground.johannes.socialnetworks.graph.social.SocialTie;
 import playground.johannes.socialnetworks.graph.social.io.SNGraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.mcmc.SNAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.ErgmGravity;
 import playground.johannes.socialnetworks.graph.spatial.GridUtils;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
+import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
+import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -78,13 +85,16 @@ public class GravityBasedGenerator {
 	 * @param args
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
 	 */
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadPopulation();
-		Scenario scenario = loader.getScenario();
-		Population population = scenario.getPopulation();
+	public static void main(String[] args) throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
+		Config config = new Config();
+		MatsimConfigReader creader = new MatsimConfigReader(config);
+		creader.parse(args[0]);
+		
+		Population2SpatialGraph reader = new Population2SpatialGraph();
+		SpatialGraph graph = reader.read(config.findParam("plans", "inputPlansFile"));
 //		LatticeGenerator generator = new LatticeGenerator();
 //		BasicPopulation<BasicPerson<?>> population = generator.generate(100, 100);
 		
@@ -95,10 +105,10 @@ public class GravityBasedGenerator {
 		generator.sampleSize = Integer.parseInt(config.getParam(MODULE_NAME, "samplesize"));
 		generator.sampleInterval = Integer.parseInt(config.getParam(MODULE_NAME, "sampleinterval"));
 		generator.outputDir = config.getParam(MODULE_NAME, "output"); 
-//		SpatialGrid<Double> densityGrid = SpatialGrid.readFromFile(args[1]);
-		SpatialGrid<Double> densityGrid = GridUtils.createDensityGrid(population, 10);
+		SpatialGrid<Double> densityGrid = SpatialGrid.readFromFile(args[1]);
+//		SpatialGrid<Double> densityGrid = GridUtils.createDensityGrid(population, 10);
 		
-		generator.generate(population, densityGrid);
+		generator.generate(graph, densityGrid);
 
 	}
 
@@ -114,11 +124,11 @@ public class GravityBasedGenerator {
 	
 	private final double thetaGravity = 1;
 	
-	public <P extends BasicPerson<?>> void generate(BasicPopulation<P> population, SpatialGrid<Double> densityGrid) {
-		SocialNetwork<P> socialnet = new SocialNetwork<P>(population);
+	public void generate(SpatialGraph graph, SpatialGrid<Double> densityGrid) {
+//		SocialNetwork<P> graph = new SocialNetwork<P>(population);
 		
 		
-		SNAdjacencyMatrix<P> matrix = new SNAdjacencyMatrix<P>(socialnet);
+		SpatialAdjacencyMatrix matrix = new SpatialAdjacencyMatrix(graph);
 		/*
 		 * Setup ergm terms.
 		 */
@@ -188,7 +198,7 @@ public class GravityBasedGenerator {
 			double c_local = AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y);
 			double c_global = AdjacencyMatrixStatistics.getGlobalClusteringCoefficient(y);
 		
-			SocialNetwork<?> net = ((SNAdjacencyMatrix)y).getGraph();
+			SpatialGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
 			double d_mean = SpatialGraphStatistics.edgeLengthDistribution(net).mean();
 			logger.info(String.format(Locale.US, "m=%1$s, <k>=%2$.4f, <c_local>=%3$.4f, <c_global>=%4$.4f, <d>=%5$.4f", m, k_mean, c_local, c_global, d_mean));
 		
@@ -209,7 +219,7 @@ public class GravityBasedGenerator {
 			degree.add(AdjacencyMatrixStatistics.getMeanDegree(y));
 			clustering.add(AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y));
 			
-			SocialNetwork<BasicPerson<?>> net = ((SNAdjacencyMatrix)y).getGraph();
+			SpatialGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
 			distance.add(SpatialGraphStatistics.edgeLengthDistribution(net).mean());
 			
 			try {
@@ -218,7 +228,7 @@ public class GravityBasedGenerator {
 				file.mkdirs();
 				SNGraphMLWriter writer = new SNGraphMLWriter();
 				writer.write(net, String.format("%1$s%2$s.socialnet.graphml", currentOutputDir, counter));
-				SocialNetworkAnalyzer.analyze(net, currentOutputDir, false, densityGrid);
+				SpatialGraphAnalyzer.analyze(net, currentOutputDir, false, densityGrid);
 				KMLWriter kmlWriter = new KMLWriter();
 				kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
 				kmlWriter.write((SocialNetwork<BasicPerson<?>>) net, String.format("%1$s%2$s.socialnet.k.kml", currentOutputDir, counter));

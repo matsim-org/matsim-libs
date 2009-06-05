@@ -28,7 +28,6 @@ import gnu.trove.TIntObjectHashMap;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
 
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.social.SocialNetworkFactory;
@@ -40,30 +39,8 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
  */
 public class SNAdjacencyMatrix<P extends BasicPerson<?>> extends SpatialAdjacencyMatrix {
 
-//	private List<Ego<P>> egoList;
-	
 	public SNAdjacencyMatrix(SocialNetwork<P> g) {
 		super(g);
-//		egoList = new ArrayList<Ego<P>>(g.getVertices().size());
-//		
-//		int idx = 0;
-//		for(Ego<P> v : g.getVertices()) {
-//			egoList.add(v);
-//			addVertex();
-//			idx++;
-//		}
-//		
-//		for(SocialTie e : g.getEdges()) {
-//			Tuple<? extends Vertex, ? extends Vertex> p = e.getVertices();
-//			int i = egoList.indexOf(p.getFirst());
-//			int j = egoList.indexOf(p.getSecond());
-//			
-//			if(i > -1 && j > -1) {
-//				addEdge(i, j);
-//			} else {
-//				throw new IllegalArgumentException(String.format("Indices i=%1$s, j=%2$s not allowed!", i, j));
-//			}
-//		}
 	}
 
 	
@@ -93,6 +70,7 @@ public class SNAdjacencyMatrix<P extends BasicPerson<?>> extends SpatialAdjacenc
 		return g;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Ego<P> getVertex(int i) {
 		return (Ego<P>) super.getVertex(i);
 	}

@@ -20,12 +20,17 @@
 package playground.johannes.socialnetworks.graph.spatial;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
+import java.util.Collection;
 import java.util.Set;
 
 import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.SparseEdge;
+import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
@@ -43,10 +48,6 @@ public class SpatialGraphStatistics {
 		for(SpatialVertex v1 : vertices) {
 			for(SparseEdge e : v1.getEdges())
 				stats.add(((SpatialEdge)e).length());
-//			for(SpatialVertex v2 : v1.getNeighbours()) {
-//				double d = CoordUtils.calcDistance(v1.getCoordinate(), v2.getCoordinate());
-//				stats.add(d);
-//			}
 		}
 		
 		return stats;
@@ -63,10 +64,6 @@ public class SpatialGraphStatistics {
 				double sum_d = 0;
 				for(SparseEdge e : i.getEdges())
 					sum_d += ((SpatialEdge)e).length();
-//				for (SpatialVertex j : i.getNeighbours()) {
-//					sum_d += CoordUtils
-//							.calcDistance(i.getCoordinate(), j.getCoordinate());
-//				}
 				double d_mean = sum_d / (double) i.getNeighbours().size();
 				values.put(i, d_mean);
 			}
@@ -80,9 +77,6 @@ public class SpatialGraphStatistics {
 			double sum = 0;
 			for(SparseEdge e : v.getEdges())
 				sum += ((SpatialEdge)e).length();
-//			for(SpatialVertex e2 : e.getNeighbours()) {
-//				sum += CoordUtils.calcDistance(e.getCoordinate(), e2.getCoordinate());
-//			}
 			d_distr.put(v, sum/(double)v.getNeighbours().size());
 		}
 		
@@ -93,30 +87,45 @@ public class SpatialGraphStatistics {
 		return edgeLengthDegreeCorrelation(network.getVertices());
 	}
 
-//	public static <T extends SpatialVertex> TObjectDoubleHashMap<T> localEdgeLengthMSE(Set<T> vertices) {
-//		TObjectDoubleHashMap<T> mse = new TObjectDoubleHashMap<T>();
-//		TDoubleDoubleHashMap globalDistr = edgeLengthDistribution(vertices).normalizedDistribution(1000);
-//		for(T v : vertices) {
-//			Distribution localDistr = new Distribution();
-//			Coord c1 = v.getCoordinate();
-//			for(SpatialVertex t : v.getNeighbours()) {
-//				Coord c2 = t.getCoordinate();
-//				double d = CoordUtils.calcDistance(c1, c2);
-//				localDistr.add(d);
-//			}
-//			mse.put(v, Distribution.meanSquareError(localDistr.normalizedDistribution(1000), globalDistr));
-//		}
-//		return mse;
-//	}
-//
-//	public static <T extends SpatialVertex> TDoubleDoubleHashMap edgeLengthMSEDegreeCorrelation(Set<T> vertices) {
-//		TObjectDoubleHashMap<T> d_distr = new TObjectDoubleHashMap<T>();
-//		TObjectDoubleHashMap<T> mseDistr = localEdgeLengthMSE(vertices);
-//		for(T e : vertices) {
-//			d_distr.put(e, mseDistr.get(e));
-//		}
-//		
-//		return GraphStatistics.degreeCorrelation(d_distr);
-//	}
+	
+	public static TDoubleDoubleHashMap densityCorrelation(TObjectDoubleHashMap<? extends SpatialVertex> vertexValues, SpatialGrid<Double> densityGrid, double binsize) {
+			double values1[] = new double[vertexValues.size()];
+			double values2[] = new double[vertexValues.size()];
+			
+			TObjectDoubleIterator<? extends SpatialVertex> it = vertexValues.iterator();
+			for(int i = 0; i < values1.length; i++) {
+				it.advance();
+				if(densityGrid.isInBounds(it.key().getCoordinate())) {
+					values1[i] = densityGrid.getValue(it.key().getCoordinate());
+					values2[i] = it.value();
+				}
+			}
+			
+			return Correlations.correlationMean(values1, values2, binsize);
+		}
+
+		public static TDoubleDoubleHashMap degreeDensityCorrelation(Collection<? extends SpatialVertex> vertices, SpatialGrid<Double> densityGrid) {
+			TObjectDoubleHashMap<SpatialVertex> vertexValues = new TObjectDoubleHashMap<SpatialVertex>();
+			for(SpatialVertex e : vertices) {
+				vertexValues.put(e, e.getEdges().size());
+			}
+			
+			return densityCorrelation(vertexValues, densityGrid, 10);
+		}
+
+		public static TDoubleDoubleHashMap clusteringDensityCorrelation(Collection<? extends SpatialVertex> vertices, SpatialGrid<Double> densityGrid) {
+			return densityCorrelation(GraphStatistics.localClusteringCoefficients(vertices), densityGrid, 500);
+		}
+
+		public static <V extends SpatialVertex> TDoubleObjectHashMap<Set<V>> createDensityPartitions(Set<V> vertices, SpatialGrid<Double> densityGrid, double binsize) {
+			TObjectDoubleHashMap<V> vertexValues = new TObjectDoubleHashMap<V>();
+			for(V v : vertices) {
+				if(densityGrid.isInBounds(v.getCoordinate())) {
+					double rho = densityGrid.getValue(v.getCoordinate());
+					vertexValues.put(v, rho);
+				}
+			}
+			return Partitions.createPartitions(vertexValues, binsize);
+		}
 
 }

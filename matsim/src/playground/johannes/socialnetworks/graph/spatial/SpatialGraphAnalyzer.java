@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph.social;
+package playground.johannes.socialnetworks.graph.spatial;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -32,15 +32,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
-import playground.johannes.socialnetworks.graph.social.io.SNGraphMLReader;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.SpatialStatistics;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -48,9 +43,9 @@ import playground.johannes.socialnetworks.statistics.Distribution;
  * @author illenberger
  *
  */
-public class SocialNetworkAnalyzer {
+public class SpatialGraphAnalyzer {
 
-	private static final Logger logger = Logger.getLogger(SocialNetworkAnalyzer.class);
+	private static final Logger logger = Logger.getLogger(SpatialGraphAnalyzer.class);
 	
 	/**
 	 * @param args
@@ -81,7 +76,8 @@ public class SocialNetworkAnalyzer {
 		}
 		
 		logger.info(String.format("Loading graph %1$s...", graphfile));
-		SocialNetwork<Person> g = SNGraphMLReader.loadFromConfig(args[0], graphfile);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph g = reader.readGraph(graphfile);
 		
 		if(!output.endsWith("/"))
 			output = output + "/";
@@ -95,7 +91,7 @@ public class SocialNetworkAnalyzer {
 	}
 
 	public static void analyze(
-			SocialNetwork<? extends BasicPerson<?>> socialnet,
+			SpatialGraph socialnet,
 			String output, boolean extended, SpatialGrid<Double> densityGrid) {
 		GraphAnalyser.analyze(socialnet, output, extended);
 
@@ -113,10 +109,10 @@ public class SocialNetworkAnalyzer {
 				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(socialnet), output + "edgelength_k.txt", "k", "edge length");
 				
 				if(densityGrid != null) {
-					Correlations.writeToFile(SpatialStatistics.degreeDensityCorrelation(socialnet.getVertices(), densityGrid), output + "k_rho.txt", "density", "k");
-					Correlations.writeToFile(SpatialStatistics.clusteringDensityCorrelation(socialnet.getVertices(), densityGrid), output + "c_rho.txt", "density", "c");
+					Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(socialnet.getVertices(), densityGrid), output + "k_rho.txt", "density", "k");
+					Correlations.writeToFile(SpatialGraphStatistics.clusteringDensityCorrelation(socialnet.getVertices(), densityGrid), output + "c_rho.txt", "density", "c");
 					
-					Correlations.writeToFile(SpatialStatistics.getDensityCorrelation(
+					Correlations.writeToFile(SpatialGraphStatistics.densityCorrelation(
 							SpatialGraphStatistics.meanEdgeLength(socialnet), densityGrid, binsize), output + "edgelength_rho", "rho", "mean_edgelength");
 				}
 				
@@ -149,8 +145,8 @@ public class SocialNetworkAnalyzer {
 //				c1 = trans.transform(c1);
 //				c2 = trans.transform(c2);
 				
-				Set<Ego<?>> egos = new HashSet<Ego<?>>();
-				for(Ego<?> e : socialnet.getVertices()) {
+				Set<SpatialVertex> egos = new HashSet<SpatialVertex>();
+				for(SpatialVertex e : socialnet.getVertices()) {
 					Coord c = e.getCoordinate();
 					
 					if(c.getX() >= c1.getX() && c.getX() <= c2.getX() && c.getY() >= c1.getY() && c.getY() <= c2.getY()) {
@@ -158,7 +154,7 @@ public class SocialNetworkAnalyzer {
 					}
 				}
 				Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution(egos).absoluteDistribution(binsize), output + "edgelength.center.hist.txt");
-				Correlations.writeToFile(SpatialStatistics.degreeDensityCorrelation(egos, densityGrid), output + "k_rho.center.txt", "density", "k");
+				Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(egos, densityGrid), output + "k_rho.center.txt", "density", "k");
 			}
 			
 			if (output != null) {

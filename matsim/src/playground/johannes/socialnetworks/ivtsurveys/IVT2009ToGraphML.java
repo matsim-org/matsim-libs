@@ -59,7 +59,6 @@ import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.social.io.SNGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.SpatialStatistics;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
@@ -236,8 +235,8 @@ public class IVT2009ToGraphML {
 			Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(egoSet), output + "edgelength_k.txt", "k", "edge length");
 			
 			if(densityGrid != null) {
-				Correlations.writeToFile(SpatialStatistics.degreeDensityCorrelation(egoSet, densityGrid), output + "k_rho.txt", "density", "k");
-				Correlations.writeToFile(SpatialStatistics.clusteringDensityCorrelation(egoSet, densityGrid), output + "c_rho.txt", "density", "c");
+				Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(egoSet, densityGrid), output + "k_rho.txt", "density", "k");
+				Correlations.writeToFile(SpatialGraphStatistics.clusteringDensityCorrelation(egoSet, densityGrid), output + "c_rho.txt", "density", "c");
 			}
 		}
 		
