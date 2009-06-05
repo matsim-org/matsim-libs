@@ -206,10 +206,11 @@ public class PlanomatTest extends MatsimTestCase {
 		planAnalyzeSubtours.run(testPlan);
 
 		testChromosome = testee.initSampleChromosome(testPlan, planAnalyzeSubtours, jgapConfiguration);
-		assertEquals(3, testChromosome.getGenes().length);
+		assertEquals(4, testChromosome.getGenes().length);
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[0].getClass());
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[1].getClass());
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[2].getClass());
+		assertEquals(IntegerGene.class, testChromosome.getGenes()[3].getClass());
 
 	}
 
@@ -279,7 +280,7 @@ public class PlanomatTest extends MatsimTestCase {
 		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 		Planomat testee = new Planomat(ltte, sfFactory);
 
-		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan);
+		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null);
 
 		// write out the test person and the modified plan into a file
 		Population outputPopulation = new PopulationImpl();

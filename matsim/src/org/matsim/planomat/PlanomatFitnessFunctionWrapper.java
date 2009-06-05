@@ -24,6 +24,7 @@ import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.matsim.core.api.population.Plan;
 import org.matsim.planomat.Planomat.StepThroughPlanAction;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 /**
  * This class connects the JGAP FitnessFunction class with the MATSim ScoringFunction interface.
@@ -50,17 +51,19 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 	private transient final Planomat planomat;
 	private transient final Plan plan;
+	private transient final PlanAnalyzeSubtours planAnalyzeSubtours;
 
-	public PlanomatFitnessFunctionWrapper(Planomat planomat, Plan plan) {
+	public PlanomatFitnessFunctionWrapper(Planomat planomat, Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
 		super();
 		this.planomat = planomat;
 		this.plan = plan;
+		this.planAnalyzeSubtours = planAnalyzeSubtours;
 	}
 
 	@Override
 	protected double evaluate(final IChromosome a_subject) {
 
-		double planScore = this.planomat.stepThroughPlan(StepThroughPlanAction.EVALUATE, a_subject, this.plan);
+		double planScore = this.planomat.stepThroughPlan(StepThroughPlanAction.EVALUATE, a_subject, this.plan, this.planAnalyzeSubtours);
 
 		return planScore;
 	}

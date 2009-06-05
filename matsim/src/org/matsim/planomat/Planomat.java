@@ -78,7 +78,6 @@ public class Planomat implements PlanAlgorithm {
 	private final static Logger logger = Logger.getLogger(Planomat.class);
 	private final boolean doLogging = this.config.isDoLogging();
 
-	private PlanAnalyzeSubtours planAnalyzeSubtours = null;
 	private ScoringFunction scoringFunction = null;
 
 	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
@@ -97,12 +96,13 @@ public class Planomat implements PlanAlgorithm {
 		}
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
+		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (this.possibleModes.length > 0) {
 			if (this.doLogging) {
 				logger.info("Running subtour analysis...");
 			}
-			this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
-			this.planAnalyzeSubtours.run(plan);
+			planAnalyzeSubtours = new PlanAnalyzeSubtours();
+			planAnalyzeSubtours.run(plan);
 		}
 		if (this.doLogging) {
 			logger.info("Running subtour analysis...done.");
@@ -118,7 +118,7 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running evolution...done.");
 			logger.info("Writing solution back to Plan object...");
 		}
-		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan);
+		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan, planAnalyzeSubtours);
 		if (this.doLogging) {
 			logger.info("Writing solution back to Plan object...done.");
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
@@ -159,7 +159,7 @@ public class Planomat implements PlanAlgorithm {
 			e1.printStackTrace();
 		}
 
-		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan);		
+		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan, planAnalyzeSubtours);		
 
 		try {
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
@@ -191,7 +191,7 @@ public class Planomat implements PlanAlgorithm {
 
 		int numActs = plan.getPlanElements().size() / 2;
 		int numSubtours = 0;
-		if (this.possibleModes.length > 0) {
+		if (planAnalyzeSubtours != null) {
 			numSubtours = planAnalyzeSubtours.getNumSubtours();
 		}
 		Gene[] sampleGenes = new Gene[1 + numActs + numSubtours];
@@ -223,7 +223,11 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
-	protected double stepThroughPlan(final StepThroughPlanAction action, final IChromosome individual, final Plan plan) {
+	protected double stepThroughPlan(
+			final StepThroughPlanAction action, 
+			final IChromosome individual, 
+			final Plan plan, 
+			final PlanAnalyzeSubtours planAnalyzeSubtours) {
 
 		// TODO comment this
 		double positionInTimeInterval = 0.5;
@@ -287,9 +291,9 @@ public class Planomat implements PlanAlgorithm {
 				leg.setDepartureTime(now);
 			}
 
-			if (possibleModes.length > 0) {
+			if (planAnalyzeSubtours != null) {
 				// set mode
-				int subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[geneIndex - 1];
+				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[geneIndex - 1];
 				int modeIndex = ((IntegerGene) individual.getGene(1 + numLegs + subtourIndex)).intValue();
 				leg.setMode(possibleModes[modeIndex]);
 			} // otherwise leave modes untouched

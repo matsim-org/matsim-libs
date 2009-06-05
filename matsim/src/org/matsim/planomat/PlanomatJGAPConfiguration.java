@@ -80,12 +80,9 @@ public class PlanomatJGAPConfiguration extends Configuration {
 				
 				int numActs = plan.getPlanElements().size() / 2;
 				int populationSize = Gbl.getConfig().planomat().getLevelOfTimeResolution() * numActs;
-				if (Gbl.getConfig().planomat().getPossibleModes().size() > 0) {
+				if (planAnalyzeSubtours != null) {
 					populationSize += Gbl.getConfig().planomat().getPossibleModes().size() * planAnalyzeSubtours.getNumSubtours();
 				}
-//				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
-//					populationSize += Gbl.getConfig().planomat().getPossibleModes().length * planAnalyzeSubtours.getNumSubtours();
-//				}
 				this.setPopulationSize( populationSize );
 				
 			} else {
