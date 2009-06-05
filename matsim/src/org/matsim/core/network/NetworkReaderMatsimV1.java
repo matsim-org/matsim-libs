@@ -21,19 +21,24 @@
 package org.matsim.core.network;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.*;
-
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.*;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.misc.*;
+import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.core.utils.misc.Time;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * A reader for network-files of MATSim according to <code>network_v1.dtd</code>.
@@ -112,13 +117,15 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startLinks(final Attributes atts) {
+		double capacityPeriod = 3600.0; //the default of one hour
 		String capperiod = atts.getValue("capperiod");
-		if (capperiod == null) {
-			// TODO [balmermi] sometime we should define the default by 1 hour!!!
-			capperiod = "12:00:00";
-			log.warn("capperiod was not defined. Using default value of 12:00:00.");
+		if (capperiod != null) {
+			capacityPeriod = Time.parseTime(capperiod);
 		}
-		this.network.setCapacityPeriod(Time.parseTime(capperiod));
+		else {
+			log.warn("capperiod was not defined. Using default value of " + Time.writeTime(capacityPeriod) + ".");
+		}
+		this.network.setCapacityPeriod(capacityPeriod);
 
 		String effectivecellsize = atts.getValue("effectivecellsize");
 		if (effectivecellsize == null){

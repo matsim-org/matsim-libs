@@ -97,8 +97,7 @@
      format := "hh:mm:ss"
      meaning:  It defines the time period over which
                the capacity of the given links has been measured.
-     NOTE:     It should be = "01:00:00" per default, but at the
-               moment, Matsim defines the default as "12:00:00" -->
+     NOTE:     It is "01:00:00" per default, i.e. 3600.0 sec   -->
 
 <!-- ATTRIBUTE effectivecellsize:
      format := double
