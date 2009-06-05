@@ -6,32 +6,38 @@ public class SynchronizedLockTestA {
 	public static void main(String[] args) {
 		int endTime = 10000000;
 
-		Test2 t2 = new Test2();
+		Object object = new Object();
+		int numberOfThreads = 4;//Integer.parseInt(args[0]);
 
 		// synchronized (score: 10.7sec)
-		Thread t0 = new Thread(new ARunnable(t2, 0, endTime));
-		Thread t1 = new Thread(new ARunnable(t2, 1, endTime));
+		Thread[] threads = new Thread[numberOfThreads];
 
-		t0.start();
-		t1.start();
+		for (int i = 0; i < numberOfThreads; i++) {
+			threads[i] = new Thread(new ARunnable(object, endTime));
+		}
+
+		for (int i = 0; i < numberOfThreads; i++) {
+			threads[i].start();
+		}
+
 	}
 
 	static class ARunnable implements Runnable {
-		private Test2 t2;
-		private int parameter;
+		private Object lock;
 		private int endTime;
+		private static int globalCounter;
 
 		public void run() {
 			Timer timer = new Timer();
 			timer.startTimer();
 			int counter = 0;
-			while (t2.nv < endTime) {
-				synchronized (t2) {
+			while (globalCounter < endTime) {
+				synchronized (lock) {
 					// satawal needs for this code much longer, than for the
 					// code above (loses factor 10)
-					if (t2.nv < endTime) {
+					if (globalCounter < endTime) {
 						counter++;
-						t2.nv += 1;
+						globalCounter += 1;
 					}
 
 				}
@@ -41,10 +47,9 @@ public class SynchronizedLockTestA {
 			System.out.println(Thread.currentThread().getId() + ":" + counter);
 		}
 
-		public ARunnable(Test2 t2, int parameter, int endTime) {
+		public ARunnable(Object lock, int endTime) {
 			super();
-			this.t2 = t2;
-			this.parameter = parameter;
+			this.lock = lock;
 			this.endTime = endTime;
 		}
 	}
