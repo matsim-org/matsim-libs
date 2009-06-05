@@ -81,8 +81,9 @@ public class ExeViaListener {
 			this.addCoreControlerListener(new CoreControlerListener());
 
 			// the default handling of plans
-			this.plansScoring = new PlansScoring();
-			this.addCoreControlerListener(this.plansScoring);
+			//DSTODO does not compile ->ask for protected in Controler
+			//this.plansScoring = new PlansScoring();
+			//this.addCoreControlerListener(this.plansScoring);
 
 			this.addCoreControlerListener(new PlansReplanning());
 			
