@@ -25,10 +25,13 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -88,6 +91,7 @@ public class ScenarioIO {
 
 		Config config = sl.getScenario().getConfig();
 		Network network = sl.getScenario().getNetwork();
+		ActivityFacilities af = sl.getScenario().getActivityFacilities();
 
 		System.out.println("transform network...");
 		WGS84toCH1903LV03 transform = new WGS84toCH1903LV03();
@@ -115,6 +119,14 @@ public class ScenarioIO {
 		Gbl.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
+		
+		System.out.println("writing facilities...");
+		new FacilitiesWriter(af).write();
+		System.out.println("done. (writing facilities)");
+
+		System.out.println("writing network...");
+		new NetworkWriter(network).write();
+		System.out.println("done. (writing network)");
 
 		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
