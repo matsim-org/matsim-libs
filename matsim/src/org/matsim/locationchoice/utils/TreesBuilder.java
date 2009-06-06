@@ -141,18 +141,7 @@ public class TreesBuilder {
 	public TreeMap<String, QuadTree<ActivityFacility>> getQuadTreesOfType() {
 		return quadTreesOfType;
 	}
-
-	public void setQuadTreesOfType(
-			TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType) {
-		this.quadTreesOfType = quadTreesOfType;
-	}
-
 	public TreeMap<String, ActivityFacility[]> getFacilitiesOfType() {
 		return facilitiesOfType;
 	}
-
-	public void setFacilitiesOfType(
-			TreeMap<String, ActivityFacility[]> facilitiesOfType) {
-		this.facilitiesOfType = facilitiesOfType;
-	}	
 }
