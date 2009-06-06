@@ -20,8 +20,10 @@
 
 package playground.balmermi;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -31,6 +33,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.balmermi.modules.PersonFacility2Link;
 
@@ -66,33 +69,53 @@ public class ScenarioIO {
 
 	public static void main(String[] args) {
 		if (args.length != 1) { printUsage(); return; }
-		Gbl.printMemoryUsage();
+
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
-		Gbl.printMemoryUsage();
+
+		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
 		Gbl.printMemoryUsage();
+		System.out.println("done. (loading facilities)");
+		System.out.println("loading network...");
 		sl.loadNetwork();
 		Gbl.printMemoryUsage();
-		Gbl.getWorld().complete();
+		System.out.println("done. (loading network)");
 
 		Config config = sl.getScenario().getConfig();
 		Network network = sl.getScenario().getNetwork();
+
+		System.out.println("transform network...");
+		WGS84toCH1903LV03 transform = new WGS84toCH1903LV03();
+		for (Node n : network.getNodes().values()) {
+			Coord c = transform.transform(n.getCoord());
+			n.getCoord().setXY(c.getX(),c.getY());
+		}
+		Gbl.printMemoryUsage();
+		System.out.println("done. (transform network)");
+
+		System.out.println("complete world...");
+		Gbl.getWorld().complete();
+		Gbl.printMemoryUsage();
+		System.out.println("done. (complete world)");
 
 		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(population,network);
 		PopulationWriter plansWriter = new PopulationWriter(population);
 
-		Gbl.printMemoryUsage();
+		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonFacility2Link());
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		population.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
 		population.addAlgorithm(plansWriter);
 		Gbl.printMemoryUsage();
+		System.out.println("done. (adding algorithms)");
 
+		System.out.println("stream population...");
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		plansWriter.write();
 		Gbl.printMemoryUsage();
+		System.out.println("done. (stream population)");
 	}
 }
