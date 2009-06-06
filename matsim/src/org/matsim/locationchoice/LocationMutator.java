@@ -51,6 +51,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected final LocationChoiceConfigGroup config;
 	
 	protected DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities();
+	protected boolean locationChoiceBasedOnKnowledge = true;
 			
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
@@ -73,7 +74,11 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.controler = controler;
 	}
 	
-	private void initLocal(final NetworkLayer network, Controler controler) {		
+	private void initLocal(final NetworkLayer network, Controler controler) {	
+		
+		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+			locationChoiceBasedOnKnowledge = false;
+		}	
 		this.initTrees(controler.getFacilities());				
 		this.network = network;
 		this.controler = controler;

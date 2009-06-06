@@ -22,6 +22,7 @@ package org.matsim.locationchoice;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.*;
 import org.matsim.core.controler.Controler;
@@ -35,7 +36,7 @@ import org.matsim.core.utils.collections.QuadTree;
  */
 public class RandomLocationMutator extends LocationMutator {
 
-	//private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
+	private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
 	public RandomLocationMutator(final NetworkLayer network, Controler controler) {
 		super(network, controler);
 	}
@@ -52,13 +53,12 @@ public class RandomLocationMutator extends LocationMutator {
 	 * plan == selected plan
 	 */
 	@Override
-	public void handlePlan(final Plan plan){
-		
-		if (super.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
-			this.handlePlanForPreDefinedFlexibleTypes(plan);			
+	public void handlePlan(final Plan plan){	
+		if (super.locationChoiceBasedOnKnowledge) {
+			this.handlePlanBasedOnKnowldge(plan);	
 		}
 		else {
-			this.handlePlanBasedOnKnowldge(plan);
+			this.handlePlanForPreDefinedFlexibleTypes(plan);	
 		}
 		super.resetRoutes(plan);		
 	}

@@ -235,11 +235,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
  		
 	public List<SubChain> calcActChains(final Plan plan) {
-		if (super.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
-			return this.calcActChainsDefinedFixedTypes(plan);
+		if (super.locationChoiceBasedOnKnowledge) {
+			return this.calcActChainsBasedOnKnowledge(plan);
 		}
 		else {
-			return this.calcActChainsBasedOnKnowledge(plan);
+			return this.calcActChainsDefinedFixedTypes(plan);
 		}
 	}
 		
