@@ -30,12 +30,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 
 
-
-/**RandomLocationMutator macht wirklich nichts anderes als einer bestimmten Aktivität eine neue Facility vom richtigen Typ 
- * zuzuweisen (zufällig ausgewählt aus allen Facilities). Der einzige Mehrwert entsteht durch die Iterationen. (ahorni, 30jan09)
-
- * @author ahorni
- *
+/*
+ * @author anhorni
  */
 public class RandomLocationMutator extends LocationMutator {
 
@@ -58,35 +54,31 @@ public class RandomLocationMutator extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 		
-		List<Activity> movablePrimaryActivities = null; 
-		if (this.config.getFixByActType().equals("false")) {
-			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		if (super.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+			this.handlePlanForPreDefinedFlexibleTypes(plan);			
 		}
+		else {
+			this.handlePlanBasedOnKnowldge(plan);
+		}
+		super.resetRoutes(plan);		
+	}
+		
+	private void handlePlanBasedOnKnowldge(final Plan plan) {
+		
+		List<Activity> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
-			
-			boolean isPrimary = false;
-			boolean movable = false;
-			if (this.config.getFixByActType().equals("false")) {	
-				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-				// "if" makes things actually slower!
-				//if (isPrimary && !act.getType().startsWith("h")) {
-					movable = movablePrimaryActivities.contains(act);
-				//}
-			}
-			else {
-				isPrimary = plan.getPerson().getKnowledge().isSomewherePrimary(act.getType());
-			}
-					
+				
+			boolean	isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean	movable = movablePrimaryActivities.contains(act);
+	
 			// if home is accidentally not defined as primary
 			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 				int length = this.facilitiesOfType.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {
-				//	Facility facility = (Facility)this.quad_trees.get(act.getType()).values().toArray()[
-				//	                       MatsimRandom.random.nextInt(size)];
 					ActivityFacility facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
 					
 					act.setFacility(facility);
@@ -95,11 +87,24 @@ public class RandomLocationMutator extends LocationMutator {
 				}		
 			}	
 		}
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (int j = 1; j < actslegs.size(); j=j+2) {
-			final Leg leg = (Leg)actslegs.get(j);
-			leg.setRoute(null);
+	}
+	
+	private void handlePlanForPreDefinedFlexibleTypes(final Plan plan) {
+		final List<?> actslegs = plan.getPlanElements();
+		for (int j = 0; j < actslegs.size(); j=j+2) {
+			final Activity act = (Activity)actslegs.get(j);
+				
+			// if home is accidentally not defined as primary
+			if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) {
+				int length = this.facilitiesOfType.get(act.getType()).length;
+				// only one facility: do not need to do location choice
+				if (length > 1) {
+					ActivityFacility facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];				
+					act.setFacility(facility);
+					act.setLink(this.network.getNearestLink(facility.getCoord()));
+					act.setCoord(facility.getCoord());
+				}		
+			}	
 		}
-	}	
+	}
 }

@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
@@ -49,7 +50,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected TreeMap<String, ActivityFacility []> facilitiesOfType;
 	protected final LocationChoiceConfigGroup config;
 	
-	private DefineFlexibleActivities defineMovablePrimaries = new DefineFlexibleActivities();
+	protected DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities();
 			
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
@@ -115,6 +116,16 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	}
 		
 	protected List<Activity>  defineMovablePrimaryActivities(final Plan plan) {				
-		return this.defineMovablePrimaries.getMovablePrimaryActivities(plan);
+		return this.defineFlexibleActivities.getMovablePrimaryActivities(plan);
+	}
+	
+	protected void resetRoutes(final Plan plan) {
+		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+		final List<?> actslegs = plan.getPlanElements();
+		for (int j = 1; j < actslegs.size(); j=j+2) {
+			final Leg leg = (Leg)actslegs.get(j);
+			leg.setRoute(null);
+		}
 	}
 }

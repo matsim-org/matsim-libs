@@ -67,14 +67,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	public void handlePlan(final Plan plan){
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
-			
-		final List<?> actslegs = plan.getPlanElements();
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (int j = 1; j < actslegs.size(); j=j+2) {
-			final Leg leg = (Leg)actslegs.get(j);
-			leg.setRoute(null);
-		}	
+		super.resetRoutes(plan);	
 	}
 	
 	public int getNumberOfUnsuccessfull() {
@@ -191,39 +184,45 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();
 	}
+	
+	private List<SubChain> calcActChainsDefinedFixedTypes(final Plan plan) {
+		ManageSubchains manager = new ManageSubchains();
 		
-	public List<SubChain> calcActChains(final Plan plan) {
-		
-		ManageSubchains manager = new ManageSubchains();	
-		List<Activity> movablePrimaryActivities = null; 
-		if (this.config.getFixByActType().equals("false")) {
-			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		final List<?> actslegs = plan.getPlanElements();
+		for (int j = 0; j < actslegs.size(); j=j+2) {
+			final Activity act = (Activity)actslegs.get(j);		
+			
+			if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) { // found secondary activity
+				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
+			}			
+			else {		// found primary activity	
+				if (j == (actslegs.size()-1)) {
+					manager.primaryActivityFound(act, null);
+				}
+				else {
+					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
+				}
+			}
 		}
-				
+		return manager.getSubChains();	
+	}
+	
+	private List<SubChain> calcActChainsBasedOnKnowledge(final Plan plan) {
+		ManageSubchains manager = new ManageSubchains();	
+		List<Activity> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 			
-			boolean isPrimary = false;
-			boolean movable = false;
-			if (this.config.getFixByActType().equals("false")) {	
-				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-				// "if" makes things actually slower!
-				//if (isPrimary && !act.getType().startsWith("h")) {
-					movable = movablePrimaryActivities.contains(act);
-				//}
-			}
-			else {
-				isPrimary = plan.getPerson().getKnowledge().isSomewherePrimary(act.getType());
-			}
+			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean movable = movablePrimaryActivities.contains(act);
 			
-			// found secondary activity
 			// if home is accidentally not defined as primary
-			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {			
+			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) { // found secondary activity
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}		
-			// found primary activity
-			else {			
+			else {	// found primary activity		
 				if (j == (actslegs.size()-1)) {
 					manager.primaryActivityFound(act, null);
 				}
@@ -234,36 +233,16 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		}
 		return manager.getSubChains();
 	}
-	
-	/* 
-	 * All but one activity type are fixed. No primary activities are moved.
-	 * Needed for the computation of shopping location choice sets.
-	 */
-	public List<SubChain> calcActChainsHavingOneFlexibleActivityType(final Plan plan, String firstOfFlexibleActivityType) {
-		ManageSubchains manager = new ManageSubchains();	
+ 		
+	public List<SubChain> calcActChains(final Plan plan) {
+		if (super.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+			return this.calcActChainsDefinedFixedTypes(plan);
+		}
+		else {
+			return this.calcActChainsBasedOnKnowledge(plan);
+		}
+	}
 		
-		final List<?> actslegs = plan.getPlanElements();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);
-						
-			// found secondary activity
-			if (act.getType().startsWith(firstOfFlexibleActivityType)) {			
-				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
-			}		
-			// found primary activity
-			else {			
-				if (j == (actslegs.size()-1)) {
-					manager.primaryActivityFound(act, null);
-				}
-				else {
-					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
-				}
-			}
-		}
-		return manager.getSubChains();
-	}
-	
-	
 	public ArrayList<ActivityFacility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd, 
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
