@@ -20,12 +20,16 @@
 
 package playground.balmermi;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -76,6 +80,7 @@ public class ScenarioIO {
 		sl.loadActivityFacilities();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading facilities)");
+
 		System.out.println("loading network...");
 		sl.loadNetwork();
 		Gbl.printMemoryUsage();
@@ -93,8 +98,21 @@ public class ScenarioIO {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (transform network)");
 
+		System.out.println("clean network...");
+		new NetworkCleaner().run(network);
+		System.out.println("done. (clean network)");
+
 		System.out.println("complete world...");
-		Gbl.getWorld().complete();
+		Set<String> exTxpes = new TreeSet<String>();
+		exTxpes.add("0-4110-0"); // motorway
+		exTxpes.add("1-4110-0"); // motorway
+		exTxpes.add("2-4130-1"); // ferry
+		exTxpes.add("2-4130-2"); // train
+		exTxpes.add("3-4130-2"); // train
+		exTxpes.add("4-4130-1"); // ferry
+		exTxpes.add("4-4130-2"); // train
+		exTxpes.add("7-4130-1"); // ferry
+		Gbl.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 
