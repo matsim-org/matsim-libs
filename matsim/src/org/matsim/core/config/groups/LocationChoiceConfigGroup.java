@@ -44,6 +44,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String SIMPLE_TG = "simple_tg";
 	private static final String CENTER_NODE = "centerNode";
 	private static final String RADIUS = "radius";
+	private static final String FLEXIBLE_TYPES = "flexible_types";
 
 	//default values
 	private String constrained = "false";
@@ -57,6 +58,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String simple_tg = "false";
 	private String centerNode = "null";
 	private String radius = "null";
+	private String flexible_types = "null";
 	
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 	
@@ -99,6 +101,9 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (RADIUS.equals(key)) {
 			return getRadius();
+		}
+		if (FLEXIBLE_TYPES.equals(key)) {
+			return getFlexibleTypes();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -174,6 +179,7 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 		} else if (SIMPLE_TG.equals(key)) {
 			if (!(value.equals("true") || value.equals("false"))) {
+				log.warn("set 'simple_tg' to either 'true' or 'false'. Set to default value 'false'");
 				setSimpleTG("false");
 			}
 			else {
@@ -181,9 +187,15 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 		} else if (CENTER_NODE.equals(key)) {
 			setCenterNode(value);
-		
 		} else if (RADIUS.equals(key)) {
 			setRadius(value);
+		} else if (FLEXIBLE_TYPES.equals(key)) {
+			if (value.length() == 0) {
+				setFlexibleTypes("null");
+			}
+			else {
+				setFlexibleTypes(value);
+			}		
 		}
 		else		
 		{
@@ -205,6 +217,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, SIMPLE_TG);
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
+		this.addParameterToMap(map, FLEXIBLE_TYPES);
 		return map;
 	}
 
@@ -274,5 +287,11 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setRadius(String radius) {
 		this.radius = radius;
+	}
+	public String getFlexibleTypes() {
+		return flexible_types;
+	}
+	public void setFlexibleTypes(String flexibleTypes) {
+		this.flexible_types = flexibleTypes;
 	}
 }
