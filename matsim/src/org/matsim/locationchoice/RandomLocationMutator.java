@@ -79,11 +79,7 @@ public class RandomLocationMutator extends LocationMutator {
 				int length = this.facilitiesOfType.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {
-					ActivityFacility facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
-					
-					act.setFacility(facility);
-					act.setLink(this.network.getNearestLink(facility.getCoord()));
-					act.setCoord(facility.getCoord());
+					this.setNewLocationForAct(act, length);
 				}		
 			}	
 		}
@@ -99,12 +95,16 @@ public class RandomLocationMutator extends LocationMutator {
 				int length = this.facilitiesOfType.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {
-					ActivityFacility facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];				
-					act.setFacility(facility);
-					act.setLink(this.network.getNearestLink(facility.getCoord()));
-					act.setCoord(facility.getCoord());
+					this.setNewLocationForAct(act, length);
 				}		
 			}	
 		}
+	}
+	
+	private void setNewLocationForAct(Activity act, int length) {
+		ActivityFacility facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];				
+		act.setFacility(facility);
+		act.setLink(this.network.getNearestLink(facility.getCoord()));
+		act.setCoord(facility.getCoord());	
 	}
 }
