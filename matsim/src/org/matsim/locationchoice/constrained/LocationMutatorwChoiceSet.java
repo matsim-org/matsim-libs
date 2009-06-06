@@ -268,7 +268,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
-		return (ArrayList<ActivityFacility>) this.quad_trees.get(type).get(midPointX, midPointY, radius);
+		return (ArrayList<ActivityFacility>) this.quadTreesOfType.get(type).get(midPointX, midPointY, radius);
 	}
 	
 	// for test cases:

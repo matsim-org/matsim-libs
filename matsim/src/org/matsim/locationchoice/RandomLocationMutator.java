@@ -82,12 +82,12 @@ public class RandomLocationMutator extends LocationMutator {
 					
 			// if home is accidentally not defined as primary
 			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
-				int length = this.facilities_of_type.get(act.getType()).length;
+				int length = this.facilitiesOfType.get(act.getType()).length;
 				// only one facility: do not need to do location choice
 				if (length > 1) {
 				//	Facility facility = (Facility)this.quad_trees.get(act.getType()).values().toArray()[
 				//	                       MatsimRandom.random.nextInt(size)];
-					ActivityFacility facility = this.facilities_of_type.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
+					ActivityFacility facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];
 					
 					act.setFacility(facility);
 					act.setLink(this.network.getNearestLink(facility.getCoord()));

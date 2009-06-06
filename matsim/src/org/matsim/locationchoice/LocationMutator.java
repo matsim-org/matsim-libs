@@ -20,29 +20,21 @@
 
 package org.matsim.locationchoice;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.TreesBuilder;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -51,18 +43,20 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 
 	protected NetworkLayer network = null;
 	protected Controler controler = null;	
-	protected TreeMap<String, QuadTree<ActivityFacility>> quad_trees;
+	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType;
 	
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
-	protected TreeMap<String, ActivityFacility []> facilities_of_type;
+	protected TreeMap<String, ActivityFacility []> facilitiesOfType;
 	protected final LocationChoiceConfigGroup config;
+	
+	private DefineFlexibleActivities defineMovablePrimaries = new DefineFlexibleActivities();
 			
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
-		this.quad_trees = new TreeMap<String, QuadTree<ActivityFacility>>();
-		this.facilities_of_type = new TreeMap<String, ActivityFacility []>();
+		this.quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
+		this.facilitiesOfType = new TreeMap<String, ActivityFacility []>();
 		this.config = Gbl.getConfig().locationchoice();
 		this.initLocal(network, controler);		
 	}
@@ -71,72 +65,30 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	public LocationMutator(final NetworkLayer network, final Controler controler, 
 			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
-		this.quad_trees = quad_trees;
-		this.facilities_of_type = facilities_of_type;
+		this.quadTreesOfType = quad_trees;
+		this.facilitiesOfType = facilities_of_type;
 		this.config = Gbl.getConfig().locationchoice();	
 		this.network = network;
 		this.controler = controler;
 	}
 	
-	
-	/*
-	 * Initialize the quadtrees of all available activity types
-	 */
-	private void initTrees(ActivityFacilities facilities) {
-		
-		boolean regionalScenario = false;
-		double radius = 0.0;
-		Node centerNode = null; 
-		
-		if (!Gbl.getConfig().locationchoice().getCenterNode().equals("null") &&
-				!Gbl.getConfig().locationchoice().getRadius().equals("null")) {
-			regionalScenario = true;
-			centerNode = this.network.getNode(new IdImpl(Gbl.getConfig().locationchoice().getCenterNode()));
-			radius = Double.parseDouble(Gbl.getConfig().locationchoice().getRadius());
-		}
-		
-		TreeMap<String, TreeMap<Id, ActivityFacility>> trees = new TreeMap<String, TreeMap<Id, ActivityFacility>>();
-		
-		// get all types of activities
-		for (ActivityFacility f : facilities.getFacilities().values()) {
-			
-			// do not add facility if it is not in region of interest
-			if (regionalScenario && f.calcDistance(centerNode.getCoord()) > radius) continue;
-			
-			Map<String, ActivityOption> activities = f.getActivityOptions();
-			Iterator<ActivityOption> act_it = activities.values().iterator();
-			while (act_it.hasNext()) {
-				ActivityOption act = act_it.next();
-				
-				if (!trees.containsKey(act.getType())) {
-					trees.put(act.getType(), new TreeMap<Id, ActivityFacility>());
-				}
-				trees.get(act.getType()).put(f.getId(), f);
-			}	
-		}
-		
-		// create the quadtrees and the arrays
-		Iterator<TreeMap<Id, ActivityFacility>> tree_it = trees.values().iterator();
-		Iterator<String> type_it = trees.keySet().iterator();
-			
-		while (tree_it.hasNext()) {
-			TreeMap<Id, ActivityFacility> tree_of_type = tree_it.next();
-			String type = type_it.next();
-			
-			// do not construct tree for home act
-			if (type.startsWith("h") || type.startsWith("tta")) continue;
-			this.quad_trees.put(type, this.builFacQuadTree(type, tree_of_type));
-			this.facilities_of_type.put(type, tree_of_type.values().toArray(new ActivityFacility[tree_of_type.size()]));
-		}
-	}
-
 	private void initLocal(final NetworkLayer network, Controler controler) {		
-		//create a quadtree for every activity type
 		this.initTrees(controler.getFacilities());				
 		this.network = network;
 		this.controler = controler;
 	}
-
+		
+	/*
+	 * Initialize the quadtrees of all available activity types
+	 */
+	
+	private void initTrees(ActivityFacilities facilities) {
+		TreesBuilder treesBuilder = new TreesBuilder(this.network);
+		treesBuilder.createTrees(facilities);
+		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
+		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
+	}
+	
 	public abstract void handlePlan(final Plan plan);
 
 
@@ -154,34 +106,6 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		handlePlan(plan);
 	}
 	
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
-		Gbl.startMeasurement();
-		log.info(" building " + type + " facility quad tree");
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
-
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-		}
-		minx -= 1.0;
-		miny -= 1.0;
-		maxx += 1.0;
-		maxy += 1.0;
-		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
-		}
-		log.info("    done");
-		Gbl.printRoundTime();
-		return quadtree;
-	}
-
 	public Controler getControler() {
 		return controler;
 	}
@@ -189,42 +113,8 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	public void setControler(Controler controler) {
 		this.controler = controler;
 	}
-	
-	
-	protected List<Activity>  defineMovablePrimaryActivities(final Plan plan) {
-	
-		List<Activity> primaryActivities = new Vector<Activity>();
 		
-		final List actslegs = plan.getPlanElements();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);
-			if (act.getType().startsWith("h") || act.getType().startsWith("tta")) continue;
-			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			
-			if (isPrimary) {
-				primaryActivities.add(act);
-			}
-		}
-		Collections.shuffle(primaryActivities);
-		
-		List<Activity> movablePrimaryActivities = new Vector<Activity>();
-		
-		// key: activity.type + activity.facility
-		HashMap<String, Boolean> fixPrimaries = new HashMap<String, Boolean>();
-				
-		Iterator<Activity> it = primaryActivities.iterator();
-		while (it.hasNext()) {
-			Activity a = it.next();		
-			String key = a.getType()+a.getFacility().getId().toString();
-			if (fixPrimaries.containsKey(key)) {
-				// there is already one activity performed of the specific type at this location
-				movablePrimaryActivities.add(a);
-			}
-			else {
-				fixPrimaries.put(key, true);
-			}
-		}
-		return movablePrimaryActivities;
+	protected List<Activity>  defineMovablePrimaryActivities(final Plan plan) {				
+		return this.defineMovablePrimaries.getMovablePrimaryActivities(plan);
 	}
-	
 }

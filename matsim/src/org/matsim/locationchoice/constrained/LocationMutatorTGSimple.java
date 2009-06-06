@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
+import java.util.Vector;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
@@ -37,28 +36,35 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.LocationMutator;
+import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 
 public class LocationMutatorTGSimple extends LocationMutator {
 	
 	protected int unsuccessfullLC = 0;
-	private static final Logger log = Logger.getLogger(LocationMutatorTGSimple.class);
+	DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities();
 	
 	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler,
 			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
+		
 		super(network, controler, quad_trees, facilities_of_type);
 	}
 		
 	public void handlePlan(final Plan plan){
 
-		List<Activity> flexibleActivities = defineMovablePrimaryActivities(plan);
-		
-		List<?> actslegs = plan.getPlanElements();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);		
-			if (!plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) && 
-					!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
-				flexibleActivities.add(act);
+		List<Activity> flexibleActivities = new Vector<Activity>();
+		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
+		}
+		else {
+			flexibleActivities = defineMovablePrimaryActivities(plan);			
+			List<?> actslegs = plan.getPlanElements();
+			for (int j = 0; j < actslegs.size(); j=j+2) {
+				final Activity act = (Activity)actslegs.get(j);		
+				if (!plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) && 
+						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
+					flexibleActivities.add(act);
+				}
 			}
 		}
 		
@@ -69,6 +75,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		
 		Collections.shuffle(flexibleActivities);
 		Activity actToMove = flexibleActivities.get(0);
+		List<?> actslegs = plan.getPlanElements();
 		int index = actslegs.indexOf(actToMove);
 		
 		// starting home and ending home are never flexible
@@ -119,7 +126,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;	
 		ArrayList<ActivityFacility> facilitySet = 
-			(ArrayList<ActivityFacility>) this.quad_trees.get(act.getType()).get(midPointX, midPointY, radius);
+			(ArrayList<ActivityFacility>) this.quadTreesOfType.get(act.getType()).get(midPointX, midPointY, radius);
 		
 		ActivityFacility facility = null;
 		if (facilitySet.size() > 1) {
