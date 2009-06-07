@@ -55,9 +55,12 @@ public class RandomLocationMutator extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){	
 		if (super.locationChoiceBasedOnKnowledge) {
+			//log.info("LC based on knowledge");
 			this.handlePlanBasedOnKnowldge(plan);	
 		}
 		else {
+			//log.info("LC based on defined types");
+			//log.info(this.defineFlexibleActivities.getFlexibleTypes());
 			this.handlePlanForPreDefinedFlexibleTypes(plan);	
 		}
 		super.resetRoutes(plan);		
