@@ -1,25 +1,27 @@
 package playground.mmoyo.input;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
-import org.matsim.api.basic.v01.Id;
+import java.util.*;
+
+import org.apache.log4j.Logger;
+
+import org.matsim.api.basic.v01.*;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.api.network.*;
 import org.matsim.core.basic.v01.IdImpl;
+<<<<<<< .mine
+import org.matsim.core.network.*;
+import org.matsim.core.utils.geometry.*;
+=======
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.api.network.Network;   //-->use interfaces
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
+>>>>>>> .r7318
 
-import playground.mmoyo.PTCase2.PTTimeTable2;
-import playground.mmoyo.PTCase2.PTStation;
-import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.PTRouter.PTLine;
+import playground.mmoyo.PTCase2.*;
+import playground.mmoyo.PTRouter.*;
 
 /** 
  * Second version of network factory for the PTCase2 (with no relationship to street network) 
@@ -29,6 +31,9 @@ import playground.mmoyo.PTRouter.PTLine;
  * @param outFileName path of network file to be created
  */ 
 public class PTNetworkFactory2 {
+	private static Logger log = Logger.getLogger(PTNetworkFactory2.class);
+
+	
 	public Map <Id,Double> linkTravelTimeMap = new TreeMap <Id,Double>();
 
 	public PTNetworkFactory2(){
@@ -180,8 +185,34 @@ public class PTNetworkFactory2 {
 		double numLanes = 1;
 		String origId = "0";
 		net.createLink(idLink, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type);
+		
+		// the following moves nodes a bit apart so that all the different links that are on top of each other
+		// get some distance between them.  kai, jun'09
+//		if ( true ) {
+//			double dx = - fromNode.getCoord().getX() + toNode.getCoord().getX() ;
+//			double dy = - fromNode.getCoord().getY() + toNode.getCoord().getY() ;
+//
+//			// normalize
+//			double sqrtTmp = Math.sqrt( dx*dx + dy*dy ) ;
+//			if ( sqrtTmp > 0. ) {
+//				dx = dx / sqrtTmp ;
+//				dy = dy / sqrtTmp ;
+//			} else {
+//				dx = 0. ;
+//				dy = 0. ;
+//			}
+//			
+//			Coord newCoord ; 
+//
+//			newCoord = new CoordImpl( toNode.getCoord().getX() + dy*(0.5+Math.random()) , toNode.getCoord().getY() - dx*(0.5+Math.random()) ) ;
+//			toNode.setCoord( newCoord ) ;
+//
+//			newCoord = new CoordImpl( fromNode.getCoord().getX() + dy*(0.5+Math.random()) , fromNode.getCoord().getY() - dx*(0.5+Math.random()) ) ;
+//			fromNode.setCoord( newCoord ) ;
+//		}
+
 	}
-	
+
 	private void createPTLink(NetworkLayer net, int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
 		//-> use this unique method and eliminate the last two
 		Id id =  new IdImpl(intId);
