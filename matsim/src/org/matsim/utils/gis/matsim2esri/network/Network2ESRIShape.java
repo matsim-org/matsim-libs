@@ -21,27 +21,27 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import org.matsim.api.core.v01.*;
+import org.matsim.core.api.network.*;
+import org.matsim.core.network.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Simple class to convert MATSim network files to ESRI shape files. The network could be written either
  * as line strings or as polygons. Furthermore the width of the links could be calculated according to
  * freespeed, lanes or capacity. For some basic examples please have a look at the <code>main</code> method.
+ * Can also be called as Network2ESRIShape inputNetwork.xml outputAsLines.shp outputAsPolygons.shp .
  *  
  * @author laemmel
+ * 
+ * @keywords converter, network, esri, shp, matsim
  *
  */
 public class Network2ESRIShape {
@@ -78,12 +78,24 @@ public class Network2ESRIShape {
 	}
 
 	public static void main(final String [] args) {
-
-		String netfile = "./examples/equil/network.xml";
+		String netfile = null ;
+		String outputFileLs = null ;
+		String outputFileP = null ;
+		
+		if ( args==null ) {
+			netfile = "./examples/equil/network.xml";
 //		String netfile = "./test/scenarios/berlin/network.xml.gz";
 
-		String outputFileLs = "./plans/networkLs.shp";
-		String outputFileP = "./plans/networkP.shp";
+			outputFileLs = "./plans/networkLs.shp";
+			outputFileP = "./plans/networkP.shp";
+		} else if ( args.length == 3 ) {
+			netfile = args[0] ;
+			outputFileLs = args[1] ;
+			outputFileP  = args[2] ;
+		} else {
+			log.error("Arguments cannot be interpreted.  Aborting ...") ;
+			System.exit(-1) ;
+		}
 		
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -105,7 +117,7 @@ public class Network2ESRIShape {
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Network2ESRIShape(network,outputFileP, builder).write();
-
+		
 	}
 
 }
