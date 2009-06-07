@@ -1,26 +1,21 @@
 package playground.mmoyo.PTCase2;
 
-import java.io.IOException;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.*;
 import org.matsim.core.network.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestCase;
 
-import playground.mmoyo.PTRouter.PTLine;
-import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
+import playground.mmoyo.TransitSimulation.*;
 import playground.mmoyo.Validators.*;
 import playground.mmoyo.input.PTLineAggregator;
-import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
-//import org.matsim.api.basic.v01.Id;
-//import org.matsim.core.basic.v01.IdImpl;
 
 
 /** 
  * Executable class to perform data input, validations and routing test according to timetable information
  */
-public class PTControler2 {
+public class PTControler2 extends MatsimTestCase {
     private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
     //private static final  String path = "C://Users/manuel/Desktop/TU/scenarios/Zuerich/";
     //private static final String path = "C://Users/manuel/Desktop/TU/scenarios/5x5";
@@ -34,6 +29,24 @@ public class PTControler2 {
 	private static final String OUTPUTPLANS= path + "output_plans.xml";
 	private static final String INPTNEWLINES= path + "TestCase/InPTDIVA.xml";
 	private static final String DIVNODES= path + "TestCase/DivNodes.xml";
+	
+	public void test1() {
+		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
+		pt.readPTNet(ZURICHPTN);
+
+		// searches and shows a PT path between two coordinates 
+		Coord coord1 = new CoordImpl(747420, 262794);   
+		Coord coord2 = new CoordImpl(685862, 254136);
+		Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
+		System.out.println(path2.links.size());
+		for (Link link : path2.links){
+			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + link.getType() + link.getToNode().getId() );
+		}
+		
+		assertEquals( 31, path2.links.size() ) ;
+		assertEquals( "1311" , path2.links.get(10).getId().toString() ) ;
+		assertEquals( "250" , path2.links.get(20).getId().toString() ) ;
+	}
 	
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
@@ -78,6 +91,8 @@ public class PTControler2 {
 				ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
 				ptLineAggregator.AddLine();
 	    		pt.writeNet(ZURICHPTN);
+	    		// Is it true that this does not write the network as the comment says?  What does "writeNet" do? kai, jun'09
+	    		
 				break;
 				
 			case -2:  
@@ -92,7 +107,7 @@ public class PTControler2 {
 				break;
 			
 			case -1:
-				/**Creates and writes detached transfer links. This is necessary before routing to get better results */  
+				/* Creates and writes detached transfer links. This is necessary before routing to get better results */  
 				pt.createPTNetWithTLinks(INPTNETFILE);
 				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
 				pt.writeNet(ZURICHPTN);
