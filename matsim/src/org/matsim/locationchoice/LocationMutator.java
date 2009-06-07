@@ -72,6 +72,9 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.config = Gbl.getConfig().locationchoice();	
 		this.network = network;
 		this.controler = controler;
+		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+			locationChoiceBasedOnKnowledge = false;
+		}
 	}
 	
 	private void initLocal(final NetworkLayer network, Controler controler) {	
