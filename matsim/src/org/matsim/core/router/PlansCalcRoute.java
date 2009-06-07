@@ -61,6 +61,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	
 	private LeastCostPathCalculatorFactory factory;
 
+	// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
 	private PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
 	
 	private final NetworkFactory routeFactory;

@@ -44,11 +44,15 @@ public class ReRouteDijkstra extends AbstractMultithreadedModule {
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
+		// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
+		configGroup = new PlansCalcRouteConfigGroup();
 	}
 	
 	public ReRouteDijkstra(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(network, costCalculator, timeCalculator);
 		this.configGroup = configGroup;
+		// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
+		if (this.configGroup == null) { System.err.println(">>> ARE YOU SURE THAT THE PlansCalcRouteConfigGroup IS SET TO NULL??? <<<"); }
 	}
 	
 
