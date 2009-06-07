@@ -21,48 +21,28 @@
 package org.matsim.vis.otfvis.opengl.queries;
 
 import java.awt.Color;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.awt.event.*;
+import java.nio.*;
+import java.util.*;
 
 import javax.media.opengl.GL;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.*;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import com.sun.opengl.util.BufferUtil;
+
+import org.matsim.api.basic.v01.*;
+import org.matsim.core.api.network.*;
+import org.matsim.core.api.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.mobsim.queuesim.*;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFQuery;
-import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
+import org.matsim.vis.otfvis.interfaces.*;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-
-import com.sun.opengl.util.BufferUtil;
 
 public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
@@ -190,21 +170,33 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 	protected void collectLinks(List<Plan> actPersons) {
 		for (Plan plan : actPersons) {
-			List actslegs = plan.getPlanElements();
-			for (int i= 0; i< actslegs.size(); i++) {
-				if( i%2 == 0) {
-					// handle act
-					Activity act = (Activity)plan.getPlanElements().get(i);
-					addLink(act.getLink());
-				} else {
-					// handle leg
-					Leg leg = (Leg)actslegs.get(i);
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-							addLink(link);
+			for ( PlanElement pe : plan.getPlanElements() ) {
+				if ( pe instanceof Activity ) {
+					Activity act = (Activity) pe ;
+					addLink( act.getLink() ) ;
+				} else if ( pe instanceof Leg ) {
+					Leg leg = (Leg) pe ;
+					for ( Link link : ((NetworkRoute) leg.getRoute()).getLinks() ) {
+						addLink(link) ;
 					}
 				}
-
 			}
+			
+//			List actslegs = plan.getPlanElements();
+//			for (int i= 0; i< actslegs.size(); i++) {
+//				if( i%2 == 0) {
+//					// handle act
+//					Activity act = (Activity)plan.getPlanElements().get(i);
+//					addLink(act.getLink());
+//				} else {
+//					// handle leg
+//					Leg leg = (Leg)actslegs.get(i);
+//					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+//							addLink(link);
+//					}
+//				}
+//
+//			}
 
 		}
 	}
