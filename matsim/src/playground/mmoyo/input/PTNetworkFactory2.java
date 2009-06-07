@@ -4,21 +4,12 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.api.basic.v01.*;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.*;
 import org.matsim.core.basic.v01.IdImpl;
-<<<<<<< .mine
 import org.matsim.core.network.*;
-import org.matsim.core.utils.geometry.*;
-=======
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.api.network.Network;   //-->use interfaces
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
->>>>>>> .r7318
 
 import playground.mmoyo.PTCase2.*;
 import playground.mmoyo.PTRouter.*;
