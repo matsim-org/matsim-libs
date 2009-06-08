@@ -35,6 +35,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 
@@ -52,8 +53,55 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		
 	public void handlePlan(final Plan plan){
 
+		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
+		
+		if (flexibleActivities.size() == 0) {
+			this.unsuccessfullLC++;
+			return;
+		}	
+		Collections.shuffle(flexibleActivities);
+		Activity actToMove = flexibleActivities.get(0);
+		List<?> actslegs = plan.getPlanElements();
+		int indexOfActToMove = actslegs.indexOf(actToMove);
+		
+		// starting home and ending home are never flexible
+		final Leg legPre = (Leg)actslegs.get(indexOfActToMove -1);
+		final Leg legPost = (Leg)actslegs.get(indexOfActToMove + 1);
+		final Activity actPre = (Activity)actslegs.get(indexOfActToMove - 2);
+		final Activity actPost = (Activity)actslegs.get(indexOfActToMove + 2);
+		
+		double travelDistancePre = 0.0;
+		double travelDistancePost = 0.0;
+		
+		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
+			travelDistancePre = legPre.getRoute().getDistance();
+		}
+		else {
+			travelDistancePre = ((CoordImpl)actPre).calcDistance(actToMove.getCoord());
+		}
+		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
+			travelDistancePost = legPost.getRoute().getDistance();
+		}
+		else {
+			travelDistancePost = ((CoordImpl)actToMove.getCoord()).calcDistance(actPost.getCoord());
+		}
+		double radius =  0.5 * (travelDistancePre + travelDistancePost);
+				
+		if (Double.isNaN(radius)) {
+			this.unsuccessfullLC++;
+			return;
+		}
+		
+		if (!this.modifyLocation(actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
+			this.unsuccessfullLC++;
+			return;
+		}
+		super.resetRoutes(plan);
+	}
+	
+	private List<Activity> getFlexibleActivities(final Plan plan) {
 		List<Activity> flexibleActivities = new Vector<Activity>();
-		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+		if (!super.locationChoiceBasedOnKnowledge) {
 			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		}
 		else {
@@ -67,61 +115,9 @@ public class LocationMutatorTGSimple extends LocationMutator {
 				}
 			}
 		}
-		
-		if (flexibleActivities.size() == 0) {
-			this.unsuccessfullLC++;
-			return;
-		}
-		
-		Collections.shuffle(flexibleActivities);
-		Activity actToMove = flexibleActivities.get(0);
-		List<?> actslegs = plan.getPlanElements();
-		int index = actslegs.indexOf(actToMove);
-		
-		// starting home and ending home are never flexible
-		final Leg legPre = (Leg)actslegs.get(index -1);
-		final Leg legPost = (Leg)actslegs.get(index + 1);
-		final Activity actPre = (Activity)actslegs.get(index - 2);
-		final Activity actPost = (Activity)actslegs.get(index + 2);
-		
-		double travelDistancePre = 0.0;
-		double travelDistancePost = 0.0;
-		
-		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePre = legPre.getRoute().getDistance() + legPost.getRoute().getDistance();
-		}
-		else {
-			travelDistancePre = Math.sqrt(Math.pow(actPre.getCoord().getX() - actToMove.getCoord().getX(), 2.0) +
-				Math.pow(actPre.getCoord().getY() - actToMove.getCoord().getY(), 2.0));
-		}
-		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePost = legPre.getRoute().getDistance() + legPost.getRoute().getDistance();
-		}
-		else {
-			travelDistancePost = Math.sqrt(Math.pow(actPost.getCoord().getX() - actToMove.getCoord().getX(), 2.0) +
-				Math.pow(actPost.getCoord().getY() - actToMove.getCoord().getY(), 2.0));
-		}
-		double radius =  0.5 * (travelDistancePre + travelDistancePost);
-				
-		if (Double.isNaN(radius)) {
-			this.unsuccessfullLC++;
-			return;
-		}
-		
-		if (!this.modifyLocation(actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
-			this.unsuccessfullLC++;
-			return;
-		}
-		
-		actslegs = plan.getPlanElements();
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (int j = 1; j < actslegs.size(); j=j+2) {
-			final Leg leg = (Leg)actslegs.get(j);
-			leg.setRoute(null);
-		}
+		return flexibleActivities;
 	}
-		
+			
 	protected boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius) {		
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;	
@@ -148,22 +144,6 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	
 	public void resetUnsuccsessfull() {
 		this.unsuccessfullLC = 0;
-	}
-	
+	}	
 }
-
-
-/*
-log.info("--------------------------------------------");
-log.info("Person " + plan.getPerson().getId());
-log.info("facility " + actToMove.getFacilityId());
-log.info("tdPre " + travelDistancePre);
-log.info("tdPost" + travelDistancePost);
-log.info(actPre);
-log.info(actPost);
-log.info(legPre.getRoute());
-log.info(legPost.getRoute());
-log.info(legPre.getMode());
-log.info(legPost.getMode());
-*/
 
