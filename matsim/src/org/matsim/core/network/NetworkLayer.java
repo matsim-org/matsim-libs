@@ -20,12 +20,19 @@
 
 package org.matsim.core.network;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.basic.v01.*;
-import org.matsim.core.api.network.*;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.api.network.NetworkBuilder;
+import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.world.Layer;
@@ -124,9 +131,6 @@ public class NetworkLayer extends Layer implements Network {
 	 * @param capPeriod the capacity-period in seconds
 	 */
 	public final void setCapacityPeriod(final double capPeriod) {
-		if (this.capperiod != Integer.MIN_VALUE) {
-			log.warn(this + "[capperiod=" + this.capperiod + " already set. Will be overwritten with " + capPeriod + "]");
-		}
 		this.capperiod = (int) capPeriod;
 	}
 
@@ -444,7 +448,7 @@ public class NetworkLayer extends Layer implements Network {
 	 *
 	 * @param node Node to be removed.
      * @return <tt>true</tt> if the specified node is part of the network and
-     * is successfully removed AND all incient links are removed successfully
+     * is successfully removed AND all incident links are removed successfully
      *
 	 */
 	public boolean removeNode(final Node node) {
