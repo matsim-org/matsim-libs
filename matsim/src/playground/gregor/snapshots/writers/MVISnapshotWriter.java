@@ -57,6 +57,7 @@ import playground.gregor.otf.InundationDataFromBinaryFileReader;
 import playground.gregor.otf.InundationDataFromNetcdfReader;
 import playground.gregor.otf.InundationDataReader;
 import playground.gregor.otf.InundationDataWriter;
+import playground.gregor.otf.OTFScaleBarDrawer;
 import playground.gregor.otf.PolygonDataReader;
 import playground.gregor.otf.PolygonDataReaderII;
 import playground.gregor.otf.PolygonDataWriter;
@@ -121,11 +122,15 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		connect.add(PolygonDataWriterII.class,PolygonDataReaderII.class);
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
+		
 		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.NoQuadDrawer.class);
 		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangRegionDrawer.class);
-		connect.add(OGLAgentPointLayer.AgentPadangRegionDrawer.class, OGLAgentPointLayer.class);
+		
+		connect.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
+		connect.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
+		
+		
 		connect.add(SimpleStaticNetLayer.NoQuadDrawer.class, SimpleStaticNetLayer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
