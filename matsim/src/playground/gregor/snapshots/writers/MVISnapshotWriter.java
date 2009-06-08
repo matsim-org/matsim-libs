@@ -74,6 +74,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
+	private boolean insertWave = true;
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, net, outFileName);
@@ -90,7 +91,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	@Override
 	protected void onAdditionalQuadData(OTFConnectionManager connect) {
 		this.quad.addAdditionalElement(this.writer);
-		this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
+		if (insertWave ) this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
 		
 		try {
 			this.quad.addAdditionalElement(new PolygonDataWriterII(ShapeFileReader.readDataFile(REGION_FILE),regionColor));
@@ -125,8 +126,10 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		//		connect.add(InundationDataReader.class,Dummy.class);
 		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
 		connect.add(TextureDataWriter.class,TextutreDataReader.class);
-		connect.add(InundationDataWriter.class,InundationDataReader.class);
-		connect.add(InundationDataReader.class,Dummy.class);
+		if (insertWave) {
+			connect.add(InundationDataWriter.class,InundationDataReader.class);
+			connect.add(InundationDataReader.class,Dummy.class);
+		}
 	}
 
 	//	public static double myParseDouble(String rep) {
