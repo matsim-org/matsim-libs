@@ -43,7 +43,7 @@ public class OTFSnapshotGenerator {
 
 	public void run() {
 		
-		
+		PositionInfo.setLANE_WIDTH(this.scenario.getNetwork().getEffectiveLaneWidth());
 		
 		Events ev = new Events();
 		DestinationDependentColorizer d = new DestinationDependentColorizer();

@@ -37,7 +37,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 
 
 	//	public enum VehicleState {Driving, Parking};
-	private static final double LANE_WIDTH = 3.5;//TODO lane width is no longer static but it is defined in network. The question is,
+	private static double LANE_WIDTH = 0.71;//TODO lane width is no longer static but it is defined in network. The question is,
 																						//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone
 																						//would be comfortable with this idea? Is there a solution to do this in a strict OO manner 
 																						//(without a static Gbl)? [GL] - april 08 
@@ -201,6 +201,10 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 	
 	public int getUserData() {
 		return this.usr;
+	}
+
+	public static void setLANE_WIDTH(double lANE_WIDTH) {
+		LANE_WIDTH = lANE_WIDTH;
 	}
 
 }
