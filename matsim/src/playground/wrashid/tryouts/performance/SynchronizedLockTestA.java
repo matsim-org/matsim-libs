@@ -37,7 +37,7 @@ public class SynchronizedLockTestA {
 					// in particular, as the number is varying.
 					
 					// need to take the average of the ratios between the threads, as fluctuating.
-					// 
+					// satwal is much fairer in the long run -> we have less fluctuations there...
 					if (globalCounter < endTime) {
 						counter++;
 						globalCounter += 1;
