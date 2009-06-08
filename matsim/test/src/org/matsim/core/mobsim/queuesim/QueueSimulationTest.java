@@ -29,6 +29,8 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
@@ -49,7 +51,6 @@ import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -227,9 +228,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals("wrong link in 4th event.", f.link1.getId(), ((ActivityStartEvent) collector.events.get(3)).getLinkId());
 	}
 
-	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
-		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
-		public void handleEvent(final LinkEnterEvent event) {
+	/*package*/ static class LinkEnterEventCollector implements BasicLinkEnterEventHandler {
+		public final ArrayList<BasicLinkEnterEvent> events = new ArrayList<BasicLinkEnterEvent>();
+		public void handleEvent(final BasicLinkEnterEvent event) {
 			this.events.add(event);
 		}
 		public void reset(final int iteration) {
@@ -736,14 +737,14 @@ public class QueueSimulationTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private final static class EnterLinkEventCounter implements LinkEnterEventHandler {
+	private final static class EnterLinkEventCounter implements BasicLinkEnterEventHandler {
 		private final String linkId;
 		private int counter = 0;
 		public EnterLinkEventCounter(final String linkId) {
 			this.linkId = linkId;
 		}
 
-		public void handleEvent(final LinkEnterEvent event) {
+		public void handleEvent(final BasicLinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) this.counter++;
 		}
 

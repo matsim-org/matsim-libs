@@ -26,6 +26,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
@@ -39,12 +43,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
@@ -137,7 +137,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 * 
 	 * @author mrieser
 	 */
-	private static class LinkAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class LinkAnalyzer implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
 		private final String linkId;
 		protected double firstCarEnter = Double.POSITIVE_INFINITY;
 		protected double lastCarEnter = Double.NEGATIVE_INFINITY;
@@ -170,7 +170,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.leaveTimes.clear();
 		}
 
-		public void handleEvent(final LinkEnterEvent event) {
+		public void handleEvent(final BasicLinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.enterTimes.add(Double.valueOf(event.getTime()));
 				if (event.getTime() < this.firstCarEnter) this.firstCarEnter = event.getTime();
@@ -178,7 +178,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final LinkLeaveEvent event) {
+		public void handleEvent(final BasicLinkLeaveEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.leaveTimes.add(Double.valueOf(event.getTime()));
 				if (event.getTime() < this.firstCarLeave) this.firstCarLeave = event.getTime();

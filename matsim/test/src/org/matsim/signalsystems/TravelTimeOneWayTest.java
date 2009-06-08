@@ -21,6 +21,8 @@ package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
@@ -33,8 +35,6 @@ import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -159,11 +159,11 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 	}
 
 
-	/*package*/ static class StubLinkEnterEventHandler implements LinkEnterEventHandler {
+	/*package*/ static class StubLinkEnterEventHandler implements BasicLinkEnterEventHandler {
 
 		public MeasurementPoint beginningOfLink2 = null;
 		
-		public void handleEvent(LinkEnterEvent event) {
+		public void handleEvent(BasicLinkEnterEvent event) {
 			// log.info("link enter event id :" + event.linkId);
 			if (event.getLinkId().toString().equalsIgnoreCase("2")) {
 				if (this.beginningOfLink2 == null) {

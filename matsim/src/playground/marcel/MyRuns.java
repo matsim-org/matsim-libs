@@ -54,11 +54,11 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcLanes;
@@ -579,31 +579,6 @@ public class MyRuns {
 		}
 	}
 
-	public static void createQVDiagramm(final String[] args) {
-
-		String[] links = { "101207", "101208", "105683", "105684", "105651", "106505", "106506", "106427", "106428", "110579", "110580", "111609" };
-//		String[] links = { "106505" };
-		QVDiagramm qvds[] = new QVDiagramm[links.length];
-
-		ScenarioLoader loader = new ScenarioLoader(args[0]);
-		Scenario data = loader.getScenario();
-		Config config = data.getConfig();
-		loader.loadNetwork();
-		
-		Events events = new Events();
-		NetworkLayer network = (NetworkLayer) data.getNetwork();
-		for (int i = 0; i < links.length; i++) {
-			qvds[i] = new QVDiagramm(network, links[i]);
-			events.addHandler(qvds[i]);
-		}
-
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-
-		for (int i = 0; i < links.length; i++) {
-			qvds[i].writeGraph("link" + links[i] + "_qv.png");
-		}
-	}
-
 	public static void someTest(final String[] args) {
 
 //		CoordinateTransformation transformation = new SoldnerBerlinToWGS84();
@@ -611,11 +586,29 @@ public class MyRuns {
 //		Coord wgs84 = transformation.transform(alexanderplatz);
 //		System.out.println(wgs84.getX() + " / " + wgs84.getY()); // expected: 13.41 / 52.52
 		
-		Gbl.printSystemInfo();
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/navteq/network.xml.gz");
-
+//		Gbl.printSystemInfo();
+//		NetworkLayer network = new NetworkLayer();
+//		new MatsimNetworkReader(network).readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/navteq/network.xml.gz");
+		
+//		Controler controler = new Controler(new String[] {"test/scenarios/berlin/config.xml"});
+//		controler.run();
+		
+//		ArrayList<Integer> list = new ArrayList<Integer>();
+//		list.add(new Integer(5));
+//		System.out.println(list.size());
+//		someMethod(list);
+//		System.out.println(list.size());
+		
+		Double d = null;
+		System.out.println("some value: " + d);
+		
 	}
+	
+//	public static void someMethod(List<Integer> list) {
+//		System.out.println(list.size());
+//		list = new ArrayList<Integer>();
+//		System.out.println(list.size());
+//	}
 
 	//////////////////////////////////////////////////////////////////////
 	// main
@@ -704,7 +697,6 @@ public class MyRuns {
 //		randomWalk(10000);
 //		readCounts(args);
 //		writeKml();
-//		createQVDiagramm(args);
 //		runSimulation();
 		someTest(args);
 

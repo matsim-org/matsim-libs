@@ -23,15 +23,14 @@ package playground.marcel;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYScatterChart;
 
 /**
@@ -42,16 +41,16 @@ import org.matsim.core.utils.charts.XYScatterChart;
  *
  * @author mrieser
  */
-public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
+public class QVDiagramm implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler {
 
 	/** The id of the link we're interesetd in. */
-	private final String linkId;
+	private final Id linkId;
 
 	/** The length of the link. */
 	private final double linkLength;
 
 	/** Stores the times agents entered the link (TreeMap<AgentId, EnterTime>). */
-	private final TreeMap<String, Double> agents = new TreeMap<String, Double>(); // agentId, enterTime
+	private final TreeMap<Id, Double> agents = new TreeMap<Id, Double>(); // agentId, enterTime
 
 	/** Stores the traffic flow values to be plotted. */
 	private final ArrayList<Double> qValues = new ArrayList<Double>();
@@ -76,28 +75,27 @@ public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler,
 	/** The sum of all speeds of vehicles in this time bin. Used to calculate the average speed in this time bin. */
 	private double speedSum = 0;
 
-	public QVDiagramm(final NetworkLayer network, final String linkId) {
-		this.linkId = linkId;
-		Link link = network.getLink(new IdImpl(linkId));
+	public QVDiagramm(final Link link) {
+		this.linkId = link.getId();
 		this.linkLength = link.getLength();
 	}
 
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 		// Store the enter time of this agent if it's on the link we're interested in.
-		if (this.linkId.equals(event.getLinkId().toString())) {
-			this.agents.put(event.getPersonId().toString(), Double.valueOf(event.getTime()));
+		if (this.linkId.equals(event.getLinkId())) {
+			this.agents.put(event.getPersonId(), Double.valueOf(event.getTime()));
 		}
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		// delete the enter time, because the agent won't leave this link for a while now...
-		if (this.linkId.equals(event.getLinkId().toString())) {
-			this.agents.remove(event.getPersonId().toString());
+		if (this.linkId.equals(event.getLinkId())) {
+			this.agents.remove(event.getPersonId());
 		}
 	}
 
-	public void handleEvent(final LinkLeaveEvent event) {
-		if (this.linkId.equals(event.getLinkId().toString())) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
+		if (this.linkId.equals(event.getLinkId())) {
 			if ((int)event.getTime() / this.binSize != this.timeBinIndex) {
 				// the event is from a new time bin, finish the old one.
 				this.updateGraphValues();
@@ -105,7 +103,7 @@ public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler,
 			}
 			// we have one more vehicle leaving this link
 			this.flowCount++;
-			Double enterTime = this.agents.remove(event.getPersonId().toString());
+			Double enterTime = this.agents.remove(event.getPersonId());
 			if (enterTime == null) return;
 			// we have the enter time of this vehicle, calculate its speed.
 			double traveltime = event.getTime() - enterTime.doubleValue();
