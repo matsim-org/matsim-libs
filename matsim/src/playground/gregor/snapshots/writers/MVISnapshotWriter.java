@@ -20,23 +20,13 @@
 
 package playground.gregor.snapshots.writers;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -48,16 +38,11 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
-import org.matsim.vis.snapshots.writers.PositionInfo;
-import org.matsim.world.World;
 
-import playground.gregor.otf.ConfluenceArrowsFromEvents;
 import playground.gregor.otf.Dummy;
 import playground.gregor.otf.InundationDataFromBinaryFileReader;
-import playground.gregor.otf.InundationDataFromNetcdfReader;
 import playground.gregor.otf.InundationDataReader;
 import playground.gregor.otf.InundationDataWriter;
-import playground.gregor.otf.OTFScaleBarDrawer;
 import playground.gregor.otf.PolygonDataReader;
 import playground.gregor.otf.PolygonDataReaderII;
 import playground.gregor.otf.PolygonDataWriter;
