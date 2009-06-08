@@ -1,21 +1,26 @@
 package playground.mmoyo.PTCase2;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.*;
-import org.matsim.core.network.*;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Node;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
 
-import playground.mmoyo.TransitSimulation.*;
-import playground.mmoyo.Validators.*;
+import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
+import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
+import playground.mmoyo.Validators.NetValidator;
+import playground.mmoyo.Validators.PTLineValidator;
+import playground.mmoyo.Validators.StationValidator;
 import playground.mmoyo.input.PTLineAggregator;
 
 
 /** 
  * Executable class to perform data input, validations and routing test according to timetable information
  */
-public class PTControler2 extends MatsimTestCase {
+public class PTControler2 /*extends MatsimTestCase*/ { // classes using MatsimTestCase must be in the test/src-directory!
     private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
     //private static final  String path = "C://Users/manuel/Desktop/TU/scenarios/Zuerich/";
     //private static final String path = "C://Users/manuel/Desktop/TU/scenarios/5x5";
@@ -30,23 +35,24 @@ public class PTControler2 extends MatsimTestCase {
 	private static final String INPTNEWLINES= path + "TestCase/InPTDIVA.xml";
 	private static final String DIVNODES= path + "TestCase/DivNodes.xml";
 	
-	public void test1() {
-		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
-		pt.readPTNet(ZURICHPTN);
-
-		// searches and shows a PT path between two coordinates 
-		Coord coord1 = new CoordImpl(747420, 262794);   
-		Coord coord2 = new CoordImpl(685862, 254136);
-		Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
-		System.out.println(path2.links.size());
-		for (Link link : path2.links){
-			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + link.getType() + link.getToNode().getId() );
-		}
-		
-		assertEquals( 31, path2.links.size() ) ;
-		assertEquals( "1311" , path2.links.get(10).getId().toString() ) ;
-		assertEquals( "250" , path2.links.get(20).getId().toString() ) ;
-	}
+	// disabled this test-case. Tests must be in test/src/*, otherwise the code doesn't compile.  marcel/8jun2009
+//	public void test1() {
+//		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
+//		pt.readPTNet(ZURICHPTN);
+//
+//		// searches and shows a PT path between two coordinates 
+//		Coord coord1 = new CoordImpl(747420, 262794);   
+//		Coord coord2 = new CoordImpl(685862, 254136);
+//		Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
+//		System.out.println(path2.links.size());
+//		for (Link link : path2.links){
+//			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + link.getType() + link.getToNode().getId() );
+//		}
+//		
+//		assertEquals( 31, path2.links.size() ) ;
+//		assertEquals( "1311" , path2.links.get(10).getId().toString() ) ;
+//		assertEquals( "250" , path2.links.get(20).getId().toString() ) ;
+//	}
 	
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
