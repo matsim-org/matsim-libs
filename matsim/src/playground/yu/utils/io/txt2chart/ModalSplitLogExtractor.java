@@ -17,18 +17,18 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class ModalSplitLogExtractor {
-	private List<Double> carFracs = new ArrayList<Double>();
-	private List<Double> ptFracs = new ArrayList<Double>();
-	private List<Double> wlkFracs = new ArrayList<Double>();
-	private List<Double> bikeFracs = new ArrayList<Double>();
-	private List<Double> undefinedFracs = new ArrayList<Double>();
-	private int maxIter;
+	private final List<Double> carFracs = new ArrayList<Double>();
+	private final List<Double> ptFracs = new ArrayList<Double>();
+	private final List<Double> wlkFracs = new ArrayList<Double>();
+	private final List<Double> bikeFracs = new ArrayList<Double>();
+	private final List<Double> undefinedFracs = new ArrayList<Double>();
+	private final int maxIter;
 
 	public int getMaxIter() {
 		return maxIter;
 	}
 
-	public ModalSplitLogExtractor(int n) {
+	public ModalSplitLogExtractor(final int n) {
 		maxIter = n;
 		for (int i = 0; i < n; i++) {
 			carFracs.add(i, Double.valueOf(0));
@@ -39,27 +39,27 @@ public class ModalSplitLogExtractor {
 		}
 	}
 
-	public void addCar(int idx, String carFrac) {
+	public void addCar(final int idx, final String carFrac) {
 		carFracs.set(idx, Double.valueOf(carFrac));
 	}
 
-	public void addPt(int idx, String ptFrac) {
+	public void addPt(final int idx, final String ptFrac) {
 		ptFracs.set(idx, Double.valueOf(ptFrac));
 	}
 
-	public void addWalk(int idx, String walkFrac) {
+	public void addWalk(final int idx, final String walkFrac) {
 		wlkFracs.set(idx, Double.valueOf(walkFrac));
 	}
 
-	public void addBike(int idx, String bikeFrac) {
+	public void addBike(final int idx, final String bikeFrac) {
 		bikeFracs.set(idx, Double.valueOf(bikeFrac));
 	}
 
-	public void addUndefined(int idx, String undefinedFrac) {
+	public void addUndefined(final int idx, final String undefinedFrac) {
 		undefinedFracs.set(idx, Double.valueOf(undefinedFrac));
 	}
 
-	private static String extractFrac(String line) {
+	private static String extractFrac(final String line) {
 		String[] words = line.split("\t");
 		String frac = words[words.length - 1];
 		return frac.substring(0, frac.length() - 1);
@@ -70,21 +70,22 @@ public class ModalSplitLogExtractor {
 	 *            , which must contains "ITERATION " and " BEGINS"
 	 * @return ITERATION-No.
 	 */
-	private static int getCount(String line) {
+	private static int getCount(final String line) {
 		String[] words = line.split(" ");
 		return Integer.parseInt(words[words.length - 2]);
 	}
 
-	private static void readLog(String logFilename, ModalSplitLogExtractor msle) {
+	private static void readLog(final String logFilename,
+			final ModalSplitLogExtractor msle) {
 		SimpleReader sr = new SimpleReader(logFilename);
 		String line = sr.readLine();
 		int count = -1;
 		while (line != null) {
 			line = sr.readLine();
-			if (line != null) {
-				if (line.contains("ITERATION ") && line.contains(" BEGINS")) {
+			if (line != null)
+				if (line.contains("ITERATION ") && line.contains(" BEGINS"))
 					count = getCount(line);
-				} else if (line.contains("car legs")) {
+				else if (line.contains("car legs")) {
 					if (count > -1)
 						msle.addCar(count, extractFrac(line));
 				} else if (line.contains("pt legs")) {
@@ -100,16 +101,14 @@ public class ModalSplitLogExtractor {
 					if (count > -1)
 						msle.addUndefined(count, extractFrac(line));
 				} else if (line.contains("ITERATION ")
-						&& line.contains(" ENDS")) {
+						&& line.contains(" ENDS"))
 					count = -1;
-				}
-			}
 		}
 		sr.close();
 	}
 
-	private static void writeMode(String chartFilename, String outputFilename,
-			ModalSplitLogExtractor msle) {
+	private static void writeMode(final String chartFilename,
+			final String outputFilename, final ModalSplitLogExtractor msle) {
 		int maxIter = msle.getMaxIter();
 		double xs[] = new double[maxIter];
 		double carFracs[] = new double[maxIter];
@@ -120,24 +119,24 @@ public class ModalSplitLogExtractor {
 
 		for (int i = 0; i < maxIter; i++) {
 			xs[i] = i;
-			Double carFrac = (i < msle.carFracs.size()) ? msle.carFracs.get(i)
+			Double carFrac = i < msle.carFracs.size() ? msle.carFracs.get(i)
 					: null;
 			if (carFrac != null)
 				carFracs[i] = carFrac;
 
-			Double ptFrac = (i < msle.ptFracs.size()) ? msle.ptFracs.get(i)
+			Double ptFrac = i < msle.ptFracs.size() ? msle.ptFracs.get(i)
 					: null;
 			if (ptFrac != null)
 				ptFracs[i] = ptFrac;
-			Double wlkFrac = (i < msle.wlkFracs.size()) ? msle.wlkFracs.get(i)
+			Double wlkFrac = i < msle.wlkFracs.size() ? msle.wlkFracs.get(i)
 					: null;
 			if (wlkFrac != null)
 				wlkFracs[i] = wlkFrac;
-			Double bikeFrac = (i < msle.bikeFracs.size()) ? msle.bikeFracs
-					.get(i) : null;
+			Double bikeFrac = i < msle.bikeFracs.size() ? msle.bikeFracs.get(i)
+					: null;
 			if (bikeFrac != null)
 				bikeFracs[i] = bikeFrac;
-			Double undefinedFrac = (i < msle.undefinedFracs.size()) ? msle.undefinedFracs
+			Double undefinedFrac = i < msle.undefinedFracs.size() ? msle.undefinedFracs
 					.get(i)
 					: null;
 			if (undefinedFrac != null)
@@ -174,18 +173,19 @@ public class ModalSplitLogExtractor {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		String filenameBase = "../matsimTests/changeLegModeTests/";
-		String logFilename = filenameBase + "logfile.log";
+	public static void main(final String[] args) {
+		String filenameBase = "../runs-svn/run689/";
+		// String logFilename = filenameBase + "logfile.log";
+		String logFilename = "../runs-svn/run669/logfile.txt";
 		String chartFilename = filenameBase + "legModeChart.png";
 		String outputFilename = filenameBase + "legMode.txt";
-//		String logFilename2 = filenameBase + "logfile2.log";
+		String logFilename2 = filenameBase + "logfile.log";
 		// String logFilename3 = filenameBase + "logfile2.log";
-		int maxIter = 501;
+		int maxIter = 1001;
 		ModalSplitLogExtractor msle = new ModalSplitLogExtractor(maxIter);
 		// reading
 		readLog(logFilename, msle);
-//		readLog(logFilename2, msle);
+		readLog(logFilename2, msle);
 		// readLog(logFilename3, msle);
 		// writing
 		writeMode(chartFilename, outputFilename, msle);

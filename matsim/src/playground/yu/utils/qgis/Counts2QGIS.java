@@ -35,8 +35,8 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 	public static class Counts2PolygonGraph extends Network2PolygonGraph {
 		private Set<Id> linkIds = null;
 
-		public Counts2PolygonGraph(NetworkLayer network,
-				CoordinateReferenceSystem crs, Set<Id> linkIds) {
+		public Counts2PolygonGraph(final NetworkLayer network,
+				final CoordinateReferenceSystem crs, final Set<Id> linkIds) {
 			super(network, crs);
 			this.linkIds = linkIds;
 		}
@@ -50,9 +50,8 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 			for (Id linkId : linkIds) {
 				Link link = network.getLink(linkId);
 				LinearRing lr = getLinearRing(link);
-				Polygon p = new Polygon(lr, null, this.geofac);
-				MultiPolygon mp = new MultiPolygon(new Polygon[] { p },
-						this.geofac);
+				Polygon p = new Polygon(lr, null, geofac);
+				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
 				int size = 8 + parameters.size();
 				Object[] o = new Object[size];
 				o[0] = mp;
@@ -62,12 +61,11 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 				o[4] = link.getLength();
 				o[5] = link.getCapacity(Time.UNDEFINED_TIME)
 						/ network.getCapacityPeriod() * 3600.0;
-				o[6] = (link.getType() != null) ? Integer.parseInt(link
-						.getType()) : 0;
+				o[6] = link.getType() != null ? Integer
+						.parseInt(link.getType()) : 0;
 				o[7] = link.getFreespeed(0);
-				for (int i = 0; i < parameters.size(); i++) {
+				for (int i = 0; i < parameters.size(); i++)
 					o[i + 8] = parameters.get(i).get(link.getId());
-				}
 				// parameters.get(link.getId().toString()) }
 				Feature ft = ftRoad.create(o, "network");
 				features.add(ft);
@@ -76,7 +74,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 		}
 
 		@Override
-		protected double getLinkWidth(BasicLink link) {
+		protected double getLinkWidth(final BasicLink link) {
 			return super.getLinkWidth(link) * 2.0;
 		}
 
@@ -84,7 +82,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 
 	protected Counts counts;
 
-	protected Set<Id> readCounts(String countsFilename) {
+	protected Set<Id> readCounts(final String countsFilename) {
 		counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);
 		System.out.println("size :\t" + counts.getCounts().keySet().size());
@@ -94,11 +92,11 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		String netFilename = "../berlin/network/bb_cl.xml.gz";
-		String countsFilename = "../berlin/counts/counts4bb_cl.xml";
+		String netFilename = "../berlin/network/bb_4.xml.gz";
+		String countsFilename = "../berlin/counts/counts4bb_4.xml";
 
 		Counts2QGIS c2q = new Counts2QGIS();
 		c2q.readNetwork(netFilename);

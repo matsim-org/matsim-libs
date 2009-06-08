@@ -46,8 +46,8 @@ import org.xml.sax.SAXException;
 
 import playground.yu.analysis.DailyDistance;
 import playground.yu.utils.CollectionSum;
-import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
+import playground.yu.utils.io.charts.PieChart;
 
 /**
  * compute daily distance of Zurich and Kanton Zurich respectively with through
@@ -65,21 +65,22 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 	private double[] throughDayDistanceCounts;
 
 	public DailyDistance4Zrh() {
-		this.throughWorkDist = 0.0;
-		this.throughEducDist = 0.0;
-		this.throughShopDist = 0.0;
-		this.throughLeisDist = 0.0;
-		this.throughHomeDist = 0.0;
-		this.throughOtherDist = 0.0;
+		throughWorkDist = 0.0;
+		throughEducDist = 0.0;
+		throughShopDist = 0.0;
+		throughLeisDist = 0.0;
+		throughHomeDist = 0.0;
+		throughOtherDist = 0.0;
 	}
 
-	public DailyDistance4Zrh(RoadPricingScheme toll) {
+	public DailyDistance4Zrh(final RoadPricingScheme toll) {
 		this();
 		throughLegDistanceCounts = new double[101];
 		throughDayDistanceCounts = new double[101];
 		this.toll = toll;
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
@@ -88,7 +89,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		double othersDayDist = 0.0;
 		double throughDayDist = 0.0;
 
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof Leg) {
 				Leg bl = (Leg) pe;
 				ActType ats = null;
@@ -108,105 +109,105 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				double dist = bl.getRoute().getDistance() / 1000.0;
 				// if (bl.getDepartureTime() < 86400)
 
-				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
-					this.throughDist += dist;
+				if (Long.parseLong(person.getId().toString()) > 1000000000) {
+					throughDist += dist;
 					throughDayDist += dist;
 					switch (ats) {
 					case home:
-						this.throughHomeDist += dist;
+						throughHomeDist += dist;
 						break;
 					case work:
-						this.throughWorkDist += dist;
+						throughWorkDist += dist;
 						break;
 					case education:
-						this.throughEducDist += dist;
+						throughEducDist += dist;
 						break;
 					case shopping:
-						this.throughShopDist += dist;
+						throughShopDist += dist;
 						break;
 					case leisure:
-						this.throughLeisDist += dist;
+						throughLeisDist += dist;
 						break;
 					default:
-						this.throughOtherDist += dist;
+						throughOtherDist += dist;
 						break;
 					}
 					throughLegDistanceCounts[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(TransportMode.car)) {
-					this.carDist += dist;
+					carDist += dist;
 					carDayDist += dist;
 					switch (ats) {
 					case home:
-						this.carHomeDist += dist;
+						carHomeDist += dist;
 						break;
 					case work:
-						this.carWorkDist += dist;
+						carWorkDist += dist;
 						break;
 					case education:
-						this.carEducDist += dist;
+						carEducDist += dist;
 						break;
 					case shopping:
-						this.carShopDist += dist;
+						carShopDist += dist;
 						break;
 					case leisure:
-						this.carLeisDist += dist;
+						carLeisDist += dist;
 						break;
 					default:
-						this.carOtherDist += dist;
+						carOtherDist += dist;
 						break;
 					}
-					this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
+					carLegDistanceCounts[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(TransportMode.pt)) {
-					this.ptDist += dist;
+					ptDist += dist;
 					ptDayDist += dist;
 					switch (ats) {
 					case home:
-						this.ptHomeDist += dist;
+						ptHomeDist += dist;
 						break;
 					case work:
-						this.ptWorkDist += dist;
+						ptWorkDist += dist;
 						break;
 					case education:
-						this.ptEducDist += dist;
+						ptEducDist += dist;
 						break;
 					case shopping:
-						this.ptShopDist += dist;
+						ptShopDist += dist;
 						break;
 					case leisure:
-						this.ptLeisDist += dist;
+						ptLeisDist += dist;
 						break;
 					default:
-						this.ptOtherDist += dist;
+						ptOtherDist += dist;
 						break;
 					}
-					this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
+					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(TransportMode.walk)) {
 					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
 							.getLink().getCoord(), plan.getNextActivity(bl)
 							.getLink().getCoord()) * 1.5 / 1000.0;
-					this.wlkDist += dist;
+					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (ats) {
 					case home:
-						this.wlkHomeDist += dist;
+						wlkHomeDist += dist;
 						break;
 					case work:
-						this.wlkWorkDist += dist;
+						wlkWorkDist += dist;
 						break;
 					case education:
-						this.wlkEducDist += dist;
+						wlkEducDist += dist;
 						break;
 					case shopping:
-						this.wlkShopDist += dist;
+						wlkShopDist += dist;
 						break;
 					case leisure:
-						this.wlkLeisDist += dist;
+						wlkLeisDist += dist;
 						break;
 					default:
-						this.wlkOtherDist += dist;
+						wlkOtherDist += dist;
 						break;
 					}
-					this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
+					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 
 				} else {
 					othersDist += dist;
@@ -231,46 +232,45 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 						othersOtherDist += dist;
 						break;
 					}
-					this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
+					othersLegDistanceCounts[Math.min(100, (int) dist)]++;
 				}
 				dayDist += dist;
 			}
-		}
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
-			this.totalDayDistanceCounts[i]++;
+			totalDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) othersDayDist); i++)
-			this.othersDayDistanceCounts[i]++;
+			othersDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) carDayDist); i++)
-			this.carDayDistanceCounts[i]++;
+			carDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) ptDayDist); i++)
-			this.ptDayDistanceCounts[i]++;
+			ptDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) wlkDayDist); i++)
-			this.wlkDayDistanceCounts[i]++;
+			wlkDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) throughDayDist); i++)
-			this.throughDayDistanceCounts[i]++;
+			throughDayDistanceCounts[i]++;
 	}
 
+	@Override
 	public void write(final String outputFilename) {
-		double sum = this.carDist + this.ptDist + wlkDist + this.othersDist
-				+ throughDist;
+		double sum = carDist + ptDist + wlkDist + othersDist + throughDist;
 
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
 		sw.writeln("\tDaily Distance\t(exkl. through-traffic)\tn_agents\t"
 				+ count);
 		sw.writeln("mode\tavg.[km]\t%\tsum.[km]");
 
-		double avgCarDist = this.carDist / this.count;
-		double avgPtDist = this.ptDist / this.count;
-		double avgWlkDist = this.wlkDist / this.count;
-		double avgOthersDist = this.othersDist / this.count;
+		double avgCarDist = carDist / count;
+		double avgPtDist = ptDist / count;
+		double avgWlkDist = wlkDist / count;
+		double avgOthersDist = othersDist / count;
 		double avgThroughDist = throughDist / count;
 
-		sw.writeln("car\t" + avgCarDist + "\t" + this.carDist / sum * 100.0
-				+ "\t" + carDist);
-		sw.writeln("pt\t" + avgPtDist + "\t" + this.ptDist / sum * 100.0 + "\t"
+		sw.writeln("car\t" + avgCarDist + "\t" + carDist / sum * 100.0 + "\t"
+				+ carDist);
+		sw.writeln("pt\t" + avgPtDist + "\t" + ptDist / sum * 100.0 + "\t"
 				+ ptDist);
-		sw.writeln("walk\t" + avgWlkDist + "\t" + this.wlkDist / sum * 100.0
-				+ "\t" + wlkDist);
+		sw.writeln("walk\t" + avgWlkDist + "\t" + wlkDist / sum * 100.0 + "\t"
+				+ wlkDist);
 		sw.writeln("others\t" + avgOthersDist + "\t" + othersDist / sum * 100.0
 				+ "\t" + othersDist);
 		sw.writeln("through\t" + avgThroughDist + "\t" + throughDist / sum
@@ -288,75 +288,69 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 				+ count);
 		sw.writeln("mode\tkm\t%\tsum.[km]");
 		sw.writeln("car\t" + (avgCarDist + avgOthersDist) + "\t"
-				+ (this.carDist + throughDist) / sum * 100.0 + "\t"
+				+ (carDist + throughDist) / sum * 100.0 + "\t"
 				+ (carDist + throughDist));
-		sw.writeln("pt\t" + avgPtDist + "\t" + this.ptDist / sum * 100.0 + "\t"
+		sw.writeln("pt\t" + avgPtDist + "\t" + ptDist / sum * 100.0 + "\t"
 				+ ptDist);
-		sw.writeln("walk\t" + avgWlkDist + "\t" + this.wlkDist / sum * 100.0
-				+ "\t" + wlkDist);
+		sw.writeln("walk\t" + avgWlkDist + "\t" + wlkDist / sum * 100.0 + "\t"
+				+ wlkDist);
 		sw.writeln("others\t" + avgOthersDist + "\t" + othersDist / sum * 100.0
 				+ "\t" + othersDist);
 		sw.writeln("----------------------------------------------");
 
 		sw.writeln("--travel destination and modal split--daily distance--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother");
-		sw.writeln("car\t" + this.carWorkDist + "\t" + this.carEducDist + "\t"
-				+ this.carShopDist + "\t" + this.carLeisDist + "\t"
-				+ this.carHomeDist + "\t" + this.carOtherDist);
-		sw.writeln("pt\t" + this.ptWorkDist + "\t" + this.ptEducDist + "\t"
-				+ this.ptShopDist + "\t" + this.ptLeisDist + "\t"
-				+ this.ptHomeDist + "\t" + this.ptOtherDist);
-		sw.writeln("walk\t" + this.wlkWorkDist + "\t" + this.wlkEducDist + "\t"
-				+ this.wlkShopDist + "\t" + this.wlkLeisDist + "\t"
-				+ this.wlkHomeDist + "\t" + this.wlkOtherDist);
-		sw.writeln("others\t" + this.othersWorkDist + "\t"
-				+ this.othersEducDist + "\t" + this.othersShopDist + "\t"
-				+ this.othersLeisDist + "\t" + this.othersHomeDist + "\t"
-				+ this.othersOtherDist);
-		sw.writeln("through\t" + this.throughWorkDist + "\t"
-				+ this.throughEducDist + "\t" + this.throughShopDist + "\t"
-				+ this.throughLeisDist + "\t" + this.throughHomeDist + "\t"
-				+ this.throughOtherDist);
-		sw.writeln("total\t"
-				+ (this.carWorkDist + this.ptWorkDist + wlkWorkDist
-						+ othersWorkDist + this.throughWorkDist)
-				+ "\t"
-				+ (this.carEducDist + this.ptEducDist + wlkEducDist
-						+ othersEducDist + this.throughEducDist)
-				+ "\t"
-				+ (this.carShopDist + this.ptShopDist + wlkShopDist
-						+ othersShopDist + this.throughShopDist)
-				+ "\t"
-				+ (this.carLeisDist + this.ptLeisDist + wlkLeisDist
-						+ othersLeisDist + this.throughLeisDist)
-				+ "\t"
-				+ (this.carHomeDist + this.ptHomeDist + wlkHomeDist
-						+ othersHomeDist + this.throughHomeDist)
-				+ "\t"
-				+ (this.carOtherDist + this.ptOtherDist + wlkOtherDist
-						+ othersOtherDist + this.throughOtherDist));
+		sw.writeln("car\t" + carWorkDist + "\t" + carEducDist + "\t"
+				+ carShopDist + "\t" + carLeisDist + "\t" + carHomeDist + "\t"
+				+ carOtherDist);
+		sw.writeln("pt\t" + ptWorkDist + "\t" + ptEducDist + "\t" + ptShopDist
+				+ "\t" + ptLeisDist + "\t" + ptHomeDist + "\t" + ptOtherDist);
+		sw.writeln("walk\t" + wlkWorkDist + "\t" + wlkEducDist + "\t"
+				+ wlkShopDist + "\t" + wlkLeisDist + "\t" + wlkHomeDist + "\t"
+				+ wlkOtherDist);
+		sw.writeln("others\t" + othersWorkDist + "\t" + othersEducDist + "\t"
+				+ othersShopDist + "\t" + othersLeisDist + "\t"
+				+ othersHomeDist + "\t" + othersOtherDist);
+		sw.writeln("through\t" + throughWorkDist + "\t" + throughEducDist
+				+ "\t" + throughShopDist + "\t" + throughLeisDist + "\t"
+				+ throughHomeDist + "\t" + throughOtherDist);
+		sw
+				.writeln("total\t"
+						+ (carWorkDist + ptWorkDist + wlkWorkDist
+								+ othersWorkDist + throughWorkDist)
+						+ "\t"
+						+ (carEducDist + ptEducDist + wlkEducDist
+								+ othersEducDist + throughEducDist)
+						+ "\t"
+						+ (carShopDist + ptShopDist + wlkShopDist
+								+ othersShopDist + throughShopDist)
+						+ "\t"
+						+ (carLeisDist + ptLeisDist + wlkLeisDist
+								+ othersLeisDist + throughLeisDist)
+						+ "\t"
+						+ (carHomeDist + ptHomeDist + wlkHomeDist
+								+ othersHomeDist + throughHomeDist)
+						+ "\t"
+						+ (carOtherDist + ptOtherDist + wlkOtherDist
+								+ othersOtherDist + throughOtherDist));
 
 		BarChart barChart = new BarChart(
 				"travel destination and modal split--daily distance",
 				"travel destination", "daily distance [km]", new String[] {
 						"work", "education", "shopping", "leisure", "home",
 						OTHERS });
-		barChart.addSeries(CAR, new double[] { this.carWorkDist,
-				this.carEducDist, this.carShopDist, this.carLeisDist,
-				this.carHomeDist, this.carOtherDist });
-		barChart.addSeries("pt", new double[] { this.ptWorkDist,
-				this.ptEducDist, this.ptShopDist, this.ptLeisDist,
-				this.ptHomeDist, this.ptOtherDist });
-		barChart.addSeries("walk", new double[] { this.wlkWorkDist,
-				this.wlkEducDist, this.wlkShopDist, this.wlkLeisDist,
-				this.wlkHomeDist, this.wlkOtherDist });
-		barChart.addSeries(OTHERS, new double[] { this.othersWorkDist,
-				this.othersEducDist, this.othersShopDist, this.othersLeisDist,
-				this.othersHomeDist, this.othersOtherDist });
-		barChart.addSeries(THROUGH, new double[] { this.throughWorkDist,
-				this.throughEducDist, this.throughShopDist,
-				this.throughLeisDist, this.throughHomeDist,
-				this.throughOtherDist });
+		barChart.addSeries(CAR, new double[] { carWorkDist, carEducDist,
+				carShopDist, carLeisDist, carHomeDist, carOtherDist });
+		barChart.addSeries("pt", new double[] { ptWorkDist, ptEducDist,
+				ptShopDist, ptLeisDist, ptHomeDist, ptOtherDist });
+		barChart.addSeries("walk", new double[] { wlkWorkDist, wlkEducDist,
+				wlkShopDist, wlkLeisDist, wlkHomeDist, wlkOtherDist });
+		barChart.addSeries(OTHERS, new double[] { othersWorkDist,
+				othersEducDist, othersShopDist, othersLeisDist, othersHomeDist,
+				othersOtherDist });
+		barChart.addSeries(THROUGH, new double[] { throughWorkDist,
+				throughEducDist, throughShopDist, throughLeisDist,
+				throughHomeDist, throughOtherDist });
 		barChart.addMatsimLogo();
 		barChart.saveAsPng(outputFilename
 				+ "dailyDistanceTravelDistination.png", 1200, 900);
@@ -372,11 +366,11 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		double yThrough[] = new double[101];
 
 		for (int i = 0; i < 101; i++) {
-			yTotal[i] = this.totalDayDistanceCounts[i] / this.count * 100.0;
-			yCar[i] = this.carDayDistanceCounts[i] / this.count * 100.0;
-			yPt[i] = this.ptDayDistanceCounts[i] / this.count * 100.0;
-			yWlk[i] = this.wlkDayDistanceCounts[i] / this.count * 100.0;
-			yOthers[i] = this.othersDayDistanceCounts[i] / this.count * 100.0;
+			yTotal[i] = totalDayDistanceCounts[i] / count * 100.0;
+			yCar[i] = carDayDistanceCounts[i] / count * 100.0;
+			yPt[i] = ptDayDistanceCounts[i] / count * 100.0;
+			yWlk[i] = wlkDayDistanceCounts[i] / count * 100.0;
+			yOthers[i] = othersDayDistanceCounts[i] / count * 100.0;
 			yThrough[i] = throughDayDistanceCounts[i] / count * 100.0;
 		}
 
@@ -410,16 +404,16 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		double yThroughFracs[] = new double[101];
 		for (int i = 0; i < 101; i++) {
 			xs[i] = i;
-			double sumLegDistanceCounts = this.ptLegDistanceCounts[i]
-					+ this.carLegDistanceCounts[i] + wlkLegDistanceCounts[i]
+			double sumLegDistanceCounts = ptLegDistanceCounts[i]
+					+ carLegDistanceCounts[i] + wlkLegDistanceCounts[i]
 					+ othersLegDistanceCounts[i] + throughLegDistanceCounts[i];
 			if (sumLegDistanceCounts > 0) {
-				yCarFracs[i] = this.carLegDistanceCounts[i]
-						/ sumLegDistanceCounts * 100.0;
-				yPtFracs[i] = this.ptLegDistanceCounts[i]
-						/ sumLegDistanceCounts * 100.0;
-				yWlkFracs[i] = this.wlkLegDistanceCounts[i]
-						/ sumLegDistanceCounts * 100.0;
+				yCarFracs[i] = carLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
+				yPtFracs[i] = ptLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
+				yWlkFracs[i] = wlkLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
 				yOthersFracs[i] = othersLegDistanceCounts[i]
 						/ sumLegDistanceCounts * 100.0;
 				yThroughFracs[i] = throughLegDistanceCounts[i]

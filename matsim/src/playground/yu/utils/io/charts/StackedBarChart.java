@@ -1,4 +1,4 @@
-package playground.yu.utils.charts;
+package playground.yu.utils.io.charts;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;

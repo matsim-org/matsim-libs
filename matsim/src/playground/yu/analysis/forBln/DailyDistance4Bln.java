@@ -20,9 +20,9 @@ import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.analysis.DailyDistance;
 import playground.yu.utils.CollectionSum;
-import playground.yu.utils.charts.PieChart;
-import playground.yu.utils.charts.StackedBarChart;
 import playground.yu.utils.io.SimpleWriter;
+import playground.yu.utils.io.charts.PieChart;
+import playground.yu.utils.io.charts.StackedBarChart;
 
 /**
  * daily distance analysis only for Berlin or for Berlin & Brandenburg
@@ -52,10 +52,11 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		super();
 	}
 
-	public DailyDistance4Bln(RoadPricingScheme toll) {
+	public DailyDistance4Bln(final RoadPricingScheme toll) {
 		super(toll);
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
@@ -63,19 +64,18 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		double wlkDayDist = 0.0;
 		double bikeDayDist = 0.0;
 		double othersDayDist = 0.0;
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof Leg) {
 
 				Leg bl = (Leg) pe;
 
 				ActType at = null;
 				String tmpActType = plan.getNextActivity(bl).getType();
-				for (ActType a : ActType.values()) {
+				for (ActType a : ActType.values())
 					if (tmpActType.equals(a.getActTypeName())) {
 						at = a;
 						break;
 					}
-				}
 				if (at == null)
 					at = ActType.other;
 
@@ -84,23 +84,23 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				TransportMode mode = bl.getMode();
 				switch (mode) {
 				case car:
-					this.carDist += dist;
+					carDist += dist;
 					carDayDist += dist;
 					switch (at) {
 					case home:
-						this.carHomeDist += dist;
+						carHomeDist += dist;
 						break;
 					case work:
-						this.carWorkDist += dist;
+						carWorkDist += dist;
 						break;
 					case education:
-						this.carEducDist += dist;
+						carEducDist += dist;
 						break;
 					case shopping:
-						this.carShopDist += dist;
+						carShopDist += dist;
 						break;
 					case leisure:
-						this.carLeisDist += dist;
+						carLeisDist += dist;
 						break;
 					case business:
 						carBusinessDist += dist;
@@ -124,29 +124,29 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						carSeeADoctorDist += dist;
 						break;
 					default:
-						this.carOtherDist += dist;
+						carOtherDist += dist;
 						break;
 					}
-					this.carLegDistanceCounts[Math.min(100, (int) dist)]++;
+					carLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case pt:
-					this.ptDist += dist;
+					ptDist += dist;
 					ptDayDist += dist;
 					switch (at) {
 					case home:
-						this.ptHomeDist += dist;
+						ptHomeDist += dist;
 						break;
 					case work:
-						this.ptWorkDist += dist;
+						ptWorkDist += dist;
 						break;
 					case education:
-						this.ptEducDist += dist;
+						ptEducDist += dist;
 						break;
 					case shopping:
-						this.ptShopDist += dist;
+						ptShopDist += dist;
 						break;
 					case leisure:
-						this.ptLeisDist += dist;
+						ptLeisDist += dist;
 						break;
 					case business:
 						ptBusinessDist += dist;
@@ -170,32 +170,32 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						ptSeeADoctorDist += dist;
 						break;
 					default:
-						this.ptOtherDist += dist;
+						ptOtherDist += dist;
 						break;
 					}
-					this.ptLegDistanceCounts[Math.min(100, (int) dist)]++;
+					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case walk:
 					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
 							.getLink().getCoord(), plan.getNextActivity(bl)
 							.getLink().getCoord()) * 1.5 / 1000.0;
-					this.wlkDist += dist;
+					wlkDist += dist;
 					wlkDayDist += dist;
 					switch (at) {
 					case home:
-						this.wlkHomeDist += dist;
+						wlkHomeDist += dist;
 						break;
 					case work:
-						this.wlkWorkDist += dist;
+						wlkWorkDist += dist;
 						break;
 					case education:
-						this.wlkEducDist += dist;
+						wlkEducDist += dist;
 						break;
 					case shopping:
-						this.wlkShopDist += dist;
+						wlkShopDist += dist;
 						break;
 					case leisure:
-						this.wlkLeisDist += dist;
+						wlkLeisDist += dist;
 						break;
 					case business:
 						wlkBusinessDist += dist;
@@ -219,32 +219,32 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						wlkSeeADoctorDist += dist;
 						break;
 					default:
-						this.wlkOtherDist += dist;
+						wlkOtherDist += dist;
 						break;
 					}
-					this.wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
+					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case bike:
 					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
 							.getLink().getCoord(), plan.getNextActivity(bl)
 							.getLink().getCoord()) / 1000.0;
-					this.bikeDist += dist;
+					bikeDist += dist;
 					bikeDayDist += dist;
 					switch (at) {
 					case home:
-						this.bikeHomeDist += dist;
+						bikeHomeDist += dist;
 						break;
 					case work:
-						this.bikeWorkDist += dist;
+						bikeWorkDist += dist;
 						break;
 					case education:
-						this.bikeEducDist += dist;
+						bikeEducDist += dist;
 						break;
 					case shopping:
-						this.bikeShopDist += dist;
+						bikeShopDist += dist;
 						break;
 					case leisure:
-						this.bikeLeisDist += dist;
+						bikeLeisDist += dist;
 						break;
 					case business:
 						bikeBusinessDist += dist;
@@ -268,32 +268,32 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						bikeSeeADoctorDist += dist;
 						break;
 					default:
-						this.bikeOtherDist += dist;
+						bikeOtherDist += dist;
 						break;
 					}
-					this.bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
+					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				default:
 					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
 							.getLink().getCoord(), plan.getNextActivity(bl)
 							.getLink().getCoord()) / 1000.0;
-					this.othersDist += dist;
+					othersDist += dist;
 					othersDayDist += dist;
 					switch (at) {
 					case home:
-						this.othersHomeDist += dist;
+						othersHomeDist += dist;
 						break;
 					case work:
-						this.othersWorkDist += dist;
+						othersWorkDist += dist;
 						break;
 					case education:
-						this.othersEducDist += dist;
+						othersEducDist += dist;
 						break;
 					case shopping:
-						this.othersShopDist += dist;
+						othersShopDist += dist;
 						break;
 					case leisure:
-						this.othersLeisDist += dist;
+						othersLeisDist += dist;
 						break;
 					case business:
 						othersBusinessDist += dist;
@@ -317,53 +317,52 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 						othersSeeADoctorDist += dist;
 						break;
 					default:
-						this.othersOtherDist += dist;
+						othersOtherDist += dist;
 						break;
 					}
-					this.othersLegDistanceCounts[Math.min(100, (int) dist)]++;
+					othersLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				}
 				dayDist += dist;
 			}
-		}
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
-			this.totalDayDistanceCounts[i]++;
+			totalDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) othersDayDist); i++)
-			this.othersDayDistanceCounts[i]++;
+			othersDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) carDayDist); i++)
-			this.carDayDistanceCounts[i]++;
+			carDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) ptDayDist); i++)
-			this.ptDayDistanceCounts[i]++;
+			ptDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) wlkDayDist); i++)
-			this.wlkDayDistanceCounts[i]++;
+			wlkDayDistanceCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) bikeDayDist); i++)
-			this.bikeDayDistanceCounts[i]++;
+			bikeDayDistanceCounts[i]++;
 	}
 
+	@Override
 	public void write(final String outputFilename) {
-		double sum = this.carDist + this.ptDist + wlkDist + bikeDist
-				+ this.othersDist;
+		double sum = carDist + ptDist + wlkDist + bikeDist + othersDist;
 
-		double avgCarDist = this.carDist / (double) this.count;
-		double avgPtDist = this.ptDist / (double) this.count;
-		double avgWlkDist = this.wlkDist / (double) this.count;
-		double avgBikeDist = this.bikeDist / (double) this.count;
-		double avgOthersDist = this.othersDist / (double) this.count;
+		double avgCarDist = carDist / count;
+		double avgPtDist = ptDist / count;
+		double avgWlkDist = wlkDist / count;
+		double avgBikeDist = bikeDist / count;
+		double avgOthersDist = othersDist / count;
 
 		SimpleWriter sw = new SimpleWriter(outputFilename + "dailyDistance.txt");
 		sw.writeln("\tDaily Distance\tn_agents\t" + count);
 		sw.writeln("mode\tavg. [km]\tfraction [%]\tsum [km]");
 
-		sw.writeln("car\t" + avgCarDist + "\t" + this.carDist / sum * 100.0
-				+ "\t" + carDist);
-		sw.writeln("pt\t" + avgPtDist + "\t" + this.ptDist / sum * 100.0 + "\t"
+		sw.writeln("car\t" + avgCarDist + "\t" + carDist / sum * 100.0 + "\t"
+				+ carDist);
+		sw.writeln("pt\t" + avgPtDist + "\t" + ptDist / sum * 100.0 + "\t"
 				+ ptDist);
-		sw.writeln("walk\t" + avgWlkDist + "\t" + this.wlkDist / sum * 100.0
-				+ "\t" + wlkDist);
-		sw.writeln("bike\t" + avgBikeDist + "\t" + this.bikeDist / sum * 100.0
+		sw.writeln("walk\t" + avgWlkDist + "\t" + wlkDist / sum * 100.0 + "\t"
+				+ wlkDist);
+		sw.writeln("bike\t" + avgBikeDist + "\t" + bikeDist / sum * 100.0
 				+ "\t" + bikeDist);
-		sw.writeln("others\t" + avgOthersDist + "\t" + this.othersDist / sum
-				* 100.0 + "\t" + othersDist);
+		sw.writeln("others\t" + avgOthersDist + "\t" + othersDist / sum * 100.0
+				+ "\t" + othersDist);
 
 		PieChart pieChart = new PieChart("Avg. Daily Distance -- Modal Split");
 		pieChart.addSeries(new String[] { CAR, "pt", WALK, BIKE, "others" },
@@ -379,32 +378,32 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				.writeln("mode\thome\twork\tshopping\teducation\tleisure\tother\tnot specified\tbusiness\tEinkauf sonstiges\tFreizeit(Sport usw.)\tsee a doctor\tholiday/journey\tmultiple");
 
 		sw.writeln("car\t" + carHomeDist + "\t" + carWorkDist + "\t"
-				+ carShopDist + "\t" + carEducDist + "\t" + this.carLeisDist
-				+ "\t" + this.carOtherDist + "\t" + carNotSpecifiedDist + "\t"
+				+ carShopDist + "\t" + carEducDist + "\t" + carLeisDist + "\t"
+				+ carOtherDist + "\t" + carNotSpecifiedDist + "\t"
 				+ carBusinessDist + "\t" + carEinkaufSonstigesDist + "\t"
 				+ carFreizeitSonstSportDist + "\t" + carSeeADoctorDist + "\t"
 				+ carHolidayJourneyDist + "\t" + carMultipleDist);
 		sw.writeln("pt\t" + ptHomeDist + "\t" + ptWorkDist + "\t" + ptShopDist
-				+ "\t" + ptEducDist + "\t" + this.ptLeisDist + "\t"
-				+ this.ptOtherDist + "\t" + ptNotSpecifiedDist + "\t"
-				+ ptBusinessDist + "\t" + ptEinkaufSonstigesDist + "\t"
-				+ ptFreizeitSonstSportDist + "\t" + ptSeeADoctorDist + "\t"
-				+ ptHolidayJourneyDist + "\t" + ptMultipleDist);
+				+ "\t" + ptEducDist + "\t" + ptLeisDist + "\t" + ptOtherDist
+				+ "\t" + ptNotSpecifiedDist + "\t" + ptBusinessDist + "\t"
+				+ ptEinkaufSonstigesDist + "\t" + ptFreizeitSonstSportDist
+				+ "\t" + ptSeeADoctorDist + "\t" + ptHolidayJourneyDist + "\t"
+				+ ptMultipleDist);
 		sw.writeln("walk\t" + wlkHomeDist + "\t" + wlkWorkDist + "\t"
-				+ wlkShopDist + "\t" + wlkEducDist + "\t" + this.wlkLeisDist
-				+ "\t" + this.wlkOtherDist + "\t" + wlkNotSpecifiedDist + "\t"
+				+ wlkShopDist + "\t" + wlkEducDist + "\t" + wlkLeisDist + "\t"
+				+ wlkOtherDist + "\t" + wlkNotSpecifiedDist + "\t"
 				+ wlkBusinessDist + "\t" + wlkEinkaufSonstigesDist + "\t"
 				+ wlkFreizeitSonstSportDist + "\t" + wlkSeeADoctorDist + "\t"
 				+ wlkHolidayJourneyDist + "\t" + wlkMultipleDist);
 		sw.writeln("bike\t" + bikeHomeDist + "\t" + bikeWorkDist + "\t"
-				+ bikeShopDist + "\t" + bikeEducDist + "\t" + this.bikeLeisDist
-				+ "\t" + this.bikeOtherDist + "\t" + bikeNotSpecifiedDist
-				+ "\t" + bikeBusinessDist + "\t" + bikeEinkaufSonstigesDist
-				+ "\t" + bikeFreizeitSonstSportDist + "\t" + bikeSeeADoctorDist
-				+ "\t" + bikeHolidayJourneyDist + "\t" + bikeMultipleDist);
+				+ bikeShopDist + "\t" + bikeEducDist + "\t" + bikeLeisDist
+				+ "\t" + bikeOtherDist + "\t" + bikeNotSpecifiedDist + "\t"
+				+ bikeBusinessDist + "\t" + bikeEinkaufSonstigesDist + "\t"
+				+ bikeFreizeitSonstSportDist + "\t" + bikeSeeADoctorDist + "\t"
+				+ bikeHolidayJourneyDist + "\t" + bikeMultipleDist);
 		sw.writeln("others\t" + othersHomeDist + "\t" + othersWorkDist + "\t"
 				+ othersShopDist + "\t" + othersEducDist + "\t"
-				+ this.othersLeisDist + "\t" + this.othersOtherDist + "\t"
+				+ othersLeisDist + "\t" + othersOtherDist + "\t"
 				+ othersNotSpecifiedDist + "\t" + othersBusinessDist + "\t"
 				+ othersEinkaufSonstigesDist + "\t"
 				+ othersFreizeitSonstSportDist + "\t" + othersSeeADoctorDist
@@ -412,50 +411,47 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 
 		sw
 				.writeln("total\t"
-						+ (this.carHomeDist + this.ptHomeDist + wlkHomeDist
+						+ (carHomeDist + ptHomeDist + wlkHomeDist
 								+ bikeHomeDist + othersHomeDist)
 						+ "\t"
-						+ (this.carWorkDist + this.ptWorkDist + wlkWorkDist
+						+ (carWorkDist + ptWorkDist + wlkWorkDist
 								+ bikeWorkDist + othersWorkDist)
 						+ "\t"
-						+ (this.carShopDist + this.ptShopDist + wlkShopDist
+						+ (carShopDist + ptShopDist + wlkShopDist
 								+ bikeShopDist + othersEducDist)
 						+ "\t"
-						+ (this.carEducDist + this.ptEducDist + wlkEducDist
+						+ (carEducDist + ptEducDist + wlkEducDist
 								+ bikeEducDist + othersEducDist)
 						+ "\t"
-						+ (this.carLeisDist + this.ptLeisDist + wlkLeisDist
+						+ (carLeisDist + ptLeisDist + wlkLeisDist
 								+ bikeLeisDist + othersLeisDist)
 						+ "\t"
-						+ (this.carOtherDist + this.ptOtherDist + wlkOtherDist
+						+ (carOtherDist + ptOtherDist + wlkOtherDist
 								+ bikeOtherDist + othersOtherDist)
 						+ "\t"
-						+ (this.carNotSpecifiedDist + this.ptNotSpecifiedDist
+						+ (carNotSpecifiedDist + ptNotSpecifiedDist
 								+ wlkNotSpecifiedDist + bikeNotSpecifiedDist + othersNotSpecifiedDist)
 						+ "\t"
-						+ (this.carBusinessDist + this.ptBusinessDist
-								+ wlkBusinessDist + bikeBusinessDist + othersBusinessDist)
+						+ (carBusinessDist + ptBusinessDist + wlkBusinessDist
+								+ bikeBusinessDist + othersBusinessDist)
 						+ "\t"
-						+ (this.carEinkaufSonstigesDist
-								+ this.ptEinkaufSonstigesDist
+						+ (carEinkaufSonstigesDist + ptEinkaufSonstigesDist
 								+ wlkEinkaufSonstigesDist
 								+ bikeEinkaufSonstigesDist + othersEinkaufSonstigesDist)
 						+ "\t"
-						+ (this.carFreizeitSonstSportDist
-								+ this.ptFreizeitSonstSportDist
+						+ (carFreizeitSonstSportDist + ptFreizeitSonstSportDist
 								+ wlkFreizeitSonstSportDist
 								+ bikeFreizeitSonstSportDist + othersFreizeitSonstSportDist)
 						+ "\t"
-						+ (this.carSeeADoctorDist + this.ptSeeADoctorDist
+						+ (carSeeADoctorDist + ptSeeADoctorDist
 								+ wlkSeeADoctorDist + bikeSeeADoctorDist + othersSeeADoctorDist)
 						+ "\t"
-						+ (this.carHolidayJourneyDist
-								+ this.ptHolidayJourneyDist
+						+ (carHolidayJourneyDist + ptHolidayJourneyDist
 								+ wlkHolidayJourneyDist
 								+ bikeHolidayJourneyDist + othersHolidayJourneyDist)
 						+ "\t"
-						+ (this.carMultipleDist + this.ptMultipleDist
-								+ wlkMultipleDist + bikeMultipleDist + othersMultipleDist));
+						+ (carMultipleDist + ptMultipleDist + wlkMultipleDist
+								+ bikeMultipleDist + othersMultipleDist));
 
 		StackedBarChart stackedBarChart = new StackedBarChart(
 				"travel destination and modal split--daily distance",
@@ -509,16 +505,12 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		double yBike[] = new double[101];
 		double yOthers[] = new double[101];
 		for (int i = 0; i < 101; i++) {
-			yTotal[i] = this.totalDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yCar[i] = this.carDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yPt[i] = this.ptDayDistanceCounts[i] / (double) this.count * 100.0;
-			yWlk[i] = this.wlkDayDistanceCounts[i] / (double) this.count
-					* 100.0;
-			yBike[i] = bikeDayDistanceCounts[i] / (double) count * 100.0;
-			yOthers[i] = this.othersDayDistanceCounts[i] / (double) this.count
-					* 100.0;
+			yTotal[i] = totalDayDistanceCounts[i] / count * 100.0;
+			yCar[i] = carDayDistanceCounts[i] / count * 100.0;
+			yPt[i] = ptDayDistanceCounts[i] / count * 100.0;
+			yWlk[i] = wlkDayDistanceCounts[i] / count * 100.0;
+			yBike[i] = bikeDayDistanceCounts[i] / count * 100.0;
+			yOthers[i] = othersDayDistanceCounts[i] / count * 100.0;
 		}
 
 		XYLineChart chart = new XYLineChart("Daily Distance Distribution",
@@ -552,17 +544,17 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		double yBikeFracs[] = new double[101];
 		double yOthersFracs[] = new double[101];
 		for (int i = 0; i < 101; i++) {
-			double sumLegDistanceCounts = this.ptLegDistanceCounts[i]
-					+ this.carLegDistanceCounts[i] + wlkLegDistanceCounts[i]
+			double sumLegDistanceCounts = ptLegDistanceCounts[i]
+					+ carLegDistanceCounts[i] + wlkLegDistanceCounts[i]
 					+ bikeLegDistanceCounts[i] + othersLegDistanceCounts[i];
 			xs[i] = i;
 			if (sumLegDistanceCounts > 0) {
-				yCarFracs[i] = this.carLegDistanceCounts[i]
-						/ sumLegDistanceCounts * 100.0;
-				yPtFracs[i] = this.ptLegDistanceCounts[i]
-						/ sumLegDistanceCounts * 100.0;
-				yWlkFracs[i] = this.wlkLegDistanceCounts[i]
-						/ sumLegDistanceCounts * 100.0;
+				yCarFracs[i] = carLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
+				yPtFracs[i] = ptLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
+				yWlkFracs[i] = wlkLegDistanceCounts[i] / sumLegDistanceCounts
+						* 100.0;
 				yBikeFracs[i] = bikeLegDistanceCounts[i] / sumLegDistanceCounts
 						* 100.0;
 				yOthersFracs[i] = othersLegDistanceCounts[i]

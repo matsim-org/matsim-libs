@@ -39,7 +39,7 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String fileBase = "d:/tmp/";
+		String fileBase = "../runs-svn/run689/";
 		String inputFile = fileBase + "scorestats.txt";
 		String chartFile = inputFile.replace("txt", "png");
 		int maxIter = 1001;

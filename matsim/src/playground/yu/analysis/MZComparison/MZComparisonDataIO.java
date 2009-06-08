@@ -29,7 +29,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.xml.sax.SAXException;
 
-import playground.yu.utils.charts.StackedBarChart;
+import playground.yu.utils.io.charts.StackedBarChart;
 
 /**
  * @author yu
@@ -40,7 +40,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 
 	private String[] chartRows = null;
 
-	private Set<String> chartColumns = new HashSet<String>();
+	private final Set<String> chartColumns = new HashSet<String>();
 
 	/**
 	 * @param arg0
@@ -48,9 +48,9 @@ public class MZComparisonDataIO implements TabularFileHandler {
 	 * @param arg1
 	 *            - String chart column
 	 */
-	private Map<String, Map<String, Double>> values = new HashMap<String, Map<String, Double>>();
+	private final Map<String, Map<String, Double>> values = new HashMap<String, Map<String, Double>>();
 
-	public void setData2Compare(MZComparisonData data2compare) {
+	public void setData2Compare(final MZComparisonData data2compare) {
 		String ADDOTA = "average daily distance [km] (MATSim)";
 		setValueFromData2Compare(ADDOTA, "car", data2compare
 				.getAvgTollDailyDistance_car_m() / 1000.0);
@@ -72,8 +72,8 @@ public class MZComparisonDataIO implements TabularFileHandler {
 				.getAvgTollDailyEnRouteTime_other_min());
 	}
 
-	private void setValueFromData2Compare(String chartColumn, String chartRow,
-			double value) {
+	private void setValueFromData2Compare(final String chartColumn,
+			final String chartRow, final double value) {
 		if (!chartColumns.contains(chartColumn))
 			chartColumns.add(chartColumn);
 		Map<String, Double> m = values.get(chartRow);
@@ -81,7 +81,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		values.put(chartRow, m);
 	}
 
-	public void startRow(String[] row) {
+	public void startRow(final String[] row) {
 		// TODO save information from MZ
 		if (lineCount > 0) {
 			chartColumns.add(row[0]);
@@ -97,26 +97,23 @@ public class MZComparisonDataIO implements TabularFileHandler {
 			}
 		} else {
 			chartRows = new String[row.length - 1];
-			for (int i = 1; i < row.length; i++) {
+			for (int i = 1; i < row.length; i++)
 				chartRows[i - 1] = row[i];
-			}
 		}
 		lineCount++;
 	}
 
-	public void write(String outputBase) {
+	public void write(final String outputBase) {
 		try {
 			BufferedWriter bw = IOUtils.getBufferedWriter(outputBase + ".txt");
 			bw.write("\t");
-			for (int i = 0; i < chartRows.length; i++) {
-				bw.write("\t" + chartRows[i]);
-			}
+			for (String chartRow : chartRows)
+				bw.write("\t" + chartRow);
 			bw.write("\n");
 			for (String chartColumn : chartColumns) {
 				bw.write(chartColumn);
-				for (int i = 0; i < chartRows.length; i++) {
-					bw.write("\t" + values.get(chartRows[i]).get(chartColumn));
-				}
+				for (String chartRow : chartRows)
+					bw.write("\t" + values.get(chartRow).get(chartColumn));
 				bw.write("\n");
 			}
 			bw.close();
@@ -131,15 +128,13 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		List<String> tmpChartColumns = new ArrayList<String>();
 		tmpChartColumns.addAll(chartColumns);
 		Collections.sort(tmpChartColumns);
-		String[] chartColumns = (String[]) tmpChartColumns
+		String[] chartColumns = tmpChartColumns
 				.toArray(new String[this.chartColumns.size()]);
 
-		for (int i = 0; i < chartRows.length; i++) {
-			for (int j = 0; j < chartColumnsSize; j++) {
+		for (int i = 0; i < chartRows.length; i++)
+			for (int j = 0; j < chartColumnsSize; j++)
 				values[i][j] = this.values.get(chartRows[i]).get(
 						chartColumns[j]);
-			}
-		}
 		StackedBarChart chart = new StackedBarChart(
 				"Mikrozensus 2005 vs MATSim (Kanton Zurich)", "", "values",
 				PlotOrientation.HORIZONTAL);
@@ -147,7 +142,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		chart.saveAsPng(outputBase + ".png", 900, 600);
 	}
 
-	public void readMZData(String inputFilename) {
+	public void readMZData(final String inputFilename) {
 		TabularFileParserConfig tfpc = new TabularFileParserConfig();
 		// tfpc.setCommentTags(new String[] { "Verkehrsmittel" });
 		tfpc.setDelimiterRegex("\t");
@@ -157,11 +152,11 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(this.values);
+		System.out.println(values);
 	}
 
 	// -----------only for testing------------------------------
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String inputFilename = "../matsimTests/analysis/Vergleichswert.txt";
 		String outputBase = "../matsimTests/compare";
 		String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";

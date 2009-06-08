@@ -12,7 +12,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.yu.utils.CollectionSum;
-import playground.yu.utils.charts.PieChart;
+import playground.yu.utils.io.charts.PieChart;
 
 /**
  * @author yu
@@ -20,27 +20,26 @@ import playground.yu.utils.charts.PieChart;
  */
 public class MZ05WegeReader implements TabularFileHandler {
 	private SimpleWriter sw = null;
-	private String tmpPersonId = null, tmpPersonKantonZurichId = null,
-			outputBase;
+	private String tmpPersonId = null, tmpPersonKantonZurichId = null;
+	final String outputBase;
 	private int personCnt = 0, personKantonZurichCnt = 0, wCnt = 0,
 			wKantonZurichCnt = 0;
 	private double w_dist_obj1 = 0.0, w_dist_obj1KantonZurich = 0.0,
 			wMIV_KZ = 0.0, wOeV_KZ = 0.0, wLV_KZ = 0.0, wOthers_KZ = 0.0;
 	private double tmpWLV = 0.0, tmpWMIV = 0.0, tmpWOeV = 0.0,
 			tmpWOthers = 0.0;
-	private Set<Double> tmpWegeDists = new HashSet<Double>();
+	private final Set<Double> tmpWegeDists = new HashSet<Double>();
 	private boolean changePerson = false, belongs2KantonZurich = false;
 
-	public MZ05WegeReader(String outputBase) {
+	public MZ05WegeReader(final String outputBase) {
 		this.outputBase = outputBase;
 		sw = new SimpleWriter(outputBase + ".txt");
 		sw.writeln("linearDistance\tlinearDistance [m]\tlinearDistance [km]");
 	}
 
-	private void reset(String personId) {
-		if (!changePerson) {
+	private void reset(final String personId) {
+		if (!changePerson)
 			append();
-		}
 		changePerson = false;
 		tmpPersonId = personId;
 		tmpWegeDists.clear();
@@ -50,7 +49,7 @@ public class MZ05WegeReader implements TabularFileHandler {
 		tmpWOthers = 0.0;
 	}
 
-	private void resetKantonZurich(String personId) {
+	private void resetKantonZurich(final String personId) {
 		belongs2KantonZurich = true;
 		tmpPersonKantonZurichId = personId;
 	}
@@ -70,16 +69,14 @@ public class MZ05WegeReader implements TabularFileHandler {
 		}
 	}
 
-	public void startRow(String[] row) {
+	public void startRow(final String[] row) {
 		String personId = row[0] + row[1];
-		if (tmpPersonId == null) {
+		if (tmpPersonId == null)
 			reset(personId);
-		} else if (!tmpPersonId.equals(personId)) {
+		else if (!tmpPersonId.equals(personId))
 			reset(personId);
-		} else {
-			if (changePerson)
-				return;
-		}
+		else if (changePerson)
+			return;
 
 		String w_dist_obj1 = row[42];
 		if (w_dist_obj1 != null) {
@@ -111,17 +108,14 @@ public class MZ05WegeReader implements TabularFileHandler {
 					tmpWOthers++;
 				if (row[9] != null) {
 					if (row[9].equals("1")) {
-						if (tmpPersonKantonZurichId == null) {
+						if (tmpPersonKantonZurichId == null)
 							resetKantonZurich(personId);
-						} else if (!tmpPersonKantonZurichId.equals(personId)) {
+						else if (!tmpPersonKantonZurichId.equals(personId))
 							resetKantonZurich(personId);
-						}
-					} else {
+					} else
 						belongs2KantonZurich = false;
-					}
-				} else {
+				} else
 					belongs2KantonZurich = false;
-				}
 			} else {
 				changePerson = true;
 				return;
@@ -133,12 +127,11 @@ public class MZ05WegeReader implements TabularFileHandler {
 	}
 
 	public void write() {
-		if (!changePerson) {
+		if (!changePerson)
 			append();
-		}
-		double avgW_dist_obj1 = w_dist_obj1 / (double) wCnt;
+		double avgW_dist_obj1 = w_dist_obj1 / wCnt;
 		double avgW_dist_obj1KantonZurich = w_dist_obj1KantonZurich
-				/ (double) wKantonZurichCnt;
+				/ wKantonZurichCnt;
 		sw.writeln("avg. w_dist_obj1\t" + avgW_dist_obj1 * 1000.0 + "\t"
 				+ avgW_dist_obj1);
 		sw.writeln("avg. w_dist_obj1 (KantonZurich)\t"
@@ -163,7 +156,7 @@ public class MZ05WegeReader implements TabularFileHandler {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String wegeFilename = "D:/fromNB04/Archieve/MikroZensus2005/4_DB_ASCII(Sep_TAB)/Wege.dat";
 		String outputBase = "../matsimTests/LinearDistance/MZ05linearDistanceWege_2";
 

@@ -38,9 +38,9 @@ public class CountsIdUpdater {
 	 */
 	public static void main(final String[] args) {
 		String oldNetFile = "../berlin data/newOSM/bb_cl_old.xml.gz";
-		String newNetFile = "../berlin/network/bb_cl.xml.gz";
+		String newNetFile = "../berlin/network/bb_5.xml.gz";
 		String oldCountsFile = "../berlin/counts/counts4bb_cl_old.xml";
-		String newCountsFile = "../berlin/counts/counts4bb_cl.xml";
+		String newCountsFile = "../berlin/counts/counts4bb_5.xml";
 
 		int cnt = 0;
 
@@ -74,7 +74,10 @@ public class CountsIdUpdater {
 				newCount.setCoord(newNet.getLink(newLinkId).getCoord());
 				for (Volume volume : oldCount.getVolumes().values())
 					newCount.createVolume(volume.getHour(), volume.getValue());
-			}
+			} else
+				System.err
+						.println("ERROR : didn't find the new link with count station according to the information of the old count station on the link with Id "
+								+ oldCountId);
 		}
 		new CountsWriter(newCounts, newCountsFile).write();
 	}

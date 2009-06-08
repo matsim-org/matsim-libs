@@ -26,8 +26,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
 
 import playground.yu.utils.TollTools;
-import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
+import playground.yu.utils.io.charts.PieChart;
 
 /**
  * @author yu
@@ -39,21 +39,21 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 			tollBikeLegs = 0, tollOthersLegs = 0;
 	private RoadPricingScheme toll = null;
 
-	public ModeSplit(RoadPricingScheme toll) {
+	public ModeSplit(final RoadPricingScheme toll) {
 		this.toll = toll;
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		run(person.getSelectedPlan());
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		Link homeLoc = plan.getFirstActivity().getLink();
 		boolean inRange = false;
 		if (toll != null)
 			inRange = TollTools.isInRange(homeLoc, toll);
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof Leg) {
 				TransportMode m = ((Leg) pe).getMode();
 				switch (m) {
@@ -84,44 +84,40 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 					break;
 				}
 			}
-		}
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(total)mode\tnumber\tfraction[%]\n");
 		double sum = carLegs + ptLegs + wlkLegs + bikeLegs + othersLegs;
-		sb.append("car\t" + carLegs + "\t" + ((double) carLegs) / sum * 100.0
+		sb.append("car\t" + carLegs + "\t" + carLegs / sum * 100.0 + "\n");
+		sb.append("pt\t" + ptLegs + "\t" + ptLegs / sum * 100.0 + "\n");
+		sb.append("walk\t" + wlkLegs + "\t" + wlkLegs / sum * 100.0 + "\n");
+		sb.append("bike\t" + bikeLegs + "\t" + bikeLegs / sum * 100.0 + "\n");
+		sb.append("others\t" + othersLegs + "\t" + othersLegs / sum * 100.0
 				+ "\n");
-		sb.append("pt\t" + ptLegs + "\t" + ((double) ptLegs) / sum * 100.0
-				+ "\n");
-		sb.append("walk\t" + wlkLegs + "\t" + ((double) wlkLegs / sum * 100.0)
-				+ "\n");
-		sb.append("bike\t" + bikeLegs + "\t"
-				+ ((double) bikeLegs / sum * 100.0) + "\n");
-		sb.append("others\t" + othersLegs + "\t"
-				+ ((double) othersLegs / sum * 100.0) + "\n");
 
 		if (toll != null) {
 			sum = tollCarLegs + tollPtLegs + tollWlkLegs + tollBikeLegs
 					+ tollOthersLegs;
 			sb.append("(toll area)mode\tnumber\tfraction[%]\n");
-			sb.append("car\t" + tollCarLegs + "\t" + (double) tollCarLegs / sum
+			sb.append("car\t" + tollCarLegs + "\t" + tollCarLegs / sum * 100.0
+					+ "\n");
+			sb.append("pt\t" + tollPtLegs + "\t" + tollPtLegs / sum * 100.0
+					+ "\n");
+			sb.append("walk\t" + tollWlkLegs + "\t" + tollWlkLegs / sum * 100.0
+					+ "\n");
+			sb.append("bike\t" + tollBikeLegs + "\t" + tollBikeLegs / sum
 					* 100.0 + "\n");
-			sb.append("pt\t" + tollPtLegs + "\t" + (double) tollPtLegs / sum
+			sb.append("other\t" + tollOthersLegs + "\t" + tollOthersLegs / sum
 					* 100.0 + "\n");
-			sb.append("walk\t" + tollWlkLegs + "\t" + (double) tollWlkLegs
-					/ sum * 100.0 + "\n");
-			sb.append("bike\t" + tollBikeLegs + "\t" + (double) tollBikeLegs
-					/ sum * 100.0 + "\n");
-			sb.append("other\t" + tollOthersLegs + "\t"
-					+ (double) tollOthersLegs / sum * 100.0 + "\n");
 		}
 
 		return sb.toString();
 	}
 
-	public void write(String outputPath) {
+	public void write(final String outputPath) {
 		SimpleWriter sw = new SimpleWriter(outputPath + "modalSplitLegs.txt");
 		sw.write(toString());
 		sw.close();
@@ -145,7 +141,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";

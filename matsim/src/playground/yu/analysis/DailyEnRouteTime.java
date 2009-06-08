@@ -29,8 +29,8 @@ import org.xml.sax.SAXException;
 import playground.yu.analysis.forZrh.Analysis4Zrh.ActType;
 import playground.yu.utils.CollectionSum;
 import playground.yu.utils.TollTools;
-import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
+import playground.yu.utils.io.charts.PieChart;
 
 /**
  * compute modal split of en route time
@@ -62,67 +62,67 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 	protected RoadPricingScheme toll = null;
 	private static final String CAR = "car", BIKE = "bike", OTHERS = "others";
 
-	public DailyEnRouteTime(RoadPricingScheme toll) {
+	public DailyEnRouteTime(final RoadPricingScheme toll) {
 		this();
 		this.toll = toll;
 	}
 
 	public DailyEnRouteTime() {
-		this.count = 0;
+		count = 0;
 
-		this.carTime = 0.0;
-		this.ptTime = 0.0;
-		this.wlkTime = 0.0;
+		carTime = 0.0;
+		ptTime = 0.0;
+		wlkTime = 0.0;
 		bikeTime = 0.0;
-		this.othersTime = 0.0;
+		othersTime = 0.0;
 
-		this.totalDayEnRouteTimeCounts = new double[101];
-		this.carDayEnRouteTimeCounts = new double[101];
-		this.ptDayEnRouteTimeCounts = new double[101];
-		this.wlkDayEnRouteTimeCounts = new double[101];
+		totalDayEnRouteTimeCounts = new double[101];
+		carDayEnRouteTimeCounts = new double[101];
+		ptDayEnRouteTimeCounts = new double[101];
+		wlkDayEnRouteTimeCounts = new double[101];
 		bikeDayEnRouteTimeCounts = new double[101];
-		this.othersDayEnRouteTimeCounts = new double[101];
+		othersDayEnRouteTimeCounts = new double[101];
 
-		this.carLegTimeCounts = new double[101];
-		this.ptLegTimeCounts = new double[101];
-		this.wlkLegTimeCounts = new double[101];
+		carLegTimeCounts = new double[101];
+		ptLegTimeCounts = new double[101];
+		wlkLegTimeCounts = new double[101];
 		bikeLegTimeCounts = new double[101];
 		othersLegTimeCounts = new double[101];
 
-		this.carWorkTime = 0.0;
-		this.carEducTime = 0.0;
-		this.carShopTime = 0.0;
-		this.carLeisTime = 0.0;
-		this.carHomeTime = 0.0;
-		this.carOtherTime = 0.0;
+		carWorkTime = 0.0;
+		carEducTime = 0.0;
+		carShopTime = 0.0;
+		carLeisTime = 0.0;
+		carHomeTime = 0.0;
+		carOtherTime = 0.0;
 
-		this.ptWorkTime = 0.0;
-		this.ptEducTime = 0.0;
-		this.ptShopTime = 0.0;
-		this.ptLeisTime = 0.0;
-		this.ptHomeTime = 0.0;
-		this.ptOtherTime = 0.0;
+		ptWorkTime = 0.0;
+		ptEducTime = 0.0;
+		ptShopTime = 0.0;
+		ptLeisTime = 0.0;
+		ptHomeTime = 0.0;
+		ptOtherTime = 0.0;
 
-		this.wlkWorkTime = 0.0;
-		this.wlkEducTime = 0.0;
-		this.wlkShopTime = 0.0;
-		this.wlkLeisTime = 0.0;
-		this.wlkHomeTime = 0.0;
-		this.wlkOtherTime = 0.0;
+		wlkWorkTime = 0.0;
+		wlkEducTime = 0.0;
+		wlkShopTime = 0.0;
+		wlkLeisTime = 0.0;
+		wlkHomeTime = 0.0;
+		wlkOtherTime = 0.0;
 
-		this.bikeWorkTime = 0.0;
-		this.bikeEducTime = 0.0;
-		this.bikeShopTime = 0.0;
-		this.bikeLeisTime = 0.0;
-		this.bikeHomeTime = 0.0;
-		this.bikeOtherTime = 0.0;
+		bikeWorkTime = 0.0;
+		bikeEducTime = 0.0;
+		bikeShopTime = 0.0;
+		bikeLeisTime = 0.0;
+		bikeHomeTime = 0.0;
+		bikeOtherTime = 0.0;
 
-		this.othersWorkTime = 0.0;
-		this.othersEducTime = 0.0;
-		this.othersShopTime = 0.0;
-		this.othersLeisTime = 0.0;
-		this.othersHomeTime = 0.0;
-		this.othersOtherTime = 0.0;
+		othersWorkTime = 0.0;
+		othersEducTime = 0.0;
+		othersShopTime = 0.0;
+		othersLeisTime = 0.0;
+		othersHomeTime = 0.0;
+		othersOtherTime = 0.0;
 	}
 
 	@Override
@@ -130,10 +130,10 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		this.person = person;
 		Plan plan = person.getSelectedPlan();
 		if (toll == null) {
-			this.count++;
+			count++;
 			run(plan);
 		} else if (TollTools.isInRange(plan.getFirstActivity().getLink(), toll)) {
-			this.count++;
+			count++;
 			run(plan);
 		}
 	}
@@ -145,19 +145,18 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		double wlkDayTime = 0.0;
 		double bikeDayTime = 0.0;
 		double othersDayTime = 0.0;
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : plan.getPlanElements())
 			if (pe instanceof Leg) {
 				Leg bl = (Leg) pe;
 
 				ActType at = null;
 				String tmpActTypeStartsWith = plan.getNextActivity(bl)
 						.getType().substring(0, 1);
-				for (ActType a : ActType.values()) {
+				for (ActType a : ActType.values())
 					if (tmpActTypeStartsWith.equals(a.getFirstLetter())) {
 						at = a;
 						break;
 					}
-				}
 				if (at == null)
 					at = ActType.others;
 
@@ -169,172 +168,170 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 				TransportMode mode = bl.getMode();
 				switch (mode) {
 				case car:
-					this.carTime += time;
+					carTime += time;
 					carDayTime += time;
 					switch (at) {
 					case home:
-						this.carHomeTime += time;
+						carHomeTime += time;
 						break;
 					case work:
-						this.carWorkTime += time;
+						carWorkTime += time;
 						break;
 					case education:
-						this.carEducTime += time;
+						carEducTime += time;
 						break;
 					case shopping:
-						this.carShopTime += time;
+						carShopTime += time;
 						break;
 					case leisure:
-						this.carLeisTime += time;
+						carLeisTime += time;
 						break;
 					default:
-						this.carOtherTime += time;
+						carOtherTime += time;
 						break;
 					}
-					this.carLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					carLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					break;
 				case pt:
-					this.ptTime += time;
+					ptTime += time;
 					ptDayTime += time;
 					switch (at) {
 					case home:
-						this.ptHomeTime += time;
+						ptHomeTime += time;
 						break;
 					case work:
-						this.ptWorkTime += time;
+						ptWorkTime += time;
 						break;
 					case education:
-						this.ptEducTime += time;
+						ptEducTime += time;
 						break;
 					case shopping:
-						this.ptShopTime += time;
+						ptShopTime += time;
 						break;
 					case leisure:
-						this.ptLeisTime += time;
+						ptLeisTime += time;
 						break;
 					default:
-						this.ptOtherTime += time;
+						ptOtherTime += time;
 						break;
 					}
-					this.ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					ptLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					break;
 				case walk:
-					this.wlkTime += time;
+					wlkTime += time;
 					wlkDayTime += time;
 					switch (at) {
 					case home:
-						this.wlkHomeTime += time;
+						wlkHomeTime += time;
 						break;
 					case work:
-						this.wlkWorkTime += time;
+						wlkWorkTime += time;
 						break;
 					case education:
-						this.wlkEducTime += time;
+						wlkEducTime += time;
 						break;
 					case shopping:
-						this.wlkShopTime += time;
+						wlkShopTime += time;
 						break;
 					case leisure:
-						this.wlkLeisTime += time;
+						wlkLeisTime += time;
 						break;
 					default:
-						this.wlkOtherTime += time;
+						wlkOtherTime += time;
 						break;
 					}
-					this.wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					wlkLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					break;
 				case bike:
 					bikeTime += time;
 					bikeDayTime += time;
 					switch (at) {
 					case home:
-						this.bikeHomeTime += time;
+						bikeHomeTime += time;
 						break;
 					case work:
-						this.bikeWorkTime += time;
+						bikeWorkTime += time;
 						break;
 					case education:
-						this.bikeEducTime += time;
+						bikeEducTime += time;
 						break;
 					case shopping:
-						this.bikeShopTime += time;
+						bikeShopTime += time;
 						break;
 					case leisure:
-						this.bikeLeisTime += time;
+						bikeLeisTime += time;
 						break;
 					default:
-						this.bikeOtherTime += time;
+						bikeOtherTime += time;
 						break;
 					}
-					this.bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					bikeLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					break;
 				default:
-					this.othersTime += time;
+					othersTime += time;
 					othersDayTime += time;
 					switch (at) {
 					case home:
-						this.othersHomeTime += time;
+						othersHomeTime += time;
 						break;
 					case work:
-						this.othersWorkTime += time;
+						othersWorkTime += time;
 						break;
 					case education:
-						this.othersEducTime += time;
+						othersEducTime += time;
 						break;
 					case shopping:
-						this.othersShopTime += time;
+						othersShopTime += time;
 						break;
 					case leisure:
-						this.othersLeisTime += time;
+						othersLeisTime += time;
 						break;
 					default:
-						this.othersOtherTime += time;
+						othersOtherTime += time;
 						break;
 					}
-					this.othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
+					othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
 					break;
 				}
 			}
-		}
 		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
-			this.totalDayEnRouteTimeCounts[i]++;
+			totalDayEnRouteTimeCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) othersDayTime); i++)
-			this.othersDayEnRouteTimeCounts[i]++;
+			othersDayEnRouteTimeCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) carDayTime); i++)
-			this.carDayEnRouteTimeCounts[i]++;
+			carDayEnRouteTimeCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) ptDayTime); i++)
-			this.ptDayEnRouteTimeCounts[i]++;
+			ptDayEnRouteTimeCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) wlkDayTime); i++)
-			this.wlkDayEnRouteTimeCounts[i]++;
+			wlkDayEnRouteTimeCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) bikeDayTime); i++)
-			this.bikeDayEnRouteTimeCounts[i]++;
+			bikeDayEnRouteTimeCounts[i]++;
 	}
 
 	public void write(final String outputFilename) {
-		double sum = this.carTime + this.ptTime + this.othersTime + wlkTime
-				+ bikeTime;
+		double sum = carTime + ptTime + othersTime + wlkTime + bikeTime;
 
 		SimpleWriter sw = new SimpleWriter(outputFilename
 				+ "dailyEnRouteTime.txt");
 		sw.writeln("\tDaily En Route Time\tn_agents\t" + count);
 		sw.writeln("\tavg.[min]\t%\tsum.[min]");
 
-		double avgCarTime = carTime / this.count;
+		double avgCarTime = carTime / count;
 		double avgPtTime = ptTime / count;
 		double avgWlkTime = wlkTime / count;
 		double avgBikeTime = bikeTime / count;
 		double avgOtherTime = othersTime / count;
 
-		sw.writeln("car\t" + avgCarTime + "\t" + this.carTime / sum * 100.0
-				+ "\t" + carTime);
-		sw.writeln("pt\t" + avgPtTime + "\t" + this.ptTime / sum * 100.0 + "\t"
+		sw.writeln("car\t" + avgCarTime + "\t" + carTime / sum * 100.0 + "\t"
+				+ carTime);
+		sw.writeln("pt\t" + avgPtTime + "\t" + ptTime / sum * 100.0 + "\t"
 				+ ptTime);
 		sw.writeln("walk\t" + avgWlkTime + "\t" + wlkTime / sum * 100.0 + "\t"
 				+ wlkTime);
 		sw.writeln("bike\t" + avgBikeTime + "\t" + bikeTime / sum * 100.0
 				+ "\t" + bikeTime);
-		sw.writeln("others\t" + avgOtherTime + "\t" + this.othersTime / sum
-				* 100.0 + "\t" + othersTime);
+		sw.writeln("others\t" + avgOtherTime + "\t" + othersTime / sum * 100.0
+				+ "\t" + othersTime);
 
 		PieChart pieChart = new PieChart(
 				"Avg. Daily En Route Time -- Modal Split");
@@ -347,71 +344,67 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		sw
 				.writeln("--travel destination and modal split--daily on route time--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
-		sw.writeln("car\t" + this.carWorkTime + "\t" + this.carEducTime + "\t"
-				+ this.carShopTime + "\t" + this.carLeisTime + "\t"
-				+ this.carHomeTime + "\t" + this.carOtherTime);
-		sw.writeln("pt\t" + this.ptWorkTime + "\t" + this.ptEducTime + "\t"
-				+ this.ptShopTime + "\t" + this.ptLeisTime + "\t"
-				+ this.ptHomeTime + "\t" + this.ptOtherTime);
-		sw.writeln("walk\t" + this.wlkWorkTime + "\t" + this.wlkEducTime + "\t"
-				+ this.wlkShopTime + "\t" + this.wlkLeisTime + "\t"
-				+ this.wlkHomeTime + "\t" + this.wlkOtherTime);
-		sw.writeln("bike\t" + this.bikeWorkTime + "\t" + this.bikeEducTime
-				+ "\t" + this.bikeShopTime + "\t" + this.bikeLeisTime + "\t"
-				+ this.bikeHomeTime + "\t" + this.bikeOtherTime);
-		sw.writeln("others\t" + this.othersWorkTime + "\t"
-				+ this.othersEducTime + "\t" + this.othersShopTime + "\t"
-				+ this.othersLeisTime + "\t" + this.othersHomeTime + "\t"
-				+ this.othersOtherTime);
-		sw.writeln("total\t"
-				+ (this.carWorkTime + this.ptWorkTime + wlkWorkTime
-						+ bikeWorkTime + othersWorkTime)
-				+ "\t"
-				+ (this.carEducTime + this.ptEducTime + wlkEducTime
-						+ bikeEducTime + othersEducTime)
-				+ "\t"
-				+ (this.carShopTime + this.ptShopTime + wlkShopTime
-						+ bikeShopTime + othersShopTime)
-				+ "\t"
-				+ (this.carLeisTime + this.ptLeisTime + wlkLeisTime
-						+ bikeLeisTime + othersLeisTime)
-				+ "\t"
-				+ (this.carHomeTime + this.ptHomeTime + wlkHomeTime
-						+ bikeHomeTime + othersHomeTime)
-				+ "\t"
-				+ (this.carOtherTime + this.ptOtherTime + wlkOtherTime
-						+ bikeOtherTime + othersOtherTime));
+		sw.writeln("car\t" + carWorkTime + "\t" + carEducTime + "\t"
+				+ carShopTime + "\t" + carLeisTime + "\t" + carHomeTime + "\t"
+				+ carOtherTime);
+		sw.writeln("pt\t" + ptWorkTime + "\t" + ptEducTime + "\t" + ptShopTime
+				+ "\t" + ptLeisTime + "\t" + ptHomeTime + "\t" + ptOtherTime);
+		sw.writeln("walk\t" + wlkWorkTime + "\t" + wlkEducTime + "\t"
+				+ wlkShopTime + "\t" + wlkLeisTime + "\t" + wlkHomeTime + "\t"
+				+ wlkOtherTime);
+		sw.writeln("bike\t" + bikeWorkTime + "\t" + bikeEducTime + "\t"
+				+ bikeShopTime + "\t" + bikeLeisTime + "\t" + bikeHomeTime
+				+ "\t" + bikeOtherTime);
+		sw.writeln("others\t" + othersWorkTime + "\t" + othersEducTime + "\t"
+				+ othersShopTime + "\t" + othersLeisTime + "\t"
+				+ othersHomeTime + "\t" + othersOtherTime);
+		sw
+				.writeln("total\t"
+						+ (carWorkTime + ptWorkTime + wlkWorkTime
+								+ bikeWorkTime + othersWorkTime)
+						+ "\t"
+						+ (carEducTime + ptEducTime + wlkEducTime
+								+ bikeEducTime + othersEducTime)
+						+ "\t"
+						+ (carShopTime + ptShopTime + wlkShopTime
+								+ bikeShopTime + othersShopTime)
+						+ "\t"
+						+ (carLeisTime + ptLeisTime + wlkLeisTime
+								+ bikeLeisTime + othersLeisTime)
+						+ "\t"
+						+ (carHomeTime + ptHomeTime + wlkHomeTime
+								+ bikeHomeTime + othersHomeTime)
+						+ "\t"
+						+ (carOtherTime + ptOtherTime + wlkOtherTime
+								+ bikeOtherTime + othersOtherTime));
 
 		BarChart barChart = new BarChart(
 				"travel destination and modal split--daily En Route Time",
 				"travel destination", "daily En Route Time [min]",
 				new String[] { "work", "education", "shopping", "leisure",
 						"home", OTHERS });
-		barChart.addSeries(CAR, new double[] { this.carWorkTime,
-				this.carEducTime, this.carShopTime, this.carLeisTime,
-				this.carHomeTime, this.carOtherTime });
+		barChart.addSeries(CAR, new double[] { carWorkTime, carEducTime,
+				carShopTime, carLeisTime, carHomeTime, carOtherTime });
 
-		double[] ptDestinationTime = new double[] { this.ptWorkTime,
-				this.ptEducTime, this.ptShopTime, this.ptLeisTime,
-				this.ptHomeTime, this.ptOtherTime };
+		double[] ptDestinationTime = new double[] { ptWorkTime, ptEducTime,
+				ptShopTime, ptLeisTime, ptHomeTime, ptOtherTime };
 		if (CollectionSum.getSum(ptDestinationTime) > 0)
 			barChart.addSeries("pt", ptDestinationTime);
 
-		double[] wlkDestinationTime = new double[] { this.wlkWorkTime,
-				this.wlkEducTime, this.wlkShopTime, this.wlkLeisTime,
-				this.wlkHomeTime, this.wlkOtherTime };
+		double[] wlkDestinationTime = new double[] { wlkWorkTime, wlkEducTime,
+				wlkShopTime, wlkLeisTime, wlkHomeTime, wlkOtherTime };
 		if (CollectionSum.getSum(wlkDestinationTime) > 0)
 			barChart.addSeries("walk", wlkDestinationTime);
 
-		double[] bikeDestinationTime = new double[] { this.bikeWorkTime,
-				this.bikeEducTime, this.bikeShopTime, this.bikeLeisTime,
-				this.bikeHomeTime, this.bikeOtherTime };
+		double[] bikeDestinationTime = new double[] { bikeWorkTime,
+				bikeEducTime, bikeShopTime, bikeLeisTime, bikeHomeTime,
+				bikeOtherTime };
 		if (CollectionSum.getSum(bikeDestinationTime) > 0)
 			barChart.addSeries(BIKE, bikeDestinationTime);
 
-		double[] othersDestinationTime = new double[] { this.othersWorkTime,
-				this.othersEducTime, this.othersShopTime, this.othersLeisTime,
-				this.othersHomeTime, this.othersOtherTime };
+		double[] othersDestinationTime = new double[] { othersWorkTime,
+				othersEducTime, othersShopTime, othersLeisTime, othersHomeTime,
+				othersOtherTime };
 		if (CollectionSum.getSum(othersDestinationTime) > 0)
 			barChart.addSeries(OTHERS, othersDestinationTime);
 
@@ -429,13 +422,12 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		double yBike[] = new double[101];
 		double yOthers[] = new double[101];
 		for (int i = 0; i < 101; i++) {
-			yTotal[i] = this.totalDayEnRouteTimeCounts[i] / this.count * 100.0;
-			yCar[i] = this.carDayEnRouteTimeCounts[i] / this.count * 100.0;
-			yPt[i] = this.ptDayEnRouteTimeCounts[i] / this.count * 100.0;
-			yWlk[i] = this.wlkDayEnRouteTimeCounts[i] / this.count * 100.0;
-			yBike[i] = this.bikeDayEnRouteTimeCounts[i] / this.count * 100.0;
-			yOthers[i] = this.othersDayEnRouteTimeCounts[i] / this.count
-					* 100.0;
+			yTotal[i] = totalDayEnRouteTimeCounts[i] / count * 100.0;
+			yCar[i] = carDayEnRouteTimeCounts[i] / count * 100.0;
+			yPt[i] = ptDayEnRouteTimeCounts[i] / count * 100.0;
+			yWlk[i] = wlkDayEnRouteTimeCounts[i] / count * 100.0;
+			yBike[i] = bikeDayEnRouteTimeCounts[i] / count * 100.0;
+			yOthers[i] = othersDayEnRouteTimeCounts[i] / count * 100.0;
 		}
 		XYLineChart chart = new XYLineChart("Daily En Route Time Distribution",
 				"Daily En Route Time in min",
@@ -470,12 +462,9 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 					+ bikeLegTimeCounts[i] + othersLegTimeCounts[i];
 			xs[i] = i * 2;
 			if (sumOfLegTimeCounts > 0) {
-				yCarFracs[i] = this.carLegTimeCounts[i] / sumOfLegTimeCounts
-						* 100.0;
-				yPtFracs[i] = this.ptLegTimeCounts[i] / sumOfLegTimeCounts
-						* 100.0;
-				yWlkFracs[i] = this.wlkLegTimeCounts[i] / sumOfLegTimeCounts
-						* 100.0;
+				yCarFracs[i] = carLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
+				yPtFracs[i] = ptLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
+				yWlkFracs[i] = wlkLegTimeCounts[i] / sumOfLegTimeCounts * 100.0;
 				yBikeFracs[i] = bikeLegTimeCounts[i] / sumOfLegTimeCounts
 						* 100.0;
 				yOthersFracs[i] = othersLegTimeCounts[i] / sumOfLegTimeCounts
