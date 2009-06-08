@@ -112,13 +112,6 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			return Double.toString(getTravelingPt());
 		} else if (TRAVELING_WALK.equals(key)) {
 			return Double.toString(getTravelingWalk());
-		} else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
-			if ( margUtlDistCnt < 1 ) {
-				margUtlDistCnt++ ;
-				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead." + Gbl.ONLYONCE );
-				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!" + Gbl.ONLYONCE );
-			}
-			return Double.toString(getMarginalUtlOfDistance());
 		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
 			return Double.toString(this.getMarginalUtlOfDistanceCar());
 		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
@@ -188,13 +181,13 @@ public class CharyparNagelScoringConfigGroup extends Module {
 				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
 				log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
 			}
-			setMarginalUtlOfDistance(Double.parseDouble(value));
+			setMarginalUtlOfDistanceCar(Double.parseDouble(value));
 		} else if (DISTANCE_COST.equals(key)) {
-			log.warn("The parameter " + DISTANCE_COST + " in module " + GROUP_NAME + " should be replaced by the parameter " + MARGINAL_UTL_OF_DISTANCE + ".");
+			log.warn("The parameter " + DISTANCE_COST + " in module " + GROUP_NAME + " should be replaced by the parameter " + MARGINAL_UTL_OF_DISTANCE_CAR + ".");
 			log.warn("Please change your config file. Take care to also negate the value of the parameter! distanceCost was specified as 'Money per kilometer', marginalUtlOfDistance is 'Money per METER'!!!");
 			double newValue = -Double.parseDouble(value) / 1000.0;
-			log.warn("We will set now the parameter '" + MARGINAL_UTL_OF_DISTANCE + "' to the value " + newValue);
-			setMarginalUtlOfDistance(newValue);
+			log.warn("We will set now the parameter '" + MARGINAL_UTL_OF_DISTANCE_CAR + "' to the value " + newValue);
+			setMarginalUtlOfDistanceCar(newValue);
 		} else if (WAITING.equals(key)) {
 			setWaiting(Double.parseDouble(value));
 		} else if (NUM_ACTIVITIES.equals(key)) {
@@ -374,7 +367,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		return this.marginalUtlOfDistanceWalk;
 	}
 	/**
-	 * @param marginalUtlOfDistance the marginal utility of distance for mode walk per meter
+	 * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
 	 */
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
@@ -387,7 +380,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		return this.marginalUtlOfDistancePt;
 	}
 	/**
-	 * @param marginalUtlOfDistance the marginal utility of distance for mode pt per meter
+	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
 	 */
 	public void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
 		this.marginalUtlOfDistancePt = marginalUtlOfDistancePt;
@@ -399,30 +392,10 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		return this.marginalUtlOfDistanceCar;
 	}
 	/**
-	 * @param marginalUtlOfDistance the marginal utility of distance for mode car per meter
+	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
 	 */
 	public void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
 		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
-	}
-	/**
-	 * @return the marginal utility of distance per meter
-	 * @deprecated use getMarginalUtlOfDistanceCar instead
-	 */
-	@Deprecated 
-	public double getMarginalUtlOfDistance() {
-		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
-		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
-		return this.marginalUtlOfDistanceCar;
-	}
-	/**
-	 * @param marginalUtlOfDistance the marginal utility of distance per meter
-	 * @deprecated use setMarginalUtlOfDistanceCar instead
-	 */
-	@Deprecated
-	public void setMarginalUtlOfDistance(final double marginalUtlOfDistance) {
-		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE +" is deprecated. Use a mode specific marginal utility of distance instead.");
-		log.warn("The parameter " + MARGINAL_UTL_OF_DISTANCE + " is interpreted like the marginal utility of distance for the car mode!");
-		this.marginalUtlOfDistanceCar = marginalUtlOfDistance;
 	}
 	
 	public double getWaiting() {
@@ -486,6 +459,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		public double getMinimalDuration() {
 			return this.minimalDuration;
 		}
+
 		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
 			if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt<1) ) {

@@ -328,7 +328,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		marginalUtilityOfTravelingWalk = params.getTravelingWalk() / 3600.0;
 		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
 
-		marginalUtilityOfDistance = params.getMarginalUtlOfDistance();
+		marginalUtilityOfDistance = params.getMarginalUtlOfDistanceCar();
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),

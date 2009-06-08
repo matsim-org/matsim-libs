@@ -150,7 +150,7 @@ public class BKickScoringFunction implements ScoringFunction {
 
 //		marginalUtilityOfPtFare = marginalUtilityOfPtFare;
 		
-		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistance();
+		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistanceCar();
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),

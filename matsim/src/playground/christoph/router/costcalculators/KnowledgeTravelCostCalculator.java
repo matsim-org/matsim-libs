@@ -52,7 +52,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		 * but the cost should be positive. Thus negate the utility.
 		 */
 		this.travelCostFactor = -Gbl.getConfig().charyparNagelScoring().getTraveling() / 3600.0;
-		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistance();
+		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistanceCar();
 	}
 	
 	public double getLinkTravelCost(final Link link, final double time) 
@@ -68,10 +68,10 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;
 		}
-		else
-		{
+//		else
+//		{
 //			log.info("Link is part of the Persons knowledge!");
-		}
+//		}
 		
 		// Person knows the link, so calculate it's costs
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);

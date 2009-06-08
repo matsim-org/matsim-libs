@@ -64,7 +64,7 @@ public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
 	
 	public FreespeedTravelTimeCost(CharyparNagelScoringConfigGroup cnScoringGroup){
 		this(cnScoringGroup.getTraveling() / 3600.0, cnScoringGroup.getPerforming() / 3600.0, 
-				cnScoringGroup.getMarginalUtlOfDistance());
+				cnScoringGroup.getMarginalUtlOfDistanceCar());
 	}
 	
 	/**

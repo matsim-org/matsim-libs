@@ -44,7 +44,7 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 		 * but the cost should be positive. Thus negate the utility.
 		 */
 		this.travelCostFactor = (- cnScoringGroup.getTraveling() / 3600.0) + (cnScoringGroup.getPerforming() / 3600.0);
-		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistance();
+		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistanceCar();
 	}
 	
 	/**
