@@ -77,7 +77,7 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			}
 
 			SynchBox = new JCheckBox("show overlays");
-//			SynchBox.setMnemonic(KeyEvent.VK_M);
+//			SynchBox.setMnemonic(KeyEvent.VK_M);3
 			SynchBox.setSelected(cfg.drawOverlays());
 			SynchBox.addItemListener(this);
 			SynchBox.setBounds(10, 60, 200, 31);
@@ -110,6 +110,14 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			//SynchBox.setVisible(true);
 			//SynchBox.setMaximumSize(new Dimension(250,60));
 			panel.add(SynchBox);
+			SynchBox = new JCheckBox("show scale bar");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.drawScaleBar());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 140, 200, 31);
+			SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
 		}
 	}
 
@@ -139,7 +147,10 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 		} else if (source.getText().equals("allow caching")) {
 			// toggle caching allowed
 			cfg.setCachingAllowed(!cfg.isCachingAllowed());
-		}
+		} else if (source.getText().equals("show scale bar")) {
+			// toggle draw Overlays
+			cfg.setDrawScaleBar(!cfg.drawScaleBar());
+		} 
 	}
 	public static void main(final String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {

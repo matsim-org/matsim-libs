@@ -96,6 +96,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
+import org.matsim.vis.otfvis.opengl.gui.OTFScaleBarDrawer;
 import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 
 import com.sun.opengl.util.ImageUtil;
@@ -489,6 +490,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	}
 	private Component canvas = null;
 	private JFrame  frame = null;
+
+	private OTFScaleBarDrawer scaleBar;
 	
 	public Insets getInsets() {
 		return this.frame.getInsets();
@@ -542,6 +545,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		linkTexWidth = size;
 
 		this.overlayItems.add(new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false));
+		this.scaleBar = new OTFScaleBarDrawer();
 	}
 
 //	public static GLContext getMotherContext() {
@@ -680,7 +684,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				item.draw();
 			}
 		}
-
+		
+		if (this.config.drawScaleBar()) {
+			this.scaleBar.draw();
+		}
+		
 		if(this.config.renderImages() && lastShot < now){
 			lastShot = now;
 			String nr = String.format("%07d", now);

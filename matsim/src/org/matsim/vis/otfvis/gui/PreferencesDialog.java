@@ -88,7 +88,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	protected void initGUI() {
 		getContentPane().setLayout(null);
 		this.setResizable(false);
-		setSize(480, 330);
+		setSize(480, 340);
 
 		// Mouse Buttons
 		{

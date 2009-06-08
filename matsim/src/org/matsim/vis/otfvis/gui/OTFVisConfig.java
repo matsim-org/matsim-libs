@@ -143,6 +143,8 @@ public class OTFVisConfig extends Module {
 	private boolean cachingAllowed = true;
 	private int delay_ms = 30;
 
+	private boolean drawScaleBar = true;
+
 	/**
 	 * @return the delay_ms
 	 */
@@ -411,6 +413,15 @@ public class OTFVisConfig extends Module {
 	
 	public boolean renderImages() {
 		return renderImages;
+	}
+	
+	public void setDrawScaleBar(boolean drawScaleBar) {
+		setModified();
+		this.drawScaleBar = drawScaleBar;
+	}
+	
+	public boolean drawScaleBar() {
+		return drawScaleBar ;
 	}
 	
 
