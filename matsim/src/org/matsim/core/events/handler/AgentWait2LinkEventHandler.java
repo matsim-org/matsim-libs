@@ -20,8 +20,10 @@
 
 package org.matsim.core.events.handler;
 
+import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.core.events.AgentWait2LinkEvent;
 
+/** @deprecated use {@link BasicAgentWait2LinkEventHandler} */
 public interface AgentWait2LinkEventHandler extends EventHandler {
 	public void handleEvent (AgentWait2LinkEvent event);
 }

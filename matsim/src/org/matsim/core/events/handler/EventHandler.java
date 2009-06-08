@@ -21,6 +21,9 @@
 package org.matsim.core.events.handler;
 
 public interface EventHandler {
-	// resets this handler to it's inital condition 
+	/** resets the handler to it's inital condition
+	 *  
+	 * @param iteration the up-coming iteration from which up-coming events will be from.
+	 */
 	public void reset(int iteration);
 }

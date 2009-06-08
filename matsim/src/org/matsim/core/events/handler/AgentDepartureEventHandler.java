@@ -20,8 +20,10 @@
 
 package org.matsim.core.events.handler;
 
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.core.events.AgentDepartureEvent;
 
+/** @deprecated use {@link BasicAgentDepartureEventHandler} */
 public interface AgentDepartureEventHandler extends EventHandler {
 	public void handleEvent (AgentDepartureEvent event);
 }

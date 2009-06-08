@@ -34,7 +34,7 @@ public abstract class LaneEvent extends LinkEvent {
 
 	public static final String ATTRIBUTE_LANE = "lane";
 	
-	private Id laneId;
+	private final Id laneId;
 	
 
 	/**
@@ -74,9 +74,5 @@ public abstract class LaneEvent extends LinkEvent {
 		return laneId;
 	}
 
-	
-	public void setLaneId(Id laneId) {
-		this.laneId = laneId;
-	}
 
 }

@@ -59,6 +59,7 @@ public abstract class PersonEvent extends BasicEventImpl implements BasicPersonE
 		this.person = agent;
 	}
 
+	/** @deprecated use {@link #getPersonId()} instead */
 	public Person getPerson() {
 		return this.person;
 	}

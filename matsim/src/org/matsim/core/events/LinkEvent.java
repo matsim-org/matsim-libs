@@ -60,10 +60,12 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 		return this.linkId;
 	}
 
+	/** @deprecated set link in constructor */
 	public void setLink(Link link) {
 		this.link = link;
 	}
 
+	/** @deprecated use getLinkId() */
 	public Link getLink() {
 		return link;
 	}

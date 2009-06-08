@@ -20,8 +20,10 @@
 
 package org.matsim.core.events.handler;
 
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.events.LinkEnterEvent;
 
+/** @deprecated use {@link BasicLinkEnterEventHandler} */
 public interface LinkEnterEventHandler extends EventHandler {
 	public void handleEvent (LinkEnterEvent event);
 }
