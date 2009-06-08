@@ -70,7 +70,6 @@ public class LinkSensorManager implements BasicLinkLeaveEventHandler {
 	}
 	/**
 	 * For each LinkLeaveEvent the corresponding traffic count value is incremented.
-	 * @see org.matsim.core.events.handler.LinkLeaveEventHandler#handleEvent(org.matsim.core.events.LinkLeaveEvent)
 	 */
 	public void handleEvent(final BasicLinkLeaveEvent event) {
 		if (this.linkCountMap.containsKey(event.getLinkId())) {
