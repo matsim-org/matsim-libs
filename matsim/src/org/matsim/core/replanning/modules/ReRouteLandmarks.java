@@ -34,20 +34,21 @@ public class ReRouteLandmarks extends ReRouteDijkstra {
 	private final AStarLandmarksFactory factory;
 	private PlansCalcRouteConfigGroup configGroup = null;
 
+	/**
+	 * @deprecated use other constructor and give the PlansCalcRouteConfigGroup
+	 * as argument 
+	 */
+	@Deprecated
 	public ReRouteLandmarks(Network network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
 		super(network, costCalculator, timeCalculator);
 		this.factory = new AStarLandmarksFactory(commonRouterData);
-		// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
-		configGroup = new PlansCalcRouteConfigGroup();
 	}
 	
 	public ReRouteLandmarks(PlansCalcRouteConfigGroup configGroup, Network network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
 		this(network, costCalculator, timeCalculator, commonRouterData);
 		this.configGroup = configGroup;
-		// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
-		if (this.configGroup == null) { System.err.println(">>> ARE YOU SURE THAT THE PlansCalcRouteConfigGroup IS SET TO NULL??? <<<"); }
 	}
 	
 	@Override

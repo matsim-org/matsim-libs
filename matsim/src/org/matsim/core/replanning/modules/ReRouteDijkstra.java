@@ -40,19 +40,20 @@ public class ReRouteDijkstra extends AbstractMultithreadedModule {
 	Network network = null;
 	private PlansCalcRouteConfigGroup configGroup = null;
 	
+	/**
+	 * @deprecated use other constructor and give the PlansCalcRouteConfigGroup
+	 * as argument 
+	 */
+	@Deprecated
 	protected ReRouteDijkstra(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
-		// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
-		configGroup = new PlansCalcRouteConfigGroup();
 	}
 	
 	public ReRouteDijkstra(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(network, costCalculator, timeCalculator);
 		this.configGroup = configGroup;
-		// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
-		if (this.configGroup == null) { System.err.println(">>> ARE YOU SURE THAT THE PlansCalcRouteConfigGroup IS SET TO NULL??? <<<"); }
 	}
 	
 

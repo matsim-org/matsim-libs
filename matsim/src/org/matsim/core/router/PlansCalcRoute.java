@@ -20,6 +20,7 @@
 
 package org.matsim.core.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
@@ -46,6 +47,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
+	private static final Logger log = Logger.getLogger(PlansCalcRoute.class);
+
+	private static final String NO_CONFIGGROUP_SET_WARNING = "No PlansCalcRouteConfigGroup"
+		+ " is set in PlansCalcRoute, using the default values. Make sure that those values" +
+				"fit your needs, otherwise set it expclicitly.";
+	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -60,8 +67,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	private LeastCostPathCalculator routeAlgoFreeflow;
 	
 	private LeastCostPathCalculatorFactory factory;
-
-	// TODO balmermi: PLEASE DOUBLECHECK/TRIPPLECHECK THE USE OF PlansCalcRouteConfigGroup
+	/**
+	 * if not set via constructor use the default values 
+	 */
 	private PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
 	
 	private final NetworkFactory routeFactory;
@@ -82,6 +90,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
 		this.routeAlgoFreeflow = this.factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 		this.routeFactory = network.getFactory();
+		log.warn(NO_CONFIGGROUP_SET_WARNING);
 	}
 	
 	/**
@@ -100,7 +109,12 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		this(network, costCalculator, timeCalculator, factory);
-		this.configGroup = group;
+		if (group != null) {
+			this.configGroup = group;
+		}
+		else {
+			log.warn(NO_CONFIGGROUP_SET_WARNING);
+		}
 	}
 	
 	/**
@@ -121,6 +135,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		this.routeAlgo = router;
 		this.routeAlgoFreeflow = routerFreeflow;
 		this.routeFactory = network.getFactory();
+		log.warn(NO_CONFIGGROUP_SET_WARNING);
 	}
 	
 	public final LeastCostPathCalculator getLeastCostPathCalculator(){
