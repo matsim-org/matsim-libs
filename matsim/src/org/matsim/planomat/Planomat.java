@@ -20,11 +20,11 @@
 
 package org.matsim.planomat;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
@@ -69,8 +69,6 @@ public class Planomat implements PlanAlgorithm {
 	private final int numTimeIntervals = (int) Math.pow(2, config.getLevelOfTimeResolution());
 	protected final double timeIntervalSize = Planomat.SCENARIO_DURATION / numTimeIntervals;
 
-	private final TransportMode[] possibleModes = this.config.getPossibleModes().toArray(new TransportMode[this.config.getPossibleModes().size()]);
-
 	private final LegTravelTimeEstimator legTravelTimeEstimator;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Random seedGenerator;
@@ -96,8 +94,10 @@ public class Planomat implements PlanAlgorithm {
 		}
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
+		TransportMode[] possibleModes = this.getPossibleModes(plan);
+		
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
-		if (this.possibleModes.length > 0) {
+		if (possibleModes.length > 0) {
 			if (this.doLogging) {
 				logger.info("Running subtour analysis...");
 			}
@@ -108,7 +108,28 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running subtour analysis...done.");
 			logger.info("Initialization of JGAP configuration...");
 		}
-		Genotype population = this.initJGAP(plan, planAnalyzeSubtours);
+		// JGAP random number generator is initialized for each run
+		// but use a random number as seed so every run will draw a different, but deterministic sequence of random numbers
+		long seed = this.seedGenerator.nextLong();
+		if (this.doLogging) {
+			logger.info("agent id: " + plan.getPerson().getId() + "; JGAP seed: " + Long.toString(seed));
+		}
+		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(
+				plan, 
+				planAnalyzeSubtours, 
+				seed,
+				this.numTimeIntervals,
+				possibleModes);
+
+		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan, planAnalyzeSubtours, possibleModes);		
+
+		Genotype population = null;
+		try {
+			jgapConfiguration.setFitnessFunction( fitnessFunction );
+			population = Genotype.randomInitialGenotype( jgapConfiguration );
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
 		if (this.doLogging) {
 			logger.info("Initialization of JGAP configuration...done.");
 			logger.info("Running evolution...");
@@ -118,7 +139,7 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running evolution...done.");
 			logger.info("Writing solution back to Plan object...");
 		}
-		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan, planAnalyzeSubtours);
+		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan, planAnalyzeSubtours, possibleModes);
 		if (this.doLogging) {
 			logger.info("Writing solution back to Plan object...done.");
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
@@ -129,48 +150,28 @@ public class Planomat implements PlanAlgorithm {
 		plan.setScore(null);
 	}
 
-//	protected EnumSet<TransportMode> getModifiedModeChoiceSet(final Plan plan) {
-
-//	EnumSet<TransportMode> modeChoiceSet = Gbl.getConfig().planomat().getPossibleModes().clone();
-
-//	if (!plan.getPerson().getCarAvail().equals("always")) {
-//	modeChoiceSet.remove(TransportMode.car);
-//	}
-
-//	return modeChoiceSet;
-//	}
-
-	private synchronized Genotype initJGAP(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours) {
-
-		Genotype population = null;
-
-		// JGAP random number generator is initialized for each run
-		// but use a random number as seed so every run will draw a different, but deterministic sequence of random numbers
-		long seed = this.seedGenerator.nextLong();
-		if (this.doLogging) {
-			logger.info("agent id: " + plan.getPerson().getId() + "; JGAP seed: " + Long.toString(seed));
+	/**
+	 * TODO refactor all "possibleModes" operations to EnumSet rather than arrays
+	 * @param plan
+	 * @return
+	 */
+	protected TransportMode[] getPossibleModes(final Plan plan) {
+		
+		// remove car option for agents that have no car available
+		EnumSet<TransportMode> possibleModesEnumSet = this.config.getPossibleModes().clone();
+		
+		String carAvail = plan.getPerson().getCarAvail();
+		if (carAvail != null) {
+			if (plan.getPerson().getCarAvail().equals("never")) {
+				possibleModesEnumSet.remove(TransportMode.car);
+			}
 		}
-		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(plan, planAnalyzeSubtours, seed);
+		TransportMode[] possibleModes = possibleModesEnumSet.toArray(new TransportMode[possibleModesEnumSet.size()]);
 
-		IChromosome sampleChromosome = this.initSampleChromosome(plan, planAnalyzeSubtours, jgapConfiguration);
-		try {
-			jgapConfiguration.setSampleChromosome(sampleChromosome);
-		} catch (InvalidConfigurationException e1) {
-			e1.printStackTrace();
-		}
-
-		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan, planAnalyzeSubtours);		
-
-		try {
-			jgapConfiguration.setFitnessFunction( fitnessFunction );
-			population = Genotype.randomInitialGenotype( jgapConfiguration );
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-
-		return population;
+		return possibleModes;
+		
 	}
-
+	
 	private IChromosome evolveAndReturnFittest(final Genotype population) {
 
 //		IChromosome fittest = null;
@@ -187,47 +188,12 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
-	protected IChromosome initSampleChromosome(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours, final org.jgap.Configuration jgapConfiguration) {
-
-		int numActs = plan.getPlanElements().size() / 2;
-		int numSubtours = 0;
-		if (planAnalyzeSubtours != null) {
-			numSubtours = planAnalyzeSubtours.getNumSubtours();
-		}
-		Gene[] sampleGenes = new Gene[1 + numActs + numSubtours];
-
-		try {
-			// first integer gene for the start time of the plan
-			sampleGenes[0] = new IntegerGene(jgapConfiguration, 0, this.numTimeIntervals - 1);
-			// one integer gene for each activity duration
-			for (int ii=0; ii < numActs; ii++) {
-				sampleGenes[1 + ii] = new IntegerGene(jgapConfiguration, 0, this.numTimeIntervals - 1);
-			}
-			// one integer gene for the mode of each subtour
-			for (int ii=0; ii < numSubtours; ii++) {
-				sampleGenes[1 + numActs + ii] = new IntegerGene(jgapConfiguration, 0, this.possibleModes.length - 1);
-			}
-		} catch (InvalidConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}		
-
-		IChromosome sampleChromosome = null;
-		try {
-			sampleChromosome = new PlanomatJGAPChromosome( jgapConfiguration, sampleGenes );
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-
-		return sampleChromosome;
-
-	}
-
 	protected double stepThroughPlan(
 			final StepThroughPlanAction action, 
 			final IChromosome individual, 
 			final Plan plan, 
-			final PlanAnalyzeSubtours planAnalyzeSubtours) {
+			final PlanAnalyzeSubtours planAnalyzeSubtours,
+			final TransportMode[] possibleModes) {
 
 		// TODO comment this
 		double positionInTimeInterval = 0.5;

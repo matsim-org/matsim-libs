@@ -22,6 +22,7 @@ package org.matsim.planomat;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.planomat.Planomat.StepThroughPlanAction;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -52,18 +53,20 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private transient final Planomat planomat;
 	private transient final Plan plan;
 	private transient final PlanAnalyzeSubtours planAnalyzeSubtours;
+	private transient final TransportMode[] possibleModes;
 
-	public PlanomatFitnessFunctionWrapper(Planomat planomat, Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
+	public PlanomatFitnessFunctionWrapper(Planomat planomat, Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours, TransportMode[] possibleModes) {
 		super();
 		this.planomat = planomat;
 		this.plan = plan;
 		this.planAnalyzeSubtours = planAnalyzeSubtours;
+		this.possibleModes = possibleModes;
 	}
 
 	@Override
 	protected double evaluate(final IChromosome a_subject) {
 
-		double planScore = this.planomat.stepThroughPlan(StepThroughPlanAction.EVALUATE, a_subject, this.plan, this.planAnalyzeSubtours);
+		double planScore = this.planomat.stepThroughPlan(StepThroughPlanAction.EVALUATE, a_subject, this.plan, this.planAnalyzeSubtours, this.possibleModes);
 
 		return planScore;
 	}

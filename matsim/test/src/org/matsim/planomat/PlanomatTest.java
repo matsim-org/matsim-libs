@@ -28,6 +28,7 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.Scenario;
@@ -112,6 +113,18 @@ public class PlanomatTest extends MatsimTestCase {
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR);
 	}
 
+	public void testCarAvailabilityAlways() {
+		Person p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		p.setCarAvail("always");
+		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
+	}
+	
+	public void testCarAvailabilityNever() {
+		Person p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		p.setCarAvail("never");
+		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
+	}
+	
 	private void runATestRun(final PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), 900, this.scenario.getConfig().travelTimeCalculator());
@@ -180,12 +193,6 @@ public class PlanomatTest extends MatsimTestCase {
 		log.info("Testing " + testRun.toString() + "...done.");
 	}
 
-//	public void testGetModifiedModeChoiceSet() {
-//		
-//		fail("Not yet implemented");
-//		
-//	}
-	
 	public void testInitSampleChromosome() {
 
 		// init test Plan
@@ -196,21 +203,28 @@ public class PlanomatTest extends MatsimTestCase {
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
-		Configuration jgapConfiguration = new Configuration();
-
-		IChromosome testChromosome = null;
-
 		Planomat testee = new Planomat(null, null);
 
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-		planAnalyzeSubtours.run(testPlan);
+		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
+		
+		PlanAnalyzeSubtours planAnalyzeSubtours = null;
+		if (possibleModes.length > 0) {
+			planAnalyzeSubtours = new PlanAnalyzeSubtours();
+			planAnalyzeSubtours.run(testPlan);
+		}
 
-		testChromosome = testee.initSampleChromosome(testPlan, planAnalyzeSubtours, jgapConfiguration);
-		assertEquals(4, testChromosome.getGenes().length);
+		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(
+				testPlan, 
+				planAnalyzeSubtours, 
+				4711,
+				128,
+				possibleModes);
+		
+		IChromosome testChromosome = jgapConfiguration.getSampleChromosome();
+		assertEquals(3, testChromosome.getGenes().length);
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[0].getClass());
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[1].getClass());
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[2].getClass());
-		assertEquals(IntegerGene.class, testChromosome.getGenes()[3].getClass());
 
 	}
 
@@ -280,7 +294,7 @@ public class PlanomatTest extends MatsimTestCase {
 		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 		Planomat testee = new Planomat(ltte, sfFactory);
 
-		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null);
+		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, null);
 
 		// write out the test person and the modified plan into a file
 		Population outputPopulation = new PopulationImpl();

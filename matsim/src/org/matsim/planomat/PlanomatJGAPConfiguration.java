@@ -22,14 +22,18 @@ package org.matsim.planomat;
 
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
+import org.jgap.Gene;
+import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.event.EventManager;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.GABreeder;
+import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -42,11 +46,23 @@ public class PlanomatJGAPConfiguration extends Configuration {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public PlanomatJGAPConfiguration(Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours, long seed) {
-		this("", "", plan, planAnalyzeSubtours, seed);
+	public PlanomatJGAPConfiguration(
+			Plan plan, 
+			PlanAnalyzeSubtours planAnalyzeSubtours, 
+			long seed,
+			int numTimeIntervals,
+			TransportMode[] possibleModes) {
+		this("", "", plan, planAnalyzeSubtours, seed, numTimeIntervals, possibleModes);
 	}
 
-	private PlanomatJGAPConfiguration(String a_id, String a_name, Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours, long seed) {
+	private PlanomatJGAPConfiguration(
+			String a_id, 
+			String a_name, 
+			Plan plan, 
+			PlanAnalyzeSubtours planAnalyzeSubtours, 
+			long seed,
+			int numTimeIntervals,
+			TransportMode[] possibleModes) {
 		super(a_id, a_name);
 
 		Configuration.reset();
@@ -62,10 +78,6 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			this.setBreeder(new PlanomatGABreeder());
 			
 			// initialize selection:
-			// - weighted roulette wheel selection (standard)
-//			WeightedRouletteSelector weightedRouletteSelector = new WeightedRouletteSelector(this);
-//			this.addNaturalSelector(weightedRouletteSelector, true);
-			
 			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(
 					this, 0.90d);
 			bestChromsSelector.setDoubletteChromosomesAllowed(false);
@@ -76,25 +88,54 @@ public class PlanomatJGAPConfiguration extends Configuration {
 
 			// initialize population properties
 			// - population size: equal to the string length, if not specified otherwise (de Jong, 1975)
-			if (Gbl.getConfig().planomat().getPopSize() == Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue())) {
+			int numActs = plan.getPlanElements().size() / 2;
+			int numSubtours = 0;
+			if (planAnalyzeSubtours != null) {
+				numSubtours = planAnalyzeSubtours.getNumSubtours();
+			}
+			
+			int populationSize = Gbl.getConfig().planomat().getPopSize();
+			if (populationSize == Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue())) {
 				
-				int numActs = plan.getPlanElements().size() / 2;
-				int populationSize = Gbl.getConfig().planomat().getLevelOfTimeResolution() * numActs;
-				if (planAnalyzeSubtours != null) {
-					populationSize += Gbl.getConfig().planomat().getPossibleModes().size() * planAnalyzeSubtours.getNumSubtours();
-				}
+				populationSize = Gbl.getConfig().planomat().getLevelOfTimeResolution() * numActs;
+				populationSize += Gbl.getConfig().planomat().getPossibleModes().size() * numSubtours;
 				this.setPopulationSize( populationSize );
 				
-			} else {
-				
-				this.setPopulationSize( Gbl.getConfig().planomat().getPopSize() );
-				
 			}
+			this.setPopulationSize(populationSize);
+			
+			// initialize sample chromosome
+			Gene[] sampleGenes = new Gene[1 + numActs + numSubtours];
 
+			try {
+				// first integer gene for the start time of the plan
+				sampleGenes[0] = new IntegerGene(this, 0, numTimeIntervals - 1);
+				// one integer gene for each activity duration
+				for (int ii=0; ii < numActs; ii++) {
+					sampleGenes[1 + ii] = new IntegerGene(this, 0, numTimeIntervals - 1);
+				}
+				// one integer gene for the mode of each subtour
+				for (int ii=0; ii < numSubtours; ii++) {
+					sampleGenes[1 + numActs + ii] = new IntegerGene(this, 0, possibleModes.length - 1);
+				}
+			} catch (InvalidConfigurationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}		
+
+			IChromosome sampleChromosome = null;
+			try {
+				sampleChromosome = new PlanomatJGAPChromosome( this, sampleGenes );
+			} catch (InvalidConfigurationException e) {
+				e.printStackTrace();
+			}
+			this.setSampleChromosome(sampleChromosome);
+			
 			// initialize fitness function
 			// - maximum selection
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
-
+			// - MATSim scoring function
+			
 			// initialize genetic operators
 			this.setChromosomePool(new ChromosomePool());
 			this.addGeneticOperator(new CrossoverOperator(this, 0.6d));

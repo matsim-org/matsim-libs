@@ -1,8 +1,6 @@
 package org.matsim.core.config.groups;
 
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
@@ -231,7 +229,7 @@ public class PlanomatConfigGroup extends Module {
 
 	private EnumSet<TransportMode> cachedPossibleModes = null;
 
-	public Set<TransportMode> getPossibleModes() {
+	public EnumSet<TransportMode> getPossibleModes() {
 
 		if (this.cachedPossibleModes == null) {
 
@@ -246,7 +244,8 @@ public class PlanomatConfigGroup extends Module {
 
 		}
 
-		return Collections.unmodifiableSet(this.cachedPossibleModes);
+		return this.cachedPossibleModes;
+//		return Collections.unmodifiableSet(this.cachedPossibleModes);
 
 	}
 
