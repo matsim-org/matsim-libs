@@ -406,7 +406,7 @@ public class Controler {
 			this.controlerListenerManager.fireControlerScoringEvent(iteration);
 			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
 			this.stopwatch.endOperation("iteration");
-			this.stopwatch.write(getOutputFilename("stopwatch.txt"));
+			this.stopwatch.write(this.getNameForOutputFilename("stopwatch.txt"));
 			log.info(marker + "ITERATION " + iteration + " ENDS") ;
 			log.info(divider) ;
 		}
@@ -425,18 +425,18 @@ public class Controler {
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 
 			// dump plans
-			new PopulationWriter(this.population, getOutputFilename("output_plans.xml.gz"),
+			new PopulationWriter(this.population, this.getNameForOutputFilename("output_plans.xml.gz"),
 					this.config.plans().getOutputVersion()).write();
 			//dump network
-			new NetworkWriter(this.network, getOutputFilename("output_network.xml.gz")).write();
+			new NetworkWriter(this.network, this.getNameForOutputFilename("output_network.xml.gz")).write();
 			// dump world
-			new WorldWriter(this.getWorld(), getOutputFilename("output_world.xml.gz")).write();
+			new WorldWriter(this.getWorld(), this.getNameForOutputFilename("output_world.xml.gz")).write();
   		// dump config
-			new ConfigWriter(this.config, getOutputFilename("output_config.xml.gz")).write();
+			new ConfigWriter(this.config, this.getNameForOutputFilename("output_config.xml.gz")).write();
 			// dump facilities
 			ActivityFacilities facilities = this.getFacilities();
 			if (facilities != null) {
-				new FacilitiesWriter(facilities, getOutputFilename("output_facilities.xml.gz")).write();
+				new FacilitiesWriter(facilities, this.getNameForOutputFilename("output_facilities.xml.gz")).write();
 			}
 
 			if (unexpected) {
@@ -690,7 +690,7 @@ public class Controler {
 
 		// optional: score stats
 		try {
-			this.scoreStats = new ScoreStats(this.population, getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+			this.scoreStats = new ScoreStats(this.population, this.getNameForOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 			this.addControlerListener(this.scoreStats);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
@@ -700,7 +700,7 @@ public class Controler {
 
 		// optional: travel distance stats
 		try {
-			this.travelDistanceStats = new TravelDistanceStats(this.population, getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
+			this.travelDistanceStats = new TravelDistanceStats(this.population, this.getNameForOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 			this.addControlerListener(this.travelDistanceStats);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
@@ -1093,6 +1093,21 @@ public class Controler {
 	public static final String getIterationFilename(final String filename, final int iteration) {
 		return getIterationPath(iteration) + "/" + iteration + "." + filename;
 	}
+	
+	/**
+	 * @param filename the basename of the file to access
+	 * @return complete path to filename prefixed with the runId in the controler config module (if set) 
+	 * to a file in the output-directory
+	 */	
+	public final String getNameForOutputFilename(String filename){
+		StringBuffer s = new StringBuffer(outputPath + "/");
+		if (this.config.controler().getRunId() != null){
+			s.append(this.config.controler().getRunId() + ".");
+		}
+		s.append(filename);
+		return s.toString();
+	}
+	
 
 	/**
 	 * Returns the complete filename to access a file in the output-directory.
