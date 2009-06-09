@@ -44,14 +44,12 @@ import org.matsim.core.utils.io.IOUtils;
  *
  * Calculates at the end of each iteration the following statistics:
  * <ul>
- * <li>average leg travel distance of the worst plan of each agent</li>
- * <li>average leg travel distance of the best plan of each agent</li>
- * <li>average leg travel distance of all plans of each agent</li>
- *  * <li>average leg travel distance of the selected plan</li>
+ * 	<li>average of the average leg distance per plan (worst plans only)</li>
+ * 	<li>average of the average leg distance per plan (best plans only)</li>
+ * 	<li>average of the average leg distance per plan (selected plans only)</li>
+ * 	<li>average of the average leg distance per plan (all plans)</li>
  * </ul>
-
- * The calculated values are written to a file, each iteration on
- * a separate line.
+ *
  *
  * @author anhorni
  */
@@ -105,10 +103,10 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		double sumLegTravelDistanceWorst = 0.0;
-		double sumLegTravelDistanceBest = 0.0;
-		double sumLegTravelDistanceAvg = 0.0;
-		double sumLegTravelDistanceExecuted = 0.0;
+		double sumAvgPlanLegTravelDistanceWorst = 0.0;
+		double sumAvgPlanLegTravelDistanceBest = 0.0;
+		double sumAvgPlanLegTravelDistanceAll = 0.0;
+		double sumAvgPlanLegTravelDistanceExecuted = 0.0;
 		int nofLegTravelDistanceWorst = 0;
 		int nofLegTravelDistanceBest = 0;
 		int nofLegTravelDistanceAvg = 0;
@@ -119,8 +117,8 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 			Plan bestPlan = null;
 			double worstScore = Double.POSITIVE_INFINITY;
 			double bestScore = Double.NEGATIVE_INFINITY;
-			double sumLegTravelDistance = 0.0;
-			double cntLegTravelDistance = 0;
+			double sumAvgLegTravelDistance = 0.0;
+			double cntAvgLegTravelDistance = 0;
 			for (Plan plan : person.getPlans()) {
 				
 				if (plan.getScore() == null) {
@@ -147,37 +145,37 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				}
 
 				// avg. leg travel distance
-				sumLegTravelDistance += getAvgLegTravelDistance(plan);
-				cntLegTravelDistance++;
+				sumAvgLegTravelDistance += getAvgLegTravelDistance(plan);
+				cntAvgLegTravelDistance++;
 
 				// executed plan? --------------------------------------------------
 				if (plan.isSelected()) {
-					sumLegTravelDistanceExecuted += getAvgLegTravelDistance(plan);
+					sumAvgPlanLegTravelDistanceExecuted += getAvgLegTravelDistance(plan);
 					nofLegTravelDistanceExecuted++;
 				}
 			}
 
 			if (worstPlan != null) {
 				nofLegTravelDistanceWorst++;
-				sumLegTravelDistanceWorst += getAvgLegTravelDistance(worstPlan);
+				sumAvgPlanLegTravelDistanceWorst += getAvgLegTravelDistance(worstPlan);
 			}
 			if (bestPlan != null) {
 				nofLegTravelDistanceBest++;
-				sumLegTravelDistanceBest += getAvgLegTravelDistance(bestPlan);
+				sumAvgPlanLegTravelDistanceBest += getAvgLegTravelDistance(bestPlan);
 			}
-			if (cntLegTravelDistance > 0) {
-				sumLegTravelDistanceAvg += (sumLegTravelDistance / cntLegTravelDistance);
+			if (cntAvgLegTravelDistance > 0) {
+				sumAvgPlanLegTravelDistanceAll += (sumAvgLegTravelDistance / cntAvgLegTravelDistance);
 				nofLegTravelDistanceAvg++;
 			}
 		}
-		log.info("-- avg. leg travel distance of the executed plan of each agent: " + (sumLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
-		log.info("-- avg. leg travel distance of the worst plan of each agent: " + (sumLegTravelDistanceWorst / nofLegTravelDistanceWorst));
-		log.info("-- avg. of the avg. leg travel distance per agent: " + (sumLegTravelDistanceAvg / nofLegTravelDistanceAvg));
-		log.info("-- avg. leg travel distance of the best plan of each agent: " + (sumLegTravelDistanceBest / nofLegTravelDistanceBest));
+		log.info("-- average of the average leg distance per plan (executed plans only): " + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
+		log.info("-- average of the average leg distance per plan (worst plans only): " + (sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst));
+		log.info("-- average of the average leg distance per plan (all plans): " + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg));
+		log.info("-- average of the average leg distance per plan (best plans only): " + (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest));
 
 		try {
-			this.out.write(event.getIteration() + "\t" + (sumLegTravelDistanceExecuted / nofLegTravelDistanceExecuted) + "\t" +
-					(sumLegTravelDistanceWorst / nofLegTravelDistanceWorst) + "\t" + (sumLegTravelDistanceAvg / nofLegTravelDistanceAvg) + "\t" + (sumLegTravelDistanceBest / nofLegTravelDistanceBest) + "\n");
+			this.out.write(event.getIteration() + "\t" + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted) + "\t" +
+					(sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst) + "\t" + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg) + "\t" + (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest) + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -185,14 +183,14 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 
 		if (this.history != null) {
 			int index = event.getIteration() - this.minIteration;
-			this.history[INDEX_WORST][index] = (sumLegTravelDistanceWorst / nofLegTravelDistanceWorst);
-			this.history[INDEX_BEST][index] = (sumLegTravelDistanceBest / nofLegTravelDistanceBest);
-			this.history[INDEX_AVERAGE][index] = (sumLegTravelDistanceAvg / nofLegTravelDistanceAvg);
-			this.history[INDEX_EXECUTED][index] = (sumLegTravelDistanceExecuted / nofLegTravelDistanceExecuted);
+			this.history[INDEX_WORST][index] = (sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst);
+			this.history[INDEX_BEST][index] = (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest);
+			this.history[INDEX_AVERAGE][index] = (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg);
+			this.history[INDEX_EXECUTED][index] = (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted);
 
 			if (event.getIteration() != this.minIteration) {
 				// create chart when data of more than one iteration is available.
-				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "avg. leg travel distance");
+				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "average of the average leg distance per plan ");
 				double[] iterations = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
 					iterations[i] = i + this.minIteration;
