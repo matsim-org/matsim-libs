@@ -40,6 +40,7 @@ import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.ExpBetaPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
@@ -157,10 +158,11 @@ public class StrategyManagerConfigLoader {
 				log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
 //				// JH
 			} else if (classname.equals("LocationChoice")) {
-	    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
-	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
-	    	strategy.addStrategyModule(new ReRoute(controler));
+				strategy = new PlanStrategy(new ExpBetaPlanSelector());
+				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
+				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());
+				manager.setPlanSelectorForRemoval(new ExpBetaPlanForRemovalSelector());
 			}
 			//if none of the strategies above could be selected we try to load the class by name
 			else {
