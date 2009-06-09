@@ -39,10 +39,9 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
  * freespeed, lanes or capacity. For some basic examples please have a look at the <code>main</code> method.
  * Can also be called as Network2ESRIShape inputNetwork.xml outputAsLines.shp outputAsPolygons.shp .
  *  
- * @author laemmel
- * 
- * @keywords converter, network, esri, shp, matsim
+ * <p> <strong>Keywords:</strong> converter, network, esri, shp, matsim </p>
  *
+ * @author laemmel
  */
 public class Network2ESRIShape {
 
