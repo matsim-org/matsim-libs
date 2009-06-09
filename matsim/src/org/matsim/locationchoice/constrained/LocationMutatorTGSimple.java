@@ -77,7 +77,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			travelDistancePre = legPre.getRoute().getDistance();
 		}
 		else {
-			travelDistancePre = ((CoordImpl)actPre).calcDistance(actToMove.getCoord());
+			travelDistancePre = ((CoordImpl)actPre.getCoord()).calcDistance(actToMove.getCoord());
 		}
 		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
 			travelDistancePost = legPost.getRoute().getDistance();
