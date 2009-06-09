@@ -56,6 +56,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 /*
  * TODO: [AH] This is copy-paste based on "ScoreStats". Refactoring needed!
+ * 
  */
 public class TravelDistanceStats implements StartupListener, IterationEndsListener, ShutdownListener {
 
@@ -74,11 +75,9 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
 
 	/**
-	 * Creates a new ScoreStats instance.
-	 *
 	 * @param population
 	 * @param filename
-	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
+	 * @param createPNG true if in every iteration, the distance statistics should be visualized in a graph and written to disk.
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
