@@ -42,15 +42,15 @@ public class MarginalTravelCostCalculatorII implements TravelCost {
 		double t = this.tc.getLinkTravelTime(link, time);
 		double s = this.sc.getSocialCost(link, time);
 		double cost = t+s;
-		if (cost < 0) {
-			System.err.println("negative cost:" + cost);
-		} else if (Double.isNaN(cost)) {
-			System.err.println("nan cost:" + cost);
-		} else if (Double.isInfinite(cost)) {
-			System.err.println("infinite cost:" + cost);
-		} else if (cost > 10000) {
-			System.out.println("verry high cost:" + cost);
-		}
+//		if (cost < 0) {
+//			System.err.println("negative cost:" + cost);
+//		} else if (Double.isNaN(cost)) {
+//			System.err.println("nan cost:" + cost);
+//		} else if (Double.isInfinite(cost)) {
+//			System.err.println("infinite cost:" + cost);
+//		} else if (cost > 10000) {
+//			System.out.println("verry high cost:" + cost);
+//		}
 		return t + s;
 	}
 	

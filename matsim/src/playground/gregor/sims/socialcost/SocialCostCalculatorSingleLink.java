@@ -23,6 +23,7 @@ package playground.gregor.sims.socialcost;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -40,6 +41,8 @@ import org.matsim.core.utils.misc.Time;
 
 public class SocialCostCalculatorSingleLink implements SocialCostCalculator, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
+	
+	private static Logger log = Logger.getLogger(SocialCostCalculatorSingleLink.class);
 	private final int travelTimeBinSize;
 	private final int numSlots;
 	private final NetworkLayer network;
@@ -88,9 +91,23 @@ public class SocialCostCalculatorSingleLink implements SocialCostCalculator, Ite
 	}
 
 	private void updateSocCosts() {
+		double maxCost = 0;
+		double minCost = Double.POSITIVE_INFINITY;
+		double costSum = 0;
+		
 		for (SocialCostRole scr : this.socCosts.values()) {
 			scr.update();
+			for (SocCostInfo sci : scr.socCosts.values()) {
+				double cost = sci.cost;
+				if (cost < minCost) {
+					minCost = cost;
+				} else if (cost > maxCost) {
+					maxCost = cost;
+				}
+				costSum += cost;
+			}
 		}
+		log.info("maxCost: " + maxCost + " minCost: " + minCost + " avg: " + costSum/this.socCosts.size());
 	}
 
 
@@ -212,6 +229,9 @@ public class SocialCostCalculatorSingleLink implements SocialCostCalculator, Ite
 
 
 		public void setSocCost(final int timeSlice, final double socCost) {
+			if (Double.isInfinite(socCost)) {
+				System.err.println("inf costs!!");
+			}
 			SocCostInfo sci = this.socCosts.get(timeSlice);
 			if (sci == null) {
 				sci = new SocCostInfo();
