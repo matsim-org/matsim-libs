@@ -145,18 +145,27 @@ public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 		float glWidth = glBX - glTX;
 		float xFactor = Math.abs(glWidth/scrWidth);
 		
-		float diff30km = Math.abs((glWidth*.4f) - 30000);
-		float diff3km = Math.abs((glWidth*.4f) - 3000);
-		float diff300m = Math.abs((glWidth*.4f) - 300);
-		float diff30m = Math.abs((glWidth*.4f) - 30);
+		float diff30km = Math.abs((glWidth*.2f) - 30000);
+		float diff15km = Math.abs((glWidth*.2f) - 15000);
+		float diff3km = Math.abs((glWidth*.2f) - 3000);
+		float diff1500m = Math.abs((glWidth*.2f) - 1500);
+		float diff300m = Math.abs((glWidth*.2f) - 300);
+		float diff150m = Math.abs((glWidth*.2f) - 150);
+		float diff30m = Math.abs((glWidth*.2f) - 30);
 		
 		float width;
-		if (diff30km < diff3km) {
+		if (diff30km < diff15km) {
 			width = 30000.f;
-		} else if (diff3km < diff300m) {
+		} else if (diff15km < diff3km) {
+			width = 15000.f;
+		} else if (diff3km < diff1500m) {
 			width = 3000.f;
-		} else if (diff300m < diff30m) {
+		} else if (diff1500m < diff300m) {
+			width = 1500.f;
+		} else if (diff300m < diff150m) {
 			width = 300.f;
+		} else if (diff150m < diff30m) {
+			width = 150.f;
 		} else {
 			width = 30.f;
 		}
