@@ -83,7 +83,6 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		leg2.setMode(TransportMode.pt);
 		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (NetworkRoute) leg1.getRoute());
-		Fixture.compareRoutes("6 7 9 10", (NetworkRoute) leg2.getRoute());
 		// and change the mode back
 		leg2.setMode(oldMode);
 
@@ -95,7 +94,6 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		// the agent should now decide to drive around
 		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 3 4 5", (NetworkRoute) leg1.getRoute());
-		Fixture.compareRoutes("6 7 8 9 10", (NetworkRoute) leg2.getRoute());
 	}
 
 	/**
