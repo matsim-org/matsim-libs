@@ -75,7 +75,9 @@ public class TreesBuilder {
 			Map<String, ActivityOption> activities = f.getActivityOptions();
 			
 			// do not add facility if it is not in region of interest ------------------------
-			if (regionalScenario && f.calcDistance(centerNode.getCoord()) > radius) continue;
+			if (regionalScenario) {
+				if (f.calcDistance(centerNode.getCoord()) > radius) continue;
+			}
 			// -------------------------------------------------------------------------------
 			
 			Iterator<ActivityOption> act_it = activities.values().iterator();
