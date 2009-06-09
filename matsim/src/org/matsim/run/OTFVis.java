@@ -162,6 +162,10 @@ public class OTFVis {
 			new OnTheFlyClientQuad("tveh:"+vehFileName + "@" + netFileName).run();
 		}
 	}
+	
+	public static final void playConfig(final String configFilename){
+		playConfig(new String[]{configFilename});
+	}
 
 	public static final void playConfig(final String[] args) {
 		ScenarioLoader loader = new ScenarioLoader(args[0]);
