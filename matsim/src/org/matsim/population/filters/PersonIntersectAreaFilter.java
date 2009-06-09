@@ -27,8 +27,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
@@ -85,13 +85,15 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 					if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 						return true;
 					}
-				} else {
+				}
+				else if (leg.getRoute() instanceof NetworkRoute) {
 					List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 					if (links.size() == 0) {
 						if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 							return true;
 						}
-					} else {
+					}
+					else {
 						for (Link link : links) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
@@ -105,6 +107,11 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
+					}
+				}
+				else { // leg.getRoute() instanceof GenericRoute
+					if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
+						return true;
 					}
 				}
 			}
