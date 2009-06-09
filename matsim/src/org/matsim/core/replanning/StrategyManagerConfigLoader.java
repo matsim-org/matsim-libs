@@ -162,6 +162,11 @@ public class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
 				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());
+				/* not really happy about the following line. Imagine what happens if everybody does 
+				 * this, that one doesn't know at the end which removal-strategy is really used.
+				 * The removal strategy must not be tight to a replanning-strategy, but is a general
+				 * option that should be set somewhere else.  marcel/9jun2009/CLEANUP
+				 */
 				manager.setPlanSelectorForRemoval(new ExpBetaPlanForRemovalSelector());
 			}
 			//if none of the strategies above could be selected we try to load the class by name
