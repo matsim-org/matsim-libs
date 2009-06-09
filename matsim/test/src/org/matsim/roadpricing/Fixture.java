@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
+import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -194,11 +195,16 @@ import org.matsim.core.utils.misc.Time;
 		Person person = new PersonImpl(new IdImpl(personId));
 		Plan plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createActivity("h", homeLink).setEndTime(Time.parseTime(startTime));
+		Activity act = plan.createActivity("h", homeLink);
+		act.setCoord(homeLink.getCoord());
+		act.setEndTime(Time.parseTime(startTime));
 		plan.createLeg(TransportMode.car);
-		plan.createActivity("w", workLink).setEndTime(16.0 * 3600);
+		act = plan.createActivity("w", workLink);
+		act.setCoord(workLink.getCoord());
+		act.setEndTime(16.0 * 3600);
 		plan.createLeg(TransportMode.car);
-		plan.createActivity("h", finishLink);
+		act = plan.createActivity("h", finishLink);
+		act.setCoord(finishLink.getCoord());
 		return person;
 	}
 

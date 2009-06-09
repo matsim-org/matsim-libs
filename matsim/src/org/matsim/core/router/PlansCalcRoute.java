@@ -306,6 +306,13 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink, toLink);
 //			route.setNodes(fromLink, path.nodes, toLink);
 			route.setTravelTime(travTime);
+			double dist = 0;
+			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
+				dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+			} else {
+				dist = CoordUtils.calcDistance(fromAct.getLink().getCoord(), toAct.getLink().getCoord());
+			}
+			route.setDistance(dist * 1.5);
 //			route.setTravelCost(path.travelCost); 
 			leg.setRoute(route);
 		} else {
@@ -329,6 +336,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		Route route = this.routeFactory.createRoute(TransportMode.walk, fromAct.getLink(), toAct.getLink());
 		int travTime = (int)(dist / this.configGroup.getWalkSpeedFactor());
 		route.setTravelTime(travTime);
+		route.setDistance(dist * 1.5);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
@@ -343,6 +351,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		Route route = this.routeFactory.createRoute(TransportMode.bike, fromAct.getLink(), toAct.getLink());
 		int travTime = (int)(dist / this.configGroup.getBikeSpeedFactor());
 		route.setTravelTime(travTime);
+		route.setDistance(dist * 1.5);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
@@ -357,6 +366,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		Route route = this.routeFactory.createRoute(TransportMode.undefined, fromAct.getLink(), toAct.getLink());
 		int travTime = (int)(dist / this.configGroup.getUndefinedModeSpeedFactor());
 		route.setTravelTime(travTime);
+		route.setDistance(dist * 1.5);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);

@@ -70,8 +70,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		//U_total_car = 0                          -(0.2*0.12/1000m)*50000m      +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
 		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		assertEquals(50.23165311164136, this.planScorer.getAgentScore(id1), EPSILON);
-		assertEquals(48.54542805141843, this.planScorer.getAgentScore(id2), EPSILON);
-		
+		assertEquals(48.45180305141843, this.planScorer.getAgentScore(id2), EPSILON);	
 	}
 	
 	public void testSingleIterationControlerScoring() {
@@ -101,8 +100,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		//U_total_car = 0                          -(0.2*0.12/1000m)*50000m      +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
 		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		assertEquals(50.23165311164136, this.planScorer.getAgentScore(id1), EPSILON);
-		assertEquals(48.54542805141843, this.planScorer.getAgentScore(id2), EPSILON);
-		
+		assertEquals(48.45180305141842, this.planScorer.getAgentScore(id2), EPSILON);
 	}
 	
 	public void testSingleIterationIncomeScoring() {
@@ -139,10 +137,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		System.out.println("Agent 001: " + this.planScorer.getAgentScore(id1));
 		System.out.println("Agent 002: " + this.planScorer.getAgentScore(id2));
 		assertEquals(77.13122224303883, this.planScorer.getAgentScore(id1), EPSILON);
-		assertEquals(73.56932562470882, this.planScorer.getAgentScore(id2), EPSILON);
-		
+		assertEquals(73.52118312470883, this.planScorer.getAgentScore(id2), EPSILON);
 	}
 
-	
-	
 }
