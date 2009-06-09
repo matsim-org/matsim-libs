@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.api.basic.v01.BasicScenarioLoader;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
@@ -34,39 +34,45 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Point;
+
 /**
+ * This class generates a simple artificial MATSim demand for 
+ * the german city Löbau. This is similar to the tutorial held 
+ * at the MATSim user meeting 09 by glaemmel, however based on
+ * the matsim api.
+ * 
+ * The files needed to run this tutorial are placed in the matsim examples
+ * repository that can be found in the root directory of the matsim
+ * sourceforge svn under the path matsimExamples/tutorial/example8DemandGeneration.
+ * 
  * @author glaemmel
  * @author dgrether
  *
  */
 public class DemandGenerator {
 
+	private static final Logger log = Logger.getLogger(DemandGenerator.class);
+	
 	private static int ID = 0;
 
+	private static final String exampleDirectory = "../matsimExamples/tutorial/example8DemandGeneration/";
+	
 	public static void main(String [] args) throws IOException {
 		
 		//out input files
-		String netFile = "./inputs/network.xml";
-		String zonesFile = "./inputs/zones.shp";
+		String netFile = exampleDirectory + "network.xml";
+		String zonesFile = exampleDirectory + "zones.shp";
 		
 		BasicScenario scenario = new ScenarioImpl();
 		
-		
-		//the following lines create a new network layer and reads the links and nodes from network.xml into this network layer
-		BasicScenarioLoader loader = new BasicScenarioLoader(scenario);
-		scenario.getConfig().network().setInputFile(netFile);
-		loader.loadNetwork();
-		
 		FeatureSource fts = ShapeFileReader.readDataFile(zonesFile); //reads the shape file in
-		Random rnd = MatsimRandom.getLocalInstance();
-
+		Random rnd = new Random();
 		
 		Feature commercial = null;
 		Feature recreation = null;
@@ -92,13 +98,15 @@ public class DemandGenerator {
 			}
 		}
 		createActivities(scenario, rnd, recreation, commercial); //this method creates the remaining activities
-
-		new PopulationWriter(scenario.getPopulation(),"./inputs/population.xml").write(); // and finally the population will be written to a xml file
+		String popFilename = exampleDirectory + "population.xml";
+		new BasicPopulationWriter(scenario.getPopulation()).write(popFilename); // and finally the population will be written to a xml file
+		log.info("population written to: " + popFilename);
 	}
 
 	private static void createActivities(BasicScenario scenario, Random rnd,  Feature recreation, Feature commercial) {
 		BasicPopulation<BasicPerson<BasicPlan>> pop = scenario.getPopulation();
 		BasicPopulationBuilder pb = pop.getPopulationBuilder(); //the population builder creates all we need 
+		
 		for (BasicPerson<BasicPlan> pers : pop.getPersons().values()) { //this loop iterates over all persons
 			BasicPlan<BasicActivity> plan = pers.getPlans().get(0); //each person has exactly one plan, that has been created in createPersons(...)
 			BasicActivity homeAct = plan.getPlanElements().get(0); //every plan has only one activity so far (home activity)
@@ -134,12 +142,12 @@ public class DemandGenerator {
 	}
 
 	private static void createPersons(BasicScenario scenario, Feature ft, Random rnd, int number) {
-		BasicPopulation pop = scenario.getPopulation();
+		BasicPopulation<BasicPerson<BasicPlan<?>>> pop = scenario.getPopulation();
 		BasicPopulationBuilder pb = pop.getPopulationBuilder();
 		for (; number > 0; number--) {
-			BasicPerson pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
+			BasicPerson<BasicPlan<?>> pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
 			pop.getPersons().put(pers.getId(), pers);
-			BasicPlan plan = pb.createPlan(pers);
+			BasicPlan<?> plan = pb.createPlan(pers);
 			Point p = getRandomPointInFeature(rnd, ft);
 			BasicActivity act = pb.createActivityFromCoord("h", scenario.createCoord(p.getX(), p.getY()));
 			plan.addActivity(act);
@@ -153,7 +161,6 @@ public class DemandGenerator {
 		do {
 			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
 			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
-			//TODO create MGC.xy2Point
 			p = MGC.xy2Point(x, y);
 		} while (ft.getDefaultGeometry().contains(p));		
 		return p;
