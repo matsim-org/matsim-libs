@@ -9,7 +9,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.misc.Time;
@@ -18,11 +17,12 @@ public class LinkRandomizer implements BeforeMobsimListener{
 
 
 
-	private static final double C = 0.1;
+	private final double C;
 	private NetworkLayer network;
 
-	public LinkRandomizer(NetworkLayer network) {
+	public LinkRandomizer(NetworkLayer network, double c) {
 		this.network = network;
+		this.C = c;
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {

@@ -34,8 +34,11 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 
 
 
-	public MarginalCostControlerRandFlowCap(final String[] args) {
+	private double c;
+
+	public MarginalCostControlerRandFlowCap(final String[] args, double c) {
 		super(args);
+		this.c = c;
 		
 	}
 
@@ -44,7 +47,7 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 		super.setUp();
 		
 		
-		LinkRandomizer lr = new LinkRandomizer(this.network);
+		LinkRandomizer lr = new LinkRandomizer(this.network, this.c);
 		
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
@@ -59,7 +62,8 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new MarginalCostControlerRandFlowCap(args);
+		double c = Double.parseDouble(args[1]);
+		final Controler controler = new MarginalCostControlerRandFlowCap(new String [] {args[0]}, c);
 		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
