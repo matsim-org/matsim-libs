@@ -48,7 +48,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	private final Map<Link, Link> subsequentLinks;
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
-	private int uncompressedLength = 0;
+	private int uncompressedLength = -1;
 	private int modCount = 0;
 	private int routeModCountState = 0;
 
@@ -58,6 +58,9 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	}
 
 	public List<Link> getLinks() {
+		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
+			return new ArrayList<Link>(0);
+		}
 		ArrayList<Link> links = new ArrayList<Link>(this.uncompressedLength);
 		if (this.modCount != this.routeModCountState) {
 			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
@@ -81,9 +84,6 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	private void getLinksTillLink(final List<Link> links, final Link nextLink, final Link startLink) {
 		Link link = startLink;
 		while (true) { // loop until we hit "return;"
-			if (links.size() > this.uncompressedLength) {
-				throw new RuntimeException("bad route data.");
-			}
 			for (Link outLink : link.getToNode().getOutLinks().values()) {
 				if (outLink == nextLink) {
 					return;
@@ -117,6 +117,9 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	}
 
 	public List<Node> getNodes() {
+		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
+			return new ArrayList<Node>(0);
+		}
 		ArrayList<Node> nodes = new ArrayList<Node>(this.uncompressedLength + 1);
 		if (this.modCount != this.routeModCountState) {
 			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);

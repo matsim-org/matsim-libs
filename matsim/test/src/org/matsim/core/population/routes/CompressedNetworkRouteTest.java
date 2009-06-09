@@ -103,4 +103,53 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		}
 	}
 
+	/**
+	 * Tests that {@link CompressedNetworkRoute#getLinks()} doesn't crash or
+	 * hang when a route object is not correctly initialized.  
+	 */
+	public void testGetLinks_incompleteInitialization() {
+		NetworkLayer network = createTestNetwork();
+		Link link0 = network.getLink(new IdImpl("0"));
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link2 = network.getLink(new IdImpl("2"));
+		Link link3 = network.getLink(new IdImpl("3"));
+		Link link4 = network.getLink(new IdImpl("4"));
+
+		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
+		subsequentLinks.put(link0, link1);
+		subsequentLinks.put(link1, link2);
+		subsequentLinks.put(link2, link3);
+		subsequentLinks.put(link3, link4);
+
+		NetworkRoute route = new CompressedNetworkRoute(link0, link4, subsequentLinks);
+		// NO route.setLinks() here!
+
+		assertEquals("expected 0 links.", 0, route.getLinks().size());
+		assertEquals("expected 0 link ids.", 0, route.getLinkIds().size());
+	}
+
+	/**
+	 * Tests that {@link CompressedNetworkRoute#getNodes()} doesn't crash or
+	 * hang when a route object is not correctly initialized.  
+	 */
+	public void testGetNodes_incompleteInitialization() {
+		NetworkLayer network = createTestNetwork();
+		Link link0 = network.getLink(new IdImpl("0"));
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link2 = network.getLink(new IdImpl("2"));
+		Link link3 = network.getLink(new IdImpl("3"));
+		Link link4 = network.getLink(new IdImpl("4"));
+		
+		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
+		subsequentLinks.put(link0, link1);
+		subsequentLinks.put(link1, link2);
+		subsequentLinks.put(link2, link3);
+		subsequentLinks.put(link3, link4);
+		
+		NetworkRoute route = new CompressedNetworkRoute(link0, link4, subsequentLinks);
+		// NO route.setLinks() here!
+		
+		assertEquals("expected 0 links.", 0, route.getNodes().size());
+	}
+	
 }
