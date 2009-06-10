@@ -25,7 +25,7 @@ import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
-import playground.gregor.sims.socialcost.LinkRandomizer;
+import playground.gregor.sims.socialcost.LinkFlowCapRandomizer;
 import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
 import playground.gregor.sims.socialcost.SocialCostCalculator;
 import playground.gregor.sims.socialcost.SocialCostCalculatorSingleLink;
@@ -47,7 +47,7 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 		super.setUp();
 		
 		
-		LinkRandomizer lr = new LinkRandomizer(this.network, this.c);
+		LinkFlowCapRandomizer lr = new LinkFlowCapRandomizer(this.network, this.c, 0.);
 		
 		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
