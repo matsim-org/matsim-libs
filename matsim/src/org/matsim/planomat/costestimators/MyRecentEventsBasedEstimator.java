@@ -23,21 +23,17 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
 
 public class MyRecentEventsBasedEstimator
-implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 
 	public void reset() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public MyRecentEventsBasedEstimator() {
@@ -100,7 +96,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 	public void reset(final int iteration) {
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 
 		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 
@@ -108,7 +104,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 		this.departureEventsLinkIDs.put(depEvent, event.getLinkId());
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 
 		Id agentId = event.getPersonId();
 
@@ -121,9 +117,6 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, event.getLinkId(), "car");
 		this.legTravelTimeEstimations.put(newLtte, travelTime);
-	}
-
-	public void handleEvent(final AgentStuckEvent event) {
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,

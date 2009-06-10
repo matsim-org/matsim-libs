@@ -23,14 +23,14 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -48,12 +48,12 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class LinearInterpolatingTTCalculator
-implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
+implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler, TravelTime {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
 	private Network network = null;
-	private final HashMap<Link, LinearInterpolatingTravelTimeData> linkData;
+	private final HashMap<Id, LinearInterpolatingTravelTimeData> linkData;
 	private final int timeslice;
 
 	static private class EnterEvent /*implements Comparable<EnterEvent>*/ {
@@ -193,7 +193,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		super();
 		this.network = network;
 		this.timeslice = timeslice;
-		this.linkData = new HashMap<Link, LinearInterpolatingTravelTimeData>(network.getLinks().size());
+		this.linkData = new HashMap<Id, LinearInterpolatingTravelTimeData>(network.getLinks().size());
 		resetTravelTimes();
 	}
 
@@ -203,25 +203,22 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 
 	public void resetTravelTimes() {
 		for (Link link : this.network.getLinks().values()) {
-			getTravelTimeRole(link).resetTravelTimes();
+			getTravelTimeRole(link.getId()).resetTravelTimes();
 		}
 		this.enterEvents.clear();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of EventAlgorithmI
-	//////////////////////////////////////////////////////////////////////
 
 	public void reset(final int iteration) {
 		resetTravelTimes();
 	}
 
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		this.enterEvents.put(e, event.getTime());
 	}
 
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		Double starttime = this.enterEvents.remove(e);
 		if (starttime != null) {
@@ -229,15 +226,11 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 			if (timediff < 0) {
 				Gbl.errorMsg("");
 			}
-			Link link = event.getLink();
-			if (null == link) link = this.network.getLink(event.getLinkId());
-			if (null != link) {
-				getTravelTimeRole(link).addTravelTime(starttime.intValue(), timediff);
-			}
+			getTravelTimeRole(event.getLinkId()).addTravelTime(starttime.intValue(), timediff);
 		}
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
@@ -247,14 +240,14 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 
 
 	public double getLinkTravelTime(final Link link, final double time) {
-		return getTravelTimeRole(link).getTravelTime(time);
+		return getTravelTimeRole(link.getId()).getTravelTime(time);
 	}
-
-	private LinearInterpolatingTravelTimeData getTravelTimeRole(final Link l) {
-		LinearInterpolatingTravelTimeData r = this.linkData.get(l);
+	
+	private LinearInterpolatingTravelTimeData getTravelTimeRole(final Id linkId) {
+		LinearInterpolatingTravelTimeData r = this.linkData.get(linkId);
 		if (null == r) {
-			r = new LinearInterpolatingTravelTimeData(l);
-			this.linkData.put(l, r);
+			r = new LinearInterpolatingTravelTimeData(this.network.getLinks().get(linkId));
+			this.linkData.put(linkId, r);
 		}
 		return r;
 	}
