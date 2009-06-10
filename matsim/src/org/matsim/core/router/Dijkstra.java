@@ -485,7 +485,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * A data structure to store temporarily information used
 	 * by the Dijkstra-algorithm.
 	 */
-	static class DijkstraNodeData {
+	protected static class DijkstraNodeData {
 
 		private Link prev = null;
 
