@@ -29,12 +29,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
@@ -66,6 +67,8 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	// User parameters:
 
+	private final Network network;
+	
 	private int numberofeventsdetection = 10;
 
 	private double ignoredQueuingTime = 30; // seconds
@@ -84,30 +87,20 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	private double predTTAlternativeRoute;
 
-	private final Map<String, Double> ttMeasured = new HashMap<String, Double>();
+	private final Map<Id, Double> ttMeasured = new HashMap<Id, Double>();
 
 	private LinkedList<Link> bottleNeckListMain = new LinkedList<Link>();
 
 	private LinkedList<Link> bottleNeckListAlt = new LinkedList<Link>();
 
 	// For distribution heterogenity check:
-	private final Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
+	private final Map<Id, Double> enterLinkEvents = new HashMap<Id, Double>();
 
 	private final Map<Id, Double> capacities = new HashMap<Id, Double>();
 
-	private List<Node> nodesMainRoute = new ArrayList<Node>();
+	private final Map<Id, Double> ttFreeSpeedUpToAndIncludingLink = new HashMap<Id, Double>();
 
-
-	private List<Node> nodesAlternativeRoute = new ArrayList<Node>();
-
-
-	private final Map<String, Double> ttFreeSpeedUpToAndIncludingLink = new HashMap<String, Double>();
-
-	private final Map<String, Double> inFlows = new HashMap<String, Double>();
-
-	private final Map<String, Double> outFlows = new HashMap<String, Double>();
-
-	private final Map<String, Integer> numbersPassedOnInAndOutLinks = new HashMap<String, Integer>();
+	private final Map<Id, Integer> numbersPassedOnInAndOutLinks = new HashMap<Id, Integer>();
 
 	// For Accident detection:
 	private Link currentBottleNeckMainRoute;
@@ -118,8 +111,9 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	private final SimulationConfigGroup simulationConfig;
 
-	public ControlInputMB(final SimulationConfigGroup simulationConfigGroup) {
+	public ControlInputMB(final SimulationConfigGroup simulationConfigGroup, final Network network) {
 		this.simulationConfig = simulationConfigGroup;
+		this.network = network;
 	}
 
 	@Override
@@ -130,13 +124,12 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		// Main route
 		List<Link> linksMainRoute = this.mainRoute.getLinks();
 		for (Link l : linksMainRoute) {
-			String linkId = l.getId().toString();
-			if (!this.intraFlows.containsKey(l.getId().toString())) {
-				this.intraFlows.put(l.getId().toString(), 0.0);
+			if (!this.intraFlows.containsKey(l.getId())) {
+				this.intraFlows.put(l.getId(), 0.0);
 			}
 
-			if (!this.ttMeasured.containsKey(l.getId().toString())) {
-				this.ttMeasured.put(l.getId().toString(), this.ttFreeSpeeds.get(l
+			if (!this.ttMeasured.containsKey(l.getId())) {
+				this.ttMeasured.put(l.getId(), this.ttFreeSpeeds.get(l
 						.getId()));
 			}
 
@@ -146,45 +139,40 @@ public class ControlInputMB extends AbstractControlInputImpl {
 				this.capacities.put(l.getId(), capacity);
 			}
 
-			if (!this.enterLinkEventTimes.containsKey(l.getId().toString())) {
+			if (!this.enterLinkEventTimes.containsKey(l.getId())) {
 				List<Double> list = new LinkedList<Double>();
-				this.enterLinkEventTimes.put(l.getId().toString(), list);
+				this.enterLinkEventTimes.put(l.getId(), list);
 			}
 
-			if (!this.ttFreeSpeedUpToAndIncludingLink.containsKey(l.getId()
-					.toString())) {
+			if (!this.ttFreeSpeedUpToAndIncludingLink.containsKey(l.getId())) {
 				double tt = sumUpTTFreeSpeed(l.getToNode(), this.mainRoute);
-				this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
+				this.ttFreeSpeedUpToAndIncludingLink.put(l.getId(), tt);
 			}
 		}
 		this.currentBottleNeckMainRoute = this.mainRouteNaturalBottleNeck;
-		this.nodesMainRoute = this.mainRoute.getNodes();
-		for (int i = 1; i < this.nodesMainRoute.size() - 1; i++) {
-			Node n = this.nodesMainRoute.get(i);
+		List<Node> nodesMainRoute = this.mainRoute.getNodes();
+		for (int i = 1; i < nodesMainRoute.size() - 1; i++) {
+			Node n = nodesMainRoute.get(i);
 			for (Link inLink : n.getInLinks().values()) {
-				String linkId = inLink.getId().toString();
 				if (!linksMainRoute.contains(inLink)) {
 					double tt = sumUpTTFreeSpeed(n, this.mainRoute);
-					this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
-					this.inLinksMainRoute.add(inLink);
-					this.inFlows.put(inLink.getId().toString(), 0.0);
-					this.numbersPassedOnInAndOutLinks.put(inLink.getId().toString(), 0);
-					this.extraFlowsMainRoute.put(linkId, 0.0);
+					this.ttFreeSpeedUpToAndIncludingLink.put(inLink.getId(), tt);
+					this.inLinksMainRoute.add(inLink.getId());
+					this.numbersPassedOnInAndOutLinks.put(inLink.getId(), 0);
+					this.extraFlowsMainRoute.put(inLink.getId(), 0.0);
 					List<Double> list = new LinkedList<Double>();
-					this.enterLinkEventTimes.put(linkId, list);
+					this.enterLinkEventTimes.put(inLink.getId(), list);
 				}
 			}
 			for (Link outLink : n.getOutLinks().values()) {
-				String linkId = outLink.getId().toString();
 				if (!linksMainRoute.contains(outLink)) {
 					double tt = sumUpTTFreeSpeed(n, this.mainRoute);
-					this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
-					this.outLinksMainRoute.add(outLink);
-					this.outFlows.put(outLink.getId().toString(), 0.0);
-					this.numbersPassedOnInAndOutLinks.put(outLink.getId().toString(), 0);
-					this.extraFlowsMainRoute.put(linkId, 0.0);
+					this.ttFreeSpeedUpToAndIncludingLink.put(outLink.getId(), tt);
+					this.outLinksMainRoute.add(outLink.getId());
+					this.numbersPassedOnInAndOutLinks.put(outLink.getId(), 0);
+					this.extraFlowsMainRoute.put(outLink.getId(), 0.0);
 					List<Double> list = new LinkedList<Double>();
-					this.enterLinkEventTimes.put(linkId, list);
+					this.enterLinkEventTimes.put(outLink.getId(), list);
 				}
 			}
 		}
@@ -193,14 +181,12 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		// Alt Route
 		List<Link> linksAlternativeRoute = this.alternativeRoute.getLinks();
 		for (Link l : linksAlternativeRoute) {
-			String linkId = l.getId().toString();
-			if (!this.intraFlows.containsKey(l.getId().toString())) {
-				this.intraFlows.put(l.getId().toString(), 0.0);
+			if (!this.intraFlows.containsKey(l.getId())) {
+				this.intraFlows.put(l.getId(), 0.0);
 			}
 
-			if (!this.ttMeasured.containsKey(l.getId().toString())) {
-				this.ttMeasured.put(l.getId().toString(), this.ttFreeSpeeds.get(l
-						.getId()));
+			if (!this.ttMeasured.containsKey(l.getId())) {
+				this.ttMeasured.put(l.getId(), this.ttFreeSpeeds.get(l.getId()));
 			}
 
 			if (!this.capacities.containsKey(l.getId())) {
@@ -209,47 +195,42 @@ public class ControlInputMB extends AbstractControlInputImpl {
 				this.capacities.put(l.getId(), capacity);
 			}
 
-			if (!this.enterLinkEventTimes.containsKey(l.getId().toString())) {
+			if (!this.enterLinkEventTimes.containsKey(l.getId())) {
 				List<Double> list = new LinkedList<Double>();
-				this.enterLinkEventTimes.put(l.getId().toString(), list);
+				this.enterLinkEventTimes.put(l.getId(), list);
 			}
-			if (!this.ttFreeSpeedUpToAndIncludingLink.containsKey(l.getId()
-					.toString())) {
+			if (!this.ttFreeSpeedUpToAndIncludingLink.containsKey(l.getId())) {
 				double tt = sumUpTTFreeSpeed(l.getToNode(), this.mainRoute);
-				this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
+				this.ttFreeSpeedUpToAndIncludingLink.put(l.getId(), tt);
 			}
 		}
 		this.currentBottleNeckAlternativeRoute = this.altRouteNaturalBottleNeck;
 
-		this.nodesAlternativeRoute = this.alternativeRoute.getNodes();
-		for (int i = 1; i < this.nodesAlternativeRoute.size() - 1; i++) {
-			Node n = this.nodesAlternativeRoute.get(i);
+		List<Node> nodesAlternativeRoute = this.alternativeRoute.getNodes();
+		for (int i = 1; i < nodesAlternativeRoute.size() - 1; i++) {
+			Node n = nodesAlternativeRoute.get(i);
 			for (Link inLink : n.getInLinks().values()) {
-				String linkId = inLink.getId().toString();
 				if (!linksAlternativeRoute.contains(inLink)) {
 					double tt = sumUpTTFreeSpeed(n, this.alternativeRoute);
-					this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
-					this.inLinksAlternativeRoute.add(inLink);
-					this.outFlows.put(inLink.getId().toString(), 0.0);
-					this.numbersPassedOnInAndOutLinks.put(inLink.getId().toString(), 0);
-					this.extraFlowsAlternativeRoute.put(linkId, 0.0);
+					this.ttFreeSpeedUpToAndIncludingLink.put(inLink.getId(), tt);
+					this.inLinksAlternativeRoute.add(inLink.getId());
+					this.numbersPassedOnInAndOutLinks.put(inLink.getId(), 0);
+					this.extraFlowsAlternativeRoute.put(inLink.getId(), 0.0);
 					List<Double> list = new LinkedList<Double>();
-					this.enterLinkEventTimes.put(linkId, list);
+					this.enterLinkEventTimes.put(inLink.getId(), list);
 					// } else{
 					// System.out.println("No additional inLinks");
 				}
 			}
 			for (Link outLink : n.getOutLinks().values()) {
-				String linkId = outLink.getId().toString();
 				if (!linksAlternativeRoute.contains(outLink)) {
 					double tt = sumUpTTFreeSpeed(n, this.alternativeRoute);
-					this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
-					this.outLinksAlternativeRoute.add(outLink);
-					this.outFlows.put(outLink.getId().toString(), 0.0);
-					this.numbersPassedOnInAndOutLinks.put(outLink.getId().toString(), 0);
-					this.extraFlowsAlternativeRoute.put(linkId, 0.0);
+					this.ttFreeSpeedUpToAndIncludingLink.put(outLink.getId(), tt);
+					this.outLinksAlternativeRoute.add(outLink.getId());
+					this.numbersPassedOnInAndOutLinks.put(outLink.getId(), 0);
+					this.extraFlowsAlternativeRoute.put(outLink.getId(), 0.0);
 					List<Double> list = new LinkedList<Double>();
-					this.enterLinkEventTimes.put(linkId, list);
+					this.enterLinkEventTimes.put(outLink.getId(), list);
 					// } else{
 					// System.out.println("No additional outLinks");
 				}
@@ -263,46 +244,46 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 
 	@Override
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 
 		// Must be done before super.handleEvent as that removes entries
-		if (this.ttMeasured.containsKey(event.getLinkId().toString())) {
-			this.enterLinkEvents.put(event.getPersonId().toString(), event.getTime());
+		if (this.ttMeasured.containsKey(event.getLinkId())) {
+			this.enterLinkEvents.put(event.getPersonId(), event.getTime());
 		}
 
 		// handle flows on outLinks
-		if (this.outLinksMainRoute.contains(event.getLink())) {
-			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.getLinkId().toString()) + 1;
-			this.numbersPassedOnInAndOutLinks.put(event.getLinkId().toString(), numbersPassed);
+		if (this.outLinksMainRoute.contains(event.getLinkId())) {
+			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.getLinkId()) + 1;
+			this.numbersPassedOnInAndOutLinks.put(event.getLinkId(), numbersPassed);
 		}
-		else if (this.outLinksAlternativeRoute.contains(event.getLink())) {
-			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.getLinkId().toString()) + 1;
-			this.numbersPassedOnInAndOutLinks.put(event.getLinkId().toString(), numbersPassed);
+		else if (this.outLinksAlternativeRoute.contains(event.getLinkId())) {
+			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.getLinkId()) + 1;
+			this.numbersPassedOnInAndOutLinks.put(event.getLinkId(), numbersPassed);
 		}
 
 		super.handleEvent(event);
 	}
 
 	@Override
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 
 		// Must be done before super.handleEvent as that removes entries
-		if (this.ttMeasured.containsKey(event.getLinkId().toString())
-				&& (this.enterLinkEvents.get(event.getPersonId().toString()) != null)) {
-			Double enterTime = this.enterLinkEvents.remove(event.getPersonId().toString());
+		if (this.ttMeasured.containsKey(event.getLinkId())
+				&& (this.enterLinkEvents.get(event.getPersonId()) != null)) {
+			Double enterTime = this.enterLinkEvents.remove(event.getPersonId());
 			Double travelTime = event.getTime() - enterTime;
-			this.ttMeasured.put(event.getLinkId().toString(), travelTime);
+			this.ttMeasured.put(event.getLinkId(), travelTime);
 		}
 
 		// Stores [NUMBEROFFLOWEVENTS] last events and calculates flow for detection
 		// of capacity reduction
-		if (this.intraFlows.containsKey(event.getLinkId().toString())) {
+		if (this.intraFlows.containsKey(event.getLinkId())) {
 			updateFlow(this.numberofeventsdetection, event);
 		}
-		if (this.inLinksAlternativeRoute.contains(event.getLink())
-				|| this.outLinksAlternativeRoute.contains(event.getLink())
-				|| this.inLinksMainRoute.contains(event.getLink())
-				|| this.outLinksMainRoute.contains(event.getLink())) {
+		if (this.inLinksAlternativeRoute.contains(event.getLinkId())
+				|| this.outLinksAlternativeRoute.contains(event.getLinkId())
+				|| this.inLinksMainRoute.contains(event.getLinkId())
+				|| this.outLinksMainRoute.contains(event.getLinkId())) {
 			// updateFlow(NUMBEROFEVENTSINOUTFLOW, event);
 			updateFlow(this.updatetimeinoutflow, event);
 
@@ -336,7 +317,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 					this.mainRouteNaturalBottleNeck);
 		}
 		else {
-			String accidentLinkId = this.accidents.iterator().next().getLinks().iterator().next().getId().toString();
+			Id accidentLinkId = this.accidents.iterator().next().getLinks().iterator().next().getId();
 			Link accidentLinkMainRoute = searchAccidentsOnRoutes(accidentLinkId);
 			this.predTTMainRoute = getPredictedTravelTime(this.mainRoute,
 					accidentLinkMainRoute);
@@ -371,16 +352,15 @@ public class ControlInputMB extends AbstractControlInputImpl {
 			for (int i = routeLinks.size() - 1; i >= 0; i--) {
 				Link link = routeLinks.get(i);
 				Id id = link.getId();
-				String linkId = id.toString();
 
-				if ((this.ttMeasured.get(linkId) > (this.ttFreeSpeeds.get(id) + this.ignoredQueuingTime))
+				if ((this.ttMeasured.get(id) > (this.ttFreeSpeeds.get(id) + this.ignoredQueuingTime))
 						&& searchForBottleNecks) {
 					bottleNeckList.addFirst(link);
 					searchForBottleNecks = false;
 					// queueFound = true;
-					log.trace("Link " + linkId + " was detected as a bottleneck.");
+					log.trace("Link " + id.toString() + " was detected as a bottleneck.");
 				}
-				else if (this.ttMeasured.get(linkId) < this.ttFreeSpeeds.get(id)
+				else if (this.ttMeasured.get(id) < this.ttFreeSpeeds.get(id)
 						+ this.ignoredQueuingTime) {
 					searchForBottleNecks = true;
 				}
@@ -472,23 +452,24 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 		routeSegment = wholeRoute.getSubRoute(firstLinkInRS.getFromNode(),
 				bottleNeck.getToNode());
-		double netFlowOnRoute = getIntraFlow(firstLinkInRS)
-				- getIntraFlow(bottleNeck);
+		double netFlowOnRoute = getIntraFlow(firstLinkInRS.getId())
+				- getIntraFlow(bottleNeck.getId());
 
 		// Calculate additional agents that enter or leaves route
 		List<Node> routeList = new ArrayList<Node>(routeSegment.getNodes());
-		List<Link> inAndOutLinks = new ArrayList<Link>();
+		List<Id> inAndOutLinks = new ArrayList<Id>();
 		inAndOutLinks.addAll(this.getOutlinks(wholeRoute));
 		inAndOutLinks.addAll(this.getInlinks(wholeRoute));
 		double flowOnThisLink = 0;
 		double ttFreeSpeedOnRouteSegment = 0;
 		double additionalAgentsInOutLinks = 0;
-		for (Link link : inAndOutLinks) {
+		for (Id id : inAndOutLinks) {
+			Link link = this.network.getLinks().get(id);
 			if (routeList.contains(link.getToNode())
 					|| routeList.contains(link.getFromNode())) {
-				flowOnThisLink = getInOutFlow(link, wholeRoute);
+				flowOnThisLink = getInOutFlow(id, wholeRoute);
 				ttFreeSpeedOnRouteSegment = getTTFreeSpeedOnRouteSegmentToLink(
-						wholeRoute, previousBottleNeckIndex, link);
+						wholeRoute, previousBottleNeckIndex, id);
 			}
 			additionalAgentsInOutLinks += flowOnThisLink
 					* (ttToThisRouteSegment + ttFreeSpeedOnRouteSegment);
@@ -506,7 +487,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 		// Do the queuecheck
 		double ttFreeSpeedRS = getFreeSpeed(routeSegment);
-		double ttQueue = agentsPredicted / getIntraFlow(bottleNeck);
+		double ttQueue = agentsPredicted / getIntraFlow(bottleNeck.getId());
 		log.trace("RS ttFreeSpeed: " + ttFreeSpeedRS);
 		log.trace("RS ttQueue: " + ttQueue);
 		if (ttQueue > ttFreeSpeedRS) {
@@ -522,7 +503,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 	}
 
 	private double getTTFreeSpeedOnRouteSegmentToLink(final NetworkRoute wholeRoute,
-			final int previousBottleNeckIndex, final Link inOutLink) {
+			final int previousBottleNeckIndex, final Id inOutLinkId) {
 
 		List<Link> wholeRouteLinks = wholeRoute.getLinks();
 		Link firstLinkOnRouteSegment = wholeRouteLinks.get(previousBottleNeckIndex + 1);
@@ -542,8 +523,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		}
 
 		double ttFreeSpeedOnRouteInlcudingThisLink = 0;
-		ttFreeSpeedOnRouteInlcudingThisLink = this.ttFreeSpeedUpToAndIncludingLink
-				.get(inOutLink.getId().toString());
+		ttFreeSpeedOnRouteInlcudingThisLink = this.ttFreeSpeedUpToAndIncludingLink.get(inOutLinkId);
 
 		return ttFreeSpeedOnRouteInlcudingThisLink - ttFreeSpeedToThisRouteSegment;
 	}
@@ -559,7 +539,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 	private double getAgents(final NetworkRoute routeSegment) {
 		double agents = 0;
 		for (Link l : routeSegment.getLinks()) {
-			agents += this.numberOfAgents.get(l.getId().toString());
+			agents += this.numberOfAgents.get(l.getId());
 		}
 		return agents;
 	}
@@ -610,14 +590,13 @@ public class ControlInputMB extends AbstractControlInputImpl {
 	 * currentBNCapacityAlternativeRoute; } return cap; }
 	 */
 
-	private double getInOutFlow(final Link inLink, final NetworkRoute route) {
+	private double getInOutFlow(final Id inLinkId, final NetworkRoute route) {
 		double flow;
-		String linkId = inLink.getId().toString();
 		if (route == this.mainRoute) {
-			flow = this.extraFlowsMainRoute.get(linkId);
+			flow = this.extraFlowsMainRoute.get(inLinkId);
 		}
 		else if (route == this.alternativeRoute) {
-			flow = this.extraFlowsAlternativeRoute.get(linkId);
+			flow = this.extraFlowsAlternativeRoute.get(inLinkId);
 		}
 		else {
 			flow = 0;
@@ -626,12 +605,12 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		return flow;
 	}
 
-	public double getIntraFlow(final Link link) {
-		return this.intraFlows.get(link.getId().toString());
+	public double getIntraFlow(final Id linkId) {
+		return this.intraFlows.get(linkId);
 	}
 
-	public double getCapacity(final Link link) {
-		return this.capacities.get(link.getId());
+	public double getCapacity(final Id linkId) {
+		return this.capacities.get(linkId);
 	}
 
 	public Link getDetectedBottleNeck(final NetworkRoute route) {
@@ -654,11 +633,11 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		}
 	}
 
-	private Link searchAccidentsOnRoutes(final String accidentLinkId) {
+	private Link searchAccidentsOnRoutes(final Id accidentLinkId) {
 		NetworkRoute r = this.mainRoute;
 		for (int j = 0; j < 2; j++) {
 			for (Link link : r.getLinks()) {
-				if (link.getId().toString().equalsIgnoreCase(accidentLinkId)) {
+				if (link.getId().equals(accidentLinkId)) {
 					return link;
 				}
 			}

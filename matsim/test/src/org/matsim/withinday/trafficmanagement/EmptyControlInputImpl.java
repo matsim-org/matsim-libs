@@ -30,12 +30,6 @@ public class EmptyControlInputImpl extends AbstractControlInputImpl {
 
 	private double nashTime;
 
-	public EmptyControlInputImpl() {
-	}
-
-	/**
-	 * @see org.matsim.withinday.trafficmanagement.ControlInput#getNashTime()
-	 */
 	public double getNashTime() {
 		return this.nashTime;
 	}

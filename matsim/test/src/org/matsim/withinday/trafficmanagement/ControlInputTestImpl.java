@@ -31,18 +31,8 @@ import org.matsim.withinday.trafficmanagement.controlinput.AbstractControlInputI
  */
 public class ControlInputTestImpl extends AbstractControlInputImpl {
 
-	/**
-	 * @see org.matsim.withinday.trafficmanagement.ControlInput#getNashTime()
-	 */
 	public double getNashTime() {
 		return 0;
-	}
-
-	/**
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
-	public void reset(final int iteration) {
-
 	}
 
 	public void finishIteration() {

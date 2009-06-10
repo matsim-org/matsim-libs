@@ -318,7 +318,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			return cI;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTMB) == 0) {
-			ControlInputMB cI = new ControlInputMB(this.simulationConfig);
+			ControlInputMB cI = new ControlInputMB(this.simulationConfig, this.network);
 			cI.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
 			this.events.addHandler(cI);
 			return cI;

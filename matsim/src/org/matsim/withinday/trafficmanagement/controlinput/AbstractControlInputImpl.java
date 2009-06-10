@@ -29,17 +29,17 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.ControlInput;
@@ -49,8 +49,8 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  *
  */
 public abstract class AbstractControlInputImpl implements ControlInput,
-		AgentDepartureEventHandler, AgentArrivalEventHandler,
-		LinkEnterEventHandler, LinkLeaveEventHandler {
+		BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler,
+		BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
 
 	private static final Logger log = Logger
 			.getLogger(AbstractControlInputImpl.class);
@@ -59,21 +59,21 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	protected NetworkRoute alternativeRoute;
 
-	protected Map<String, Integer> numberOfAgents;
+	protected Map<Id, Integer> numberOfAgents;
 
 	protected Map<Id, Double> ttFreeSpeeds;
 
-	protected String firstLinkOnMainRoute;
+	private Id firstLinkOnMainRoute;
 
-	protected String firstLinkOnAlternativeRoute;
+	private Id firstLinkOnAlternativeRoute;
 
-	protected String lastLinkOnMainRoute;
+	private Id lastLinkOnMainRoute;
 
-	protected String lastLinkOnAlternativeRoute;
+	private Id lastLinkOnAlternativeRoute;
 
-	protected Map<String, Double> enterEvents1;
+	private Map<Id, Double> enterEvents1;
 
-	protected Map<String, Double> enterEvents2;
+	private Map<Id, Double> enterEvents2;
 
 	protected double lastTimeMainRoute;
 
@@ -95,30 +95,30 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	private final ControlInputWriter writer;
 
-	protected Map<String, Double> intraFlows = new HashMap<String, Double>();
+	protected Map<Id, Double> intraFlows = new HashMap<Id, Double>();
 
-	protected Map<String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
+	protected Map<Id, List<Double>> enterLinkEventTimes = new HashMap<Id, List<Double>>();
 
-	protected List<Link> inLinksMainRoute = new ArrayList<Link>();
+	protected List<Id> inLinksMainRoute = new ArrayList<Id>();
 
-	protected List<Link> outLinksMainRoute = new ArrayList<Link>();
+	protected List<Id> outLinksMainRoute = new ArrayList<Id>();
 
 
-	protected List<Link> inLinksAlternativeRoute = new ArrayList<Link>();
+	protected List<Id> inLinksAlternativeRoute = new ArrayList<Id>();
 
-	protected List<Link> outLinksAlternativeRoute = new ArrayList<Link>();
+	protected List<Id> outLinksAlternativeRoute = new ArrayList<Id>();
 
 	// For in/outlinks disturbance check:
-	protected Map<String, Double> extraFlowsMainRoute = new HashMap<String, Double>();
+	protected Map<Id, Double> extraFlowsMainRoute = new HashMap<Id, Double>();
 
-	protected Map<String, Double> extraFlowsAlternativeRoute = new HashMap<String, Double>();
+	protected Map<Id, Double> extraFlowsAlternativeRoute = new HashMap<Id, Double>();
 
 
 
 	public AbstractControlInputImpl() {
-		this.numberOfAgents = new HashMap<String, Integer>();
-		this.enterEvents1 = new HashMap<String, Double>();
-		this.enterEvents2 = new HashMap<String, Double>();
+		this.numberOfAgents = new HashMap<Id, Integer>();
+		this.enterEvents1 = new HashMap<Id, Double>();
+		this.enterEvents2 = new HashMap<Id, Double>();
 		this.ttFreeSpeeds = new HashMap<Id, Double>();
 
 		this.lastTimeMainRoute = 0.0;
@@ -175,7 +175,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	public int getNumberOfVehiclesOnRoute(final NetworkRoute route) {
 		int ret = 0;
 		for (Link link : route.getLinks()) {
-			ret += this.numberOfAgents.get(link.getId().toString());
+			ret += this.numberOfAgents.get(link.getId());
 		}
 		return ret;
 	}
@@ -188,12 +188,11 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.writer.open();
 
 		List<Link> routeLinks = this.getAlternativeRoute().getLinks();
-		this.firstLinkOnAlternativeRoute = routeLinks.get(0).getId().toString();
-		this.lastLinkOnAlternativeRoute = routeLinks.get(routeLinks.size() - 1).getId()
-				.toString();
+		this.firstLinkOnAlternativeRoute = routeLinks.get(0).getId();
+		this.lastLinkOnAlternativeRoute = routeLinks.get(routeLinks.size() - 1).getId();
 		for (Link l : routeLinks) {
-			if (!this.numberOfAgents.containsKey(l.getId().toString())) {
-				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
+			if (!this.numberOfAgents.containsKey(l.getId())) {
+				this.numberOfAgents.put(l.getId(), Integer.valueOf(0));
 			}
 			double tt = l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME);
 			this.ttFreeSpeeds.put(l.getId(), tt);
@@ -211,13 +210,12 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 
 		routeLinks = this.getMainRoute().getLinks();
-		this.firstLinkOnMainRoute = routeLinks.get(0).getId().toString();
-		this.lastLinkOnMainRoute = routeLinks.get(routeLinks.size() - 1).getId()
-				.toString();
+		this.firstLinkOnMainRoute = routeLinks.get(0).getId();
+		this.lastLinkOnMainRoute = routeLinks.get(routeLinks.size() - 1).getId();
 		double tt;
 		for (Link l : routeLinks) {
-			if (!this.numberOfAgents.containsKey(l.getId().toString())) {
-				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
+			if (!this.numberOfAgents.containsKey(l.getId())) {
+				this.numberOfAgents.put(l.getId(), Integer.valueOf(0));
 			}
 			tt = l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME);
 			this.ttFreeSpeeds.put(l.getId(), tt);
@@ -236,30 +234,30 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	}
 
 	// memorize linkEnterEvents on the first links of the two alternative routes:
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 		// count the agents on the route links
 
-		if (event.getLinkId().toString().equals(this.firstLinkOnMainRoute)) {
-			this.enterEvents1.put(event.getPersonId().toString(), event.getTime());
+		if (event.getLinkId().equals(this.firstLinkOnMainRoute)) {
+			this.enterEvents1.put(event.getPersonId(), event.getTime());
 		}
-		else if (event.getLinkId().toString().equals(this.firstLinkOnAlternativeRoute)) {
-			this.enterEvents2.put(event.getPersonId().toString(), event.getTime());
+		else if (event.getLinkId().equals(this.firstLinkOnAlternativeRoute)) {
+			this.enterEvents2.put(event.getPersonId(), event.getTime());
 		}
 
-		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
-			int number = this.numberOfAgents.get(event.getLinkId().toString());
+		if (this.numberOfAgents.containsKey(event.getLinkId())) {
+			int number = this.numberOfAgents.get(event.getLinkId());
 			number++;
-			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId(), Integer.valueOf(number));
 		}
 
 	}
 
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		// decrease current #agents
-		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
-			int number = this.numberOfAgents.get(event.getLinkId().toString());
+		if (this.numberOfAgents.containsKey(event.getLinkId())) {
+			int number = this.numberOfAgents.get(event.getLinkId());
 			number--;
-			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId(), Integer.valueOf(number));
 		}
 
 		// if someone leaves one of the last links of the two alternative routes,
@@ -267,8 +265,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		// - check if that vehicle entered at the beginning
 		// - if so, then derive latest measured nashtime input from that
 		boolean timeDifferenceHasChanged = false;
-		if (event.getLinkId().toString().equals(this.lastLinkOnMainRoute)) {
-			Double t1 = this.enterEvents1.remove(event.getPersonId().toString());
+		if (event.getLinkId().equals(this.lastLinkOnMainRoute)) {
+			Double t1 = this.enterEvents1.remove(event.getPersonId());
 			if (t1 != null) {
 				double deltaT = event.getTime() - t1;
 				this.ttMeasuredMainRoute.put(event.getTime(), deltaT);
@@ -282,8 +280,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 //				}
 			}
 		}
-		else if (event.getLinkId().toString().equals(this.lastLinkOnAlternativeRoute)) {
-			Double t1 = this.enterEvents2.remove(event.getPersonId().toString());
+		else if (event.getLinkId().equals(this.lastLinkOnAlternativeRoute)) {
+			Double t1 = this.enterEvents2.remove(event.getPersonId());
 			if (t1 != null) {
 				double deltaT = event.getTime() - t1;
 				this.ttMeasuredAlternativeRoute.put(event.getTime(), deltaT);
@@ -311,21 +309,21 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		// increase number of agents on the route links
-		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
-			int number = this.numberOfAgents.get(event.getLinkId().toString());
+		if (this.numberOfAgents.containsKey(event.getLinkId())) {
+			int number = this.numberOfAgents.get(event.getLinkId());
 			number++;
-			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId(), Integer.valueOf(number));
 		}
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		// decrease number of agents on the route links
-		if (this.numberOfAgents.containsKey(event.getLinkId().toString())) {
-			int number = this.numberOfAgents.get(event.getLinkId().toString());
+		if (this.numberOfAgents.containsKey(event.getLinkId())) {
+			int number = this.numberOfAgents.get(event.getLinkId());
 			number--;
-			this.numberOfAgents.put(event.getLinkId().toString(), Integer.valueOf(number));
+			this.numberOfAgents.put(event.getLinkId(), Integer.valueOf(number));
 		}
 	}
 
@@ -358,10 +356,10 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		return naturalBottleNeck;
 	}
 
-	protected void updateFlow(final int flowResolution, final LinkLeaveEvent event) {
+	protected void updateFlow(final int flowResolution, final BasicLinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
-				.get(event.getLinkId().toString());
+				.get(event.getLinkId());
 		if (list.size() == flowResolution) {
 			list.removeFirst();
 			list.addLast(event.getTime());
@@ -381,24 +379,24 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		// Flow = agents / seconds:
 		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
 
-		if (this.intraFlows.containsKey(event.getLinkId().toString())) {
-			this.intraFlows.put(event.getLinkId().toString(), flow);
+		if (this.intraFlows.containsKey(event.getLinkId())) {
+			this.intraFlows.put(event.getLinkId(), flow);
 		}
-		if (this.inLinksMainRoute.contains(event.getLink())) {
+		if (this.inLinksMainRoute.contains(event.getLinkId())) {
 			double inFlow = flow;
-			this.extraFlowsMainRoute.put(event.getLinkId().toString(), inFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId(), inFlow);
 		}
-		if (this.outLinksMainRoute.contains(event.getLink())) {
+		if (this.outLinksMainRoute.contains(event.getLinkId())) {
 			double outFlow = -flow;
-			this.extraFlowsMainRoute.put(event.getLinkId().toString(), outFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId(), outFlow);
 		}
-		if (this.inLinksAlternativeRoute.contains(event.getLink())) {
+		if (this.inLinksAlternativeRoute.contains(event.getLinkId())) {
 			double inFlow = flow;
-			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), inFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId(), inFlow);
 		}
-		if (this.outLinksAlternativeRoute.contains(event.getLink())) {
+		if (this.outLinksAlternativeRoute.contains(event.getLinkId())) {
 			double outFlow = -flow;
-			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), outFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId(), outFlow);
 		}
 	}
 
@@ -414,10 +412,10 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		return ttFS;
 	}
 
-	protected void updateFlow(final double flowUpdateTime, final LinkLeaveEvent event) {
+	protected void updateFlow(final double flowUpdateTime, final BasicLinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
-				.get(event.getLinkId().toString());
+				.get(event.getLinkId());
 		// Remove times older than flowUpdateTime
 			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.getTime())) {
 				list.removeFirst();
@@ -428,37 +426,37 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		// Flow = agents / seconds:
 		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
 
-		if (this.intraFlows.containsKey(event.getLinkId().toString())) {
-			this.intraFlows.put(event.getLinkId().toString(), flow);
+		if (this.intraFlows.containsKey(event.getLinkId())) {
+			this.intraFlows.put(event.getLinkId(), flow);
 		}
-		if (this.inLinksMainRoute.contains(event.getLink())) {
+		if (this.inLinksMainRoute.contains(event.getLinkId())) {
 			double inFlow = flow;
-			this.extraFlowsMainRoute.put(event.getLinkId().toString(), inFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId(), inFlow);
 		}
-		if (this.outLinksMainRoute.contains(event.getLink())) {
+		if (this.outLinksMainRoute.contains(event.getLinkId())) {
 			double outFlow = -flow;
-			this.extraFlowsMainRoute.put(event.getLinkId().toString(), outFlow);
+			this.extraFlowsMainRoute.put(event.getLinkId(), outFlow);
 		}
-		if (this.inLinksAlternativeRoute.contains(event.getLink())) {
+		if (this.inLinksAlternativeRoute.contains(event.getLinkId())) {
 			double inFlow = flow;
-			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), inFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId(), inFlow);
 		}
-		if (this.outLinksAlternativeRoute.contains(event.getLink())) {
+		if (this.outLinksAlternativeRoute.contains(event.getLinkId())) {
 			double outFlow = -flow;
-			this.extraFlowsAlternativeRoute.put(event.getLinkId().toString(), outFlow);
+			this.extraFlowsAlternativeRoute.put(event.getLinkId(), outFlow);
 		}
 	}
 
 	public void reset(final int iteration) {}
 	
-	protected List<Link> getOutlinks(final NetworkRoute route) {
+	protected List<Id> getOutlinks(final NetworkRoute route) {
 		if (route == this.mainRoute) {
 			return this.outLinksMainRoute;
 		}
 		return this.outLinksAlternativeRoute;
 	}
 
-	protected List<Link> getInlinks(final NetworkRoute route) {
+	protected List<Id> getInlinks(final NetworkRoute route) {
 		if (route == this.mainRoute) {
 			return this.inLinksMainRoute;
 		}

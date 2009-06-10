@@ -21,29 +21,14 @@
 package org.matsim.withinday.trafficmanagement.controlinput;
 
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
- * @author a.bergsten, d.zetterberg
- *
- */
-
-/*
- *
  * Measures the travel time difference between route 1 and 2 and returns that as
  * the control signal. ("Reactive control")
+ * 
+ * @author a.bergsten, d.zetterberg
  */
-
-public class ControlInputImpl1 extends AbstractControlInputImpl implements
-		LinkLeaveEventHandler, LinkEnterEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler, ControlInput {
-
-
-	public ControlInputImpl1() {}
+public class ControlInputImpl1 extends AbstractControlInputImpl {
 
 	@Override
 	public double getPredictedNashTime(NetworkRoute route) {
@@ -53,15 +38,10 @@ public class ControlInputImpl1 extends AbstractControlInputImpl implements
 		return this.lastTimeAlternativeRoute;
 	}
 
-
 	@Override
 	public double getNashTime() {
 		super.getNashTime();
 		return this.timeDifference;
 	}
-
-	public void reset(int iteration) {}
-
-
 
 }
