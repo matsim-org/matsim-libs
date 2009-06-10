@@ -366,7 +366,7 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkLayer filterNetwork(final NetworkLayer net, boolean full) {
-		EditableNetworkLayer n = new EditableNetworkLayer();
+		NetworkLayer n = new NetworkLayer();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];
 		int i = 0;
@@ -387,7 +387,7 @@ public class TollSchemeGenerator {
 					new Coordinate[] { fromCord }), geofac))
 					&& ppp.contains(new Point(new CoordinateArraySequence(
 							new Coordinate[] { toCord }), geofac))) {
-				n.addLink(l);
+				n.getLinks().put(l.getId(), l);
 			}
 		}
 		return n;

@@ -39,7 +39,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -52,7 +51,6 @@ import org.matsim.vis.kml.MatsimKMLLogo;
 
 import playground.dgrether.analysis.gis.ShapeFileNetworkWriter;
 import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
-import playground.dgrether.roadpricing.EditableNetworkLayer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -1215,7 +1213,7 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkLayer filterNetwork(final NetworkLayer net, boolean full) {
-		EditableNetworkLayer n = new EditableNetworkLayer();
+		NetworkLayer n = new NetworkLayer();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];
 		int i = 0;
@@ -1237,7 +1235,7 @@ public class TollSchemeGenerator {
 					new Coordinate[] { fromCord }), geofac))
 					&& ppp.contains(new Point(new CoordinateArraySequence(
 							new Coordinate[] { toCord }), geofac))) {
-				n.addLink(l);
+				n.getLinks().put(l.getId(), l);
 			}
 		}
 		return n;
