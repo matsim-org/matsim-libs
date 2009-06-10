@@ -105,6 +105,13 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		if(this.changeEvents != null)
 			this.changeEvents.clear();
 	
+		this.aFlowCapacityTimes = null;
+		this.aFlowCapacityValues = null;
+		this.aFreespeedTimes = null;
+		this.aFreespeedValues = null;
+		this.aLanesTimes = null;
+		this.aLanesValues = null;
+		
 		this.aFreespeedEvents = 1;
 		this.aFlowCapacityEvents = 1;
 		this.aLanesEvents = 1;
