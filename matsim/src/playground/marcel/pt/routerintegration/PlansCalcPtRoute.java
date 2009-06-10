@@ -31,7 +31,6 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -40,11 +39,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.mmoyo.PTCase2.PTRouter2;
 import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs2;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-import playground.mmoyo.input.PTLineAggregator;
+import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
 import playground.mmoyo.input.PTNetworkFactory2;
 
 public class PlansCalcPtRoute extends PlansCalcRoute {
@@ -61,18 +59,22 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 		super(config, network, costCalculator, timeCalculator, factory);
 		this.planSimplifier = new SimplifyPtLegs2();
 
-		String timeTableFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/inptnetfile.xml"; // TODO [MM] use TransitSchedule
-		String ptNewLinesFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/TestCase/InPTDIVA.xml";
+//		String timeTableFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/inptnetfile.xml";
+//		String ptNewLinesFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/TestCase/InPTDIVA.xml";
+		String transitScheduleFilename = "test/input/playground/marcel/pt/transitSchedule.xml";
+		
+		TransitScheduleToPTTimeTableConverter transitScheduleToPTTimeTableConverter = new TransitScheduleToPTTimeTableConverter();
+		PTTimeTable2 timeTable = transitScheduleToPTTimeTableConverter.getPTTimeTable(transitScheduleFilename, network);
+//		new PTLineAggregator(ptNewLinesFilename, net, timeTable).addLines();
 
-		NetworkLayer net = new NetworkLayer();
-		PTTimeTable2 timeTable = new PTTimeTable2(timeTableFilename);
-		new PTLineAggregator(ptNewLinesFilename, net, timeTable).addLines();
-
-		PTNetworkFactory2 ptNetFactory = new PTNetworkFactory2();
-		ptNetFactory.createTransferLinks(net, timeTable);
-		ptNetFactory.createDetachedTransfers(net, 300);
-
-		this.ptRouter = new TransitRouteFinder(new PTRouter2(net, timeTable));
+		PTNetworkFactory2 ptNetFactory = new PTNetworkFactory2(); // this looks like it could be an abstract Utility class.
+		// internal setup of things should happen internally somewhere, not be called externally...
+//		ptNetFactory.createTransferLinks(net, timeTable); // this looks like it could be a static helper method
+//		ptNetFactory.createDetachedTransfers(net, 300); // this also.
+//
+//		this.ptRouter = new TransitRouteFinder(new PTRouter2(net, timeTable)); // should work with transitSchedule only
+		
+		this.ptRouter = new TransitRouteFinder(schedule);
 	}
 
 	@Override
