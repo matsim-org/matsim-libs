@@ -39,7 +39,6 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
@@ -311,7 +310,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param filename
 	 * @param legMode
 	 *
-	 * @see #getGraphic(BasicLeg.TransportMode)
+	 * @see #getGraphic(TransportMode)
 	 */
 	public void writeGraphic(final String filename, final TransportMode legMode) {
 		try {
