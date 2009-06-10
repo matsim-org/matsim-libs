@@ -18,7 +18,7 @@ public class PTLinkCostCalculator{
 		this.ptTimeTableInfo = ptTimeTableInfo; 
 	}
 	
-	public int cost(Link l, int time) {
+	public int getCost(Link l, int time) {
 		int cost=0;
 		if (l.getType().equals("Standard")){
 			cost= ptTimeTableInfo.travelTime(l,time); 

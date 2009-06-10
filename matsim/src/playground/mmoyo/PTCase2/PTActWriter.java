@@ -17,11 +17,12 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 //import org.matsim.core.controler.Controler;
-import playground.mmoyo.Validators.PathValidator;
+//import playground.mmoyo.Validators.PathValidator;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs2;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 import playground.mmoyo.Pedestrian.Walk;
-
+import org.matsim.core.population.PopulationReader
+;
 /**
  * Reads a plan file, finds a PT connection between two acts creating new PT legs and acts between them
  * and writes a output_plan file
@@ -40,23 +41,23 @@ public class PTActWriter {
 	private Link walkLink2;
 	
 	public PTActWriter(final PTOb ptOb){
-		ptRouter = ptOb.getPtRouter2();
-		net= ptOb.getPtNetworkLayer();
+		this.ptRouter = ptOb.getPtRouter2();
+		this.net= ptOb.getPtNetworkLayer();
 		String conf = ptOb.getConfig();
-		outputFile = ptOb.getOutPutFile();
-		plansFile =  ptOb.getPlansFile();
+		this.outputFile = ptOb.getOutPutFile();
+		this.plansFile =  ptOb.getPlansFile();
 		
 		Config config = new Config();
 		config = Gbl.createConfig(new String[]{conf, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
 		
-		population = new PopulationImpl();
+		this.population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population,net);
 		plansReader.readFile(plansFile);
 	}
 
 	public void SimplifyPtLegs(){
 		Population outPopulation = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(outPopulation,net);
+		PopulationReader plansReader = new MatsimPopulationReader(outPopulation,net);
 		plansReader.readFile(outputFile);
 		
 		SimplifyPtLegs2 SimplifyPtLegs = new SimplifyPtLegs2();
@@ -93,7 +94,7 @@ public class PTActWriter {
 		Population newPopulation = new PopulationImpl();
 		int numPlans=0;
 
-		PathValidator ptPathValidator = new PathValidator ();
+		//PathValidator ptPathValidator = new PathValidator ();
 		int trips=0;
 		int valid=0;
 		int invalid=0;
@@ -102,8 +103,8 @@ public class PTActWriter {
 		int nulls =0;
 		
 		//List<Double> travelTimes = new ArrayList<Double>();  <-This is for the performance test
+		//List<Path> invalidPaths = new ArrayList<Path>();  
 		List<Double> durations = new ArrayList<Double>();  
-		List<Path> invalidPaths = new ArrayList<Path>();  
 		List<Path> validPaths = new ArrayList<Path>();
 		
 		for (Person person: this.population.getPersons().values()) {
@@ -116,7 +117,7 @@ public class PTActWriter {
 			boolean addPerson= true;
 			Activity lastAct = null;
 			Activity thisAct= null;
-			double travelTime=0;
+			//double travelTime=0;
 			
 			double startTime=0;
 			double duration=0;
@@ -397,8 +398,8 @@ public class PTActWriter {
 	
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
 		//-> move and use it in Link factory
-		originNode= ptRouter.CreateWalkingNode(new IdImpl("w1"), coord1);
-		destinationNode= ptRouter.CreateWalkingNode(new IdImpl("w2"), coord2);
+		originNode= ptRouter.createWalkingNode(new IdImpl("w1"), coord1);
+		destinationNode= ptRouter.createWalkingNode(new IdImpl("w2"), coord2);
 		path.nodes.add(0, originNode);
 		path.nodes.add(destinationNode);
 		walkLink1 = ptRouter.createPTLink("linkW1", originNode , path.nodes.get(1), "Walking");

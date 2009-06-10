@@ -137,7 +137,7 @@ public class MiniDijkstra {
 	}
 	
 	private void updateCost(Link link, int iniTime){
-		int cost=ptLinkCostCalculator.cost(link,iniTime);
+		int cost=ptLinkCostCalculator.getCost(link,iniTime);
 		
 		int fromNodeIndex = nodeList.indexOf(link.getFromNode());
 		int toNodeIndex = nodeList.indexOf(link.getToNode());

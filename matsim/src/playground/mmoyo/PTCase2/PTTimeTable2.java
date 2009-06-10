@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
 import playground.mmoyo.input.PTLinesReader2;
 import playground.mmoyo.PTRouter.*;
@@ -48,8 +48,8 @@ public class PTTimeTable2{
 	 * Minutemap to save average travel time from the fist station to any station of the ptLine 
 	 * NodeDepartureTime to save all departures times in a day for each node   
 	 */
-	public void calculateTravelTimes(NetworkLayer networklayer){
-		// make it own class in inout and the pttimetable gets this extern data
+	public void calculateTravelTimes(Network networklayer){
+		// -> make its own class in input and the pttimetable gets this external data
 		Map<Id,Double> minuteMap = new TreeMap<Id,Double>();
 		
 		for (PTLine ptLine : ptLineList){
@@ -103,14 +103,14 @@ public class PTTimeTable2{
 		*/
 	}
 	
-	public double GetTravelTime(Link link){
+	public double getTravelTime(Link link){
 		return linkTravelTimeMap.get(link.getId()); 
 	}
 
 	/**
 	 * Returns the waiting time in a transfer link head node after a given time //minutes
 	 */
-	public double GetTransferTime(Link link, double time){
+	public double getTransferTime(Link link, double time){
 	 	double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
 		double transferTime= 0;
 		if (nextDeparture>=time){

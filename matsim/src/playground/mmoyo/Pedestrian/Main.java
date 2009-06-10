@@ -16,6 +16,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -50,7 +51,7 @@ public class Main {
 		
 		NetworkFactory networkFactory = new NetworkFactory();
 		
-		NetworkLayer logicNet= new NetworkLayer(networkFactory);
+		Network logicNet= new NetworkLayer(networkFactory);
 		MatsimNetworkReader logicMatsimNetworkReader = new MatsimNetworkReader(logicNet);
 		logicMatsimNetworkReader.readFile(LOGICNETFILE);
 		
@@ -58,7 +59,7 @@ public class Main {
 		MatsimNetworkReader matsimNetworkReader2 = new MatsimNetworkReader(net);
 		matsimNetworkReader2.readFile(NETFILE);
 		
-		Dijkstra dijkstra = new Dijkstra(net, new PedTravelCost(), new PedTravelTime());
+		org.matsim.core.router.util.LeastCostPathCalculator dijkstra = new Dijkstra(net, new PedTravelCost(), new PedTravelTime());
 		
 		Population population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population,logicNet);

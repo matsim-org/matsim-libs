@@ -2,11 +2,12 @@ package playground.mmoyo.Validators;
 
 import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTCase2.PTTravelCost;
-import playground.mmoyo.PTTest.PTTravelTime1;
-import playground.mmoyo.PTRouter.PTDijkstra;
+import playground.mmoyo.PTCase2.PTTravelTime1;
+import playground.mmoyo.PTRouter.MyDijkstra;
 import playground.mmoyo.PTRouter.PTLine;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.api.network.Node;
 import java.util.ArrayList;
@@ -18,17 +19,18 @@ import java.util.List;
 public class PTLineValidator {
 	
 	
+	
 	/**
 	 * Shows ptlines with no connection with other ptLines
 	 * @param ptTimeTable
 	 * @param net
 	 */
-	public void getIsolatedPTLines(PTTimeTable2 ptTimeTable, NetworkLayer net){
+	public void getIsolatedPTLines(PTTimeTable2 ptTimeTable, Network net){
 		int isolated=0;
 		int comparisons=0;
 		PTTravelCost ptTravelCost = new PTTravelCost(ptTimeTable);
 		PTTravelTime1 ptTravelTime1 = new PTTravelTime1();
-		PTDijkstra expressDijkstra = new PTDijkstra(net, ptTravelCost, ptTravelTime1);
+		LeastCostPathCalculator expressDijkstra = new MyDijkstra(net, ptTravelCost, ptTravelTime1);
 		
 		List<Id[]> ptLineIdList = new ArrayList<Id[]>();
 		for (PTLine ptLine: ptTimeTable.getPtLineList()){
@@ -66,7 +68,7 @@ public class PTLineValidator {
 	 */
 	public double getMinimalDistance (PTLine ptl1, PTLine ptl2 ){
 		double minDistance=0;
-		// compare distances from first ptline with ever node of secondptline, store the minimal distance		
+		// ->compare distances from first ptline with ever node of secondptline, store the minimal distance		
 		return minDistance;
 	}	
 }

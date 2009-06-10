@@ -2,6 +2,7 @@ package playground.mmoyo.PTCase1;
 
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.network.NetworkLayer;
 //import playground.mmoyo.PTRouter.*;
 import playground.mmoyo.input.PTLinesReader;

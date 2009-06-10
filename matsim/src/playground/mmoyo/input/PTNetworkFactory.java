@@ -227,15 +227,3 @@ public class PTNetworkFactory {
 	}
 }
 
-/*
- * Old CODE
- *  public void setMaxNodekey(int maxNodekey) { 
- *  	this.maxNodekey = maxNodekey; 
- *  }
- * 
- * public void setMaxLinkKey(int maxLinkKey) { 
- *		this.maxLinkKey = maxLinkKey;
- * }
- * 
-*/
-

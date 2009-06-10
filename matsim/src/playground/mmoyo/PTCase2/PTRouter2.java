@@ -13,10 +13,11 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.mmoyo.PTRouter.PTDijkstra;
+import playground.mmoyo.PTRouter.MyDijkstra;
 import playground.mmoyo.PTRouter.PTNode;
-
-
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 /** 
  * Second version of Router using Matsims Class Dijkstra  
  * We avoid the relationship with the city network and use coordinate search instead
@@ -30,28 +31,28 @@ import playground.mmoyo.PTRouter.PTNode;
  */
 public class PTRouter2 {
 	private NetworkLayer net; 
-	private PTDijkstra PTdijkstra;
-	private PTTravelCost ptTravelCost;
-	public PTTravelTime ptTravelTime;   //> make private 
+	private LeastCostPathCalculator PTdijkstra;
+	private TravelCost ptTravelCost;
+	public TravelTime ptTravelTime;   //> make private 
 	//private int x=0;//--> Should be part of the method if the simulation strategy is set to re-route.
 	
 	public PTRouter2(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimetable) {
 		this.net = ptNetworkLayer;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
-		this.PTdijkstra = new PTDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
+		this.PTdijkstra = new MyDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 	
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
 		double walkRange= distToWalk; 
-		Node origin= CreateWalkingNode(new IdImpl("W1"), coord1);
-		Node destination=CreateWalkingNode(new IdImpl("W2"), coord2);
+		Node origin= createWalkingNode(new IdImpl("W1"), coord1);
+		Node destination=createWalkingNode(new IdImpl("W2"), coord2);
 
-		Collection <Node> nearStops1 = FindnStations (coord1, walkRange);
-		Collection <Node> nearStops2 = FindnStations (coord2, walkRange);
+		Collection <Node> nearStops1 = findnStations (coord1, walkRange);
+		Collection <Node> nearStops2 = findnStations (coord2, walkRange);
 		
-		List <Link> walkingLinkList1 = CreateWalkingLinks(origin, nearStops1, true);
-		List <Link> walkingLinkList2 = CreateWalkingLinks(destination, nearStops2, false);
+		List <Link> walkingLinkList1 = createWalkingLinks(origin, nearStops1, true);
+		List <Link> walkingLinkList2 = createWalkingLinks(destination, nearStops2, false);
 			
 		Path path = PTdijkstra.calcLeastCostPath(origin, destination, time); 
 			
@@ -66,7 +67,7 @@ public class PTRouter2 {
 		return path;
 	}
 
-	private Collection <Node> FindnStations(Coord coord, double walkRange){
+	private Collection <Node> findnStations(Coord coord, double walkRange){
 		Collection <Node> stations;
 		do{
 			stations = net.getNearestNodes(coord, walkRange);
@@ -79,14 +80,14 @@ public class PTRouter2 {
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the quadtree
 	 */
-	public Node CreateWalkingNode(Id idNode, Coord coord) {
+	public Node createWalkingNode(Id idNode, Coord coord) {
 		//-> use node factory
 		Node node = new PTNode(idNode, coord, "Walking");
 		net.getNodes().put(idNode, node);
 		return node;
 	}
 	
-	public List <Link> CreateWalkingLinks(Node walkNode, Collection <Node> nearNodes, boolean to){
+	public List <Link> createWalkingLinks(Node walkNode, Collection <Node> nearNodes, boolean to){
 		//->move to link factory
 		List<Link> NewWalkLinks = new ArrayList<Link>();
 		String idLink;
@@ -140,7 +141,7 @@ public class PTRouter2 {
 		return PTdijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 	}
 	
-	public void PrintRoute(Path path){
+	public void printRoute(Path path){
 		if (path!=null){
 			System.out.print("\nLinks: ");
 			//for (Link l L route.getLinks()) {

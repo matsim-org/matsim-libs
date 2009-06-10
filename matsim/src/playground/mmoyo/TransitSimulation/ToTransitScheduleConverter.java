@@ -4,13 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
@@ -28,7 +27,7 @@ public class ToTransitScheduleConverter {
 				
 	}
 	
-	public void createTransitSchedule(final PTTimeTable2 ptTimeTable, final NetworkLayer ptNet, String outTransitFile) {
+	public void createTransitSchedule(final PTTimeTable2 ptTimeTable, final Network ptNet, String outTransitFile) {
 		for (Node node:  ptNet.getNodes().values()){
 			this.transitSchedule.addStopFacility(new TransitStopFacility(node.getId(), node.getCoord()));
 		}
@@ -76,7 +75,7 @@ public class ToTransitScheduleConverter {
 		}
 	}
 	
-	public void createFacilities(NetworkLayer net){
+	public void createFacilities(Network net){
 	
 	}
 	

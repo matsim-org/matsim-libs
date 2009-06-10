@@ -1,7 +1,6 @@
 package playground.mmoyo.PTRouter;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -18,15 +17,12 @@ public class MyDijkstra extends Dijkstra{
 	
 	public MyDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
-	
 	}
 
-	/*
-	// Make public the inner class Dikjstra.DijkstraNodeData?   or create a public method only to return the prev Link 
 	protected boolean canPassLink(final Link link) {
 		DijkstraNodeData fromNodeData= getData(link.getFromNode());
 		Link lastLink = fromNodeData.getPrevLink();
 		return pathVal.canPassLink(lastLink, link);	
 	}
-	*/
+	
 }

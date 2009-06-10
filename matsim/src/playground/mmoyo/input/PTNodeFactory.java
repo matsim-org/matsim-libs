@@ -7,7 +7,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 
 import playground.mmoyo.PTCase2.PTStation;
 import playground.mmoyo.PTCase2.PTTimeTable2;
@@ -16,7 +16,7 @@ import playground.mmoyo.Validators.StationValidator;
 
 public class PTNodeFactory {
 
-	NetworkLayer net;
+	Network net;
 	PTStation ptStation;;
 	StationValidator sValidator;
 
@@ -24,7 +24,7 @@ public class PTNodeFactory {
 		
 	}
 			
-	public PTNodeFactory(NetworkLayer net, PTTimeTable2 ptTimeTable) {
+	public PTNodeFactory(Network net, PTTimeTable2 ptTimeTable) {
 		this.net = net;
 		this.ptStation = new PTStation(ptTimeTable);
 		this.sValidator = new StationValidator(net);
@@ -34,7 +34,7 @@ public class PTNodeFactory {
 	/**
 	 * converts all nodes from the network into PTNodes 
 	 */
-	public NetworkLayer TransformToPTNodes(NetworkLayer NetWithNodes, NetworkLayer NetWithPTNodes){
+	public Network transformToPTNodes(Network NetWithNodes, Network NetWithPTNodes){
 		for (Node node: NetWithNodes.getNodes().values()){
 			PTNode ptNode = new PTNode(node.getId(),node.getCoord(),node.getType());
 			NetWithPTNodes.getNodes().put(node.getId(),ptNode);
@@ -50,7 +50,7 @@ public class PTNodeFactory {
 	/**
 	 * Receives a original Basicnode and creates a pair of PTNodes with prefix indicating both directions and sufix to differentiate from other PTL's 
 	 */
-	public BasicNode[] CreatePTNodes(BasicNode basicNode){
+	public BasicNode[] createPTNodes(BasicNode basicNode){
 		BasicNode[] pair = new BasicNode[2];
 		
 		Coord newCoord = basicNode.getCoord();	    		

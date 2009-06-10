@@ -6,7 +6,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 import playground.mmoyo.PTRouter.PTNode;;
 /**
  * First basic version of PT router for the PTCase1 scenario
@@ -15,9 +15,9 @@ public class PTRouter{
 	public PTNode[] route;
 	private PTNetworkLayer ptNetworkLayer;
 	private PTLinkCostCalculator ptLinkCostCalculator;
-	private NetworkLayer cityNetworkLayer;
+	private Network cityNetworkLayer;
 	
-	public PTRouter(NetworkLayer cityNetworkLayer, PTNetworkLayer ptNetworkLayer, PTLinkCostCalculator ptLinkCostCalculator){
+	public PTRouter(Network cityNetworkLayer, PTNetworkLayer ptNetworkLayer, PTLinkCostCalculator ptLinkCostCalculator){
 		this.cityNetworkLayer= cityNetworkLayer;
 		this.ptNetworkLayer = ptNetworkLayer;
 		this.ptLinkCostCalculator = ptLinkCostCalculator;

@@ -5,7 +5,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -13,10 +13,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @param net current PT network 
  */
 public class PTLinkFactory {
-	NetworkLayer net;
+	Network net;
 	int intNextId;
 	
-	public PTLinkFactory(NetworkLayer net) {
+	public PTLinkFactory(Network net) {
 		this.net= net;
 		intNextId = getNextLinkId();
 	}
@@ -24,7 +24,7 @@ public class PTLinkFactory {
 	/**
 	 * Gets a ptline as a list of nodes and creates directed links (standard) between them
 	 */
-	public void AddNewLinks (List<BasicNode> nodeList){
+	public void addNewLinks (List<BasicNode> nodeList){
 		boolean isFirst= true;
 		BasicNode lastNode = null;
 		

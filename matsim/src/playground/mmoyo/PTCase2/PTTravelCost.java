@@ -2,13 +2,14 @@ package playground.mmoyo.PTCase2;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * Calculates the cost of travel in different travel zones of the city
  */
 public class PTTravelCost implements TravelCost {
 	PTTimeTable2 ptTimeTable;
-	PTTravelTime ptTravelTime;
+	TravelTime ptTravelTime;
 	
 	public PTTravelCost(PTTimeTable2 ptTimeTable) {
 		this.ptTimeTable = ptTimeTable; 

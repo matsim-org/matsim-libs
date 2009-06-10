@@ -5,7 +5,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 
 import playground.mmoyo.PTCase2.PTStation;
 
@@ -13,9 +13,9 @@ import playground.mmoyo.PTCase2.PTStation;
  * Validates that all nodes in an intersection have the same coordinate and correct id`s
  */
 public class StationValidator {
-	NetworkLayer net;
+	Network net;
 	
-	public StationValidator(NetworkLayer net){
+	public StationValidator(Network net){
 		this.net = net;
 	}
 	
@@ -34,7 +34,7 @@ public class StationValidator {
 		return true;
 	}
 	
-	public void validateIds(final NetworkLayer netDiv){
+	public void validateIds(final Network netDiv){
 		int x=0;
 		int diferent = 0;
 		for (Node node: net.getNodes().values()){

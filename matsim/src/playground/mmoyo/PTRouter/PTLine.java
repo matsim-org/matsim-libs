@@ -67,4 +67,12 @@ public class PTLine {
 	public List<String> getDepartures() {
 		return departures;
 	}
+
+	public TransportMode getTransportMode() {
+		return transportMode;
+	}
+
+	public void setTransportMode(TransportMode transportMode) {
+		this.transportMode = transportMode;
+	}
 }

@@ -6,16 +6,16 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
 import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
 import playground.mmoyo.Validators.NetValidator;
-import playground.mmoyo.Validators.PTLineValidator;
+//import playground.mmoyo.Validators.PTLineValidator;
 import playground.mmoyo.Validators.StationValidator;
 import playground.mmoyo.input.PTLineAggregator;
-
 
 /** 
  * Executable class to perform data input, validations and routing test according to timetable information
@@ -37,10 +37,8 @@ public class PTControler2 {
 	
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
-		// seems that INPTNETFILE is never used in PTOb and should be removed as a parameter so that it 
-		// becomes clear that all conversions are done somewhere else.  kai, may'09 //  DONE
 		
-		int option =5;
+		int option =2;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
@@ -49,10 +47,10 @@ public class PTControler2 {
 				NetworkLayer net = new NetworkLayer();
 				pt.setPtNetworkLayer(net);
 				PTLineAggregator ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
-				ptLineAggregator.AddLines();
+				ptLineAggregator.addLines();
 	
 				pt.getPtNetworkFactory().createTransferLinks(pt.getPtNetworkLayer(), pt.getPtTimeTable());
-				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
+				pt.getPtNetworkFactory().createDetachedTransfers(pt.getPtNetworkLayer(), 300);
 				
 				pt.writeNet(ZURICHPTN);
 				pt.createRouter();
@@ -62,7 +60,7 @@ public class PTControler2 {
 			
 			case-4:
 	    		/** validates the id assignation for nodes of ZVV diva2Web database*/
-				NetworkLayer netDiv= new NetworkLayer(new NetworkFactory());
+				Network netDiv= new NetworkLayer(new NetworkFactory());
 	    		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(netDiv);
 	    		matsimNetworkReader.readFile(DIVNODES);
 	    		
@@ -72,14 +70,13 @@ public class PTControler2 {
 
 			case -3: 
 				/** adds in memory extra PTlines from a separate file creating alias nodes but 
-				does not write the new network*/
+				does not write the new PTLines back to the TimeTable file but in a matsim network. 
+				PTTimeTables will be not longer used, TransitSchedule format instead*/
 				pt.createPTNetWithTLinks(INPTNETFILE);
 	    		pt.readPTNet(INPTNETFILE);
 				ptLineAggregator = new PTLineAggregator(INPTNEWLINES, pt.getPtNetworkLayer(), pt.getPtTimeTable());
-				ptLineAggregator.AddLine();
+				ptLineAggregator.addLine();
 	    		pt.writeNet(ZURICHPTN);
-	    		// Is it true that this does not write the network as the comment says?  What does "writeNet" do? kai, jun'09
-	    		
 				break;
 				
 			case -2:  
@@ -94,9 +91,9 @@ public class PTControler2 {
 				break;
 			
 			case -1:
-				/* Creates and writes detached transfer links. This is necessary before routing to get better results */  
+				/** Creates and writes detached transfer links. This is necessary before routing to get better results */  
 				pt.createPTNetWithTLinks(INPTNETFILE);
-				pt.getPtNetworkFactory().CreateDetachedTransfers(pt.getPtNetworkLayer(), 300);
+				pt.getPtNetworkFactory().createDetachedTransfers(pt.getPtNetworkLayer(), 300);
 				pt.writeNet(ZURICHPTN);
 	    		pt.readPTNet(ZURICHPTN);
 	    		PTActWriter ptActWriter2 = new PTActWriter(pt);
@@ -149,6 +146,7 @@ public class PTControler2 {
 	    		//converter.createFacilities(network);
 	    		converter.createTransitSchedule(pt.getPtTimeTable(), pt.getPtNetworkLayer(), path + "transitSchedule.xml");
 	    		break;
+	    	
 	    	case 5:
 	    		/**reads a transitSchedule file to create a PTTimeTable and routes a population */
 	    		TransitScheduleToPTTimeTableConverter transitScheduleToPTTimeTableConverter = new TransitScheduleToPTTimeTableConverter();
@@ -157,11 +155,7 @@ public class PTControler2 {
 	    		PTActWriter ptActWriter3 = new PTActWriter(pt);
 	    		ptActWriter3.findRouteForActivities();
 	    		break;
-	    	case 6:
-	    		PTLineValidator ptLineValidator = new PTLineValidator(); 
-	    		ptLineValidator.getIsolatedPTLines(pt.getPtTimeTable(), pt.getPtNetworkLayer());
-	    		break;
-	   
+	      
 	    	
 		}
 	}

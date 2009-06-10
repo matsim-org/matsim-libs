@@ -9,6 +9,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -24,10 +25,10 @@ public class PTNetworkLayer extends NetworkLayer {
 	// These are temporary values for the 5x5 scenario
 	int maxNodekey = 24;
 	int maxLinkKey = 79;
-	private final NetworkLayer cityNet;
+	private final Network cityNet;
 	public Map<Id, ArrayList<String>> childrenList = new TreeMap<Id, ArrayList<String>>();
 
-	public PTNetworkLayer(final NetworkLayer cityNet) {
+	public PTNetworkLayer(final Network cityNet) {
 		super();
 		this.cityNet = cityNet;
 	}

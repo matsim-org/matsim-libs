@@ -5,7 +5,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 /** Validates a given path with the next conditions:
  * No null
- * must have at least 3 links     //-> not absolutely. A path can we also only walking
+ * must have at least 3 links     //-> not absolutely. A path can be also only walking
  * starts and ends with walking links
  * transfer links must be always between standard links
  * must not have two adjacent walking links

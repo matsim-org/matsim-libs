@@ -66,11 +66,11 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 
 		NetworkLayer net = new NetworkLayer();
 		PTTimeTable2 timeTable = new PTTimeTable2(timeTableFilename);
-		new PTLineAggregator(ptNewLinesFilename, net, timeTable).AddLines();
+		new PTLineAggregator(ptNewLinesFilename, net, timeTable).addLines();
 
 		PTNetworkFactory2 ptNetFactory = new PTNetworkFactory2();
 		ptNetFactory.createTransferLinks(net, timeTable);
-		ptNetFactory.CreateDetachedTransfers(net, 300);
+		ptNetFactory.createDetachedTransfers(net, 300);
 
 		this.ptRouter = new TransitRouteFinder(new PTRouter2(net, timeTable));
 	}

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mmoyo.PTRouter.PTLine;
 

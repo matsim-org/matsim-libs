@@ -1,8 +1,7 @@
 package playground.mmoyo.PTCase2;
 
-import org.matsim.core.network.NetworkLayer;
-
 import playground.mmoyo.input.PTNetworkFactory2;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * Contains the common objects for the route search: network, PTTimetable, PtRouter
@@ -26,7 +25,7 @@ public class PTOb {
 	}
 
 	public void readPTNet(String netFile){
-		this.ptNetworkLayer= this.ptNetworkFactory.readNetwork(netFile,ptTimeTable);
+		this.ptNetworkLayer = this.ptNetworkFactory.readNetwork(netFile,ptTimeTable);
 		createRouter();
 	}
 	
@@ -39,7 +38,7 @@ public class PTOb {
 	}
 
 	public void writeNet(String outNetFile){
-		this.ptNetworkFactory.writeNet(this.ptNetworkLayer, outNetFile);
+		this.ptNetworkFactory.writeNet(ptNetworkLayer, outNetFile);
 	}
 	
 	public NetworkLayer getPtNetworkLayer() {

@@ -13,7 +13,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTCase2.*;
 import playground.mmoyo.PTRouter.*;
-
+import org.matsim.core.network.NetworkLayer;
 /** 
  * Second version of network factory for the PTCase2 (with no relationship to street network) 
  * Represent a network layer with independent route with transfer links at intersections 
@@ -23,7 +23,6 @@ import playground.mmoyo.PTRouter.*;
  */ 
 public class PTNetworkFactory2 {
 	private static Logger log = Logger.getLogger(PTNetworkFactory2.class);
-
 	
 	public Map <Id,Double> linkTravelTimeMap = new TreeMap <Id,Double>();
 
@@ -93,7 +92,7 @@ public class PTNetworkFactory2 {
 	/**
 	 * Reads the timetable File, validates that every node exists and loads the data in the ptTimeTable object
 	 */	
-	public void readTimeTable(final NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
+	public void readTimeTable(final Network ptNetworkLayer, PTTimeTable2 ptTimeTable){
 		PTNode ptLastNode = null;
 		for (PTLine ptLine :  ptTimeTable.getPtLineList()) {
 			//Test code
@@ -103,7 +102,7 @@ public class PTNetworkFactory2 {
 			System.out.println(ptLine.getDepartures().toString());
 			System.out.println(ptLine.getMinutes().toString() + "\n");
 			*/
-			//Create a map with travel times for every standard link
+			/*Creates a map with travel times for every standard link */
 			int indexMin=0;
 			double travelTime=0;
 			double lastTravelTime=0;
@@ -131,15 +130,14 @@ public class PTNetworkFactory2 {
 				lastTravelTime= min;
 				first=false;
 				indexMin++;
-			}//for interator String
-		}//for interator ptline
+			}
+		}
 	
-		//Calculates the travel time of each link and stores these data in ptTimeTable
+		/**Calculates the travel time of each link and stores these data in ptTimeTable*/
 		ptTimeTable.calculateTravelTimes(ptNetworkLayer);  //??
 		ptTimeTable.setMaps(linkTravelTimeMap);
 		//return ptTimeTable;
 	}
-	
 	
 	public void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
 		PTStation stationMap = new PTStation(ptTimeTable);
@@ -204,7 +202,7 @@ public class PTNetworkFactory2 {
 
 	}
 
-	private void createPTLink(NetworkLayer net, int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
+	private void createPTLink(Network net, int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
 		//-> use this unique method and eliminate the last two
 		Id id =  new IdImpl(intId);
 		Link  link = net.getFactory().createLink(id, fromBasicNode.getId(), toBasicNode.getId() );
@@ -212,13 +210,13 @@ public class PTNetworkFactory2 {
 		link.setType(type);
 	}
 
-	public void writeNet(NetworkLayer net, String fileName){
+	public void writeNet(Network net, String fileName){
 		System.out.println("writing pt network...");
 		new NetworkWriter(net, fileName).write();
 		System.out.println("done.");
 	}
 	
-	public void CreateDetachedTransfers (NetworkLayer net, double distance){
+	public void createDetachedTransfers (NetworkLayer net, double distance){
 		//--> move this to class Linkfactory
 		int x=0;
 		String strId;

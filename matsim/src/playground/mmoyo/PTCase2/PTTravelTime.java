@@ -37,7 +37,7 @@ public class PTTravelTime implements TravelTime {
 			travelTime= link.getLength()* walkSpeed;
 		
 		}else if (type.equals("Standard")){
-			travelTime= ptTimeTable.GetTravelTime(link);
+			travelTime= ptTimeTable.getTravelTime(link);
 		
 		}else if (type.equals("DetTransfer")){
 			walkTime=link.getLength()* walkSpeed;
@@ -49,7 +49,7 @@ public class PTTravelTime implements TravelTime {
 	}
 
 	private double transferTime(Link link, double t){
-		transTime= ptTimeTable.GetTransferTime(link, t);
+		transTime= ptTimeTable.getTransferTime(link, t);
 		if (transTime<0) {
 			costValidator.pushNegativeValue(link.getId(), t, transTime);
 			transTime = 600;

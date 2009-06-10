@@ -98,7 +98,7 @@ public class PTNode extends NodeImpl {
 	 * This is an attempt to faster the calculaton of waiting time in a transfer
 	 * It must be determined if it is faster to do it here or at timetable class
 	 */
-	public double transferTime (double time){//,
+	public double getTransferTime (double time){//,
 		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){
