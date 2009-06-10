@@ -3,16 +3,17 @@ package playground.mmoyo.TransitSimulation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.mmoyo.PTCase2.PTRouter2;
 import playground.mmoyo.Pedestrian.Walk;
 
@@ -23,6 +24,11 @@ public class TransitRouteFinder {
 	private PTRouter2 ptRouter;
 	private static Walk walk = new Walk ();
 	
+	public TransitRouteFinder(final TransitSchedule transitSchedule) {
+		// TODO
+	}
+	
+	@Deprecated
 	public TransitRouteFinder(PTRouter2 ptRouter ){
 		this.ptRouter = ptRouter; 
 	}
