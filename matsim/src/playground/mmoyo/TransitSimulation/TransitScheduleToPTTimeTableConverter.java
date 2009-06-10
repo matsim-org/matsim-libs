@@ -1,13 +1,18 @@
 package playground.mmoyo.TransitSimulation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
+import org.xml.sax.SAXException;
+
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
@@ -15,7 +20,6 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.mmoyo.PTCase2.PTTimeTable2;
-import playground.mmoyo.input.PTNetworkFactory2;
 import playground.mmoyo.PTRouter.PTLine;
 
 /**
@@ -29,18 +33,25 @@ public class TransitScheduleToPTTimeTableConverter {
 
 	}
 
-	public PTTimeTable2 getPTTimeTable(final String transitScheduleFile, final NetworkLayer net){
-		PTTimeTable2 ptTimeTable = new PTTimeTable2();
+	public PTTimeTable2 getPTTimeTable(final String transitScheduleFile, final Network net) {
 		TransitSchedule transitSchedule = new TransitSchedule();
-		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, net);
+		try {
+			new TransitScheduleReaderV1(transitSchedule, net).readFile(transitScheduleFile);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return getPTTimeTable(transitSchedule);
+	}
+	
+	
+	public PTTimeTable2 getPTTimeTable(final TransitSchedule transitSchedule) {
+		PTTimeTable2 ptTimeTable = new PTTimeTable2();
 		List<PTLine> ptLineList = new ArrayList<PTLine>();
 		
-		/** Read TransitSchedule */
-		try{
-			transitScheduleReaderV1.readFile(transitScheduleFile);
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		}
 		
 		/**Convert every transitRoute into PTLine    */
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
@@ -64,7 +75,7 @@ public class TransitScheduleToPTTimeTableConverter {
 			}
 		}
 		ptTimeTable.setptLineList(ptLineList);
-		new PTNetworkFactory2().readTimeTable(net, ptTimeTable);
+//		new PTNetworkFactory2().readTimeTable(net, ptTimeTable); // TODO [Manuel] this must work without explicit ptNetwork. If really needed, construct it from transitSchedule
 		
 		return ptTimeTable;
 	}
