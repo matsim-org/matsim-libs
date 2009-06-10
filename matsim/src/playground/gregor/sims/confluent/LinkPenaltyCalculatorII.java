@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
@@ -17,7 +18,6 @@ import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 
@@ -36,7 +36,7 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 
 	private static final double epsilon = 0.01;
 
-	private enum MODE { confluent, nonconfluent};
+	private enum MODE { confluent, nonconfluent}
 
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
 	private final HashMap<Id,NodeInfo> nodeInfos = new HashMap<Id, NodeInfo>();
@@ -54,12 +54,11 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null){
 			return 0;
-		} else {
-			return li.penalty;
 		}
+		return li.penalty;
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 		LinkInfo info = getLinkInfo(event.getLinkId());
 		info.enterTimes.put(event.getPersonId(), event.getTime());
 	}

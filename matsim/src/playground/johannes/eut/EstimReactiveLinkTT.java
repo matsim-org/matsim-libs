@@ -28,81 +28,83 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author illenberger
  *
  */
 public class EstimReactiveLinkTT implements
-		LinkEnterEventHandler,
-		LinkLeaveEventHandler,
-		AgentArrivalEventHandler,
-		AgentWait2LinkEventHandler,
+		BasicLinkEnterEventHandler,
+		BasicLinkLeaveEventHandler,
+		BasicAgentArrivalEventHandler,
+		BasicAgentWait2LinkEventHandler,
 		TravelTime {
 
 //	private QueueNetwork queueNetwork;
 	
 	private double capacityFactor;
 	
-	private Map<BasicLink, LinkTTCalculator> linkTTCalculators;
+	private Map<Id, LinkTTCalculator> linkTTCalculators;
 
 	private BasicLink lastQueriedLink;
 
 	private double lastQueryTime;
 
 	private double lastTravelTime;
+	
+	private final Network network;
 
-	public EstimReactiveLinkTT(double scenarioScale) {
+	public EstimReactiveLinkTT(double scenarioScale, Network network) {
 		capacityFactor = scenarioScale;
+		this.network = network;
 	}
 	
 	public void reset(int iteration) {
-		this.linkTTCalculators = new LinkedHashMap<BasicLink, LinkTTCalculator>();
+		this.linkTTCalculators = new LinkedHashMap<Id, LinkTTCalculator>();
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
-		increaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
+	public void handleEvent(BasicLinkEnterEvent event) {
+		increaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
-		decreaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
+	public void handleEvent(BasicLinkLeaveEvent event) {
+		decreaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
-		decreaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
+	public void handleEvent(BasicAgentArrivalEvent event) {
+		decreaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 
-	public void handleEvent(AgentWait2LinkEvent event) {
-		increaseCount(event.getLink(), event.getPerson(), (int) event.getTime());
+	public void handleEvent(BasicAgentWait2LinkEvent event) {
+		increaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 
-	private void increaseCount(Link link, Person person, int time) {
-		LinkTTCalculator f = this.linkTTCalculators.get(link);
+	private void increaseCount(Id linkId, Id personId, int time) {
+		LinkTTCalculator f = this.linkTTCalculators.get(linkId);
 		if(f == null) {
-			f = new LinkTTCalculator(link);
-			this.linkTTCalculators.put(link, f);
+			f = new LinkTTCalculator(this.network.getLinks().get(linkId));
+			this.linkTTCalculators.put(linkId, f);
 		}
-		f.enterLink(person, time);
+		f.enterLink(personId, time);
 	}
 
-	private void decreaseCount(Link link, Person person, int time) {
-		LinkTTCalculator f = this.linkTTCalculators.get(link);
-		f.leaveLink(person, time);
+	private void decreaseCount(Id linkId, Id personId, int time) {
+		LinkTTCalculator f = this.linkTTCalculators.get(linkId);
+		f.leaveLink(personId, time);
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
@@ -113,7 +115,7 @@ public class EstimReactiveLinkTT implements
 			this.lastQueryTime = simtime;
 			this.lastQueriedLink = link;
 
-			LinkTTCalculator f = this.linkTTCalculators.get(link);
+			LinkTTCalculator f = this.linkTTCalculators.get(link.getId());
 			if (f == null)
 				this.lastTravelTime = link.getFreespeedTravelTime(simtime);
 			else
@@ -157,11 +159,11 @@ public class EstimReactiveLinkTT implements
 //			this.currentOutFlow = this.feasibleOutFlow;
 		}
 
-		public void enterLink(Person person, int time) {
-			this.samples.add(new Sample(person, (int) Math.ceil(time + link.getFreespeedTravelTime(time))));
+		public void enterLink(Id personId, int time) {
+			this.samples.add(new Sample(personId, (int) Math.ceil(time + link.getFreespeedTravelTime(time))));
 		}
 
-		public void leaveLink(Person person, int time) {
+		public void leaveLink(Id personId, int time) {
 			this.outCount++;
 
 			Sample sample = null;
@@ -170,7 +172,7 @@ public class EstimReactiveLinkTT implements
 			 * this should not be that expensive...
 			 */
 			for(Sample s : this.samples) {
-				if(s.person.equals(person)) {
+				if(s.personId.equals(personId)) {
 					this.samples.remove(s);
 					sample = s;
 					break;
@@ -220,12 +222,12 @@ public class EstimReactiveLinkTT implements
 
 	private class Sample implements Comparable<Sample> {
 
-		public Person person;
+		public Id personId;
 
 		public int linkLeaveTime;
 
-		public Sample(Person person, int linkLeaveTime) {
-			this.person = person;
+		public Sample(Id personId, int linkLeaveTime) {
+			this.personId = personId;
 			this.linkLeaveTime = linkLeaveTime;
 		}
 
@@ -235,7 +237,7 @@ public class EstimReactiveLinkTT implements
 			else {
 				int result = Double.compare(this.linkLeaveTime, o.linkLeaveTime);
 				if(result == 0)
-					result = this.person.getId().compareTo(o.person.getId());
+					result = this.personId.compareTo(o.personId);
 
 				return result;
 			}

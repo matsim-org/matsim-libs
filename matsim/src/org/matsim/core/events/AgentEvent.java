@@ -32,14 +32,12 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 
 	public static final String ATTRIBUTE_LINK = "link";	
 
-	private Link link;
 	private Leg leg;
 
 	private final Id linkId;
 
 	AgentEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent);
-		this.link = link;
 		this.linkId = link.getId();
 		this.leg = leg;
 	}
@@ -58,11 +56,6 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 
 	protected String asString() {
 		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t"+ this.getLinkId().toString() + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
-	}
-
-	/** @deprecated use {@link #getLinkId()} instead */
-	public Link getLink() {
-		return this.link;
 	}
 
 	public Leg getLeg() {

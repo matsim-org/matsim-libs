@@ -40,7 +40,6 @@ import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 import playground.johannes.eut.EstimReactiveLinkTT;
-import playground.johannes.eut.EventBasedTTProvider;
 import playground.johannes.eut.GuidedAgentFactory;
 
 /**
@@ -86,7 +85,7 @@ public class Controler extends WithindayControler {
 		 */
 		addControlerListener(new WithindayControlerListener());
 		
-		this.reactTTs = new EstimReactiveLinkTT(1);
+		this.reactTTs = new EstimReactiveLinkTT(1, this.network);
 //		this.reactTTs = new EventBasedTTProvider(10);
 		this.events.addHandler((EventHandler) this.reactTTs);
 		((EventHandler) this.reactTTs).reset(getIteration());

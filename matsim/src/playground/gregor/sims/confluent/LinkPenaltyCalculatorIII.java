@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
@@ -16,11 +17,6 @@ import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
@@ -49,13 +45,12 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null){
 			return 0;
-		} else {
-			return li.penalty;
 		}
+		return li.penalty;
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
-		LinkInfo info = getLinkInfo(event.getLink());
+	public void handleEvent(BasicLinkEnterEvent event) {
+		LinkInfo info = getLinkInfo(event.getLinkId());
 		info.enterTimes.put(event.getPersonId(), event.getTime());
 	}
 
@@ -104,7 +99,7 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 	}
 
 	public void handleEvent(AgentStuckEvent event) {
-		LinkInfo info = getLinkInfo(event.getLink());
+		LinkInfo info = getLinkInfo(event.getLinkId());
 		info.cin++;
 		info.cumTT += STUCK_PENALTY;
 		
@@ -191,12 +186,12 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 		}
 		
 	}
-	private LinkInfo getLinkInfo(final Link link) {
-		LinkInfo ret = this.linkInfos.get(link.getId());
+	private LinkInfo getLinkInfo(final Id linkId) {
+		LinkInfo ret = this.linkInfos.get(linkId);
 		if (ret == null) {
 			ret = new LinkInfo();
-			ret.freeTT = link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
-			this.linkInfos.put(link.getId(), ret);
+			ret.freeTT = this.net.getLinks().get(linkId).getFreespeedTravelTime(Time.UNDEFINED_TIME);
+			this.linkInfos.put(linkId, ret);
 		}
 		return ret;
 	}

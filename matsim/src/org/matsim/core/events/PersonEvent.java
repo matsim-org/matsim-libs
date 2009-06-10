@@ -54,11 +54,6 @@ public abstract class PersonEvent extends BasicEventImpl implements BasicPersonE
 		return attr;
 	}
 
-	@Deprecated // should be set via Constructor...
-	public void setPerson(final Person agent) {
-		this.person = agent;
-	}
-
 	/** @deprecated use {@link #getPersonId()} instead */
 	public Person getPerson() {
 		return this.person;

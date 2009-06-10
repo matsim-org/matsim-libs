@@ -8,7 +8,6 @@ import java.util.HashMap;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentMoneyEvent;
@@ -111,7 +110,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 		if (controler == null) {
 			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
-			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
+//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// change properties of roads
@@ -138,7 +137,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 		// if energy level is below zero: give huge penalty to agent
 		if (state.energyLevel <= 0) {
-			events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPerson(),
+			events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPersonId(),
 					penaltyForRunningOutOfElectricEnergy));
 		}
 		recordSOCOfVehicle(event);
@@ -191,7 +190,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 		if (controler == null) {
 			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
-			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
+//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// initialize the energyLevel at the beginning to full energy
@@ -210,7 +209,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 		if (controler == null) {
 			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
-			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
+//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
 		}
 
 		// initialize the energyLevel at the beginning to full energy
@@ -257,7 +256,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 			// System.out.println("noooo:"+costOfEnergy);
 		}
 
-		events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPerson(),
+		events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPersonId(),
 				costOfEnergy));
 
 		state.energyLevel += energyCharged;
