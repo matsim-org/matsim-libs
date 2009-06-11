@@ -68,7 +68,7 @@ public class TransitDriver implements TransitDriverAgent {
 
 		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
 			this.transitLine = line;
-			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + departure.getId().toString()));
+			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 			this.stopIterator = route.getStops().iterator();
 			this.nextStop = this.stopIterator.next();
 			this.sim = sim;
