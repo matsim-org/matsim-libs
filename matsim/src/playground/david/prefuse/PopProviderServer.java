@@ -32,6 +32,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -112,29 +113,30 @@ public class PopProviderServer implements PopulationProvider {
 	OTFClientQuad clientQ;
 	Network netti = null;
 	
+	
 	public PopProviderServer(final OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
 		
 		if(netti == null) {
-//			Set<Id> nodeIds = ((QueryIds)(clientQ.doQuery(new QueryIds(true)))).iId;
-//			for(Id id : nodeIds) {
-//				clientQ.doQuery(new QueryOb(id, true));
-//			};
+			Set<Id> nodeIds = ((QueryIds)(clientQ.doQuery(new QueryIds(true)))).iId;
+			for(Id id : nodeIds) {
+				clientQ.doQuery(new QueryOb(id, true));
+			};
 //			Set<Id> linkIds = ((QueryIds)(clientQ.doQuery(new QueryIds(false)))).iId;
 //			for(Id idl : linkIds) {
 //				clientQ.doQuery(new QueryOb(idl, false));
 //			};
-//			netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
+			netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
 
 			
-			Runnable loader = new Runnable() {
-				synchronized public void run() {
-					netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
-					this.notifyAll();
-				};
-			};
-			
-			netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
+//			Runnable loader = new Runnable() {
+//				synchronized public void run() {
+//					netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
+//					this.notifyAll();
+//				};
+//			};
+//			
+////			netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
 //			new Thread(null,loader, "netLoader", 25*1024*1024).start();
 //			try {
 //				synchronized (loader) {
