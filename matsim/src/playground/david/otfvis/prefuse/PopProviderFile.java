@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.prefuse;
+package playground.david.otfvis.prefuse;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,6 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
+
 
 public class PopProviderFile implements PopulationProvider {
 

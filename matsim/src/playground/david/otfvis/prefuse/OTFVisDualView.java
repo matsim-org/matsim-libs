@@ -1,12 +1,38 @@
-package playground.david.prefuse;
+package playground.david.otfvis.prefuse;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D.Double;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -18,25 +44,32 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
+import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
-import playground.david.prefuse.TreeView.MTree;
+import playground.david.otfvis.prefuse.TreeView.MTree;
+import prefuse.Visualization;
 import prefuse.controls.ControlAdapter;
 import prefuse.data.Node;
 import prefuse.data.Tree;
+import prefuse.util.FontLib;
+import prefuse.util.ui.JSearchPanel;
 import prefuse.visual.VisualItem;
+
 
 
 public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	
 	private static final String BG_IMG_ROOT = "../vsp-cvs/studies/padang/imagery/sliced/";
 	protected String url;
+	protected PopDrawer popD;
 	
 	public OTFVisDualView(String filename2, OTFConnectionManager connect, boolean split) {
 		super(filename2, connect, split);
@@ -58,19 +91,28 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 
 		public PopDrawer(final Tree t) {
 			super(t, "name");
+	        // create a search panel for the tree map
+	        JSearchPanel search = new JSearchPanel(this.getVisualization(),
+	            treeNodes, Visualization.SEARCH_ITEMS, "name", true, true);
+	        search.setShowResultCount(true);
+	        search.setBorder(BorderFactory.createEmptyBorder(5,5,4,0));
+	        search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
+//	        search.setBackground(BACKGROUND);
+//	        search.setForeground(FOREGROUND);
+
 	        addControlListener(new ControlAdapter() {
 	        	public void itemClicked(VisualItem item, MouseEvent e) { 
 	                if(item.canGetInt("level")){
 	                	String ids = item.getString("name");
 	                	int level = item.getInt("level");
-	                	if(level<=2){
+	                	if(level<=1){
 	                		MTree tree = (MTree)t;
 	                		int row = item.getRow();
 	                		Node parent = tree.getNode(row);
 	                		if(level > 0) {
 	                        	int id = Integer.parseInt(ids);
 	                    		int step = (int)Math.pow(10, level-1);
-	                    		tree.generateLayer(parent, id, id+10*step, 1, 0);
+	                    		tree.generateLayer(parent, id, id+10*step, 0, -1);
 	                    		invalidate();
 	                		} else if(level < 0) {
 	                			Object ref = parent.get("ref");
@@ -140,11 +182,16 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	public void setLeftComponent(OTFClientQuad clientQ) {
 		Gbl.printMemoryUsage();
 		System.out.println("Creating tree");
-		if(url.startsWith("file:")) pane.setLeftComponent(new PopDrawer(new MTree(new PopProviderFile(this.filename))));
+		if(url.startsWith("file:")){
+			popD = new PopDrawer(new MTree(new PopProviderFile(this.filename)));
+		}
 		else {
 			
-			pane.setLeftComponent(new PopDrawer(new MTree(new PopProviderServer(clientQ))));
+			popD = new PopDrawer(new MTree(new PopProviderServer(clientQ)));
 		}
+		pane.setLeftComponent(popD);
+		QueryAgentPlanSyncView.popD = this.popD;
+		
 		Gbl.printMemoryUsage();
 	}
 	

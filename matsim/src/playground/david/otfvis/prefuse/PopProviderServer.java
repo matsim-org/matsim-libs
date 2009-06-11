@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.prefuse;
+package playground.david.otfvis.prefuse;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -18,11 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.prefuse;
+package playground.david.otfvis.prefuse;
 
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
-import playground.david.prefuse.OTFVisDualView.PopDrawer;
+import playground.david.otfvis.prefuse.OTFVisDualView.PopDrawer;
 
 public class QueryAgentPlanSyncView extends QueryAgentPlan {
 

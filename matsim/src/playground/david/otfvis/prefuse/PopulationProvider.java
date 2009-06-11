@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.prefuse;
+package playground.david.otfvis.prefuse;
 
 import java.util.Set;
 import java.util.SortedSet;

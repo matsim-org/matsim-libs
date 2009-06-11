@@ -1,4 +1,4 @@
-package playground.david.prefuse;
+package playground.david.otfvis.prefuse;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

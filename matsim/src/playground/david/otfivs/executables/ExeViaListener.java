@@ -56,7 +56,7 @@ import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
-import playground.david.prefuse.OTFVisDualView;
+import playground.david.otfvis.prefuse.OTFVisDualView;
 
 public class ExeViaListener {
 	public static class SimCanceledException extends RuntimeException{
