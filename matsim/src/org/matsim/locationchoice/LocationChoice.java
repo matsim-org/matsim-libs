@@ -32,10 +32,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -47,7 +47,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
 	
-	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
+	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacility []> facilitiesOfType = new TreeMap<String, ActivityFacility []>();
 	

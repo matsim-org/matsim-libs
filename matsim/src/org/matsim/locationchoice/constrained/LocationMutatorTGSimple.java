@@ -34,10 +34,10 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.QuadTreeRing;
 
 public class LocationMutatorTGSimple extends LocationMutator {
 	
@@ -45,7 +45,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities();
 	
 	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler,
-			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
 		
 		super(network, controler, quad_trees, facilities_of_type);

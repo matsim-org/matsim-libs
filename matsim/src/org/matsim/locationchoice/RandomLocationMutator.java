@@ -28,8 +28,7 @@ import org.matsim.core.api.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.collections.QuadTree;
-
+import org.matsim.locationchoice.utils.QuadTreeRing;
 
 /*
  * @author anhorni
@@ -42,7 +41,7 @@ public class RandomLocationMutator extends LocationMutator {
 	}
 	
 	public RandomLocationMutator(final NetworkLayer network, Controler controler,
-			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
 		super(network, controler, quad_trees, facilities_of_type);
 	}

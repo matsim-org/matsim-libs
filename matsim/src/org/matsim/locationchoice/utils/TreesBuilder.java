@@ -14,7 +14,6 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.LocationChoice;
 
 public class TreesBuilder {
@@ -23,7 +22,7 @@ public class TreesBuilder {
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	
-	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
+	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	protected TreeMap<String, ActivityFacility []> facilitiesOfType = new TreeMap<String, ActivityFacility []>();
 	
 	
@@ -112,7 +111,7 @@ public class TreesBuilder {
 		}
 	}
 	
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
+	private QuadTreeRing<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
@@ -131,7 +130,7 @@ public class TreesBuilder {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		QuadTreeRing<ActivityFacility> quadtree = new QuadTreeRing<ActivityFacility>(minx, miny, maxx, maxy);
 		for (final ActivityFacility f : facilities_of_type.values()) {
 			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
@@ -140,7 +139,7 @@ public class TreesBuilder {
 		return quadtree;
 	}
 
-	public TreeMap<String, QuadTree<ActivityFacility>> getQuadTreesOfType() {
+	public TreeMap<String, QuadTreeRing<ActivityFacility>> getQuadTreesOfType() {
 		return quadTreesOfType;
 	}
 	public TreeMap<String, ActivityFacility[]> getFacilitiesOfType() {

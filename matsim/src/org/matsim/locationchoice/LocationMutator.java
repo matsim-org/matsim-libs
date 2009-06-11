@@ -33,8 +33,8 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -44,7 +44,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 
 	protected NetworkLayer network = null;
 	protected Controler controler = null;	
-	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType;
+	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType;
 	
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacility []> facilitiesOfType;
@@ -57,7 +57,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	// ----------------------------------------------------------
 
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
-		this.quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
+		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacility []>();
 		this.config = Gbl.getConfig().locationchoice();
 		this.initLocal(network, controler);		
@@ -65,7 +65,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	
 	
 	public LocationMutator(final NetworkLayer network, final Controler controler, 
-			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
 		this.quadTreesOfType = quad_trees;
 		this.facilitiesOfType = facilities_of_type;

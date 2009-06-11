@@ -35,8 +35,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.LocationMutator;
+import org.matsim.locationchoice.utils.QuadTreeRing;
 
 public class LocationMutatorwChoiceSet extends LocationMutator {
 	
@@ -47,7 +47,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	protected int maxRecursions = 10;
 	
 	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler,
-			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
 		super(network, controler, quad_trees, facilities_of_type);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
