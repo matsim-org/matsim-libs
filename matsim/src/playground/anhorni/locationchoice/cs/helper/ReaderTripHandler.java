@@ -50,7 +50,7 @@ public class ReaderTripHandler {
 		afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
 		
 		if (!(mzTrip.getEndTime() > 0.0)) {
-			log.error("No end time found for person : " + mzTrip.getPersonId());
+			log.error("No end time found for person : " /*+ mzTrip.getPersonId()*/);
 		}
 		double startTimeAfterShoppingAct = mzTrip.getEndTime(); 			
 		afterShoppingAct.setStartTime(startTimeAfterShoppingAct);
