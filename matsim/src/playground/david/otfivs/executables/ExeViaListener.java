@@ -106,6 +106,8 @@ public class ExeViaListener {
 			boolean simIsFinished = false;
 			Events events = this.events;
 			this.events = new MyEvents();
+
+			Gbl.startMeasurement();
 			
 			while(!simIsFinished) {
 				try {
@@ -116,10 +118,14 @@ public class ExeViaListener {
 					System.out.println("Sim canceled... Restarting!");
 				}
 			}
-
+			System.out.println("Sim run");
+			Gbl.printElapsedTime();
+			Gbl.startMeasurement();
+			System.out.println("Event handling");
 			List<BasicEvent> myEvents = ((MyEvents)this.events).events;
 			for(BasicEvent event : myEvents) events.processEvent(event);
 			this.events = events;
+			Gbl.printElapsedTime();
 		}
 	
 		public ResetableMobsimControler(Config config) {
