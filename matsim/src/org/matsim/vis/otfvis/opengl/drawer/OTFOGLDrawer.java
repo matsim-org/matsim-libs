@@ -1053,6 +1053,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	public Point3f getOGLPos(int x, int y) {
 		return mouseMan.getOGLPos(x, y);
 	}
+	public static GLContext getMotherContext() {
+		// TODO Auto-generated method stub
+		return motherContext;
+	}
 
 
 }
