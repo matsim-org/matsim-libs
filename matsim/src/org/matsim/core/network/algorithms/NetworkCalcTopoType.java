@@ -56,6 +56,8 @@ public class NetworkCalcTopoType {
 				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)) { setTopoType(n, PASS2WAY); }
 				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 1)) { setTopoType(n, START1WAY); }
 				else if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 2)) { setTopoType(n, END1WAY); }
+				// The following case is not covered by the paper, but quite common, e.g. parallel roads connecting the same nodes. 
+				else if ((n.getOutLinks().size() >= 2) && (n.getInLinks().size() >= 2)) { setTopoType(n, INTERSECTION); }
 				else { Gbl.errorMsg("Node=" + n.toString() + " cannot be assigned to a topo type!"); }
 			}
 			else { // more than two neighbour nodes and no sink or source
@@ -69,15 +71,15 @@ public class NetworkCalcTopoType {
 		}
 
 		System.out.println("      #nodes        = " + network.getNodes().size());
-		System.out.println("      #EMTPY        = " + cnt[EMPTY]);
-		System.out.println("      #SOURCE       = " + cnt[SOURCE]);
-		System.out.println("      #SINK         = " + cnt[SINK]);
-		System.out.println("      #DEADEND      = " + cnt[DEADEND]);
-		System.out.println("      #PASS1WAY     = " + cnt[PASS1WAY]);
-		System.out.println("      #PASS2WAY     = " + cnt[PASS2WAY]);
-		System.out.println("      #START1WAY    = " + cnt[START1WAY]);
-		System.out.println("      #END1WAY      = " + cnt[END1WAY]);
-		System.out.println("      #INTERSECTION = " + cnt[INTERSECTION]);
+		System.out.println("      #EMTPY        = " + cnt[EMPTY.intValue()]);
+		System.out.println("      #SOURCE       = " + cnt[SOURCE.intValue()]);
+		System.out.println("      #SINK         = " + cnt[SINK.intValue()]);
+		System.out.println("      #DEADEND      = " + cnt[DEADEND.intValue()]);
+		System.out.println("      #PASS1WAY     = " + cnt[PASS1WAY.intValue()]);
+		System.out.println("      #PASS2WAY     = " + cnt[PASS2WAY.intValue()]);
+		System.out.println("      #START1WAY    = " + cnt[START1WAY.intValue()]);
+		System.out.println("      #END1WAY      = " + cnt[END1WAY.intValue()]);
+		System.out.println("      #INTERSECTION = " + cnt[INTERSECTION.intValue()]);
 
 		System.out.println("    done.");
 	}
