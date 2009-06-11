@@ -57,7 +57,7 @@ public class NetworkCalcTopoType {
 				else if ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 1)) { setTopoType(n, START1WAY); }
 				else if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 2)) { setTopoType(n, END1WAY); }
 				// The following case is not covered by the paper, but quite common, e.g. parallel roads connecting the same nodes. 
-				else if ((n.getOutLinks().size() >= 2) && (n.getInLinks().size() >= 2)) { setTopoType(n, INTERSECTION); }
+				else if ((n.getOutLinks().size() >= 1) && (n.getInLinks().size() >= 1)) { setTopoType(n, INTERSECTION); }
 				else { Gbl.errorMsg("Node=" + n.toString() + " cannot be assigned to a topo type!"); }
 			}
 			else { // more than two neighbour nodes and no sink or source
