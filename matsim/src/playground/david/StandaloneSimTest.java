@@ -112,7 +112,7 @@ public class StandaloneSimTest {
 			ObjectOutputStream outFile;
 			try {
 				zos = new ZipOutputStream(new BufferedOutputStream(
-						new FileOutputStream("net+population.zip"), 50000));
+						new FileOutputStream("output/OTFQuadfile1p+pop.mvi"), 50000));
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			}
@@ -128,23 +128,23 @@ public class StandaloneSimTest {
 				System.exit(0);
 				
 //				
-				Gbl.startMeasurement();
-				File sourceZipFile = new File("testpop.zip");
-				// Open Zip file for reading
-				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
-				ZipEntry infoEntry = zipFile.getEntry("net+population.bin");
-				BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(infoEntry));
-				ObjectInputStream inFile = new ObjectInputStream(is);
-				network = (NetworkLayer)inFile.readObject();
-				population = (PopulationImpl)inFile.readObject();
-				Gbl.printElapsedTime();
+//				Gbl.startMeasurement();
+//				File sourceZipFile = new File("testpop.zip");
+//				// Open Zip file for reading
+//				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+//				ZipEntry infoEntry = zipFile.getEntry("net+population.bin");
+//				BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(infoEntry));
+//				ObjectInputStream inFile = new ObjectInputStream(is);
+//				network = (NetworkLayer)inFile.readObject();
+//				population = (PopulationImpl)inFile.readObject();
+//				Gbl.printElapsedTime();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+//			catch (ClassNotFoundException e) {
+//				e.printStackTrace();
+//			}
 //			System.exit(0);
 		}
 		Events events = new Events() ;
