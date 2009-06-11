@@ -28,11 +28,11 @@ public class AsciiToPlan {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String INPUT_FILE = "../../inputs/M3.dat";
-		final String NET_FILE="../../inputs/padang_net_v20080618.xml";
-		final String OUTPUT_FILE="../../inputs/population2.xml";
+		final String INPUT_FILE = "../../inputs/demand/m3.dat";
+		final String NET_FILE="../../inputs/networks/padang_net_car_v20090604.xml";
+		final String OUTPUT_FILE="../../inputs/networks/padang_plans_transport_v20090604_10p.xml";
 		final int MAX_SIZE = 13;
-		final double SAMPLE_SIZE = 0.1; //Fraction of used population. default = 1
+		final double SAMPLE_SIZE = 1.; //Fraction of used population. default = 1
 //		final char TRENNER = ' ';
 //		final String REF_TYPE = "w";
 		
@@ -46,7 +46,7 @@ public class AsciiToPlan {
 		StringBuffer kette = new StringBuffer();
 		
 		
-		//öffne ASCII Input File
+		//ï¿½ffne ASCII Input File
 		try {
 			in = new BufferedReader(new FileReader(new File(INPUT_FILE)));
 		} catch (FileNotFoundException e) {
@@ -54,7 +54,7 @@ public class AsciiToPlan {
 			e.printStackTrace();
 			
 		}
-		System.out.println("Öffnen der Datei erfolgreich!");
+		System.out.println("ï¿½ffnen der Datei erfolgreich!");
 		//lese 1. Zeile ein
 		String zeile = null;
 		try {
@@ -64,7 +64,7 @@ public class AsciiToPlan {
 			e.printStackTrace();
 		}
 		
-		//Öffnen des Szenarios
+		//ï¿½ffnen des Szenarios
 		Scenario sc = new ScenarioImpl();
 		Network net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(NET_FILE);
@@ -123,39 +123,39 @@ public class AsciiToPlan {
 			Activity home1 = plan.createActivity(type, coord1);
 			home1.setEndTime(start);
 			
-			plan.addLeg(pb.createLeg(TransportMode.car)); //<--- muss beim Hereinnehmen des Switch Befehls entfernt werden
-//			switch (mode.intValue())
-//			{
-//				case 1: plan.addLeg(pb.createLeg(TransportMode.walk)); break;
-//				case 2: plan.addLeg(pb.createLeg(TransportMode.car)); break;
-//				case 3: plan.addLeg(pb.createLeg(TransportMode.pt)); break;
-//				case 4: plan.addLeg(pb.createLeg(TransportMode.other.undefined)); break;
-//				default: plan.addLeg(pb.createLeg(TransportMode.car));
-//			}	
+//			plan.addLeg(pb.createLeg(TransportMode.car)); //<--- muss beim Hereinnehmen des Switch Befehls entfernt werden
+			switch (mode.intValue())
+			{
+				case 1: plan.addLeg(pb.createLeg(TransportMode.walk)); break;
+				case 2: plan.addLeg(pb.createLeg(TransportMode.car)); break;
+				case 3: plan.addLeg(pb.createLeg(TransportMode.pt)); break;
+				case 4: plan.addLeg(pb.createLeg(TransportMode.undefined)); break;
+				default: plan.addLeg(pb.createLeg(TransportMode.car));
+			}	
 						
 			//Erzeuge Activity
 			Coord coord2 = new CoordImpl(awayx,awayy);
 			switch (actType.intValue())
 			{
 				case 1: type = "w"; break;
-				case 2: type = "school"; break;
+				case 2: type = "edu"; break;
 				case 3: type = "routine"; break;
-				case 4: type = "social"; break;
+				case 4: type = "soc"; break;
 				default: type = "h";
 			}
 			String typeHaupt = type;
 			Activity work = plan.createActivity(type, coord2);
 			work.setStartTime(start);
 			work.setEndTime(start + dur);
-			plan.addLeg(pb.createLeg(TransportMode.car)); // <--- muss beim Hereinnehmen des Switch Befehls entfernt werden!!!
-//			switch (mode.intValue())
-//			{
-//				case 1: plan.addLeg(pb.createLeg(TransportMode.walk)); break;
-//				case 2: plan.addLeg(pb.createLeg(TransportMode.car)); break;
-//				case 3: plan.addLeg(pb.createLeg(TransportMode.pt)); break;
-//				case 4: plan.addLeg(pb.createLeg(TransportMode.other.undefined)); break;
-//				default: plan.addLeg(pb.createLeg(TransportMode.car));
-//			}		
+//			plan.addLeg(pb.createLeg(TransportMode.car)); // <--- muss beim Hereinnehmen des Switch Befehls entfernt werden!!!
+			switch (mode.intValue())
+			{
+				case 1: plan.addLeg(pb.createLeg(TransportMode.walk)); break;
+				case 2: plan.addLeg(pb.createLeg(TransportMode.car)); break;
+				case 3: plan.addLeg(pb.createLeg(TransportMode.pt)); break;
+				case 4: plan.addLeg(pb.createLeg(TransportMode.undefined)); break;
+				default: plan.addLeg(pb.createLeg(TransportMode.car));
+			}		
 			
 			//Erzeuge 2. Homeactivity
 			type = "h";
@@ -169,11 +169,11 @@ public class AsciiToPlan {
 				e.printStackTrace();
 			}
 			//if (typeHaupt.equals(REF_TYPE)){
-			if (age==2){
+//			if (age==2){
 				wert++;
-				System.out.println(zaehler +". Person eingelesen");
+				if (zaehler % 1000 == 0) System.out.println(zaehler +". Person eingelesen");
 				pop.addPerson(person);
-			}
+//			}
 		} while(zeile!=null);
 		
 		//Alles fertig --- Ergebnis ausgeben.
