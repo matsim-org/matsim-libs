@@ -19,6 +19,7 @@
 
 package org.matsim.api.basic.v01.population;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
@@ -28,7 +29,7 @@ import org.matsim.api.basic.v01.TransportMode;
 /**
  * @author dgrether
  */
-public interface BasicPopulationBuilder {
+public interface BasicPopulationBuilder extends Serializable{
 
 	public BasicPerson createPerson(Id id);
 

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.api.basic.v01.population;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
@@ -26,7 +27,7 @@ import org.matsim.api.basic.v01.Id;
 /**
 * @author dgrether
 */
-public interface BasicPopulation<T extends BasicPerson> {
+public interface BasicPopulation<T extends BasicPerson> extends Serializable {
 
 	public String getName();
 	
