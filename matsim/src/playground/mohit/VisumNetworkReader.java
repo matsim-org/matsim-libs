@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -37,6 +36,28 @@ public class VisumNetworkReader {
 
 	private final Logger log = Logger.getLogger(VisumNetworkReader.class);
 
+	/** index for accessing the localized strings. */
+	private int language = 0;
+	
+	/* collection of localized strings: [0] english, [1] german */
+	private final String[] TABLE_STOP = {"$STOP:", "$HALTESTELLE:"};
+	private final String[] TABLE_STOPAREA = {"$STOPAREA:", "$HALTESTELLENBEREICH:"};
+	private final String[] TABLE_STOPPOINT = {"$STOPPOINT:", "$HALTEPUNKT:"};
+	private final String[] TABLE_LINE = {"$LINE:", "$LINIE:"};
+	private final String[] TABLE_LINEROUTE = {"$LINEROUTE:", "$LINIENROUTE:"};
+	private final String[] TABLE_LINEROUTEITEM = {"$LINEROUTEITEM:", "$LINIENROUTENELEMENT:"};
+	private final String[] TABLE_TIMEPROFILE = {"$TIMEPROFILE:", "$FAHRZEITPROFIL:"};
+	private final String[] TABLE_TIMEPROFILEITEM = {"$TIMEPROFILEITEM:", "$FAHRZEITPROFILELEMENT:"};
+	private final String[] TABLE_VEHJOURNEY = {"$VEHJOURNEY:", "$FZGFAHRT:"};
+	
+	private final String[] ATTRIBUTE_STOP_NO = {"NO", "NR"};
+	private final String[] ATTRIBUTE_STOP_NAME = {"NAME", "NAME"};
+	private final String[] ATTRIBUTE_STOP_XCOORD = {"XCOORD", "XCOORD"};
+	private final String[] ATTRIBUTE_STOP_YCOORD = {"YCOORD", "YCOORD"};
+
+	private final String[] ATTRIBUTE_STOPAREA_NO = {"NO", "NR"};
+	private final String[] ATTRIBUTE_STOPAREA_STOPNO = {"STOPNO", "HSTNR"};
+	
 	public VisumNetworkReader(final VisumNetwork network) {
 		this.network = network;
 	}
@@ -61,23 +82,25 @@ public class VisumNetworkReader {
 			while (line != null) {
 				if (line.startsWith("* ")) {
 					// just a comment, ignore it
-				} else if (line.startsWith("$STOP:")) {
+				} else if (line.startsWith("$VERSION:")) {
+					readVersion(line, reader);
+				} else if (line.startsWith(TABLE_STOP[language])) {
 					readStops(line, reader);
-				} else if (line.startsWith("$STOPAREA:")) {
+				} else if (line.startsWith(TABLE_STOPAREA[language])) {
 					readStopAreas(line, reader);
-				} else if (line.startsWith("$STOPPOINT:")) {
+				} else if (line.startsWith(TABLE_STOPPOINT[language])) {
 					readStopPoints(line, reader);
-				} else if (line.startsWith("$LINE:")) {
+				} else if (line.startsWith(TABLE_LINE[language])) {
 					readLines(line, reader);
-				} else if (line.startsWith("$LINEROUTE:")) {
+				} else if (line.startsWith(TABLE_LINEROUTE[language])) {
 					readLineRoutes(line, reader);
-				} else if (line.startsWith("$LINEROUTEITEM:")) {
+				} else if (line.startsWith(TABLE_LINEROUTEITEM[language])) {
 					readLineRouteItems(line, reader);
-				} else if (line.startsWith("$TIMEPROFILE:")) {
+				} else if (line.startsWith(TABLE_TIMEPROFILE[language])) {
 					readTimeProfile(line, reader);
-				} else if (line.startsWith("$TIMEPROFILEITEM:")) {
+				} else if (line.startsWith(TABLE_TIMEPROFILEITEM[language])) {
 					readTimeProfileItems(line, reader);
-				} else if (line.startsWith("$VEHJOURNEY:")) {
+				} else if (line.startsWith(TABLE_VEHJOURNEY[language])) {
 					readDepartures(line, reader);
 				} else if (line.startsWith("$")) {
 					readUnknownTable(line, reader);
@@ -107,12 +130,29 @@ public class VisumNetworkReader {
 	}
 	
 
+	private void readVersion(final String tableAttributes, final BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring("$VERSION:".length()), ';');
+		final int idxLanguage = getAttributeIndex("LANGUAGE", attributes);
+		
+		String line = reader.readLine();
+		final String[] parts = StringUtils.explode(line, ';');
+		if (parts[idxLanguage].equals("ENG")) {
+			this.language = 0;
+		} else if (parts[idxLanguage].equals("DEU")) {
+			this.language = 1;
+		} else {
+			throw new RuntimeException("Unkown language: " + parts[idxLanguage]);
+		}
+		// proceed to next line, should be empty
+		line = reader.readLine();
+	}
+
 	private void readStops(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring("$STOP:".length()), ';');
-		final int idxNo = getAttributeIndex("NO", attributes);
-		final int idxName = getAttributeIndex("NAME", attributes);
-		final int idxXcoord = getAttributeIndex("XCOORD", attributes);
-		final int idxYcoord = getAttributeIndex("YCOORD", attributes);
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_STOP[language].length()), ';');
+		final int idxNo = getAttributeIndex(ATTRIBUTE_STOP_NO[language], attributes);
+		final int idxName = getAttributeIndex(ATTRIBUTE_STOP_NAME[language], attributes);
+		final int idxXcoord = getAttributeIndex(ATTRIBUTE_STOP_XCOORD[language], attributes);
+		final int idxYcoord = getAttributeIndex(ATTRIBUTE_STOP_YCOORD[language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
@@ -124,11 +164,11 @@ public class VisumNetworkReader {
 			line = reader.readLine();
 		}
 	}
+	
 	private void readStopAreas(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring("$STOPAREA:".length()), ';');
-		final int idxNo = getAttributeIndex("NO", attributes);
-		final int idxStopId = getAttributeIndex("STOPNO", attributes);
-		
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_STOPAREA[language].length()), ';');
+		final int idxNo = getAttributeIndex(ATTRIBUTE_STOPAREA_NO[language], attributes);
+		final int idxStopId = getAttributeIndex(ATTRIBUTE_STOPAREA_STOPNO[language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
