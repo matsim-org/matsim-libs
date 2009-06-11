@@ -34,7 +34,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
-import org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.xml.sax.SAXException;
 
@@ -69,7 +69,7 @@ public class MyNetworkGenerator {
 		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
-		new Network2ESRIShape(net,"/Users/johanwjoubert/Desktop/Temp/network.shp", builder).write();
+		new Links2ESRIShape(net,"/Users/johanwjoubert/Desktop/Temp/network.shp", builder).write();
 		
 	}
 

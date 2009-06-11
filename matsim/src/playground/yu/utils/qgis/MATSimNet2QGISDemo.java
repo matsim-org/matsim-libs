@@ -32,7 +32,7 @@ import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -66,7 +66,7 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		Gbl.createConfig(null);
 		Gbl.getConfig().global().setCoordinateSystem(coordinateSys);
 
-		Logger log = Logger.getLogger(Network2ESRIShape.class);
+		Logger log = Logger.getLogger(Links2ESRIShape.class);
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
@@ -77,13 +77,13 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 				.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-		new Network2ESRIShape(network, outputFileLs, builder).write();
+		new Links2ESRIShape(network, outputFileLs, builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSys);
 		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Network2ESRIShape(network, outputFileP, builder).write();
+		new Links2ESRIShape(network, outputFileP, builder).write();
 	}
 }

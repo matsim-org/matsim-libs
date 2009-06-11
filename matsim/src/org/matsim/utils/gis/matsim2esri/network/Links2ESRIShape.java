@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Network2ESRIShape.java
+ * Links2ESRIShape.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -34,29 +34,29 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 /**
- * Simple class to convert MATSim network files to ESRI shape files. The network could be written either
+ * Simple class to convert the links of MATSim network files to ESRI shape files. The network could be written either
  * as line strings or as polygons. Furthermore the width of the links could be calculated according to
  * freespeed, lanes or capacity. For some basic examples please have a look at the <code>main</code> method.
- * Can also be called as Network2ESRIShape inputNetwork.xml outputAsLines.shp outputAsPolygons.shp .
+ * Can also be called as Links2ESRIShape inputNetwork.xml outputAsLines.shp outputAsPolygons.shp .
  *  
- * <p> <strong>Keywords:</strong> converter, network, esri, shp, matsim </p>
+ * <p> <strong>Keywords:</strong> converter, network, links, esri, shp, matsim </p>
  *
  * @author laemmel
  */
-public class Network2ESRIShape {
+public class Links2ESRIShape {
 
-	private static Logger log = Logger.getLogger(Network2ESRIShape.class);
+	private static Logger log = Logger.getLogger(Links2ESRIShape.class);
 
 	private final FeatureGenerator featureGenerator;
 	private final Network network;
 	private final String filename;
 
 
-	public Network2ESRIShape(final Network network, final String filename) {
+	public Links2ESRIShape(final Network network, final String filename) {
 		this(network, filename, new FeatureGeneratorBuilder(network));
 	}
 
-	public Network2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
+	public Links2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
 		this.network = network;
 		this.filename = filename;
 		this.featureGenerator = builder.createFeatureGenerator();
@@ -81,7 +81,7 @@ public class Network2ESRIShape {
 		String outputFileLs = null ;
 		String outputFileP = null ;
 		
-		if ( args==null ) {
+		if ( args.length == 0 ) {
 			netfile = "./examples/equil/network.xml";
 //		String netfile = "./test/scenarios/berlin/network.xml.gz";
 
@@ -108,14 +108,14 @@ public class Network2ESRIShape {
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
-		new Network2ESRIShape(network,outputFileLs, builder).write();
+		new Links2ESRIShape(network,outputFileLs, builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(0.001);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Network2ESRIShape(network,outputFileP, builder).write();
+		new Links2ESRIShape(network,outputFileP, builder).write();
 		
 	}
 

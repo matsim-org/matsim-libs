@@ -50,7 +50,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Network2ESRIShape(network,outputFileP, builder).write();
+		new Links2ESRIShape(network,outputFileP, builder).write();
 		
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
@@ -77,7 +77,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Network2ESRIShape(network,outputFileP, builder).write();
+		new Links2ESRIShape(network,outputFileP, builder).write();
 		
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
@@ -102,7 +102,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Network2ESRIShape(network,outputFileP, builder).write();
+		new Links2ESRIShape(network,outputFileP, builder).write();
 		
 		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
@@ -129,7 +129,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Network2ESRIShape(network,outputFileShp, builder).write();
+		new Links2ESRIShape(network,outputFileShp, builder).write();
 		
 		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
 		long checksum2 = CRCChecksum.getCRCFromFile(outputFileShp);
@@ -140,5 +140,26 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 //		checksum2 = CRCChecksum.getCRCFromFile(outputFileDbf);
 //		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 //		assertEquals(checksum1, checksum2);
+	}
+	
+	public void testNodesShape() {
+		String netFileName = "test/scenarios/berlin/network.xml.gz";
+		String outputFileShp = getOutputDirectory() + "./network.shp";
+//		String outputFileDbf = getOutputDirectory() + "./network.dbf";
+		String refShp = getInputDirectory() + "./network.shp";
+//		String refDbf = getInputDirectory() + "./network.dbf";
+		
+		
+		Gbl.createConfig(null);
+		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
+
+		final NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFileName);
+
+		new Nodes2ESRIShape(network,outputFileShp).write();	
+		
+		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
+		long checksum2 = CRCChecksum.getCRCFromFile(outputFileShp);
+		assertEquals("different shp-files.", checksum1, checksum2);
 	}
 }

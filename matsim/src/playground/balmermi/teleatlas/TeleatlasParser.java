@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -260,7 +260,7 @@ public class TeleatlasParser {
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
-		new Network2ESRIShape(network,outputDir+"/output_links.shp",builder).write();
+		new Links2ESRIShape(network,outputDir+"/output_links.shp",builder).write();
 	}
 	
 	//////////////////////////////////////////////////////////////////////

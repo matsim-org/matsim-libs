@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 public class TeleAtlas2Network {
 
@@ -90,7 +90,7 @@ public class TeleAtlas2Network {
 			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
-			new Network2ESRIShape(network,outputDir+"/output_links.shp",builder).write();
+			new Links2ESRIShape(network,outputDir+"/output_links.shp",builder).write();
 			System.out.println("done.");
 		}
 		return network;
