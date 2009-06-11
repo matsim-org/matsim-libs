@@ -343,7 +343,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
     playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
     pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
 
-		add(createButton("Restart", STOP, "buttonRestart", "restart the server/simulation"));
+		add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
 		if (this.liveHost == null) {
 			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
@@ -418,8 +418,18 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
-	private void pressed_TO_START() {
-		//host.restart()
+	private void pressed_TO_START() throws IOException {
+		stopMovie();
+		if(host.isLive()) {
+			liveHost.requestControllerStatus(OTFVisController.CANCEL);
+			requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
+			simTime = 0;
+			updateTimeLabel();
+			repaint();
+		} else {
+			requestTimeStep(loopStart, OTFServerRemote.TimePreference.LATER);
+			System.out.println("To start...");
+		}
 	}
 
 	private void pressed_PAUSE() throws IOException {
