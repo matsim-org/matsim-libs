@@ -195,7 +195,7 @@ public static class MTree extends Tree {
 		this.addColumn("ref", Object.class);
 		Node root = this.addRoot();
 		root.setString("name", Integer.toString(this.max));
-		generateLayer(this.getRoot(), 0, this.max, (int)Math.log10(this.max)-1, 0);
+		generateLayer(this.getRoot(), 0, this.max, (int)Math.log10(this.max)-1, -1);
 
 	}
 
@@ -205,6 +205,7 @@ public static class MTree extends Tree {
 		return false;
 	}
 	public boolean generateLayer(Node parent, int start, int end, int level, int minLevel) {
+		if (level == minLevel) return false;
 		if(!hasPersons(start, end)){
 			// this complete subtree does not contain persons. do not create
 			parent.setInt("level", 0);
@@ -226,8 +227,9 @@ public static class MTree extends Tree {
 					//this.fireTupleEvent(child, prefuse.data.event.EventConstants.INSERT);
 				}
 			}
+			return true;
 		}
-		if (level == minLevel) return false;
+
 		int step = (int)Math.pow(10, level);
 		for (int i = start; (i < end) && (i<max); i+=step) {
 			if(!hasPersons(i, Math.min(i+step, end)))continue;
@@ -546,7 +548,7 @@ public boolean focusOnId(String id){
                 if(item.canGetInt("level")){
                 	String ids = item.getString(label);
                 	int level = item.getInt("level");
-                	if(level<=0){
+                	if(level<=1){
                 		MTree tree = (MTree)t2;
                 		int row = item.getRow();
                 		Node parent = tree.getNode(row);
@@ -569,6 +571,9 @@ public boolean focusOnId(String id){
                     		tview.invalidate();
                 		} else {
                 			// level == 0 --> this is an already expanded item
+                			Object ref = parent.get("ref");
+                        	int id = Integer.parseInt(ids);
+                    		if(ref == null) tree.generateLayer(parent, id, id, 1, -1, item);
                 		}
                 	}
                 }
