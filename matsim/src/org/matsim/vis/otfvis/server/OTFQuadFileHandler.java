@@ -352,6 +352,10 @@ public class OTFQuadFileHandler {
 					name = name.replaceFirst("org.matsim.utils.vis.otfivs",
 							"org.matsim.vis.otfvis");
 					return Class.forName(name);
+				} else if (name.startsWith("org.matsim.mobsim")) {
+					name = name.replaceFirst("org.matsim.mobsim",
+							"org.matsim.core.mobsim");
+					return Class.forName(name);
 				} else if (name.startsWith("org.matsim.utils.collections")) {
 					name = name.replaceFirst("org.matsim.utils.collections",
 							"org.matsim.core.utils.collections");
