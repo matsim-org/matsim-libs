@@ -37,6 +37,7 @@ public class RetailersControler extends Controler {
 		super.shutdown(unexpected);
 		
 		ComputeGravityModelParameters cgmp = new ComputeGravityModelParameters ();
+		cgmp.computeInitialParameters (this);
 		/*for (Facility f:this.getFacilities().getFacilities().values()) {
 			for (Person p:this.getPopulation().getPersons().values()) {
 				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
