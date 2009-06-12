@@ -35,7 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
  */
 public class ExpBetaPlanForRemovalSelector implements PlanSelector {
 
-	protected static double MIN_WEIGHT = Double.MIN_VALUE;
+	private static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
 
 	public ExpBetaPlanForRemovalSelector() {
