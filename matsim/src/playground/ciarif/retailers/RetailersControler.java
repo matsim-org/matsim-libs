@@ -19,14 +19,43 @@
 
 package playground.ciarif.retailers;
 
+import org.matsim.core.api.facilities.Facility;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 
-public class RetailersControler {
+public class RetailersControler extends Controler {
+	
+	public RetailersControler(String[] args) {
+		super(args);
+	}
+
+	@Override
+	protected void shutdown(final boolean unexpected) {
+		super.shutdown(unexpected);
+		
+		ComputeGravityModelParameters cgmp = new ComputeGravityModelParameters ();
+		/*for (Facility f:this.getFacilities().getFacilities().values()) {
+			for (Person p:this.getPopulation().getPersons().values()) {
+				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
+						if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
+							
+						}
+					}	
+				}
+			}
+		}*/
+	}
 	
     public static void main (final String[] args) { 
-    	Controler controler = new Controler(args);
-    	controler.addControlerListener(new RetailersLocationListener());
+    	Controler controler = new RetailersControler(args);
+    	controler.addControlerListener(new RetailersParallelLocationListener());
+    	controler.addControlerListener(new RetailersSequentialLocationListener()); //TODO Introduce a parameter in config file for the type of 
+    	// relocation to be performed, sequential or parallel
     	controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
     	controler.run();
     }

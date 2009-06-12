@@ -5,14 +5,19 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.controler.Controler;
 
 public class Retailer {
 	private final Id id;
+//<<<<<<< .mine
+//	private final LinkedHashMap<Id, Facility> facilities = new LinkedHashMap<Id,Facility>();
+//=======
 	private final Map<Id,ActivityFacility> facilities = new LinkedHashMap<Id,ActivityFacility>();
+//>>>>>>> .r6943
 	private RetailerStrategy strategy;
 		
-	protected Retailer(final Id id, RetailerStrategy rs) { 
+	public Retailer(final Id id, RetailerStrategy rs) { 
 		this.id = id;
 		this.strategy = rs;
 	}
@@ -61,6 +66,4 @@ public class Retailer {
 		strategy.moveFacilities(this.facilities);
 		return this.facilities;
 	}
-	
-
 }

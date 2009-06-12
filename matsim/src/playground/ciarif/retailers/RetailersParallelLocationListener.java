@@ -56,7 +56,7 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.collections.QuadTree;
 
 
-public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {
+public class RetailersParallelLocationListener implements StartupListener, BeforeMobsimListener {
 	
 	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	
@@ -76,7 +76,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	private String facilityIdFile = null;
 	private Object[] links = null;
 	
-	public RetailersLocationListener() {
+	public RetailersParallelLocationListener() {
 	}
 
 	public void notifyStartup(StartupEvent event) {
@@ -135,7 +135,6 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
-		//System.out.println("Veryfing if the retailers need to be relocated " + controler.getIteration()%5);
 		if (controler.getIteration()%1==0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
 			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 			
@@ -147,7 +146,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			int retailers_count = 0;
 			for (Retailer r : this.retailers.getRetailers().values()) {
-				log.info("The retailer " + r.getId() + " will try to relocate its facilities");
+				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");
 				Map<Id,ActivityFacility> facs = r.runStrategy();
 				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will really be moved!!!!!!!!!!! 
 				// probably is not incorrect but slower and should be changed
@@ -159,8 +158,10 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			
 			for (Person p : controler.getPopulation().getPersons().values()) {
 				pst.run(p,iter);
-				for (Plan plan : p.getPlans()) {
-					
+				//for (Plan plan : p.getPlans()) {
+				Plan plan = p.getSelectedPlan();
+					// fc: is it not possible anymore to use only the selected plan? 
+					// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
 					boolean routeIt = false;
 					for (PlanElement pe : plan.getPlanElements()) {
 						if (pe instanceof Activity) {
@@ -173,6 +174,17 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 					}
 					if (routeIt) {
 						pcrl.run(plan);
+					}
+//				}
+				for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
+					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
+						if (pe2 instanceof Activity) {
+							Activity act = (Activity) pe2;
+							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
+								// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
+								//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 
+							}
+						}
 					}
 				}
 			}
@@ -192,7 +204,8 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
-		
+
+		log.info("minx = " + minx + "; miny = " + miny + "; maxx = " + maxx + "; maxy =" + maxy );
 		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
 		for (Person p : controler.getPopulation().getPersons().values()) {
 			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();

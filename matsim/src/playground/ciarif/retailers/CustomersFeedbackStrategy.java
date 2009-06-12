@@ -22,18 +22,21 @@ public class CustomersFeedbackStrategy implements RetailerStrategy {
 		this.links = links;
 	}
 	
-	public void moveRetailersFacilities(Map<Id, FacilityRetailersImpl> facilities) {
+	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
 		
-		for (FacilityRetailersImpl f :facilities.values()) {
+		for (ActivityFacility f :facilities.values()) {
 			int rd = MatsimRandom.getRandom().nextInt(links.length);
 			BasicLinkImpl link =(BasicLinkImpl)links[rd];
 			Utils.moveFacility(f,link, controler.getWorld());
 		}		
 	}
+//<<<<<<< .mine
+//=======
 
-	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
+//	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
 		// TODO Auto-generated method stub
 		
-	}
+	//}
 
+//>>>>>>> .r6943
 }

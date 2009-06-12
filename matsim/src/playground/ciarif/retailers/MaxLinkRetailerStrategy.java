@@ -13,6 +13,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.opengis.go.display.primitive.GraphicLineString;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	
@@ -99,14 +100,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			}
 			else {
 				log.info ("The facility " + f.getId() + " will stay at the current link");
-			}
+			} 
 		}
 	}
-
-
-	public void moveRetailersFacilities(
-			Map<Id, FacilityRetailersImpl> facilities) {
-		// TODO Auto-generated method stub
-		
-	}	
 }	
