@@ -227,12 +227,14 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 		double facilityPenaltiesScore = 0.0;
 
-		// copied from LocationChoiceScoringFunction
-		// reduce score by penalty from capacity restraints
-		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
-		while (pen_it.hasNext()){
-			ScoringPenalty penalty = pen_it.next();
-			facilityPenaltiesScore -= penalty.getPenalty();
+		if (this.penalty != null) {
+			// copied from LocationChoiceScoringFunction
+			// reduce score by penalty from capacity restraints
+			Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
+			while (pen_it.hasNext()) {
+				ScoringPenalty penalty = pen_it.next();
+				facilityPenaltiesScore -= penalty.getPenalty();
+			}
 		}
 		return facilityPenaltiesScore;
 	}
