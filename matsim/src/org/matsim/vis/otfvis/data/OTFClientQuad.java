@@ -351,7 +351,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	
 	private static class CollectExecutor implements Executor<OTFDataReader> {
 		private Class class_old;
-		class Item {
+		static class Item {
 			public double x;
 			public double y;
 			OTFDataReader reader;

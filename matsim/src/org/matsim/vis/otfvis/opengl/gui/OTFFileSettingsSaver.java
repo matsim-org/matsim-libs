@@ -58,19 +58,19 @@ public class OTFFileSettingsSaver implements OTFSettingsSaver {
 		void close()throws IOException;
 	}
 	
-	private class BinWriter extends ObjectOutputStream implements Writer{
+	private static class BinWriter extends ObjectOutputStream implements Writer{
 
 		public BinWriter(OutputStream out) throws IOException {
 			super(out);
 		}
-	};
+	}
 
-	private class XMLWriter extends XMLEncoder implements Writer{
+	private static class XMLWriter extends XMLEncoder implements Writer{
 
 		public XMLWriter(OutputStream out) {
 			super(out);
 		}
-	};
+	}
 		
 	public OTFFileSettingsSaver(String filename) {
 		this.fileName = filename;
