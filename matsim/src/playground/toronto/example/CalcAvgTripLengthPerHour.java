@@ -23,12 +23,14 @@ package playground.toronto.example;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -36,15 +38,15 @@ import org.matsim.core.network.NetworkLayer;
  *
  * @author mrieser
  */
-public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler {
+public class CalcAvgTripLengthPerHour implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler {
 
 	private final static int NUM_OF_HOURS = 30;
 
 	private double[] travelDistanceSum = new double[NUM_OF_HOURS];
 	private int[] travelDistanceCnt = new int[NUM_OF_HOURS];
 	
-	private Map<String, Double> travelStartPerAgent = new HashMap<String, Double>(1000);
-	private Map<String, Double> travelDistancePerAgent = new HashMap<String, Double>(1000);
+	private Map<Id, Double> travelStartPerAgent = new HashMap<Id, Double>(1000);
+	private Map<Id, Double> travelDistancePerAgent = new HashMap<Id, Double>(1000);
 
 	private final NetworkLayer network;
 
@@ -52,29 +54,27 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 		this.network = network;
 	}
 	
-	public void handleEvent(final AgentDepartureEvent event) {
-		this.travelStartPerAgent.put(event.getPersonId().toString().intern(), event.getTime());
-		this.travelDistancePerAgent.put(event.getPersonId().toString().intern(), 0.0);
+	public void handleEvent(final BasicAgentDepartureEvent event) {
+		this.travelStartPerAgent.put(event.getPersonId(), event.getTime());
+		this.travelDistancePerAgent.put(event.getPersonId(), 0.0);
 	}
 	
-	public void handleEvent(final AgentArrivalEvent event) {
-		Double distance = this.travelDistancePerAgent.remove(event.getPersonId().toString().intern());
-		
+	public void handleEvent(final BasicAgentArrivalEvent event) {
+		Double distance = this.travelDistancePerAgent.remove(event.getPersonId());
+
 		if (distance > 0.0) {
-			Double startTime = this.travelStartPerAgent.get(event.getPersonId().toString().intern());
+			Double startTime = this.travelStartPerAgent.get(event.getPersonId());
 			int hour = startTime.intValue() / 3600;
 			this.travelDistanceSum[hour] += distance;
 			this.travelDistanceCnt[hour]++;
 		}
 	}
-	
-	public void handleEvent(final LinkEnterEvent event) {
-		Double distance = this.travelDistancePerAgent.get(event.getPersonId().toString().intern());
-		if (event.getLink() == null) {
-			event.setLink(this.network.getLink(event.getLinkId().toString()));
-		}
-		distance = distance + event.getLink().getLength();
-		this.travelDistancePerAgent.put(event.getPersonId().toString().intern(), distance);
+
+	public void handleEvent(final BasicLinkEnterEvent event) {
+		Double distance = this.travelDistancePerAgent.get(event.getPersonId());
+		Link link = this.network.getLinks().get(event.getLinkId());
+		distance = distance + link.getLength();
+		this.travelDistancePerAgent.put(event.getPersonId(), distance);
 	}
 
 	public void reset(final int iteration) {

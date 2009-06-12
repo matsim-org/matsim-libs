@@ -20,23 +20,30 @@
 
 package playground.toronto.example;
 
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.network.Network;
 
 /**
  * Calculates the distance all vehicles travel per hour
  *
  * @author mrieser
  */
-public class CalcVehicleKilometerTraveled implements LinkEnterEventHandler {
+public class CalcVehicleKilometerTraveled implements BasicLinkEnterEventHandler {
 
 	private final static int NUM_OF_HOURS = 30;
 
 	private double[] travelDistanceSum = new double[NUM_OF_HOURS];
 
-	public void handleEvent(final LinkEnterEvent event) {
+	private final Network network;
+	
+	public CalcVehicleKilometerTraveled(final Network network) {
+		this.network = network;
+	}
+	
+	public void handleEvent(final BasicLinkEnterEvent event) {
 		int hour = (int) event.getTime() / 3600;
-		this.travelDistanceSum[hour] += event.getLink().getLength(); // this assumes link.length is specified in meters!
+		this.travelDistanceSum[hour] += this.network.getLinks().get(event.getLinkId()).getLength(); // this assumes link.length is specified in meters!
 	}
 
 	public void reset(final int iteration) {
