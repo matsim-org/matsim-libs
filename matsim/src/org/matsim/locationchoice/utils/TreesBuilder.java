@@ -14,12 +14,11 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.locationchoice.LocationChoice;
 
 public class TreesBuilder {
 	
 	private NetworkLayer network = null;
-	private static final Logger log = Logger.getLogger(LocationChoice.class);
+	private static final Logger log = Logger.getLogger(TreesBuilder.class);
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
