@@ -21,21 +21,13 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.geotools.feature.*;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.*;
+
+import org.matsim.core.api.network.Link;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 
@@ -56,7 +48,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 
 	private void initFeatureType() {
 
-		AttributeType [] attribs = new AttributeType[9];
+		AttributeType [] attribs = new AttributeType[10];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -66,6 +58,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);		
+		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);		
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -83,7 +76,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
 
-		Object [] attribs = new Object[9];
+		Object [] attribs = new Object[10];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -93,6 +86,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[6] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 		attribs[7] = link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 		attribs[8] = width;
+		attribs[9] = link.getType();
 
 		try {
 			return this.featureType.create(attribs);
