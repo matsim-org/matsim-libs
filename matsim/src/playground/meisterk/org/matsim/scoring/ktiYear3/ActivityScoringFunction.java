@@ -69,13 +69,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	// TODO differentiate in any way?
 	public static final double MINIMUM_DURATION = 0.5 * 3600;
 
-	private List<ScoringPenalty> penalty = new Vector<ScoringPenalty>();
-	private TreeMap<Id, FacilityPenalty> facilityPenalties;
-	private HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
-	private HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
-	private double accumulatedTooShortDuration;
-	private double timeSpentWaiting;
-	private double accumulatedNegativeDuration;
+	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<BasicOpeningTime> DEFAULT_OPENING_TIME = new TreeSet<BasicOpeningTime>();
@@ -90,6 +84,16 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		super(plan, params);
 		this.facilityPenalties = facilityPenalties;
 	}
+
+	/*
+	 * Variables only used in activity score calculation.
+	 */
+	private List<ScoringPenalty> penalty = null;
+	private HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
+	private HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
+	private double accumulatedTooShortDuration;
+	private double timeSpentWaiting;
+	private double accumulatedNegativeDuration;
 
 	@Override
 	protected double calcActScore(double arrivalTime, double departureTime,
@@ -165,6 +169,10 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 							this.getPerformanceScore(act.getType(), accumulatedDuration + duration) - 
 							this.getPerformanceScore(act.getType(), accumulatedDuration);
 
+						// lazy init of penalty data structure
+						if (this.penalty == null) {
+							this.penalty = new Vector<ScoringPenalty>();
+						}
 						/* Penalty due to facility load:
 						 * Store the temporary score to reduce it in finish() proportionally 
 						 * to score and dep. on facility load.
@@ -275,20 +283,6 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		return (2 * this.params.marginalUtilityOfLateArrival * Math.abs(this.accumulatedNegativeDuration));
 	}
 
-	@Override
-	public void reset() {
-		super.reset();
-		if (this.penalty != null) {
-			this.penalty.clear();
-		}
-		if (this.accumulatedTimeSpentPerforming != null) {
-			this.accumulatedTimeSpentPerforming.clear();
-		}
-		this.accumulatedTooShortDuration = 0.0;
-		this.timeSpentWaiting = 0.0;
-		this.accumulatedNegativeDuration = 0.0;
-	}
-
 	public Map<String, Double> getAccumulatedDurations() {
 		return Collections.unmodifiableMap(this.accumulatedTimeSpentPerforming);
 	}
@@ -303,18 +297,6 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	public double getTimeSpentWaiting() {
 		return timeSpentWaiting;
-	}
-
-	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
-		return facilityPenalties;
-	}
-
-	public List<ScoringPenalty> getPenalty() {
-		return penalty;
-	}
-
-	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
-		this.facilityPenalties = facilityPenalties;
 	}
 
 	public double getAccumulatedNegativeDuration() {

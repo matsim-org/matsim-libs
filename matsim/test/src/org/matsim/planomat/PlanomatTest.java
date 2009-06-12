@@ -291,8 +291,7 @@ public class PlanomatTest extends MatsimTestCase {
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 
 		// run the method
-		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
-		Planomat testee = new Planomat(ltte, sfFactory);
+		Planomat testee = new Planomat(ltte, null);
 
 		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, null);
 

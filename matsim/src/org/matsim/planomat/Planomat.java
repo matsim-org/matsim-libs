@@ -76,8 +76,6 @@ public class Planomat implements PlanAlgorithm {
 	private final static Logger logger = Logger.getLogger(Planomat.class);
 	private final boolean doLogging = this.config.isDoLogging();
 
-	private ScoringFunction scoringFunction = null;
-
 	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
@@ -86,8 +84,6 @@ public class Planomat implements PlanAlgorithm {
 	}
 
 	public void run(final Plan plan) {
-
-		this.scoringFunction = this.scoringFunctionFactory.getNewScoringFunction(plan);
 
 		if (this.doLogging) {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
@@ -206,8 +202,9 @@ public class Planomat implements PlanAlgorithm {
 		List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 		int numLegs = actslegs.size() / 2;
 
+		ScoringFunction scoringFunction = null;
 		if (action.equals(StepThroughPlanAction.EVALUATE)) {
-			this.scoringFunction.reset();
+			scoringFunction = this.scoringFunctionFactory.getNewScoringFunction(plan);
 		}
 		// TODO this as a quick and dirty implementation that takes a lot of resources
 		// replace activity duration encoding with double [0.0,1.0] or time slots, respectively

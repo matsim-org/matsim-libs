@@ -492,17 +492,6 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		assertEquals(expectedScore, testee.getScore());
 		
-		testee.reset();
-
-		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[8], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
-			}
-		}
-		assertEquals(expectedTooShortDurationsSequence[8], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[8], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[8], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
-		
 	}
 	
 	@Override
