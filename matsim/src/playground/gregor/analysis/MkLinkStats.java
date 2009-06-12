@@ -8,7 +8,7 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 
 public class MkLinkStats {
@@ -30,7 +30,7 @@ public class MkLinkStats {
 		CalcLinkStats ls = new CalcLinkStats(netzzz);
 		events.addHandler(h);
 		
-		AbstractTravelTimeCalculator tt = new TravelTimeCalculatorBuilder(c.travelTimeCalculator()).createTravelTimeCalculator(netzzz, 5*3600);
+		TravelTimeCalculator tt = TravelTimeCalculatorBuilder.createTravelTimeCalculator(netzzz, c.travelTimeCalculator());
 		events.addHandler(tt);
 		new EventsReaderTXTv1(events).readFile(eventsFile);
 		ls.addData(h, tt);

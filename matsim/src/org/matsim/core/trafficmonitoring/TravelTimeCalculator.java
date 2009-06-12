@@ -35,19 +35,36 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
 
 /**
+ * Calculates actual travel times on link from events and optionally also the link-to-link 
+ * travel times, e.g. if signaled nodes are used and thus turns in different directions
+ * at a node may take a different amount of time.
+ * <br>
+ * Travel times on links are collected and averaged in bins/slots with a specified size
+ * (<code>binSize</code>, in seconds, default 900 seconds = 15 minutes). The data for the travel times per link
+ * is stored in {@link TravelTimeData}-objects. If a short binSize is used, it is useful to
+ * use {@link TravelTimeDataHashMap} (see {@link #setTravelTimeDataFactory(TravelTimeDataFactory)}
+ * as that one does not use any memory to time bins where no traffic occurred. By default,
+ * {@link TravelTimeDataArray} is used.
+ * 
+ * 
  * @author dgrether
  * @author mrieser
  */
-public class TravelTimeCalculator extends AbstractTravelTimeCalculator
-		implements LinkToLinkTravelTime, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, 
+public class TravelTimeCalculator
+		implements TravelTime, LinkToLinkTravelTime, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, 
 		BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler {
 	
-	public static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
-				"agent is not known the turning move travel time cannot be calculated!";
+	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
+	"agent is not known the turning move travel time cannot be calculated!";
+	
+	/*package*/ final int timeslice;
+	/*package*/ final int numSlots;
+	private AbstractTravelTimeAggregator aggregator;
 	
 	private static final Logger log = Logger.getLogger(TravelTimeCalculator.class);
 	
@@ -61,7 +78,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 
 	private boolean calculateLinkToLinkTravelTimes;
 	
-	private final Network network;
+	private TravelTimeDataFactory ttDataFactory = null; 
 	
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, 15*60, 30*3600, ttconfigGroup);	// default timeslot-duration: 15 minutes
@@ -71,14 +88,12 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 		this(network, timeslice, 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
 
-	public TravelTimeCalculator(Network network, int timeslice,	int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		this(network, timeslice, maxTime, new TravelTimeAggregatorFactory(), ttconfigGroup);
-	}
-
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
-			TravelTimeAggregatorFactory factory, TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		super(timeslice, maxTime, factory);
-		this.network = network;
+			TravelTimeCalculatorConfigGroup ttconfigGroup) {
+		this.timeslice = timeslice;
+		this.numSlots = (maxTime / this.timeslice) + 1;
+		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeslice);
+		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
 		if (this.calculateLinkTravelTimes){
@@ -98,7 +113,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
 			Tuple<Id, Id> fromToLink = new Tuple<Id, Id>(oldEvent.getLinkId(), e.getLinkId());
 			DataContainer data = getLinkToLinkTravelTimeData(fromToLink, true);
-			this.getTravelTimeAggregator().addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
+			this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
 			data.needsConsolidation = true;
 		}
 		this.linkEnterEvents.put(e.getPersonId(), e);
@@ -109,7 +124,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 			BasicLinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
   		if (oldEvent != null) {
   			DataContainer data = getTravelTimeData(e.getLinkId(), true);
-  			this.getTravelTimeAggregator().addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
+  			this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
   			data.needsConsolidation = true;
   		}
 		}
@@ -127,7 +142,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 		if (e != null) {
 			DataContainer data = getTravelTimeData(e.getLinkId(), true);
 			data.needsConsolidation = true;
-			this.getTravelTimeAggregator().addStuckEventTravelTime(data.ttData, e.getTime(), event.getTime());
+			this.aggregator.addStuckEventTravelTime(data.ttData, e.getTime(), event.getTime());
 			if (this.calculateLinkToLinkTravelTimes){
 				log.error(ERROR_STUCK_AND_LINKTOLINK);
 				throw new IllegalStateException(ERROR_STUCK_AND_LINKTOLINK);
@@ -138,8 +153,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	private DataContainer getLinkToLinkTravelTimeData(Tuple<Id, Id> fromLinkToLink, final boolean createIfMissing) {
 		DataContainer data = this.linkToLinkData.get(fromLinkToLink);
 		if ((null == data) && createIfMissing) {
-			Link fromLink = this.network.getLinks().get(fromLinkToLink.getFirst());
-			data = new DataContainer(this.getTravelTimeAggregatorFactory().createTravelTimeData(fromLink, this.getNumSlots()));
+			data = new DataContainer(this.ttDataFactory.createTravelTimeData(fromLinkToLink.getFirst()));
 			this.linkToLinkData.put(fromLinkToLink, data);
 		}
 		return data;
@@ -148,21 +162,19 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 	private DataContainer getTravelTimeData(final Id linkId, final boolean createIfMissing) {
 		DataContainer data = this.linkData.get(linkId);
 		if ((null == data) && createIfMissing) {
-			Link link = network.getLink(linkId);
-			data = new DataContainer(this.getTravelTimeAggregatorFactory().createTravelTimeData(link, this.getNumSlots()));
+			data = new DataContainer(this.ttDataFactory.createTravelTimeData(linkId));
 			this.linkData.put(linkId, data);
 		}
 		return data;
 	}
 
-	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
 			DataContainer data = getTravelTimeData(link.getId(), true);
 			if (data.needsConsolidation) {
 				consolidateData(data);
 			}
-			return this.getTravelTimeAggregator().getTravelTime(data.ttData, time); 
+			return this.aggregator.getTravelTime(data.ttData, time); 
 		}
 		throw new IllegalStateException("No link travel time is available " +
 				"if calculation is switched off by config option!");
@@ -177,7 +189,7 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 		if (data.needsConsolidation) {
 			consolidateData(data);
 		}
-		return this.getTravelTimeAggregator().getTravelTime(data.ttData, time);
+		return this.aggregator.getTravelTime(data.ttData, time);
 	}
 
 	public void reset(int iteration) {
@@ -194,6 +206,14 @@ public class TravelTimeCalculator extends AbstractTravelTimeCalculator
 			}
 		}
 		this.linkEnterEvents.clear();
+	}
+	
+	public void setTravelTimeDataFactory(final TravelTimeDataFactory factory) {
+		this.ttDataFactory = factory;
+	}
+	
+	public void setTravelTimeAggregator(final AbstractTravelTimeAggregator aggregator) {
+		this.aggregator = aggregator;
 	}
 	
 	/**

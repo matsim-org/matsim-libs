@@ -2,17 +2,17 @@ package playground.gregor.sims.socialcost;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 
 public class MarginalTravelCostCalculatorIII implements TravelCost {
 	
 	
 	private final SocialCostCalculator sc;
-	private final AbstractTravelTimeCalculator tc;
+	private final TravelTimeCalculator tc;
 	private int binSize;
 
-	public MarginalTravelCostCalculatorIII(final AbstractTravelTimeCalculator tc, final SocialCostCalculator sc, final int binSize) {
+	public MarginalTravelCostCalculatorIII(final TravelTimeCalculator tc, final SocialCostCalculator sc, final int binSize) {
 		this.tc = tc;
 		this.sc = sc;
 		this.binSize = binSize;

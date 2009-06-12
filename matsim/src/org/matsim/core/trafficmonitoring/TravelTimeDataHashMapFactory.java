@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RiskAversTravelCost.java
+ * TravelTimeDataHashMapFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,24 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sims.riskaversion;
+package org.matsim.core.trafficmonitoring;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
 
-public class RiskAverseTravelCostCalculator implements TravelCost {
+public class TravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 
-	private final TravelTimeCalculator tc;
-	private final RiskCostCalculator rc;
-
-	public RiskAverseTravelCostCalculator(final TravelTimeCalculator tc, final RiskCostCalculator rc) {
-		this.tc = tc;
-		this.rc = rc;
+	private final Network network;
+	
+	public TravelTimeDataHashMapFactory(final Network network) {
+		this.network = network;
 	}
 	
-	public double getLinkTravelCost(final Link link, final double time) {
-		return this.tc.getLinkTravelTime(link, time) + this.rc.getLinkRisk(link,time);
+	public TravelTimeData createTravelTimeData(Id linkId) {
+		return new TravelTimeDataHashMap(this.network.getLinks().get(linkId));
 	}
 
 }

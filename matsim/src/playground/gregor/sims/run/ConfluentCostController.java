@@ -9,11 +9,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 
 import playground.gregor.flooding.FloodingReader;
 import playground.gregor.flooding.RiskCostFromFloodingData;
-import playground.gregor.sims.confluent.CostCalculator;
 import playground.gregor.sims.confluent.LinkPenalty;
-import playground.gregor.sims.confluent.LinkPenaltyCalculator;
 import playground.gregor.sims.confluent.LinkPenaltyCalculatorII;
-import playground.gregor.sims.confluent.LinkPenaltyCalculatorIII;
 import playground.gregor.sims.confluent.RiskAverseCostCalculator;
 import playground.gregor.sims.evacbase.Building;
 import playground.gregor.sims.evacbase.BuildingsShapeReader;
@@ -35,9 +32,8 @@ public class ConfluentCostController extends Controler {
 		LinkPenalty lpc = new LinkPenaltyCalculatorII(this.network);
 		this.events.addHandler(lpc);
 		addControlerListener(lpc);
-		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.travelTimeCalculator()).createTravelTimeCalculator(this.network, (int)endTime);
+			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		
 		String netcdf = this.config.evacuation().getFloodingDataFile();

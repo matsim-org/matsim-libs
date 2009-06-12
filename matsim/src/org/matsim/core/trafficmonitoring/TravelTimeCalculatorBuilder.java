@@ -24,41 +24,35 @@ import org.matsim.core.api.network.Network;
 
 
 /**
- * 
  * @author dgrether
- *
+ * @author mrieser
  */
-public class TravelTimeCalculatorBuilder {
+abstract public class TravelTimeCalculatorBuilder {
 
-	private static final Logger log = Logger
-			.getLogger(TravelTimeCalculatorBuilder.class);
-	
-	private TravelTimeCalculatorConfigGroup travelTimeCalcConfigGroup;
+	private static final Logger log = Logger.getLogger(TravelTimeCalculatorBuilder.class);
 
-	public TravelTimeCalculatorBuilder(TravelTimeCalculatorConfigGroup group){
-		this.travelTimeCalcConfigGroup = group;
-	}
-	
-	public AbstractTravelTimeCalculator createTravelTimeCalculator(Network network, int endTime) {
-		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		AbstractTravelTimeCalculator calculator = null;
+	public static TravelTimeCalculator createTravelTimeCalculator(final Network network, final TravelTimeCalculatorConfigGroup group) {
+		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
 		
-		if ("TravelTimeCalculatorHashMap".equals(travelTimeCalcConfigGroup.getTravelTimeCalculatorType())) {
-			factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-		} else if (!"TravelTimeCalculatorArray".equals(travelTimeCalcConfigGroup.getTravelTimeCalculatorType())) {
-			throw new RuntimeException(travelTimeCalcConfigGroup.getTravelTimeCalculatorType() + " is unknown!");
+		// set travelTimeData factory
+		if ("TravelTimeCalculatorArray".equals(group.getTravelTimeCalculatorType())) {
+			calculator.setTravelTimeDataFactory(new TravelTimeDataArrayFactory(network, calculator.numSlots));
+		} else if ("TravelTimeCalculatorHashMap".equals(group.getTravelTimeCalculatorType())) {
+			calculator.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
+		} else {
+			throw new RuntimeException(group.getTravelTimeCalculatorType() + " is unknown!");
 		}
 		
-		if ("experimental_LastMile".equals(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType())) {
-			factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		// set travelTimeAggregator
+		if ("optimistic".equals(group.getTravelTimeAggregatorType())) {
+			calculator.setTravelTimeAggregator(new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeslice));
+		} else if ("experimental_LastMile".equals(group.getTravelTimeAggregatorType())) {
+			calculator.setTravelTimeAggregator(new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeslice));
 			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intendet please remove the travelTimeAggregator entry in the controler section in your config.xml!");
-		} else if (!"optimistic".equals(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType())) {
-			throw new RuntimeException(this.travelTimeCalcConfigGroup.getTravelTimeAggregatorType() + " is unknown!");
+		} else {
+			throw new RuntimeException(group.getTravelTimeAggregatorType() + " is unknown!");
 		}
-		calculator = new TravelTimeCalculator(network, this.travelTimeCalcConfigGroup.getTraveltimeBinSize(), 
-				endTime, factory, this.travelTimeCalcConfigGroup);
 		
-
 		return calculator;
 	}
 	

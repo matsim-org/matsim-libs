@@ -58,37 +58,46 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
+		Scenario scenario = new ScenarioImpl();
 
-		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-
-		doTravelTimeCalculatorTest(factory, 15*60, compareFile, false);
+		int endTime = 30*3600;
+		int binSize = 15*60;
+		int numSlots = (endTime / binSize) + 1;
+		
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots), 
+				new OptimisticTravelTimeAggregator(numSlots, binSize), binSize, compareFile, false);
 	}
 
 	public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-	
-		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+		Scenario scenario = new ScenarioImpl();
 		
-		doTravelTimeCalculatorTest(factory, 15*60, compareFile, false);
+		int endTime = 30*3600;
+		int binSize = 15*60;
+		int numSlots = (endTime / binSize) + 1;
+		
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()), 
+				new OptimisticTravelTimeAggregator(numSlots, binSize), binSize, compareFile, false);
 	}
 	
 	public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
-
-		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+		Scenario scenario = new ScenarioImpl();
 		
-		doTravelTimeCalculatorTest(factory, 1*60, compareFile, false);
+		int endTime = 12*3600;
+		int binSize = 1*60;
+		int numSlots = (endTime / binSize) + 1;
+		
+		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
+				new PessimisticTravelTimeAggregator(binSize, numSlots), binSize, compareFile, false);
 	}
 
-	private final void doTravelTimeCalculatorTest(final TravelTimeAggregatorFactory factory, final int timeBinSize,
+	private final void doTravelTimeCalculatorTest(final Scenario scenario, final TravelTimeDataFactory ttDataFactory, 
+			final AbstractTravelTimeAggregator aggregator, final int timeBinSize,
 			final String compareFile, final boolean generateNewData) throws IOException {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
 		String eventsFile = getClassInputDirectory() + "link10_events.txt";
 
-		Scenario scenario = new ScenarioImpl();
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
@@ -100,12 +109,13 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		
 		Events events2 = new Events();
 		
-		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, factory, scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, scenario.getConfig().travelTimeCalculator());
+		ttcalc.setTravelTimeAggregator(aggregator);
+		ttcalc.setTravelTimeDataFactory(ttDataFactory);
 		events2.addHandler(ttcalc);
 		for (BasicEvent e : eventsList){
 			events2.processEvent(e);
 		}
-		
 		
 		// read comparison data
 		BufferedReader infile = new BufferedReader(new FileReader(compareFile));
@@ -165,8 +175,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 
 		int timeBinSize = 15*60;
-		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, factory, scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
 		Person person = new PersonImpl(new IdImpl(1));
 		

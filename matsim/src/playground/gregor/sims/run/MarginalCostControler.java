@@ -21,9 +21,6 @@
 package playground.gregor.sims.run;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
-import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
 import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
 import playground.gregor.sims.socialcost.SocialCostCalculator;
@@ -42,9 +39,9 @@ public class MarginalCostControler extends EvacuationQSimControler{
 		super.setUp();
 		
 		
-		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+//		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+//		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+//		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		SocialCostCalculator sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize());
 		
 		this.events.addHandler(sc);

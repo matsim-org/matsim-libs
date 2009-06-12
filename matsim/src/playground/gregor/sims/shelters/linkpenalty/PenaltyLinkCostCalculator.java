@@ -2,14 +2,14 @@ package playground.gregor.sims.shelters.linkpenalty;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 
 public class PenaltyLinkCostCalculator implements TravelCost{
 
-	private final AbstractTravelTimeCalculator tc;
+	private final TravelTimeCalculator tc;
 	private final ShelterInputCounter sc;
-	public PenaltyLinkCostCalculator(AbstractTravelTimeCalculator tc, ShelterInputCounter sc) {
+	public PenaltyLinkCostCalculator(TravelTimeCalculator tc, ShelterInputCounter sc) {
 		this.tc = tc;
 		this.sc = sc;
 	}

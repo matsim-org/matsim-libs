@@ -21,15 +21,10 @@
 package playground.gregor.sims.run;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
-import org.matsim.core.trafficmonitoring.TravelTimeAggregatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 
-import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
 import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorIII;
 import playground.gregor.sims.socialcost.SocialCostCalculator;
 import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLink;
-import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLinkII;
 
 public class MarginalCostControlerMultiLink extends Controler{
 
@@ -44,9 +39,9 @@ public class MarginalCostControlerMultiLink extends Controler{
 		super.setUp();
 		
 		
-		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
-		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
-		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
+//		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
+//		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
+//		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		SocialCostCalculator sc = new SocialCostCalculatorMultiLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), this.travelTimeCalculator, this.population);
 		
 		this.events.addHandler(sc);

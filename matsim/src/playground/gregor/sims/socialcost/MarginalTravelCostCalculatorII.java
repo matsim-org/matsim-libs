@@ -22,7 +22,7 @@ package playground.gregor.sims.socialcost;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class MarginalTravelCostCalculatorII implements TravelCost {
 
@@ -30,9 +30,9 @@ public class MarginalTravelCostCalculatorII implements TravelCost {
 
 
 	private final SocialCostCalculator sc;
-	private final AbstractTravelTimeCalculator tc;
+	private final TravelTimeCalculator tc;
 
-	public MarginalTravelCostCalculatorII(final AbstractTravelTimeCalculator tc, final SocialCostCalculator sc) {
+	public MarginalTravelCostCalculatorII(final TravelTimeCalculator tc, final SocialCostCalculator sc) {
 		this.tc = tc;
 		this.sc = sc;
 	}

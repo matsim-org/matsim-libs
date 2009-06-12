@@ -26,13 +26,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.utils.misc.IntegerCache;
 
+/**
+ * Implementation of {@link TravelTimeData} that stores the travel time data in
+ * a HashMap. This has the advantage that no memory is used if no vehicle travels
+ * over a link, and thus no data is available to be stored. Especially useful with
+ * short time bins as there the probability to have empty time bins is higher.
+ *
+ * @author mrieser
+ * @author glaemmel
+ */
 public class TravelTimeDataHashMap implements TravelTimeData {
 	private final Map<Integer,TimeStruct> travelTimes;
 	
 	private final Link link;
 
-	public TravelTimeDataHashMap(final Link link, final int unused) {
-		// unused, must be there because of Prototype-Constructor
+	public TravelTimeDataHashMap(final Link link) {
 		this.travelTimes =  new ConcurrentHashMap<Integer,TimeStruct>();
 		this.link = link;
 		resetTravelTimes();
@@ -44,7 +52,7 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 
 	public void addTravelTime(final int timeSlice, final double traveltime) {
 		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
-		if (curr != null ){
+		if (curr != null) {
 			curr.cnt += 1;
 			curr.timeSum += traveltime;
 		} else {
@@ -55,17 +63,16 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 	public double getTravelTime(final int timeSlice, final double now) {
 
 		TimeStruct ts = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
-		if (ts == null){
-			return this.link.getLength() / this.link.getFreespeed(now);
+		if (ts == null) {
+			return this.link.getFreespeedTravelTime(now);
 		}
-
 		return ts.timeSum / ts.cnt;
 	}
 
 	private static class TimeStruct {
 		public double timeSum;
 		public int cnt;
-		public TimeStruct(final double timeSum, final int cnt){
+		public TimeStruct(final double timeSum, final int cnt) {
 			this.cnt = cnt;
 			this.timeSum = timeSum;
 		}

@@ -100,7 +100,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
@@ -155,7 +155,7 @@ public class Controler {
 	private Counts counts = null;
 	private final NetworkFactory networkFactory = new NetworkFactory(this.network);
 
-	protected AbstractTravelTimeCalculator travelTimeCalculator = null;
+	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
@@ -455,9 +455,8 @@ public class Controler {
 	 * scenario data (network, population) is read.
 	 */
 	protected void setUp() {
-		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.travelTimeCalculator()).createTravelTimeCalculator(this.network, (int)endTime);
+			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		if (this.travelCostCalculator == null) {
 			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());

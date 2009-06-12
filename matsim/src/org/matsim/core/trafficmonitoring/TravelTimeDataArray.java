@@ -22,6 +22,13 @@ package org.matsim.core.trafficmonitoring;
 
 import org.matsim.core.api.network.Link;
 
+/**
+ * Implementation of {@link TravelTimeData} that stores the data per time bin
+ * in simple arrays. Useful if not too many empty time bins (time bins with 
+ * no traffic on a link) exist, so no memory is wasted.
+ *
+ * @author mrieser
+ */
 public class TravelTimeDataArray implements TravelTimeData {
 	private final double[] timeSum;
 	private final int[] timeCnt;
@@ -36,9 +43,6 @@ public class TravelTimeDataArray implements TravelTimeData {
 		resetTravelTimes();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.trafficmonitoring.TravelTimeData#resetTravelTimes()
-	 */
 	public void resetTravelTimes() {
 		for (int i = 0; i < this.timeSum.length; i++) {
 			this.timeSum[i] = 0.0;
@@ -47,9 +51,6 @@ public class TravelTimeDataArray implements TravelTimeData {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.trafficmonitoring.TravelTimeData#addTravelTime(double, double)
-	 */
 	public void addTravelTime(final int timeSlot, final double traveltime) {
 		double sum = this.timeSum[timeSlot];
 		int cnt = this.timeCnt[timeSlot];
@@ -60,9 +61,6 @@ public class TravelTimeDataArray implements TravelTimeData {
 		this.travelTimes[timeSlot] = -1.0; // initialize with negative value
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.trafficmonitoring.TravelTimeData#getTravelTime(double)
-	 */
 	public double getTravelTime(final int timeSlot, final double now) {
 		double ttime = this.travelTimes[timeSlot];
 		if (ttime >= 0.0) return ttime; // negative values are invalid.

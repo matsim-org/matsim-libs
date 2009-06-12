@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 
 import playground.gregor.sims.run.MarginalCostControlerMultiLink;
@@ -36,7 +36,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	
 	private final NetworkLayer network;
 	private final int binSize;
-	private final AbstractTravelTimeCalculator travelTimeCalculator;
+	private final TravelTimeCalculator travelTimeCalculator;
 	private final Population population;
 	
 	private Integer maxK;
@@ -51,7 +51,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 
 	private final static int MSA_OFFSET = 0;
 	
-	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize,AbstractTravelTimeCalculator travelTimeCalculator, Population population) {
+	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population) {
 		this.network = network;
 		this.binSize = binSize;
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed
