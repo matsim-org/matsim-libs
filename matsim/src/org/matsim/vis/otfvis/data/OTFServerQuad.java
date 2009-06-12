@@ -30,7 +30,6 @@ import java.util.List;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
@@ -96,8 +95,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 			if(src instanceof QueueLink) {
 				QueueLink link = q.getLinks().get(((QueueLink) src).getLink().getId());
 				writer.setSrc(link);
-			} else if(src instanceof QueueNode) {
-				
+//			} else if(src instanceof QueueNode) {
+//				
 			}
 		}
 	}
