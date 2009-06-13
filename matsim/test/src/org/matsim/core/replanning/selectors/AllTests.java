@@ -31,6 +31,7 @@ public class AllTests {
 		suite.addTestSuite(BestPlanSelectorTest.class);
 		suite.addTestSuite(ExpBetaPlanChangerTest.class);
 		suite.addTestSuite(ExpBetaPlanSelectorTest.class);
+		suite.addTestSuite(ExpBetaPlanForRemovalSelectorTest.class);
 		suite.addTestSuite(KeepSelectedTest.class);
 		suite.addTestSuite(PathSizeLogitSelectorTest.class); 
 		suite.addTestSuite(RandomPlanSelectorTest.class);

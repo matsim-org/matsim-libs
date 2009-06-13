@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,110 +20,28 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * Selects one of the existing plans of the person based on the
- * weight = exp(beta*score).
+ * weight = exp(beta * 1/f * (score/maxScore)).
+ * 
+ * TODO does not seem to be for removal in my opinion! marcel/13jun2009
+ * I would expect plans with lower score to be removed more frequently,
+ * but this selector chooses plans with higher scores more frequently! 
  *
  * @author anhorni
- * 
- * TODO: Merge with ExpBetaPlanSelector. Not courageous enough to refactor ExpBetaPlanSelector at the moment.
  */
-public class ExpBetaPlanForRemovalSelector implements PlanSelector {
+public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector {
 
-	private static final double MIN_WEIGHT = Double.MIN_VALUE;
-	protected final double beta;
-
-	public ExpBetaPlanForRemovalSelector() {
-		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
-	}
-
-	/**
-	 * @return Returns a random plan from the person, random but according to its weight.
-	 */
-	public Plan selectPlan(final Person person) {
-
-		// Build the weights of all plans
-		// - first find the max. score of all plans of this person
-		double maxScore = Double.NEGATIVE_INFINITY;
-		for (Plan plan : person.getPlans()) {
-			if ((plan.getScore() != null) && (plan.getScore().doubleValue() > maxScore)) {
-				maxScore = plan.getScore().doubleValue();
-			}
-		}
-
-		// - now calculate the weights
-		double[] weights = new double[person.getPlans().size()];
-		double sumWeights = 0.0;
-
-		int idx = 0;
-		for (Plan plan : person.getPlans()) {
-			weights[idx] = calcPlanWeight(plan, maxScore);
-			sumWeights += weights[idx];
-			idx++;
-		}
-
-		// choose a random number over interval [0,sumWeights[
-		double selnum = sumWeights*MatsimRandom.getRandom().nextDouble();
-		idx = 0;
-		for (Plan plan : person.getPlans()) {
-			selnum -= weights[idx];
-			if (selnum <= 0.0) {
-				return plan;
-			}
-			idx++;
-		}
-
-		// hmm, no plan returned... either the person has no plans, or the plan(s) have no score.
-		if (person.getPlans().size() > 0) {
-			return person.getPlans().get(0);
-		}
-
-		// this case should never happen, except a person has no plans at all.
-		return null;
-	}
-
-	/**
-	 * Calculates the weight of a single plan
-	 *
-	 * @param plan
-	 * @param maxScore
-	 * @return the weight of the plan
-	 */
-	private double calcPlanWeight(final Plan plan, final double maxScore) {
+	private static final double f = 1.0 / 5.0;
+	
+	protected double calcPlanWeight(final Plan plan, final double maxScore) {
 		if (plan.getScore() == null) {
 			return Double.NaN;
 		}
-		//ExpBetaPlanSelector : double weight = Math.exp(this.beta * (plan.getScore() - maxScore));
-		double f = 1.0 / 5.0;
 		double weight = Math.exp(this.beta * (plan.getScore() / (f * maxScore)));
 		if (weight < MIN_WEIGHT) weight = MIN_WEIGHT;
 		return weight;
 	}
 }
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
