@@ -26,8 +26,6 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * Tests for {@link ExpBetaPlanSelector}.
@@ -36,7 +34,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
-	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
+	private final static Logger log = Logger.getLogger(ExpBetaPlanSelectorTest.class);
 	private Config config = null;
 
 	@Override
