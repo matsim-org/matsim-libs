@@ -10,6 +10,7 @@ import java.awt.Font;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
@@ -20,7 +21,6 @@ import com.sun.opengl.util.texture.TextureCoords;
 
 public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 
-	
 	private TextRenderer textRenderer = null;
 	double[] modelview = new double[16];
 	double[] projection = new double[16];
@@ -33,30 +33,22 @@ public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 	private final String sb;
 
 	public OTFScaleBarDrawer() {
-		this("./res/sb_background.png","./res/scalebar.png");
-	}
-
-	public OTFScaleBarDrawer(String picturePath, String sb) {
-		this.bg = picturePath;
-		this.sb = sb;
+		this.bg = "sb_background.png";
+		this.sb = "scalebar.png";
 		initTextRenderer();
 	}
 
-	
 	private void initTextRenderer() {
 		// Create the text renderer
-		Font font = new Font("SansSerif", Font.PLAIN, 32);
+		Font font = new Font("SansSerif", Font.PLAIN, 30);
 		this.textRenderer = new TextRenderer(font, true, false);
 		InfoText.setRenderer(this.textRenderer);
 	}
 	
 	public void onDraw(GL gl) {
-
-		
-	
 		if (this.back == null){
-			this.back = OTFOGLDrawer.createTexture(this.bg);
-			this.sc = OTFOGLDrawer.createTexture(this.sb);
+			this.back = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream(this.bg));
+			this.sc = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream(this.sb));
 		}
 		
 		updateMatrices(gl);
@@ -88,11 +80,8 @@ public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 
 		gl.glDisable(GL.GL_BLEND);
 
-
 		this.sc.enable();
 		this.sc.bind();
-		
-
 		
 		gl.glColor4f(1,1,1,1);
 		
@@ -104,22 +93,17 @@ public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 		gl.glEnd();
 		this.sc.disable();
 		
-		Font font = new Font("SansSerif", Font.PLAIN, 32);
-		this.textRenderer = new TextRenderer(font, true, false);
-		
-			
-		
-        this.textRenderer.begin3DRendering();
+		this.textRenderer.begin3DRendering();
 		float c = 0.f;
 		String text = ""+(int)fl[10];
 		float width = (float) this.textRenderer.getBounds(text).getWidth() * fl[8];
 		// Render the text
 		this.textRenderer.setColor(c, c, c, 1.f);
-        this.textRenderer.draw3D(text, fl[2] - width/2.f,fl[9],1.1f,fl[8]);
-        
-        this.textRenderer.draw3D("METERS", fl[2] + width2/4.f,fl[3],1.1f,fl[8]);
-        this.textRenderer.end3DRendering();
-		
+		this.textRenderer.draw3D(text, fl[2] - width/2.f,fl[9],1.1f,fl[8]);
+
+		this.textRenderer.draw3D("METERS", fl[2] + width2/4.f,fl[3],1.1f,fl[8]);
+		this.textRenderer.end3DRendering();
+
 	}
 	
 	private float [] getKoords() {
@@ -204,8 +188,7 @@ public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 		gl.glGetIntegerv( GL_VIEWPORT, this.viewport,0 );
 	}
 
-	private float [] getOGLPos(int x, int y)
-	{
+	private float [] getOGLPos(int x, int y) {
 		
 		
 		double[] obj_pos = new double[3];
@@ -220,7 +203,7 @@ public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 		z_pos[0]=1;
 
 		GLU glu = new GLU();
-		obj_pos[2]=0; // Check view relative z-koord of layer zero == visnet layer
+		obj_pos[2]=0; // Check view relative z-coord of layer zero == visnet layer
 		glu.gluProject( obj_pos[0], obj_pos[1],obj_pos[2], this.modelview,0, this.projection,0, this.viewport,0, w_pos,0);
 		glu.gluUnProject( winX, winY, w_pos[2], this.modelview,0, this.projection,0, this.viewport,0, obj_pos,0);
 
