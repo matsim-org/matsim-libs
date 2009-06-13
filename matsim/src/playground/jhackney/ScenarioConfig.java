@@ -26,29 +26,20 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.counts.Counts;
-import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.MatricesWriter;
-import org.matsim.matrices.MatsimMatricesReader;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.WorldWriter;
 
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 
@@ -212,12 +203,12 @@ public abstract class ScenarioConfig {
 		return counts;
 	}
 
-	public static final Matrices readMatrices() {
-		System.out.println("  reading matrices xml file... ");
-		new MatsimMatricesReader(Matrices.getSingleton(), world).readFile(config.matrices().getInputFile());
-		System.out.println("  done.");
-		return Matrices.getSingleton();
-	}
+//	public static final Matrices readMatrices() {
+//		System.out.println("  reading matrices xml file... ");
+//		new MatsimMatricesReader(Matrices.getSingleton(), world).readFile(config.matrices().getInputFile());
+//		System.out.println("  done.");
+//		return Matrices.getSingleton();
+//	}
 
 //	public static final Population readPlans() {
 //		System.out.println("  reading plans xml file... ");
@@ -287,48 +278,48 @@ public abstract class ScenarioConfig {
 	//////////////////////////////////////////////////////////////////////
 	// write output
 	//////////////////////////////////////////////////////////////////////
-
-	public static final void writePlans(final Population plans) {
-		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans).write();
-		System.out.println("  done.");
-	}
-
-	public static final void writeMatrices(final Matrices matrices) {
-		System.out.println("  writing matrices xml file... ");
-		new MatricesWriter(matrices).write();
-		System.out.println("  done.");
-	}
-
-	public static final void writeCounts(final Counts counts) {
-		System.out.println("  writing counts xml file... ");
-		new CountsWriter(counts).write();
-		System.out.println("  done.");
-	}
-
-	public static final void writeNetwork(final NetworkLayer network) {
-		System.out.println("  writing network xml file... ");
-		new NetworkWriter(network).write();
-		System.out.println("  done.");
-	}
-
-	public static final void writeFacilities(final ActivityFacilities facilities) {
-		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write();
-		System.out.println("  done.");
-	}
-
-	public static final void writeWorld(final World world) {
-		System.out.println("  writing world xml file... ");
-		new WorldWriter(world).write();
-		System.out.println("  done.");
-	}
-
-	public static final void writeConfig() {
-		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).write();
-		System.out.println("  done.");
-	}
+//
+//	public static final void writePlans(final Population plans) {
+//		System.out.println("  writing plans xml file... ");
+//		new PopulationWriter(plans).write();
+//		System.out.println("  done.");
+//	}
+//
+//	public static final void writeMatrices(final Matrices matrices) {
+//		System.out.println("  writing matrices xml file... ");
+//		new MatricesWriter(matrices).write();
+//		System.out.println("  done.");
+//	}
+//
+//	public static final void writeCounts(final Counts counts) {
+//		System.out.println("  writing counts xml file... ");
+//		new CountsWriter(counts).write();
+//		System.out.println("  done.");
+//	}
+//
+//	public static final void writeNetwork(final NetworkLayer network) {
+//		System.out.println("  writing network xml file... ");
+//		new NetworkWriter(network).write();
+//		System.out.println("  done.");
+//	}
+//
+//	public static final void writeFacilities(final ActivityFacilities facilities) {
+//		System.out.println("  writing facilities xml file... ");
+//		new FacilitiesWriter(facilities).write();
+//		System.out.println("  done.");
+//	}
+//
+//	public static final void writeWorld(final World world) {
+//		System.out.println("  writing world xml file... ");
+//		new WorldWriter(world).write();
+//		System.out.println("  done.");
+//	}
+//
+//	public static final void writeConfig() {
+//		System.out.println("  writing config xml file... ");
+//		new ConfigWriter(config).write();
+//		System.out.println("  done.");
+//	}
 	public static Config getConfig(){
 		return config;
 	}

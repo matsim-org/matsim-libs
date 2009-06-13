@@ -103,9 +103,9 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeMatrices() {
+	public static final void writeMatrices(final Matrices matrices) {
 		System.out.println("  writing matrices xml file... ");
-		MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
+		MatricesWriter matrices_writer = new MatricesWriter(matrices);
 		matrices_writer.write();
 		System.out.println("  done.");
 	}

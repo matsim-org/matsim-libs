@@ -25,11 +25,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
 /**
@@ -38,26 +37,20 @@ import org.matsim.world.Location;
  */
 public class VisumMatrixReader {
 
-	/*default*/ Layer layer = null;
-	private String id = null;
+	private Matrix matrix = null;
 
 	/*default*/ static final Logger log = Logger.getLogger(VisumMatrixReader.class);
 
-	private final ArrayList<String> knownMissingLocations = new ArrayList<String>();
-
-	public VisumMatrixReader(final String id, final Layer layer) {
-		this.id = id;
-		this.layer = layer;
+	public VisumMatrixReader(final Matrix matrix) {
+		this.matrix = matrix;
 	}
 
 	public Matrix readFile(final String filename) {
-		Matrix matrix = null;
-		matrix = Matrices.getSingleton().createMatrix(this.id, this.layer, "");
 		BufferedReader infile = null;
 		try {
 			infile = IOUtils.getBufferedReader(filename);
 
-			matrix.setDesc(filename);
+			this.matrix.setDesc(filename);
 
 			infile.mark(1024);
 			String header = infile.readLine();
@@ -65,9 +58,9 @@ public class VisumMatrixReader {
 
 			if (header != null) {
 				if (header.equals("$VN;Y5")) {
-					new DenseMatrixReader(this.layer).read(infile, matrix);
+					new DenseMatrixReader(this.matrix).read(infile);
 				} else if (header.startsWith("$O")) {
-					new SparseMatrixReader().read(infile, matrix);
+					new SparseMatrixReader(this.matrix).read(infile);
 				} else {
 					Gbl.errorMsg("Visum file format '" + header +"' is not supported.");
 				}
@@ -96,21 +89,19 @@ public class VisumMatrixReader {
 		private final static int STATE_DATA = 3;
 		private final static int STATE_GARBAGE = 4;
 
-		private final Layer layer;
 		private int state = STATE_HEADER;
 		private String zoneNames[] = null;
 		private int zoneCounter = 0;
 		private int lineCounter = 0;
 		private int nofZones = 0;
-		private Matrix matrix = null;
+		private final Matrix matrix;
 
-		public DenseMatrixReader(final Layer layer) {
-			this.layer = layer;
+		public DenseMatrixReader(final Matrix matrix) {
+			this.matrix = matrix;
 		}
 
-		public void read(final BufferedReader in, final Matrix matrix) throws IOException {
+		public void read(final BufferedReader in) throws IOException {
 			String line = null;
-			this.matrix = matrix;
 			while ( (line = in.readLine()) != null) {
 				this.lineCounter++;
 				if (!line.startsWith("*")) {
@@ -129,8 +120,8 @@ public class VisumMatrixReader {
 					" in line " + this.lineCounter + ".");
 				}
 				for (int i = 0; i < this.nofZones; i++) {
-					this.matrix.setEntry(this.layer.getLocation(this.zoneNames[this.zoneCounter]),
-							this.layer.getLocation(this.zoneNames[i]), Double.parseDouble(data[i]));
+					this.matrix.setEntry(this.matrix.getLayer().getLocations().get(new IdImpl(this.zoneNames[this.zoneCounter])),
+							this.matrix.getLayer().getLocations().get(new IdImpl(this.zoneNames[i])), Double.parseDouble(data[i]));
 				}
 				this.zoneCounter++;
 				if (this.zoneCounter == this.nofZones) {
@@ -166,7 +157,7 @@ public class VisumMatrixReader {
 
 	}
 
-	/*default*/ class SparseMatrixReader {
+	/*default*/ static class SparseMatrixReader {
 		/* I call the format, where each entry of the matrix is written on its
 		 * own line together with a from- and to-cell-id, a "sparse matrix" format,
 		 * as it is most effective for storing sparse matrices.   */
@@ -178,11 +169,16 @@ public class VisumMatrixReader {
 
 		private int state = STATE_HEADER;
 		private int lineCounter = 0;
-		private Matrix matrix = null;
+		private final Matrix matrix;
 
-		public void read(final BufferedReader in, final Matrix matrix) throws IOException {
-			String line = null;
+		private final ArrayList<String> knownMissingLocations = new ArrayList<String>();
+
+		public SparseMatrixReader(final Matrix matrix) {
 			this.matrix = matrix;
+		}
+		
+		public void read(final BufferedReader in) throws IOException {
+			String line = null;
 			while ( (line = in.readLine()) != null) {
 				this.lineCounter++;
 				if (!line.startsWith("*")) {
@@ -202,8 +198,8 @@ public class VisumMatrixReader {
 					);
 				}
 
-				Location from = VisumMatrixReader.this.layer.getLocation(data[0]);
-				Location to = VisumMatrixReader.this.layer.getLocation(data[1]);
+				Location from = this.matrix.getLayer().getLocations().get(new IdImpl(data[0]));
+				Location to = this.matrix.getLayer().getLocations().get(new IdImpl(data[1]));
 
 				if (from == null) {
 					warnMissingLocation(data[0]);
@@ -239,13 +235,12 @@ public class VisumMatrixReader {
 				Gbl.errorMsg("unknown internal state: " + this.state);
 			}
 		}
-
-	}
-
-	/*default*/ void warnMissingLocation(final String locName) {
-		if (!this.knownMissingLocations.contains(locName)) {
-			this.knownMissingLocations.add(locName);
-			log.warn("Location " + locName + " does not exist in world.");
+		
+		private void warnMissingLocation(final String locName) {
+			if (!this.knownMissingLocations.contains(locName)) {
+				this.knownMissingLocations.add(locName);
+				log.warn("Location " + locName + " does not exist in world.");
+			}
 		}
 	}
 

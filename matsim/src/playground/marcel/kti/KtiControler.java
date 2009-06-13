@@ -61,6 +61,7 @@ public class KtiControler extends Controler {
 	private PreProcessLandmarks commonRoutingData = null;
 	private Matrix ptTravelTimes = null;
 	private SwissHaltestellen haltestellen = null;
+	private final Matrices matrices = new Matrices();
 	
 	public KtiControler(String[] args) {
 		super(args);
@@ -71,9 +72,8 @@ public class KtiControler extends Controler {
 		super.setUp();
 		
 		// read additional data for the special pt-router
-		VisumMatrixReader reader = new VisumMatrixReader("pt_traveltime", getWorld().getLayer("municipality"));
-		reader.readFile(this.config.getModule("kti").getValue("pt_traveltime_matrix"));
-		this.ptTravelTimes = Matrices.getSingleton().getMatrix("pt_traveltime");
+		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", getWorld().getLayer("municipality"), null);
+		new VisumMatrixReader(this.ptTravelTimes).readFile(this.config.getModule("kti").getValue("pt_traveltime_matrix"));
 		this.haltestellen = new SwissHaltestellen(getNetwork());
 		try {
 			haltestellen.readFile(this.config.getModule("kti").getValue("pt_haltestellen"));

@@ -60,7 +60,8 @@ public class ScenarioCreation {
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), world);
+		Matrices matrices = new Matrices();
+		MatsimMatricesReader reader = new MatsimMatricesReader(matrices, world);
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 
@@ -73,13 +74,13 @@ public class ScenarioCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running matrices modules... ");
-		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)world.getLayer("municipality")).run(Matrices.getSingleton());
+		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)world.getLayer("municipality")).run(matrices);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing matrices xml file... ");
-		MatricesWriter mat_writer = new MatricesWriter(Matrices.getSingleton());
+		MatricesWriter mat_writer = new MatricesWriter(matrices);
 		mat_writer.write();
 		System.out.println("  done.");
 

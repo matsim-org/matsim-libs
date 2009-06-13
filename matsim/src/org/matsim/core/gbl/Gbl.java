@@ -34,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.matrices.Matrices;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
@@ -152,7 +151,6 @@ public abstract class Gbl {
 		log.info("Gbl.reset() -- reset config, world");
 		Gbl.config = null;
 		Gbl.world = null;
-		Matrices.reset();
 		MatsimRandom.reset();
 		SimulationTimer.reset();
 	}

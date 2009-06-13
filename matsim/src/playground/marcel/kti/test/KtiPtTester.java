@@ -58,10 +58,11 @@ public class KtiPtTester {
 
 	@SuppressWarnings("deprecation")
 	public void readPtTimeMatrix(final String filename) {
+		Matrices matrices = new Matrices();
+		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", ((ScenarioImpl)this.data).getWorld().getLayer("municipality"), null);
 		System.out.println("  reading visum matrix file... ");
-		VisumMatrixReader reader = new VisumMatrixReader("pt_traveltime", ((ScenarioImpl)this.data).getWorld().getLayer("municipality"));
+		VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
 		reader.readFile(filename);
-		this.ptTravelTimes = Matrices.getSingleton().getMatrix("pt_traveltime");
 		System.out.println("  done.");
 	}
 
