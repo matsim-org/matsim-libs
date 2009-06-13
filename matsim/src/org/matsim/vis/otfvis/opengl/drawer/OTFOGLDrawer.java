@@ -1026,7 +1026,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		} catch (IOException e) {
-			log.error("Error loading Texture from stream", e);
+			log.error("Error loading Texture from stream.", e);
+		}
+		try {
+			data.close();
+		} catch (IOException e) {
+			log.warn("Exception when closing resource.", e);
 		}
 		return t;
 	}
