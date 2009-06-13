@@ -24,23 +24,39 @@ import org.matsim.core.api.population.Plan;
 
 /**
  * Selects one of the existing plans of the person based on the
- * weight = exp(beta * 1/f * (score/maxScore)).
+ * weight = exp(beta * ((maxScore - score)/maxScore)).
  * 
  * TODO does not seem to be for removal in my opinion! marcel/13jun2009
  * I would expect plans with lower score to be removed more frequently,
- * but this selector chooses plans with higher scores more frequently! 
+ * but this selector chooses plans with higher scores more frequently!
+ * 
+ *  Thanks! Have tentatively changed the weight. Need to think about that again, after some sleep.
+ *  anhorni/13jun2009
  *
  * @author anhorni
  */
 public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector {
-
-	private static final double f = 1.0 / 5.0;
 	
 	protected double calcPlanWeight(final Plan plan, final double maxScore) {
+		
 		if (plan.getScore() == null) {
 			return Double.NaN;
 		}
-		double weight = Math.exp(this.beta * (plan.getScore() / (f * maxScore)));
+		
+		/*
+		 * TODO:
+		 * if maxScore == 0 all scores are maybe negative
+		 * -> need minScore for scaling
+		 * for the moment: do not do scaling in this case while hoping to not face an overflow
+		 */	
+		double scaling = maxScore;
+		if (maxScore == 0) scaling = 1.0;
+		
+		/*
+		 * TODO: Check that again
+		 * (interval [min..max] etc.)
+		 */
+		double weight = Math.exp(this.beta * ((maxScore - plan.getScore()) / scaling));
 		if (weight < MIN_WEIGHT) weight = MIN_WEIGHT;
 		return weight;
 	}
