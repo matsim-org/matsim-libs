@@ -22,12 +22,14 @@ package playground.anhorni.locationchoice.cs.choicesetextractors;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -133,13 +135,13 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		 */
 		double totalTravelDist = 0.0;
 		
-		Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
+		Iterator<Id> routeLinkBefore_it = ((NetworkRoute) legBefore.getRoute()).getLinkIds().iterator();
 		while (routeLinkBefore_it.hasNext()) {		
 			Id lId = routeLinkBefore_it.next();
 			totalTravelDist += network.getLink(lId).getLength();
 		}
 		
-		Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
+		Iterator<Id> routeLinkAfter_it = ((NetworkRoute) legAfter.getRoute()).getLinkIds().iterator();
 		while (routeLinkAfter_it.hasNext()) {		
 			Id lId = routeLinkAfter_it.next();
 			totalTravelDist += network.getLink(lId).getLength();

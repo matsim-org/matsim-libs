@@ -70,14 +70,12 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		CarRouteMock(Link startLink, Link endLink){
 			super(startLink, endLink);
 		}
-		
 	}
 
 	/*package*/ static class PtRouteMock extends AbstractRoute {
 		PtRouteMock(Link startLink, Link endLink){
 			super(startLink, endLink);
 		}
-		
 	}
 	
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {

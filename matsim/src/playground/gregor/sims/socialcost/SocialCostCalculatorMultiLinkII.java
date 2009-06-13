@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -89,7 +90,7 @@ public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, Qu
 				continue;
 			}
 			Plan plan = pers.getSelectedPlan();
-			List<Id> links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkIds();
+			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			traceAgentsRoute(links,pers.getId());
 			
 		}

@@ -105,8 +105,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		this.modCount++;
 		super.setStartLink(link);
 	}
-	
-	@Override
+
 	public List<Id> getLinkIds() {
 		List<Link> links = getLinks();
 		List<Id> ids = new ArrayList<Id>(links.size());

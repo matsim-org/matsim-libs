@@ -39,6 +39,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -173,8 +174,8 @@ public class Getagentcoords {
 
 
 				boolean found = false; 
-				if (leg.getRoute() != null) if (leg.getRoute().getLinkIds() != null)
-				for (Id id : leg.getRoute().getLinkIds()) {			      
+				if (leg.getRoute() != null) if (leg.getRoute() instanceof NetworkRoute) if (((NetworkRoute) leg.getRoute()).getLinkIds() != null)
+				for (Id id : ((NetworkRoute) leg.getRoute()).getLinkIds()) {			      
 					if (evaclinks.containsKey(id)) {
 						found = true;
 						//System.out.println("Juhu " + id);

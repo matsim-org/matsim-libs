@@ -131,7 +131,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		for(Person p : event.getControler().getPopulation().getPersons().values()) {
 			for(Plan plan : p.getPlans()) {
 				Leg leg = (Leg) plan.getPlanElements().get(1);
-				if(leg.getRoute().getLinkIds().contains(id)) {
+				if(((NetworkRoute) leg.getRoute()).getLinkIds().contains(id)) {
 					riskyPlans.add(plan);
 				} else {
 					safePlans.add(plan);

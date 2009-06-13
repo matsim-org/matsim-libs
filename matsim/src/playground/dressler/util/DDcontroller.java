@@ -26,10 +26,10 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -92,7 +92,7 @@ public class DDcontroller {
 					System.out.println("Person " + person.getId() + " has no leg.");
 					continue;
 				}
-				Route route = leg.getRoute();
+				NetworkRoute route = (NetworkRoute) leg.getRoute();
 				if (route == null) {
 					System.out.println("Person " + person.getId() + " has no route.");
 					continue;

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -91,7 +92,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				continue;
 			}
 			Plan plan = pers.getSelectedPlan();
-			List<Id> links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkIds();
+			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			traceAgentsRoute(links,pers.getId());
 			
 		}
@@ -165,7 +166,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				continue;
 			}
 			Plan plan = pers.getSelectedPlan();
-			List<Id> links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkIds();
+			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			double cost = 0;
 			for (Id id : links) {
 				LinkInfo li = this.linkInfos.get(id);

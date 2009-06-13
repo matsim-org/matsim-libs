@@ -40,6 +40,7 @@ import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
@@ -143,7 +144,7 @@ public class Controller extends Controler {
 					double tt = 0;
 					Leg leg = (Leg)plan.getPlanElements().get(1);
 					Route route = leg.getRoute();
-					for(Id id : route.getLinkIds()) {
+					for(Id id : ((NetworkRoute) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
 							
 							tt = observer.avr_route1TTs;

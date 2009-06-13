@@ -25,6 +25,7 @@ package playground.johannes.itsc08;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -47,7 +48,7 @@ public class ForceSelectPlan implements PlanSelector {
 		Plan plan = null;
 		for(Plan p : person.getPlans()) {
 			Leg leg = (Leg) p.getPlanElements().get(1);
-			if(leg.getRoute().getLinkIds().contains(link.getId())) {
+			if(((NetworkRoute) leg.getRoute()).getLinkIds().contains(link.getId())) {
 				plan = p;
 				break;
 			}

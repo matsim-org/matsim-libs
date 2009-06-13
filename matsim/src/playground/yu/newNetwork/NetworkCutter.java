@@ -33,6 +33,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -112,8 +113,8 @@ public class NetworkCutter {
 						resetBoundary(((Activity) pe).getCoord());
 					else {
 						Route route = ((Leg) pe).getRoute();
-						if (route != null)
-							resetBoundary(route, net);
+						if (route != null && (route instanceof NetworkRoute))
+							resetBoundary((NetworkRoute) route, net);
 					}
 		Set<Link> links = new HashSet<Link>();
 		links.addAll(net.getLinks().values());
@@ -140,7 +141,7 @@ public class NetworkCutter {
 				&& y <= maxY + 1000;
 	}
 
-	private void resetBoundary(Route route, NetworkLayer net) {
+	private void resetBoundary(NetworkRoute route, NetworkLayer net) {
 		for (Id linkId : route.getLinkIds()) {
 			resetBoundary(net.getLink(linkId));
 		}

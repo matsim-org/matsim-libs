@@ -70,10 +70,6 @@ public class BasicRouteImpl implements BasicRoute {
 	public void setLinkIds(List<Id> linkids) {
 		this.linkIds = linkids;
 	}
-	
-	public List<Id> getLinkIds() {
-		return this.linkIds;
-	}
 
 	public Id getStartLinkId() {
 		return this.startLinkId;

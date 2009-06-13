@@ -30,6 +30,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.controler.Controler;
@@ -155,7 +156,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
 				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
 			}*/
-			List<Id> l = ((Leg)(basePlan.getPlanElements().get(i))).getRoute().getLinkIds(); // to be checked whether this works
+			List<Id> l = ((NetworkRoute) ((Leg)(basePlan.getPlanElements().get(i))).getRoute()).getLinkIds(); // to be checked whether this works
 			r.setLinkIds(l);
 			routes.add(r);
 		}

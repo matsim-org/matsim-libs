@@ -73,7 +73,6 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 		this.route.trimToSize();
 	}
 
-	@Override
 	public List<Id> getLinkIds() {
 		ArrayList<Id> ids = new ArrayList<Id>(this.route.size());
 		for (Link link : this.route) {

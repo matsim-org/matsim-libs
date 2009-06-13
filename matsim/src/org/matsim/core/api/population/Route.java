@@ -20,9 +20,6 @@
 
 package org.matsim.core.api.population;
 
-import java.util.List;
-
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.network.Link;
 
@@ -41,8 +38,5 @@ public interface Route extends BasicRoute {
 
 	public Link getEndLink();
 	public void setEndLink(final Link link);
-
-	@Deprecated
-	public List<Id> getLinkIds();
 	
 }

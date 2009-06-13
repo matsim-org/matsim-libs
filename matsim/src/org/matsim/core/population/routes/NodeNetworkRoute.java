@@ -128,7 +128,6 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 		return this.cost;
 	}
 
-	@Override
 	public List<Id> getLinkIds() {
 		List<Id> ret = new ArrayList<Id>(Math.max(0, this.route.size() - 1));
 		for (Link l : getLinks()) {
