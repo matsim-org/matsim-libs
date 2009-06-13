@@ -1099,9 +1099,11 @@ public class Controler {
 	 * to a file in the output-directory
 	 */	
 	public final String getNameForOutputFilename(String filename){
-		StringBuffer s = new StringBuffer(outputPath + "/");
+		StringBuilder s = new StringBuilder(outputPath);
+		s.append('/');
 		if (this.config.controler().getRunId() != null){
-			s.append(this.config.controler().getRunId() + ".");
+			s.append(this.config.controler().getRunId());
+			s.append('.');
 		}
 		s.append(filename);
 		return s.toString();
