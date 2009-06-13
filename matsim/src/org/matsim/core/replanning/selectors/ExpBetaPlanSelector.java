@@ -33,8 +33,8 @@ import org.matsim.core.gbl.MatsimRandom;
  */
 public class ExpBetaPlanSelector implements PlanSelector {
 
-	private static double MIN_WEIGHT = Double.MIN_VALUE;
-	private final double beta;
+	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
+	protected final double beta;
 
 	public ExpBetaPlanSelector() {
 		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
@@ -92,7 +92,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @param maxScore
 	 * @return the weight of the plan
 	 */
-	private double calcPlanWeight(final Plan plan, final double maxScore) {
+	protected double calcPlanWeight(final Plan plan, final double maxScore) {
 		if (plan.getScore() == null) {
 			return Double.NaN;
 		}
