@@ -65,10 +65,10 @@ public class RiskCostFromFloodingData implements RiskCostCalculator {
 		this.lis = classifyLinks(nis);
 		log.info("done");
 
-		log.info("creating shape files.");
-		new NodeCostShapeCreator(this.lis, MGC
-				.getCRS(TransformationFactory.WGS84_UTM47S));
-		log.info("done");
+//		log.info("creating shape files.");
+//		new NodeCostShapeCreator(this.lis, MGC
+//				.getCRS(TransformationFactory.WGS84_UTM47S));
+//		log.info("done");
 	}
 
 	private Map<Node, NodeInfo> classifyNodesII() {
