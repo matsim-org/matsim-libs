@@ -75,6 +75,7 @@ public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 		return leg;
 	}
 
+	/** @deprecated setting the linkIds is not supported. */
 	public BasicRoute createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
 		BasicRouteImpl route = new BasicRouteImpl(startLinkId, endLinkId);
 		if (!currentRouteLinkIds.isEmpty()) {

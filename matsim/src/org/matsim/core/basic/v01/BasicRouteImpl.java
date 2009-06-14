@@ -22,17 +22,18 @@ package org.matsim.core.basic.v01;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.utils.misc.Time;
 
 public class BasicRouteImpl implements BasicRoute {
+
+	private final static Logger log = Logger.getLogger(BasicRouteImpl.class);
 	
 	private double dist = Double.NaN;
 
 	private double travTime = Time.UNDEFINED_TIME;
-
-	private List<Id> linkIds = null;
 	
 	private Id startLinkId = null;
 	private Id endLinkId = null;
@@ -67,8 +68,9 @@ public class BasicRouteImpl implements BasicRoute {
 		this.travTime = travTime;
 	}
 
+	@Deprecated
 	public void setLinkIds(List<Id> linkids) {
-		this.linkIds = linkids;
+		log.error("BasicRouteImpl.setLinkIds() is deprecated and has no effect on the route!");
 	}
 
 	public Id getStartLinkId() {
