@@ -72,11 +72,11 @@ public class TravelTimeCalculator
 	
 	private Map<Tuple<Id, Id>, DataContainer> linkToLinkData;
 	
-	private Map<Id, BasicLinkEnterEvent> linkEnterEvents;
+	private final Map<Id, BasicLinkEnterEvent> linkEnterEvents;
 
 	private final boolean calculateLinkTravelTimes;
 
-	private boolean calculateLinkToLinkTravelTimes;
+	private final boolean calculateLinkToLinkTravelTimes;
 	
 	private TravelTimeDataFactory ttDataFactory = null; 
 	
@@ -92,7 +92,13 @@ public class TravelTimeCalculator
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
-		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeslice);
+		
+		if (ttconfigGroup.getTravelTimeAggregatorType().equals("optimistic")) {
+			this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeslice);
+		} else if(ttconfigGroup.getTravelTimeAggregatorType().equals("experimental_LastMile")) {
+			log.warn("using experimental travel time calculator!!!");
+			this.aggregator = new PessimisticTravelTimeAggregator(this.numSlots, this.timeslice);
+		}
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
