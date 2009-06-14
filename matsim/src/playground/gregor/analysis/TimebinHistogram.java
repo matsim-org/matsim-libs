@@ -12,7 +12,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.misc.IntegerCache;
 
-import playground.gregor.PATH;
+import playground.gregor.MY_STATIC_STUFF;
 
 public class TimebinHistogram implements LinkEnterEventHandler {
 
@@ -98,14 +98,14 @@ public class TimebinHistogram implements LinkEnterEventHandler {
 	}
 	
 	public static void main(String [] args) {
-		String eventsFile = PATH.OUTPUTS + "run337/800.events.txt.gz";
+		String eventsFile = MY_STATIC_STUFF.OUTPUTS + "run337/800.events.txt.gz";
 		System.out.println("loading:" + eventsFile);
 		Events events = new Events();
 		TimebinHistogram hist = new TimebinHistogram();
 		events.addHandler(hist);
 		new EventsReaderTXTv1(events).readFile(eventsFile);
 		try {
-			hist.writeToFile(PATH.OUTPUTS + "run337/800.tbinhist.txt");
+			hist.writeToFile(MY_STATIC_STUFF.OUTPUTS + "run337/800.tbinhist.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

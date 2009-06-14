@@ -12,7 +12,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-import playground.gregor.PATH;
+import playground.gregor.MY_STATIC_STUFF;
 
 public class ShapeFileCutter {
 	private static double max_x = 652088.;
@@ -22,7 +22,7 @@ public class ShapeFileCutter {
 	private static final Envelope e = new Envelope(MIN_X,max_x,MIN_Y,max_y);
 	
 	public static void main(String [] args) throws IOException {
-		String buildings = PATH.CVS_GIS + "buildings_v20090403/buildings_v20090403.shp";
+		String buildings = MY_STATIC_STUFF.CVS_GIS + "buildings_v20090403/buildings_v20090403.shp";
 		String out = "tmp/buildings.shp";
 		FeatureSource fs = ShapeFileReader.readDataFile(buildings);
 		

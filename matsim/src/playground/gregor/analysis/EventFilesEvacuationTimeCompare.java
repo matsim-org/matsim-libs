@@ -53,7 +53,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.PATH;
+import playground.gregor.MY_STATIC_STUFF;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -205,10 +205,10 @@ public class EventFilesEvacuationTimeCompare {
 	}
 	
 	public static void main(final String [] args) {
-		String eventsFile1 = PATH.OUTPUTS + "output/ITERS/it.200/200.events.txt.gz";
-		String eventsFile2 = PATH.OUTPUTS + "output_delay/ITERS/it.200/200.events.txt.gz";
+		String eventsFile1 = MY_STATIC_STUFF.OUTPUTS + "output/ITERS/it.200/200.events.txt.gz";
+		String eventsFile2 = MY_STATIC_STUFF.OUTPUTS + "output_delay/ITERS/it.200/200.events.txt.gz";
 		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = PATH.OUTPUTS + "output/analysis/etimcomp.shp";
+		String outfile = MY_STATIC_STUFF.OUTPUTS + "output/analysis/etimcomp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		

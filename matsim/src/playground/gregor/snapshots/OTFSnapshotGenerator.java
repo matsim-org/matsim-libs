@@ -16,7 +16,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.gregor.PATH;
+import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.otf.ConfluenceArrowsFromEvents;
 import playground.gregor.otf.SimpleBackgroundTextureDrawer;
 import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
@@ -35,7 +35,7 @@ public class OTFSnapshotGenerator {
 	private String eventsFile;
 
 	public OTFSnapshotGenerator(String[] args) {
-		this.eventsFile = PATH.OUTPUTS + "/output/ITERS/it." + args[1] + "/" + args[1] + ".events.txt.gz"; 
+		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + args[1] + "/" + args[1] + ".events.txt.gz"; 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
 		this.scenario = sl.getScenario();

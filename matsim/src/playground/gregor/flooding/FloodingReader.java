@@ -187,6 +187,10 @@ public class FloodingReader {
 		return this.triangles;
 	}
 
+	/**
+	 * Mapping from coordinate index from triangle list to flooding info index
+	 * @return Map<Integer cordIdx, Integer fiIdx>
+	 */
 	public Map<Integer,Integer> getIdxMapping() {
 		if (!this.readTriangles && this.initialized) {
 			throw new RuntimeException("Netcdf already initialized, could not read triangle. To initialize netcdf with triangles reading enabled, " +
