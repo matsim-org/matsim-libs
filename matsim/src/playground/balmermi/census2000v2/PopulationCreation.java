@@ -30,6 +30,8 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -97,6 +99,7 @@ public class PopulationCreation {
 
 		System.out.println("  creating plans object...");
 		Population plans = new PopulationImpl();
+		Knowledges knowledges =  new KnowledgesImpl();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -124,7 +127,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
-		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households,facilities).run(plans, municipalityLayer);
+		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households,facilities, knowledges).run(plans, municipalityLayer);
 //		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(plans);
 		System.out.println("  done.");
 

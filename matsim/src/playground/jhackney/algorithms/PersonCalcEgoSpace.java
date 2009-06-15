@@ -29,6 +29,7 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -51,6 +52,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 	// ellipse, bean, cassini, superellipse
 //	private static final String activity_shape = EllipseObjective.OBJECTIVE_NAME;
 	private String activity_shape = null;
+	private Knowledges knowledges;
 //	private static final String [] activity_shapes = {CassiniObjective.OBJECTIVE_NAME,BeanObjective.OBJECTIVE_NAME,SuperEllipseObjective.OBJECTIVE_NAME,EllipseObjective.OBJECTIVE_NAME};
 	private static final String [] activity_shapes = {EllipseObjective.OBJECTIVE_NAME};
 	private static final double theta_stepsize = Math.PI / 8.0;
@@ -73,8 +75,9 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 //	super();
 //	}
 
-	public PersonCalcEgoSpace() {
+	public PersonCalcEgoSpace(Knowledges knowledges) {
 		super();
+		this.knowledges = knowledges;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -86,7 +89,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 
 		// Check if knowledge exists
 
-		final Knowledge know = person.getKnowledge();
+		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 		if (know == null) {
 			throw new RuntimeException("Knowledge is not defined!");

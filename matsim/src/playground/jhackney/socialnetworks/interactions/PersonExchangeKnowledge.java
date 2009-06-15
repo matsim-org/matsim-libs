@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
@@ -35,9 +36,11 @@ import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class PersonExchangeKnowledge {
 	SocialNetwork net;
+	private Knowledges knowledges;
 
-	public PersonExchangeKnowledge(SocialNetwork snet) {
+	public PersonExchangeKnowledge(SocialNetwork snet, Knowledges kn) {
 		this.net = snet;
+		this.knowledges = kn;
 
 	}
 	/**
@@ -54,8 +57,8 @@ public class PersonExchangeKnowledge {
 		Person p2 = curLink.getPersonTo();
 		Person p1 = curLink.getPersonFrom();
 
-		Knowledge k1 = p1.getKnowledge();
-		Knowledge k2 = p2.getKnowledge();
+		Knowledge k1 = this.knowledges.getKnowledgesByPersonId().get(p1.getId());
+		Knowledge k2 = this.knowledges.getKnowledgesByPersonId().get(p2.getId());
 
 //		Get a random facility (activity--> facility)
 		//from Person 2's knowledge and add it to Person 1's

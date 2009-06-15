@@ -32,6 +32,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
+import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.DeadEndRemover;
 
@@ -41,17 +42,17 @@ public class CreateKnownNodesMap {
 	
 	private final static Logger log = Logger.getLogger(CreateKnownNodesMap.class);
 	
-	public static void collectAllSelectedNodes(Population population)
+	public static void collectAllSelectedNodes(Population population, Knowledges knowledges)
 	{
 		for (Person person : population.getPersons().values()) 
 		{
-			collectAllSelectedNodes(person);
+			collectAllSelectedNodes(person, knowledges);
 		}
 	}
 	
-	public static void collectAllSelectedNodes(Person person)
+	private static void collectAllSelectedNodes(Person person, Knowledges knowledges)
 	{		
-		if(person.getKnowledge() == null) person.createKnowledge("activityroom");
+		if(knowledges.getKnowledgesByPersonId().get(person.getId()) == null) knowledges.getBuilder().createKnowledge(person.getId(), "activityroom");
 			
 //		Plan plan = person.getSelectedPlan();
 //		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
@@ -61,19 +62,19 @@ public class CreateKnownNodesMap {
 		// for all node selectors of the person
 		for (SelectNodes nodeSelector : personNodeSelectors)
 		{
-			collectSelectedNodes(person, nodeSelector);
+			collectSelectedNodes(knowledges, person, nodeSelector);
 		}
 		// if Flag is set, remove Dead Ends from the Person's Activity Room
-		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
+		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(knowledges, person);
 	}
 	
 	/*
 	 * The handling of the nodeSelectors should probably be outsourced...
 	 * Implementing them direct in the nodeSelectors could be a good solution...
 	 */
-	public static void collectSelectedNodes(Person p, SelectNodes nodeSelector)
+	public static void collectSelectedNodes(Knowledges knowledges, Person p, SelectNodes nodeSelector)
 	{	
-		if(p.getKnowledge() == null) p.createKnowledge("activityroom");
+		if(knowledges.getKnowledgesByPersonId().get(p.getId()) == null) knowledges.getBuilder().createKnowledge(p.getId(), "activityroom");
 		
 		Plan plan = p.getSelectedPlan();
 		

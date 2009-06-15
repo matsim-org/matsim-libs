@@ -84,6 +84,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
+	@Override
 	public void run (Plan plan){
 		
 		OptimizedAgents agents = this.module.getOptimizedAgents();
@@ -98,12 +99,12 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			/* Hard constraints */
 			
 			// All prim acts in potential agent's plan
-			for (int i=0;i<plan.getPerson().getKnowledge().getActivities(true).size();i++){
+			for (int i=0;i<this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size();i++){
 				boolean in = false;
 				for (int x=0;x<agents.getAgentPlan(j).getPlanElements().size()-2;x=x+2){
 					// try statement with print block to analyze some strange exceptions in Zurich scenario
 					try {
-					if (((Activity)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(plan.getPerson().getKnowledge().getActivities(true).get(i).getType())){
+					if (((Activity)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(i).getType())){
 						in = true;
 						break;
 					}
@@ -116,8 +117,8 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 						}
 						System.out.println();
 						System.out.println("Primacts im Knowledge des zuzuordnenden Agenten:");
-						for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size();k++){
-							if (plan.getPerson().getKnowledge().getActivities(true).get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(plan.getPerson().getKnowledge().getActivities(true).get(k).getType()+" ");
+						for (int k=0;k< this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size();k++){
+							if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getType()+" ");
 							else System.out.print("Leg but undefined. ");
 						}
 						System.out.println();
@@ -179,22 +180,22 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			// Distance between primary activities
 			if (this.primActsDistance=="yes"){
 				double tmpDistance=0;
-				if (plan.getPerson().getKnowledge().getActivities(true).size()>1){
-					for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
-						tmpDistance+=CoordUtils.calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord(), plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
+				if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()>1){
+					for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1;k++){
+						tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k+1).getLocation().getCoord());
 					}
-					tmpDistance+=CoordUtils.calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord(), plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
+					tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(0).getLocation().getCoord());
 				}
 				distanceAgent+=	this.coefficients.getSingleCoef("primActsDistance")*(java.lang.Math.abs(tmpDistance-this.module.getOptimizedAgents().getAgentDistance(j)));		
 			}
 			
 			// Distance between home location of potential agent to copy from and home location of agent in question
 			if (this.homeLocation=="yes"){			
-				double homelocationAgentX = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getX();
-				double homelocationAgentY = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getY();
+				double homelocationAgentX = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities("home", true).get(0).getFacility().getCoord().getX();
+				double homelocationAgentY = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities("home", true).get(0).getFacility().getCoord().getY();
 			
-				distanceAgent += this.coefficients.getSingleCoef("homeLocationDistance")*java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getX()-homelocationAgentX),2)+
-						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCoord().getY()-homelocationAgentY),2));
+				distanceAgent += this.coefficients.getSingleCoef("homeLocationDistance")*java.lang.Math.sqrt(java.lang.Math.pow((this.knowledges.getKnowledgesByPersonId().get(agents.getAgentPerson(j).getId()).getActivities("home", true).get(0).getFacility().getCoord().getX()-homelocationAgentX),2)+
+						java.lang.Math.pow((this.knowledges.getKnowledgesByPersonId().get(agents.getAgentPerson(j).getId()).getActivities("home", true).get(0).getFacility().getCoord().getY()-homelocationAgentY),2));
 			}
 			
 			// TODO @mfeil: exception handling missing

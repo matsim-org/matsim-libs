@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
 import org.matsim.utils.optimization.BeanObjective;
@@ -52,6 +53,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 	private static final double theta_stepsize = Math.PI / 8.0;
 	// all, home, work, education, shop, leisure
 	private String activity_type = null;
+	private Knowledges knowledges;
 //	private static final int shape = 1;
 	// 0.0 < coverage <= 1.0
 	private static final double coverage = 0.95;
@@ -70,8 +72,9 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 //		super();
 //	}
 
-	public PersonCalcActivitySpace(String activity_type) {
+	public PersonCalcActivitySpace(String activity_type, Knowledges knowledges) {
 		super();
+		this.knowledges = knowledges;
 		this.activity_type = activity_type;
 	}
 
@@ -84,7 +87,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 
 		// Check if knowledge exists
 		
-		final Knowledge know = person.getKnowledge();
+		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			throw new RuntimeException("Knowledge is not defined!");
 		}

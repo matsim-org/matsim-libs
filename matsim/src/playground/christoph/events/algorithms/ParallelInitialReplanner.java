@@ -23,14 +23,12 @@ package playground.christoph.events.algorithms;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -49,7 +47,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	 * @param population
 	 * @param time
 	 */	
-	public static void run(ArrayList<Person> persons, double time)
+	public static void run(ArrayList<Person> persons, Knowledges knowledges, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -57,7 +55,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) 
 		{
-			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners, time);
+			ReplannerThread replannerThread = new ReplannerThread(knowledges, i, replannerArray, replanners, time);
 			replannerThread.setRemoveKnowledge(removeKnowledge);
 			replannerThreads[i] = replannerThread;
 			
@@ -93,7 +91,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	}
 	
 	
-	public static void run(Population population, double time)
+	public static void run(Population population, Knowledges knowledges, double time)
 	{
 		ArrayList<Person> persons = new ArrayList<Person>();
 		
@@ -102,7 +100,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 			persons.add(person);
 		}
 		
-		run(persons, time);
+		run(persons, knowledges, time);
 	}
 	
 	public static void setRemoveKnowledge(boolean value)
@@ -122,13 +120,15 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
 		private final List<Person> persons = new LinkedList<Person>();
+		private Knowledges knowledges;
 
-		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
+		public ReplannerThread(Knowledges kn, final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
 		{
 			this.threadId = i;
 			this.replannerArray = replannerArray;
 			this.replanners = replanners;
 			this.time = time;
+			this.knowledges = kn;
 		}
 
 		public void setRemoveKnowledge(boolean value)
@@ -171,7 +171,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 				// If flag is set, remove Knowledge after doing the replanning.
 				if (removeKnowledge)
 				{
-					KnowledgeTools.removeKnowledge(person);
+					KnowledgeTools.removeKnowledge(this.knowledges, person);
 				}
 				
 				numRuns++;

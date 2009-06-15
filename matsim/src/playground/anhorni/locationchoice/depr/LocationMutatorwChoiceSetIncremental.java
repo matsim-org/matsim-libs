@@ -25,6 +25,7 @@ package playground.anhorni.locationchoice.depr;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.SubChain;
 
@@ -33,8 +34,8 @@ public class LocationMutatorwChoiceSetIncremental extends LocationMutatorwChoice
 	
 	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSetIncremental.class);
 	
-	public LocationMutatorwChoiceSetIncremental(final NetworkLayer network, Controler controler) {
-		super(network, controler);
+	public LocationMutatorwChoiceSetIncremental(final NetworkLayer network, Controler controler, Knowledges kn) {
+		super(network, controler, kn);
 	}
 	
 	@Override

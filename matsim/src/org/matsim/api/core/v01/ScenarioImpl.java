@@ -41,6 +41,8 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.world.World;
 
@@ -65,6 +67,8 @@ public class ScenarioImpl implements Scenario {
 	
 	private Households households;
   private BasicVehicles vehicles;
+  
+  private Knowledges knowledges; 
 	
 	public ScenarioImpl(){
 		this.config = new Config();
@@ -99,8 +103,15 @@ public class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseRoadpricing()){
 			this.createRoadPricingScheme();
 		}
+		if (this.config.scenario().isUseKnowledges()){
+			this.createKnowledges();
+		}
 	}
 	
+	private void createKnowledges() {
+		this.knowledges = new KnowledgesImpl();
+	}
+
 	protected void createRoadPricingScheme(){
 		this.roadPricingScheme = new RoadPricingScheme(this.getNetwork());		
 	}
@@ -211,6 +222,10 @@ public class ScenarioImpl implements Scenario {
 	
 	public BasicVehicles getVehicles(){
 		return this.vehicles;
+	}
+	
+	public Knowledges getKnowledges(){
+		return this.knowledges;
 	}
 
 }

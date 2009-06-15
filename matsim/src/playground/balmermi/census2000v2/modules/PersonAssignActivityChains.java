@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -40,13 +41,16 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 
 	private final MicroCensus microcensus;
 
+	private Knowledges knowledges;
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignActivityChains(MicroCensus microcensus) {
+	public PersonAssignActivityChains(MicroCensus microcensus, Knowledges knowledges) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.microcensus = microcensus;
+		this.knowledges = knowledges;
 		log.info("    done.");
 	}
 
@@ -57,16 +61,16 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 	@Override
 	public void run(Person person) {
 		boolean has_work = false;
-		if (!person.getKnowledge().getActivities(CAtts.ACT_W2).isEmpty() ||
-		    !person.getKnowledge().getActivities(CAtts.ACT_W3).isEmpty()) {
+		if (!this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W2).isEmpty() ||
+		    !this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W3).isEmpty()) {
 			has_work = true;
 		}
 		boolean has_educ = false;
-		if (!person.getKnowledge().getActivities(CAtts.ACT_EKIGA).isEmpty() ||
-		    !person.getKnowledge().getActivities(CAtts.ACT_EPRIM).isEmpty() ||
-		    !person.getKnowledge().getActivities(CAtts.ACT_ESECO).isEmpty() ||
-		    !person.getKnowledge().getActivities(CAtts.ACT_EHIGH).isEmpty() ||
-		    !person.getKnowledge().getActivities(CAtts.ACT_EOTHR).isEmpty()) {
+		if (!this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EKIGA).isEmpty() ||
+		    !this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EPRIM).isEmpty() ||
+		    !this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_ESECO).isEmpty() ||
+		    !this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EHIGH).isEmpty() ||
+		    !this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EOTHR).isEmpty()) {
 			has_educ = true;
 		}
 

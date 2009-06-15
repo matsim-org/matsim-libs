@@ -24,9 +24,13 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.world.World;
@@ -37,6 +41,7 @@ import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class EgoNetMakeActivitySpaces {
 
+	
 	//////////////////////////////////////////////////////////////////////
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
@@ -45,12 +50,19 @@ public class EgoNetMakeActivitySpaces {
 
 		System.out.println("Make activity spaces for egoNet:");
 
-		Scenario.setUpScenarioConfig();
+		Config config = Scenario.setUpScenarioConfig();
 
 		World world = Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		Population plans = Scenario.readPlans(network);
+		
+		System.out.println("  reading plans xml file... ");
+		Population plans = new PopulationImpl();
+		Knowledges knowledges = new KnowledgesImpl();
+		System.out.println(config.plans().getInputFile());
+		new MatsimPopulationReader(plans, network, knowledges).readFile(config.plans().getInputFile());
+		System.out.println("  done.");
+		
 		ActivityFacilities facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
@@ -58,7 +70,7 @@ public class EgoNetMakeActivitySpaces {
 		System.out.println("... done");
 		
 		//read in facilities knowledge
-		new InitializeKnowledge(plans, facilities);
+		new InitializeKnowledge(plans, facilities,  knowledges);
 		new WorldConnectLocations().run(world);
 		//////////////////////////////////////////////////////////////////////
 
@@ -114,15 +126,15 @@ public class EgoNetMakeActivitySpaces {
 
 		PopulationImpl socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
 //		// make the set of plans to use as EgoNet
-		socialPlans.addAlgorithm(new PersonCalcActivitySpace("all"));
+		socialPlans.addAlgorithm(new PersonCalcActivitySpace("all", knowledges));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("leisure"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("work"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("home"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("shop"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("education"));
-		PersonWriteActivitySpaceTable pwast = new PersonWriteActivitySpaceTable();
+		PersonWriteActivitySpaceTable pwast = new PersonWriteActivitySpaceTable(knowledges);
 		socialPlans.addAlgorithm(pwast);
-		socialPlans.addAlgorithm(new PersonDrawActivitySpace());
+		socialPlans.addAlgorithm(new PersonDrawActivitySpace(knowledges));
 		System.out.println("  done.");
 
 		

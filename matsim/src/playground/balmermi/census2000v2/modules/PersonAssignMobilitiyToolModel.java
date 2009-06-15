@@ -31,6 +31,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -58,12 +59,15 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 
 	private final ModelMobilityTools model = new ModelMobilityTools();
 
+	private Knowledges knowledges;
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignMobilitiyToolModel() {
+	public PersonAssignMobilitiyToolModel(Knowledges knowledges) {
 		log.info("    init " + this.getClass().getName() + " module...");
+		this.knowledges = knowledges;
 		log.info("    done.");
 	}
 
@@ -137,10 +141,10 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
 
 		// disthw
-		Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCoord();
+		Coord h_coord = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility().getCoord();
 		ArrayList<ActivityOption> prim_acts = new ArrayList<ActivityOption>();
-		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
-		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
+		prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W2));
+		prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W3));
 		if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 		else {
 			Coord p_coord = prim_acts.get(MatsimRandom.getRandom().nextInt(prim_acts.size())).getFacility().getCoord();
@@ -153,7 +157,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		// language: 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian)
 		int cid = hh.getMunicipality().getCantonId();
 		if (cid == 21) { model.setLanguage(3); }
-		else if ((22 <= cid) && (cid <= 26) || (cid == 10)) { model.setLanguage(2); }
+		else if (((22 <= cid) && (cid <= 26)) || (cid == 10)) { model.setLanguage(2); }
 		else { model.setLanguage(1); }
 
 		// calc and assign mobility tools

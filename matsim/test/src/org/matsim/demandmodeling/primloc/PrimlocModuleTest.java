@@ -33,6 +33,8 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -112,7 +114,8 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(population, network);
+		Knowledges knowledges = new KnowledgesImpl();
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(population, network, knowledges);
 		populationReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
@@ -120,7 +123,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		// ***************
 
 		System.out.println("  ** running primary location choice module (PLCM)");
-		PrimlocModule plcm = new PrimlocModule();
+		PrimlocModule plcm = new PrimlocModule(knowledges);
 		plcm.externalTripDist = CumulativeDistribution.readDistributionFromFile("test/input/org/matsim/demandmodeling/primloc/sample_dist.txt");
 		plcm.setup( world, population );
 		plcm.run(population);

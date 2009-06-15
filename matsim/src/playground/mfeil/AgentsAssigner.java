@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
@@ -34,6 +35,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -56,6 +58,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final ScheduleCleaner				cleaner;
 	protected final double						minimumTime;
 	protected LinkedList<String>				nonassignedAgents;
+	protected Knowledges knowledges;
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 		
 	
@@ -81,6 +84,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.minimumTime			= minimumTime;
 		this.nonassignedAgents		= nonassignedAgents;
 		this.cleaner				= new ScheduleCleaner(legTravelTimeEstimator, this.minimumTime);
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 	}
 	
 		
@@ -137,7 +141,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
 		
 		// NEW NEW NEW NEW NEW NEW NEW
-		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(out.getPerson().getKnowledge().getActivities(true));
+		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(this.knowledges.getKnowledgesByPersonId().get(out.getPerson().getId()).getActivities(true));
 		
 		// TODO Check what is better! Condition that home activity is always first and last activity in day plan
 		for (int i=0;i<primActs.size();i++){

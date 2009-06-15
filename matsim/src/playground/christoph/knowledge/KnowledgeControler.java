@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -123,9 +124,9 @@ public class KnowledgeControler extends Controler {
 		while (PersonIterator.hasNext())
 		{
 			Person p = PersonIterator.next();
-			if (p.getKnowledge() == null) 
+			if (((ScenarioImpl)this.getScenarioData()).getKnowledges().getKnowledgesByPersonId().get(p.getId()) == null) 
 			{
-				p.createKnowledge("Knowledgemodels");
+				((ScenarioImpl)this.getScenarioData()).getKnowledges().getBuilder().createKnowledge(p.getId(), "Knowledgemodels");
 			}
 			
 			// Kosten fuer Links fixieren bzw. je Person beeinflussen

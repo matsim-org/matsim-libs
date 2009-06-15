@@ -28,10 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.knowledges.Knowledges;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -52,6 +55,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final Network network;
 	private final ActivityFacilities facilities;
 	private MatsimXmlParser delegate = null;
+	private Knowledges knowledges;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
 
@@ -71,6 +75,12 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 		this.facilities = scenario.getActivityFacilities();
+		this.knowledges = ((ScenarioImpl) scenario).getKnowledges();
+	}
+
+	public MatsimPopulationReader(BasicPopulation population, NetworkLayer network, Knowledges knowledges) {
+		this(population, network);
+		this.knowledges = knowledges;
 	}
 
 	@Override
@@ -105,7 +115,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		if (PLANS_V4.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV4(this.plans, this.network, this.facilities);
+			this.delegate = new PopulationReaderMatsimV4(this.plans, this.network, this.facilities, this.knowledges);
 			log.info("using plans_v4-reader.");
 		} 
 		else if (PLANS_V1.equals(doctype)) {

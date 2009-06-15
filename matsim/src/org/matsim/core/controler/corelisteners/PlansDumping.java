@@ -21,6 +21,7 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -40,11 +41,11 @@ public class PlansDumping implements BeforeMobsimListener {
 
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
-		if (event.getIteration() % 10 == 0 || event.getIteration() == (controler.getFirstIteration() + 1)) {
+		if ((event.getIteration() % 10 == 0) || (event.getIteration() == (controler.getFirstIteration() + 1))) {
 			controler.stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
 			String outversion = controler.getConfig().plans().getOutputVersion();
-			PopulationWriter plansWriter = new PopulationWriter(controler.getPopulation(), Controler.getIterationFilename("plans.xml.gz"), outversion);
+			PopulationWriter plansWriter = new PopulationWriter(controler.getPopulation(), ((ScenarioImpl)controler.getScenarioData()).getKnowledges(), Controler.getIterationFilename("plans.xml.gz"), outversion);
 			plansWriter.write();
 			log.info("finished plans dump.");
 			controler.stopwatch.endOperation("dump all plans");

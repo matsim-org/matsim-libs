@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -42,6 +43,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
@@ -75,6 +77,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private final String					finalOpt;
 	
 	private final LegTravelTimeEstimator legTravelTimeEstimator;
+	private Knowledges knowledges;
 	
 	
 	
@@ -119,7 +122,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 		else this.finalTimer		= new TimeOptimizerWIGIC(controler, legTravelTimeEstimator, this.scorer);		
 		
-		this.locator				= locator;		
+		this.locator				= locator;	
+		
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 	}
 	
 		
@@ -155,8 +160,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
-		ArrayList<ActivityOptionImpl> primActs					= plan.getPerson().getKnowledge().getActivities(true);
-		ArrayList<ActivityOption> actTypes					= plan.getPerson().getKnowledge().getActivities();
+		ArrayList<ActivityOptionImpl> primActs					= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true);
+		ArrayList<ActivityOption> actTypes					= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities();
 		
 		/*
 		double [] xs;

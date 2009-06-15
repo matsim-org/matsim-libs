@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -38,6 +38,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -53,13 +54,16 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 	private TravelTime ttime;
 	private String[] factypes;
 
-	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime) {
+	private Knowledges knowledges;
+
+	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges knowledges) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
 		this.tcost=tcost;
 		this.ttime=ttime;
 		this.factypes=factypes;
+		this.knowledges = knowledges;
 	}
 
 	public void run(Plan plan) {
@@ -90,11 +94,11 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 		if (rand < cum_p_factype[0]) {
 			factype = factypes[0];
-		}else if (cum_p_factype[0] <= rand && rand < cum_p_factype[1]) {
+		}else if ((cum_p_factype[0] <= rand) && (rand < cum_p_factype[1])) {
 			factype = factypes[1];
-		}else if (cum_p_factype[1] <= rand && rand < cum_p_factype[2]) {
+		}else if ((cum_p_factype[1] <= rand) && (rand < cum_p_factype[2])) {
 			factype = factypes[2];
-		}else if (cum_p_factype[2] <= rand && rand < cum_p_factype[3]) {
+		}else if ((cum_p_factype[2] <= rand) && (rand < cum_p_factype[3])) {
 			factype = factypes[3];
 		}else {
 			factype = factypes[4];
@@ -121,7 +125,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 			Activity newAct = (actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
-			Knowledge k = person.getKnowledge();
+			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 			// Replace with plan.getRandomActivity(type)
 
@@ -134,14 +138,14 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
-				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
+				if((newAct.getType() == plan.getFirstActivity().getType()) && (newAct.getLink() == plan.getFirstActivity().getLink())){
 					Activity lastAct = (Activity) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 					lastAct.setLink(fFromKnowledge.getLink());
 					lastAct.setCoord(fFromKnowledge.getCoord());
 					lastAct.setFacility(fFromKnowledge);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if(newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
+				if((newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
 					Activity firstAct = newPlan.getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					firstAct.setCoord(fFromKnowledge.getCoord());
@@ -225,7 +229,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 			Activity act1 = (Activity)(plan.getPlanElements().get(i));
 			Activity act2 = (Activity)(plan.getPlanElements().get(i+2));
 
-			if (act2 != null && act1 != null) {
+			if ((act2 != null) && (act1 != null)) {
 				double dist = CoordUtils.calcDistance(act1.getCoord(), act2.getCoord());
 				length += dist;
 			}

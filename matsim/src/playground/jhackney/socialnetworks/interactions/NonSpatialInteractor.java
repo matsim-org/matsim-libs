@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.knowledges.Knowledges;
 
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
@@ -50,10 +51,10 @@ public class NonSpatialInteractor{
 
 	PersonExchangeKnowledge pxk; // the actual workhorse
 
-	public NonSpatialInteractor(SocialNetwork snet) {
+	public NonSpatialInteractor(SocialNetwork snet, Knowledges knowledges) {
 		this.net=snet;
 
-		pxk = new PersonExchangeKnowledge(net);
+		pxk = new PersonExchangeKnowledge(net, knowledges);
 		proportionOfLinksToActivate = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractNSInteract());
 		numInteractionsPerLink = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetNSInteractions());
 		fract_intro=Double.parseDouble(Gbl.getConfig().socnetmodule().getFriendIntroProb());

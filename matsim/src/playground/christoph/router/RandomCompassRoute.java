@@ -27,11 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.routes.NodeNetworkRoute;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -46,15 +43,19 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 	protected boolean tabuSearch = true;
 	protected double compassProbability = 0.35;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
+
+	private Knowledges knowledges;
 	
 	private final static Logger log = Logger.getLogger(RandomCompassRoute.class);
 	
 	/**
 	 * Default constructor.
+	 * @param knowledges 
 	 *                    
 	 */
-	public RandomCompassRoute() 
+	public RandomCompassRoute(Knowledges knowledges) 
 	{	
+		this.knowledges = knowledges;
 	}
 
 	
@@ -78,7 +79,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		nodes.add(fromNode);
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
 
 		while(!currentNode.equals(toNode))
 		{
@@ -203,7 +204,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		 * choosing this link would be a bad idea, so return the worst possible angle.
 		 * 
 		 */
-		if (v1x == 0.0 && v1y == 0.0) return Math.PI;
+		if ((v1x == 0.0) && (v1y == 0.0)) return Math.PI;
 		
 		/*
 		 * If the nextLinkNode is the TargetNode return 0.0 so this link is chosen.
@@ -235,9 +236,10 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		errorCounter = i;
 	}
 	
+	@Override
 	public RandomCompassRoute clone()
 	{
-		RandomCompassRoute clone = new RandomCompassRoute();
+		RandomCompassRoute clone = new RandomCompassRoute(this.knowledges);
 		clone.compassProbability = this.compassProbability;
 		clone.maxLinks = this.maxLinks;
 		clone.removeLoops = this.removeLoops;

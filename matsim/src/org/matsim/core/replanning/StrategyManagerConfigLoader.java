@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -159,7 +160,7 @@ public class StrategyManagerConfigLoader {
 //				// JH
 			} else if (classname.equals("LocationChoice")) {
 				strategy = new PlanStrategy(new ExpBetaPlanSelector());
-				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
+				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges()));
 				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());
 				/* not really happy about the following line. Imagine what happens if everybody does 

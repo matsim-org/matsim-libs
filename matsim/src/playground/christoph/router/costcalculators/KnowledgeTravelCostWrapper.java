@@ -7,6 +7,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
@@ -14,11 +15,14 @@ import playground.christoph.router.util.KnowledgeTravelCost;
 public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	
 	protected TravelCost travelCostcalculator;
+
+	private Knowledges knowledges;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
-	public KnowledgeTravelCostWrapper(TravelCost travelCost)
+	public KnowledgeTravelCostWrapper(Knowledges knowledges, TravelCost travelCost)
 	{
+		this.knowledges = knowledges;
 		this.travelCostcalculator = travelCost;
 	}
 	
@@ -37,7 +41,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
 		
 		// if the Person doesn't know the link -> return max costs 
 		if (!KnowledgeTools.knowsLink(link, knownNodesMap))
@@ -52,6 +56,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		}
 	}
 	
+	@Override
 	public KnowledgeTravelCostWrapper clone()
 	{
 		TravelCost travelCostCalculatorClone;
@@ -66,7 +71,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 			travelCostCalculatorClone = this.travelCostcalculator;
 		}
 		
-		KnowledgeTravelCostWrapper clone = new KnowledgeTravelCostWrapper(travelCostCalculatorClone);
+		KnowledgeTravelCostWrapper clone = new KnowledgeTravelCostWrapper(this.knowledges, travelCostCalculatorClone);
 
 		return clone;
 	}

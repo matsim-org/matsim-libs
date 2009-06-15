@@ -22,6 +22,7 @@ package org.matsim.locationchoice;
 
 import java.util.List;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
@@ -33,6 +34,7 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
@@ -50,13 +52,16 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected TreeMap<String, ActivityFacility []> facilitiesOfType;
 	protected final LocationChoiceConfigGroup config;
 	
-	protected DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities();
+	protected DefineFlexibleActivities defineFlexibleActivities;
 	protected boolean locationChoiceBasedOnKnowledge = true;
+	protected Knowledges knowledges = null;
 			
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
-	public LocationMutator(final NetworkLayer network, final Controler controler) {
+	public LocationMutator(final NetworkLayer network, final Controler controler, final Knowledges kn) {
+		this.knowledges = kn;
+		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacility []>();
 		this.config = Gbl.getConfig().locationchoice();
@@ -64,9 +69,11 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	}
 	
 	
-	public LocationMutator(final NetworkLayer network, final Controler controler, 
+	public LocationMutator(final NetworkLayer network, final Controler controler, final Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
+		this.knowledges = kn;
+		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 		this.quadTreesOfType = quad_trees;
 		this.facilitiesOfType = facilities_of_type;
 		this.config = Gbl.getConfig().locationchoice();	

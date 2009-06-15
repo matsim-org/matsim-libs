@@ -32,9 +32,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -43,6 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -64,17 +65,20 @@ public class PlansCreateFromCensus2000 {
 	private final Households households;
 	private final ActivityFacilities facilities;
 	private final Map<String,QuadTree<ActivityFacility>> fqts = new HashMap<String, QuadTree<ActivityFacility>>();
+
+	private Knowledges knowledges;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCreateFromCensus2000(final String infile, final Households households, final ActivityFacilities facilities) {
+	public PlansCreateFromCensus2000(final String infile, final Households households, final ActivityFacilities facilities, Knowledges knowledges) {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
 		this.households = households;
 		this.facilities = facilities;
+		this.knowledges = knowledges;
 		this.buildQuadTrees();
 		log.info("    done.");
 	}
@@ -123,13 +127,13 @@ public class PlansCreateFromCensus2000 {
 	private ActivityOption chooseEducActBasedOnSchoolType(final Person p, String act_type) {
 		if (act_type.equals(CAtts.ACT_EKIGA) || act_type.equals(CAtts.ACT_EPRIM)) { // assign nearest act
 			QuadTree<ActivityFacility> qt = this.fqts.get(act_type);
-			ActivityFacility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
+			ActivityFacility home_f = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility();
 			ActivityFacility educ_f = qt.get(home_f.getCoord().getX(),home_f.getCoord().getY());
 			return educ_f.getActivityOption(act_type);
 		}
 		else if (act_type.equals(CAtts.ACT_ESECO)) { // search in home zone and expanding
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
-			ActivityFacility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
+			ActivityFacility home_f = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility();
 			Zone zone = (Zone)home_f.getUpMapping().values().iterator().next();
 			Coord max = new CoordImpl(((Zone)zone).getMax());
 			Coord min = new CoordImpl(((Zone)zone).getMin());
@@ -214,7 +218,7 @@ public class PlansCreateFromCensus2000 {
 				for (ActivityOption a : acts) { for (int i=0; i<a.getCapacity(); i++) { acts_weighted.add(a); } }
 				ActivityOption act = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
 				if (act == null) { Gbl.errorMsg("That should not happen!"); }
-				p.getKnowledge().addActivity(act, false); // set activity in given zone
+				this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act, false); // set activity in given zone
 			}
 			else {
 				log.debug("        pid="+p.getId()+", act_type="+act_type+", zone="+zone.getId()+": no facilities for educ found in that zone!");
@@ -236,7 +240,7 @@ public class PlansCreateFromCensus2000 {
 						}
 						ActivityOption act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
 						if (act == null) { Gbl.errorMsg("That should not happen!"); }
-						p.getKnowledge().addActivity(act, false); // set activity in expanded given zone
+						this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act, false); // set activity in expanded given zone
 					}
 				}
 			}
@@ -245,8 +249,8 @@ public class PlansCreateFromCensus2000 {
 			log.debug("        pid="+p.getId()+", act_type="+act_type+": no educ zone defined! Assigning according act_type!");
 			ActivityOption act = this.chooseEducActBasedOnSchoolType(p,act_type);
 			if (act == null) { Gbl.errorMsg("That should not happen!"); }
-			p.getKnowledge().addActivity(act, false);
-			p.getKnowledge().setDescription(p.getKnowledge().getDescription()+"("+CAtts.P_SGDE+":"+sgde+")");
+			this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act, false);
+			this.knowledges.getKnowledgesByPersonId().get(p.getId()).setDescription(this.knowledges.getKnowledgesByPersonId().get(p.getId()).getDescription()+"("+CAtts.P_SGDE+":"+sgde+")");
 		}
 	}
 
@@ -296,10 +300,10 @@ public class PlansCreateFromCensus2000 {
 		if (zone == null) {
 			if ((i_agde == -7) || (i_agde > 8100)) {
 				log.info("        pid="+p.getId()+", jobnr="+job+": no work muni defined");
-				ActivityFacility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
+				ActivityFacility home_f = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility();
 				zone = (Zone)home_f.getUpMapping().values().iterator().next();
 				log.info("        => work muni = home muni (zid="+agde+") assigned.");
-				p.getKnowledge().setDescription(p.getKnowledge().getDescription()+"("+CAtts.P_AGDE+":"+agde+")");
+				this.knowledges.getKnowledgesByPersonId().get(p.getId()).setDescription(this.knowledges.getKnowledgesByPersonId().get(p.getId()).getDescription()+"("+CAtts.P_AGDE+":"+agde+")");
 			}
 			else { Gbl.errorMsg("pid="+p.getId()+", jobnr="+job+": Zone id="+agde+" not found!"); }
 		}
@@ -382,7 +386,7 @@ public class PlansCreateFromCensus2000 {
 		}
 		log.trace("        pid="+p.getId()+", jobnr="+job+", acts_weighted size="+acts_weighted.size());
 		ActivityOption act_choosen = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
-		p.getKnowledge().addActivity(act_choosen, false);
+		this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act_choosen, false);
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -402,8 +406,8 @@ public class PlansCreateFromCensus2000 {
 		Map<String,Object> p_atts = p.getCustomAttributes();
 
 		// adding home knowledge
-		Knowledge k = p.getKnowledge();
-		if (k == null) { k = p.createKnowledge(""); }
+		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
+		if (k == null) { k = this.knowledges.getBuilder().createKnowledge(p.getId(), ""); }
 		String desc = "";
 		if (wkat == 1) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);
@@ -435,8 +439,8 @@ public class PlansCreateFromCensus2000 {
 		
 		// some consistency checks
 		if (p.isEmployed()) {
-			if (!p.getKnowledge().getActivityTypes().contains(CAtts.ACT_W2) &&
-			    !p.getKnowledge().getActivityTypes().contains(CAtts.ACT_W3)) {
+			if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivityTypes().contains(CAtts.ACT_W2) &&
+			    !this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivityTypes().contains(CAtts.ACT_W3)) {
 				log.warn("pid="+p.getId()+",employed="+p.isEmployed()+": person does not have work activity!");
 			}
 			if (p.getAge()<15) {
@@ -444,8 +448,8 @@ public class PlansCreateFromCensus2000 {
 			}
 		}
 		if (p.getAge()<15) {
-			if (p.getKnowledge().getActivityTypes().contains(CAtts.ACT_W2) ||
-			    p.getKnowledge().getActivityTypes().contains(CAtts.ACT_W3)) {
+			if (this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivityTypes().contains(CAtts.ACT_W2) ||
+			    this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivityTypes().contains(CAtts.ACT_W3)) {
 					log.warn("pid="+p.getId()+",age="+p.getAge()+": person is too young for having work activities!");
 			}
 		}

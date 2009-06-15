@@ -21,16 +21,14 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -45,16 +43,20 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 	
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
+
+	private Knowledges knowledges;
 	
 	/**
 	 * Default constructor.
+	 * @param knowledges 
 	 *
 	 * @param random
 	 * 			  Random number generator. Needed to create reproducible results.           
 	 *            
 	 */
-	public RandomRoute() 
+	public RandomRoute(Knowledges knowledges) 
 	{
+		this.knowledges = knowledges;
 	}
 
 	
@@ -74,8 +76,8 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
-		
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
+		 
 		nodes.add(fromNode);
 		
 		while(!currentNode.equals(toNode))
@@ -142,7 +144,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 	@Override
 	public RandomRoute clone()
 	{
-		RandomRoute clone = new RandomRoute();
+		RandomRoute clone = new RandomRoute(this.knowledges);
 		clone.removeLoops = this.removeLoops;
 		clone.maxLinks = this.maxLinks;
 		

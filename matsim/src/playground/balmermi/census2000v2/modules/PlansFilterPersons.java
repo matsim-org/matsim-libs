@@ -25,11 +25,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
@@ -41,13 +42,15 @@ public class PlansFilterPersons {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(PlansFilterPersons.class);
+	private Knowledges knowledges;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansFilterPersons() {
+	public PlansFilterPersons(Knowledges knowledges) {
 		super();
+		this.knowledges = knowledges;
 		log.info("    init " + this.getClass().getName() + " module...");
 		log.info("    done.");
 	}
@@ -85,14 +88,14 @@ public class PlansFilterPersons {
 				((Household)o).removePersonZ(p.getId());
 				p.getCustomAttributes().remove(CAtts.HH_Z);
 
-				if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() == 2) {
-					ActivityOption a0 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0);
-					ActivityOption a1 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(1);
+				if (this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() == 2) {
+					ActivityOption a0 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0);
+					ActivityOption a1 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(1);
 					if (a0.getFacility().getId().equals(f.getId())) {
-						if (!p.getKnowledge().removeActivity(a0)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
+						if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).removeActivity(a0)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
 					}
 					else if (a1.getFacility().getId().equals(f.getId())) {
-						if (!p.getKnowledge().removeActivity(a1)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
+						if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).removeActivity(a1)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
 					}
 					else {
 						Gbl.errorMsg("pid="+p.getId()+": That must not happen!");
@@ -106,8 +109,8 @@ public class PlansFilterPersons {
 			if (p.getCustomAttributes().get(CAtts.HH_W) == null) {
 				Gbl.errorMsg("pid="+p.getId()+": No hh_w!");
 			}
-			if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() != 1) {
-				Gbl.errorMsg("pid="+p.getId()+": "+ p.getKnowledge().getActivities(CAtts.ACT_HOME).size() + " home acts!");
+			if (this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() != 1) {
+				Gbl.errorMsg("pid="+p.getId()+": "+ this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() + " home acts!");
 			}
 		}
 		

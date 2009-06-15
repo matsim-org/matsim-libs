@@ -30,6 +30,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -44,13 +45,15 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 	private final String[] w_acts = { CAtts.ACT_W2, CAtts.ACT_W3 };
 	private final String[] e_acts = { CAtts.ACT_EKIGA, CAtts.ACT_EPRIM, CAtts.ACT_ESECO, CAtts.ACT_EHIGH, CAtts.ACT_EOTHR };
+	private Knowledges knowledges;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonCreateFakePlanFromKnowledge() {
+	public PersonCreateFakePlanFromKnowledge(Knowledges knowledges) {
 		super();
+		this.knowledges = knowledges;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -63,7 +66,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		Knowledge k = person.getKnowledge();
+		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 		ActivityOption home = null;
 		ArrayList<ActivityOption> home_acts = k.getActivities(CAtts.ACT_HOME);

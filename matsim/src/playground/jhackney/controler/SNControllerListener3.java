@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
@@ -43,6 +44,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -128,6 +130,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 //	private Controler controler = null;
 	private playground.jhackney.controler.SNController3 controler=null;
+	private Knowledges knowledges;
 
 	public SNControllerListener3(playground.jhackney.controler.SNController3 controler){
 		this.controler=controler;
@@ -135,14 +138,14 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	
 	public void notifyStartup(final StartupEvent event) {
 //		this.controler = event.getControler();
-
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldConnectLocations().run(event.getControler().getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 
 //		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
@@ -271,13 +274,13 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 			Gbl.printMemoryUsage();
 			controler.stopwatch.beginOperation("netstats");
 			this.log.info(" Calculating and reporting network statistics ...");
-			this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
+			this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation(), this.knowledges);
 			this.log.info(" ... done");
 			controler.stopwatch.endOperation("netstats");
 
 			Gbl.printMemoryUsage();
 
-			if(CALCSTATS && event.getIteration()%50==0){
+			if(CALCSTATS && (event.getIteration()%50==0)){
 
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
 				aaw=new ActivityActWriter();
@@ -350,9 +353,9 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		while (p_it.hasNext()) {
 			Person person=p_it.next();
 
-			Knowledge k = person.getKnowledge();
+			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
-				k = person.createKnowledge("created by " + this.getClass().getName());
+				k = this.knowledges.getBuilder().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
@@ -393,7 +396,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");
-		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities());
+		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities(), this.knowledges);
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");
@@ -423,7 +426,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info(" Setting up the NonSpatial interactor ...");
-		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
@@ -485,7 +488,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];
@@ -507,7 +510,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];

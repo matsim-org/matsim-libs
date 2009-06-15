@@ -41,13 +41,13 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Location;
 
 import playground.jhackney.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 import playground.jhackney.socialnetworks.algorithms.PlanEuclideanLength;
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
-
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
@@ -158,7 +158,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	public void calculate(int iteration, SocialNetwork snet, Population plans) {
+	public void calculate(int iteration, SocialNetwork snet, Population plans, Knowledges knowledges) {
 		// First instantiate the JUNG-compatible graph structure
 		if (snet.isUNDIRECTED()) {
 			this.g = new UndirectedSparseGraph();
@@ -189,7 +189,7 @@ public class SocialNetworkStatistics {
 		// Calcualted and output in Person and Edge statistics
 		// Persons statistics
 
-		runPersonStatistics(iteration, plans, snet);
+		runPersonStatistics(iteration, plans, snet, knowledges);
 		// Edge statistics
 //		runEdgeStatistics(iteration, plans);
 		runEdgeStatistics2(iteration,snet);
@@ -345,7 +345,7 @@ public class SocialNetworkStatistics {
 		return 2. * g.numEdges() / g.numVertices();
 	}
 
-	private void runPersonStatistics(int iter, Population plans, SocialNetwork snet) {
+	private void runPersonStatistics(int iter, Population plans, SocialNetwork snet, Knowledges knowledges) {
 
 		double clusteringRatio = 0.;
 		double clusterCoef = 0.;
@@ -439,7 +439,7 @@ public class SocialNetworkStatistics {
 //					esa+" "+esb+" "+esx+" "+esy+" "+est+" "+pop);
 					aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
 							+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
-							+ " " + myPerson.getKnowledge().getActivities().size() + " "+pop);
+							+ " " + knowledges.getKnowledgesByPersonId().get(myPerson.getId()).getActivities().size() + " "+pop);
 					aout.newLine();
 					aout.flush();
 				} catch (IOException e) {

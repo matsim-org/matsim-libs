@@ -20,14 +20,17 @@
 
 package org.matsim.locationchoice;
 
-import java.util.*;
+import java.util.List;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.*;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
 /*
@@ -36,14 +39,15 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
 public class RandomLocationMutator extends LocationMutator {
 
 	private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
-	public RandomLocationMutator(final NetworkLayer network, Controler controler) {
-		super(network, controler);
+	
+	public RandomLocationMutator(final NetworkLayer network, Controler controler, Knowledges kn) {
+		super(network, controler, kn);
 	}
 	
-	public RandomLocationMutator(final NetworkLayer network, Controler controler,
+	public RandomLocationMutator(final NetworkLayer network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
-		super(network, controler, quad_trees, facilities_of_type);
+		super(network, controler, kn, quad_trees, facilities_of_type);
 	}
 
 	/*
@@ -73,7 +77,7 @@ public class RandomLocationMutator extends LocationMutator {
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 				
-			boolean	isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean	isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			boolean	movable = movablePrimaryActivities.contains(act);
 	
 			// if home is accidentally not defined as primary

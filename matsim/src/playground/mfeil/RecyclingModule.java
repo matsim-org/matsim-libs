@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
@@ -36,6 +37,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -67,12 +69,14 @@ public class RecyclingModule implements PlanStrategyModule {
 	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
 	protected final NetworkLayer 						network;
 	public static PrintStream 					assignment;
+	protected Knowledges knowledges;
 	
 	
 	
 	public RecyclingModule (ControlerMFeil controler){
 		this.controler=controler;
-		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges);
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network = controler.getNetwork();
 		this.init(network);	
@@ -136,7 +140,7 @@ public class RecyclingModule implements PlanStrategyModule {
 		}
 		assignment.println();
 		
-		this.agents = new OptimizedAgents (this.list[0]);		
+		this.agents = new OptimizedAgents (this.list[0], this.knowledges);		
 		this.assignmentModule.prepareReplanning();		
 		for (int i=0;i<list[1].size();i++){
 			this.assignmentModule.handlePlan(this.list[1].get(i));
@@ -186,45 +190,45 @@ public class RecyclingModule implements PlanStrategyModule {
 		double secondMeasure=0;
 		int [] dependents = new int [this.testAgentsNumber];
 		for (int i=0;i<this.testAgentsNumber;i++){
-			if (i!=firstCentroid && i!=secondCentroid){
-				if (firstCentroid<i && secondCentroid<i) {
+			if ((i!=firstCentroid) && (i!=secondCentroid)){
+				if ((firstCentroid<i) && (secondCentroid<i)) {
 					if (distanceMatrix[firstCentroid][i]<distanceMatrix[secondCentroid][i]) {
 						dependents[i]=1;
-						firstMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						firstMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("firstMeasure = "+firstMeasure);
 						one++;
 					}
 					else {
 						dependents[i]=2;
-						secondMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						secondMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("secondMeasure = "+secondMeasure);
 						two++;
 					}
 				}
-				else if (firstCentroid>i && secondCentroid>i) {
+				else if ((firstCentroid>i) && (secondCentroid>i)) {
 					if (distanceMatrix[i][firstCentroid]<distanceMatrix[i][secondCentroid]) {
 						dependents[i]=1;
-						firstMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						firstMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("firstMeasure = "+firstMeasure);
 						one++;
 					}
 					else{
 						dependents[i]=2;
-						secondMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						secondMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("secondMeasure = "+secondMeasure);
 						two++;
 					}
 				}
-				else if (firstCentroid<i && secondCentroid>i) {
+				else if ((firstCentroid<i) && (secondCentroid>i)) {
 					if (distanceMatrix[firstCentroid][i]<distanceMatrix[i][secondCentroid]) {
 						dependents[i]=1;
-						firstMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						firstMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("firstMeasure = "+firstMeasure);
 						one++;
 					}
 					else {
 						dependents[i]=2;
-						secondMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						secondMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("secondMeasure = "+secondMeasure);
 						two++;
 					}
@@ -232,21 +236,21 @@ public class RecyclingModule implements PlanStrategyModule {
 				else {
 					if (distanceMatrix[i][firstCentroid]<distanceMatrix[secondCentroid][i]) {
 						dependents[i]=1;
-						firstMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						firstMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("firstMeasure = "+firstMeasure);
 						one++;
 					}
 					else {
 						dependents[i]=2;
-						secondMeasure+=CoordUtils.calcDistance(list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+						secondMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(i).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 						System.out.println("secondMeasure = "+secondMeasure);
 						two++;
 					}
 				}
 			}
 		}
-		firstMeasure+=CoordUtils.calcDistance(list.get(firstCentroid).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(firstCentroid).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
-		secondMeasure+=CoordUtils.calcDistance(list.get(secondCentroid).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord(), list.get(secondCentroid).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCoord());
+		firstMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(firstCentroid).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(firstCentroid).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
+		secondMeasure+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(list.get(secondCentroid).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(list.get(secondCentroid).getPerson().getId()).getActivities(true).get(1).getLocation().getCoord());
 		
 		firstMeasure/=one+1;
 		secondMeasure/=two+1;

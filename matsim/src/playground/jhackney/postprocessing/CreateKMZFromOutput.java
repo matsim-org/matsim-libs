@@ -25,6 +25,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -65,7 +67,8 @@ public class CreateKMZFromOutput {
 		for(int i=0; i<501; i+=50){
 			config.socnetmodule().setInitIter(Integer.toString(i));
 //			config.socnetmodule().setInitIter(Integer.toString(0));
-			Population plans = Scenario.readPlans(network, i);
+			Knowledges kn = new KnowledgesImpl();
+			Population plans = Scenario.readPlansAndKnowledges(network, kn);
 			//read in social network
 			System.out.println(" Initializing the social network ...");
 			SocialNetwork snet=new SocialNetwork(plans);
@@ -138,7 +141,7 @@ public class CreateKMZFromOutput {
 //			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
 			Person testP=plans.getPersons().get(new IdImpl("21924270"));//1pct
 //			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-			EgoNetPlansItersMakeKML.loadData(testP,i);
+			EgoNetPlansItersMakeKML.loadData(testP,i, kn);
 			System.out.println(" ... done");
 
 

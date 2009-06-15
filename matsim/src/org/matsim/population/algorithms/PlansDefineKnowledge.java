@@ -23,20 +23,23 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 
 public class PlansDefineKnowledge {
 
 	private final ActivityFacilities facilities;
+	private Knowledges knowledges;
 	
-	public PlansDefineKnowledge(final ActivityFacilities facilities) {
+	public PlansDefineKnowledge(final ActivityFacilities facilities, Knowledges knowledges) {
 		this.facilities = facilities;
+		this.knowledges = knowledges;
 	}
 
 	public void run(Population plans) {
@@ -60,7 +63,7 @@ public class PlansDefineKnowledge {
 		Iterator<Person> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
 			Person p = p_it.next();
-			Knowledge k = p.createKnowledge("created by " + this.getClass().getName());
+			Knowledge k = this.knowledges.getBuilder().createKnowledge(p.getId(), "created by " + this.getClass().getName());
 			int index = MatsimRandom.getRandom().nextInt(home_acts.size());
 			k.addActivity(home_acts.get(index),true);
 			index = MatsimRandom.getRandom().nextInt(work_acts.size());

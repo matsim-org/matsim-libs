@@ -30,6 +30,7 @@ import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.knowledges.Knowledges;
 
 /*
  * Removes Dead Ends from the Activity Maps in the Knowledge of a Person.
@@ -41,7 +42,8 @@ public class DeadEndRemover {
 
 	private final static Logger log = Logger.getLogger(DeadEndRemover.class);
 	
-	public static void removeDeadEnds(Person person)
+	
+	public static void removeDeadEnds(Knowledges knowledges, Person person)
 	{
 		Map<Id, Node> knownNodesMap;
 		
@@ -50,7 +52,7 @@ public class DeadEndRemover {
 		 * If there is no Knowledge there can't be a Map of known Nodes
 		 * so set the knownNodesMap to null.
 		 */ 
-		if(person.getKnowledge() != null) knownNodesMap = KnowledgeTools.getKnownNodes(person);
+		if(knowledges.getKnowledgesByPersonId().get(person.getId()) != null) knownNodesMap = KnowledgeTools.getKnownNodes(knowledges, person);
 		else knownNodesMap = null;
 		
 		// if the Person has an Activity Room in his/her Knowledge

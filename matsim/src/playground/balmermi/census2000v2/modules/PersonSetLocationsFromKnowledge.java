@@ -29,6 +29,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -41,13 +42,15 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(PersonSetLocationsFromKnowledge.class);
+	private Knowledges knowledges;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetLocationsFromKnowledge() {
+	public PersonSetLocationsFromKnowledge(Knowledges knowledges) {
 		log.info("    init " + this.getClass().getName() + " module...");
+		this.knowledges = knowledges;
 		log.info("    done.");
 	}
 
@@ -63,7 +66,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 		if (plan == null) { Gbl.errorMsg("pid="+person.getId()+": no plan exists."); }
 
 		// knowledge
-		Knowledge k = person.getKnowledge();
+		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (k == null) { Gbl.errorMsg("pid="+person.getId()+": no knowledge exists."); }
 
 		// home act

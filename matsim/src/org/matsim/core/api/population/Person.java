@@ -25,7 +25,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.households.Household;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.Customizable;
 
 /**
@@ -84,7 +83,7 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	 */
 	public boolean removePlan(final Plan plan);
 
-	public Knowledge createKnowledge(final String desc);
+//	public Knowledge createKnowledge(final String desc);
 	
 	public void setHousehold(Household hh);
 	
@@ -132,8 +131,8 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 
 	public TreeSet<String> getTravelcards();
 
-	@Deprecated // not yet well enough understood
-	public Knowledge getKnowledge();
+//	@Deprecated // not yet well enough understood
+//	public Knowledge getKnowledge();
 
 	@Deprecated // not yet well enough understood
 	public Desires getDesires();

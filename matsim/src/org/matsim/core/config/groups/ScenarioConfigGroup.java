@@ -128,4 +128,8 @@ public class ScenarioConfigGroup extends Module {
 		this.useRoadpricing = useRoadpricing;
 	}
 
+	public boolean isUseKnowledges() {
+		return true;
+	}
+
 }

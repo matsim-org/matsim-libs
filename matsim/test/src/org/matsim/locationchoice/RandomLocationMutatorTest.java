@@ -1,5 +1,6 @@
 package org.matsim.locationchoice;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -9,6 +10,7 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 	private RandomLocationMutator randomlocationmutator = null;
 	private Initializer initializer;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.initializer = new Initializer();
@@ -16,6 +18,7 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 		this.initialize();     
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		this.randomlocationmutator = null;
 		this.initializer = null;
@@ -24,7 +27,7 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 
 	private void initialize() {		
 		this.randomlocationmutator = new RandomLocationMutator(this.initializer.getControler().getNetwork(), 
-				this.initializer.getControler());
+				this.initializer.getControler(), ((ScenarioImpl)this.initializer.getControler().getScenarioData()).getKnowledges());
 	}
 
 	/* 

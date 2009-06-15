@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -36,6 +37,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.facilities.algorithms.FacilitiesDefineCapAndOpentime;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
 import org.matsim.population.algorithms.PlansDefineKnowledge;
@@ -169,7 +171,8 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  running plans algorithms... ");
-		new PlansDefineKnowledge(facilities).run(plans);
+		KnowledgesImpl kn = new KnowledgesImpl();
+		new PlansDefineKnowledge(facilities, kn).run(plans);
 		log.info("  done.");
 
 		log.info("\n");
@@ -177,7 +180,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  running plans algorithms... ");
-		new PersonCreatePlanFromKnowledge().run(plans);
+		new PersonCreatePlanFromKnowledge(kn).run(plans);
 		log.info("  done.");
 
 		log.info("\n");
@@ -185,7 +188,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(plans).write();
+		new PopulationWriter(plans, kn, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion(), Gbl.getConfig().plans().getOutputSample()).write();
 		log.info("  done.");
 
 		log.info("  writing network xml file... ");

@@ -36,6 +36,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -72,14 +73,17 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	private final PlanAnalyzeSubtours past = new PlanAnalyzeSubtours();
 	private final Municipalities municipalities;
+
+	private Knowledges knowledges;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile) {
+	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile, Knowledges knowledges) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.municipalities = municipalities;
+		this.knowledges = knowledges;
 		try {
 			fw = new FileWriter(outfile);
 			out = new BufferedWriter(fw);
@@ -246,15 +250,15 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			// dist_subtour; // distance of the sub-tour (in kilometers)
 			model.setDistanceTour(this.calcTourDistance(act_indices,p));
 			// dist_h_w; // distance between home and work or education facility (in km)
-			Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCoord();
+			Coord h_coord = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility().getCoord();
 			ArrayList<ActivityOption> prim_acts = new ArrayList<ActivityOption>();
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EKIGA));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EPRIM));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_ESECO));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EHIGH));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EOTHR));
+			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W2));
+			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W3));
+			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EKIGA));
+			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EPRIM));
+			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_ESECO));
+			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EHIGH));
+			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EOTHR));
 			if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 			else {
 				Coord p_coord = prim_acts.get(MatsimRandom.getRandom().nextInt(prim_acts.size())).getFacility().getCoord();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
@@ -42,6 +43,7 @@ public class SNController4 extends Controler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
+	@Override
 	protected StrategyManager loadStrategyManager() {
 
 		StrategyManager manager = new StrategyManager();
@@ -50,7 +52,7 @@ public class SNController4 extends Controler {
 		
 		// Adjust activity start times by social network and time windows
 		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());// only facilities visited in last iteration are in time window hastable
-		PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.network,this.travelCostCalculator,this.travelTimeCalculator);
+		PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.network,this.travelCostCalculator,this.travelTimeCalculator, ((ScenarioImpl)this.getScenarioData()).getKnowledges());
 		strategy1.addStrategyModule(socialNetStrategyModule);
 		manager.addStrategy(strategy1, 0.15);
 		this.log.info("  added strategy SNCoordinateArrivalTimes with probability 0.15");

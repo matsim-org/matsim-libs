@@ -26,6 +26,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -44,6 +46,7 @@ public class AnalyzeTimeCorrelations {
 
 	static Population plans;
 	static ActivityFacilities facilities;
+	static Knowledges knowledges;
 	
 	public static void run() throws Exception {
 
@@ -61,7 +64,8 @@ public class AnalyzeTimeCorrelations {
 		int isoc=0;
 //		read in plans
 		System.out.println(" Initializing the plans ...");
-		plans = Scenario.readPlans(network, iplan);
+		knowledges = new KnowledgesImpl();
+		plans = Scenario.readPlansAndKnowledges(network, knowledges);
 		System.out.println("... done");
 
 		System.out.println(" Initializing agent knowledge about geography ...");
@@ -120,7 +124,7 @@ public class AnalyzeTimeCorrelations {
 		Gbl.printElapsedTime();
 	}
 	protected static void initializeKnowledge() {
-		new InitializeKnowledge(plans, facilities);
+		new InitializeKnowledge(plans, facilities, knowledges);
 	}
 }
 

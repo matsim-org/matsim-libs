@@ -33,6 +33,8 @@ import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
 import org.matsim.population.algorithms.PlansDefineKnowledge;
@@ -93,6 +95,7 @@ public class Mode_choice_main {
 
 		System.out.println("  creating plans object... ");
 		Population plans = new PopulationImpl();
+		Knowledges knowledges = new KnowledgesImpl();
 		System.out.println("  done.");
 
 		System.out.println("  running plans algorithms... ");
@@ -128,7 +131,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  running plans algorithms... ");
-		new PlansDefineKnowledge(facilities).run(plans);
+		new PlansDefineKnowledge(facilities, knowledges).run(plans);
 		System.out.println("  done.");
 
 		System.out.println();
@@ -136,7 +139,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  running plans algorithms... ");
-		new PersonCreatePlanFromKnowledge().run(plans);
+		new PersonCreatePlanFromKnowledge(knowledges).run(plans);
 		//new FrancescoAlgo().run(plans);
 		new TicketAlgo ().run(plans);
 

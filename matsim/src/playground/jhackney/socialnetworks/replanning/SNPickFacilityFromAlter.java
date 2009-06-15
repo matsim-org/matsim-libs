@@ -5,6 +5,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class SNPickFacilityFromAlter extends AbstractMultithreadedModule {
@@ -14,16 +15,19 @@ public class SNPickFacilityFromAlter extends AbstractMultithreadedModule {
 	private NetworkLayer network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;
+	private Knowledges knowledges;
 	
-	public SNPickFacilityFromAlter(NetworkLayer network, TravelCost tcost, TravelTime ttime) {
+	public SNPickFacilityFromAlter(NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
 		log.info("initializing SNPickFacility");
     	this.network=network;
     	this.tcost = tcost;
     	this.ttime = ttime;
+    	this.knowledges = kn;
     }
 
-    public PlanAlgorithm getPlanAlgoInstance() {
+    @Override
+		public PlanAlgorithm getPlanAlgoInstance() {
 
-    	return new SNPickFacility(factypes, network, tcost, ttime);
+    	return new SNPickFacility(factypes, network, tcost, ttime, this.knowledges);
     }
 }

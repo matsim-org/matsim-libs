@@ -11,12 +11,15 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 
 public class DefineFlexibleActivities {
 	
+	private Knowledges knowledges = null;
 	HashSet<String> flexibleTypes = new HashSet<String>();
 	
-	public DefineFlexibleActivities() {
+	public DefineFlexibleActivities(Knowledges kn) {
+		this.knowledges = kn;
 		this.initFlexibleTypes();
 	}
 	
@@ -46,7 +49,7 @@ public class DefineFlexibleActivities {
 	private void getFlexibleActsBasedOnKnowledge(Plan plan, List<Activity> flexibleActivities) {				
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
 			Activity act = (Activity)plan.getPlanElements().get(i);
-			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			if (!isPrimary && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 				flexibleActivities.add(act);
 			}
@@ -65,7 +68,7 @@ public class DefineFlexibleActivities {
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 			if (act.getType().startsWith("h") || act.getType().startsWith("tta")) continue;
-			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			
 			if (isPrimary) {
 				primaryActivities.add(act);

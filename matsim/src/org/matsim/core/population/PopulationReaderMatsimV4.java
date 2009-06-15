@@ -49,6 +49,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Desires;
 import org.matsim.population.Knowledge;
@@ -83,7 +85,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final BasicPopulation plans;
 	private final Network network;
 	private final ActivityFacilities facilities;
-
+	private Knowledges knowledges;
+		
 	private Person currperson = null;
 	private Desires currdesires = null;
 	private Knowledge currknowledge = null;
@@ -109,16 +112,24 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	 * @param facilities
 	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
 	 */
-	public PopulationReaderMatsimV4(final BasicPopulation pop, final Network network, final ActivityFacilities facilities) {
+	@Deprecated
+	public PopulationReaderMatsimV4(final BasicPopulation pop, final Network network, final ActivityFacilities facilities, Knowledges knowledges) {
 		this.plans = pop;
 		this.network = network;
 		this.facilities = facilities;
+		this.knowledges = knowledges;
 	}
 	
 	public PopulationReaderMatsimV4(final Scenario scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 		this.facilities = scenario.getActivityFacilities();
+		this.knowledges = new KnowledgesImpl();
+	}
+	
+	public PopulationReaderMatsimV4(final Scenario sc, Knowledges knowledges){
+		this(sc);
+		this.knowledges = knowledges;
 	}
 
 	@Override
@@ -173,6 +184,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (DESIRES.equals(name)) {
 			this.currdesires = null;
 		} else if (KNOWLEDGE.equals(name)) {
+			
 				this.currknowledge = null;
 		} else if (ACTIVITYSPACE.equals(name)) {
 			if (!this.curractspace.isComplete()) {
@@ -248,7 +260,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startKnowledge(final Attributes atts) {
-		this.currknowledge = this.currperson.createKnowledge(atts.getValue("desc"));
+		this.currknowledge = this.knowledges.getBuilder().createKnowledge(this.currperson.getId(), atts.getValue("desc"));
+		this.knowledges.getKnowledgesByPersonId().put(this.currperson.getId(), this.currknowledge);
 	}
 
 	private void startActivitySpace(final Attributes atts) {

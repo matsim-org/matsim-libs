@@ -3,6 +3,7 @@ package org.matsim.locationchoice.constrained;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.locationchoice.Initializer;
@@ -14,6 +15,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	private LocationMutatorwChoiceSet locationmutator = null;
 	private Initializer initializer;
 	
+	@Override
 	protected void setUp() throws Exception {
         super.setUp();
         this.initializer = new Initializer();
@@ -30,7 +32,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 
 	private void initialize() {		
 		this.locationmutator = new LocationMutatorwChoiceSet(this.initializer.getControler().getNetwork(),
-				this.initializer.getControler());
+				this.initializer.getControler(), ((ScenarioImpl)this.initializer.getControler().getScenarioData()).getKnowledges());
 	}
 	
 	public void testConstructor() {

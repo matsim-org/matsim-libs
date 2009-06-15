@@ -38,6 +38,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -46,7 +47,6 @@ import playground.jhackney.socialnetworks.algorithms.FacilitiesFindScenarioMinMa
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 import playground.jhackney.socialnetworks.statistics.GeoStatistics;
-
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -59,11 +59,13 @@ public class PajekWriter {
 	private Coord maxCoord;
 	private TreeMap<Id, Integer> pajekIndex= new TreeMap<Id, Integer>();
 	String dir;
+	private Knowledges knowledges;
 
 	private final static Logger log = Logger.getLogger(PajekWriter.class);
 
-	public PajekWriter(String dir, ActivityFacilities facilities){
+	public PajekWriter(String dir, ActivityFacilities facilities, Knowledges knowledges){
 		this.dir= dir + "/";
+		this.knowledges = knowledges;
 		File pjDir=new File(this.dir+"pajek/");
 		log.info("PajekWriter1 make dir "+this.dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){
@@ -109,7 +111,7 @@ public class PajekWriter {
 			int iperson = 1;
 			while (itPerson.hasNext()) {
 				Person p = itPerson.next();
-				final Knowledge know = p.getKnowledge();
+				final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(p.getId());
 				if (know == null) {
 					Gbl.errorMsg("Knowledge is not defined!");
 				}

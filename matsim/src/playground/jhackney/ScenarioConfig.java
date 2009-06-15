@@ -38,6 +38,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
@@ -234,6 +235,17 @@ public abstract class ScenarioConfig {
 		System.out.println("  done.");
 		return plans;
 	}
+	
+	public static final Population readPlansAndKnowledges(final Network network, Knowledges kn) {
+		System.out.println("  reading plans xml file... ");
+		Population plans = new PopulationImpl();
+		String filename=input_directory +popFileName;
+		System.out.println(filename);
+		new MatsimPopulationReader(plans, (NetworkLayer) network, kn).readFile(filename);
+		System.out.println("  done.");
+		return plans;
+	}
+
 
 	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");

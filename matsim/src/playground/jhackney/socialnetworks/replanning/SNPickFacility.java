@@ -20,6 +20,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -68,14 +69,16 @@ public class SNPickFacility implements PlanAlgorithm {
 	private TravelTime ttime;
 	private String[] factypes;
 	private final Logger log = Logger.getLogger(SNPickFacility.class);
+	private Knowledges knowledges;
 
-	public SNPickFacility(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime){
+	public SNPickFacility(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges knowledges){
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
 		this.tcost=tcost;
 		this.ttime=ttime;
 		this.factypes=factypes;
+		this.knowledges = knowledges;
 	}
 
 	public void run(Plan plan) {
@@ -97,11 +100,11 @@ public class SNPickFacility implements PlanAlgorithm {
 
 		if (rand < cum_p_factype[0]) {
 			factype = factypes[0];
-		}else if (cum_p_factype[0] <= rand && rand < cum_p_factype[1]) {
+		}else if ((cum_p_factype[0] <= rand) && (rand < cum_p_factype[1])) {
 			factype = factypes[1];
-		}else if (cum_p_factype[1] <= rand && rand < cum_p_factype[2]) {
+		}else if ((cum_p_factype[1] <= rand) && (rand < cum_p_factype[2])) {
 			factype = factypes[2];
-		}else if (cum_p_factype[2] <= rand && rand < cum_p_factype[3]) {
+		}else if ((cum_p_factype[2] <= rand) && (rand < cum_p_factype[3])) {
 			factype = factypes[3];
 		}else {
 			factype = factypes[4];
@@ -130,7 +133,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			Activity newAct = (actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
-			Knowledge k = person.getKnowledge();
+			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 			LinkedHashMap<ActivityOption,Integer> facMap=new LinkedHashMap<ActivityOption,Integer>();
 			ArrayList<ActivityOption> facList=k.getActivities(factype);
@@ -153,7 +156,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			while(aIt.hasNext()){
 				Person alter = aIt.next();
 				facList.clear();
-				facList.addAll(alter.getKnowledge().getActivities(factype));
+				facList.addAll(this.knowledges.getKnowledgesByPersonId().get(alter.getId()).getActivities(factype));
 				fIt=null;
 				fIt=facList.iterator();
 				while(fIt.hasNext()){
@@ -175,14 +178,14 @@ public class SNPickFacility implements PlanAlgorithm {
 
 			if(newAct.getLinkId()!=f.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
-				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
+				if((newAct.getType() == plan.getFirstActivity().getType()) && (newAct.getLink() == plan.getFirstActivity().getLink())){
 					Activity lastAct = (Activity) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 					lastAct.setLink(f.getLink());
 					lastAct.setCoord(f.getCoord());
 					lastAct.setFacility(f);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if(newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType() && newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink()){
+				if((newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
 					Activity firstAct = newPlan.getFirstActivity();
 					firstAct.setLink(f.getLink());
 					firstAct.setCoord(f.getCoord());
@@ -244,7 +247,7 @@ public class SNPickFacility implements PlanAlgorithm {
 		for(int i=0;i<nums.length;i++){
 			if(i==0){
 				if(random<=p[i]) pick=0;
-			}else if(p[i-1]<random && random<=p[i]){
+			}else if((p[i-1]<random) && (random<=p[i])){
 				pick=i;
 			}
 		}

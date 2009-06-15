@@ -32,6 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
@@ -50,6 +51,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacility []> facilitiesOfType = new TreeMap<String, ActivityFacility []>();
+	private Knowledges knowledges;
 	
 	
 	public LocationChoice() {
@@ -57,7 +59,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	public LocationChoice(
 			final NetworkLayer network,
-			Controler controler) {
+			Controler controler, Knowledges kn) {
 		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
 		// when you use it in demandmodelling where you don't really need a control(l)er.
 		// kai, jan09
@@ -77,7 +79,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			
 			anhorni: april09
 		 */
-
+		this.knowledges = kn;
 		this.initLocal(network, controler);
 	}
 
@@ -103,7 +105,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	 * Initialize the quadtrees of all available activity types
 	 */
 	private void initTrees(ActivityFacilities facilities) {
-		DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities();
+		DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
 		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.network);
 		treesBuilder.createTrees(facilities);
@@ -142,18 +144,18 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		if (!this.constrained) {
-			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, 
+			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
 					this.quadTreesOfType, this.facilitiesOfType));
 		}
 		else {
 			// only moving one flexible activity
 			if (Gbl.getConfig().locationchoice().getSimpleTG().equals("true")) {	
-				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler,  
+				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges, 
 					this.quadTreesOfType, this.facilitiesOfType));
 			}
 			else {
 				// computing new chain of flexible activity
-				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  
+				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
 				this.quadTreesOfType, this.facilitiesOfType));
 			}
 		}		

@@ -30,6 +30,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -55,6 +57,7 @@ public class AnalyzeScores {
 
 	static Population plans;
 	static ActivityFacilities facilities;
+	static Knowledges knowledges;
 	
 	public static void run() throws Exception {
 
@@ -70,7 +73,9 @@ public class AnalyzeScores {
 		new WorldConnectLocations().run(world);
 		int iplans=500;
 		int isoc=500;
-		plans = ScenarioConfig.readPlans(network, iplans);
+		knowledges = new KnowledgesImpl();		
+		plans = ScenarioConfig.readPlansAndKnowledges(network, knowledges);
+		
 		System.out.println(" Initializing the social network ...");
 		
 		System.out.println(" Initializing agent knowledge about geography ...");
@@ -187,7 +192,7 @@ public class AnalyzeScores {
 		Gbl.printElapsedTime();
 	}
 	protected static void initializeKnowledge() {
-		new InitializeKnowledge(plans, facilities);
+		new InitializeKnowledge(plans, facilities, knowledges);
 	}
 }
 

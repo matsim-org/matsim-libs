@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
@@ -38,6 +39,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.InitializeKnowledge;
@@ -110,10 +112,11 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 	private EventsToScore scoring = null;
 	private Controler controler = null;
 	private final Logger log = Logger.getLogger(SNSimpleControllerListener.class);
+	private Knowledges knowledges;
 
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
-
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldConnectLocations().run(controler.getWorld());
 
@@ -203,11 +206,11 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 
 		if( event.getIteration()%interact_interval==0){
 
-			if(reportInterval>0 && event.getIteration()%reportInterval==0){//50
+			if((reportInterval>0) && (event.getIteration()%reportInterval==0)){//50
 				Gbl.printMemoryUsage();
 				controler.stopwatch.beginOperation("netstats");
 				this.log.info(" Calculating and reporting network statistics ...");
-				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
+				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation(), this.knowledges);
 				this.log.info(" ... done");
 				controler.stopwatch.endOperation("netstats");
 
@@ -283,7 +286,7 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 		this.rndEncounterProbs = new ParamStringsToStringDoubleMap(this.controler.getConfig().socnetmodule().getActTypes(), this.controler.getConfig().socnetmodule().getFacWt()).getMap();
 
 		this.log.info(" Instantiating the Pajek writer ...");
-		this.pjw = new PajekWriter(SOCNET_OUT_DIR, this.controler.getFacilities());
+		this.pjw = new PajekWriter(SOCNET_OUT_DIR, this.controler.getFacilities(), this.knowledges);
 		this.log.info("... done");
 
 		if(this.controler.getConfig().socnetmodule().getSocNetAlgo()==(null)){
@@ -308,7 +311,7 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 		this.log.info("... done");
 
 		this.log.info(" Setting up the NonSpatial interactor ...");
-		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
@@ -344,7 +347,7 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 	}
 
 	protected void initializeKnowledge() {
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
 	}
 }
 

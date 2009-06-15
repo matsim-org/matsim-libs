@@ -2,10 +2,11 @@ package org.matsim.locationchoice;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.locationchoice.LocationChoice;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -18,6 +19,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 	public LocationChoiceTest() {
 	}
 	
+	@Override
 	protected void setUp() throws Exception {
         super.setUp();
         this.initializer = new Initializer();
@@ -25,6 +27,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
         this.initialize();     
     }
 	
+	@Override
 	protected void tearDown() throws Exception {
          super.tearDown();
          Gbl.reset();
@@ -32,7 +35,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 	
 	private void initialize() {		
 		this.locationchoice = new LocationChoice(this.initializer.getControler().getNetwork(), 
-				this.initializer.getControler());
+				this.initializer.getControler(), ((ScenarioImpl)this.initializer.getControler().getScenarioData()).getKnowledges());
 	}
 	
 	public void testConstructorandInitLocal() {

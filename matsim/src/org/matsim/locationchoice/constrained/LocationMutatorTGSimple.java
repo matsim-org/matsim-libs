@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
@@ -35,6 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -42,15 +44,16 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
 public class LocationMutatorTGSimple extends LocationMutator {
 	
 	protected int unsuccessfullLC = 0;
-	DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities();
+	DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 	
-	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler,
+	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler, Knowledges knowledges,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
 		
-		super(network, controler, quad_trees, facilities_of_type);
+		super(network, controler, knowledges, quad_trees, facilities_of_type);
 	}
 		
+	@Override
 	public void handlePlan(final Plan plan){
 
 		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
@@ -109,7 +112,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			List<?> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final Activity act = (Activity)actslegs.get(j);		
-				if (!plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) && 
+				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) && 
 						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 					flexibleActivities.add(act);
 				}

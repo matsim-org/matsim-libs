@@ -32,6 +32,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -128,7 +130,8 @@ public class IIDMGeneration {
 
 		log.info("  reding plans xml file... ");
 		Population pop = new PopulationImpl();
-		new MatsimPopulationReader(pop, null).readFile(config.plans().getInputFile());
+		Knowledges knowledges =  new KnowledgesImpl();
+		new MatsimPopulationReader(pop, null, knowledges).readFile(config.plans().getInputFile());
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -157,7 +160,7 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  removing persons... ");
-		new PlansFilterPersons().run(pop);
+		new PlansFilterPersons(knowledges).run(pop);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -183,8 +186,8 @@ public class IIDMGeneration {
 
 		log.info("  runnning person models... ");
 		new PersonAssignLicenseModel().run(pop);
-		new PersonAssignMobilitiyToolModel().run(pop);
-		new PersonAssignActivityChains(mz).run(pop);
+		new PersonAssignMobilitiyToolModel(knowledges).run(pop);
+		new PersonAssignActivityChains(mz, knowledges).run(pop);
 		new PlansAnalyse().run(pop);
 		new PlansAnalyse().run(mz_pop);
 		log.info("  done.");

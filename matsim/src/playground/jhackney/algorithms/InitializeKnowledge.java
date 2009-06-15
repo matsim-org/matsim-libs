@@ -8,6 +8,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 
 import playground.jhackney.socialnetworks.io.ActivityActReader;
@@ -15,7 +16,7 @@ import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities){
+	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities, Knowledges knowledges){
 
 		ActivityActReader aar = null;
 
@@ -45,9 +46,9 @@ public class InitializeKnowledge {
 		while (p_it.hasNext()) {
 			Person person=p_it.next();
 
-			Knowledge k = person.getKnowledge();
+			Knowledge k = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
-				k = person.createKnowledge("created by " + this.getClass().getName());
+				k = knowledges.getBuilder().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);

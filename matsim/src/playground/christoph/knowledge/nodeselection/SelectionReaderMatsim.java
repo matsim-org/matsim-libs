@@ -39,6 +39,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -66,7 +67,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	
 	protected Population population;
 	protected NetworkLayer network;
-	protected Person currentPerson;
+	protected Person person;
 	protected Knowledge currentKnowledge;
 	protected Map<Id, Node> currentNodes;
 	protected Map<Id, Link> currentLinks;
@@ -78,12 +79,15 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	protected Id linkId;
 	
 	protected FileNameCreator fileNameCreator;
+
+	private Knowledges knowledges;
 			
-	public SelectionReaderMatsim(NetworkLayer network, Population population)
+	public SelectionReaderMatsim(NetworkLayer network, Population population, Knowledges knowledges)
 	{
 		this.network = network;
 		this.population = population;
 		this.fileNameCreator = new FileNameCreator();
+		this.knowledges = knowledges;
 	}
 
 	public void setOverwriteExistingSelection(boolean value)
@@ -104,7 +108,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 		}
 		else if (PERSON.equalsIgnoreCase(name))
 		{
-			currentPerson = null;
+			person = null;
 		}
 		else if (KNOWLEDGE.equalsIgnoreCase(name))
 		{
@@ -146,24 +150,24 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 			
 			if (personId != null)
 			{
-				currentPerson = population.getPersons().get(personId);	
+				person = population.getPersons().get(personId);	
 			}
 			else
 			{
-				currentPerson = null;
+				person = null;
 			}		
 		} 
 		
 		else if (KNOWLEDGE.equalsIgnoreCase(name))
 		{
-			if (currentPerson != null)
+			if (person != null)
 			{
-				currentKnowledge = currentPerson.getKnowledge();
+				currentKnowledge = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 	 
 				if (currentKnowledge == null)
 				{
-					currentPerson.createKnowledge("activityroom");
-					currentKnowledge = currentPerson.getKnowledge();
+					this.knowledges.getBuilder().createKnowledge(person.getId(), "activityroom");
+					currentKnowledge = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 				}
 			}
 			else
@@ -181,7 +185,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 		{
 			if (currentKnowledge != null)
 			{
-				Map<String,Object> customAttributes = currentPerson.getCustomAttributes();
+				Map<String,Object> customAttributes = person.getCustomAttributes();
 	
 				if (customAttributes != null)
 				{

@@ -30,7 +30,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
@@ -38,11 +37,10 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-
-import playground.mfeil.PlanomatX18;
+import org.matsim.knowledges.Knowledges;
 
 
 /**
@@ -57,11 +55,12 @@ public class AnalysisSelectedPlans {
 	private ArrayList<List<PlanElement>> activityChains;
 	private ArrayList<ArrayList<Plan>> plans;
 	private final Map<String,Double> minimumTime;
+	private Knowledges knowledges;
 	private static final Logger log = Logger.getLogger(AnalysisSelectedPlans.class);
 	
 
 
-	public AnalysisSelectedPlans(final Population population, final String outputDir) {
+	public AnalysisSelectedPlans(final Population population, Knowledges knowledges, final String outputDir) {
 		this.population = population;
 		this.outputDir = outputDir;
 		initAnalysis();
@@ -110,20 +109,20 @@ public class AnalysisSelectedPlans {
 						break;
 					}
 				}
-				for (int k=0;k<this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).size();k++){
+				for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).size();k++){
 					boolean notIn = true;
 					for (int l=0;l<this.plans.get(i).get(j).getPlanElements().size()-2;l+=2){
-						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(l))).getType().equalsIgnoreCase(this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(k).getType()) &&
-								((Activity)(this.plans.get(i).get(j).getPlanElements().get(l))).getFacilityId().toString().equalsIgnoreCase(this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(k).getFacility().getId().toString())){
+						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(l))).getType().equalsIgnoreCase(this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k).getType()) &&
+								((Activity)(this.plans.get(i).get(j).getPlanElements().get(l))).getFacilityId().toString().equalsIgnoreCase(this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k).getFacility().getId().toString())){
 							notIn = false;
 							break;
 						}
 					}
-					if (notIn) log.warn("Prim act error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" for prim act "+this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(k));
+					if (notIn) log.warn("Prim act error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" for prim act "+this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k));
 				}
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
 					if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home")){
-						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId()!=this.plans.get(i).get(j).getPerson().getKnowledge().getActivities(true).get(0).getFacility().getId()){
+						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId()!=this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(0).getFacility().getId()){
 							log.warn("Non-primary home act found in plan of person "+this.plans.get(i).get(j).getPerson().getId());
 							break;
 						}
@@ -241,12 +240,12 @@ public class AnalysisSelectedPlans {
 
 		final String outputDir = "./output/Test2/";
 
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
-		AnalysisSelectedPlans sp = new AnalysisSelectedPlans(scenario.getPopulation(), outputDir);
+		AnalysisSelectedPlans sp = new AnalysisSelectedPlans(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
 		sp.analyze();
 		sp.checkCorrectness();
 		

@@ -27,9 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -44,16 +42,19 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
+
+	private Knowledges knowledges;
 	
 	private final static Logger log = Logger.getLogger(CompassRoute.class);
 	
 	/**
 	 * Default constructor.
+	 * @param knowledges 
 	 *                    
 	 */
-	public CompassRoute() 
+	public CompassRoute(Knowledges knowledges) 
 	{
-		
+		this.knowledges = knowledges;
 	}
 
 	
@@ -74,7 +75,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
 		
 		nodes.add(fromNode);
 		
@@ -194,7 +195,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		 * choosing this link would be a bad idea, so return the worst possible angle.
 		 * 
 		 */
-		if (v1x == 0.0 && v1y == 0.0) return Math.PI;
+		if ((v1x == 0.0) && (v1y == 0.0)) return Math.PI;
 		
 		/*
 		 * If the nextLinkNode is the TargetNode return 0.0 so this link is chosen.
@@ -228,7 +229,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	@Override
 	public CompassRoute clone()
 	{
-		CompassRoute clone = new CompassRoute();
+		CompassRoute clone = new CompassRoute(this.knowledges);
 		clone.removeLoops = this.removeLoops;
 		clone.tabuSearch = this.tabuSearch;
 		clone.maxLinks = this.maxLinks;

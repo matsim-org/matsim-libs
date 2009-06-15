@@ -73,6 +73,7 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 	
 	
 
+	@Override
 	public void finishReplanning(){
 		
 		Statistics.noSexAssignment=false;
@@ -90,11 +91,11 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 		schedulingModule.finishReplanning();
 		
 		/* Fill Optimized Agents object */
-		agents = new OptimizedAgents (list[0]);
+		agents = new OptimizedAgents (list[0], this.knowledges);
 		
 		/* Detect optimal coefficients metric */
 		Statistics.prt=false;
-		if (Controler.getIteration()==1	&&	this.noOfSoftCoefficients>1) this.detectCoefficients();
+		if ((Controler.getIteration()==1)	&&	(this.noOfSoftCoefficients>1)) this.detectCoefficients();
 		Statistics.prt=true;
 		
 		/* Print statistics of individual optimization */

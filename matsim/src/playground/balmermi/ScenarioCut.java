@@ -27,10 +27,11 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.ScenarioLoader;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
@@ -105,8 +106,8 @@ public class ScenarioCut {
 					}
 				}
 			}
-			if (p.getKnowledge() != null) {
-				for (ActivityOption ao : p.getKnowledge().getActivities()) {
+			if (((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
+				for (ActivityOption ao : ((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
 					ActivityFacility f = ao.getFacility();
 					if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 					if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
@@ -220,8 +221,8 @@ public class ScenarioCut {
 					}
 				}
 			}
-			if (p.getKnowledge() != null) {
-				for (ActivityOption ao : p.getKnowledge().getActivities()) {
+			if (((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
+				for (ActivityOption ao : ((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
 					if (!facIds.contains(ao.getFacility().getId())) { removeIt = true; }
 				}
 			}

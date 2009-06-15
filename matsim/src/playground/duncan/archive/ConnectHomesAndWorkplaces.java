@@ -37,6 +37,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.RandomLocationMutator;
 import org.matsim.world.MatsimWorldReader;
@@ -81,12 +83,13 @@ public class ConnectHomesAndWorkplaces {
 		fr.readFile( this.config.facilities().getInputFile() ) ;
 
 		// create the locachoice object:
-		LocationMutator locachoice = new RandomLocationMutator( controler.getNetwork(),controler) ;
+		Knowledges knowledges = new KnowledgesImpl();
+		LocationMutator locachoice = new RandomLocationMutator(controler.getNetwork(), controler, knowledges) ;
 
 		final PopulationImpl plans = new PopulationImpl();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network, knowledges);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, knowledges);
 		plans.addAlgorithm(locachoice);
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
 

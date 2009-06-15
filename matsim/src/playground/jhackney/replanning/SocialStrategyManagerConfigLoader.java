@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
@@ -153,7 +154,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				// JH
 			} else if (classname.equals("KSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
+				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("FSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
@@ -161,12 +162,12 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("SSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(network,travelCostCalc,travelTimeCalc);
+				PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(network,travelCostCalc,travelTimeCalc, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 				strategy.addStrategyModule(socialNetStrategyModule);
 				// JH
 			} else if (classname.equals("LocationChoice")) {
 	    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
-	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
+	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());
 			}

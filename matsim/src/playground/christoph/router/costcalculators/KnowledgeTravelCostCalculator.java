@@ -28,6 +28,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
@@ -42,11 +43,13 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	protected TravelTime timeCalculator;
 	protected double travelCostFactor;
 	protected double marginalUtlOfDistance;
+	private Knowledges knowledges;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostCalculator.class);
 	
-	public KnowledgeTravelCostCalculator(TravelTime timeCalculator)
+	public KnowledgeTravelCostCalculator(Knowledges knowledges, TravelTime timeCalculator)
 	{
+		this.knowledges = knowledges;
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
@@ -60,7 +63,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
 		
 		// if the Person doesn't know the link -> return max costs 
 		if (!KnowledgeTools.knowsLink(link, knownNodesMap))
@@ -83,6 +86,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}
 	
+	@Override
 	public KnowledgeTravelCostCalculator clone()
 	{
 		TravelTime timeCalculatorClone;
@@ -97,7 +101,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 			timeCalculatorClone = timeCalculator;
 		}
 		
-		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(timeCalculatorClone);
+		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(this.knowledges, timeCalculatorClone);
 		clone.marginalUtlOfDistance = this.marginalUtlOfDistance;
 		clone.travelCostFactor = this.travelCostFactor;
 		

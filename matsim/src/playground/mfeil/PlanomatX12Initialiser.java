@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.replanning.modules.*;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -53,7 +54,7 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);	
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);

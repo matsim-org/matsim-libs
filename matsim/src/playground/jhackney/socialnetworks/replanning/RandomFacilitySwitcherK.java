@@ -25,6 +25,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -47,18 +48,21 @@ public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	 * Need to make this change in the SNControllers, too.
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
+	private Knowledges knowledges;
 	
-    public RandomFacilitySwitcherK(NetworkLayer network, TravelCost tcost, TravelTime ttime) {
+    public RandomFacilitySwitcherK(NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
 
 		log.info("initializing SNRandomFacilitySwitcher");
     	this.network=network;
     	this.tcost = tcost;
     	this.ttime = ttime;
+    	this.knowledges = kn;
     }
 
-    public PlanAlgorithm getPlanAlgoInstance() {
+    @Override
+		public PlanAlgorithm getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
-	return new RandomChangeLocationK(factypes, network, tcost, ttime);
+	return new RandomChangeLocationK(factypes, network, tcost, ttime, this.knowledges);
     }
 
 

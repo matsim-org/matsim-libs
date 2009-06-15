@@ -33,10 +33,12 @@ import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
+import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Desires;
 import org.matsim.population.Knowledge;
@@ -48,9 +50,11 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	private PopulationWriterHandler handler = null;
 	private final BasicPopulation population;
+	private Knowledges knowledges = null;
 
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
 
+	
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
 	 * as specified in the {@linkplain org.matsim.core.config.groups.PlansConfigGroup configuration}.
@@ -104,12 +108,48 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		}
 	}
 	
+	/**
+	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
+	 * the specified version and also writes knowledges to the xml.
+	 * If plans-streaming is on, the file will already be opened and the file-header be written.
+	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
+	 *
+	 * @param population the population to write to file
+	 * @param filename the filename where to write the data
+	 * @param version specifies the file-format
+	 * @param fraction of persons to write to the plans file
+	 */
+	public PopulationWriter(final BasicPopulation population, final Knowledges knowledges, final String filename, final String version,
+			final double fraction) {
+		super();
+		this.population = population;
+		this.outfile = filename;
+		this.write_person_fraction = fraction;
+		this.knowledges = knowledges;
+		createHandler(version);
+
+		if (this.population instanceof PopulationImpl) {
+			if (((PopulationImpl) this.population).isStreaming()) {
+				// write the file head if it is used with streaming.
+				writeStartPlans();
+			}
+		}
+	}
 	
 	public PopulationWriter(final BasicPopulation population, String filename) {
 		this(population, filename, "v4", 1.0);
 	}
 	
 	
+
+	public PopulationWriter(PopulationImpl pop, Knowledges knowledges2) {
+		this(pop);
+		this.knowledges = knowledges2;
+	}
+
+	public PopulationWriter(Population population2, Knowledges knowledges2, String iterationFilename, String outversion) {
+		this(population2, knowledges2, iterationFilename, outversion, 1.0);
+	}
 
 	/**
 	 * Just a helper method to instantiate the correct handler
@@ -181,8 +221,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 					this.handler.endDesires(this.out);
 				}
 				// knowledge
-				if (p.getKnowledge() != null) {
-					Knowledge k = p.getKnowledge();
+				if ((this.knowledges != null) && (this.knowledges.getKnowledgesByPersonId().get(p.getId()) != null)) {
+					Knowledge k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
 					this.handler.startKnowledge(k, this.out);
 					// activity spaces
 					if (k.getActivitySpaces() != null) {

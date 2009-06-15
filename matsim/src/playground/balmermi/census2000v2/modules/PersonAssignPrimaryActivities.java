@@ -29,6 +29,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -40,13 +41,15 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(PersonAssignPrimaryActivities.class);
+	private Knowledges knowledges;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignPrimaryActivities() {
+	public PersonAssignPrimaryActivities(Knowledges knowledges) {
 		log.info("    init " + this.getClass().getName() + " module...");
+		this.knowledges = knowledges;
 		log.info("    done.");
 	}
 
@@ -60,7 +63,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	}
 
 	public void run(Plan plan) {
-		Knowledge k = plan.getPerson().getKnowledge();
+		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId());
 		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
 		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
 		ArrayList<ActivityOptionImpl> prim_acts = k.getActivities(true);

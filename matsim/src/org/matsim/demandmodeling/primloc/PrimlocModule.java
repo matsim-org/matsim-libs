@@ -59,9 +59,9 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -72,6 +72,7 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.Layer;
@@ -117,11 +118,15 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	private Random random;
 	
 	private final Config cfg;
+
+	private Knowledges knowledges;
 	
-	public PrimlocModule () {
+	public PrimlocModule (Knowledges knowledges) {
 		this.cfg = Gbl.getConfig();
+		this.knowledges = knowledges;
 	}
 	
+	@Override
 	public void run(Person guy){
 
 		// Modify the plans of the agents accordingly to the Primloc model 
@@ -133,7 +138,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		if( !agentHasPrimaryActivityInPlan( guy ) )
 			return;
 				
-		Knowledge knowledge = guy.getKnowledge();
+		Knowledge knowledge = this.knowledges.getKnowledgesByPersonId().get(guy.getId());
 		ActivityFacility home = knowledge.getActivities("home").get(0).getFacility();
 		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCoord(), null).get(0);
 		if( homezone == null )
@@ -291,7 +296,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		// Determine how many employed persons live in each zone
 		for (Person guy : population.getPersons().values()) 
 			if( agentHasPrimaryActivityInPlan( guy ) ){
-				ActivityFacility homeOfGuy = guy.getKnowledge().getActivities("home").get(0).getFacility();
+				ActivityFacility homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
 				ArrayList<Location> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
 				Zone homezone = (Zone) list.get(0);
 				if( homezone == null )

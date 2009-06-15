@@ -32,6 +32,7 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.DeadEndRemover;
 
@@ -56,7 +57,7 @@ public class ParallelCreateKnownNodesMap {
 	 * @param nodeSelectors
 	 * @param numberOfThreads
 	 */
-	public static void run(final Population population, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
+	public static void run(final Population population, Knowledges knowledges, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
 	{
 		int numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
@@ -89,7 +90,7 @@ public class ParallelCreateKnownNodesMap {
 		for (int i = 0; i < numOfThreads; i++) 
 		{
 
-			SelectNodesThread selectionThread = new SelectNodesThread(i, nodeSelectorArray, nodeSelectors);
+			SelectNodesThread selectionThread = new SelectNodesThread(i, nodeSelectorArray, nodeSelectors, knowledges);
 			selectorThreads[i] = selectionThread;
 			
 			Thread thread = new Thread(selectionThread, "Thread#" + i);
@@ -143,12 +144,14 @@ public class ParallelCreateKnownNodesMap {
 		private final ArrayList<SelectNodes> nodeSelectors;
 		private final SelectNodes[][] nodeSelectorArray;
 		private final List<Person> persons = new LinkedList<Person>();
+		private Knowledges knowledges;
 
-		public SelectNodesThread(final int i, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
+		public SelectNodesThread(final int i, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors, Knowledges knowledges)
 		{
 			this.threadId = i;
 			this.nodeSelectorArray = nodeSelectorArray;
 			this.nodeSelectors = nodeSelectors;
+			this.knowledges = knowledges;
 		}
 
 		public void handlePerson(final Person person)
@@ -168,9 +171,9 @@ public class ParallelCreateKnownNodesMap {
 				 * No known nodes is handled as if the person would know the entire network.
 				 * This should be faster than using a Map that contains all Nodes of the network.
 				 */
-				if(person.getKnowledge() == null) 
+				if(this.knowledges.getKnowledgesByPersonId().get(person.getId()) == null) 
 				{
-					person.createKnowledge("activityroom");
+					knowledges.getBuilder().createKnowledge(person.getId(), "activityroom");
 					
 					Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 
@@ -191,7 +194,7 @@ public class ParallelCreateKnownNodesMap {
 					// if there is a valid index returned -> get Nodes
 					if (index >= 0)
 					{			
-						CreateKnownNodesMap.collectSelectedNodes(person, this.nodeSelectorArray[index][threadId]);
+						CreateKnownNodesMap.collectSelectedNodes(knowledges, person, this.nodeSelectorArray[index][threadId]);
 					}
 					else
 					{
@@ -201,7 +204,7 @@ public class ParallelCreateKnownNodesMap {
 				}	// for all NodeSelectors
 				
 				// if Flag is set, remove Dead Ends from the Person's Activity Room
-				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
+				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(knowledges, person);
 				
 				numRuns++;
 				if (numRuns % 500 == 0) 

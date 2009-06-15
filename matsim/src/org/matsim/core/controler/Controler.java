@@ -425,7 +425,7 @@ public class Controler {
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 
 			// dump plans
-			new PopulationWriter(this.population, this.getNameForOutputFilename("output_plans.xml.gz"),
+			new PopulationWriter(this.population, ((ScenarioImpl)this.getScenarioData()).getKnowledges(), this.getNameForOutputFilename("output_plans.xml.gz"),
 					this.config.plans().getOutputVersion()).write();
 			//dump network
 			new NetworkWriter(this.network, this.getNameForOutputFilename("output_network.xml.gz")).write();

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -37,6 +38,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.InitializeKnowledge;
@@ -120,13 +122,14 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 //	private Controler controler = null;
 	private playground.jhackney.controler.SNController4 controler=null;
+	private Knowledges knowledges;
 
 	public SNControllerListener4(playground.jhackney.controler.SNController4 controler){
 		this.controler=controler;
 	}
 
 	public void notifyStartup(final StartupEvent event) {
-
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldConnectLocations().run(controler.getWorld());
 
@@ -160,7 +163,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 	private void initializeKnowledge() {
 		// TODO Auto-generated method stub
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
 	}
 
 	public void notifyScoring(final ScoringEvent event){
@@ -251,13 +254,13 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 			Gbl.printMemoryUsage();
 			controler.stopwatch.beginOperation("netstats");
 			this.log.info(" Calculating and reporting network statistics ...");
-			this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
+			this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation(), this.knowledges);
 			this.log.info(" ... done");
 			controler.stopwatch.endOperation("netstats");
 
 			Gbl.printMemoryUsage();
 
-			if(CALCSTATS && event.getIteration()%50==0){//50
+			if(CALCSTATS && (event.getIteration()%50==0)){//50
 
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
 				aaw=new ActivityActWriter();
@@ -330,7 +333,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");
-		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities());
+		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities(), this.knowledges);
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");
@@ -351,7 +354,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		this.log.info("... done");
 
 		this.log.info(" Setting up the NonSpatial interactor ...");
-		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
@@ -411,7 +414,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];
@@ -433,7 +436,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];

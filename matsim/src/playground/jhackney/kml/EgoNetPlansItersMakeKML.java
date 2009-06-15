@@ -52,8 +52,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
@@ -62,6 +62,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceEllipse;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
@@ -110,6 +111,7 @@ public class EgoNetPlansItersMakeKML {
 	private static TimeSpanType timeSpan;
 	private static int nColors=13;//36
 	private static Person ai;
+	private static Knowledges knowledges;
 
 	public static void setUp(Config config, NetworkLayer network) {
 		EgoNetPlansItersMakeKML.config=config;
@@ -252,9 +254,10 @@ public class EgoNetPlansItersMakeKML {
 	}
 
 
-	public static void loadData(Person myPerson, int iter){
+	public static void loadData(Person myPerson, int iter, Knowledges kn){
 
 		ego=myPerson;
+		knowledges = kn;
 		ai=myPerson;
 		if(config.getModule(KML21_MODULE)==null) return;
 
@@ -507,12 +510,12 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 		// make the activity spaces
-		new PersonCalcEgoSpace().run(ego);
+		new PersonCalcEgoSpace(knowledges).run(ego);
 
 		// add the points of the activity space to the polygon
 		// if PersonCalcEgoSpace() failed to give an activity space, ...
-		if((ego.getKnowledge().getActivitySpaces().size()>1)){
-			ActivitySpace space = ego.getKnowledge().getActivitySpaces().get(1);
+		if((knowledges.getKnowledgesByPersonId().get(ego.getId()).getActivitySpaces().size()>1)){
+			ActivitySpace space = knowledges.getKnowledgesByPersonId().get(ego.getId()).getActivitySpaces().get(1);
 			if (space instanceof ActivitySpaceEllipse) {
 
 //				calculate the circumference points (boundary)
@@ -664,13 +667,13 @@ public class EgoNetPlansItersMakeKML {
 		// For the KMZ animations you can overwrite (erase, replace) the activity space
 		// each iteration.
 
-		if(!(myPerson.getKnowledge().getActivitySpaces()==null)){
-			myPerson.getKnowledge().getActivitySpaces().clear();
+		if(!(knowledges.getKnowledgesByPersonId().get(myPerson.getId()).getActivitySpaces()==null)){
+			knowledges.getKnowledgesByPersonId().get(myPerson.getId()).getActivitySpaces().clear();
 		}
-		new PersonCalcActivitySpace("all").run(myPerson);
+		new PersonCalcActivitySpace("all", knowledges).run(myPerson);
 //		new PersonDrawActivitySpace().run(myPerson);
 		// add the points of the activity space to the polygon
-		ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
+		ActivitySpace space = knowledges.getKnowledgesByPersonId().get(myPerson.getId()).getActivitySpaces().get(0);
 
 		if (space instanceof ActivitySpaceEllipse) {
 

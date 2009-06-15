@@ -35,6 +35,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
@@ -46,17 +47,17 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
 	
-	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler,
+	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacility []> facilities_of_type) {
-		super(network, controler, quad_trees, facilities_of_type);
+		super(network, controler, kn, quad_trees, facilities_of_type);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
 	}
 	
-	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler) {
-		super(network, controler);
+	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler, Knowledges kn) {
+		super(network, controler, kn);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
@@ -97,7 +98,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			boolean shrinked = false;
 			while (change != 0) {				
 				// shrinking only every second time
-				if (change == -1 && shrinked) {
+				if ((change == -1) && shrinked) {
 					speed *= (1.0 - this.recursionTravelSpeedChange);
 					shrinked = true;
 				}
@@ -215,7 +216,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 			
-			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			boolean movable = movablePrimaryActivities.contains(act);
 			
 			// if home is accidentally not defined as primary

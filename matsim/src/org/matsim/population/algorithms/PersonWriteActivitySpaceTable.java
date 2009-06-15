@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
 import org.matsim.population.ActivitySpaceCassini;
@@ -53,13 +54,15 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
+	private Knowledges knowledges;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonWriteActivitySpaceTable() {
+	public PersonWriteActivitySpaceTable(Knowledges kn) {
 		super();
+		this.knowledges = kn;
 		try {
 			fw = new FileWriter("output/person-act-space-table.txt");
 			out = new BufferedWriter(fw);
@@ -127,7 +130,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(Person person) {
-		final Knowledge know = person.getKnowledge();
+		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			Gbl.errorMsg("Knowledge is not defined!");
 		}

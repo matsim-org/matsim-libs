@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.population.Activity;
@@ -45,6 +46,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Knowledge;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -136,10 +138,11 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	int replan_interval;
 
 	private Controler controler = null;
-
+	private Knowledges knowledges;
+	
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
-
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 		// Make a new zone layer (Raster)
 //		if(!(this.controler.getConfig().socnetmodule().getGridSpace().equals(null))){
 //		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
@@ -161,7 +164,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 
-		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities(), this.knowledges);
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
@@ -235,10 +238,10 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 //			You could forget activities here, after the replanning and assignment
 
-			if(CALCSTATS && event.getIteration()%1==0){
+			if(CALCSTATS && (event.getIteration()%1==0)){
 				Gbl.printMemoryUsage();
 				this.log.info(" Calculating and reporting network statistics ...");
-				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
+				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation(), this.knowledges);
 				this.log.info(" ... done");
 
 				Gbl.printMemoryUsage();
@@ -262,7 +265,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
 				Person testP=this.controler.getPopulation().getPersons().get(new IdImpl("21924270"));//1pct
 //				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
+				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration(), this.knowledges);
 				this.log.info(" ... done");
 			}
 		}
@@ -285,7 +288,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		/* code previously in setupIteration() */
 
-		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
+		if( (event.getIteration()%replan_interval==0) && (event.getIteration()!=this.controler.getFirstIteration())){
 
 			// only generate the map if spatial meeting is important in this experiment
 			if (total_spatial_fraction(this.fractionS) > 0) {
@@ -353,7 +356,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final Population plans, ActivityFacilities facilities ) {
+	void initializeKnowledge(final Population plans, ActivityFacilities facilities, Knowledges knowledges ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
@@ -372,9 +375,9 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		while (p_it.hasNext()) {
 			Person person=p_it.next();
 
-			Knowledge k = person.getKnowledge();
+			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
-				k = person.createKnowledge("created by " + this.getClass().getName());
+				k =  this.knowledges.getBuilder().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
@@ -412,7 +415,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");
-		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities());
+		this.pjw = new PajekWriter(SOCNET_OUT_DIR, controler.getFacilities(), this.knowledges);
 		this.log.info("... done");
 
 		this.log.info(" Initializing the social network ...");
@@ -442,7 +445,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("... done");
 
 		this.log.info(" Setting up the NonSpatial interactor ...");
-		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet, this.knowledges);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
@@ -504,7 +507,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];
@@ -526,7 +529,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];

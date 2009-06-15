@@ -28,22 +28,28 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
+import org.matsim.knowledges.Knowledges;
 
 public class KnowledgeTools {
 
-	private final static Logger log = Logger.getLogger(KnowledgeTools.class);	
+	private final static Logger log = Logger.getLogger(KnowledgeTools.class);
+	private Knowledges knowledges;	
+	
+	public KnowledgeTools(Knowledges knowledges){
+		this.knowledges = knowledges;
+	}
 	
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static Map<Id, Node> getKnownNodes(Person person)
+	public static Map<Id, Node> getKnownNodes(Knowledges knowledges, Person person)
 	{
 		Map<Id, Node> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)
 		{		
-			if(person.getKnowledge() != null)
+			if(knowledges.getKnowledgesByPersonId().get(person.getId()) != null)
 			{
 				Map<String,Object> customAttributes = person.getCustomAttributes();
 				
@@ -76,7 +82,7 @@ public class KnowledgeTools {
 	public static Link[] getKnownLinks(Link[] links, Map<Id, Node> knownNodesMap)
 	{	
 		// If the current Person has knowledge about known Nodes (Map exists and has Elements)
-		if(knownNodesMap != null && knownNodesMap.size() != 0)
+		if((knownNodesMap != null) && (knownNodesMap.size() != 0))
 		{
 			ArrayList<Link> knownLinks = new ArrayList<Link>();
 			
@@ -119,14 +125,14 @@ public class KnowledgeTools {
 	 * doing their routing. An Example would be a Random Router that does only an
 	 * initial planning before starting the mobsim.
 	 */ 
-	public static void removeKnowledge(Person person)
+	public static void removeKnowledge(Knowledges knowledges, Person person)
 	{
 		Map<Id, Node> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)
 		{		
-			if(person.getKnowledge() != null)
+			if(knowledges.getKnowledgesByPersonId().get(person.getId()) != null)
 			{
 				Map<String,Object> customAttributes = person.getCustomAttributes();
 				

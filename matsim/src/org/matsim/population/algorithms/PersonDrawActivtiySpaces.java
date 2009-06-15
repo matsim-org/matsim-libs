@@ -29,6 +29,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
 import org.matsim.population.ActivitySpaceCassini;
@@ -50,8 +51,11 @@ public class PersonDrawActivtiySpaces extends AbstractPersonAlgorithm {
 	// constructor
 	// ////////////////////////////////////////////////////////////////////
 
-	public PersonDrawActivtiySpaces() {
+	private Knowledges knowledges;
+
+	public PersonDrawActivtiySpaces(Knowledges knowledges) {
 		super();
+		this.knowledges = knowledges;
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -84,7 +88,7 @@ public class PersonDrawActivtiySpaces extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(Person person) {
-		final Knowledge know = person.getKnowledge();
+		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			Gbl.errorMsg("Knowledge is not defined!");
 		}
@@ -102,7 +106,7 @@ public class PersonDrawActivtiySpaces extends AbstractPersonAlgorithm {
 			out_gpl.write("#unset key\n");
 			out_gpl.write("plot \\\n");
 
-			Iterator<ActivityOption> a_it = person.getKnowledge().getActivities().iterator();
+			Iterator<ActivityOption> a_it = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
 				String at = a.getType();
@@ -137,9 +141,9 @@ public class PersonDrawActivtiySpaces extends AbstractPersonAlgorithm {
 				}
 			}
 
-			int nof_as = person.getKnowledge().getActivitySpaces().size();
+			int nof_as = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivitySpaces().size();
 			int cnt = 0;
-			Iterator<ActivitySpace> as_it = person.getKnowledge().getActivitySpaces().iterator();
+			Iterator<ActivitySpace> as_it = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivitySpaces().iterator();
 			while (as_it.hasNext()) {
 				cnt++;
 				ActivitySpace as = as_it.next();

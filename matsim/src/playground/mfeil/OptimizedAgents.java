@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 
 /**
  * @author Matthias Feil
@@ -37,9 +38,11 @@ public class OptimizedAgents {
 	
 	private ArrayList<Plan> list;
 	private ArrayList<Double> distancesTestAgents;
+	private Knowledges knowledges;
 	
-	public OptimizedAgents (ArrayList<Plan> list){
+	public OptimizedAgents (ArrayList<Plan> list, Knowledges knowledges){
 		this.list = list;
+		this.knowledges = knowledges;
 		this.run();
 	}
 	
@@ -47,11 +50,11 @@ public class OptimizedAgents {
 		this.distancesTestAgents = new ArrayList<Double>();
 		for (int i=0;i<this.list.size();i++){
 			double tmpDistance=0;
-			if (this.list.get(i).getPerson().getKnowledge().getActivities(true).size()>1){
-				for (int k=0;k<this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1;k++){
-					tmpDistance+=CoordUtils.calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord(), this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
+			if (this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).size()>1){
+				for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).size()-1;k++){
+					tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(k).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(k+1).getLocation().getCoord());
 				}
-				tmpDistance+=CoordUtils.calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord(), this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
+				tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).size()-1).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(this.list.get(i).getPerson().getId()).getActivities(true).get(0).getLocation().getCoord());
 			}
 			this.distancesTestAgents.add(tmpDistance);
 		}
@@ -76,11 +79,11 @@ public class OptimizedAgents {
 	public void addAgent (Plan plan){
 		/* this.list.add(plan); */	// this is not necessary as there is a flat link to list[0] anyway.
 		double tmpDistance=0;
-		if (plan.getPerson().getKnowledge().getActivities(true).size()>1){
-			for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
-				tmpDistance+=CoordUtils.calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCoord(), plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCoord());
+		if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()>1){
+			for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1;k++){
+				tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k+1).getLocation().getCoord());
 			}
-			tmpDistance+=CoordUtils.calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCoord(), plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCoord());
+			tmpDistance+=CoordUtils.calcDistance(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()-1).getLocation().getCoord(), this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(0).getLocation().getCoord());
 		}
 		this.distancesTestAgents.add(tmpDistance);
 	}

@@ -32,6 +32,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -123,20 +125,21 @@ public class IIDMGenerationPart2 {
 
 		System.out.println("  setting up population objects...");
 		PopulationImpl pop = new PopulationImpl();
+		Knowledges knowledges =  new KnowledgesImpl();
 		pop.setIsStreaming(true);
-		PopulationWriter pop_writer = new PopulationWriter(pop);
+		PopulationWriter pop_writer = new PopulationWriter(pop, knowledges);
 		PopulationReader pop_reader = new MatsimPopulationReader(pop, null);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		pop.addAlgorithm(new PersonSetLocationsFromKnowledge());
+		pop.addAlgorithm(new PersonSetLocationsFromKnowledge(knowledges));
 		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));
 		pop.addAlgorithm(new PersonAssignAndNormalizeTimes());
-		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt");
+		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt", knowledges);
 		pop.addAlgorithm(pamcm);
-		pop.addAlgorithm(new PersonAssignPrimaryActivities());
+		pop.addAlgorithm(new PersonAssignPrimaryActivities(knowledges));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

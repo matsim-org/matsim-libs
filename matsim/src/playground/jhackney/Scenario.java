@@ -37,6 +37,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -198,10 +199,12 @@ public abstract class Scenario {
 		Population plans = new PopulationImpl();
 		System.out.println(config.plans().getInputFile());
 		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
-
 		System.out.println("  done.");
 		return plans;
 	}
+
+
+	
 	public static final Population readPlans(final Network network, final int i) {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
@@ -210,6 +213,15 @@ public abstract class Scenario {
 		System.out.println(filename);
 		new MatsimPopulationReader(plans, network).readFile(filename);
 
+		System.out.println("  done.");
+		return plans;
+	}
+
+	public static final Population readPlansAndKnowledges(final Network network, Knowledges kn) {
+		System.out.println("  reading plans xml file... ");
+		Population plans = new PopulationImpl();
+		System.out.println(config.plans().getInputFile());
+		new MatsimPopulationReader(plans, (NetworkLayer) network, kn).readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 		return plans;
 	}

@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.Dijkstra;
@@ -37,6 +38,7 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
@@ -124,6 +126,7 @@ public class EventControler extends Controler{
 	protected void initReplanningRouter()
 	{
 		replanners = new ArrayList<PlanAlgorithm>();
+		Knowledges knowledges = ((ScenarioImpl)this.getScenarioData()).getKnowledges();
 		
 		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
 		TravelTimeDistanceCostCalculator travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator);
@@ -138,10 +141,10 @@ public class EventControler extends Controler{
 		
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
-		replanners.add(new KnowledgePlansCalcRoute(network, new RandomRoute(), new RandomRoute()));
-		replanners.add(new KnowledgePlansCalcRoute(network, new TabuRoute(), new TabuRoute()));
-		replanners.add(new KnowledgePlansCalcRoute(network, new CompassRoute(), new CompassRoute()));
-		replanners.add(new KnowledgePlansCalcRoute(network, new RandomCompassRoute(), new RandomCompassRoute()));
+		replanners.add(new KnowledgePlansCalcRoute(network, new RandomRoute(knowledges), new RandomRoute(knowledges)));
+		replanners.add(new KnowledgePlansCalcRoute(network, new TabuRoute(knowledges), new TabuRoute(knowledges)));
+		replanners.add(new KnowledgePlansCalcRoute(network, new CompassRoute(knowledges), new CompassRoute(knowledges)));
+		replanners.add(new KnowledgePlansCalcRoute(network, new RandomCompassRoute(knowledges), new RandomCompassRoute(knowledges)));
 		
 		// Dijkstra for Replanning
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
@@ -149,7 +152,7 @@ public class EventControler extends Controler{
 		
 		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
 		TravelTimeDistanceCostCalculator travelCost = new TravelTimeDistanceCostCalculator(travelTime);
-		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(knowledges, travelCost);
 
 		// Use the Wrapper with the same CostCalculator as the MobSim uses
 		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
@@ -373,7 +376,7 @@ public class EventControler extends Controler{
 			log.info("Path: " + path);
 
 			// reading single File
-			new SelectionReaderMatsim(this.network, this.population).readFile(path);
+			new SelectionReaderMatsim(this.network, this.population,(((ScenarioImpl)this.getScenarioData()).getKnowledges())).readFile(path);
 			
 			//reading multiple Files automatically
 			//new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
@@ -395,7 +398,7 @@ public class EventControler extends Controler{
 			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
 			
 			// write single File
-			new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write();
+			new SelectionWriter(this.population, (((ScenarioImpl)this.getScenarioData()).getKnowledges()), outPutFile, dtdFile, "1.0", "dummy").write();
 			
 			// write multiple Files automatically
 			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(10000);
@@ -413,7 +416,7 @@ public class EventControler extends Controler{
 	protected void createKnownNodes()
 	{
 		// create Known Nodes Maps on multiple Threads
-		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 2);
+		ParallelCreateKnownNodesMap.run(this.population, (((ScenarioImpl)this.getScenarioData()).getKnowledges()), nodeSelectors, 2);
 		
 //		writePersonKML(this.population.getPerson("100139"));
 		
@@ -441,7 +444,7 @@ public class EventControler extends Controler{
 		// Remove Knowledge after replanning to save memory.
 		ParallelInitialReplanner.setRemoveKnowledge(true);
 		// Run Replanner.
-		ParallelInitialReplanner.run(personsToReplan, time);
+		ParallelInitialReplanner.run(personsToReplan, (((ScenarioImpl)this.getScenarioData()).getKnowledges()), time);
 
 		// Number of Routes that could not be created...
 		log.info(RandomRoute.getErrorCounter() + " Routes could not be created by RandomRoute.");
