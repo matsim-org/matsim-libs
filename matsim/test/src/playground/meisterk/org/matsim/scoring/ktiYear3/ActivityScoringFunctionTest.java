@@ -208,9 +208,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		final int TEST_PLAN_NR = 0;
 
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, 900, this.config.travelTimeCalculator());
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.config.charyparNagelScoring());
-		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, 900);
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, this.config.travelTimeCalculator().getTraveltimeBinSize());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCostEstimator, tTravelEstimator);
 		

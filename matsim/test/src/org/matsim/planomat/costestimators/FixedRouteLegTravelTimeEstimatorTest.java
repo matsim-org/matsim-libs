@@ -96,8 +96,9 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.originAct = (Activity) actsLegs.get(TEST_LEG_NR);
 		this.destinationAct = (Activity) actsLegs.get(TEST_LEG_NR + 2);
 
+		config.travelTimeCalculator().setTraveltimeBinSize(TIME_BIN_SIZE);
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
-		this.linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE, config.travelTimeCalculator());
+		this.linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), config.travelTimeCalculator());
 		this.linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(this.linkTravelTimeEstimator, config.charyparNagelScoring());
 	}
 

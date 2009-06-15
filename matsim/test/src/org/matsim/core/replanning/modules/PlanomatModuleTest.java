@@ -72,7 +72,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		config.planomat().setPossibleModes("car,pt");
 
 		Events emptyEvents = new Events();
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), 900, config.travelTimeCalculator());
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());
 		

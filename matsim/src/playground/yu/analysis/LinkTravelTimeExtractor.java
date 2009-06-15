@@ -48,8 +48,9 @@ public class LinkTravelTimeExtractor {
 		Events events = new Events();
 
 		Config config = new ScenarioImpl().getConfig();
+		config.travelTimeCalculator().setTraveltimeBinSize(timeBin);
 		
-		TravelTimeCalculator ttc = new TravelTimeCalculator(network, timeBin, config.travelTimeCalculator());
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttc);
 
 		System.out.println("-->reading evetsfile: " + eventsFilename);

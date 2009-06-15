@@ -74,13 +74,13 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		Gbl.printMemoryUsage();
 
 		log.info("Initializing TravelTimeCalculator...");
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900, config.travelTimeCalculator());
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		log.info("Initializing TravelTimeCalculator...done.");
 		log.info("Initializing TravelCost...");
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
 		log.info("Initializing TravelCost...done.");
 		log.info("Initializing DepartureDelayAverageCalculator...");
-		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, config.travelTimeCalculator().getTraveltimeBinSize());
 		log.info("Initializing DepartureDelayAverageCalculator...done.");
 
 		log.info("Reading events...");

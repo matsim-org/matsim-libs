@@ -127,7 +127,7 @@ public class PlanomatTest extends MatsimTestCase {
 	
 	private void runATestRun(final PlanomatTestRun testRun) {
 
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), 900, this.scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.scenario.getConfig().travelTimeCalculator());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 

@@ -84,10 +84,6 @@ public class TravelTimeCalculator
 		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
 
-	public TravelTimeCalculator(final Network network, final int timeslice, TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		this(network, timeslice, 30*3600, ttconfigGroup); // default: 30 hours at most
-	}
-
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this.timeslice = timeslice;
