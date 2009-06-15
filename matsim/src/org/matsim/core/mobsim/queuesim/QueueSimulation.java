@@ -114,7 +114,7 @@ public class QueueSimulation {
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 	
-	private QueueSimEngine simEngine = null;
+	protected QueueSimEngine simEngine = null;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to
