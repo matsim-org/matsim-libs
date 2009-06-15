@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package org.matsim.knowledges;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,12 +26,8 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.population");
-
-		suite.addTestSuite(DesiresTest.class);
-		suite.addTest(org.matsim.population.algorithms.AllTests.suite());
-		suite.addTest(org.matsim.population.filters.AllTests.suite());
-
+		TestSuite suite = new TestSuite("Tests for org.matsim.knowledges");
+		suite.addTestSuite(KnowledgeTest.class);
 		return suite;
 	}
 

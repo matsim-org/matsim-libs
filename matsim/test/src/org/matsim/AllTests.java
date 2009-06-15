@@ -52,6 +52,7 @@ public class AllTests {
 		suite.addTest(org.matsim.analysis.AllTests.suite());
 		suite.addTest(org.matsim.counts.AllTests.suite());
 		suite.addTest(org.matsim.demandmodeling.AllTests.suite());
+		suite.addTest(org.matsim.knowledges.AllTests.suite());
 		suite.addTest(org.matsim.locationchoice.AllTests.suite());
 		suite.addTest(org.matsim.planomat.AllTests.suite());
 		suite.addTest(org.matsim.population.AllTests.suite());
