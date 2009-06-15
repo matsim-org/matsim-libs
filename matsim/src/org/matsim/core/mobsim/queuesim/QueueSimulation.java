@@ -153,7 +153,7 @@ public class QueueSimulation {
 
 	private QueueSimListenerManager listenerManager;
 	
-	private final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
