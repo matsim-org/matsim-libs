@@ -17,6 +17,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.sims.riskaversion.RiskCostCalculator;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -26,8 +27,7 @@ public class RiskCostFromFloodingData implements RiskCostCalculator {
 	private final static Logger log = Logger
 			.getLogger(RiskCostFromFloodingData.class);
 
-	private final static double MAX_DIST = 100.;
-	private final static double MAX_FLOODED_DIST = 10.;
+
 	private final static double BASE_COST = 30 * 3600;
 	private final static double BASE_TIME = 3 * 3600;
 
@@ -78,7 +78,7 @@ public class RiskCostFromFloodingData implements RiskCostCalculator {
 			FloodingInfo fi = this.nc.getNearestFloodingInfo(node);
 			double dist = fi.getCoordinate().distance(
 					MGC.coord2Coordinate(node.getCoord()));
-			if (dist > MAX_DIST) {
+			if (dist > MY_STATIC_STUFF.BUFFER_SIZE) {
 				continue;
 			}
 
@@ -87,8 +87,8 @@ public class RiskCostFromFloodingData implements RiskCostCalculator {
 			ni.time = BASE_TIME + 60 * fi.getFloodingTime();
 			ni.dist = dist;
 			ni.cost = this.nc.getNodeRiskCost(node);
-			if (dist > MAX_FLOODED_DIST) {
-				ni.cost = (BASE_COST / 2) * (1 - (dist / MAX_DIST));
+			if (dist > MY_STATIC_STUFF.FLOODED_DIST_THRESHOLD) {
+				ni.cost = (BASE_COST / 2) * (1 - (dist / MY_STATIC_STUFF.BUFFER_SIZE));
 			} else {
 				ni.cost = (BASE_COST - 60 * fi.getFloodingTime());
 			}
@@ -123,32 +123,32 @@ public class RiskCostFromFloodingData implements RiskCostCalculator {
 
 	}
 
-	private Map<Node, NodeInfo> classifyNodes(QuadTree<FloodingInfo> tree) {
-		Map<Node, NodeInfo> nis = new HashMap<Node, NodeInfo>();
-
-		for (Node node : this.network.getNodes().values()) {
-			FloodingInfo fi = tree.get(node.getCoord().getX(), node.getCoord()
-					.getY());
-			double dist = fi.getCoordinate().distance(
-					MGC.coord2Coordinate(node.getCoord()));
-			if (dist > MAX_DIST) {
-				continue;
-			}
-			NodeInfo ni = new NodeInfo();
-			ni.node = node;
-			ni.time = BASE_TIME + 60 * fi.getFloodingTime();
-			ni.dist = dist;
-			if (dist > MAX_FLOODED_DIST) {
-				ni.cost = (BASE_COST / 2) * (1 - (dist / MAX_DIST));
-			} else {
-				ni.cost = (BASE_COST - 60 * fi.getFloodingTime());
-			}
-			nis.put(node, ni);
-		}
-
-		return nis;
-
-	}
+//	private Map<Node, NodeInfo> classifyNodes(QuadTree<FloodingInfo> tree) {
+//		Map<Node, NodeInfo> nis = new HashMap<Node, NodeInfo>();
+//
+//		for (Node node : this.network.getNodes().values()) {
+//			FloodingInfo fi = tree.get(node.getCoord().getX(), node.getCoord()
+//					.getY());
+//			double dist = fi.getCoordinate().distance(
+//					MGC.coord2Coordinate(node.getCoord()));
+//			if (dist > MAX_DIST) {
+//				continue;
+//			}
+//			NodeInfo ni = new NodeInfo();
+//			ni.node = node;
+//			ni.time = BASE_TIME + 60 * fi.getFloodingTime();
+//			ni.dist = dist;
+//			if (dist > MAX_FLOODED_DIST) {
+//				ni.cost = (BASE_COST / 2) * (1 - (dist / MAX_DIST));
+//			} else {
+//				ni.cost = (BASE_COST - 60 * fi.getFloodingTime());
+//			}
+//			nis.put(node, ni);
+//		}
+//
+//		return nis;
+//
+//	}
 
 	private QuadTree<FloodingInfo> buildQuad() {
 		Envelope e = this.fr.getEnvelope();
@@ -176,19 +176,6 @@ public class RiskCostFromFloodingData implements RiskCostCalculator {
 		double dist;
 	}
 
-	public static void main(String[] args) {
-		String netcdf = "../../inputs/padang/Model_result_Houses_kst20.sww";
-
-		FloodingReader fr = new FloodingReader(netcdf, true);
-
-		String config = "../../inputs/configs/timeVariantEvac.xml";
-		Config c = Gbl.createConfig(new String[] { config });
-
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
-
-		new RiskCostFromFloodingData(net, fr);
-	}
 
 	public double getLinkRisk(Link link, double time) {
 		LinkInfo li = this.lis.get(link);
@@ -212,6 +199,20 @@ public class RiskCostFromFloodingData implements RiskCostCalculator {
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	public static void main(String[] args) {
+		String netcdf = "../../inputs/padang/Model_result_Houses_kst20.sww";
+		
+		FloodingReader fr = new FloodingReader(netcdf, true);
+		
+		String config = "../../inputs/configs/timeVariantEvac.xml";
+		Config c = Gbl.createConfig(new String[] { config });
+		
+		NetworkLayer net = new NetworkLayer();
+		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
+		
+		new RiskCostFromFloodingData(net, fr);
 	}
 
 }
