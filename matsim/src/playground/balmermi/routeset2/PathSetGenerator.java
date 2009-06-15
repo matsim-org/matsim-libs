@@ -377,6 +377,8 @@ public class PathSetGenerator {
 			if ((n.getIncidentNodes().size() == 2) &&
 			    (((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) ||
 			     ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)))) {
+			}
+			else {
 				nofNonePassNodesLCP++;
 				avLinkDensityPerNonePassNodeLCP += n.getIncidentLinks().size();
 				avIncidentNodeDensityPerNonePassNodeLCP += n.getIncidentNodes().size();
