@@ -31,6 +31,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicActivityOption;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.testcases.MatsimTestCase;
 
 public class KnowledgeTest extends MatsimTestCase {

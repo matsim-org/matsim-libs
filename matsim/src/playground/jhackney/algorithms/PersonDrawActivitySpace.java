@@ -29,13 +29,13 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.ActivitySpace;
+import org.matsim.knowledges.ActivitySpaceBean;
+import org.matsim.knowledges.ActivitySpaceCassini;
+import org.matsim.knowledges.ActivitySpaceEllipse;
+import org.matsim.knowledges.ActivitySpaceSuperEllipse;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.ActivitySpace;
-import org.matsim.population.ActivitySpaceBean;
-import org.matsim.population.ActivitySpaceCassini;
-import org.matsim.population.ActivitySpaceEllipse;
-import org.matsim.population.ActivitySpaceSuperEllipse;
-import org.matsim.population.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {

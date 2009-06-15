@@ -38,9 +38,9 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.ActivitySpace;
+import org.matsim.knowledges.ActivitySpace;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 
 public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 

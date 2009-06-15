@@ -44,8 +44,8 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.Knowledge;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.InitializeKnowledge;

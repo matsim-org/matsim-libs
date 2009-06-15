@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package org.matsim.knowledges;
 
 import java.util.ArrayList;
 import java.util.Iterator;

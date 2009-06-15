@@ -49,11 +49,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.knowledges.ActivitySpace;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
-import org.matsim.population.ActivitySpace;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

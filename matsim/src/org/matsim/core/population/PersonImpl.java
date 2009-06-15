@@ -32,8 +32,8 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.households.Household;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**

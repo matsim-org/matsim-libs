@@ -25,8 +25,8 @@ import java.util.List;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.Knowledge;
 
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;

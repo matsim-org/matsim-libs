@@ -31,8 +31,8 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.io.WriterHandler;
-import org.matsim.population.ActivitySpace;
-import org.matsim.population.Knowledge;
+import org.matsim.knowledges.ActivitySpace;
+import org.matsim.knowledges.Knowledge;
 
 public interface SelectionWriterHandler extends WriterHandler {
 

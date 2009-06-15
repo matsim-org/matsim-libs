@@ -38,10 +38,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
+import org.matsim.knowledges.ActivitySpace;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.ActivitySpace;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 
 public class PopulationWriter extends Writer implements PersonAlgorithm {
 

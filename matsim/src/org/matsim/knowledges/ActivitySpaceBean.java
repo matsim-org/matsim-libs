@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package org.matsim.knowledges;
 
 import org.matsim.core.gbl.Gbl;
 

@@ -20,7 +20,6 @@
 package org.matsim.knowledges;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.population.Knowledge;
 
 
 /**

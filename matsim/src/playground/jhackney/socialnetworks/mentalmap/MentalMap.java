@@ -41,7 +41,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.population.Knowledge;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.world.Location;
 
 import playground.jhackney.socialnetworks.algorithms.SortHashMapByValue;

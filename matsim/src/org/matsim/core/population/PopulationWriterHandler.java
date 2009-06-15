@@ -32,9 +32,9 @@ import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.utils.io.WriterHandler;
-import org.matsim.population.ActivitySpace;
+import org.matsim.knowledges.ActivitySpace;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 
 public interface PopulationWriterHandler extends WriterHandler {
 

@@ -41,13 +41,13 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.ActivitySpace;
-import org.matsim.population.ActivitySpaceBean;
-import org.matsim.population.ActivitySpaceCassini;
-import org.matsim.population.ActivitySpaceEllipse;
-import org.matsim.population.ActivitySpaceSuperEllipse;
+import org.matsim.knowledges.ActivitySpace;
+import org.matsim.knowledges.ActivitySpaceBean;
+import org.matsim.knowledges.ActivitySpaceCassini;
+import org.matsim.knowledges.ActivitySpaceEllipse;
+import org.matsim.knowledges.ActivitySpaceSuperEllipse;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 
 public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 

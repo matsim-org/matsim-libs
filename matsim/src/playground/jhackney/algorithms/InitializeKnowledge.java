@@ -8,8 +8,8 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.Knowledge;
 
 import playground.jhackney.socialnetworks.io.ActivityActReader;
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
