@@ -81,7 +81,7 @@ public class TravelTimeCalculator
 	private TravelTimeDataFactory ttDataFactory = null; 
 	
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		this(network, 15*60, 30*3600, ttconfigGroup);	// default timeslot-duration: 15 minutes
+		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
 
 	public TravelTimeCalculator(final Network network, final int timeslice, TravelTimeCalculatorConfigGroup ttconfigGroup) {
@@ -92,13 +92,7 @@ public class TravelTimeCalculator
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
-		
-		if (ttconfigGroup.getTravelTimeAggregatorType().equals("optimistic")) {
-			this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeslice);
-		} else if(ttconfigGroup.getTravelTimeAggregatorType().equals("experimental_LastMile")) {
-			log.warn("using experimental travel time calculator!!!");
-			this.aggregator = new PessimisticTravelTimeAggregator(this.numSlots, this.timeslice);
-		}
+		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeslice);
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
