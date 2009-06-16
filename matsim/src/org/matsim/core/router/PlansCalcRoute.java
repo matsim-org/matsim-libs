@@ -85,13 +85,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	@Deprecated
 	public PlansCalcRoute(final Network network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
-		super();
-		this.factory = factory;
-		this.routeAlgo = this.factory.createPathCalculator(network, costCalculator, timeCalculator);
-		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
-		this.routeAlgoFreeflow = this.factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
-		this.routeFactory = network.getFactory();
-		log.warn(NO_CONFIGGROUP_SET_WARNING);
+		this(null, network, costCalculator, timeCalculator, factory);
 	}
 	
 	/**
@@ -100,7 +94,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 */
 	@Deprecated
 	public PlansCalcRoute(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
-		this(network, costCalculator, timeCalculator, new DijkstraFactory());
+		this(null, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 	
 	/**
@@ -109,7 +103,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
-		this(network, costCalculator, timeCalculator, factory);
+		this.factory = factory;
+		this.routeAlgo = this.factory.createPathCalculator(network, costCalculator, timeCalculator);
+		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
+		this.routeAlgoFreeflow = this.factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
+		this.routeFactory = network.getFactory();
 		if (group != null) {
 			this.configGroup = group;
 		}
