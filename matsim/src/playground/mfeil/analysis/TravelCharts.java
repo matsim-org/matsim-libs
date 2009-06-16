@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelCharts.java
+ * AnalysisActivityTimings.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,8 +28,8 @@ import java.util.StringTokenizer;
 
 
 /**
- * Simple class to read an Excel file with several data sources and 
- * to draw a chart from this the data.
+ * Simple class to read an Excel file and 
+ * to draw a MATSim chart from this the data.
  *
  * @author mfeil
  */

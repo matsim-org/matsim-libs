@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AnalysisSelectedPlans.java
+ * AnalysisSelectedPlansActivityChains.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Activity;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -44,25 +43,27 @@ import org.matsim.knowledges.Knowledges;
 
 
 /**
- * Simple class to analyze a plans-file for selected plans.
+ * Simple class to analyze the selected plans of a plans (output) file. Extracts the 
+ * activity chains and their number of occurrences.
  *
  * @author mfeil
  */
-public class AnalysisSelectedPlans {
+public class AnalysisSelectedPlansActivityChains {
 
-	private final Population population;
-	private final String outputDir;
-	private ArrayList<List<PlanElement>> activityChains;
-	private ArrayList<ArrayList<Plan>> plans;
-	private final Map<String,Double> minimumTime;
-	private Knowledges knowledges;
-	private static final Logger log = Logger.getLogger(AnalysisSelectedPlans.class);
+	protected final Population population;
+	protected final String outputDir;
+	protected ArrayList<List<PlanElement>> activityChains;
+	protected ArrayList<ArrayList<Plan>> plans;
+	protected final Map<String,Double> minimumTime;
+	protected final Knowledges knowledges;
+	protected static final Logger log = Logger.getLogger(AnalysisSelectedPlansActivityChains.class);
 	
 
 
-	public AnalysisSelectedPlans(final Population population, Knowledges knowledges, final String outputDir) {
+	public AnalysisSelectedPlansActivityChains(final Population population, Knowledges knowledges, final String outputDir) {
 		this.population = population;
 		this.outputDir = outputDir;
+		this.knowledges = knowledges;
 		initAnalysis();
 		this.minimumTime = new TreeMap<String, Double>();
 		this.minimumTime.put("home", 7200.0);
@@ -71,7 +72,7 @@ public class AnalysisSelectedPlans {
 		this.minimumTime.put("leisure", 3600.0);
 	}
 	
-	private void initAnalysis(){
+	protected void initAnalysis(){
 		
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<Plan>>();
@@ -94,7 +95,7 @@ public class AnalysisSelectedPlans {
 		}
 	}
 	
-	private void checkCorrectness(){
+	protected void checkCorrectness(){
 		for (int i=0;i<this.plans.size();i++){
 			for (int j=0;j<this.plans.get(i).size();j++){
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
@@ -132,7 +133,7 @@ public class AnalysisSelectedPlans {
 		}
 	}
 	
-	private void analyze(){
+	protected void analyze(){
 	
 		PrintStream stream1;
 		try {
@@ -158,8 +159,8 @@ public class AnalysisSelectedPlans {
 		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
 		
-		
-		/* Analysis of legs */
+		/*
+	 	Analysis of legs 
 		double averageDistance=0;
 		double averageTime=0;
 		stream1.println("Person ID\tInitial travel distance\tFinal travel distance\tInitial travel time\tFinal travel time");
@@ -184,28 +185,10 @@ public class AnalysisSelectedPlans {
 		
 		
 		stream1.close();
-		
-		/*
-		PrintStream stream2;
-		try {
-			stream2 = new PrintStream (new File(this.outputDir + "/analysis_modeChoice.xls"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		stream2.println("Number of occurrences\tActivity chain");
-		for (int i=0; i<this.activityChains.size();i++){
-			stream2.print((this.plans.get(i).size())+"\t");
-			for (int j=0; j<this.activityChains.get(i).size();j=j+2){
-				stream2.print(((Activity)(this.activityChains.get(i).get(j))).getType()+"\t");
-			}
-			stream2.println();
-		}
-		stream2.close();
 		*/
 	}
 	
-	private boolean checkForEquality (Plan plan, List<PlanElement> activityChain){
+	protected boolean checkForEquality (Plan plan, List<PlanElement> activityChain){
 		
 		if (plan.getPlanElements().size()!=activityChain.size()){
 		
@@ -222,30 +205,25 @@ public class AnalysisSelectedPlans {
 			}		
 			return (acts1.equals(acts2));
 		}
-	}	
-
-	
-		
-		
+	}			
 	
 
 	public static void main(final String [] args) {
-		// FIXME hard-coded file names; does this class really need a main-method?
 //		final String populationFilename = "./examples/equil/plans100.xml";
 //		final String networkFilename = "./examples/equil/network.xml";
-		final String populationFilename = "./output/Test2/output_plans.xml.gz";
+		final String populationFilename = "./plans/output_plans.xml.gz";
 //		final String populationFilename = "./output/Test1/ITERS/it.0/0.plans.xml.gz";
 		final String networkFilename = "./test/scenarios/chessboard/network.xml";
 		final String facilitiesFilename = "./test/scenarios/chessboard/facilities.xml";
 
-		final String outputDir = "./output/Test2/";
+		final String outputDir = "./plans/";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
-		AnalysisSelectedPlans sp = new AnalysisSelectedPlans(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
+		AnalysisSelectedPlansActivityChains sp = new AnalysisSelectedPlansActivityChains(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
 		sp.analyze();
 		sp.checkCorrectness();
 		

@@ -26,7 +26,9 @@ import java.util.StringTokenizer;
 
 
 /**
- * Simple class to read an Events file and extract average activity timings.
+ * Simple class to read an events file and extract average activity timings. Works only when 
+ * all agents have home-work-shopping-home or home-work-leisure-home activity chains. Calculates
+ * averages and agent 1 in detail.
  *
  * @author mfeil
  */
@@ -99,10 +101,9 @@ public class AnalysisActivityTimings {
 		
 		AnalysisActivityTimings msc = new AnalysisActivityTimings();
 
-		msc.readData("./plans/0.events.txt");
+		msc.readData("./plans/100.events.txt");
 
 		stream1.println("Agent 1");
-		double time=0;
 		for (int i=0; i<msc.times.size();i++){
 			if (msc.agent.get(i)==1 && msc.event.get(i).startsWith("actstart")) stream1.println("Act start\t"+msc.times.get(i)+
 					"\t"+java.lang.Math.floor(msc.times.get(i)/3600)+
@@ -136,7 +137,6 @@ public class AnalysisActivityTimings {
 		for (int j=1;j<325;j++){
 			actpos=0;
 			for (int i=0; i<msc.times.size();i++){
-				//System.out.println(msc.event.get(i));
 				if (msc.event2.get(i).startsWith("leisure") && msc.agent.get(i)==j) {
 					hasLeisure = true;
 					break;
