@@ -1,9 +1,12 @@
 package playground.andreas.bln;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -27,7 +30,7 @@ public class OSM2MATSim {
 		osmReader.setScaleMaxSpeed(true);
 		
 //		String inputFile = "./berlin.osm.gz";
-//		String outputFile = "./test_lanes";
+//		String outputFile = "./test";
 		
 		String inputFile = args[0];
 		String outputFile = args[1];
@@ -68,16 +71,19 @@ public class OSM2MATSim {
 		osmReader.setHighwayDefaults(8, "steps", 1,  3.0/3.6, 1.0,  300);
 		
 //		osmReader.setHierarchyLayer(55.5, 4.5, 47.5, 15.5, 1); // Deutschland
-//		osmReader.setHierarchyLayer(54.3, 10.0, 50.8, 15.0, 2); // Brandenburg mit Autobahnstummeln
+		osmReader.setHierarchyLayer(54.3, 10.0, 50.8, 15.0, 2); // Brandenburg mit Autobahnstummeln
 //		osmReader.setHierarchyLayer(53.6, 11.2, 51.2, 15.0, 4); // BerlinBrandenburg
 		
-//		osmReader.setHierarchyLayer(53.6, 11.5, 52.8, 14.5, 4); // BerlinBrandenburg - Streifen 1
-//		osmReader.setHierarchyLayer(53.0, 12.1, 52.0, 14.9, 4); // BerlinBrandenburg - Quadrat
-//		osmReader.setHierarchyLayer(52.0, 13.0, 51.4, 14.9, 4); // BerlinBrandenburg - Streifen 2
+		osmReader.setHierarchyLayer(53.6, 11.5, 52.8, 14.5, 4); // BerlinBrandenburg - Streifen 1
+		osmReader.setHierarchyLayer(53.0, 12.1, 52.0, 14.9, 4); // BerlinBrandenburg - Quadrat
+		osmReader.setHierarchyLayer(52.0, 13.0, 51.4, 14.9, 4); // BerlinBrandenburg - Streifen 2
 		
-//		osmReader.setHierarchyLayer(52.62, 13.2, 52.37, 13.7, 6); // Stadtbereich Bln
-//		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 6); // Potsdam
-//		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 6); // Spandau
+		osmReader.setHierarchyLayer(52.62, 13.2, 52.37, 13.7, 6); // Stadtbereich Bln
+		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 6); // Potsdam
+		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 6); // Spandau
+
+		
+		
 		
 //		osmReader.setHierarchyLayer(52.642299, 13.304882, 52.527397, 13.805398, 5);
 //		osmReader.setHierarchyLayer(52.537028, 13.410000, 52.520000, 13.443527, 8);
@@ -90,8 +96,8 @@ public class OSM2MATSim {
 //		osmReader.setHierarchyLayer(52.537028, 13.410000, 52.520000, 13.443527, 8);
 		
 		// POA Berlin Hundekopf
-		osmReader.setHierarchyLayer(52.565, 13.265, 52.45, 13.5, 1);
-		osmReader.setHierarchyLayer(52.56, 13.27, 52.458, 13.485, 4);
+//		osmReader.setHierarchyLayer(52.565, 13.265, 52.45, 13.5, 1);
+//		osmReader.setHierarchyLayer(52.56, 13.27, 52.458, 13.485, 4);
 		// POA Berlin Korridor
 //		osmReader.setHierarchyLayer(52.52, 13.145, 52.504, 13.38, 4);
 		// POA Berlin Korridor Ana
@@ -108,6 +114,21 @@ public class OSM2MATSim {
 		}
 		new NetworkWriter(network, outputFile + ".xml.gz").write();
 		new NetworkCleaner().run(new String[] {outputFile + ".xml.gz", outputFile + "_cl.xml.gz"});
+		
+
+		// Simplifier
+		network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(outputFile + "_cl.xml.gz");
+
+		NetworkSimplifier nsimply = new NetworkSimplifier();
+		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+		nodeTypesToMerge.add(new Integer(4));
+		nodeTypesToMerge.add(new Integer(5));
+		nsimply.setNodesToMerge(nodeTypesToMerge);
+//		nsimply.setMergeLinkStats(true);
+		nsimply.run(network);
+
+		new NetworkWriter(network, outputFile + "_cl_simple.xml.gz").write();
 
 	}
 
