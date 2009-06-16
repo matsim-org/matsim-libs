@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -270,14 +274,14 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			return;
 		}
 		stream.print(plan.getScore()+"\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-		Act act = (Act)plan.getActsLegs().get(z);
+		for (int z= 0;z<plan.getPlanElements().size();z=z+2){
+		Activity act = (Activity)plan.getPlanElements().get(z);
 			stream.print(act.getType()+"\t");
 		}
 		stream.println();
 		stream.print("\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-			stream.print(((Act)(plan.getActsLegs()).get(z)).getDuration()+"\t");
+		for (int z= 0;z<plan.getPlanElements().size();z=z+2){
+			stream.print(((Activity)(plan.getPlanElements()).get(z)).getDuration()+"\t");
 		}
 		stream.println();
 		*/
@@ -324,7 +328,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		/* Do Tabu Search iterations */
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
-	//		stream.println("Iteration "+currentIteration);
+		//	stream.println("Iteration "+currentIteration);
 			
 			this.createNeighbourhood((PlanomatXPlan)plan, neighbourhood, score, moves, position, planAnalyzeSubtours, subtourDis);
 			pointer = this.findBestSolution (neighbourhood, score, moves, position);
