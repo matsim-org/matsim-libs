@@ -20,20 +20,20 @@
 package playground.mfeil;
 
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.locationchoice.LocationChoice;
 
 
 /**
@@ -45,10 +45,11 @@ public class ControlerMFeil extends Controler {
 	public ControlerMFeil (String [] args){
 		super(args);
 	}
+	
+	
 		/*
 		 * @return A fully initialized StrategyManager for the plans replanning.
-		 */
-	
+		 */	
 	
 	@Override
 		protected StrategyManager loadStrategyManager() {
@@ -97,6 +98,12 @@ public class ControlerMFeil extends Controler {
 				PlanStrategyModule module = new TmcInitialiser(this);
 				strategy.addStrategyModule(module);
 			}
+			else if (classname.equals("LocationChoice")) {
+	    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
+	    	strategy.addStrategyModule(new LocationChoice(this.getNetwork(), this, ((ScenarioImpl)this.getScenarioData()).getKnowledges()));
+	    	strategy.addStrategyModule(new ReRoute(this));
+				strategy.addStrategyModule(new TimeAllocationMutator());
+			}
 		
 			manager.addStrategy(strategy, rate);
 		}
@@ -106,9 +113,9 @@ public class ControlerMFeil extends Controler {
 	}
 	
 	@Override
-		protected ScoringFunctionFactory loadScoringFunctionFactory() {
-			//return new PlanomatXScoringFunctionFactory(this.getConfig().charyparNagelScoring());
-			return new JohScoringFunctionFactory();
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		//return new PlanomatXScoringFunctionFactory(this.getConfig().charyparNagelScoring());
+		return new JohScoringFunctionFactory();
 	}
 	
 }
