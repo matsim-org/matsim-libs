@@ -45,7 +45,6 @@ public class ComputeGravityModelParameters {
 				}
 			}
 		}
-		// TODO Auto-generated method stub
 		
 	}
 

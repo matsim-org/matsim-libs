@@ -45,8 +45,10 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
@@ -58,7 +60,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 
 
-public class RetailersSequentialLocationListener implements StartupListener, BeforeMobsimListener {
+public class RetailersSequentialLocationListener implements StartupListener, IterationEndsListener {
 	
 	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	
@@ -77,6 +79,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Bef
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
 	private Object[] links = null;
+	private RetailZones retailZones = null;
 	
 	public RetailersSequentialLocationListener() {
 	}
@@ -132,68 +135,10 @@ public class RetailersSequentialLocationListener implements StartupListener, Bef
 				Gbl.errorMsg(e);
 			}
 		}
+		
 		int n =2; // TODO: get this from the config file  
 		//Utils.setPersonQuadTree(this.createZones(controler, n));
-		this.createRetailZones(controler, n);
-	}
-	
-	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		Controler controler = event.getControler();
-		if (controler.getIteration()%1==0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
-			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
-			
-			// works, but it is not nicely programmed. shouldn't be a global container, should be
-			// controlled by the controler (or actually added to the population)
-			
-			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-			int retailers_count = 0;
-			for (Retailer r : this.retailers.getRetailers().values()) {
-				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");
-				Map<Id,ActivityFacility> facs = r.runStrategy();
-				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will really be moved!!!!!!!!!!! 
-				// probably is not incorrect but slower and should be changed
-				System.out.println("moved facilities =" + facs);
-			}
-			
-			int iter = controler.getIteration();
-			this.rs.write(this.retailers);
-			
-			for (Person p : controler.getPopulation().getPersons().values()) {
-				pst.run(p,iter);
-				//for (Plan plan : p.getPlans()) {
-				Plan plan = p.getSelectedPlan();
-					// fc: is it not possible anymore to use only the selected plan? 
-					// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
-					boolean routeIt = false;
-					for (PlanElement pe : plan.getPlanElements()) {
-						if (pe instanceof Activity) {
-							Activity act = (Activity) pe;
-							if (movedFacilities.containsKey(act.getFacilityId())) {
-								act.setLink(act.getFacility().getLink());
-								routeIt = true;
-							}
-						}
-					}
-					if (routeIt) {
-						pcrl.run(plan);
-					}
-//				}
-				for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
-					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
-						if (pe2 instanceof Activity) {
-							Activity act = (Activity) pe2;
-							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
-								// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
-								//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 
-							}
-						}
-					}
-				}
-			}
-		}
-	}	
-	
-	private final TreeMap<Id,QuadTree<Person>> createRetailZones(Controler controler, int n) {
+		//this.createRetailZones(controler, n);
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -207,24 +152,80 @@ public class RetailersSequentialLocationListener implements StartupListener, Bef
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 
-		log.info("minx = " + minx + "; miny = " + miny + "; maxx = " + maxx + "; maxy =" + maxy );
-		int z = n*n;
-		TreeMap<Id,QuadTree<Person>> l = new TreeMap<Id,QuadTree<Person>>();
+		//TreeMap<Id,QuadTree<Person>> l = new TreeMap<Id,QuadTree<Person>>();
 		double x_width = (maxx - minx)/n;
 		double y_width = (maxy - miny)/n;
+		int a = 0;
 		for (int i=0; i==n-1; i=i+1 ) {
 			for (int j=0; j==n-1; j=j+1) {
-				
+				Id id = new IdImpl (a);
+				double x1= minx + i*x_width;
+				double x2= x1 + x_width;
+				double y1= miny + j*y_width;
+				double y2= y1 + y_width;
+				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
+				rz.addPersons (controler);
+				rz.addFacilities (controler);
+				this.retailZones.addRetailZone(rz);
+				a=a+1;
+			}	
+		}
+	}
+	
+//	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+//		Controler controler = event.getControler();
+//		if (controler.getIteration()%5==0){ // TODO Here instead of 100, the number of iterations 
+//			// supposed to be enough in order to reach a relaxed state should be inserted.
+//			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+//			
+//			// works, but it is not nicely programmed. shouldn't be a global container, should be
+//			// controlled by the controler (or actually added to the population)
+//			
+//			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+//			int retailers_count = 0;
+//			for (Retailer r : this.retailers.getRetailers().values()) {
+//				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");
+//				Map<Id,ActivityFacility> facs = r.runStrategy();
+//				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will be really moved!!!!!!!!!!! 
+//				// probably is not incorrect but slower and should be changed
+//				System.out.println("moved facilities =" + facs);
+//			}
+//			
+//			this.rs.write(this.retailers);
+//			
+//			
+//		}
+//	}	
+	
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		// TODO Auto-generated method stub
+		Controler controler = event.getControler();
+		// TODO use a double ""for" cycle in order to avoid to use the getIteration method
+		// the first is 0...n where n is the number of times the gravity model needs to 
+		// be computed, the second is 0...k, where k is the number of iterations needed 
+		// in order to obtain a relaxed state
+		int iter = controler.getIteration();
+		if (controler.getIteration()%5==0){
+			for (RetailZone rz : this.retailZones.getRetailZones().values()) {
+				//rz.getPersonsQuadTree().
 			}
 			
-			
+//			for (Person p : controler.getPopulation().getPersons().values()) {				
+//				for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
+//					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
+//						if (pe2 instanceof Activity) {
+//							Activity act = (Activity) pe2;
+//							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
+//								// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
+//								//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 
+//							}
+//						}
+//					}
+//				}
+//			}
 		}
-		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
-		for (Person p : controler.getPopulation().getPersons().values()) {
-			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
-			personQuadTree.put(c.getX(),c.getY(),p);
-		}
-		return l;
 	}
+	
+	
 }
 

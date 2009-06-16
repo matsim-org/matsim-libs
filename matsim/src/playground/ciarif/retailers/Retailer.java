@@ -2,19 +2,14 @@ package playground.ciarif.retailers;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.controler.Controler;
 
 public class Retailer {
 	private final Id id;
-//<<<<<<< .mine
-//	private final LinkedHashMap<Id, Facility> facilities = new LinkedHashMap<Id,Facility>();
-//=======
 	private final Map<Id,ActivityFacility> facilities = new LinkedHashMap<Id,ActivityFacility>();
-//>>>>>>> .r6943
+
 	private RetailerStrategy strategy;
 		
 	public Retailer(final Id id, RetailerStrategy rs) { 
