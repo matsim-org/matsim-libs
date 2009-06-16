@@ -37,6 +37,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import com.sun.opengl.util.BufferUtil;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
@@ -48,6 +50,7 @@ import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -62,8 +65,6 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-
-import com.sun.opengl.util.BufferUtil;
 
 public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
@@ -82,7 +83,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
-		if (source.getText().equals("trip only")) {
+		if (source.getText().equals("leg only")) {
 			tripOnly = !tripOnly;
 		} else if (source.getText().equals("only vehicles on the link now")) {
 			nowOnly = ! nowOnly;
@@ -92,7 +93,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 	public JComponent getOptionsGUI(JComponent mother) {
 		JPanel com = new JPanel();
 		com.setSize(500, 60);
-		JCheckBox SynchBox = new JCheckBox("trip only");
+		JCheckBox SynchBox = new JCheckBox("leg only");
 		SynchBox.setMnemonic(KeyEvent.VK_M);
 		SynchBox.setSelected(false);
 		SynchBox.addItemListener(this);
@@ -155,33 +156,37 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 	}
 	
 	protected void collectLinksFromTrip(List<Plan> actPersons) {
+		// TODO kai Despite the name, this collects links from the "leg", not from the trip.  kai, jun09
 		boolean addthis = false;
 		for (Plan plan : actPersons) {
-			List actslegs = plan.getPlanElements();
-			for (int i= 0; i< actslegs.size(); i++) {
-				if( i%2 == 0) {
-					// handle act
-					Activity act = (Activity)plan.getPlanElements().get(i);
-					Id id2 = act.getLink().getId();
-					if(id2.equals(this.linkId)) {
-						// only if act is ON the link add +1 to linkcounter
-						addLink(act.getLink());
-						addthis = true;
-					}
-				} else {
-					// handle leg
-					Leg leg = (Leg)actslegs.get(i);
-					List<Link> links = new ArrayList<Link>();
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-						links.add(link);
-						Id id2 = link.getId();
-						if(id2.equals(this.linkId) ) {
-							// only if this specific trip includes link, add all!
-							addthis = true;
+			for (PlanElement pe : plan.getPlanElements()) {
+
+//				if( i%2 == 0) {
+//					// handle act
+//					Activity act = (Activity)plan.getPlanElements().get(i);
+//					Id id2 = act.getLink().getId();
+//					if(id2.equals(this.linkId)) {
+//						// only if act is ON the link add +1 to linkcounter
+//						addLink(act.getLink());
+//						addthis = true;
+//					}
+// I don't think that it is very plausible to include this, and since it makes the code longer, I removed it. kai, jun09				
+				
+				if ( pe instanceof Leg ) {
+					Leg leg = (Leg) pe ;
+					Route route = leg.getRoute();
+					if ( route instanceof NetworkRoute ) { // added in jun09, see below in "collectLinks". kai, jun09
+						List<Link> links = new ArrayList<Link>();
+						for (Link link : ((NetworkRoute) route).getLinks() ) {
+							links.add(link);
+							if(link.getId().equals(this.linkId) ) {
+								// only if this specific route includes link, add the route
+								addthis = true;
+							}
 						}
+						if(addthis) for (Link link : links) addLink(link);
+						addthis = false;
 					}
-					if(addthis) for (Link link : links) addLink(link);
-					addthis = false;
 				}
 
 			}
@@ -197,8 +202,22 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					addLink(act.getLink());
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-						addLink(link);
+
+//					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					/* I regularly got an exception with the above line:
+					 * Exception in thread "AWT-EventQueue-0" java.lang.ClassCastException: org.matsim.core.population.routes.GenericRouteImpl
+					 *	at org.matsim.vis.otfvis.opengl.queries.QuerySpinne.collectLinksFromTrip(QuerySpinne.java:XXX)
+					 *  ...
+					 * I assume that it comes from the fact that some routes are not network routes (but, say, pt routes).
+					 * So I included the instanceof check (see below).  Should be done in ALL the queries.  kai, jun09
+					 */
+
+					Route route = leg.getRoute() ;
+					if ( route instanceof NetworkRoute ) {
+						NetworkRoute nr = (NetworkRoute) route ;
+						for (Link link : nr.getLinks() ) {
+							addLink(link);
+						}
 					}
 				}
 			}
