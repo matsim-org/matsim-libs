@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.teach.telematics.ha2;
+package playground.johannes.teach.telematics;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntObjectHashMap;

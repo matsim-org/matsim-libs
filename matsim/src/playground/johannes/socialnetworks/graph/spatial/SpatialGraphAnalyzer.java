@@ -23,18 +23,20 @@
  */
 package playground.johannes.socialnetworks.graph.spatial;
 
+import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TDoubleObjectIterator;
+
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
+import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
@@ -53,23 +55,23 @@ public class SpatialGraphAnalyzer {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		String graphfile = args[1];
+		String graphfile = args[0];
 		String gridfile = null;
 		String output = null;
 		boolean extended = false;
-		if(args.length > 2) {
-			if(args[2].equals("-e"))
+		if(args.length > 1) {
+			if(args[1].equals("-e"))
 				extended = true;
 			else
-				gridfile = args[2];
-			if(args.length > 3) {
-				if(args[3].equals("-e"))
+				gridfile = args[1];
+			if(args.length > 2) {
+				if(args[2].equals("-e"))
 					extended = true;
 				else
-					output = args[3];
+					output = args[2];
 				
-				if(args.length > 4) {
-					if(args[4].equals("-e"))
+				if(args.length > 3) {
+					if(args[3].equals("-e"))
 						extended = true;	
 				}
 			}
@@ -90,71 +92,66 @@ public class SpatialGraphAnalyzer {
 		
 	}
 
-	public static void analyze(
-			SpatialGraph socialnet,
-			String output, boolean extended, SpatialGrid<Double> densityGrid) {
-		GraphAnalyser.analyze(socialnet, output, extended);
+	@SuppressWarnings("unchecked")
+	public static void analyze(SpatialGraph graph, String output, boolean extended, SpatialGrid<Double> densityGrid) {
+		GraphAnalyser.analyze(graph, output, extended);
 
-		double binsize = 10;
+		double binsize = 1000.0;
+		if(densityGrid != null)
+			binsize = densityGrid.getResolution();
+		
 		try {
 			/*
 			 * edge length distribution
 			 */
-			Distribution edgeLengthDistr = SpatialGraphStatistics.edgeLengthDistribution(socialnet);
+			Distribution edgeLengthDistr = SpatialGraphStatistics.edgeLengthDistribution(graph);
 			double d_mean = edgeLengthDistr.mean();
 			logger.info("Mean edge length is " + d_mean);	
 		
 			if(output != null) {
-				Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution(socialnet).absoluteDistribution(binsize), output + "edgelength.hist.txt");
-				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(socialnet), output + "edgelength_k.txt", "k", "edge length");
-				
+				/*
+				 * edge length histogram
+				 */
+				Distribution.writeHistogram(edgeLengthDistr.absoluteDistribution(binsize), output + "edgelength.hist.txt");
+				/*
+				 * edge length degree correlation
+				 */
+				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(graph), output + "edgelength_k.txt", "k", "edgelength");
+				/*
+				 * density correlations
+				 */
 				if(densityGrid != null) {
-					Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(socialnet.getVertices(), densityGrid), output + "k_rho.txt", "density", "k");
-					Correlations.writeToFile(SpatialGraphStatistics.clusteringDensityCorrelation(socialnet.getVertices(), densityGrid), output + "c_rho.txt", "density", "c");
-					
+					Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(
+							graph.getVertices(), densityGrid), output + "k_rho.txt", "density", "k");
+					Correlations.writeToFile(SpatialGraphStatistics.clusteringDensityCorrelation(
+							graph.getVertices(), densityGrid), output + "c_rho.txt", "density", "c");
 					Correlations.writeToFile(SpatialGraphStatistics.densityCorrelation(
-							SpatialGraphStatistics.meanEdgeLength(socialnet), densityGrid, binsize), output + "edgelength_rho", "rho", "mean_edgelength");
+							SpatialGraphStatistics.meanEdgeLength(graph), densityGrid, binsize), output + "edgelength_rho.txt", "rho", "mean_edgelength");
 				}
-				
-//				Correlations.writeToFile(SocialNetworkStatistics.edgeLengthMSEDegreeCorrelation(socialnet.getVertices()), output + "edgelenghtMSE_k.txt", "degree", "MSE(d)");
-//				
-//				TDoubleObjectHashMap<?> kPartitions = Partitions.createDegreePartitions(socialnet.getVertices());
-//				for(int k = 5; k < 16; k++) {
-//					Set<? extends Ego<? extends BasicPerson<?>>> partition = (Set<? extends Ego<? extends BasicPerson<?>>>) kPartitions.get((double)k);
-//					Distribution.writeHistogram(SocialNetworkStatistics.edgeLengthDistribution(partition).absoluteDistribution(10), output + "edgelength.k="+k+".hist.txt");
-//				}
-//				
-//				TDoubleObjectHashMap<?> rhoPartitions = SpatialStatistics.createDensityPartitions(socialnet.getVertices(), densityGrid, 10);
-//				for(double rho = 10; rho < 200; rho += 10) {
-//					Set<? extends Ego<? extends BasicPerson<?>>> partition = (Set<? extends Ego<? extends BasicPerson<?>>>) rhoPartitions.get(rho);
-//					if(partition != null)
-//						Distribution.writeHistogram(SocialNetworkStatistics.edgeLengthDistribution(partition).absoluteDistribution(10), output + "edgelength.rho="+rho+".hist.txt");
-//				}
-				
-				double xmin = 8.298482309439372;
-				double xmax = 8.848994325098269;
-				double ymin = 47.20737601071456;
-				double ymax = 47.50074681594523;
-//				double xmin = 40;
-//				double xmax = 60;
-//				double ymin = 40;
-//				double ymax = 60;
-				Coord c1 = new CoordImpl(xmin, ymin);
-				Coord c2 = new CoordImpl(xmax, ymax);
-//				CoordinateTransformation trans = new WGS84toCH1903LV03();
-//				c1 = trans.transform(c1);
-//				c2 = trans.transform(c2);
-				
-				Set<SpatialVertex> egos = new HashSet<SpatialVertex>();
-				for(SpatialVertex e : socialnet.getVertices()) {
-					Coord c = e.getCoordinate();
-					
-					if(c.getX() >= c1.getX() && c.getX() <= c2.getX() && c.getY() >= c1.getY() && c.getY() <= c2.getY()) {
-						egos.add(e);
-					}
+				/*
+				 * degree partitions
+				 */
+				TDoubleObjectHashMap<?> kPartitions = Partitions.createDegreePartitions(graph.getVertices());
+				TDoubleObjectIterator<?> it = kPartitions.iterator();
+				String patitionOutput = output + "/kPartitions"; 
+				new File(patitionOutput).mkdirs();
+				for(int i = 0; i < kPartitions.size(); i++) {
+					it.advance();
+					String filename = String.format("%1$s/edgelength.%2$s.hist.txt", patitionOutput, (int)it.key());
+					Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution((Set<SpatialVertex>)it.value()).absoluteDistribution(binsize), filename);
 				}
-				Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution(egos).absoluteDistribution(binsize), output + "edgelength.center.hist.txt");
-				Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(egos, densityGrid), output + "k_rho.center.txt", "density", "k");
+				/*
+				 * density partitions
+				 */			
+				TDoubleObjectHashMap<?> rhoPartitions = SpatialGraphStatistics.createDensityPartitions(graph.getVertices(), densityGrid, binsize);
+				it = rhoPartitions.iterator();
+				patitionOutput = output + "/rhoPartitions"; 
+				new File(patitionOutput).mkdirs();
+				for(int i = 0; i < rhoPartitions.size(); i++) {
+					it.advance();
+					String filename = String.format("%1$s/edgelength.%2$s.hist.txt", patitionOutput, (int)it.key());
+					Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution((Set<SpatialVertex>)it.value()).absoluteDistribution(binsize), filename);
+				}
 			}
 			
 			if (output != null) {

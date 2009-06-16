@@ -21,17 +21,13 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph.social.util;
+package playground.johannes.socialnetworks.graph.spatial.io;
 
 import java.io.IOException;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.io.SNGraphMLReader;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 
 /**
  * @author illenberger
@@ -44,13 +40,20 @@ public class GraphML2KMLDegree {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SocialNetwork<Person> socialnet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraph socialnet = reader.readGraph(args[0]);
 		
 		KMLWriter writer = new KMLWriter();
+		
 		KMLDegreeStyle vertexStyle = new KMLDegreeStyle(writer.getVertexIconLink());
-		vertexStyle.setLogscale(false);
+		vertexStyle.setLogscale(true);
+		
+		KMLVertexDescriptor descriptor = new KMLVertexDescriptor(socialnet);
+		
 		writer.setVertexStyle(vertexStyle);
+		writer.setVertexDescriptor(descriptor);
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
-		writer.write(socialnet, args[2]);
+		writer.setDrawEdges(false);
+		writer.write(socialnet, args[1]);
 	}
 }

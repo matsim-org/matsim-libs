@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
@@ -33,6 +33,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
+import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 
 /**
  * @author illenberger
@@ -42,13 +43,14 @@ public class ErgmGravity extends ErgmTerm {
 	
 	private static final Logger logger = Logger.getLogger(ErgmGravity.class);
 
-	private double normBinSize = 1000.0;
+	private double descretization;
 	
 //	private double scale = 1000.0;
 	
 	private TIntObjectHashMap<TDoubleDoubleHashMap> normConstants;
 		
-	public ErgmGravity(SpatialAdjacencyMatrix m) {
+	public ErgmGravity(SpatialAdjacencyMatrix m, double descretization) {
+		this.descretization = descretization;
 		logger.info("Initializing ERGM gravity term...");
 		int n = m.getVertexCount();
 		normConstants = new TIntObjectHashMap<TDoubleDoubleHashMap>();
@@ -71,6 +73,10 @@ public class ErgmGravity extends ErgmTerm {
 				it.advance();
 				double a = 2 * Math.PI * it.key() - Math.PI;
 				double count = it.value();
+				if(count == 0) {
+					count = 1;
+					logger.warn(String.format("No sample in d=%1$s.", it.key()));
+				}
 				it.setValue(count/a);
 			}
 			
@@ -89,18 +95,18 @@ public class ErgmGravity extends ErgmTerm {
 //		this.scale = scale;
 //	}
 
-	public double getNormBinSize() {
-		return normBinSize;
+	public double getDescretization() {
+		return descretization;
 	}
 
-	public void setNormBinSize(double normBinSize) {
-		this.normBinSize = normBinSize;
+	public void setDescretization(double descretization) {
+		this.descretization = descretization;
 	}
 
 	private double getBin(double d) {
 //		double a = Math.PI * d *d;
 //		return Math.ceil(a / area);
-		return Math.ceil(d/normBinSize);
+		return Math.ceil(d/descretization);
 	}
 	
 	@Override
@@ -112,8 +118,9 @@ public class ErgmGravity extends ErgmTerm {
 		
 		
 		double norm_i = normConstants.get(i).get(d);
-		if(norm_i == 0)
-			throw new IllegalArgumentException("Norm must no be zero!");
+		if(norm_i == 0) {
+			throw new IllegalArgumentException(String.format("Norm must no be zero! i=%1$s, d=%2$s", i, d));
+		}
 		
 		return - getTheta() * (Math.log(1 / (d * d * norm_i)));
 	}

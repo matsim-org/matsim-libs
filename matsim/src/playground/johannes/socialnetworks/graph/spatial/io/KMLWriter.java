@@ -66,6 +66,8 @@ public class KMLWriter {
 	
 	private boolean drawEdges = true;
 	
+	private boolean drawNames = false;
+	
 	private KMLObjectStyle<Graph, Vertex> vertexStyle;
 	
 	private KMLObjectStyle<Graph, Edge> edgeStyle;
@@ -100,6 +102,14 @@ public class KMLWriter {
 		this.drawEdges = drawEdges;
 	}
 
+	public boolean isDrawNames() {
+		return drawNames;
+	}
+	
+	public void setDrawNames(boolean drawNames) {
+		this.drawNames = drawNames;
+	}
+	
 	public KMLObjectStyle<Graph, Vertex> getVertexStyle() {
 		return vertexStyle;
 	}
@@ -192,7 +202,8 @@ public class KMLWriter {
 				placemark.setStyleUrl(vertexStyle.getObjectSytleId(v));
 				if(vertexDescriptor != null) {
 					placemark.setDescription(vertexDescriptor.getDescription(v));
-					placemark.setName(vertexDescriptor.getName(v));
+					if(drawNames)
+						placemark.setName(vertexDescriptor.getName(v));
 				}
 				/*
 				 * add placemark to vertex folder
@@ -242,7 +253,8 @@ public class KMLWriter {
 				placemark.setStyleUrl(edgeStyle.getObjectSytleId(e));
 				if(edgeDescriptor != null) {
 					placemark.setDescription(edgeDescriptor.getDescription(e));
-					placemark.setName(edgeDescriptor.getName(e));
+					if(drawNames)
+						placemark.setName(edgeDescriptor.getName(e));
 				}
 				/*
 				 * add placemark to edge folder

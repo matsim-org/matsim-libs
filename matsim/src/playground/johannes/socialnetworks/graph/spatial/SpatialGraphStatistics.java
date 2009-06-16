@@ -110,11 +110,11 @@ public class SpatialGraphStatistics {
 				vertexValues.put(e, e.getEdges().size());
 			}
 			
-			return densityCorrelation(vertexValues, densityGrid, 10);
+			return densityCorrelation(vertexValues, densityGrid, densityGrid.getResolution());
 		}
 
 		public static TDoubleDoubleHashMap clusteringDensityCorrelation(Collection<? extends SpatialVertex> vertices, SpatialGrid<Double> densityGrid) {
-			return densityCorrelation(GraphStatistics.localClusteringCoefficients(vertices), densityGrid, 500);
+			return densityCorrelation(GraphStatistics.localClusteringCoefficients(vertices), densityGrid, densityGrid.getResolution());
 		}
 
 		public static <V extends SpatialVertex> TDoubleObjectHashMap<Set<V>> createDensityPartitions(Set<V> vertices, SpatialGrid<Double> densityGrid, double binsize) {

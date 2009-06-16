@@ -39,11 +39,11 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitcher;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.generators.GravityBasedGenerator.Handler;
 import playground.johannes.socialnetworks.graph.social.io.SNGraphMLReader;
 import playground.johannes.socialnetworks.graph.social.mcmc.SNAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.ErgmGravity;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
+import playground.johannes.socialnetworks.graph.spatial.generators.ErgmGravity;
+import playground.johannes.socialnetworks.graph.spatial.generators.GravityGenerator.Handler;
 
 /**
  * @author illenberger
@@ -83,7 +83,7 @@ public class GravityBasedAnnealer {
 		ErgmTerm[] terms = new ErgmTerm[3];
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(theta_density);
-		terms[1] = new ErgmGravity(matrix);
+		terms[1] = new ErgmGravity(matrix, 1000);
 		terms[1].setTheta(theta_distance);
 		terms[2] = new ErgmTriangles();
 		terms[2].setTheta(theta_triangle);

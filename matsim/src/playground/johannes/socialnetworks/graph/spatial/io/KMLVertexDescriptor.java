@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNGraphMLWriter.java
+ * KMLVertexDescriptor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.Vertex;
-import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
+import gnu.trove.TObjectDoubleHashMap;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraphMLWriter extends GraphMLWriter {
-
-	@Override
-	public void write(Graph graph, String filename) throws IOException {
-		if(graph instanceof SpatialGraph)
-			super.write(graph, filename);
-		else
-			throw new ClassCastException("Graph must be of type SpatialGraph.");
+public class KMLVertexDescriptor implements KMLObjectDescriptor<SpatialVertex> {
+	
+	private TObjectDoubleHashMap<SpatialVertex> clustering;
+	
+	private TObjectDoubleHashMap<SpatialVertex> meanEdgeLength;
+	
+	@SuppressWarnings("unchecked")
+	public KMLVertexDescriptor(SpatialGraph graph) {
+		clustering = (TObjectDoubleHashMap<SpatialVertex>) GraphStatistics.localClusteringCoefficients(graph);
+		meanEdgeLength = (TObjectDoubleHashMap<SpatialVertex>) SpatialGraphStatistics.meanEdgeLength(graph);
+	}
+	
+	public String getDescription(SpatialVertex object) {
+		StringBuilder builder= new StringBuilder();
+		
+		builder.append("k = ");
+		builder.append(String.valueOf(object.getNeighbours().size()));
+		builder.append("<br>");
+		builder.append("c = ");
+		builder.append(String.valueOf(clustering.get(object)));
+		builder.append("<br>");
+		builder.append("d = ");
+		builder.append(String.valueOf(meanEdgeLength.get(object)));
+		
+		return builder.toString();
 	}
 
-	@Override
-	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
-		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
-		
-		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_X_TAG, String.valueOf(((SpatialVertex)v).getCoordinate().getX())));
-		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_Y_TAG, String.valueOf(((SpatialVertex)v).getCoordinate().getY())));
-		
-		return attrs;
+	public String getName(SpatialVertex object) {
+		return null;
 	}
+
 }

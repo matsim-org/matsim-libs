@@ -61,6 +61,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -208,7 +209,9 @@ public class IVT2009ToGraphML {
 		popWriter.write();
 		
 		logger.info("Writing social network to " + output + "ivt2009.graphml");
-		SNGraphMLWriter graphWriter = new SNGraphMLWriter();
+//		SNGraphMLWriter graphWriter = new SNGraphMLWriter();
+//		graphWriter.write(socialnet, output + "ivt2009.graphml");
+		SpatialGraphMLWriter graphWriter = new SpatialGraphMLWriter();
 		graphWriter.write(socialnet, output + "ivt2009.graphml");
 		
 		KMLWriter kmlwriter = new KMLWriter();
@@ -219,6 +222,14 @@ public class IVT2009ToGraphML {
 		/*
 		 * statistics
 		 */
+		/*
+		 * degree
+		 */
+		Distribution degreeStats = GraphStatistics.degreeDistribution(egoSet);
+		double meanDegree = degreeStats.mean();
+		logger.info(String.format("Mean degree is %1$s.", meanDegree));
+		if(output != null)
+			Distribution.writeHistogram(degreeStats.absoluteDistribution(), output + "degree.hist.txt");
 		/*
 		 * edge length distribution
 		 */
@@ -242,20 +253,16 @@ public class IVT2009ToGraphML {
 		
 		if (output != null) {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(output + GraphAnalyser.SUMMARY_FILE, true));
-			writer.write("mean edge length=");
+			writer.write("meanEdgeLength=");
 			writer.write(Double.toString(d_mean));
+			writer.newLine();
+			writer.write("meanDegree=");
+			writer.write(Double.toString(meanDegree));
 			writer.newLine();
 			writer.close();
 		}
 		
-		/*
-		 * degree
-		 */
-		Distribution degreeStats = GraphStatistics.degreeDistribution(egoSet);
-		double meanDegree = degreeStats.mean();
-		logger.info(String.format("Mean degree is %1$s.", meanDegree));
-		if(output != null)
-			Distribution.writeHistogram(degreeStats.absoluteDistribution(), output + "degree.hist.txt");
+		
 		
 
 	}

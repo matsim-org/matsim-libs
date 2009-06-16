@@ -88,7 +88,7 @@ public abstract class PajekColorizer<V extends Vertex, E extends Edge> {
 		
 		public PajekColorTable() {
 			try {
-				InputStream stream = ClassLoader.getSystemResourceAsStream("playground/johannes/graph/io/PajekColorTable");
+				InputStream stream = ClassLoader.getSystemResourceAsStream("playground/johannes/socialnetworks/graph/io/PajekColorTable");
 				BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 				String line;
 				String name = null;
