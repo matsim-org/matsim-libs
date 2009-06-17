@@ -32,8 +32,10 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.LocationChoice;
+import playground.mfeil.MDSAM.*;
 
 
 /**
@@ -104,6 +106,11 @@ public class ControlerMFeil extends Controler {
 	    	strategy.addStrategyModule(new ReRoute(this));
 				strategy.addStrategyModule(new TimeAllocationMutator());
 			}
+			
+			else if (classname.equals("PlansVariator")) {
+		    	strategy = new PlanStrategy(new KeepSelected());
+				strategy.addStrategyModule(new PlansVariatorInitializer());
+				}
 		
 			manager.addStrategy(strategy, rate);
 		}
