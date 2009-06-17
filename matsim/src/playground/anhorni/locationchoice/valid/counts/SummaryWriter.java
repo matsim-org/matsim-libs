@@ -20,7 +20,7 @@ public class SummaryWriter {
 	}
 	
 	public void writeRelative(Stations stations, String outpath) {	
-		String header = "Hour\tAVG(|COUNT_i-SIM_i/COUNT_i|)\tAVG(StandardDev_i/COUNT_i)\n";
+		String header = "Hour\tAVG(|(SIM_i - COUNT_i)/COUNT_i|)\tAVG(StandardDev_i/COUNT_i)\n";
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "AVG_relative.txt");
 			out.write(header);			
@@ -63,7 +63,7 @@ public class SummaryWriter {
 				out.write(formatter.format(rel_StandardDev[hour]) + "\n");	
 			}
 			LineChart chart = new LineChart("Relative Measures", "hour", "%");
-			chart.addSeries("AVG(|COUNT_i-SIM_i/COUNT_i|)", rel_COUNT_SIM_avg);
+			chart.addSeries("AVG(|(SIM_i - COUNT_i)/COUNT_i|)", rel_COUNT_SIM_avg);
 			chart.addSeries("AVG(StandardDev_i/COUNT_i)", rel_StandardDev);
 			chart.saveAsPng(outpath + "AVG_relative.png", 1000, 800);
 			
@@ -75,7 +75,7 @@ public class SummaryWriter {
 	}
 	
 	public void writeAbsoluteDifference(Stations stations, String outpath) {	
-		String header = "Hour\tAVG(|COUNT_i-SIM_i|)\tAVG(|StandardDev_i|\n";
+		String header = "Hour\tAVG(|SIM_i - COUNT_i|)\tAVG(|StandardDev_i|\n";
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "AVG_difference.txt");
 			out.write(header);			
@@ -118,7 +118,7 @@ public class SummaryWriter {
 				out.write(formatter.format(standarddev[hour]) + "\n");	
 			}
 			LineChart chart = new LineChart("Difference values", "hour", "# vehicles");
-			chart.addSeries("AVG(|COUNT_i-SIM_i|)", count_sim);
+			chart.addSeries("AVG(|SIM_i- COUNT_i|)", count_sim);
 			chart.addSeries("AVG(|StandardDev_i|)", standarddev);
 			chart.saveAsPng(outpath + "AVG_difference.png", 1000, 800);
 			
