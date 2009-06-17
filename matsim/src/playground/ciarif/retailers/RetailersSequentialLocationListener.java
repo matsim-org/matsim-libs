@@ -29,25 +29,18 @@ package playground.ciarif.retailers;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -56,9 +49,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.utils.collections.QuadTree;
-
-
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class RetailersSequentialLocationListener implements StartupListener, IterationEndsListener {
 	
@@ -79,7 +70,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
 	private Object[] links = null;
-	private RetailZones retailZones = null;
+	private RetailZones retailZones = new RetailZones();
 	
 	public RetailersSequentialLocationListener() {
 	}
@@ -135,10 +126,10 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				Gbl.errorMsg(e);
 			}
 		}
-		
+		Collection<Person> persons = controler.getPopulation().getPersons().values();
+		ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>(); // TODO check if it works at runtime, otherwise try to initialize the object differently
 		int n =2; // TODO: get this from the config file  
-		//Utils.setPersonQuadTree(this.createZones(controler, n));
-		//this.createRetailZones(controler, n);
+		System.out.println("Number of retail zones = "+  n*n);
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -149,29 +140,62 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
 			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
+				shops.add(f);
+				System.out.println("The shop " + f.getId() + "has been added to the file 'shops'");
+			}
+			else {System.out.println ("Activity options are: " + f.getActivityOptions().values().toString());}
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 
 		//TreeMap<Id,QuadTree<Person>> l = new TreeMap<Id,QuadTree<Person>>();
 		double x_width = (maxx - minx)/n;
+		System.out.println("x_width = " + x_width);
 		double y_width = (maxy - miny)/n;
+		System.out.println("y_width = " + y_width);
 		int a = 0;
-		for (int i=0; i==n-1; i=i+1 ) {
-			for (int j=0; j==n-1; j=j+1) {
+		int i = 0;
+		int j = 0;
+		while (i<=n) {
+			while (j<=n) {
+				j=j+1;
 				Id id = new IdImpl (a);
 				double x1= minx + i*x_width;
 				double x2= x1 + x_width;
 				double y1= miny + j*y_width;
 				double y2= y1 + y_width;
 				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-				rz.addPersons (controler);
-				rz.addFacilities (controler);
+				System.out.println("Number of persons = " + persons.size());
+				rz.addPersons (persons); // TODO check if it works at runtime, if not
+				// try modifying the type in the retailZone class
+				System.out.println("Number of shops = " + shops.size());
+				rz.addFacilities (shops);
 				this.retailZones.addRetailZone(rz);
 				a=a+1;
-			}	
+				System.out.println("parametro a (numero di zone) = " + a);
+			}
+			i=i+1;
 		}
 	}
 	
+//	for (int i=0; i==n; i=i+1 ) {
+//		System.out.println("i = " + i);
+//		for (int j=0; j==n-1; j=j+1) {
+//			System.out.println("j = " + j);
+//			Id id = new IdImpl (a);
+//			double x1= minx + i*x_width;
+//			double x2= x1 + x_width;
+//			double y1= miny + j*y_width;
+//			double y2= y1 + y_width;
+//			RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
+//			rz.addPersons (persons); // TODO check if it works at runtime, if not
+//			// try modifying the type in the retailZone class
+//			rz.addFacilities (shops);
+//			this.retailZones.addRetailZone(rz);
+//			a=a+1;
+//			System.out.println("parametro a (numero di zone) = " + a);
+//		}	
+//	}
 //	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 //		Controler controler = event.getControler();
 //		if (controler.getIteration()%5==0){ // TODO Here instead of 100, the number of iterations 
@@ -203,13 +227,15 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		// TODO use a double ""for" cycle in order to avoid to use the getIteration method
 		// the first is 0...n where n is the number of times the gravity model needs to 
 		// be computed, the second is 0...k, where k is the number of iterations needed 
-		// in order to obtain a relaxed state
-		int iter = controler.getIteration();
+		// in order to obtain a relaxed state, or maybe use a while.
+		//int iter = controler.getIteration();
+		//if (controler.getIteration()>0 & controler.getIteration()%5==0){
 		if (controler.getIteration()%5==0){
-			for (RetailZone rz : this.retailZones.getRetailZones().values()) {
+			log.info("matrix dimensions, columns = " + this.retailZones.getRetailZones().values());
+			DenseDoubleMatrix2D am2d = new DenseDoubleMatrix2D (4 , this.retailZones.getRetailZones().values().size());
+			for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {//for (RetailZone rz : this.retailZones.getRetailZones().values()) 
 				//rz.getPersonsQuadTree().
-			}
-			
+			}				
 //			for (Person p : controler.getPopulation().getPersons().values()) {				
 //				for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
 //					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
