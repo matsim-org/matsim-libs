@@ -35,6 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -69,6 +70,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		this.plans = plans;
 		this.network = network;
 		this.facilities = (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE);
+		this.knowledges = new KnowledgesImpl();
 	}
 	
 	public MatsimPopulationReader(final Scenario scenario) {
