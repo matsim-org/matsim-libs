@@ -1,0 +1,50 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * UniSAM.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.mfeil.MDSAM;
+
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+
+/**
+ * Java re-implementation of Joh's uni-dimensional sequence alignment method
+ * 
+ * @author Matthias Feil
+ */
+public class UniSAM {
+	
+	private BasicPopulation population = null;
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		final ScenarioImpl scenario = new ScenarioImpl();
+		final String populationFilename = "./plans/output_plans.xml.gz";
+		new MatsimPopulationReader(scenario).readFile(populationFilename);
+		
+		//log.info("Reading plans xml file...");
+		//population = new BasicPopulation(Population.NO_STREAMING);
+		//PopulationReader plansReader = new MatsimPopulationReader(population);
+
+	}
+
+}
