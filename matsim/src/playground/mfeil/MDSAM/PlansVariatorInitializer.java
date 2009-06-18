@@ -20,8 +20,15 @@
 
 package playground.mfeil.MDSAM;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.controler.Controler;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import java.util.ArrayList;
+import java.util.List;
+import org.matsim.core.api.facilities.ActivityOption;
 
 
 
@@ -32,13 +39,23 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PlansVariatorInitializer extends AbstractMultithreadedModule{
 	
+	private final Controler controler;
+	private final LocationMutatorwChoiceSet locator;
+	private final PlansCalcRoute router;
+	private final List<String> actTypes;
 	
-	public PlansVariatorInitializer () {
+	public PlansVariatorInitializer (Controler controler) {
+		this.controler = controler;
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
+		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		ActivityOptionFinder finder = new ActivityOptionFinder ();
+		finder.run(controler.getFacilities());
+		this.actTypes = finder.getActTypes();
 	}
 
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansVariator ();
+		return new PlansVariator (this.controler, this.locator, this.router, this.actTypes);
 	}
 }

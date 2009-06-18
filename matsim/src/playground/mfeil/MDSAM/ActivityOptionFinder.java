@@ -35,14 +35,14 @@ import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 
 
 /**
- * Class that searches all facilities of a given map of facilities (e.g., the facilities of a scenario) 
+ * Class that searches all facilities of a given facilities layer (e.g., the facilities of a scenario) 
  * for activity options. Returns a list of all found activity options.
  * 
  * @author Matthias Feil
  */
 public class ActivityOptionFinder extends AbstractFacilityAlgorithm {
 	
-	private List<ActivityOption> actTypes = new ArrayList<ActivityOption>();
+	private List<String> actTypes = new ArrayList<String>();
 	
 	public void run (final ActivityFacilities facilities) {
 		for (ActivityFacility f : facilities.getFacilities().values()) {
@@ -52,12 +52,13 @@ public class ActivityOptionFinder extends AbstractFacilityAlgorithm {
 	public void run(ActivityFacility facility){
 		Collection<ActivityOption> facActTypes = facility.getActivityOptions().values();
 		for (Iterator<ActivityOption> iterator = facActTypes.iterator();iterator.hasNext();){
-			if (!this.actTypes.contains(iterator.next())){
-				this.actTypes.add(iterator.next());
+			ActivityOption act = iterator.next();
+			if (!this.actTypes.contains(act.getType())){
+				this.actTypes.add(act.getType());
 			}
 		}
 	}
-	public List<ActivityOption> getActTypes (){
+	public List<String> getActTypes (){
 		return this.actTypes;
 	}
 	
