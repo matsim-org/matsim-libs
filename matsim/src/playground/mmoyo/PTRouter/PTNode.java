@@ -18,7 +18,7 @@ public class PTNode extends NodeImpl {
 	private Id idPTLine;
 	private int lineSequenceindex; 
 	private int minutesAfterDeparture;
-	private double[]arrDep = new double[72];  //30 april  //-> eliminate this
+	private double[]arrDep;  //-> fill up this with departure times and use it for nextDeparture calculation
 		
 	public PTNode(final Id id, final Coord coord, final String type, final Id idStation, final Id idPTLine) {
 		super(id, coord, type);
@@ -95,7 +95,7 @@ public class PTNode extends NodeImpl {
 	}
 	
 	/*
-	 * This is an attempt to faster the calculaton of waiting time in a transfer
+	 * This is an attempt to speed up the calculaton of waiting time in a transfer
 	 * It must be determined if it is faster to do it here or at timetable class
 	 */
 	public double getTransferTime (double time){//,

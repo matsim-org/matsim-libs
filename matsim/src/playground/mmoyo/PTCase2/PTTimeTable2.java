@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
 import playground.mmoyo.input.PTLinesReader2;
@@ -24,21 +23,24 @@ public class PTTimeTable2{
 	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
 	private static Time time;
 	
+	
+	public PTTimeTable2(Map<Id,Double> linkTravelTimeMap,Map<Id,double[]> nodeDeparturesMap ){
+		this.linkTravelTimeMap = linkTravelTimeMap;
+		this.nodeDeparturesMap =  nodeDeparturesMap;
+	}
+	
+	@Deprecated
 	public PTTimeTable2(String TimeTableFile){
 		ptLinesReader.readFile(TimeTableFile);
 		this.ptLineList = ptLinesReader.ptLineList;
 	}
 
+	@Deprecated
 	public PTTimeTable2(){
+		
 	}
 	
-	/**
-	 * gets the map with travel time information for standard links
-	 */
-	public void setMaps(Map<Id,Double> linkTravelTimeMap){
-		this.linkTravelTimeMap = linkTravelTimeMap;
-	}
-	
+	@Deprecated
 	public void setptLineList(List<PTLine> ptLineList){
 		this.ptLineList= ptLineList;
 	}
@@ -46,8 +48,10 @@ public class PTTimeTable2{
 	/**
 	 * Reads every ptline information and creates  
 	 * Minutemap to save average travel time from the fist station to any station of the ptLine 
-	 * NodeDepartureTime to save all departures times in a day for each node   
+	 * NodeDepartureTime to save all departures times in a day for each node 
+	 * [MMoyo]17th June It will be completely replaced by  TransitTravelTimeCalculator 
 	 */
+	@Deprecated
 	public void calculateTravelTimes(Network networklayer){
 		// -> make its own class in input and the pttimetable gets this external data
 		Map<Id,Double> minuteMap = new TreeMap<Id,Double>();
@@ -73,34 +77,8 @@ public class PTTimeTable2{
 				Arrays.sort(departuresArray);
 				nodeDeparturesMap.put(idNode, departuresArray);
 				x++;
-			
-				/*
-				PTNode ptNode = (PTNode)networklayer.getNode(idNode);
-				Link[] arrlink= ptNode.getOutLinks().values().toArray(new Link[1]);
-				Link link = arrlink[0];
-				//System.out.println(link.getFromNode().getId() + "--" + link.getId() + "-->" + link.getToNode().getId());
-				*/
-				//if (link.getType().equals("Standard")){
-				//Id idFromNode = link.getFromNode().getId();
-				//Id idToNode = link.getToNode().getId();
-				//double travelTime=minuteMap.get(idToNode)- minuteMap.get(idFromNode); 
-				//linkTravelTimeMap.put(link.getId(), travelTime);
-				//}
 			}
 		}
-		
-		/*
-		//Creates the map with link-travel time
-		for (Link link : networklayer.getLinks().values()) {
-			if (link.getType().equals("Standard")){
-				Id idFromNode = link.getFromNode().getId();
-				Id idToNode = link.getToNode().getId();
-				double travelTime=minuteMap.get(idToNode)- minuteMap.get(idFromNode); 
-				linkTravelTimeMap.put(link.getId(), travelTime);
-			}
-		}
-		networklayer =null;
-		*/
 	}
 	
 	public double getTravelTime(Link link){
@@ -108,8 +86,7 @@ public class PTTimeTable2{
 	}
 
 	/**
-	 * Returns the waiting time in a transfer link head node after a given time //minutes
-	 */
+	 * Returns the waiting time in a transfer link head node after a given time //minutes */
 	public double getTransferTime(Link link, double time){
 	 	double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
 		double transferTime= 0;
@@ -125,11 +102,10 @@ public class PTTimeTable2{
 	/**
 	*A binary search returns the next departure in a node after a given time 
 	*If the time is greater than the last departure, 
-	*returns the first departure(of the next day)
-	*/
+	*returns the first departure(of the next day)*/
 	public double nextDepartureB(Id idPTNode,  double time){//,
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
-		int length = arrDep.length;
+	int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){
 			index = -index;
@@ -140,21 +116,16 @@ public class PTTimeTable2{
 		return arrDep[index];
 	}
 
+	@Deprecated
 	public List<PTLine> getPtLineList() {
 		return ptLineList;
 	}
-	
-	public Map<Id, Link> getNextLinkMap() {
-		return nextLinkMap;
-	}
 
-	
+	@Deprecated
 	public void putNextDTLink(Id id, Link link) {
-		//->This should not be necessary
 		nextLinkMap.put(id, link);
 	}
 	
-		
 	public void printDepartures(){
 		for (Map.Entry <Id,double[]> departuresMap : nodeDeparturesMap.entrySet()){
 			System.out.println("\n node:" + departuresMap.getKey());
@@ -164,22 +135,14 @@ public class PTTimeTable2{
 			}
 		}
 	}
+
+	public void setLinkTravelTimeMap(Map<Id, Double> linkTravelTimeMap) {
+		this.linkTravelTimeMap = linkTravelTimeMap;
+	}
+
+	public void setNodeDeparturesMap(Map<Id, double[]> nodeDeparturesMap) {
+		this.nodeDeparturesMap = nodeDeparturesMap;
+	}
 	
 		
 }
-
-
-/* ******************************
- * Time Methods
-
-
-//Converts a string in format hh:mm into integer representing seconds after the midnight
-private double strTimeToDbl(String strDeparture){
-	return time.parseTime(strDeparture);
-}
-
-//Converts integers representing a time into format "hh:mm"
-private String TimeToString(double dblDeparture){
-	return time.writeTime(dblDeparture, "HH:mm");
-}
-*/

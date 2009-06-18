@@ -8,7 +8,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import playground.mmoyo.PTCase1.PTTimeTable;
 /** 
- * Parses the xml file with the information of departures
+ * Parses the xml file with the information of departures for PTCase1
  */
 public class PTTimeTableReader extends MatsimXmlParser {
 	private final static String SCHEDULE = "schedule";

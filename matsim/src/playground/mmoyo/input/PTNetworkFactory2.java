@@ -37,6 +37,13 @@ public class PTNetworkFactory2 {
 		return ptNetworkLayer1;
 	}
 
+	public NetworkLayer readNetwork(String inFileName){
+		NetworkLayer networkLayer= new NetworkLayer(new NetworkFactory());
+		new MatsimNetworkReader(networkLayer).readFile(inFileName);
+		return networkLayer;
+	}
+	
+	@Deprecated
 	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
 		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer, ptTimeTable);
@@ -135,7 +142,7 @@ public class PTNetworkFactory2 {
 	
 		/**Calculates the travel time of each link and stores these data in ptTimeTable*/
 		ptTimeTable.calculateTravelTimes(ptNetworkLayer);  //??
-		ptTimeTable.setMaps(linkTravelTimeMap);
+		ptTimeTable.setLinkTravelTimeMap(linkTravelTimeMap);
 		//return ptTimeTable;
 	}
 	
@@ -279,7 +286,7 @@ public class PTNetworkFactory2 {
 	public static void printLinks(NetworkLayer ptNetworkLayer) {
 		//-> unify with first version of ptNetFactory
 		for (Link l : ptNetworkLayer.getLinks().values()) {
-			System.out.print("\n(" ); 
+			System.out.print("\n(" );
 			System.out.print(l.getFromNode().getId().toString()); 
 			System.out.print( ")----" ); 
 			System.out.print( l.getId().toString() ); 

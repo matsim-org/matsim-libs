@@ -76,7 +76,7 @@ public class PTLinesReader2 extends MatsimXmlParser {
 	}
 
 	private void startLine(final Attributes atts) {
-		idPTLine = new IdImpl(atts.getValue("id"));
+		idPTLine = new IdImpl(atts.getValue("id"));  //+ " " + atts.getValue("direction")
 		type = atts.getValue("id").charAt(0); //-> Read from atts.getValue("type")
 		transportMode = getTransportMode(type);
 		direction =atts.getValue("direction");

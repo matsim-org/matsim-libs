@@ -31,30 +31,29 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class PTRouter2 {
 	private NetworkLayer net; 
-	private LeastCostPathCalculator PTdijkstra;
+	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
 	public TravelTime ptTravelTime;   //> make private 
-	//private int x=0;//--> Should be part of the method if the simulation strategy is set to re-route.
 	
 	public PTRouter2(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimetable) {
 		this.net = ptNetworkLayer;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
-		this.PTdijkstra = new MyDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
+		this.myDijkstra = new MyDijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 	
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
 		double walkRange= distToWalk; 
 		Node origin= createWalkingNode(new IdImpl("W1"), coord1);
-		Node destination=createWalkingNode(new IdImpl("W2"), coord2);
-
+		Node destination= createWalkingNode(new IdImpl("W2"), coord2);
+		
 		Collection <Node> nearStops1 = findnStations (coord1, walkRange);
 		Collection <Node> nearStops2 = findnStations (coord2, walkRange);
 		
 		List <Link> walkingLinkList1 = createWalkingLinks(origin, nearStops1, true);
 		List <Link> walkingLinkList2 = createWalkingLinks(destination, nearStops2, false);
 			
-		Path path = PTdijkstra.calcLeastCostPath(origin, destination, time); 
+		Path path = myDijkstra.calcLeastCostPath(origin, destination, time); 
 			
 		removeWalkingLinks(walkingLinkList1);
 		removeWalkingLinks(walkingLinkList2);
@@ -80,17 +79,16 @@ public class PTRouter2 {
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the quadtree
 	 */
-	public Node createWalkingNode(Id idNode, Coord coord) {
-		//-> use node factory
-		Node node = new PTNode(idNode, coord, "Walking");
-		net.getNodes().put(idNode, node);
+	public Node createWalkingNode(Id id, Coord coord) {
+		Node node = new PTNode(id, coord, "Walking");
+		net.getNodes().put(id, node);
 		return node;
 	}
 	
 	public List <Link> createWalkingLinks(Node walkNode, Collection <Node> nearNodes, boolean to){
 		//->move to link factory
 		List<Link> NewWalkLinks = new ArrayList<Link>();
-		String idLink;
+		Id idLink;
 		Node fromNode;
 		Node toNode;
 		int x=0;
@@ -99,13 +97,13 @@ public class PTRouter2 {
 			if (to){
 				fromNode= walkNode;
 				toNode= node;
-				idLink= "WLO" + x++;
+				idLink = new IdImpl ("WLO" + x++);
 			}else{
 				fromNode= node;
 				toNode=  walkNode;
-				idLink= "WLD" + x++;
+				idLink = new IdImpl ("WLD" + x++);
 			}
-			Link link= createPTLink(idLink, fromNode, toNode, "Walking");
+			Link link= net.createLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", "Walking");
 			//-->check if this temporary stuff improves the performance
 			//link.setFreespeed(link.getLength()* WALKING_SPEED);
 			NewWalkLinks.add(link);
@@ -113,17 +111,6 @@ public class PTRouter2 {
 		return NewWalkLinks;
 	}
 
-	public Link createPTLink(String strIdLink, Node fromNode, Node toNode, String type){
-		//->use link factory
-		Id idLink = new IdImpl(strIdLink);
-		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-		double freespeed= 1;
-		double capacity = 1;
-		double numLanes = 1;
-		String origId = "0";
-		return net.createLink(idLink, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type);
-	}
-	
 	public void removeWalkingLinks(Collection<Link> WalkingLinkList){
 		//->use link factory
 		for (Link link : WalkingLinkList){
@@ -138,7 +125,7 @@ public class PTRouter2 {
 	}
 	
 	public Path findRoute(Node ptNode1, Node ptNode2, double time){
-		return PTdijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
+		return myDijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 	}
 	
 	public void printRoute(Path path){
@@ -164,40 +151,9 @@ public class PTRouter2 {
 			System.out.println("The route is null");
 		}
 	}
-}//class
-
-
-
-/**
- * Main method to be invoked by other classes 
- */
-/*
-public Path findRoute(Coord coord1, Coord coord2, double time, double distToWalk){
-
-	double distOridDest = CoordUtils.calcDistance(coord1,coord2);
-	Collection <Node> nearStops1 = findNearStops(coord1,  distToWalk);
-	Collection <Node> nearStops2 = findNearStops(coord2, distToWalk);
-	
-	Node ptNode1= CreateWalkingNode(new IdImpl("W1"), coord1);
-	Node ptNode2=CreateWalkingNode(new IdImpl("W2"), coord2);
-
-	List <Link> walkingLinkList1 = CreateWalkingLinks(ptNode1, nearStops1, true);
-	List <Link> walkingLinkList2 = CreateWalkingLinks(ptNode2, nearStops2, false);
-
-	Path path = PTdijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
-	
-	removeWalkingLinks(walkingLinkList1);
-	removeWalkingLinks(walkingLinkList2);
-	net.removeNode(ptNode1);
-	net.removeNode(ptNode2);
-	
-	if (path!=null){
-		path.nodes.remove(ptNode1);
-		path.nodes.remove(ptNode2);
-	}
-	return path;
 }
-*/
+
+
 
 /*
  * searches nodes in walk range or else the nearest one
@@ -215,88 +171,4 @@ private Collection <Node> findNearStops (final Coord coord, final double walkDis
 }
 */
 
-/*
-public List<Object> findLegActs(Path path, double depTime){
-	List<Object> actLegList = new ArrayList<Object>();
-	if (path!=null){
-		double legTravTime =0;
-		double accumulatedTime=depTime;
-		//double legArrTime=depTime;
-		double routeTravelTime =0;
-		int num=0;
-	
-		List<Link> linkList = new ArrayList<Link>();
-		boolean first=true;
-		List<Link> linkRoute = path.links;
-		for(int x=0; x< linkRoute.size();x++){
-			Link link = linkRoute.get(x);
-			double linkTravelTime=ptTravelTime.getLinkTravelTime(link,accumulatedTime);
-			accumulatedTime =accumulatedTime + linkTravelTime;
-			routeTravelTime =routeTravelTime+linkTravelTime;
-			
-			//insert first ptActivity: boarding first PTVehicle
-			if (first){ 
-				Coord coord = link.getFromNode().getCoord();
-				double startTime = 0; //this must be inmediately set when we know the passenger gets to the station
-				double dur= 0;        //this must be inmediately set when we know the passenger gets to the station
-				double endTime = depTime;
-				actLegList.add(newPTAct(coord, link, startTime, dur, endTime));
-				first=false;
-			}
-			
-			if (link.getType().equals("Standard")){
-				legTravTime = legTravTime+ linkTravelTime; 
-				linkList.add(link);
-			}else{
-				//CarRoute legRoute = new NodeCarRoute();    25 feb
-				LinkNetworkRoute legRoute = new LinkNetworkRoute(null, null); 
-				
-				legRoute.setTravelTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
-				if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}
-				
-				//insert leg
-				Leg leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
-				//routeTravelTime =routeTravelTime; // routeTravelTime =routeTravelTime*3600;  //Seconds
-				leg.setDepartureTime(accumulatedTime);
-				leg.setTravelTime(routeTravelTime);
-				leg.setArrivalTime((accumulatedTime + (routeTravelTime)));
-				//leg.setNum(num);   deprecated 		
-				leg.setRoute(legRoute);
-				actLegList.add(leg);		
-				
-				//clean variables
-				linkList = new ArrayList<Link>();
-				legTravTime=0;
-				num++;
-				
-				//insert transfer activity  TODO: what about walking and other possible "pt modal choices"
-				Coord coord = link.getToNode().getCoord();
-				double startTime=depTime + routeTravelTime;
-				double dur= linkTravelTime; //double dur= linkTravelTime*60;  //Seconds
-				double endTime = startTime + dur;
-				actLegList.add(newPTAct(coord,link, startTime, dur, endTime));
-				
-			}//if link = standard
-			//set arrTime for the next loop:
-			//legArrTime =  accumulatedTime;
-			routeTravelTime=0;
-				
-		}// for x=0
-	}//if route!null
-	return actLegList;
-}
 
-
-private Activity newPTAct(Coord coord, Link link, double startTime, double dur, double endTime){
-	Activity ptAct= new org.matsim.core.population.ActivityImpl("Wait PT Vehicle", coord);
-	ptAct.setStartTime(startTime);
-	ptAct.setEndTime(endTime);
-	//ptAct.setDuration(dur);   deprecated
-	//ptAct.calculateDuration();
-	ptAct.setLink(link);
-	//act.setDur(linkTravelTime*60);
-	//act.setLinkId(link.getId());
-	//act.setCoord(coord)
-	return ptAct;
-}
-*/

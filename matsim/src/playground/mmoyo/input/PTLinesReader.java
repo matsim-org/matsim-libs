@@ -13,7 +13,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import playground.mmoyo.PTRouter.PTLine;
-import org.matsim.core.basic.v01.IdImpl;
 
 /** 
  * First version of parser xml PTLines for the PTCase1 with a upper hierarchical node to identify the station

@@ -16,23 +16,23 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.mmoyo.PTCase2.PTRouter2;
 import playground.mmoyo.Pedestrian.Walk;
-
 /**
  * Receives two acts and returns a list of PT legs that join their coordinates 
  */
 public class TransitRouteFinder {
 	private PTRouter2 ptRouter;
-	private static Walk walk = new Walk ();
+	private static Walk walk = new Walk();
 	
-	public TransitRouteFinder(final TransitSchedule transitSchedule) {
-		// TODO
+	public TransitRouteFinder(final TransitSchedule transitSchedule){
+		LogicTransitOb logicTransitOb = new LogicTransitOb(transitSchedule);
+		this.ptRouter = logicTransitOb.getPTRouter();
 	}
 	
 	@Deprecated
 	public TransitRouteFinder(PTRouter2 ptRouter ){
 		this.ptRouter = ptRouter; 
 	}
-
+	
 	public List<Leg> calculateRoute (Activity fromAct, Activity toAct, Person person ){
 		List<Leg> legList = new ArrayList<Leg>();
 

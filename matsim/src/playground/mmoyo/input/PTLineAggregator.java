@@ -189,7 +189,7 @@ public class PTLineAggregator {
 		}
 
 		timeTable.setptLineList(ptLineList);
-		timeTable.setMaps(linkTravelTimeMap);
+		timeTable.setLinkTravelTimeMap(linkTravelTimeMap);
 		timeTable.calculateTravelTimes(net);
 
 		/*

@@ -21,6 +21,7 @@ import playground.mmoyo.PTCase2.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 
 /**
+ * Temporary Class to be deleted!
  * Reads a transitschedule to feed a PTTimetable
  */
 public class TransitScheduleToPTTimeTableConverter {
@@ -92,8 +93,4 @@ public class TransitScheduleToPTTimeTableConverter {
 		return strDepartureList;
 	}
 	
-	
-	
-
-		
 }

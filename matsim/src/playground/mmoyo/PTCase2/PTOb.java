@@ -7,7 +7,8 @@ import org.matsim.core.network.NetworkLayer;
  * Contains the common objects for the route search: network, PTTimetable, PtRouter
  */
 public class PTOb {
-	private NetworkLayer ptNetworkLayer; 
+	private NetworkLayer networkLayer; 
+	private NetworkLayer logicNetworkLayer;
 	public  PTRouter2 ptRouter2;  //-->: make private
 	private PTTimeTable2 ptTimeTable;
 	private String outPutPlanFile; 
@@ -15,7 +16,8 @@ public class PTOb {
 	private String plansFile;
 	private String ptNetFile; 
 	private PTNetworkFactory2 ptNetworkFactory =new PTNetworkFactory2();
-	
+
+	@Deprecated
 	public PTOb(String configFile, String ptNetFileName, String timeTableFile, String plansFile, String outPutPlansFile){
 		this.outPutPlanFile= outPutPlansFile;
 		this.config = configFile;
@@ -24,25 +26,33 @@ public class PTOb {
 	    this.ptTimeTable = new PTTimeTable2(timeTableFile);
 	}
 
+	public PTOb(String configFile, String ptNetFileName, String plansFile, String outPutPlansFile){
+		this.outPutPlanFile= outPutPlansFile;
+		this.config = configFile;
+	    this.plansFile= plansFile;
+	    this.ptNetFile= ptNetFileName;
+	}
+	
 	public void readPTNet(String netFile){
-		this.ptNetworkLayer = this.ptNetworkFactory.readNetwork(netFile,ptTimeTable);
+		this.networkLayer = this.ptNetworkFactory.readNetwork(netFile,ptTimeTable);
 		createRouter();
 	}
 	
 	public void createRouter(){
-		ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
+		ptRouter2 = new PTRouter2(networkLayer, ptTimeTable);
 	}
 	
 	public void createPTNetWithTLinks(String inNetFile){
-		this.ptNetworkLayer = ptNetworkFactory.createNetwork(inNetFile, this.ptTimeTable, ptNetFile);
+		this.networkLayer = ptNetworkFactory.createNetwork(inNetFile, this.ptTimeTable, ptNetFile);
+	
 	}
 
 	public void writeNet(String outNetFile){
-		this.ptNetworkFactory.writeNet(ptNetworkLayer, outNetFile);
+		this.ptNetworkFactory.writeNet(networkLayer, outNetFile);
 	}
 	
 	public NetworkLayer getPtNetworkLayer() {
-		return ptNetworkLayer;
+		return networkLayer;
 	}
 
 	public PTRouter2 getPtRouter2() {
@@ -70,7 +80,7 @@ public class PTOb {
 	}
 
 	public void setPtNetworkLayer(NetworkLayer ptNetworkLayer) {
-		this.ptNetworkLayer = ptNetworkLayer;
+		this.networkLayer = ptNetworkLayer;
 	}
 
 	public void setPtRouter2(PTRouter2 ptRouter2) {
@@ -79,5 +89,13 @@ public class PTOb {
 		
 	public void setPTTimeTable(PTTimeTable2 ptTimeTable) {
 		this.ptTimeTable= ptTimeTable;
+	}
+
+	public NetworkLayer getLogicNetworkLayer() {
+		return logicNetworkLayer;
+	}
+
+	public void setLogicNetworkLayer(NetworkLayer logicNetworkLayer) {
+		this.logicNetworkLayer = logicNetworkLayer;
 	}	
 }
