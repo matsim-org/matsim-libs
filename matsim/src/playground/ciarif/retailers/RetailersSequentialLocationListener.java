@@ -71,7 +71,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	private String facilityIdFile = null;
 	private Object[] links = null;
 	private RetailZones retailZones = new RetailZones();
-	
+	private ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
 	public RetailersSequentialLocationListener() {
 	}
 
@@ -127,7 +127,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			}
 		}
 		Collection<Person> persons = controler.getPopulation().getPersons().values();
-		ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>(); // TODO check if it works at runtime, otherwise try to initialize the object differently
+		 // TODO check if it works at runtime, otherwise try to initialize the object differently
 		int n =2; // TODO: get this from the config file  
 		System.out.println("Number of retail zones = "+  n*n);
 		double minx = Double.POSITIVE_INFINITY;
@@ -141,85 +141,35 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
 			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
-				shops.add(f);
+				this.shops.add(f);
 				System.out.println("The shop " + f.getId() + "has been added to the file 'shops'");
 			}
 			else {System.out.println ("Activity options are: " + f.getActivityOptions().values().toString());}
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 
-		//TreeMap<Id,QuadTree<Person>> l = new TreeMap<Id,QuadTree<Person>>();
 		double x_width = (maxx - minx)/n;
-		System.out.println("x_width = " + x_width);
 		double y_width = (maxy - miny)/n;
-		System.out.println("y_width = " + y_width);
 		int a = 0;
 		int i = 0;
-		int j = 0;
-		while (i<=n) {
-			while (j<=n) {
-				j=j+1;
+		while (i<n) {
+			int j = 0;
+			while (j<n) {
 				Id id = new IdImpl (a);
 				double x1= minx + i*x_width;
 				double x2= x1 + x_width;
 				double y1= miny + j*y_width;
 				double y2= y1 + y_width;
 				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-				System.out.println("Number of persons = " + persons.size());
-				rz.addPersons (persons); // TODO check if it works at runtime, if not
-				// try modifying the type in the retailZone class
-				System.out.println("Number of shops = " + shops.size());
+				rz.addPersons (persons); 
 				rz.addFacilities (shops);
 				this.retailZones.addRetailZone(rz);
 				a=a+1;
-				System.out.println("parametro a (numero di zone) = " + a);
+				j=j+1;
 			}
 			i=i+1;
 		}
 	}
-	
-//	for (int i=0; i==n; i=i+1 ) {
-//		System.out.println("i = " + i);
-//		for (int j=0; j==n-1; j=j+1) {
-//			System.out.println("j = " + j);
-//			Id id = new IdImpl (a);
-//			double x1= minx + i*x_width;
-//			double x2= x1 + x_width;
-//			double y1= miny + j*y_width;
-//			double y2= y1 + y_width;
-//			RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-//			rz.addPersons (persons); // TODO check if it works at runtime, if not
-//			// try modifying the type in the retailZone class
-//			rz.addFacilities (shops);
-//			this.retailZones.addRetailZone(rz);
-//			a=a+1;
-//			System.out.println("parametro a (numero di zone) = " + a);
-//		}	
-//	}
-//	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-//		Controler controler = event.getControler();
-//		if (controler.getIteration()%5==0){ // TODO Here instead of 100, the number of iterations 
-//			// supposed to be enough in order to reach a relaxed state should be inserted.
-//			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
-//			
-//			// works, but it is not nicely programmed. shouldn't be a global container, should be
-//			// controlled by the controler (or actually added to the population)
-//			
-//			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-//			int retailers_count = 0;
-//			for (Retailer r : this.retailers.getRetailers().values()) {
-//				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");
-//				Map<Id,ActivityFacility> facs = r.runStrategy();
-//				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will be really moved!!!!!!!!!!! 
-//				// probably is not incorrect but slower and should be changed
-//				System.out.println("moved facilities =" + facs);
-//			}
-//			
-//			this.rs.write(this.retailers);
-//			
-//			
-//		}
-//	}	
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// TODO Auto-generated method stub
@@ -231,9 +181,10 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		//int iter = controler.getIteration();
 		//if (controler.getIteration()>0 & controler.getIteration()%5==0){
 		if (controler.getIteration()%5==0){
-			log.info("matrix dimensions, columns = " + this.retailZones.getRetailZones().values());
-			DenseDoubleMatrix2D am2d = new DenseDoubleMatrix2D (4 , this.retailZones.getRetailZones().values().size());
-			for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {//for (RetailZone rz : this.retailZones.getRetailZones().values()) 
+			log.info("matrix dimensions, columns = " + this.retailZones.getRetailZones().values().size());
+			log.info("matrix dimensions, rows = " + shops.size());
+			DenseDoubleMatrix2D am2d = new DenseDoubleMatrix2D (shops.size() , this.retailZones.getRetailZones().values().size());
+			for (ActivityFacility f:shops) {//for (RetailZone rz : this.retailZones.getRetailZones().values()) 
 				//rz.getPersonsQuadTree().
 			}				
 //			for (Person p : controler.getPopulation().getPersons().values()) {				

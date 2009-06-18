@@ -12,19 +12,19 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class RetailZone {
-	private final Id id;
+	private Id id;
 	private QuadTree<Person> personsQuadTree; // TODO Check if it does make more sense private, or if static does make sense at all  
 	private QuadTree<ActivityFacility> shopsQuadTree;
 	
-	public RetailZone(final Id id,final Double minx,final Double miny,final Double maxx,final Double maxy) { 
+	public RetailZone(Id id,final Double minx,final Double miny,final Double maxx,final Double maxy) { 
 		this.id = id;
 		this.personsQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
 		this.shopsQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 	}
 
 	public Id getId() {
-		// TODO Auto-generated method stub
-		return null;
+		Id id= this.id;
+		return id;
 	}
 
 	public void addPersons(Collection<Person> persons) {
