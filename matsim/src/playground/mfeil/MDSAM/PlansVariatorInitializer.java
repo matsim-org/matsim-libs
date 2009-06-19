@@ -26,9 +26,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import java.util.ArrayList;
 import java.util.List;
-import org.matsim.core.api.facilities.ActivityOption;
+
 
 
 

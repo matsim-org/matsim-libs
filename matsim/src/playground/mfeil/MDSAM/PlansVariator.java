@@ -22,6 +22,7 @@ package playground.mfeil.MDSAM;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -31,12 +32,17 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Plan;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.router.PlansCalcRoute;
+
+import playground.mfeil.PlanomatXPlan;
+
 
 
 
@@ -88,7 +94,6 @@ public class PlansVariator implements PlanAlgorithm {
 		
 		/* Do nothing for non-relevant agents */
 		if (Integer.parseInt(plan.getPerson().getId().toString())<this.agentIDthreshold) {
-			System.out.println("return!");
 			return;
 		}
 		
@@ -98,7 +103,6 @@ public class PlansVariator implements PlanAlgorithm {
 		for (int i = 0; i < output.length; i++){
 			output[i] = new PlanImpl (plan.getPerson());
 			output[i].copyPlan(plan);	
-			System.out.println("Hallo");
 		}
 		this.varyPlans(output);
 		
@@ -115,16 +119,23 @@ public class PlansVariator implements PlanAlgorithm {
 	
 	private void varyPlans (Plan[] output){
 		int counter = 0;
-		int j=1;
-		double slots = this.noOfVariedPlans*this.shareAC*this.shareNumber;
+		
+		/* Change number */
+		int slots = (int) (this.noOfVariedPlans*this.shareAC*this.shareNumber);
+		
+		int j;
+		if (slots/(this.noOfMaxActs-1)>=1)j=1;
+		else j=java.lang.Math.max((output[0].getPlanElements().size()/2+1)-(slots/2),1);
+		
 		for (int i=0;i<slots;i++){	
-				
-			if (j==output[i].getPlanElements().size()/2+1) j++;
+			if (j>this.noOfMaxActs) j=3; //sets the index back to an act chain of 3 acts (1 and 2 exist only once).	
+			if (j==output[i].getPlanElements().size()/2+1) j++; // jumps over the base act chain.
 			while (j<=output[i].getPlanElements().size()/2){
 				if (j==1) output[i].removeActivity(0); //remove first act until only one final home act remains
 				else {
 					int pos = (1+((int)(MatsimRandom.getRandom().nextDouble()*((output[i].getPlanElements().size()-2)/2))))*2;
 					output[i].removeActivity(pos);
+					/* Recovers the route of the trip in front of the removed act */
 					router.handleLeg((Leg)output[i].getPlanElements().get(pos-1), 
 							(Activity)output[i].getPlanElements().get(pos-2), 
 							(Activity)output[i].getPlanElements().get(pos), 
@@ -145,13 +156,27 @@ public class PlansVariator implements PlanAlgorithm {
 			j++;
 			counter++;
 		}
+		
+		/* Change order */
+		//TODO: Positions should be indexed in acts order, not planElements order
+		int[] orderPos = {2,4};
 		for (int i=counter;i<this.noOfVariedPlans*this.shareAC*(this.shareNumber+this.shareOrder);i++){
+			if (!this.changeOrder(output[i], orderPos)) break;
 			counter++;
 		}
 		
+		/* Change type */
+		int [] typePos = new int [(output[counter].getPlanElements().size()/2)];
+		for (int x=1;x<output[counter].getPlanElements().size()/2;x++){
+			typePos[x] = (int)(MatsimRandom.getRandom().nextDouble()*this.actTypes.size());
+		}
+		int rotationPos = 1;
 		for (int i=counter;i<this.noOfVariedPlans*this.shareAC;i++){
+			rotationPos = this.changeType(output[i], typePos, rotationPos);
 			counter++;
 		}
+		
+		
 		
 		/* Location and route choice for all slots */
 		for (int i=0;i<output.length;i++){
@@ -160,4 +185,61 @@ public class PlansVariator implements PlanAlgorithm {
 		}
 		
 	}
+	
+	private boolean changeOrder (Plan plan, int [] positions){
+		
+		List<PlanElement> actslegs = plan.getPlanElements();
+
+		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order. Do nothing.		
+			return false;
+		}
+		else {
+			for (int planBasePos = positions[0]; planBasePos < actslegs.size()-4; planBasePos=planBasePos+2){			
+				for (int planRunningPos = positions[1]; planRunningPos < actslegs.size()-2; planRunningPos=planRunningPos+2){ //Go through the "inner" acts only
+					positions[1] = positions[1]+2;
+					
+					/*Activity swapping	*/		
+					Activity act0 = (Activity)(actslegs.get(planBasePos));
+					Activity act1 = (Activity)(actslegs.get(planRunningPos));
+					if (act0.getType()!=act1.getType() &&
+							act0.getFacilityId() != act1.getFacilityId()){
+							
+						Activity actHelp = new ActivityImpl ((Activity)(actslegs.get(planBasePos)));
+						
+						actslegs.set(planBasePos, actslegs.get(planRunningPos));
+						actslegs.set(planRunningPos, actHelp);
+						
+						positions[0] = planBasePos;
+						return true;
+					}
+				}
+				positions[1] = planBasePos+4;
+			}
+			return false;
+		}
+	}
+	
+	private int changeType (Plan plan, int [] position, int rotationPos){
+			
+		Activity act = (Activity) plan.getPlanElements().get(rotationPos*2);
+		String type = act.getType();
+				
+		while (type.equals(this.actTypes.get(position[rotationPos]))) {
+			position[rotationPos]++;
+			if (position[rotationPos]>=this.actTypes.size()) position[rotationPos] = 0;
+		} 
+		
+		act.setType(this.actTypes.get(position[rotationPos]));
+		if (act.getType().equalsIgnoreCase("home")){
+			act.setFacility(((Activity)(plan.getPlanElements().get(0))).getFacility());
+			act.setCoord(((Activity)(plan.getPlanElements().get(0))).getCoord());
+			act.setLink(((Activity)(plan.getPlanElements().get(0))).getLink());
+		}
+		position[rotationPos]++;
+		if (position[rotationPos]>=this.actTypes.size()) position[rotationPos] = 0;
+		rotationPos++;
+		if (rotationPos>=plan.getPlanElements().size()/2) rotationPos=1;
+		return rotationPos;		
+	}
+	
 }
