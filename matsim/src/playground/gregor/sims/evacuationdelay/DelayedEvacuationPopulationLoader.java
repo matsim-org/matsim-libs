@@ -9,10 +9,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.evacuation.base.Building;
+import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
+import org.matsim.evacuation.base.EvacuationStartTimeCalculator;
 
-import playground.gregor.sims.evacbase.Building;
-import playground.gregor.sims.evacbase.EvacuationPopulationFromShapeFileLoader;
-import playground.gregor.sims.evacbase.EvacuationStartTimeCalculator;
 
 public class DelayedEvacuationPopulationLoader extends EvacuationPopulationFromShapeFileLoader {
 	private DelayedEvacuationStartTimeCalculator startTimer;

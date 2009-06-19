@@ -2,7 +2,8 @@ package playground.gregor.sims.run;
 
 import org.matsim.core.controler.Controler;
 
-import playground.gregor.sims.socialcost.LinkFlowCapRandomizer;
+import playground.gregor.sims.socialcostII.LinkFlowCapRandomizer;
+
 
 public class RndFlowCapController extends Controler {
 

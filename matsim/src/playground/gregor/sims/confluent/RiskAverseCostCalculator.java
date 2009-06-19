@@ -3,8 +3,8 @@ package playground.gregor.sims.confluent;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.evacuation.riskaversion.RiskCostCalculator;
 
-import playground.gregor.sims.riskaversion.RiskCostCalculator;
 
 public class RiskAverseCostCalculator implements TravelCost{
 

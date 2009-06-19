@@ -21,11 +21,12 @@
 package playground.gregor.sims.run;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
+import org.matsim.evacuation.socialcost.SocialCostCalculator;
+import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 
-import playground.gregor.sims.socialcost.LinkFlowCapRandomizer;
-import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorII;
-import playground.gregor.sims.socialcost.SocialCostCalculator;
-import playground.gregor.sims.socialcost.SocialCostCalculatorSingleLink;
+import playground.gregor.sims.socialcostII.LinkFlowCapRandomizer;
+
 
 public class MarginalCostControlerRandFlowCap extends Controler{
 

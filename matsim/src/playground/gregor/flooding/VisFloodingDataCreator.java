@@ -5,6 +5,8 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimWriter;
+import org.matsim.evacuation.flooding.FloodingInfo;
+import org.matsim.evacuation.flooding.FloodingReader;
 
 public class VisFloodingDataCreator extends MatsimWriter {
 	

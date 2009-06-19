@@ -38,9 +38,9 @@ import org.geotools.feature.SchemaException;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.evacuation.flooding.RiskCostFromFloodingData.LinkInfo;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.flooding.RiskCostFromFloodingData.LinkInfo;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -127,15 +127,15 @@ public class NodeCostShapeCreator {
 			// double deg = 90;
 			try {
 				Feature ft = this.ft
-						.create(new Object[] { ls, e.getValue().baseCost,
+						.create(new Object[] { ls, e.getValue().getBaseCost(),
 								l.getFromNode().getId().toString(),
 								l.getToNode().getId().toString(),
 								l.getId().toString() });
 				Feature ftP = this.ftPoint.create(new Object[] { p,
-						e.getValue().baseCost,
+						e.getValue().getBaseCost(),
 						l.getFromNode().getId().toString(),
 						l.getToNode().getId().toString(), l.getId().toString(),
-						deg, e.getValue().dist });
+						deg, e.getValue().getDist() });
 				this.features.add(ft);
 				this.pointFeatures.add(ftP);
 			} catch (IllegalAttributeException e1) {

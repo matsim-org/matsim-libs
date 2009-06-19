@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * MarginalCostControlerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,42 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package org.matsim.evacuation.socialcost;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.evacuation.run.MarginalCostControler;
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
 
-	public static Test suite() {
-
-	
-
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.benjamin.AllTests.suite());
-		suite.addTest(playground.johannes.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.meisterk.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
+public class MarginalCostControlerTest extends MatsimTestCase {
+	public void testSimpleChecksum() {
 		
-		/* xTODO balmermi: Urgent!!! There is an unknown problem about those two test suites. Need's to be solved!
-		 * For the time being, per night, only one of the two will run */
-		// currently, it looks like they work again together... marcel/13apr2009
-//		if (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % 2 == 0) {
-//			suite.addTest(playground.gregor.AllTests.suite());
-//		}
-//		else {
-//			suite.addTest(playground.jhackney.socialnetworks.AllTests.suite());
-//		}
-
-		suite.addTest(playground.jhackney.socialnetworks.AllTests.suite());
-		suite.addTest(playground.yu.AllTests.suite());
-		
-		//$JUnit-END$
-		return suite;
+		String config = getInputDirectory() + "config.xml";
+		String ref = getInputDirectory() + "events.txt.gz";
+		String compare = getOutputDirectory() + "ITERS/it.10/10.events.txt.gz";
+		new MarginalCostControler(new String [] {config}).run();
+		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(ref),	CRCChecksum.getCRCFromFile(compare));
+		MatsimRandom.reset();
 	}
-
 }

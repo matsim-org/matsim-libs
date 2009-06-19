@@ -21,10 +21,11 @@
 package playground.gregor.sims.run;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.evacuation.socialcost.SocialCostCalculator;
 
-import playground.gregor.sims.socialcost.MarginalTravelCostCalculatorIII;
-import playground.gregor.sims.socialcost.SocialCostCalculator;
-import playground.gregor.sims.socialcost.SocialCostCalculatorMultiLink;
+import playground.gregor.sims.socialcostII.MarginalTravelCostCalculatorIII;
+import playground.gregor.sims.socialcostII.SocialCostCalculatorMultiLink;
+
 
 public class MarginalCostControlerMultiLink extends Controler{
 
