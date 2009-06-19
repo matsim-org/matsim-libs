@@ -50,12 +50,12 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.evacuation.base.EvacuationAreaFileReader;
+import org.matsim.evacuation.base.EvacuationAreaFileWriter;
+import org.matsim.evacuation.base.EvacuationAreaLink;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
-import playground.gregor.sims.evacbase.EvacuationAreaFileReader;
-import playground.gregor.sims.evacbase.EvacuationAreaFileWriter;
-import playground.gregor.sims.evacbase.EvacuationAreaLink;
 
 public class CutNetwork {
 
