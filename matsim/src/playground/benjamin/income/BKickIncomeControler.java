@@ -58,9 +58,8 @@ public class BKickIncomeControler extends Controler {
 	
 	@Override
 	protected void setUp(){		
-		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.travelTimeCalculator()).createTravelTimeCalculator(this.network, (int)endTime);
+			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 		super.setUp();

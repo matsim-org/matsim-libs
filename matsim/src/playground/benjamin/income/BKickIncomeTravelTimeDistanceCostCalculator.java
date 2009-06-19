@@ -25,7 +25,6 @@ import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.AbstractTravelTimeCalculator;
 
 
 /**
@@ -42,9 +41,8 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelCost {
 	
 	private double income;
 
-	public BKickIncomeTravelTimeDistanceCostCalculator(AbstractTravelTimeCalculator travelTimeCalculator,
-			CharyparNagelScoringConfigGroup charyparNagelScoring) {
-		this.timeCalculator = travelTimeCalculator;
+	public BKickIncomeTravelTimeDistanceCostCalculator(final TravelTime timeCalculator, CharyparNagelScoringConfigGroup charyparNagelScoring) {
+		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
