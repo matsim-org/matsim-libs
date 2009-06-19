@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.evacuation.flooding.FloodingInfo;
+import org.matsim.evacuation.flooding.FloodingReader;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
-import playground.gregor.flooding.FloodingInfo;
-import playground.gregor.flooding.FloodingReader;
 import playground.gregor.otf.InundationData.InundationGeometry;
 import playground.gregor.otf.InundationData.Polygon;
 import playground.gregor.otf.InundationData.Quad;
