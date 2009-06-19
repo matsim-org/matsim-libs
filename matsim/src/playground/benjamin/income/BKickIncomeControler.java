@@ -22,7 +22,11 @@ package playground.benjamin.income;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanCalcType;
 
 import playground.dgrether.DgPaths;
@@ -51,6 +55,22 @@ public class BKickIncomeControler extends Controler {
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		return new BKickIncomeScoringFunctionFactory(this.config.charyparNagelScoring());
 	}
+	
+	@Override
+	protected void setUp(){		
+		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
+		if (this.travelTimeCalculator == null) {
+			this.travelTimeCalculator = new TravelTimeCalculatorBuilder(this.config.travelTimeCalculator()).createTravelTimeCalculator(this.network, (int)endTime);
+		}
+		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
+		super.setUp();
+	}
+	
+	@Override
+	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
+		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+	}
+	
 
 	@Override
 	protected Population loadPopulation() {

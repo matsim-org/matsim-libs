@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IncomeCalculator
+ * IncomeCalculatorGesamtschweiz
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
  * @author dgrether
  *
  */
-public class IncomeCalculator {
-
-	private static final Logger log = Logger.getLogger(IncomeCalculator.class);
+public class IncomeCalculatorGesamtschweiz {
+	
+	private static final Logger log = Logger.getLogger(IncomeCalculatorGesamtschweiz.class);
 	
 	private Random random;
 
-	public IncomeCalculator() {
+	public IncomeCalculatorGesamtschweiz() {
 		long seed = 984521478;
 		this.random = new Random(seed);
 	}
@@ -54,13 +54,12 @@ public class IncomeCalculator {
 	
 	
 	private double calculateLorenzValue(double x){
-		return 0.9916 * Math.pow(x, 3) - 0.2398 * Math.pow(x, 2) + 0.2056 * x;
+		return 0.3178 * Math.pow(x, 3) + 0.2259 * Math.pow(x, 2) + 0.4467 * x;
 	}
 	
 
 	private double calculateLorenzDerivativeValue(double x){
-		return 2.9748 * Math.pow(x, 2.0) - 0.4796 * x + 0.2056;
+		return 0.9534 * Math.pow(x, 2.0) + 0.4518 * x + 0.4467;
 	}
 
-	
 }

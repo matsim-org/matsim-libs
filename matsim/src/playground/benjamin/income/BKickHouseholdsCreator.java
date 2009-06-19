@@ -89,7 +89,7 @@ public class BKickHouseholdsCreator {
     Households hhs = sc.getHouseholds();
     HouseholdBuilder b = hhs.getHouseholdBuilder();
 
-    IncomeCalculator incomeCalculator = new IncomeCalculator();
+    IncomeCalculatorKantonZurich incomeCalculator = new IncomeCalculatorKantonZurich();
     
     for (Person p : pop.getPersons().values()){
       Household hh = b.createHousehold(p.getId());
