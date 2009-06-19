@@ -47,7 +47,7 @@ public class PlansVariatorInitializer extends AbstractMultithreadedModule{
 		this.controler = controler;
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		ActivityOptionFinder finder = new ActivityOptionFinder ();
+		ActivityTypeFinder finder = new ActivityTypeFinder ();
 		finder.run(controler.getFacilities());
 		this.actTypes = finder.getActTypes();
 	}

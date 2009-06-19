@@ -26,10 +26,12 @@ import java.util.List;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
+
 
 
 
@@ -40,14 +42,16 @@ import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
  * 
  * @author Matthias Feil
  */
-public class ActivityOptionFinder extends AbstractFacilityAlgorithm {
+public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	
 	private List<String> actTypes = new ArrayList<String>();
+	private static final Logger log = Logger.getLogger(ActivityTypeFinder.class);
 	
 	public void run (final ActivityFacilities facilities) {
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			run(f);
 		}
+		log.info("Searching available activity types done.");
 	}
 	public void run(ActivityFacility facility){
 		Collection<ActivityOption> facActTypes = facility.getActivityOptions().values();

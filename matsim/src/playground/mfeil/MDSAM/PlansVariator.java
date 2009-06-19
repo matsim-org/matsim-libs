@@ -27,12 +27,12 @@ import java.util.List;
 
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.PlanElement;
@@ -40,8 +40,10 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Plan;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.mfeil.PlanomatXPlan;
+import playground.mfeil.config.TimeModeChoicerConfigGroup;
+
 
 
 
@@ -62,6 +64,8 @@ public class PlansVariator implements PlanAlgorithm {
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRoute router;
 	private final List<String> actTypes;
+	private final TransportMode[] possibleModes;
+	private final double maxWalkingDistance;
 	
 	public PlansVariator (Controler controler, LocationMutatorwChoiceSet locator, PlansCalcRoute router, List<String> actTypes){
 		this.controler = controler;
@@ -76,6 +80,8 @@ public class PlansVariator implements PlanAlgorithm {
 		this.shareNumber = 0.66;
 		this.shareOrder = 0.17;
 		this.noOfMaxActs = 10;
+		this.possibleModes = TimeModeChoicerConfigGroup.getPossibleModes();
+		this.maxWalkingDistance	= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
 	}
 	
 	
@@ -104,7 +110,7 @@ public class PlansVariator implements PlanAlgorithm {
 			output[i] = new PlanImpl (plan.getPerson());
 			output[i].copyPlan(plan);	
 		}
-		this.varyPlans(output);
+		this.varyPlans(output, plan);
 		
 		/* Add the new plans to the person's set of plans */
 		for (int i = 0; i < output.length; i++){
@@ -117,7 +123,7 @@ public class PlansVariator implements PlanAlgorithm {
 		//popwriter.write();
 	}
 	
-	private void varyPlans (Plan[] output){
+	private void varyPlans (Plan[] output, Plan plan){
 		int counter = 0;
 		
 		/* Change number */
@@ -166,16 +172,15 @@ public class PlansVariator implements PlanAlgorithm {
 		}
 		
 		/* Change type */
-		int [] typePos = new int [(output[counter].getPlanElements().size()/2)];
-		for (int x=1;x<output[counter].getPlanElements().size()/2;x++){
+		int [] typePos = new int [(plan.getPlanElements().size()/2)];
+		for (int x=1;x<plan.getPlanElements().size()/2;x++){
 			typePos[x] = (int)(MatsimRandom.getRandom().nextDouble()*this.actTypes.size());
 		}
 		int rotationPos = 1;
 		for (int i=counter;i<this.noOfVariedPlans*this.shareAC;i++){
 			rotationPos = this.changeType(output[i], typePos, rotationPos);
 			counter++;
-		}
-		
+		}		
 		
 		
 		/* Location and route choice for all slots */
@@ -183,6 +188,64 @@ public class PlansVariator implements PlanAlgorithm {
 			locator.handlePlan(output[i]);
 			router.run(output[i]);
 		}
+		
+		/* Check whether LC activity chains are duplicated */
+		boolean [] chosen = new boolean [output.length];
+		boolean [] equal = new boolean [output.length];
+		int equalChains = 0;
+		for (int i=counter;i<output.length;i++){
+			equal[i]=this.checkEqualityOfLocations(output[i], plan);
+			if (!equal[i]){
+				for (j=counter;j<i;j++){
+					equal[i]=this.checkEqualityOfLocations(output[i], output[j]);
+					if (equal[i]) {
+						chosen[j]=true; // causes that i-chain gets new modes but j-chain keeps stable.
+						break;
+					}
+				}
+			}
+			if (equal[i]) equalChains++; 
+		}
+		
+		/* Variation of modes */
+		//boolean [] chosen = new boolean [output.length];
+		
+		// AC slots
+		for (int i=0;i<this.noOfVariedPlans*this.shareAC*this.shareACMC;i++){
+			
+			/* Selection of plan */
+			int MCpos = (int)(MatsimRandom.getRandom().nextDouble()*this.noOfVariedPlans*this.shareAC);
+			while (chosen[MCpos] || output[MCpos].getPlanElements().size()<4){
+				MCpos++;
+				if (MCpos>=(int) (this.noOfVariedPlans*this.shareAC)) MCpos=0;
+			}			
+			this.changeMode(output[MCpos]);
+			chosen[MCpos]=true;
+		}
+		
+		// LC slots
+		for (int i=0;i<equal.length;i++){
+			if (equal[i]) {
+				this.changeMode(output[i]);
+				chosen[i]=true;
+			}
+		}
+		//if (equalChains<(int)(this.noOfVariedPlans*(1-this.shareAC)*this.shareLCMC)){
+			Loop:
+			for (int i=0;i<(int)(this.noOfVariedPlans*(1-this.shareAC)*this.shareLCMC)-equalChains;i++){
+				int MCpos = (int)(this.noOfVariedPlans*this.shareAC) + (int)(MatsimRandom.getRandom().nextDouble()*this.noOfVariedPlans*(1-this.shareAC));
+				int count=0;
+				while (chosen[MCpos]){
+					MCpos++;
+					if (MCpos>=this.noOfVariedPlans) MCpos= (int)(this.noOfVariedPlans*this.shareAC);
+					if (count>this.noOfVariedPlans*(1-this.shareAC)) break Loop;
+					count++;
+				}		
+				this.changeMode(output[MCpos]);
+				chosen[MCpos]=true;
+			}
+		//}
+		
 		
 	}
 	
@@ -242,4 +305,73 @@ public class PlansVariator implements PlanAlgorithm {
 		return rotationPos;		
 	}
 	
+	
+	/* Method that returns true if two plans feature the same activity chain and the same locations, or false otherwise.*/
+	private boolean checkEqualityOfLocations (Plan plan1, Plan plan2){
+			
+		ArrayList<String> acts1 = new ArrayList<String> ();
+		ArrayList<String> acts2 = new ArrayList<String> ();
+		for (int i = 0;i<plan1.getPlanElements().size();i=i+2){
+			//acts1.add(((Activity)(plan1.getPlanElements().get(i))).getType().toString());	
+			acts1.add(((Activity)(plan1.getPlanElements().get(i))).getFacilityId().toString());	
+		}
+		for (int i = 0;i<plan2.getPlanElements().size();i=i+2){
+			//acts2.add(((Activity)(plan2.getPlanElements().get(i))).getType().toString());
+			acts2.add(((Activity)(plan2.getPlanElements().get(i))).getFacilityId().toString());	
+		}
+	
+		return (acts1.equals(acts2));
+		
+	}	
+	
+	/* Method that calculates the distance of a subtour. 
+	 * Returns 	0 if distance = 0m
+	 * 			2 if distance is longer than this.maxWalkingDistance
+	 * 			1 otherwise.
+	 * */
+	private int checksubtourDistance2 (List<PlanElement> actslegs, PlanAnalyzeSubtours planAnalyzeSubtours, int pos){
+		double distance = 0;
+		for (int k=0;k<((int)(actslegs.size()/2));k++){
+			if ((planAnalyzeSubtours.getSubtourIndexation()[k])==pos){
+				distance=distance+CoordUtils.calcDistance(((Activity)(actslegs.get(k*2))).getCoord(), ((Activity)(actslegs.get(k*2+2))).getCoord());
+				if (distance>this.maxWalkingDistance) {
+					return 2;
+				}
+			}
+		}
+		if (distance==0) return 0;
+		return 1;	
+	}
+	
+	private void changeMode (Plan plan){
+		/* Selection of subtour to be changed */
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.run(plan);
+		int subtourIndex = (int)(MatsimRandom.getRandom().nextDouble()*planAnalyzeSubtours.getNumSubtours());
+		
+		/* Selection of mode to be inserted */
+		// Current mode
+		TransportMode currentMode;
+		int j=-1;
+		do {
+			j+=2;
+			currentMode = ((Leg)(plan.getPlanElements().get(j))).getMode();
+		} while (planAnalyzeSubtours.getSubtourIndexation()[j/2]!=subtourIndex);			
+		
+		// New mode
+		int modeIndex = ((int)(MatsimRandom.getRandom().nextDouble()*this.possibleModes.length));
+		while (this.possibleModes[modeIndex].equals(currentMode) ||
+				(this.possibleModes[modeIndex].equals(TransportMode.walk) && this.checksubtourDistance2 (plan.getPlanElements(), planAnalyzeSubtours, subtourIndex) == 2) ||
+				((!this.possibleModes[modeIndex].equals(TransportMode.walk)) && this.checksubtourDistance2 (plan.getPlanElements(), planAnalyzeSubtours, subtourIndex) == 0)){
+			modeIndex++;
+			if (modeIndex>=this.possibleModes.length) modeIndex=0;
+		}
+		
+		/* Replacement of mode */
+		for (j=1;j<plan.getPlanElements().size();j+=2){
+			if (planAnalyzeSubtours.getSubtourIndexation()[j/2]==subtourIndex){
+				((Leg)(plan.getPlanElements().get(j))).setMode(this.possibleModes[modeIndex]);
+			}
+		}
+	}
 }
