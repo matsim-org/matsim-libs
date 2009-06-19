@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.core.population.ActivityImpl;
@@ -42,6 +43,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.mfeil.TimeOptimizer;
 import playground.mfeil.config.TimeModeChoicerConfigGroup;
 
 
@@ -66,8 +68,9 @@ public class PlansVariator implements PlanAlgorithm {
 	private final List<String> actTypes;
 	private final TransportMode[] possibleModes;
 	private final double maxWalkingDistance;
+	private final TimeOptimizer timer;
 	
-	public PlansVariator (Controler controler, LocationMutatorwChoiceSet locator, PlansCalcRoute router, List<String> actTypes){
+	public PlansVariator (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc, LocationMutatorwChoiceSet locator, PlansCalcRoute router, List<String> actTypes){
 		this.controler = controler;
 		this.locator = locator;
 		this.router = router;
@@ -82,6 +85,7 @@ public class PlansVariator implements PlanAlgorithm {
 		this.noOfMaxActs = 10;
 		this.possibleModes = TimeModeChoicerConfigGroup.getPossibleModes();
 		this.maxWalkingDistance	= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
+		this.timer = new TimeOptimizer (this.controler, tDepDelayCalc);
 	}
 	
 	
@@ -183,10 +187,9 @@ public class PlansVariator implements PlanAlgorithm {
 		}		
 		
 		
-		/* Location and route choice for all slots */
+		/* Location choice for all slots */
 		for (int i=0;i<output.length;i++){
 			locator.handlePlan(output[i]);
-			router.run(output[i]);
 		}
 		
 		/* Check whether LC activity chains are duplicated */
@@ -207,9 +210,7 @@ public class PlansVariator implements PlanAlgorithm {
 			if (equal[i]) equalChains++; 
 		}
 		
-		/* Variation of modes */
-		//boolean [] chosen = new boolean [output.length];
-		
+		/* Variation of modes */		
 		// AC slots
 		for (int i=0;i<this.noOfVariedPlans*this.shareAC*this.shareACMC;i++){
 			
@@ -230,22 +231,25 @@ public class PlansVariator implements PlanAlgorithm {
 				chosen[i]=true;
 			}
 		}
-		//if (equalChains<(int)(this.noOfVariedPlans*(1-this.shareAC)*this.shareLCMC)){
-			Loop:
-			for (int i=0;i<(int)(this.noOfVariedPlans*(1-this.shareAC)*this.shareLCMC)-equalChains;i++){
-				int MCpos = (int)(this.noOfVariedPlans*this.shareAC) + (int)(MatsimRandom.getRandom().nextDouble()*this.noOfVariedPlans*(1-this.shareAC));
-				int count=0;
-				while (chosen[MCpos]){
-					MCpos++;
-					if (MCpos>=this.noOfVariedPlans) MCpos= (int)(this.noOfVariedPlans*this.shareAC);
-					if (count>this.noOfVariedPlans*(1-this.shareAC)) break Loop;
-					count++;
-				}		
-				this.changeMode(output[MCpos]);
-				chosen[MCpos]=true;
-			}
-		//}
+		Loop:
+		for (int i=0;i<(int)(this.noOfVariedPlans*(1-this.shareAC)*this.shareLCMC)-equalChains;i++){
+			int MCpos = (int)(this.noOfVariedPlans*this.shareAC) + (int)(MatsimRandom.getRandom().nextDouble()*this.noOfVariedPlans*(1-this.shareAC));
+			int count=0;
+			while (chosen[MCpos]){
+				MCpos++;
+				if (MCpos>=this.noOfVariedPlans) MCpos= (int)(this.noOfVariedPlans*this.shareAC);
+				if (count>this.noOfVariedPlans*(1-this.shareAC)) break Loop;
+				count++;
+			}		
+			this.changeMode(output[MCpos]);
+			chosen[MCpos]=true;
+		}
 		
+		/* Route choice for all slots */
+		for (int i=0;i<output.length;i++){
+			router.run(output[i]);
+			timer.run(output[i]);
+		}
 		
 	}
 	

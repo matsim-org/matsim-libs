@@ -21,10 +21,12 @@
 package playground.mfeil.MDSAM;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import java.util.List;
 
@@ -39,22 +41,32 @@ import java.util.List;
 public class PlansVariatorInitializer extends AbstractMultithreadedModule{
 	
 	private final Controler controler;
+	private final NetworkLayer 						network;
+	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRoute router;
 	private final List<String> actTypes;
 	
 	public PlansVariatorInitializer (Controler controler) {
 		this.controler = controler;
+		this.network = controler.getNetwork();
+		this.init(network);	
+		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		ActivityTypeFinder finder = new ActivityTypeFinder ();
 		finder.run(controler.getFacilities());
 		this.actTypes = finder.getActTypes();
 	}
+	
+	private void init(final NetworkLayer network) {
+		this.network.connect();
+	}
 
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansVariator (this.controler, this.locator, this.router, this.actTypes);
+		return new PlansVariator (this.controler, this.tDepDelayCalc, this.locator, this.router, this.actTypes);
 	}
 }
