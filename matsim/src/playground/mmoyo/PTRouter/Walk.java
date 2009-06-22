@@ -1,7 +1,7 @@
-package playground.mmoyo.Pedestrian;
+package playground.mmoyo.PTRouter;
 
 /**
- * This class contains constant variables a constant values to pedestrian simulation
+ * This class contains constant variables a constant values to pedestrian routing
  */
 
 public class Walk {
@@ -14,6 +14,7 @@ public class Walk {
 	public static double walkingSpeed(){
 		return AV_WALKING_SPEED;
 	}
+	
 	public double walkTravelTime(final double distance){
 		return distance * AV_WALKING_SPEED;
 	}

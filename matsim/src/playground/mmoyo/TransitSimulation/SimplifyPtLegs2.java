@@ -40,7 +40,7 @@ public class SimplifyPtLegs2 {
 	}
 
 	/**
-	 * Deletes marked ptActs and thier legs 
+	 * Deletes marked ptActs and their legs 
 	 */
 	private void deleteElements(Plan plan, List<Integer> ptElements){
 		Leg firstLeg = (Leg)plan.getPlanElements().get(ptElements.get(0)-1);

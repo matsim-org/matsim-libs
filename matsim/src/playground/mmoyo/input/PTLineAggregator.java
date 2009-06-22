@@ -11,7 +11,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.api.network.Link;
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.PTCase2.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 import java.util.TreeMap;
 import org.matsim.core.network.NetworkLayer;
 

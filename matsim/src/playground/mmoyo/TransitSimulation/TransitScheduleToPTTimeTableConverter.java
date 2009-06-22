@@ -17,7 +17,7 @@ import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.mmoyo.PTCase2.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 
 /**
@@ -27,7 +27,6 @@ import playground.mmoyo.PTRouter.PTLine;
 public class TransitScheduleToPTTimeTableConverter {
 	//->Ideally the router should use transitroute to get directly these data
 	private static Time time;
-	
 	public TransitScheduleToPTTimeTableConverter() {
 
 	}
@@ -51,14 +50,13 @@ public class TransitScheduleToPTTimeTableConverter {
 		PTTimeTable2 ptTimeTable = new PTTimeTable2();
 		List<PTLine> ptLineList = new ArrayList<PTLine>();
 		
-		
 		/**Convert every transitRoute into PTLine    */
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				Id id = transitRoute.getId();
 				System.out.println("TransitRoute: " + id);
 				TransportMode transportMode =  transitRoute.getTransportMode();
-				String Direction = id.toString();
+				String direction = id.toString();
 				List<String> strDepartureList=  getStrDepartureList (transitRoute.getDepartures().values());
 				
 				List<Double> minutesList = new ArrayList<Double>();
@@ -69,11 +67,12 @@ public class TransitScheduleToPTTimeTableConverter {
 				}
 				
 				//transitRoute.getDescription();
-				PTLine ptLine = new PTLine(id, transportMode, Direction, idNodeRouteList, minutesList, strDepartureList); 
+				PTLine ptLine = new PTLine(id, transportMode, direction, idNodeRouteList, minutesList, strDepartureList); 
 				ptLineList.add(ptLine);
 			}
 		}
 		ptTimeTable.setptLineList(ptLineList);
+//      ptTimeTable.calculateTravelTimes(net);
 //		new PTNetworkFactory2().readTimeTable(net, ptTimeTable); // TODO [Manuel] this must work without explicit ptNetwork. If really needed, construct it from transitSchedule
 		
 		return ptTimeTable;

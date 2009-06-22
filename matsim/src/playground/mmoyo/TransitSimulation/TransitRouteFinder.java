@@ -14,8 +14,8 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.mmoyo.PTCase2.PTRouter2;
-import playground.mmoyo.Pedestrian.Walk;
+import playground.mmoyo.PTRouter.PTRouter2;
+import playground.mmoyo.PTRouter.Walk;
 /**
  * Receives two acts and returns a list of PT legs that join their coordinates 
  */
@@ -33,7 +33,7 @@ public class TransitRouteFinder {
 		this.ptRouter = ptRouter; 
 	}
 	
-	public List<Leg> calculateRoute (Activity fromAct, Activity toAct, Person person ){
+	public List<Leg> calculateRoute (final Activity fromAct, final Activity toAct, final Person person ){
 		List<Leg> legList = new ArrayList<Leg>();
 
 		double distToWalk = walk.distToWalk(person.getAge());
@@ -74,7 +74,7 @@ public class TransitRouteFinder {
 		return legList;
 	}
 	
-	private TransportMode selectMode(String linkType){
+	private TransportMode selectMode(final String linkType){
 		TransportMode mode = null;
 		if (linkType.equals("Standard")){ 
 			mode=  TransportMode.pt;

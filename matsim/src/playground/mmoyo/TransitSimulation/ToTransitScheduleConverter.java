@@ -13,7 +13,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.transitSchedule.*;
-import playground.mmoyo.PTCase2.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 
 /**

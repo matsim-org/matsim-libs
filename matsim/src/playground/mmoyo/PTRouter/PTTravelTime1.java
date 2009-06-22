@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.PTRouter;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelTime;

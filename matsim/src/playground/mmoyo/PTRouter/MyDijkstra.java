@@ -15,7 +15,7 @@ import playground.mmoyo.Validators.PathValidator;
 public class MyDijkstra extends Dijkstra{
 	private PathValidator pathVal = new PathValidator(); 
 	
-	public MyDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction) {
+	public MyDijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 	}
 

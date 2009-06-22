@@ -23,6 +23,10 @@ import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.Departure;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
 
+import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.collections.map.MultiKeyMap;
+import org.matsim.core.api.network.Link;
+
 /**
  * Reads a TransitSchedule and creates:
  * -Plain network: A node represent a station. A link represents a path between stations 
@@ -35,9 +39,10 @@ public class LogicFactory{
 	private NetworkLayer logicNet= new NetworkLayer();
 	private NetworkLayer plainNet= new NetworkLayer();
 	private TransitSchedule logicTransitSchedule = new TransitSchedule(); 
-	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>();
-	private Map<Id,Id> logicStopMap = new TreeMap<Id,Id>();
-	private Map<Id,Id> NodeLineMap = new TreeMap<Id,Id>();
+	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /** key= PlainStop value = List of logicStops to be joined by transfer links*/
+	private Map<Id,Id> logicStopMap = new TreeMap<Id,Id>(); 
+	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();
+	private MultiKeyMap multiKeyMap;
 	long newLinkId=0;
 	long newPlainLinkId=0;
 	long newStopId=0;
@@ -69,6 +74,8 @@ public class LogicFactory{
 					Id logicalId= createLogicalId(idStopFacility, transitRoute.getId()); 
 					
 					Node node= logicNet.createNode(logicalId, coord);
+					node.setType(idStopFacility.toString());
+					
 					Node plainNode= createPlainNode(transitStopFacility);
 					
 					/**fill the facilityNodeMap  this will identify all nodes of a station with the same coordinates this will help to create transfer links*/
@@ -112,7 +119,7 @@ public class LogicFactory{
 	private Id createLogicalId(final Id idStopFacility, final Id lineId){
 		Id newId = new IdImpl(newStopId++);
 		logicStopMap.put(newId, idStopFacility);
-		NodeLineMap.put(newId, lineId);
+		nodeLineMap.put(newId, lineId);
 		return newId;
 	}
 	
@@ -133,13 +140,14 @@ public class LogicFactory{
 			nearNodes.remove(centerNode);
 			for (Node nearNode : nearNodes){
 				boolean areConected = centerNode.getOutNodes().containsValue(nearNode); 
-				boolean belongToSameLine = NodeLineMap.get(centerNode.getId()) == NodeLineMap.get(nearNode.getId()); 
+				boolean belongToSameLine = nodeLineMap.get(centerNode.getId()) == nodeLineMap.get(nearNode.getId()); 
 				if (!areConected && !belongToSameLine){  /**avoid joining nodes that are already joined by standard links AND joining nodes of the same Line*/
 					Id idNewLink = new IdImpl("DT" + ++newLinkId);
 					createLogicLink(idNewLink, centerNode, nearNode, "DetTransfer");
 				}
 			}
 		}
+		//NodeLineMap= null;??
 	}
 	
 	/**links for the logical network, one for transitRoute*/
@@ -148,11 +156,12 @@ public class LogicFactory{
 		logicNet.createLink(id, fromNode, toNode, length , 1.0 , 1.0, 1.0, "0", type);	
 	}
 	
-	/**links for the logical network, one for transitRoute*/
+	/**links for the plain network, only one between two stations*/
 	private void createPlainLink(Node fromNode, Node toNode){
 		if (!fromNode.getOutNodes().containsValue(toNode)){
 			double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-			plainNet.createLink(new IdImpl(newPlainLinkId++), fromNode, toNode, length, 1.0, 1.0 , 1);
+			Link plainLink = plainNet.createLink(new IdImpl(newPlainLinkId++), fromNode, toNode, length, 1.0, 1.0 , 1);
+			
 		}
 	}
 	
@@ -175,10 +184,8 @@ public class LogicFactory{
 		} catch (IOException ex) {
 			System.out.println(this + ex.getMessage());
 		}
-		
 		new NetworkWriter(logicNet, outLogicNetFile).write();
 		//new NetworkWriter(plainNet, outPlainNetFile).write();   //->for the time being the plainNet is itself the input
-
 		System.out.println("done.");
 	}
 
@@ -186,19 +193,17 @@ public class LogicFactory{
 		return this.logicNet;
 	}
 
-	public NetworkLayer getPlainNet() {
+	public NetworkLayer getPlainNet(){
 		return this.plainNet;
 	}
 
-	public TransitSchedule getLogicTransitSchedule() {
+	public TransitSchedule getLogicTransitSchedule(){
 		return this.logicTransitSchedule;
 	}
 	
 	/** logicStopMap stores the relationship between the new "logical stops" and the real transit stop*/
-	public Map<Id,Id> getLogicStopMap() {
+	public Map<Id,Id> getLogicStopMap(){
 		return this.logicStopMap;
 	}
-
-	
 	
 }

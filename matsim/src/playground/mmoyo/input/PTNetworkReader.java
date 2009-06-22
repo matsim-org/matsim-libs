@@ -14,7 +14,7 @@ public class PTNetworkReader{
 	
 	}
 
-	public Network readNetFile(String inFileName){
+	public Network readNetFile(final String inFileName){
 		NetworkFactory networkFactory = new NetworkFactory();
 	
 		Network tempNet= new NetworkLayer(networkFactory);

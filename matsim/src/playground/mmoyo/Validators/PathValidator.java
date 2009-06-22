@@ -24,60 +24,24 @@ public class PathValidator {
 	@Deprecated
 	public boolean isValid(Path path) {
 		boolean valid = true;
-		
 		if (path!=null){
-			//that path starts and ends with walking links
-			//if (path.links.size()>2 && path.links.get(0).getType().equals("Walking") && path.links.get(path.links.size()-1).getType().equals("Walking") ){
-				//boolean hasStandardLinks = false;
-				boolean first = true;
-			
-				Link lastLink = null;
-				for (Link link : path.links) {
-					//if (!first){
-						if (!canPassLink(lastLink, link)){
-							return false;
-						}
-					
-					//}
-					
-					//first=false;
-					lastLink= link;
-					/*
-					linkType= link.getType();
-					if (linkType.equals("Standard")) {
-						hasStandardLinks=true;
-					}else if(linkType.equals("Transfer")){
-						if (i>0){  
-							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).equals("Standard")){ //TODO:check that transfer links are only between standard link
-								return false;
-							}
-						}
-					}else if (linkType.equals("Walking")){
-						if (i>0){
-							if (path.links.get(i-1).getType().equals("Walking")){ //TODO:check that the path does not have two adjacent walking link
-								return false;
-							}
-						}
-					}else if(linkType.equals("DetTransfer")){
-						if (i>0){  
-							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).getType().equals("Standard")){
-								return false;
-							}
-						}
-					}//linktype
-					i++;
-					*/
-				}//for interator
-				
-				//if(!hasStandardLinks) valid= false;
-			//}else{
-			//	valid=false;
-			//}//if pathlinks
+			Link lastLink = null;
+			boolean first= true;
+			for (Link link : path.links) {
+				if (!first){
+					if (!canPassLink(lastLink, link)){
+						return false;
+					}
+				}else{
+					first=false;
+				}
+				lastLink= link;
+			}
 		}else{
 			valid=false;
-		}//path!=null
+		}
 		return valid;
-	}//is valid
+	}
 	
 	public boolean canPassLink(final Link lastLink, final Link link){
 		boolean pass = false;

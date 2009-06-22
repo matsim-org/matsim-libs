@@ -1,9 +1,9 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.PTRouter;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.router.util.TravelTime;
 import playground.mmoyo.Validators.CostValidator;
-import playground.mmoyo.Pedestrian.Walk;
+import playground.mmoyo.PTRouter.Walk;
 /**
  * Calculates the travel time of each link depending on its type
  */
@@ -11,12 +11,11 @@ public class PTTravelTime implements TravelTime {
 	double walkSpeed =  Walk.walkingSpeed();
 	private PTTimeTable2 ptTimeTable; // = new PTTimeTable2();
 	public CostValidator costValidator = new CostValidator();
+	private String type = "";
 	double walkTime=0;
 	double travelTime=0;
 	double waitingTime=0;
 	double transTime=0;
-	String type = "";
-	
 	
 	public PTTravelTime(PTTimeTable2 ptTimeTable) {
 		this.ptTimeTable = ptTimeTable; 
@@ -29,7 +28,7 @@ public class PTTravelTime implements TravelTime {
 	 * Transfer link: (2° veh departure - 1° veh arrival)
 	 * Detached transfer: (distance*walk speed) + (veh departure - walk arrival)  
 	 */
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(final Link link, final double time) {
 		type = link.getType();
 		if (type.equals("Transfer")){
 			travelTime= transferTime(link,time); 
@@ -47,10 +46,10 @@ public class PTTravelTime implements TravelTime {
 		return travelTime;
 	}
 	
-	private double transferTime(Link link, double t){
-		transTime= ptTimeTable.getTransferTime(link, t);
+	private double transferTime(final Link link, final double time){
+		transTime= ptTimeTable.getTransferTime(link, time);
 		if (transTime<0) {
-			costValidator.pushNegativeValue(link.getId(), t, transTime);
+			costValidator.pushNegativeValue(link.getId(), time, transTime);
 			transTime = 600;
 		}
 		return transTime;  //-> Transfer factor

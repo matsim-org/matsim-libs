@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.mmoyo.PTCase2.PTOb;
+import playground.mmoyo.PTRouter.PTOb;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
 public class RouterTest extends MatsimTestCase {

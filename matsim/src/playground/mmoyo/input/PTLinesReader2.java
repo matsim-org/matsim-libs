@@ -33,10 +33,11 @@ public class PTLinesReader2 extends MatsimXmlParser {
 	private List<Double> minutes;
 	private List<String> departureList;
 	private TransportMode transportMode;
-	public List<PTLine> ptLineList = new ArrayList<PTLine>();
+	private List<PTLine> ptLineList;
 	
-	public PTLinesReader2() {
-		super();
+	public PTLinesReader2(List<PTLine> ptLineList) {
+		this.ptLineList = ptLineList;
+		
 	}
 
 	public void readFile(final String filename) {

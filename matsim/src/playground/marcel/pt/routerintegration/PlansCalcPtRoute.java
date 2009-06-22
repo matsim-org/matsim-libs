@@ -39,7 +39,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.mmoyo.PTCase2.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs2;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;

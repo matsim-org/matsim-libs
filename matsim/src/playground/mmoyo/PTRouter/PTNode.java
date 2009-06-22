@@ -26,6 +26,7 @@ public class PTNode extends NodeImpl {
 		this.idPTLine = idPTLine;
 	}
 
+	/*constructor for the PtLine aggregator class*/	
 	public PTNode(final Id id, final Coord coord, final Id idStation, final Id idPTLine, int lineSequenceindex) {
 		super(id, coord, "PtNode");
 		this.idStation = idStation;

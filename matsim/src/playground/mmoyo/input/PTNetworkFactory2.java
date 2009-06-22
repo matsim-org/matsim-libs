@@ -10,8 +10,6 @@ import org.matsim.core.api.network.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.*;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import playground.mmoyo.PTCase2.*;
 import playground.mmoyo.PTRouter.*;
 import org.matsim.core.network.NetworkLayer;
 /** 
@@ -30,14 +28,14 @@ public class PTNetworkFactory2 {
 		super();
 	}
 	
-	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String outFileName){
+	public NetworkLayer createNetwork(final String inFileName, final PTTimeTable2 ptTimeTable, final String outFileName){
 		NetworkLayer ptNetworkLayer1 = readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer1, ptTimeTable);
 		createTransferLinks(ptNetworkLayer1, ptTimeTable);
 		return ptNetworkLayer1;
 	}
 
-	public NetworkLayer readNetwork(String inFileName){
+	public NetworkLayer readNetwork(final String inFileName){
 		NetworkLayer networkLayer= new NetworkLayer(new NetworkFactory());
 		new MatsimNetworkReader(networkLayer).readFile(inFileName);
 		return networkLayer;
@@ -50,7 +48,7 @@ public class PTNetworkFactory2 {
 		return ptNetworkLayer;
 	}
 	
-	public NetworkLayer readNetFile(String inFileName){
+	public NetworkLayer readNetFile(final String inFileName){
 		NetworkFactory networkFactory = new NetworkFactory();
 	
 		NetworkLayer tempNet= new NetworkLayer(networkFactory);
@@ -78,24 +76,6 @@ public class PTNetworkFactory2 {
 		return ptNetworkLayer;
 	}
 
-	/*
-	//->This should be the new version
-	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
-		PTNetworkReader ptNetworkReader = new PTNetworkReader();
-		NetworkLayer ptNetworkLayer = ptNetworkReader.readNetFile(inFileName);
-		readTimeTable(ptNetworkLayer, ptTimeTable);
-		createTransferLinks(ptNetworkLayer, ptTimeTable);
-		return ptNetworkLayer;
-	}
-	
-	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
-		PTNetworkReader ptNetworkReader = new PTNetworkReader();
-		NetworkLayer ptNetworkLayer = ptNetworkReader.readNetFile(inFileName);
-		readTimeTable(ptNetworkLayer, ptTimeTable);
-		return ptNetworkLayer;
-	}
-	*/
-	
 	/**
 	 * Reads the timetable File, validates that every node exists and loads the data in the ptTimeTable object
 	 */	
@@ -217,7 +197,7 @@ public class PTNetworkFactory2 {
 		link.setType(type);
 	}
 
-	public void writeNet(Network net, String fileName){
+	public void writeNet(final Network net, final String fileName){
 		System.out.println("writing pt network...");
 		new NetworkWriter(net, fileName).write();
 		System.out.println("done.");

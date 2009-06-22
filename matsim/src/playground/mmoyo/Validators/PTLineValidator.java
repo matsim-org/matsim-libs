@@ -1,8 +1,8 @@
 package playground.mmoyo.Validators;
 
-import playground.mmoyo.PTCase2.PTTimeTable2;
-import playground.mmoyo.PTCase2.PTTravelCost;
-import playground.mmoyo.PTCase2.PTTravelTime1;
+import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTravelCost;
+import playground.mmoyo.PTRouter.PTTravelTime1;
 import playground.mmoyo.PTRouter.MyDijkstra;
 import playground.mmoyo.PTRouter.PTLine;
 import org.matsim.api.basic.v01.Id;
@@ -17,9 +17,6 @@ import java.util.List;
  * Identifies isolated PTlines
  */
 public class PTLineValidator {
-	
-	
-	
 	/**
 	 * Shows ptlines with no connection with other ptLines
 	 * @param ptTimeTable
@@ -62,9 +59,8 @@ public class PTLineValidator {
 		System.out.println(	"Total comparisons: " + comparisons + "\nisolated: " + isolated);
 	}
 	
-	
 	/**
-	 * Returns the minimal distance between two PTLines. This can help the decision to join them with a Detached Transfer 
+	 * Returns the minimal distance between two PTLines. This can help the decision of joining them with a Detached Transfer 
 	 */
 	public double getMinimalDistance (PTLine ptl1, PTLine ptl2 ){
 		double minDistance=0;

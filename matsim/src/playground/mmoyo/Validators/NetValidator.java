@@ -5,9 +5,7 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.mmoyo.PTCase2.PTTimeTable2;
-import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.PTRouter.PTLine;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 
 /**
  * Validates all links in a network for correct cost values and lengths
@@ -18,7 +16,7 @@ public class NetValidator {
 	private PTTimeTable2 ptTimeTable;
 	
 	
-	public NetValidator (Network net, PTTimeTable2 ptTimeTable){
+	public NetValidator (final Network net, final PTTimeTable2 ptTimeTable){
 		this.net = net;
 		this.ptTimeTable =ptTimeTable; 
 	}
@@ -53,11 +51,11 @@ public class NetValidator {
 	}
 	
 	public boolean validLinkLengths(){
-		for (Link l : net.getLinks().values()){
-			Coord from = l.getFromNode().getCoord();
-			Coord to = l.getToNode().getCoord();
+		for (Link link : net.getLinks().values()){
+			Coord from = link.getFromNode().getCoord();
+			Coord to = link.getToNode().getCoord();
 			double distance= CoordUtils.calcDistance(from, to);
-			if (l.getLength()!= distance ){
+			if (link.getLength()!= distance ){
 				return false;
 			}
 		}

@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.PTRouter;
 
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +34,7 @@ public class PTControler2 {
     
 	private static final String CONFIG =  path  + "config.xml";
 	private static final String ZURICHPTN = path + "network.xml";
-	private static final String ZURICHPTTIMETABLE = path + "PTTimetable.xml";  // PTTimeTable format will be not longer used 
+	private static final String ZURICHPTTIMETABLE = path + "PTTimetable.xml";  //PTTimeTable format will be not longer used 
 	private static final String INPTNETFILE = path + "inptnetfile.xml";
 	private static final String ZURICHPTPLANS = path + "plans.xml";
 	private static final String OUTPUTPLANS = path + "output_plans.xml";
@@ -48,7 +48,7 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE, ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =7;
+		int option =2;
 		
 		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
@@ -154,9 +154,7 @@ public class PTControler2 {
 	    		break;
 	 
 	    	case 3:
-	    		/**counts the number of routes found for a population */
-	    		PTTester pttester= new PTTester(pt);
-	    		pttester.countRoutes();
+	    		
 	    		break;
 
 	    	case 4:
@@ -166,8 +164,8 @@ public class PTControler2 {
 	    		break;
 	    	
 	    	case 5:
-	    		/**reads a transitSchedule file to create a PTTimeTable and routes a population 
-	    		 *  to be replaced completely by TransitSchedule
+	    		/**reads a transitSchedule file to create a PTTimeTable and routes a population. 
+	    		 *  warning: PTTimeTable xml format will not be used anymore and will be replaced completely by TransitSchedule
 	    		 * */
 	    		TransitScheduleToPTTimeTableConverter transitScheduleToPTTimeTableConverter = new TransitScheduleToPTTimeTableConverter();
 	    		PTTimeTable2 ptTimeTable = transitScheduleToPTTimeTableConverter.getPTTimeTable(path + "transitSchedule.xml", pt.getPtNetworkLayer());

@@ -1,4 +1,4 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.PTRouter;
 
 import playground.mmoyo.input.PTNetworkFactory2;
 import org.matsim.core.network.NetworkLayer;
@@ -79,15 +79,15 @@ public class PTOb {
 		return ptNetworkFactory;
 	}
 
-	public void setPtNetworkLayer(NetworkLayer ptNetworkLayer) {
+	public void setPtNetworkLayer(final NetworkLayer ptNetworkLayer) {
 		this.networkLayer = ptNetworkLayer;
 	}
 
-	public void setPtRouter2(PTRouter2 ptRouter2) {
+	public void setPtRouter2(final PTRouter2 ptRouter2) {
 		this.ptRouter2 = ptRouter2;
 	}	
 		
-	public void setPTTimeTable(PTTimeTable2 ptTimeTable) {
+	public void setPTTimeTable(final PTTimeTable2 ptTimeTable) {
 		this.ptTimeTable= ptTimeTable;
 	}
 
@@ -95,7 +95,7 @@ public class PTOb {
 		return logicNetworkLayer;
 	}
 
-	public void setLogicNetworkLayer(NetworkLayer logicNetworkLayer) {
+	public void setLogicNetworkLayer(final NetworkLayer logicNetworkLayer) {
 		this.logicNetworkLayer = logicNetworkLayer;
 	}	
 }

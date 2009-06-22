@@ -9,22 +9,22 @@ import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.api.network.Network;
 
-import playground.mmoyo.PTCase2.PTStation;
-import playground.mmoyo.PTCase2.PTTimeTable2;
+import playground.mmoyo.input.PTStation;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.StationValidator;
 
 public class PTNodeFactory {
 
-	Network net;
-	PTStation ptStation;;
-	StationValidator sValidator;
+	private Network net;
+	private PTStation ptStation;;
+	private StationValidator sValidator;
 
 	public PTNodeFactory(){
 		
 	}
 			
-	public PTNodeFactory(Network net, PTTimeTable2 ptTimeTable) {
+	public PTNodeFactory(final Network net, final PTTimeTable2 ptTimeTable) {
 		this.net = net;
 		this.ptStation = new PTStation(ptTimeTable);
 		this.sValidator = new StationValidator(net);
@@ -34,23 +34,18 @@ public class PTNodeFactory {
 	/**
 	 * converts all nodes from the network into PTNodes 
 	 */
-	public Network transformToPTNodes(Network NetWithNodes, Network NetWithPTNodes){
-		for (Node node: NetWithNodes.getNodes().values()){
+	public Network transformToPTNodes(final Network netWithNodes, Network netWithPTNodes){
+		for (Node node: netWithNodes.getNodes().values()){
 			PTNode ptNode = new PTNode(node.getId(),node.getCoord(),node.getType());
-			NetWithPTNodes.getNodes().put(node.getId(),ptNode);
+			netWithPTNodes.getNodes().put(node.getId(),ptNode);
 		}
-		return NetWithPTNodes;
-	}
-	
-	public void createPtNode(){
-		
-		
+		return netWithPTNodes;
 	}
 	
 	/**
 	 * Receives a original Basicnode and creates a pair of PTNodes with prefix indicating both directions and sufix to differentiate from other PTL's 
 	 */
-	public BasicNode[] createPTNodes(BasicNode basicNode){
+	public BasicNode[] createPTNodes(final BasicNode basicNode){
 		BasicNode[] pair = new BasicNode[2];
 		
 		Coord newCoord = basicNode.getCoord();	    		
@@ -96,7 +91,7 @@ public class PTNodeFactory {
 	/**
 	 * Creates a new PTNode and put it in the network
 	 */
-	private BasicNode insertNode(String strIdStation, String strId, Coord coord){
+	private BasicNode insertNode(final String strIdStation, final String strId, final Coord coord){
 		Id idPTNode = new IdImpl(strId);
 		PTNode ptNode = new PTNode(idPTNode, coord, "");
 		ptNode.setIdStation(new IdImpl(strIdStation));

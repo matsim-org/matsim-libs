@@ -1,5 +1,6 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.PTRouter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -9,33 +10,33 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
 import playground.mmoyo.input.PTLinesReader2;
-import playground.mmoyo.PTRouter.*;
 
 /**
  * Contains the information of departures for every station and PTLine
  * @param TimeTableFile path of file with departure information
  */
 public class PTTimeTable2{
-	private PTLinesReader2 ptLinesReader = new PTLinesReader2();
-	private List<PTLine> ptLineList; 
+	private List<PTLine> ptLineList;
+	private PTLinesReader2 ptLinesReader;
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
 	private static Time time;
 	
-	
+	/*
 	public PTTimeTable2(Map<Id,Double> linkTravelTimeMap,Map<Id,double[]> nodeDeparturesMap ){
 		this.linkTravelTimeMap = linkTravelTimeMap;
 		this.nodeDeparturesMap =  nodeDeparturesMap;
 	}
+	*/
 	
 	@Deprecated
-	public PTTimeTable2(String TimeTableFile){
+	public PTTimeTable2(final String TimeTableFile){
+		ptLineList = new ArrayList<PTLine>();
+		ptLinesReader = new PTLinesReader2(ptLineList);
 		ptLinesReader.readFile(TimeTableFile);
-		this.ptLineList = ptLinesReader.ptLineList;
 	}
 
-	@Deprecated
 	public PTTimeTable2(){
 		
 	}

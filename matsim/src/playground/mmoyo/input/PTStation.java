@@ -1,10 +1,11 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.input;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import playground.mmoyo.PTRouter.PTLine;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.Coord;
 
@@ -14,7 +15,7 @@ import org.matsim.api.basic.v01.Coord;
 public class PTStation {
 	Map<String, List<Id>> IntersectionMap = new TreeMap<String, List<Id>>(); 
 	
-	String id;  /**the idNode asigned by the transit firm*/
+	String id;  /**the station id asigned by the transit firm*/
 	String stationName;
 	Coord coord;
 	Id idFareZone;
@@ -35,7 +36,7 @@ public class PTStation {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -43,7 +44,7 @@ public class PTStation {
 		return stationName;
 	}
 
-	public void setStationName(String stationName) {
+	public void setStationName(final  String stationName) {
 		this.stationName = stationName;
 	}
 
@@ -59,27 +60,11 @@ public class PTStation {
 		return idFareZone;
 	}
 
-	public void setIdFareZone(Id idFareZone) {
+	public void setIdFareZone(final Id idFareZone) {
 		this.idFareZone = idFareZone;
 	}
 
-	/*
-	//-> eliminate this method from factory
-	public void createIntersecionMap(PTTimeTable2 ptTimeTable){
-		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
-			for (String strIdNode: ptLine.getRoute()) {
-				String strNodeBaseId =  getNodeBaseId(strIdNode);
-				if (!IntersectionMap.containsKey(strNodeBaseId)){
-	    			List<Id> ch = new ArrayList<Id>();
-	    			IntersectionMap.put(strNodeBaseId, ch);
-	    		}
-	    		IntersectionMap.get(strNodeBaseId).add(new IdImpl(strIdNode));
-			}
-		}
-	}
-	*/
-
-	public void createIntersecionMap(PTTimeTable2 ptTimeTable){
+	public void createIntersecionMap(final PTTimeTable2 ptTimeTable){
 		//-> Use idImpl or PTnode types instead of String??
 		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
 			for (Id idNode : ptLine.getNodeRoute()) {
@@ -93,7 +78,6 @@ public class PTStation {
 		}
 	}
 
-	
 	public Map<String, List<Id>> getIntersecionMap(){
 		return this.IntersectionMap;
 	}
@@ -101,7 +85,7 @@ public class PTStation {
 	/**
 	 * Gets a child node with prefix and suffix and returns the Main node Id
 	 */
-	public String getNodeBaseId(Id id){
+	public String getNodeBaseId(final Id id){
 		//-> eliminate this method from networkFactory
 		String baseID = id.toString();
 		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')

@@ -19,13 +19,13 @@ public class PTLine {
 	private List<Double> minute = new ArrayList<Double>();     /**average arrival time to each station after departure from first station*/
 	private List<String> departures = new ArrayList<String>(); /**Departures from first stations during the day in format "hh:mm" */
 
-	public PTLine(Id id, char lineType, List<Id> nodeRoute) {
+	public PTLine(final Id id, final char lineType, final List<Id> nodeRoute) {
 		this.id = id;
 		//this.ptLineType = new PTLineType(lineType);
 		this.nodeRoute = nodeRoute;
 	}
 
-	public PTLine(Id id, TransportMode transportMode, String direction, List<Id> nodeRoute, List<Double> minute, List<String> departures) {
+	public PTLine(final Id id, final TransportMode transportMode, final String direction, final List<Id> nodeRoute, final List<Double> minute, final List<String> departures) {
 		this.id = id;
 		this.transportMode = transportMode;
 		this.nodeRoute = nodeRoute;
@@ -38,7 +38,7 @@ public class PTLine {
 		return id;
 	}
 
-	public void setId(Id id) {
+	public void setId(final Id id) {
 		this.id = id;
 	}
 
@@ -72,7 +72,7 @@ public class PTLine {
 		return transportMode;
 	}
 
-	public void setTransportMode(TransportMode transportMode) {
+	public void setTransportMode(final TransportMode transportMode) {
 		this.transportMode = transportMode;
 	}
 }

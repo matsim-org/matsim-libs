@@ -28,7 +28,7 @@ public class CostValidator {
 	}
 
 	public void printNegativeVaues(){
-		System.out.println("Negative values found:" + negativeValuesMap.size());
+		System.out.println("negative values found:" + negativeValuesMap.size());
 		System.out.println("Link - Time - Cost");
 		for(Map.Entry <Id,List<double[]>> entry: negativeValuesMap.entrySet() ){
 			List<double[]> list = entry.getValue();

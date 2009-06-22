@@ -6,8 +6,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.network.Network;
-
-import playground.mmoyo.PTCase2.PTStation;
+import playground.mmoyo.input.PTStation;
 
 /**
  * Validates that all nodes in an intersection have the same coordinate and correct id`s
@@ -15,11 +14,11 @@ import playground.mmoyo.PTCase2.PTStation;
 public class StationValidator {
 	Network net;
 	
-	public StationValidator(Network net){
+	public StationValidator(final Network net){
 		this.net = net;
 	}
 	
-	public boolean hasValidCoordinates(PTStation ptStation){
+	public boolean hasValidCoordinates(final PTStation ptStation){
 		for (List<Id> list : ptStation.getIntersecionMap().values()) {
 			Id firstId= list.get(0);
 			Node firstNode=  net.getNode(firstId);
