@@ -29,8 +29,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanCalcType;
 
-import playground.dgrether.DgPaths;
-
 
 /**
  * Controler for first zurich scenario test run of estimated scoring function.
@@ -79,9 +77,9 @@ public class BKickIncomeControler extends Controler {
 	}
 	
 	public static void main(String[] args) {
-		String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
-		String[] args2 = {config};
-		args = args2;
+//		String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+//		String[] args2 = {config};
+//		args = args2;
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");

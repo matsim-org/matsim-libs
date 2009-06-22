@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.income;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.households.BasicIncome;
 import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
@@ -33,6 +34,8 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelCost {
 
+	private static final Logger log = Logger.getLogger(BKickIncomeTravelTimeDistanceCostCalculator.class);
+	
 	private static double betaIncomeCar = 1.31;
 	
 	protected TravelTime timeCalculator;
@@ -48,8 +51,8 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelCost {
 		 */
 		this.travelCostFactor = (- charyparNagelScoring.getTraveling() / 3600.0) + (charyparNagelScoring.getPerforming() / 3600.0);
 		this.marginalUtlOfDistance = charyparNagelScoring.getMarginalUtlOfDistanceCar() * 1.31;
-	
-	
+		
+		log.info("Using BKickIncomeTravelTimeDistanceCostCalculator...");
 	}
 
 	/**
