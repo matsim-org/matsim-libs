@@ -46,4 +46,6 @@ public interface DgPaths {
   final String IVTCHCOUNTS = SHAREDSVN + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
 
 	final String IVTCHBASE = SHAREDSVN + "studies/schweiz-ivtch/";
+
+	final String STUDIESDG = SHAREDSVN + "studies/dgrether/";
 }
