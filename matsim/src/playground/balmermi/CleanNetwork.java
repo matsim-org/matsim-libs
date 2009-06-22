@@ -20,18 +20,18 @@
 
 package playground.balmermi;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
-import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
+import org.matsim.counts.MatsimCountsReader;
+
+import playground.balmermi.modules.NetworkDoubleLinks;
+import playground.balmermi.modules.NetworkThinner;
 
 public class CleanNetwork {
 
@@ -41,70 +41,22 @@ public class CleanNetwork {
 
 	public static void cleanNetwork(final String[] args) {
 
-		System.out.println("RUN:");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile("../../input/network.xml.gz");
+		
+		Counts counts = new Counts();
+		new MatsimCountsReader(counts).readFile("../../input/counts.xml.gz");
 
-//		Config config = Gbl.createConfig(null);
-//		config.config().setOutputFile("output_config.xml");
-		Scenario.setUpScenarioConfig();
-		NetworkLayer network = Scenario.readNetwork();
-//		Counts counts = Scenario.readCounts();
-//		NetworkLayer network = new NetworkLayer();
-
-//		Iterator<? extends Link> l_it = network.getLinks().values().iterator();
-//		while (l_it.hasNext()) {
-//			Link l = l_it.next();
-//			if (l.getLength()<75.0) { l.setLength(75.0); }
-//		}
-
-		System.out.println("  running Network modules... ");
-//		new NetworkParseETNet("../../input/nodes.txt","../../input/linksET.txt").run(network);
-//		new NetworkCalibrationWithCounts("../../output/greentimes.xml",counts).run(network);
-//		new NetworkSetDefaultCapacities().run(network);
-		new NetworkCalcTopoType().run(network);
-		new NetworkSummary().run(network);
-
-		ArrayList<Link> links = new ArrayList<Link>();
-		Iterator<? extends Link> l_it = network.getLinks().values().iterator();
-		while (l_it.hasNext()) { Link l = l_it.next(); if (Integer.parseInt(l.getType())>48) { links.add(l); } }
-		System.out.println("    removing " + links.size() + " links...");
-		for (int i=0; i<links.size(); i++) { network.removeLink(links.get(i)); }
-		System.out.println("    done.");
-
-		NetworkCalcTopoType topoTypes = new NetworkCalcTopoType();
-		topoTypes.run(network);
-		new NetworkSummary().run(network);
-
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
-		while (n_it.hasNext()) { Node n = n_it.next(); if (topoTypes.getTopoType(n) == NetworkCalcTopoType.EMPTY.intValue()) { nodes.add(n); } }
-		System.out.println("    removing " + nodes.size() + " nodes...");
-		for (int i=0; i<nodes.size(); i++) { network.removeNode(nodes.get(i)); }
-		System.out.println("    done.");
-
-		new NetworkCalcTopoType().run(network);
-		new NetworkSummary().run(network);
-
-//		new NetworkSimplifyAttributes().run(network);
-//		new NetworkAdaptCHNavtec().run(network);
+		new NetworkDoubleLinks("-dl").run(network);
+		new NetworkThinner().run(network,counts);
 		new NetworkCleaner().run(network);
-		new NetworkMergeDoubleLinks().run(network);
-		new NetworkCalcTopoType().run(network);
-//		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
-		new NetworkSummary().run(network);
-		System.out.println("  done.");
 
-//		NetworkWriteETwithCounts nwetwc = new NetworkWriteETwithCounts(Counts.getSingleton());
-//		nwetwc.run(network);
-//		nwetwc.close();
-		NetworkWriteAsTable nwat = new NetworkWriteAsTable(Scenario.output_directory);
+		NetworkWriteAsTable nwat = new NetworkWriteAsTable("../../output/");
 		nwat.run(network);
 		nwat.close();
-
-		Scenario.writeNetwork(network);
-//		Scenario.writeConfig();
-
-		System.out.println("RUN: cleanNetwork finished.");
-		System.out.println();
+		
+		new CountsWriter(counts,"../../output/output_counts.xml.gz").write();
+		new NetworkWriter(network,"../../output/output_network.xml.gz").write();
 	}
 
 	//////////////////////////////////////////////////////////////////////

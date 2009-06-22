@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
@@ -97,18 +98,18 @@ public class ScenarioIO {
 		Network network = sl.getScenario().getNetwork();
 		ActivityFacilities af = sl.getScenario().getActivityFacilities();
 
-		System.out.println("transform network...");
-		WGS84toCH1903LV03 transform = new WGS84toCH1903LV03();
-		for (Node n : network.getNodes().values()) {
-			Coord c = transform.transform(n.getCoord());
-			n.getCoord().setXY(c.getX(),c.getY());
-		}
-		Gbl.printMemoryUsage();
-		System.out.println("done. (transform network)");
+//		System.out.println("transform network...");
+//		WGS84toCH1903LV03 transform = new WGS84toCH1903LV03();
+//		for (Node n : network.getNodes().values()) {
+//			Coord c = transform.transform(n.getCoord());
+//			n.getCoord().setXY(c.getX(),c.getY());
+//		}
+//		Gbl.printMemoryUsage();
+//		System.out.println("done. (transform network)");
 
-		System.out.println("clean network...");
-		new NetworkCleaner().run(network);
-		System.out.println("done. (clean network)");
+//		System.out.println("clean network...");
+//		new NetworkCleaner().run(network);
+//		System.out.println("done. (clean network)");
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
@@ -124,60 +125,67 @@ public class ScenarioIO {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 		
-		System.out.println("writing facilities...");
-		new FacilitiesWriter(af).write();
-		System.out.println("done. (writing facilities)");
-
-		System.out.println("writing network...");
-		new NetworkWriter(network).write();
-		System.out.println("done. (writing network)");
-
-		System.out.println("loading population...");
-		sl.loadPopulation();
-		PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
-		population.setIsStreaming(false);
-		Gbl.printMemoryUsage();
-		System.out.println("done. (loading population)");
-		
-		System.out.println("running algorithms...");
-		new PersonFacility2Link().run(population);
-		Gbl.printMemoryUsage();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
-		preProcessLandmarks.run(network);
-		ReRouteLandmarks router = new ReRouteLandmarks(network,timeCostCalc,timeCostCalc,preProcessLandmarks);
-		router.prepareReplanning();
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				router.handlePlan(plan);
-			}
+		System.out.println("--------------------------------------------------");
+		System.out.println(""+"fid"+"\t"+"lid");
+		for (Facility f : af.getFacilities().values()) {
+			System.out.println(""+f.getId()+"\t"+f.getLink().getId());
 		}
-		router.finishReplanning();
-		Gbl.printMemoryUsage();
-		System.out.println("done. (running algorithms)");
-
-		System.out.println("writing population...");
-		new PopulationWriter(population).write();
-		System.out.println("done. (writing population)");
+		System.out.println("--------------------------------------------------");
 		
-//		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
-//		population.setIsStreaming(true);
-//		PopulationReader plansReader = new MatsimPopulationReader(population,network);
-//		PopulationWriter plansWriter = new PopulationWriter(population);
-//
-//		System.out.println("adding algorithms...");
+//		System.out.println("writing facilities...");
+//		new FacilitiesWriter(af).write();
+//		System.out.println("done. (writing facilities)");
+
+//		System.out.println("writing network...");
+//		new NetworkWriter(network).write();
+//		System.out.println("done. (writing network)");
+
+//		System.out.println("loading population...");
+//		sl.loadPopulation();
+//		PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
+//		population.setIsStreaming(false);
+//		Gbl.printMemoryUsage();
+//		System.out.println("done. (loading population)");
+		
+//		System.out.println("running algorithms...");
+//		new PersonFacility2Link().run(population);
+//		Gbl.printMemoryUsage();
+//		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+//		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
+//		preProcessLandmarks.run(network);
+//		ReRouteLandmarks router = new ReRouteLandmarks(network,timeCostCalc,timeCostCalc,preProcessLandmarks);
+//		router.prepareReplanning();
+//		for (Person person : population.getPersons().values()) {
+//			for (Plan plan : person.getPlans()) {
+//				router.handlePlan(plan);
+//			}
+//		}
+//		router.finishReplanning();
+//		Gbl.printMemoryUsage();
+//		System.out.println("done. (running algorithms)");
+
+//		System.out.println("writing population...");
+//		new PopulationWriter(population).write();
+//		System.out.println("done. (writing population)");
+		
+		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
+		population.setIsStreaming(true);
+		PopulationReader plansReader = new MatsimPopulationReader(population,network);
+		PopulationWriter plansWriter = new PopulationWriter(population);
+
+		System.out.println("adding algorithms...");
 //		population.addAlgorithm(new PersonFacility2Link());
 //		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 //		population.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
-//		population.addAlgorithm(plansWriter);
-//		Gbl.printMemoryUsage();
-//		System.out.println("done. (adding algorithms)");
-//
-//		System.out.println("stream population...");
-//		plansReader.readFile(config.plans().getInputFile());
-//		population.printPlansCount();
-//		plansWriter.write();
-//		Gbl.printMemoryUsage();
-//		System.out.println("done. (stream population)");
+		population.addAlgorithm(plansWriter);
+		Gbl.printMemoryUsage();
+		System.out.println("done. (adding algorithms)");
+
+		System.out.println("stream population...");
+		plansReader.readFile(config.plans().getInputFile());
+		population.printPlansCount();
+		plansWriter.write();
+		Gbl.printMemoryUsage();
+		System.out.println("done. (stream population)");
 	}
 }
