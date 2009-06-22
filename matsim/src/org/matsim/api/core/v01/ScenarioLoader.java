@@ -115,6 +115,7 @@ public class ScenarioLoader extends BasicScenarioLoader {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+			log.info("households loaded.");
 		}
 		else {
 			log.info("no households file set in config, not able to load households");
