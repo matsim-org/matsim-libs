@@ -5,11 +5,9 @@ import java.util.List;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
-import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 
 import playground.gregor.sims.evacuationdelay.DelayedEvacuationPopulationLoader;
 
@@ -34,7 +32,7 @@ public class EvacuationDelayController extends Controler {
 			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
 		}
 		
-		return new DelayedEvacuationPopulationLoader(this.buildings,this.network,this.config).getPopulation();
+		return new DelayedEvacuationPopulationLoader(this.buildings,this.scenarioData).getPopulation();
 	}
 	
 	public static void main(final String[] args) {

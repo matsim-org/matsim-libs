@@ -177,7 +177,7 @@ public class Controler {
 	private String externalMobsim = null;
 
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
-	private ScenarioImpl scenarioData = null;
+	protected ScenarioImpl scenarioData = null;
 	private PlansScoring plansScoring = null;
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
@@ -196,11 +196,11 @@ public class Controler {
 	/**
 	 * This instance encapsulates all behavior concerning the ControlerEvents/Listeners
 	 */
-	private ControlerListenerManager controlerListenerManager = new ControlerListenerManager(this);
+	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(this);
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
-	private List<QueueSimulationListener> queueSimulationListener  = new ArrayList<QueueSimulationListener>();
+	private final List<QueueSimulationListener> queueSimulationListener  = new ArrayList<QueueSimulationListener>();
 	
 	private final Thread shutdownHook = new Thread() {
 		@Override
@@ -474,7 +474,7 @@ public class Controler {
 			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 		}
 
-		if (config.controler().isLinkToLinkRoutingEnabled()){
+		if (this.config.controler().isLinkToLinkRoutingEnabled()){
 			this.leastCostPathCalculatorFactory = new LeastCostPathCalculatorInvertedNetProxyFactory(this.leastCostPathCalculatorFactory);
 		}
 		
@@ -585,7 +585,7 @@ public class Controler {
 			this.scenarioData = new ScenarioImpl(this.config);
 			((NetworkLayer)this.scenarioData.getNetwork()).setFactory(this.getNetworkFactory());
 			this.loader = new ScenarioLoader(this.scenarioData);
-			loader.loadScenario();
+			this.loader.loadScenario();
 			this.network = loadNetwork();
 			this.population = loadPopulation();
 			
@@ -1022,7 +1022,7 @@ public class Controler {
 	}
 	
 	public VolumesAnalyzer getVolumes() {
-		return volumes;
+		return this.volumes;
 	}
 
 	/**
@@ -1137,7 +1137,7 @@ public class Controler {
 	 */
 	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ShutdownListener {
 
-		private List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
 
 		public CoreControlerListener() {
 			// empty public constructor for protected class
@@ -1242,11 +1242,11 @@ public class Controler {
 
 	
 	public List<QueueSimulationListener> getQueueSimulationListener() {
-		return queueSimulationListener;
+		return this.queueSimulationListener;
 	}
 
 	public PlansScoring getPlansScoring() {
-		return plansScoring;
+		return this.plansScoring;
 	}
 
 }

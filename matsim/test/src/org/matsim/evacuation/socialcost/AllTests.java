@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.evacuation.socialcost");
 
-		suite.addTestSuite(MarginalCostControlerTest.class);
+		suite.addTestSuite(SocialCostCalculatorSingleLinkTest.class);
 
 		return suite;
 	}

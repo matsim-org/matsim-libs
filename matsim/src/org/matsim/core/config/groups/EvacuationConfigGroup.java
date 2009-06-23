@@ -28,7 +28,7 @@ public class EvacuationConfigGroup  extends Module{
 	
 	private static final long serialVersionUID = 1L;
 
-	public enum Scenario {day,night}
+	public enum EvacuationScenario {day,night}
 	
 	public static final String GROUP_NAME = "evacuation";
 
@@ -80,7 +80,7 @@ public class EvacuationConfigGroup  extends Module{
 	/**
 	 * the scenario type
 	 */
-	private Scenario scenario;
+	private EvacuationScenario scenario;
 	
 
 	public EvacuationConfigGroup(){
@@ -112,7 +112,7 @@ public class EvacuationConfigGroup  extends Module{
 		}else if(SHORELINE_FILE.equals(key)){
 			setShorelineFile(value.replace('\\', '/'));
 		}else if(SCENARIO.equals(key)){
-			setScenario(value);
+			setEvacuationScenario(value);
 		}else {
 			throw new IllegalArgumentException(key);
 		}
@@ -192,7 +192,7 @@ public class EvacuationConfigGroup  extends Module{
 	 * 
 	 * @return the scenario type (i.e. day or night)
 	 */
-	public Scenario getScanrio() {
+	public EvacuationScenario getEvacuationScanrio() {
 		return this.scenario;
 	}
 	
@@ -201,11 +201,11 @@ public class EvacuationConfigGroup  extends Module{
 	 * @param scenario
 	 * the type of the scenario (i.e. day or night)
 	 */
-	public void setScenario(String scenario) {
+	public void setEvacuationScenario(String scenario) {
 		if (scenario.equals("day")) {
-			this.scenario = Scenario.day;
+			this.scenario = EvacuationScenario.day;
 		} else if (scenario.equals("night")) {
-			this.scenario = Scenario.night;
+			this.scenario = EvacuationScenario.night;
 		} else {
 			throw new RuntimeException("unkown scenario type:" + scenario);
 		}

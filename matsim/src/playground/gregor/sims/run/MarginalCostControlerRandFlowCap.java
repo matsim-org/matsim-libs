@@ -32,7 +32,7 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 
 
 
-	private double c;
+	private final double c;
 
 	public MarginalCostControlerRandFlowCap(final String[] args, double c) {
 		super(args);
@@ -50,7 +50,7 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		SocialCostCalculator sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize());
+		SocialCostCalculator sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
 		
 		this.events.addHandler(sc);
 		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);

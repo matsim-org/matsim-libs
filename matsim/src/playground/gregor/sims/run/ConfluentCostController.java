@@ -63,7 +63,7 @@ public class ConfluentCostController extends Controler {
 			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
 		}
 		
-		return new EvacuationPopulationFromShapeFileLoader(this.buildings,this.network,this.config).getPopulation();
+		return new EvacuationPopulationFromShapeFileLoader(this.buildings,this.scenarioData).getPopulation();
 	}
 	
 	public static void main(final String[] args) {
