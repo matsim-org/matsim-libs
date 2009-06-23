@@ -54,6 +54,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	public void testExpBeta2() {
 		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
 		Person person = new PersonImpl(new IdImpl(1));
+		// TODO [AH] Update to newest formula
 		// weight = Math.exp(this.beta * 5 * (plan.getScore() / maxScore));
 		Plan plan1 = person.createPlan(false); // weight: 14764.781
 		plan1.setScore(96.0);
@@ -93,11 +94,11 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		 * they should still be feasible. In this example, the numbers should
 		 * differ by a factor of ~1.1 from each other, according to the weights.
 		 */
-		assertEquals(1578, cnt1);
-		assertEquals(1772, cnt2);
-		assertEquals(1995, cnt3);
-		assertEquals(2205, cnt4);
-		assertEquals(2450, cnt5);
+		assertEquals(2036, cnt1);
+		assertEquals(2009, cnt2);
+		assertEquals(2029, cnt3);
+		assertEquals(1999, cnt4);
+		assertEquals(1927, cnt5);
 	}
 
 	/**
@@ -106,6 +107,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	public void testExpBeta1() {
 		this.config.charyparNagelScoring().setBrainExpBeta(1.0);
 		Person person = new PersonImpl(new IdImpl(1));
+		// TODO [AH] update to newest formula
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 121.5104175
 		Plan plan1 = person.createPlan(false); 
@@ -150,11 +152,11 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		 * they should still be feasible. In this example, the numbers should
 		 * differ by a factor of ~1.05 from each other, according to the weights.
 		 */
-		assertEquals(1755, cnt1);
-		assertEquals(1850, cnt2);
-		assertEquals(2013, cnt3);
-		assertEquals(2146, cnt4);
-		assertEquals(2236, cnt5);
+		assertEquals(1986, cnt1);
+		assertEquals(1997, cnt2);
+		assertEquals(2021, cnt3);
+		assertEquals(2017, cnt4);
+		assertEquals(1979, cnt5);
 	}
 
 }
