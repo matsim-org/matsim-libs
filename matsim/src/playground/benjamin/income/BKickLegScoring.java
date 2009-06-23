@@ -48,7 +48,7 @@ public class BKickLegScoring extends LegScoringFunction {
 		BasicIncome income = plan.getPerson().getHousehold().getIncome();
 		this.incomePerTrip = this.calculateIncomePerTrip(income);
 		
-		log.info("Using BKickLegScoring...");
+//		log.info("Using BKickLegScoring...");
 	}
 
 	@Override
