@@ -42,7 +42,6 @@ import org.matsim.core.scoring.PlanScorer;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 
@@ -53,36 +52,33 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
  */
 
 
-public class RecyclingModule1 implements PlanStrategyModule{
+public class RecyclingModule implements PlanStrategyModule{
 		
-	private  ArrayList<Plan> []					list;
-	private final AbstractMultithreadedModule 	schedulingModule;
-	private final AbstractMultithreadedModule	assignmentModule;
-	private final LocationMutatorwChoiceSet 	locator;
-	private final PlanScorer					scorer;
-	private final double						minimumTime;
-	private final PlanAlgorithm					timer;
-	private final int							testAgentsNumber;
-	//protected String[]							criteria;
-	private final Controler						controler;
-	private OptimizedAgents 					agents;
-	private LinkedList<String>					nonassignedAgents;
+	private  ArrayList<Plan> []						list;
+	private final AbstractMultithreadedModule 		schedulingModule;
+	private final AbstractMultithreadedModule		assignmentModule;
+	private final LocationMutatorwChoiceSet 		locator;
+	private final PlanScorer						scorer;
+	private final int								testAgentsNumber;
+	private final Controler							controler;
+	private OptimizedAgents 						agents;
+	private LinkedList<String>						nonassignedAgents;
 	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
 	private final NetworkLayer 						network;
-	public static PrintStream 					assignment;
-	private final Knowledges 					knowledges;
-	private final ActivityTypeFinder 			finder;
+	public static PrintStream 						assignment;
+	private final Knowledges 						knowledges;
+	private final ActivityTypeFinder 				finder;
 	
 	private final int iterations, noOfAgents, noOfSoftCoefficients;
-	private final DistanceCoefficients 			coefficients;
+	private final DistanceCoefficients 				coefficients;
 	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
-	private final ArrayList<String> 			softCoef; 
-	private final ArrayList<String> 			allCoef; 
-	private ArrayList<Integer> 					list1Pointer; 
-	private static final Logger 				log = Logger.getLogger(RecyclingModule1.class);
+	private final ArrayList<String> 				softCoef; 
+	private final ArrayList<String> 				allCoef; 
+	private ArrayList<Integer> 						list1Pointer; 
+	private static final Logger 					log = Logger.getLogger(RecyclingModule.class);
 	
 	                      
-	public RecyclingModule1 (ControlerMFeil controler, ActivityTypeFinder finder) {
+	public RecyclingModule (ControlerMFeil controler, ActivityTypeFinder finder) {
 		
 		this.controler=controler;
 		this.knowledges 			= ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
@@ -93,14 +89,7 @@ public class RecyclingModule1 implements PlanStrategyModule{
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.timer					= new TimeModeChoicer1 (controler, this.tDepDelayCalc);
-		//this.schedulingModule 		= new PlanomatX12Initialiser(controler, finder);
-		//this.assignmentModule		= new AgentsAssignmentInitialiser1 (this.controler, this.timer, this.locator, this.scorer, this, this.minimumTime, this.coefficients, this.nonassignedAgents);
-		this.minimumTime			= 3600;	
 		this.testAgentsNumber		= 5;
-		//this.criteria				= new String [2];
-		//this.criteria [0]			= "distance";
-		//this.criteria [1]			= "primacts";
 		
 		this.finder					= finder;
 		
@@ -122,7 +111,7 @@ public class RecyclingModule1 implements PlanStrategyModule{
 		this.list1Pointer 			= new ArrayList<Integer>();
 		
 		this.schedulingModule 		= new PlanomatX12Initialiser(controler, finder);
-		this.assignmentModule		= new AgentsAssignmentInitialiser1 (this.controler, this.tDepDelayCalc, this.locator, this.scorer, this, this.minimumTime, this.coefficients, this.nonassignedAgents);
+		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.tDepDelayCalc, this.locator, this.scorer, this.finder, this, this.coefficients, this.nonassignedAgents);
 		
 		
 		new Statistics();		
@@ -134,8 +123,8 @@ public class RecyclingModule1 implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		RecyclingModule1.assignment = new PrintStream (fileOverview);
-		RecyclingModule1.assignment.println("Agent\tScore\tPlan\n");
+		RecyclingModule.assignment = new PrintStream (fileOverview);
+		RecyclingModule.assignment.println("Agent\tScore\tPlan\n");
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -303,7 +292,6 @@ public class RecyclingModule1 implements PlanStrategyModule{
 			String st = naa.next();
 			for (int x=0;x<this.list[1].size();x++){
 				if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
-					//log.warn("Anschlag!");
 					schedulingModule.handlePlan(list[1].get(x));
 					this.list1Pointer.add(x);
 					break;

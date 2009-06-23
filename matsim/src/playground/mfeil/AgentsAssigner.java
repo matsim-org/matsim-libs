@@ -44,6 +44,8 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
+import playground.mfeil.MDSAM.ActivityTypeFinder;
+
 
 /**
  * @author Matthias Feil
@@ -51,7 +53,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
  * (= non-optimized agent copies the plan of the most similar optimized agent).
  */
 
-public class AgentsAssigner1 implements PlanAlgorithm{ 
+public class AgentsAssigner implements PlanAlgorithm{ 
 	
 	
 	//////////////////////////////////////////////////////////////////////
@@ -61,20 +63,20 @@ public class AgentsAssigner1 implements PlanAlgorithm{
 	protected final Controler					controler;
 	protected final PlanAlgorithm 				timer;
 	protected final LocationMutatorwChoiceSet 	locator;
-	protected final RecyclingModule1			module;
-	protected final double						minimumTime;
+	protected final RecyclingModule				module;
 	protected LinkedList<String>				nonassignedAgents;
 	protected Knowledges 						knowledges;
-	protected static final Logger 				log = Logger.getLogger(AgentsAssigner1.class);
+	private final ActivityTypeFinder 			finder;
+	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 		
 	
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, age, sex, license, car_avail, employed;
 	
 	
-	public AgentsAssigner1 (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
-			LocationMutatorwChoiceSet locator, PlanScorer scorer, RecyclingModule1 recyclingModule,
-			double minimumTime, DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
+	public AgentsAssigner (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
+			LocationMutatorwChoiceSet locator, PlanScorer scorer, ActivityTypeFinder finder, RecyclingModule recyclingModule,
+			DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 		
 		this.controler				= controler;
 		PlansCalcRoute router 		= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
@@ -82,12 +84,11 @@ public class AgentsAssigner1 implements PlanAlgorithm{
 				controler.getTravelTimeCalculator(), 
 				tDepDelayCalc, 
 				router);
-		this.timer					= new TimeModeChoicer1(this.controler, legTravelTimeEstimator, scorer);
+		this.timer					= new TimeModeChoicer1(controler, legTravelTimeEstimator, scorer);
 		this.locator 				= locator;
+		this.finder					= finder;
 		this.module					= recyclingModule;
-		this.minimumTime			= minimumTime;
 		this.nonassignedAgents		= nonassignedAgents;
-		//this.cleaner				= new ScheduleCleaner(legTravelTimeEstimator, this.minimumTime);
 		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 		
 		this.coefficients = coefficients;
@@ -109,7 +110,6 @@ public class AgentsAssigner1 implements PlanAlgorithm{
 		}
 		
 	}
-	
 	
 		
 	//////////////////////////////////////////////////////////////////////
@@ -141,23 +141,30 @@ public class AgentsAssigner1 implements PlanAlgorithm{
 					}
 					} catch (Exception e){
 						log.warn(e);
-						System.out.println("Acts im Plan des schon optimierten Agenten:");
+						log.warn("Acts im Plan des schon optimierten Agenten:");
 						for (int k=0;k<agents.getAgentPlan(j).getPlanElements().size();k++) {
-							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(((Activity)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
-							else System.out.print(((Leg)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
+							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(((Activity)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
+							else log.warn(((Leg)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
 						}
 						System.out.println();
-						System.out.println("Primacts im Knowledge des zuzuordnenden Agenten:");
+						log.warn("Primacts im Knowledge des zuzuordnenden Agenten:");
 						for (int k=0;k< this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size();k++){
-							if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getType()+" ");
-							else System.out.print("Leg but undefined. ");
+							if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(k).getType()+" ");
+							else log.warn("Leg but undefined. ");
 						}
 						System.out.println();
 						continue optimizedAgentsLoop;	// if exception occurs go to next agent whatsoever the exception is.
 					}
 				}
 				if (!in) {
-					//log.warn("Anschlag optimizedAgentsLoop! Person "+plan.getPerson().getId()+" bei OptimizedAgent "+agents.getAgentPerson(j).getId());
+					continue optimizedAgentsLoop;
+				}
+			}
+			
+			// All act types complying with those eligible to the agent (see ActivityTypeFinder)
+			List<String> actTypes = this.finder.getActTypes(plan.getPerson());
+			for (int i=2;i<plan.getPlanElements().size()-2;i+=2){ // "home" does not need to be checked
+				if (!actTypes.contains(((Activity)(plan.getPlanElements().get(i))).getType())) {
 					continue optimizedAgentsLoop;
 				}
 			}

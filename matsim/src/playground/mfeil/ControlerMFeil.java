@@ -95,7 +95,7 @@ public class ControlerMFeil extends Controler {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
 				finder.run(this.getFacilities());
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule module = new RecyclingModule1(this, finder);
+				PlanStrategyModule module = new RecyclingModule(this, finder);
 				strategy.addStrategyModule(module);
 			}
 			

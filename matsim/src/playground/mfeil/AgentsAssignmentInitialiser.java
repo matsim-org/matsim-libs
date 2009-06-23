@@ -26,6 +26,9 @@ import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.mfeil.MDSAM.ActivityTypeFinder;
+
 import java.util.LinkedList;
 
 
@@ -35,26 +38,26 @@ import java.util.LinkedList;
  * Initializes the agentsAssigner.
  */
 
-public class AgentsAssignmentInitialiser1 extends AbstractMultithreadedModule {
+public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 	
-	protected final NetworkLayer 					network;
-	protected final Controler						controler;
-	protected final LocationMutatorwChoiceSet 		locator;
-	protected final PlanScorer 						scorer;
-	protected final RecyclingModule1				module;
-	protected final double							minimumTime;
-	protected LinkedList<String>					nonassignedAgents;
+	protected final NetworkLayer 						network;
+	protected final Controler							controler;
+	protected final LocationMutatorwChoiceSet 			locator;
+	protected final PlanScorer 							scorer;
+	protected final RecyclingModule						module;
+	protected LinkedList<String>						nonassignedAgents;
 	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
+	private final ActivityTypeFinder 					finder;
 	
-	private final DistanceCoefficients 				distanceCoefficients;
+	private final DistanceCoefficients 					distanceCoefficients;
 
 		
-	public AgentsAssignmentInitialiser1 (final Controler controler, 
+	public AgentsAssignmentInitialiser (final Controler controler, 
 			final DepartureDelayAverageCalculator 	tDepDelayCalc,
 			final LocationMutatorwChoiceSet locator,
 			final PlanScorer scorer,
-			final RecyclingModule1 module, 
-			final double minimumTime,
+			final ActivityTypeFinder finder,
+			final RecyclingModule module, 
 			final DistanceCoefficients distanceCoefficients,
 			LinkedList<String> nonassignedAgents) {
 		
@@ -63,8 +66,8 @@ public class AgentsAssignmentInitialiser1 extends AbstractMultithreadedModule {
 		this.init(network);	
 		this.locator = locator;
 		this.scorer = scorer;
+		this.finder = finder;
 		this.module = module;
-		this.minimumTime = minimumTime;
 		this.nonassignedAgents = nonassignedAgents;
 		this.tDepDelayCalc = tDepDelayCalc;
 		
@@ -80,8 +83,8 @@ public class AgentsAssignmentInitialiser1 extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm agentsAssigner;
 		
-		agentsAssigner = new AgentsAssigner1 (this.controler, this.tDepDelayCalc,
-					this.locator, this.scorer, this.module, this.minimumTime, this.distanceCoefficients,
+		agentsAssigner = new AgentsAssigner (this.controler, this.tDepDelayCalc,
+					this.locator, this.scorer, this.finder, this.module, this.distanceCoefficients,
 					this.nonassignedAgents);
 		
 		return agentsAssigner;
