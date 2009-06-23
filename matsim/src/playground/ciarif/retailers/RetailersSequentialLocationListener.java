@@ -31,12 +31,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -49,6 +50,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
+
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class RetailersSequentialLocationListener implements StartupListener, IterationEndsListener {
@@ -181,28 +184,35 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		//int iter = controler.getIteration();
 		//if (controler.getIteration()>0 & controler.getIteration()%5==0){
 		if (controler.getIteration()%5==0){
-			log.info("matrix dimensions, columns = " + this.retailZones.getRetailZones().values().size());
-			log.info("matrix dimensions, rows = " + shops.size());
-			DenseDoubleMatrix2D am2d = new DenseDoubleMatrix2D (shops.size() , this.retailZones.getRetailZones().values().size());
-			for (ActivityFacility f:shops) {//for (RetailZone rz : this.retailZones.getRetailZones().values()) 
-				//rz.getPersonsQuadTree().
-			}				
-//			for (Person p : controler.getPopulation().getPersons().values()) {				
-//				for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
-//					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
-//						if (pe2 instanceof Activity) {
-//							Activity act = (Activity) pe2;
-//							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
-//								// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
-//								//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 
-//							}
-//						}
-//					}
-//				}
-//			}
+			log.info("matrix dimensions, columns (zones) = " + this.retailZones.getRetailZones().values().size());
+			log.info("matrix dimensions, rows (shops) = " + shops.size());
+			DenseDoubleMatrix2D prob_i_j = new DenseDoubleMatrix2D (shops.size() , this.retailZones.getRetailZones().values().size());
+			DenseDoubleMatrix1D avg_prob_i = new DenseDoubleMatrix1D (this.retailZones.getRetailZones().values().size());
+			for (ActivityFacility f:shops) {
+				int counter = 0;
+				for (RetailZone rz : this.retailZones.getRetailZones().values()) { 
+				Collection<Person> persons = new ArrayList<Person> ();
+				rz.getPersonsQuadTree().get(rz.getPersonsQuadTree().getMinEasting(),rz.getPersonsQuadTree().getMinNorthing(), rz.getPersonsQuadTree().getMaxEasting(), rz.getPersonsQuadTree().getMaxNorthing(), persons );
+					for (Person p:persons) {
+						for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
+							if (pe2 instanceof Activity) {
+								Activity act = (Activity) pe2;
+								if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
+									counter++;
+									// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
+									//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 
+								}
+							}
+						}
+					}
+					double prob = counter/persons.size();
+					int i = Integer.parseInt(f.getId().toString()); // TODO check the correspondence between Id's and columns/rows of the prob_i_j matrix
+					int j =Integer.parseInt(rz.getId().toString());
+					prob_i_j.set(i,j, prob);
+					log.info("prob_i_j = " + prob_i_j.get(i,j));
+				}
+			}	
 		}
 	}
-	
-	
 }
 
