@@ -63,16 +63,17 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 	private final double capCorrectionFactor;
 	private final double storageCapFactor;
 	private final String snapshotStyle;
-	private List<PostProcessorI> colorizers = new ArrayList<PostProcessorI>();
-	private MVISnapshotWriter writer;
-	private double endTime;
+	private final List<PostProcessorI> colorizers = new ArrayList<PostProcessorI>();
+	private final MVISnapshotWriter writer;
+	private final double endTime;
+	private double visOutputMod;
 
 	public SnapshotGenerator(Scenario sc, MVISnapshotWriter writer) {
 		this.network = sc.getNetwork();
-		this.eventLinks = new HashMap<Id, EventLink>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.eventLinks = new HashMap<Id, EventLink>((int)(this.network.getLinks().size()*1.1), 0.95f);
 		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);
 		this.snapshotPeriod = sc.getConfig().simulation().getSnapshotPeriod();
-		this.capCorrectionFactor = sc.getConfig().simulation().getFlowCapFactor() / network.getCapacityPeriod();
+		this.capCorrectionFactor = sc.getConfig().simulation().getFlowCapFactor() / this.network.getCapacityPeriod();
 		this.storageCapFactor = sc.getConfig().simulation().getStorageCapFactor();
 		this.snapshotStyle = sc.getConfig().simulation().getSnapshotStyle();
 		this.endTime = sc.getConfig().simulation().getEndTime();
@@ -147,12 +148,15 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 	}
 
 	private void doSnapshot(final double time) {
-		if (time > this.endTime) {
+		if (time > this.endTime && this.endTime > 0) {
 			return;
 		}
 		System.out.println("create snapshot at " + Time.writeTime(time));
 		Collection<PositionInfo> positions = getVehiclePositions(time);
 		for (PositionInfo pos : positions) {
+			if (pos.getAgentId().hashCode() % this.visOutputMod != 0 ) {
+				continue;
+			}
 			for (PostProcessorI pp : this.colorizers){
 				pp.processPositionInfo(pos);
 			}
@@ -160,7 +164,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 			ExtendedPositionInfo position = new ExtendedPositionInfo(pos.getAgentId(), pos.getEasting(), 
 					pos.getNorthing(), pos.getElevation(), pos.getAzimuth(), pos.getSpeed(),
 					pos.getVehicleState(),pos.getType(),pos.getUserData());
-			writer.addVehicle(time, position);
+			this.writer.addVehicle(time, position);
 		}
 	}
 
@@ -269,7 +273,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
 			double vehLen = Math.min(	// the length of a vehicle in visualization
 					this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
-					this.effectiveCellSize / storageCapFactor); // a vehicle should not be larger than it's actual size
+					this.effectiveCellSize / this.storageCapFactor); // a vehicle should not be larger than it's actual size
 
 			// put all cars in the buffer one after the other
 			for (EventAgent agent : this.buffer) {
@@ -469,6 +473,11 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 		public double getPosInLink_m() {
 			return this.linkPosition;
 		}
+	}
+
+	public void setVisOutputSample(double visOutputSample) {
+		this.visOutputMod = 1/visOutputSample;
+		
 	}
 
 }

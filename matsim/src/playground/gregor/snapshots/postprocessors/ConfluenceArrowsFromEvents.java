@@ -1,10 +1,11 @@
-package playground.gregor.otf;
+package playground.gregor.snapshots.postprocessors;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
@@ -12,12 +13,15 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.gregor.otf.SimpleBackgroundTextureDrawer;
+
 public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 
-
-	private Map<Node,NodeInfo> infos = new HashMap<Node,NodeInfo>();
-	private SimpleBackgroundTextureDrawer sbg;
-	private Network network;
+	protected static final double PI_HALF = Math.PI/2;
+	protected static final double TWO_PI = 2 * Math.PI;
+	protected final Map<Node,NodeInfo> infos = new HashMap<Node,NodeInfo>();
+	protected final SimpleBackgroundTextureDrawer sbg;
+	private final Network network;
 	
 	public ConfluenceArrowsFromEvents(SimpleBackgroundTextureDrawer sbg, Network network) {
 		this.sbg = sbg;
@@ -34,6 +38,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 		NodeInfo ni = this.infos.get(l.getFromNode());
 		if (ni == null) {
 			ni = new NodeInfo();
+			ni.node = l.getFromNode();
 			this.infos.put(l.getFromNode(), ni);
 		}
 		ni.outLinks.add(l);
@@ -62,8 +67,26 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 				} else {
 					angle = 2*Math.PI - Math.acos(cangle);
 				}
+				double theta = 0.0;
+				double dx = f.getX() - t.getX();
+				double dy = f.getY() - t.getY();
+				if (dx > 0) {
+					theta = Math.atan(dy/dx);
+				} else if (dx < 0) {
+					theta = Math.PI + Math.atan(dy/dx);
+				} else { // i.e. DX==0
+					if (dy > 0) {
+						theta = PI_HALF;
+					} else {
+						theta = -PI_HALF;
+					}
+				}
+				if (theta < 0.0) theta += TWO_PI;
 				
-				this.sbg.addLocation(l.getCoord(), angle, 2*l.getLength()/3);
+				Coord c = new CoordImpl(l.getCoord().getX() + Math.sin(theta) * 10,l.getCoord().getY() - Math.cos(theta)*10);
+				
+				double effLinkLength = Math.min(l.getLength(),100);
+				this.sbg.addLocation(c, angle, 2*effLinkLength/3);
 				
 			}
 			
@@ -73,7 +96,8 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	}
 	
 	
-	private static class NodeInfo {
+	static class NodeInfo {
 		Set<Link> outLinks = new HashSet<Link>();
+		Node node;
 	}
 }

@@ -13,15 +13,15 @@ import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.MY_STATIC_STUFF;
-import playground.gregor.otf.ConfluenceArrowsFromEvents;
 import playground.gregor.otf.SimpleBackgroundTextureDrawer;
+import playground.gregor.snapshots.postprocessors.ConfluenceArrowsFromEvents;
 import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
 import playground.gregor.snapshots.postprocessors.EvacuationLinksTeleporter;
 import playground.gregor.snapshots.postprocessors.TimeDependentColorizer;
+import playground.gregor.snapshots.postprocessors.WrongDirectionArrowsFromEvents;
 import playground.gregor.snapshots.writers.LineStringTree;
 import playground.gregor.snapshots.writers.MVISnapshotWriter;
 import playground.gregor.snapshots.writers.PositionInfo;
@@ -31,8 +31,23 @@ public class OTFSnapshotGenerator {
 
 	private final static String lsFile = "../../../workspace/vsp-cvs/studies/padang/gis/network_v20080618/d_ls.shp";
 
-	private Scenario scenario;
-	private String eventsFile;
+	private final static double VIS_OUTPUT_SAMPLE = 1.;
+	
+	private final Scenario scenario;
+	private final String eventsFile;
+	
+	public OTFSnapshotGenerator() {
+		
+		ScenarioLoader sl = new ScenarioLoader("../../outputs/output/output_config.xml.gz");
+		
+		this.scenario = sl.getScenario();
+		this.scenario.getConfig().network().setInputFile("../../outputs/output/output_network.xml.gz");
+		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
+		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
+		int it = this.scenario.getConfig().controler().getLastIteration();
+		sl.loadNetwork();
+		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz"; 
+	}
 
 	public OTFSnapshotGenerator(String[] args) {
 		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + args[1] + "/" + args[1] + ".events.txt.gz"; 
@@ -54,19 +69,30 @@ public class OTFSnapshotGenerator {
 		
 		SimpleBackgroundTextureDrawer sbg = new SimpleBackgroundTextureDrawer("./res/arrow.png");
 		ConfluenceArrowsFromEvents c = new ConfluenceArrowsFromEvents(sbg,this.scenario.getNetwork());
+		
+		SimpleBackgroundTextureDrawer sbgII = new SimpleBackgroundTextureDrawer("./res/arrow.png");
+		SimpleBackgroundTextureDrawer sbgIII = new SimpleBackgroundTextureDrawer("./res/blocked.png");
+		WrongDirectionArrowsFromEvents w = new WrongDirectionArrowsFromEvents(sbgII,sbgIII,this.scenario.getNetwork());
+		
 		ev.addHandler(c);
+		ev.addHandler(w);
 		new EventsReaderTXTv1(ev).readFile(this.eventsFile);
 		ev.removeHandler(d);
 		ev.removeHandler(t);
 		ev.removeHandler(c);
+		ev.removeHandler(w);
 		c.createArrows();
+		w.createArrows();
 		
 		PositionInfo.lsTree = new LineStringTree(getFeatures(),(NetworkLayer) this.scenario.getNetwork());
 		
 		MVISnapshotWriter writer = new MVISnapshotWriter(this.scenario);
-		writer.setSimpleBackgroundTextureDrawer(sbg);
+		writer.addSimpleBackgroundTextureDrawer(sbg);
+		writer.addSimpleBackgroundTextureDrawer(sbgII);
+		writer.addSimpleBackgroundTextureDrawer(sbgIII);
 		
 		SnapshotGenerator sg = new SnapshotGenerator(this.scenario,writer);
+		sg.setVisOutputSample(VIS_OUTPUT_SAMPLE);
 		ev.addHandler(sg);
 		sg.addColorizer(d);
 		sg.addColorizer(e);
@@ -101,6 +127,7 @@ public class OTFSnapshotGenerator {
 
 	public static void main(String [] args) {
 
-		new OTFSnapshotGenerator(args).run();
+		new OTFSnapshotGenerator().run();
 	}
 }
+

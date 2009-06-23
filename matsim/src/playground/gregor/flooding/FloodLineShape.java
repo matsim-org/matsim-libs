@@ -93,9 +93,9 @@ public class FloodLineShape {
 	}
 
 	public static void main(String[] args) {
-		// String netcdf = "../../inputs/flooding/flooding_old.sww";
-		String netcdf = "test/input/playground/gregor/data/flooding.sww";
-		String output = "./plans/floodLineSmall.shp";
+		 String netcdf = "../../inputs/flooding/flooding_old.sww";
+//		String netcdf = "test/input/playground/gregor/data/flooding.sww";
+		String output = "./floodLine.shp";
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("WGS84_UTM47S");
 		FloodLineShape fls = new FloodLineShape(netcdf, output);

@@ -21,12 +21,15 @@
 package playground.gregor.snapshots.writers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -41,6 +44,7 @@ import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
 import playground.gregor.otf.Dummy;
 import playground.gregor.otf.InundationDataFromBinaryFileReader;
+import playground.gregor.otf.InundationDataFromNetcdfReader;
 import playground.gregor.otf.InundationDataReader;
 import playground.gregor.otf.InundationDataWriter;
 import playground.gregor.otf.PolygonDataReader;
@@ -68,13 +72,13 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	final String LINKS_FILE = "../../inputs/gis/links.shp";
 	final String NODES_FILE = "../../inputs/gis/nodes.shp";
 	final String REGION_FILE =  "../../inputs/gis/region.shp";
-	final private static float [] regionColor = new float [] {.87f,.92f,.87f,1.f};
+	final private static float [] regionColor = new float [] {.9f,.92f,.82f,1.f};
 	final private static float [] buildingsColor = new float [] {1.f,.5f,.0f,.8f};
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	private boolean insertWave = true;
+	private final boolean insertWave = true;
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, net, outFileName);
@@ -91,20 +95,24 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	@Override
 	protected void onAdditionalQuadData(OTFConnectionManager connect) {
 		this.quad.addAdditionalElement(this.writer);
-		if (insertWave ) this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
+		if (this.insertWave ){
+			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
+//			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReader(OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast).createData()));
+		}
 		
 		try {
-			this.quad.addAdditionalElement(new PolygonDataWriterII(ShapeFileReader.readDataFile(REGION_FILE),regionColor));
+			this.quad.addAdditionalElement(new PolygonDataWriterII(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
 			this.quad.addAdditionalElement(new TileDrawerDataWriter());
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(LINKS_FILE),linksColor));
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(NODES_FILE),nodesColor));
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(BUILDINGS_FILE),buildingsColor));
+			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.LINKS_FILE),linksColor));
+			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.NODES_FILE),nodesColor));
+			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.BUILDINGS_FILE),buildingsColor));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-//		this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReader(OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast).createData()));
-		this.quad.addAdditionalElement(new TextureDataWriter(this.sbg));
+		for (SimpleBackgroundTextureDrawer sbg : this.sbgs){
+			this.quad.addAdditionalElement(new TextureDataWriter(sbg));
+		}
 		connect.add(PolygonDataWriterII.class,PolygonDataReaderII.class);
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
@@ -126,7 +134,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		//		connect.add(InundationDataReader.class,Dummy.class);
 		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
 		connect.add(TextureDataWriter.class,TextutreDataReader.class);
-		if (insertWave) {
+		if (this.insertWave) {
 			connect.add(InundationDataWriter.class,InundationDataReader.class);
 			connect.add(InundationDataReader.class,Dummy.class);
 		}
@@ -164,7 +172,8 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	private int cntPositions=0;
 	private double lastTime=-1;
 	private int cntTimesteps=0;
-	private SimpleBackgroundTextureDrawer sbg;
+//	private SimpleBackgroundTextureDrawer sbg;
+	private final List<SimpleBackgroundTextureDrawer> sbgs = new ArrayList<SimpleBackgroundTextureDrawer>();
 
 
 	public void addVehicle(final double time, final ExtendedPositionInfo position) {
@@ -199,8 +208,8 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		//		}
 	}
 
-	public void setSimpleBackgroundTextureDrawer(SimpleBackgroundTextureDrawer sbg) {
-		this.sbg = sbg;
+	public void addSimpleBackgroundTextureDrawer(SimpleBackgroundTextureDrawer sbg) {
+		this.sbgs.add(sbg);
 	}
 
 	@Override
