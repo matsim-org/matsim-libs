@@ -53,6 +53,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.config.PlanomatXConfigGroup;
 
 
@@ -75,6 +76,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private final PlanScorer 				scorer;
 	private static final Logger 			log = Logger.getLogger(PlanomatX18.class);
 	private final String					finalOpt;
+	private final ActivityTypeFinder 		finder;
 	
 	private final LegTravelTimeEstimator legTravelTimeEstimator;
 	private Knowledges knowledges;
@@ -86,14 +88,14 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public PlanomatX18 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc){
+	public PlanomatX18 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		this.legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(
 				controler.getTravelTimeCalculator(), 
 				tDepDelayCalc, 
 				this.router);
-				
+		this.finder 				= finder;	
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(PlanomatXConfigGroup.getNeighbourhoodSize());
 		/*Weighing whether changing the sequence of activities.*/
 		this.WEIGHT_CHANGE_ORDER	= Double.parseDouble(PlanomatXConfigGroup.getWeightChangeOrder());
@@ -160,8 +162,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
-		ArrayList<ActivityOptionImpl> primActs					= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true);
-		ArrayList<ActivityOption> actTypes					= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities();
+		ArrayList<ActivityOptionImpl> primActs			= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true);
+		//ArrayList<ActivityOption> actTypes			= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities();
+		List<String> actTypes							= this.finder.getActTypes(plan.getPerson());
+		log.warn("Länge actTypes = "+actTypes.size());
+		
 		
 		/*
 		double [] xs;
@@ -453,7 +458,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 	
 	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[][]infoOnNeighbourhood, 
-			ArrayList<ActivityOption> actTypes, ArrayList primActs) {
+			List<String> actTypes, ArrayList primActs) {
 		
 		if (neighbourhood[0].getPlanElements().size()>=5){
 			int neighbourPos;
@@ -526,7 +531,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	public int[] changeNumber (PlanomatXPlan basePlan, int [] positions, int [] actsToBeAdded, 
-			ArrayList<ActivityOption> actTypes, ArrayList<ActivityOption> primActs){
+			List<String> actTypes, ArrayList<ActivityOption> primActs){
 				
 		//if(MatsimRandom.getRandom().nextDouble()>=weight){
 		if(MatsimRandom.getRandom().nextDouble()>=WEIGHT_INC_NUMBER){
@@ -614,7 +619,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	
-	private int[] changeNumberShortPlan (PlanomatXPlan basePlan, int []position, int [] actsToBeAdded, ArrayList<ActivityOption> actTypes){
+	private int[] changeNumberShortPlan (PlanomatXPlan basePlan, int []position, int [] actsToBeAdded, List<String> actTypes){
 		
 		if (position[0]==-1) return (new int[]{1,0,0});
 		if (basePlan.getPlanElements().size()==1){
@@ -663,7 +668,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	
 	public int[] changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged, 
-			ArrayList<ActivityOption> actTypes, ArrayList<ActivityOption> primActs){
+			List<String> actTypes, ArrayList<ActivityOption> primActs){
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NE
 		OuterLoop:
@@ -679,7 +684,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			String type;
 					
 			do {
-				type = actTypes.get(actsToBeChanged[position[0]]).getType();
+				type = actTypes.get(actsToBeChanged[position[0]]);
 				actsToBeChanged[position[0]]++;
 				if (actsToBeChanged[position[0]]>=actTypes.size()) actsToBeChanged[position[0]] = 0;
 			} while (type.equals(act.getType()));
@@ -888,7 +893,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	
 	/* Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)*/
-	private boolean insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<ActivityOption> actTypes){
+	private boolean insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, List<String> actTypes){
 		boolean HomeActInserted = false;
 		/*
 		List<PlanElement> actslegs = basePlan.getPlanElements();
@@ -901,7 +906,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0; //sets the pointer back to the first activity type
 		
 		if (position!=1){ // ensures that no duplicate activity chains are created
-			if (actTypes.get(actToBeAdded[position]).getType().equals(((Activity)(basePlan.getPlanElements().get(position*2-2))).getType().toString())){
+			if (actTypes.get(actToBeAdded[position]).equals(((Activity)(basePlan.getPlanElements().get(position*2-2))).getType().toString())){
 				if (actToBeAdded[position]+1>=actTypes.size()){
 					actToBeAdded[position] = 0;
 				}
@@ -912,7 +917,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 		List<PlanElement> actslegs = basePlan.getPlanElements();
 		Activity actHelp;
-		if (!(actTypes.get(actToBeAdded[position]).getType().equalsIgnoreCase("home"))){ // copy activity Before/behind the gap
+		if (!(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // copy activity Before/behind the gap
 		//	actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2)));
 			actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2-2)));
 			actHelp.setDuration(0);
@@ -926,7 +931,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 			HomeActInserted = true;
 		}
-		actHelp.setType(actTypes.get(actToBeAdded[position]).getType());
+		actHelp.setType(actTypes.get(actToBeAdded[position]));
 		actToBeAdded[position]++;
 		
 		Leg legHelp;

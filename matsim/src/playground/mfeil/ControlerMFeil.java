@@ -68,8 +68,10 @@ public class ControlerMFeil extends Controler {
 			PlanStrategy strategy = null;
 			
 			if (classname.equals("PlanomatX")) {
+				ActivityTypeFinder finder = new ActivityTypeFinder (this);
+				finder.run(this.getFacilities());
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatXStrategyModule = new PlanomatX12Initialiser(this);
+				PlanStrategyModule planomatXStrategyModule = new PlanomatX12Initialiser(this, finder);
 				strategy.addStrategyModule(planomatXStrategyModule);
 			}
 			else if  (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
@@ -89,9 +91,11 @@ public class ControlerMFeil extends Controler {
 				PlanStrategyModule timeOptStrategyModule = new TimeOptInitialiser(this);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}
-			else if (classname.equals("Clustering")) {
+			else if (classname.equals("Recycling")) {
+				ActivityTypeFinder finder = new ActivityTypeFinder (this);
+				finder.run(this.getFacilities());
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule module = new RecyclingModule1(this);
+				PlanStrategyModule module = new RecyclingModule1(this, finder);
 				strategy.addStrategyModule(module);
 			}
 			

@@ -23,11 +23,15 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.PlanScorer;
@@ -53,6 +57,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, age, sex, license, car_avail, employed;
 	
+	
 	public AgentsAssigner1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc,
 			LocationMutatorwChoiceSet locator, PlanScorer scorer, RecyclingModule recyclingModule,
 			double minimumTime, DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
@@ -76,6 +81,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			if (this.coefficients.getNamesOfCoef().get(i).equals("car_avail")) this.car_avail="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("employed")) this.employed="yes";			
 		}
+		
 	}
 	
 	
@@ -224,14 +230,6 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		}
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
-		// TODO check this with Konrad or someone who knows the router
-		if (Gbl.getConfig().planomat().getPossibleModes().size()>0){
-			for (int z=1;z<plan.getPlanElements().size();z+=2){
-				//((Leg)(plan.getActsLegs().get(z))).setMode(Gbl.getConfig().planomat().getPossibleModes()[y]);
-				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
-			}
-		}
-		this.router.run(plan);
 		this.timer.run(plan);  // includes to write the new score to the plan
 		
 		if (Statistics.prt==true) {
@@ -244,6 +242,59 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			}
 			Statistics.list.add(prt);	
 		}	
-	}	
+	}
+	
+	
+	protected void writePlan (Plan in, Plan out){
+		Plan bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
+		bestPlan.copyPlan(in);
+		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
+		
+		// NEW NEW NEW NEW NEW NEW NEW
+		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(this.knowledges.getKnowledgesByPersonId().get(out.getPerson().getId()).getActivities(true));
+		
+		for (int i=2;i<bestPlan.getPlanElements().size()-2;i+=2){
+			if (!primActs.isEmpty()){
+				for (int j=0;j<primActs.size();j++){
+					if (((Activity)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
+						ActivityFacility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
+						((Activity)(bestPlan.getPlanElements().get(i))).setFacility(fac);
+						// not only update of fac required but also coord and link; data inconsistencies otherwise
+						((Activity)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());
+						((Activity)(bestPlan.getPlanElements().get(i))).setLink(fac.getLink());
+						if (!primActs.get(j).getType().toString().equals("home")) primActs.remove(j);
+						break;
+					}
+				}
+			}
+		}
+		
+		if(al.size()>bestPlan.getPlanElements().size()){ 
+			int i;
+			for (i = 2; i<bestPlan.getPlanElements().size()-2;i++){
+				al.remove(i);
+				al.add(i, bestPlan.getPlanElements().get(i));	
+			}
+			for (int j = i; j<al.size()-2;j=j+0){
+				al.remove(j);
+			}
+		}
+		else if(al.size()<bestPlan.getPlanElements().size()){
+			int i;
+			for (i = 2; i<al.size()-2;i++){
+				al.remove(i);
+				al.add(i, bestPlan.getPlanElements().get(i));	
+			}
+			for (int j = i; j<bestPlan.getPlanElements().size()-2;j++){			
+				al.add(j, bestPlan.getPlanElements().get(j));
+			}
+		}
+		else {
+			for (int i = 2; i<al.size()-2;i++){
+			al.remove(i);
+			al.add(i, bestPlan.getPlanElements().get(i));	
+			}
+		}
+	}
 }
 	

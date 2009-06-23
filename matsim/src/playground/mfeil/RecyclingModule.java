@@ -42,6 +42,8 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.mfeil.MDSAM.ActivityTypeFinder;
+
 /**
  * @author Matthias Feil
  * This is a module that individually optimizes a number (=this.testAgentsNumber) of agents
@@ -69,11 +71,12 @@ public class RecyclingModule implements PlanStrategyModule {
 	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
 	protected final NetworkLayer 						network;
 	public static PrintStream 					assignment;
-	protected Knowledges knowledges;
+	protected final Knowledges knowledges;
+	protected final ActivityTypeFinder finder;
 	
 	
 	
-	public RecyclingModule (ControlerMFeil controler){
+	public RecyclingModule (ControlerMFeil controler, ActivityTypeFinder finder){
 		this.controler=controler;
 		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges);
@@ -81,11 +84,11 @@ public class RecyclingModule implements PlanStrategyModule {
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
-	
+		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
 		this.timer					= new TimeModeChoicer1 (controler, this.tDepDelayCalc);
 		//this.timer					= new Planomat (this.estimator, controler.getScoringFunctionFactory());
-		this.schedulingModule 		= new PlanomatX12Initialiser(controler);
+		this.schedulingModule 		= new PlanomatX12Initialiser(controler, finder);
 		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.tDepDelayCalc, this.locator,
 			this.scorer, this, this.minimumTime, this.nonassignedAgents);
 		this.minimumTime			= 3600;	
@@ -93,6 +96,7 @@ public class RecyclingModule implements PlanStrategyModule {
 		this.criteria				= new String [2];
 		this.criteria [0]			= "distance";
 		this.criteria [1]			= "primacts";
+		this.finder					= finder;
 		
 		new Statistics();		
 		String outputfileOverview = Controler.getOutputFilename("assignment_log.xls");

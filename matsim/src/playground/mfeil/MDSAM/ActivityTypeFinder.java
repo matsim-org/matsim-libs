@@ -31,6 +31,11 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.population.Person;
+
+import playground.mfeil.config.PlanomatXConfigGroup;
 
 
 
@@ -44,8 +49,14 @@ import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
  */
 public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	
-	private List<String> actTypes = new ArrayList<String>();
+	private List<String> actTypes;
 	private static final Logger log = Logger.getLogger(ActivityTypeFinder.class);
+	private final Controler controler;
+	
+	public ActivityTypeFinder (Controler controler){
+		this.controler = controler;
+		this.actTypes = new ArrayList<String>();
+	}
 	
 	public void run (final ActivityFacilities facilities) {
 		for (ActivityFacility f : facilities.getFacilities().values()) {
@@ -64,6 +75,49 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	}
 	public List<String> getActTypes (){
 		return this.actTypes;
+	}
+	
+	public List<String> getActTypes (Person agent){
+		if (PlanomatXConfigGroup.getActTypes().equals("knowledge")){
+			return this.getKnActTypes(agent);
+		}
+		
+		else if (PlanomatXConfigGroup.getActTypes().equals("customized")){
+			List<String> agentKnActTypes = this.getKnActTypes(agent);
+			if (agent.getAge()<6){
+				return agentKnActTypes;
+			}
+			// remove invalid act types from overall list, unless in agent's knowledge
+			List<String> agentCuActTypes = new ArrayList<String>(this.actTypes);
+			if (agent.getAge()<18){
+				if (!agentKnActTypes.contains("education_kindergarten"))agentCuActTypes.remove("education_kindergarten");
+				if (!agentKnActTypes.contains("education_higher"))agentCuActTypes.remove("education_higher");
+				return agentCuActTypes;
+			}
+			// remove invalid act types from overall list, unless in agent's knowledge
+			else {
+				if (!agentKnActTypes.contains("education_kindergarten")) agentCuActTypes.remove("education_kindergarten");
+				if (!agentKnActTypes.contains("education_primary"))agentCuActTypes.remove("education_primary");
+				if (!agentKnActTypes.contains("education_secondary"))agentCuActTypes.remove("education_secondary");
+				return agentCuActTypes;
+			}
+		}
+		
+		else return this.actTypes;
+	}
+	
+	private List<String> getKnActTypes (Person agent){
+		// get act options of agent
+		Collection<ActivityOption> agentActOptions = ((ScenarioImpl)(this.controler.getScenarioData())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
+		// convert them into act types
+		List<String> agentActTypes = new ArrayList<String>();
+		for (Iterator<ActivityOption> iterator = agentActOptions.iterator();iterator.hasNext();){
+			ActivityOption act = iterator.next();
+			if (!agentActTypes.contains(act.getType())){
+				agentActTypes.add(act.getType());
+			}
+		}
+		return agentActTypes;
 	}
 	
 }

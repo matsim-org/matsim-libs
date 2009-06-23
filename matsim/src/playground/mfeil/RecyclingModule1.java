@@ -31,6 +31,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
+import playground.mfeil.MDSAM.ActivityTypeFinder;
+
 
 /**
  * @author Matthias Feil
@@ -49,8 +51,8 @@ public class RecyclingModule1 extends RecyclingModule implements PlanStrategyMod
 	private ArrayList<Integer> list1Pointer; 
 	private static final Logger log = Logger.getLogger(RecyclingModule1.class);
 	                      
-	public RecyclingModule1 (ControlerMFeil controler) {
-		super(controler);
+	public RecyclingModule1 (ControlerMFeil controler, ActivityTypeFinder finder) {
+		super(controler, finder);
 		this.iterations 			= 20;
 		this.noOfAgents				= 10;
 		this.primActsDistance 		= "yes";

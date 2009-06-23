@@ -41,6 +41,7 @@ public class PlanomatXConfigGroup extends Module {
 	private static final String FINAL_TIMER = "final_timer";
 	private static final String LC_MODE = "lc_mode";
 	private static final String LC_SET_SIZE = "lc_set_size";
+	private static final String ACT_TYPES = "act_types";
 	
 	//default values
 	// TODO all "static" to be removed later, only bypassing solution
@@ -52,7 +53,8 @@ public class PlanomatXConfigGroup extends Module {
 	private static String timer = "TimeModeChoicer";
 	private static String final_timer = "none";
 	private static String lc_mode = "reducedLC";
-	private static String lc_set_size = "1";
+	private static String lc_set_size = "5";
+	private static String act_types = "customized";
 	
 	private final static Logger log = Logger.getLogger(PlanomatXConfigGroup.class);
 	
@@ -89,6 +91,9 @@ public class PlanomatXConfigGroup extends Module {
 		}
 		if (LC_SET_SIZE.equals(key)) {
 			return getLCSetSize();
+		}
+		if (ACT_TYPES.equals(key)) {
+			return getActTypes();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -177,6 +182,14 @@ public class PlanomatXConfigGroup extends Module {
 				setLCSetSize(value);
 			}
 			
+		} else if (ACT_TYPES.equals(key)) {
+			if (value.equals("knowledge") || value.equals("all") || value.equals("customized")) {
+				setActTypes(value);
+			}
+			else {
+				log.warn(value+" is no valid ACT_TYPES parameter. \"All\" activity types will be used instead.");
+			}
+			
 		} else throw new IllegalArgumentException(key);
 	}
 	
@@ -192,6 +205,7 @@ public class PlanomatXConfigGroup extends Module {
 		this.addParameterToMap(map, FINAL_TIMER);
 		this.addParameterToMap(map, LC_MODE);
 		this.addParameterToMap(map, LC_SET_SIZE);
+		this.addParameterToMap(map, ACT_TYPES);
 		return map;
 	}
 	
@@ -249,5 +263,11 @@ public class PlanomatXConfigGroup extends Module {
 	}
 	public void setLCSetSize(String size) {
 		this.lc_set_size = size;
+	}
+	public static String getActTypes() {
+		return act_types;
+	}
+	public void setActTypes(String size) {
+		this.act_types = size;
 	}
 }

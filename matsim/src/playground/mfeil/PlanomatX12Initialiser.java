@@ -29,6 +29,8 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.mfeil.MDSAM.ActivityTypeFinder;
+
 
 
 /**
@@ -44,10 +46,10 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 	private final PreProcessLandmarks				preProcessRoutingData;
 	private final LocationMutatorwChoiceSet 		locator;
 	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
-
+	private final ActivityTypeFinder 				finder;
 	
 	
-	public PlanomatX12Initialiser (final ControlerMFeil controler) {
+	public PlanomatX12Initialiser (final ControlerMFeil controler, ActivityTypeFinder finder) {
 		
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
@@ -58,17 +60,19 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
+		this.finder = finder;
 	}
 	
 	public PlanomatX12Initialiser (final ControlerMFeil controler, 
 			final PreProcessLandmarks preProcessRoutingData,
-			final LocationMutatorwChoiceSet locator) {
+			final LocationMutatorwChoiceSet locator, ActivityTypeFinder finder) {
 		
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);
 		this.preProcessRoutingData = preProcessRoutingData;	
 		this.locator = locator;
+		this.finder = finder;
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -79,7 +83,7 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm planomatXAlgorithm;
-		planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, this.locator, this.tDepDelayCalc);
+		planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, this.locator, this.tDepDelayCalc, this.finder);
 		return planomatXAlgorithm;
 	}
 	
