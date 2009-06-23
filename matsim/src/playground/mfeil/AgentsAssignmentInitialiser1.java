@@ -20,10 +20,12 @@
 package playground.mfeil;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import java.util.LinkedList;
 
 
@@ -33,26 +35,45 @@ import java.util.LinkedList;
  * Initializes the agentsAssigner.
  */
 
-public class AgentsAssignmentInitialiser1 extends AgentsAssignmentInitialiser {
+public class AgentsAssignmentInitialiser1 extends AbstractMultithreadedModule {
 	
-	private final DistanceCoefficients distanceCoefficients;
+	protected final NetworkLayer 					network;
+	protected final Controler						controler;
+	protected final LocationMutatorwChoiceSet 		locator;
+	protected final PlanScorer 						scorer;
+	protected final RecyclingModule1				module;
+	protected final double							minimumTime;
+	protected LinkedList<String>					nonassignedAgents;
+	protected final DepartureDelayAverageCalculator 	tDepDelayCalc;
+	
+	private final DistanceCoefficients 				distanceCoefficients;
 
 		
 	public AgentsAssignmentInitialiser1 (final Controler controler, 
 			final DepartureDelayAverageCalculator 	tDepDelayCalc,
 			final LocationMutatorwChoiceSet locator,
 			final PlanScorer scorer,
-			final RecyclingModule module, 
+			final RecyclingModule1 module, 
 			final double minimumTime,
 			final DistanceCoefficients distanceCoefficients,
 			LinkedList<String> nonassignedAgents) {
 		
-		super (controler, tDepDelayCalc, locator, scorer,
-				module, minimumTime, nonassignedAgents);
+		this.network = controler.getNetwork();
+		this.controler = controler;
+		this.init(network);	
+		this.locator = locator;
+		this.scorer = scorer;
+		this.module = module;
+		this.minimumTime = minimumTime;
+		this.nonassignedAgents = nonassignedAgents;
+		this.tDepDelayCalc = tDepDelayCalc;
+		
 		this.distanceCoefficients = distanceCoefficients;
 	}
 	
-
+	private void init(final NetworkLayer network) {
+		this.network.connect();
+	}
 
 	
 	@Override

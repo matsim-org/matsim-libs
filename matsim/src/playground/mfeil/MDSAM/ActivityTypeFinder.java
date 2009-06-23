@@ -87,14 +87,16 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 			if (agent.getAge()<6){
 				return agentKnActTypes;
 			}
-			// remove invalid act types from overall list, unless in agent's knowledge
+			// remove defined act types from overall list, unless in agent's knowledge
 			List<String> agentCuActTypes = new ArrayList<String>(this.actTypes);
 			if (agent.getAge()<18){
 				if (!agentKnActTypes.contains("education_kindergarten"))agentCuActTypes.remove("education_kindergarten");
 				if (!agentKnActTypes.contains("education_higher"))agentCuActTypes.remove("education_higher");
+				if (!agentKnActTypes.contains("work_sector2"))agentCuActTypes.remove("work_sector2");
+				if (!agentKnActTypes.contains("work_sector3"))agentCuActTypes.remove("work_sector3");
 				return agentCuActTypes;
 			}
-			// remove invalid act types from overall list, unless in agent's knowledge
+			// remove defined act types from overall list, unless in agent's knowledge
 			else {
 				if (!agentKnActTypes.contains("education_kindergarten")) agentCuActTypes.remove("education_kindergarten");
 				if (!agentKnActTypes.contains("education_primary"))agentCuActTypes.remove("education_primary");

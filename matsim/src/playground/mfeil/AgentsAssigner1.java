@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.population.Activity;
@@ -33,12 +34,15 @@ import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 
 /**
@@ -47,23 +51,45 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * (= non-optimized agent copies the plan of the most similar optimized agent).
  */
 
-public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{ 
+public class AgentsAssigner1 implements PlanAlgorithm{ 
 	
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
+	protected final Controler					controler;
+	protected final PlanAlgorithm 				timer;
+	protected final LocationMutatorwChoiceSet 	locator;
+	protected final RecyclingModule1			module;
+	protected final double						minimumTime;
+	protected LinkedList<String>				nonassignedAgents;
+	protected Knowledges 						knowledges;
+	protected static final Logger 				log = Logger.getLogger(AgentsAssigner1.class);
+		
+	
 	private final DistanceCoefficients coefficients;
 	private String primActsDistance, homeLocation, age, sex, license, car_avail, employed;
 	
 	
-	public AgentsAssigner1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc,
-			LocationMutatorwChoiceSet locator, PlanScorer scorer, RecyclingModule recyclingModule,
+	public AgentsAssigner1 (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
+			LocationMutatorwChoiceSet locator, PlanScorer scorer, RecyclingModule1 recyclingModule,
 			double minimumTime, DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 		
-		super(controler, tDepDelayCalc, locator, scorer,
-				recyclingModule, minimumTime, nonassignedAgents);
+		this.controler				= controler;
+		PlansCalcRoute router 		= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		LegTravelTimeEstimator legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(
+				controler.getTravelTimeCalculator(), 
+				tDepDelayCalc, 
+				router);
+		this.timer					= new TimeModeChoicer1(this.controler, legTravelTimeEstimator, scorer);
+		this.locator 				= locator;
+		this.module					= recyclingModule;
+		this.minimumTime			= minimumTime;
+		this.nonassignedAgents		= nonassignedAgents;
+		//this.cleaner				= new ScheduleCleaner(legTravelTimeEstimator, this.minimumTime);
+		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		
 		this.coefficients = coefficients;
 		this.primActsDistance	="no";
 		this.homeLocation		="no";
@@ -90,7 +116,6 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
-	@Override
 	public void run (Plan plan){
 		
 		OptimizedAgents agents = this.module.getOptimizedAgents();
@@ -172,7 +197,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			// Employment status
 			if (this.employed=="yes"){
 				try{
-					if (!plan.getPerson().getEmployed().equals(agents.getAgentPerson(j).getEmployed())) continue optimizedAgentsLoop;
+					if (!plan.getPerson().isEmployed().equals(agents.getAgentPerson(j).isEmployed())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e){
 					Statistics.noEmploymentAssignment = true;
