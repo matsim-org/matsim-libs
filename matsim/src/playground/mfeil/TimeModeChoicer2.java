@@ -72,6 +72,8 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		this.STOP_CRITERION			= 5;	
 	}
 
+	
+	// TODO: this is bad programming style... needs to be improved!
 	public void run (Plan basePlan){
 		
 		/*Do nothing if the plan has only one activity (=24h home)*/
