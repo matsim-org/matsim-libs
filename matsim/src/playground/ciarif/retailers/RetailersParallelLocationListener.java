@@ -197,7 +197,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
+		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) { //TODO check if it is really necessary to iterate on facilities or if it should be done on persons as in the sequential case (see relevant class) 
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }

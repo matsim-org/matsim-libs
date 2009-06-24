@@ -130,7 +130,6 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			}
 		}
 		Collection<Person> persons = controler.getPopulation().getPersons().values();
-		 // TODO check if it works at runtime, otherwise try to initialize the object differently
 		int n =2; // TODO: get this from the config file  
 		System.out.println("Number of retail zones = "+  n*n);
 		double minx = Double.POSITIVE_INFINITY;
@@ -139,15 +138,17 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		double maxy = Double.NEGATIVE_INFINITY;
 		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
-			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
 				this.shops.add(f);
 				System.out.println("The shop " + f.getId() + "has been added to the file 'shops'");
 			}
 			else {System.out.println ("Activity options are: " + f.getActivityOptions().values().toString());}
+		}
+		for (Person p : persons) {
+			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
+			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() < miny) { miny = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
+			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() > maxx) { maxx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
+			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() > maxy) { maxy = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 
@@ -175,42 +176,58 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		// TODO Auto-generated method stub
 		Controler controler = event.getControler();
-		// TODO use a double ""for" cycle in order to avoid to use the getIteration method
+		// TODO could try to use a double ""for" cycle in order to avoid to use the getIteration method
 		// the first is 0...n where n is the number of times the gravity model needs to 
 		// be computed, the second is 0...k, where k is the number of iterations needed 
 		// in order to obtain a relaxed state, or maybe use a while.
 		//int iter = controler.getIteration();
 		//if (controler.getIteration()>0 & controler.getIteration()%5==0){
-		if (controler.getIteration()%5==0){
-			log.info("matrix dimensions, columns (zones) = " + this.retailZones.getRetailZones().values().size());
-			log.info("matrix dimensions, rows (shops) = " + shops.size());
-			DenseDoubleMatrix2D prob_i_j = new DenseDoubleMatrix2D (shops.size() , this.retailZones.getRetailZones().values().size());
-			DenseDoubleMatrix1D avg_prob_i = new DenseDoubleMatrix1D (this.retailZones.getRetailZones().values().size());
+		if (controler.getIteration()%5==0 && controler.getIteration()>0){
+			
+			log.info("matrix dimensions, rows (zones) = " + this.retailZones.getRetailZones().values().size());
+			log.info("matrix dimensions, columns (shops) = " + shops.size());
+			DenseDoubleMatrix2D prob_i_j = new DenseDoubleMatrix2D (this.retailZones.getRetailZones().values().size(),shops.size());
+			DenseDoubleMatrix1D avg_prob_i = new DenseDoubleMatrix1D (shops.size());
+			int j=0;
 			for (ActivityFacility f:shops) {
-				int counter = 0;
-				for (RetailZone rz : this.retailZones.getRetailZones().values()) { 
-				Collection<Person> persons = new ArrayList<Person> ();
-				rz.getPersonsQuadTree().get(rz.getPersonsQuadTree().getMinEasting(),rz.getPersonsQuadTree().getMinNorthing(), rz.getPersonsQuadTree().getMaxEasting(), rz.getPersonsQuadTree().getMaxNorthing(), persons );
+				double sum_prob =0;
+				double  zone_numb =0;
+				for (RetailZone rz : this.retailZones.getRetailZones().values()) {
+					double counter = 0;
+					double prob = 0;
+					Collection<Person> persons = new ArrayList<Person> ();
+					rz.getPersonsQuadTree().get(rz.getPersonsQuadTree().getMinEasting(),rz.getPersonsQuadTree().getMinNorthing(), rz.getPersonsQuadTree().getMaxEasting(), rz.getPersonsQuadTree().getMaxNorthing(), persons );
 					for (Person p:persons) {
+						//if (rz.getPersonsQuadTree().values().contains(p))
 						for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
 							if (pe2 instanceof Activity) {
 								Activity act = (Activity) pe2;
 								if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
 									counter++;
-									// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
-									//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 
+									log.info("The number of shop activities in the shop " + f.getId() + " is " + counter);
 								}
 							}
 						}
 					}
-					double prob = counter/persons.size();
-					int i = Integer.parseInt(f.getId().toString()); // TODO check the correspondence between Id's and columns/rows of the prob_i_j matrix
-					int j =Integer.parseInt(rz.getId().toString());
-					prob_i_j.set(i,j, prob);
-					log.info("prob_i_j = " + prob_i_j.get(i,j));
+					if (persons.size()>0) {
+						log.info("counter = " + counter);
+						log.info("persons = " + ((Integer)persons.size()).doubleValue());
+						int i =Integer.parseInt(rz.getId().toString());
+						prob = counter/persons.size();
+						prob_i_j.set(i,j,prob);
+						log.info("prob (" + i + "," + j + ") = " + prob_i_j.get(i,j));
+						sum_prob = sum_prob+prob;
+						zone_numb++;
+						
+					}
+					else {} // TODO Throw an error, it is not possible that a zone hasn't inhabitants since they are constructed depending on 
+					// max/min coordinates of inhabitants' home location
 				}
+				avg_prob_i.set(j, sum_prob/zone_numb);
+				log.info("avg_prob_i = " + avg_prob_i.get(j));
+				log.info("number of zones = " + zone_numb);
+				j=j+1; //Integer.parseInt(f.getId().toString());
 			}	
 		}
 	}
