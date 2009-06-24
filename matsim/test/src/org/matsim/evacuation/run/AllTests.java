@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.evacuation;
+package org.matsim.evacuation.run;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,13 +26,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.evacuation");
-		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.evacuation.base.AllTests.suite());
-		suite.addTest(org.matsim.evacuation.riskaversion.AllTests.suite());
-		suite.addTest(org.matsim.evacuation.run.AllTests.suite());
-		suite.addTest(org.matsim.evacuation.socialcost.AllTests.suite());
-		//$JUnit-END$
+		TestSuite suite = new TestSuite("Tests for org.matsim.evacuation.run");
+
+		suite.addTestSuite(MarginalRiskCostControllerTest.class);
+
 		return suite;
 	}
 

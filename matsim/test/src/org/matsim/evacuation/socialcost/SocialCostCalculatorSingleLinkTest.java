@@ -1,15 +1,12 @@
 package org.matsim.evacuation.socialcost;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;

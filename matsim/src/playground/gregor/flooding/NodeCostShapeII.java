@@ -38,11 +38,10 @@ public class NodeCostShapeII {
 		this.output = output;
 	}
 
-	private void run() {
+	public void run() {
 		initFeatures();
 		this.targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		NodeRiskCostsFromNetcdf nc = new NodeRiskCostsFromNetcdf(this.network,
-				this.netcdf);
+		NodeRiskCostsFromNetcdf nc = new NodeRiskCostsFromNetcdf(this.netcdf);
 		Collection<Feature> fts = new ArrayList<Feature>();
 		for (Node n : this.network.getNodes().values()) {
 			double cost = nc.getNodeRiskCost(n);

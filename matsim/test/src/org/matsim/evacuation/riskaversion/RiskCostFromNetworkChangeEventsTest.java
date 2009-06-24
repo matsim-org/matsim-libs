@@ -33,14 +33,11 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.evacuation.riskaversion.RiskCostFromNetworkChangeEvents;
-import org.matsim.evacuation.run.RiskCostController;
 import org.matsim.testcases.MatsimTestCase;
 
 
 
-public class RiskCostControllerTest extends MatsimTestCase{
+public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
 	
 
 	
@@ -99,11 +96,11 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		net.setNetworkChangeEvents(nc);
 		
 		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,false);
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l0, 0.));
-		assertEquals("Risk cost:" , 107400. * 10., rcc.getLinkRisk(l1, 0.));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l2, 0.));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3, 0.));
-		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l4, 0.));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l0));
+		assertEquals("Risk cost:" , 107400. * 10., rcc.getLinkRisk(l1));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l2));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3));
+		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l4));
 		
 	}
 	
@@ -164,21 +161,13 @@ public class RiskCostControllerTest extends MatsimTestCase{
 		
 		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,true);
 		
-		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l0, 0.));
-		assertEquals("Risk cost:" , 107400. * 3.5, rcc.getLinkRisk(l1, 0.));
-		assertEquals("Risk cost:" , 107400. * 4.5, rcc.getLinkRisk(l2, 0.));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3, 0.));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l4, 0.));
-		assertEquals("Risk cost:" , 106800. * 5.5, rcc.getLinkRisk(l5, 0.));
+		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l0));
+		assertEquals("Risk cost:" , 107400. * 3.5, rcc.getLinkRisk(l1));
+		assertEquals("Risk cost:" , 107400. * 4.5, rcc.getLinkRisk(l2));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l4));
+		assertEquals("Risk cost:" , 106800. * 5.5, rcc.getLinkRisk(l5));
 		
 	}
 	
-	public void testSimpleChecksum() {
-		
-		String config = getInputDirectory() + "config.xml";
-		String ref = getInputDirectory() + "events.txt.gz";
-		String compare = getOutputDirectory() + "ITERS/it.10/10.events.txt.gz";
-		new RiskCostController(new String [] {config}).run();
-		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(ref),	CRCChecksum.getCRCFromFile(compare));
-	}
 }

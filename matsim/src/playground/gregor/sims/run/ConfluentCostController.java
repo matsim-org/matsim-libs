@@ -11,8 +11,9 @@ import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
 import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.flooding.FloodingReader;
-import org.matsim.evacuation.flooding.RiskCostFromFloodingData;
 import org.matsim.evacuation.riskaversion.RiskCostCalculator;
+import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
+import org.matsim.evacuation.riskaversion.RiskCostFromFloodingDataTest;
 
 import playground.gregor.sims.confluent.LinkPenalty;
 import playground.gregor.sims.confluent.LinkPenaltyCalculatorII;
@@ -40,7 +41,7 @@ public class ConfluentCostController extends Controler {
 
 		FloodingReader fr  = new FloodingReader(netcdf);
 		
-		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr);
+		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents());
 		
 		
 		this.travelCostCalculator = new RiskAverseCostCalculator(this.travelTimeCalculator,lpc,rc); 

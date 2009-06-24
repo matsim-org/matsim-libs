@@ -28,7 +28,9 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.evacuation.riskaversion");
 
-		suite.addTestSuite(RiskCostControllerTest.class);
+		suite.addTestSuite(RiskCostFromFloodingDataTest.class);
+		suite.addTestSuite(RiskCostFromNetworkChangeEventsTest.class);
+		
 
 		return suite;
 	}

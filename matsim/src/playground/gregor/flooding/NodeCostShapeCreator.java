@@ -38,7 +38,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.evacuation.flooding.RiskCostFromFloodingData.LinkInfo;
+import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData.LinkInfo;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -72,9 +72,9 @@ public class NodeCostShapeCreator {
 	private void writeFeatures() {
 		try {
 			ShapeFileWriter
-					.writeGeometries(this.features, "plans/linkCost.shp");
+					.writeGeometries(this.features, "../../tmp/linkCost.shp");
 			ShapeFileWriter.writeGeometries(this.pointFeatures,
-					"plans/linkCostDirection.shp");
+					"../../tmp/linkCostDirection.shp");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

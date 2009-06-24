@@ -8,9 +8,9 @@ import org.matsim.evacuation.riskaversion.RiskCostCalculator;
 
 public class RiskAverseCostCalculator implements TravelCost{
 
-	private RiskCostCalculator rc;
-	private LinkPenalty lpc;
-	private TravelTime tt;
+	private final RiskCostCalculator rc;
+	private final LinkPenalty lpc;
+	private final TravelTime tt;
 
 	public RiskAverseCostCalculator(TravelTime tt, LinkPenalty lpc, RiskCostCalculator rc){
 		this.tt = tt;
@@ -19,7 +19,7 @@ public class RiskAverseCostCalculator implements TravelCost{
 	}
 	
 	public double getLinkTravelCost(Link link, double time) {
-		return this.rc.getLinkRisk(link, time) + this.lpc.getLinkCost(link) + this.tt.getLinkTravelTime(link, time);
+		return this.rc.getLinkRisk(link) + this.lpc.getLinkCost(link) + this.tt.getLinkTravelTime(link, time);
 	}
 
 }
