@@ -306,35 +306,42 @@ public class QueueSimulation {
 
 	private AdaptiveSignalSystemControler createAdaptiveControler(
 			final BasicAdaptiveSignalSystemControlInfo config) {
-		if (config.getAdaptiveControlerClass() == null){
+		String controllerName = config.getAdaptiveControlerClass();
+		AdaptiveSignalSystemControler controler = null;
+		if (controllerName == null){
 			throw new IllegalArgumentException("controler class must be given");
 		}
-		if (config.getAdaptiveControlerClass().startsWith("org.matsim")){
+		if (controllerName.startsWith("org.matsim")){
 			//when we have standardized code for adaptive control
 			//within org.matsim here is the point to create those controlers
 			throw new IllegalArgumentException("Loading classes by name within the org.matsim packages is not allowed!");
 		}
-		AdaptiveSignalSystemControler controler = null;
-		try {
-			Class<? extends AdaptiveSignalSystemControler> klas = (Class<? extends AdaptiveSignalSystemControler>) Class.forName(config.getAdaptiveControlerClass());
-			Class[] args = new Class[1];
-			args[0] = BasicAdaptiveSignalSystemControlInfo.class;
-			Constructor<? extends AdaptiveSignalSystemControler> c = klas.getConstructor(args);
-			controler = c.newInstance(config);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+		else if (controllerName.equalsIgnoreCase("gregorträgteinenbezeichnerhierein")){
+			//der bezeichner kommt dann ins xml
+			//und hier steht dann controler = new SheltersDoorBlockerController();
+		}
+		else {
+			try {
+				Class<? extends AdaptiveSignalSystemControler> klas = (Class<? extends AdaptiveSignalSystemControler>) Class.forName(config.getAdaptiveControlerClass());
+				Class[] args = new Class[1];
+				args[0] = BasicAdaptiveSignalSystemControlInfo.class;
+				Constructor<? extends AdaptiveSignalSystemControler> c = klas.getConstructor(args);
+				controler = c.newInstance(config);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		}
 		if (controler == null){
 			throw new IllegalStateException("Cannot create AdaptiveSignalSystemControler for class name: " + config.getAdaptiveControlerClass());
