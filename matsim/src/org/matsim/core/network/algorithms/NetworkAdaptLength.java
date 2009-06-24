@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,35 +20,30 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.matsim.api.basic.v01.Coord;
+import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkAdaptLength {
+	
+	private static final double overLengthFactor = 1.001; // link length is at least 1 permil longer than euclidean distance
 
+	private static final Logger log = Logger.getLogger(NetworkAdaptLength.class);
+	
 	public void run(final Network network) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-
+		log.info("running " + this.getClass().getName() + " module...");
+		log.info("  adapting link length to at least 'overLengthFactor * euclidean distance' (works properly only for eucledian coord systems)");
+		log.info("  also ceil link length to meters");
+		log.info("  overLengthFactor: "+overLengthFactor);
+		
 		for (Link l : network.getLinks().values()) {
-			Coord fc = l.getFromNode().getCoord();
-			Coord tc   = l.getToNode().getCoord();
-			double length = l.getLength();
-
-			double dist = CoordUtils.calcDistance(fc, tc);
-			if (dist > length) {
-				l.setLength(dist);
-				System.out.println("      link id=" + l.getId() + ": length=" + length + " set to eucledian dist=" + dist + ".");
-			}
-
-			// the following is just temporary (remove it later)
-			if (l.getType().equals("90")) {
-				l.setFreespeed(1.0/3.6);
-				System.out.println("      link id=" + l.getId() + ", type=" + l.getType() + ": freespeed set to " + (1.0/3.6) + ".");
-			}
+			double dist = overLengthFactor*CoordUtils.calcDistance(l.getFromNode().getCoord(),l.getToNode().getCoord());
+			if (dist > l.getLength()) { l.setLength(dist); }
+			double len = Math.ceil(l.getLength());
+			l.setLength(len);
 		}
 
-		System.out.println("    done.");
+		log.info("done.");
 	}
-
 }

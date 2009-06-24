@@ -24,6 +24,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkAdaptLength;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.counts.Counts;
@@ -47,6 +48,7 @@ public class CleanNetwork {
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile("../../input/counts.xml.gz");
 
+		new NetworkAdaptLength().run(network);
 		new NetworkDoubleLinks("-dl").run(network);
 		new NetworkThinner().run(network,counts);
 		new NetworkCleaner().run(network);
