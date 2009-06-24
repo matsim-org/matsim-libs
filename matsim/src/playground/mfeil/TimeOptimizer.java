@@ -406,7 +406,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	private double cleanSchedule (double now, Plan plan){
+	protected double cleanSchedule (double now, Plan plan){
 		
 		((Activity)(plan.getPlanElements().get(0))).setEndTime(now);
 		((Activity)(plan.getPlanElements().get(0))).setDuration(now);
@@ -454,7 +454,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 
 	
 	@SuppressWarnings("unchecked")
-	private double setTimes (PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, double offset, int outer, int inner, int start, int stop){		
+	protected double setTimes (PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, double offset, int outer, int inner, int start, int stop){		
 		double travelTime;
 		double now = ((Leg)(actslegs.get(start+1))).getDepartureTime();
 		int position = 0;	// indicates whether time setting has reached parameter "stop"
