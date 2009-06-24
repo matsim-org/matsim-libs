@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*																															*
+ * project: org.matsim.*
+ * BKickIncomeControlerMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,30 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.api.core.v01;
-import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Population;
+package playground.benjamin.income;
+
+import playground.dgrether.DgPaths;
 
 
-
-/**
- * The scenario is the entry point to MATSim 
- * scenarios. An implementation of Scenario
- * has to provide consistent implementations
- * for the different return types, e.g. Network, 
- * Facilities or Population.
- * @see org.matsim.core.api.ScenarioLoader
- * @author dgrether
- *
- */
-public interface Scenario extends BasicScenario {
-
-	public Network getNetwork();
-
-	public ActivityFacilities getActivityFacilities() ;
-
-	public Population getPopulation() ;
+public class BKickIncomeControlerMain {
+	
+	public static void main(String[] args){
+		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
+		new BKickIncomeControler(config).run();
+	}
 
 }

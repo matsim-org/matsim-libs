@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;

@@ -61,13 +61,19 @@ public class BKickLegScoring extends LegScoringFunction {
 		if (TransportMode.car.equals(leg.getMode())) {
 			Route route = leg.getRoute();
 			dist = route.getDistance();
+			if (Double.isNaN(dist)){
+				throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
+			}
+			
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling + this.params.marginalUtilityOfDistanceCar * dist
 					* betaIncomeCar / this.incomePerTrip + betaIncomeCar * Math.log(this.incomePerTrip);
 		}
-		else
-			if (TransportMode.pt.equals(leg.getMode())) {
+		else if (TransportMode.pt.equals(leg.getMode())) {
 				dist = leg.getRoute().getDistance();
 //				log.error("dist: " + dist);
+				if (Double.isNaN(dist)){
+					throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
+				}
 				tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT + this.params.marginalUtilityOfDistancePt
 						* dist * betaIncomePt / this.incomePerTrip + betaIncomePt * Math.log(this.incomePerTrip);
 			}
@@ -75,6 +81,9 @@ public class BKickLegScoring extends LegScoringFunction {
 				throw new IllegalStateException("Scoring funtion not defined for other modes than pt and car!");
 			}
 
+		if (Double.isNaN(tmpScore)){
+			throw new IllegalStateException("Leg score is NaN for person: " + this.plan.getPerson().getId());
+		}
 		return tmpScore;
 	}
 
@@ -83,6 +92,9 @@ public class BKickLegScoring extends LegScoringFunction {
 		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
 			ipt = income.getIncome() / (240 * 3.5);
 //			log.debug("income: " + ipt);
+			if (Double.isNaN(ipt)){
+				throw new IllegalStateException("cannot calculate income for person: " + this.plan.getPerson().getId());
+			}
 		}
 		else {
 			throw new UnsupportedOperationException("Can't calculate income per trip");

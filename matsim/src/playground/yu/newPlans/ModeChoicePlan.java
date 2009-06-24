@@ -23,7 +23,7 @@ package playground.yu.newPlans;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;

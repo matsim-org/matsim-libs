@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;

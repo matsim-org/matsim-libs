@@ -17,13 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.api.basic.v01;
+package org.matsim.core.basic.v01;
 
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;

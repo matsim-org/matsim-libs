@@ -38,18 +38,18 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.households.BasicHousehold;
-import org.matsim.core.basic.v01.households.BasicHouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicHouseholds;
 import org.matsim.core.basic.v01.households.BasicIncome;
+import org.matsim.core.basic.v01.households.HouseholdBuilder;
 import org.matsim.core.basic.v01.households.HouseholdsWriterV1;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
 
 import playground.dgrether.DgPaths;
 
@@ -72,9 +72,9 @@ public class BKickHouseholdsCreatorZurich {
      * GMDE
      * FLAECHE_HA
 		 */
-		String quartiereZurichShapeFile = DgPaths.WORKBASE + "externedaten/Schweiz/Gemeindegrenzen/quartiergrenzen2006/quart06_shp_070824/quart06.shp";
+		String quartiereZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/quartiergrenzen2006/quart06_shp_070824/quart06.shp";
 		
-		String gemeindenKantonZurichShapeFile = DgPaths.WORKBASE + "externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
+		String gemeindenKantonZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
 		
 		String plansZurichWoTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_10pct.xml.gz";
 		
@@ -97,7 +97,7 @@ public class BKickHouseholdsCreatorZurich {
 		ScenarioLoader loader = new ScenarioLoader(scenario);
 		loader.loadScenario();
 		
-		BasicHouseholds households = ((ScenarioImpl) scenario).getHouseholds();
+		Households households = ((ScenarioImpl) scenario).getHouseholds();
 		
 		
 		IncomeCalculatorGesamtschweiz incomeCalcSchweiz = new IncomeCalculatorGesamtschweiz();
@@ -112,9 +112,9 @@ public class BKickHouseholdsCreatorZurich {
 		BasicPopulation<BasicPerson<BasicPlan>> pop = (BasicPopulation) scenario.getPopulation();
 		for (BasicPerson<BasicPlan> p : pop.getPersons().values()){
 			//create the households
-	    BasicHouseholdBuilder b = households.getHouseholdBuilder();
-	    BasicHousehold hh = b.createHousehold(p.getId());
-	    hh.getMemberIds().add(p.getId());
+	    HouseholdBuilder b = households.getHouseholdBuilder();
+	    Household hh = b.createHousehold(p.getId());
+	    hh.getMembers().put(p.getId(), (Person)(BasicPerson)p);
 	    households.getHouseholds().put(p.getId(), hh);
 
 	    //calculate the income

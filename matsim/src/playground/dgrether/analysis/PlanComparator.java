@@ -23,7 +23,7 @@ package playground.dgrether.analysis;
 import java.util.Date;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;

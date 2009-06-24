@@ -23,7 +23,7 @@ package playground.balmermi;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Network;

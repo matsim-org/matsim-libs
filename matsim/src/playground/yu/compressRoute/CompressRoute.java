@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.ScenarioLoader;
+import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
