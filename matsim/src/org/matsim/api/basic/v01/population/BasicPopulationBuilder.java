@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.TransportMode;
 
 /**
  * @author dgrether
+ * @deprecated don't use this class yet because the method signatures are still under heavy discussion and might be changed in the near future
  */
 public interface BasicPopulationBuilder extends Serializable{
 
