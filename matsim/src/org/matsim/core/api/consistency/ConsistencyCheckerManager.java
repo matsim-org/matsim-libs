@@ -37,10 +37,6 @@ public interface ConsistencyCheckerManager {
 
 	public List<ScenarioConsistencyChecker> getScenarioConsistencyCheckers();
 		
-	public List<NetworkConsistencyChecker> getNetworkConsistencyCheckers();
-	
-	public List<PopulationConsistencyChecker> getPopulationConsistencyCheckers();
-	
 	public boolean checkConsistency(Scenario scenario);
 
 }
