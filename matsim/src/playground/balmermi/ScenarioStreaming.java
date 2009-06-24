@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScenarioIO.java
+ * ScenarioStreaming.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,21 +27,16 @@ import org.matsim.api.core.v01.ScenarioLoader;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.replanning.modules.ReRouteLandmarks;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 
-import playground.balmermi.modules.PersonFacility2Link;
-
-public class ScenarioIO {
+public class ScenarioStreaming {
 
 	//////////////////////////////////////////////////////////////////////
 	// printUsage
@@ -49,9 +44,9 @@ public class ScenarioIO {
 
 	private static void printUsage() {
 		System.out.println();
-		System.out.println("ScenarioIO");
+		System.out.println("ScenarioStreaming");
 		System.out.println();
-		System.out.println("Usage1: ScenarioIO configfile");
+		System.out.println("Usage1: ScenarioStreaming configfile");
 		System.out.println("        add a MATSim config file as the only input parameter.");
 		System.out.println();
 		System.out.println("Note: config file should at least contain the following parameters:");
@@ -119,32 +114,24 @@ public class ScenarioIO {
 		new NetworkWriter(network).write();
 		System.out.println("done. (writing network)");
 
-		System.out.println("loading population...");
-		sl.loadPopulation();
-		PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
-		population.setIsStreaming(false);
-		Gbl.printMemoryUsage();
-		System.out.println("done. (loading population)");
-		
-		System.out.println("running algorithms...");
-		new PersonFacility2Link().run(population);
-		Gbl.printMemoryUsage();
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
-		preProcessLandmarks.run(network);
-		ReRouteLandmarks router = new ReRouteLandmarks(network,timeCostCalc,timeCostCalc,preProcessLandmarks);
-		router.prepareReplanning();
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				router.handlePlan(plan);
-			}
-		}
-		router.finishReplanning();
-		Gbl.printMemoryUsage();
-		System.out.println("done. (running algorithms)");
+		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
+		population.setIsStreaming(true);
+		PopulationReader plansReader = new MatsimPopulationReader(population,network);
+		PopulationWriter plansWriter = new PopulationWriter(population);
 
-		System.out.println("writing population...");
-		new PopulationWriter(population).write();
-		System.out.println("done. (writing population)");
+		System.out.println("adding algorithms...");
+//		population.addAlgorithm(new PersonFacility2Link());
+//		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+//		population.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
+		population.addAlgorithm(plansWriter);
+		Gbl.printMemoryUsage();
+		System.out.println("done. (adding algorithms)");
+
+		System.out.println("stream population...");
+		plansReader.readFile(config.plans().getInputFile());
+		population.printPlansCount();
+		plansWriter.write();
+		Gbl.printMemoryUsage();
+		System.out.println("done. (stream population)");
 	}
 }
