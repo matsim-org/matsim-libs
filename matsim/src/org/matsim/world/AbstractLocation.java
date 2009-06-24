@@ -172,6 +172,10 @@ public abstract class AbstractLocation implements Location {
 		this.id = id;
 	}
 
+	public void setCoord(Coord coord) {
+		throw new UnsupportedOperationException( " derived classes need to implement their own setCoord methods if desired " ) ;
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -193,6 +197,7 @@ public abstract class AbstractLocation implements Location {
 	public final Coord getCoord() {
 		return this.center;
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getUpLocation(org.matsim.utils.identifiers.IdI)

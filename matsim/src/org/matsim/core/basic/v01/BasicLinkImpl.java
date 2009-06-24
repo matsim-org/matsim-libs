@@ -149,4 +149,5 @@ implements BasicLink
 		this.from.addOutLink(this);
 		this.to.addInLink(this);
 	}
+
 }

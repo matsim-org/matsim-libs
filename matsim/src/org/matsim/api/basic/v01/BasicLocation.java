@@ -31,4 +31,6 @@ public interface BasicLocation extends Identifiable, Serializable {
 	
 	public Coord getCoord();
 	
+	public void setCoord( Coord coord ) ;
+	
 }
