@@ -234,6 +234,10 @@ public class TransitRouterNetworkWrapper implements Network {
 		public Coord getCoord() {
 			return this.node.stop.getStopFacility().getCoord();
 		}
+		
+		public void setCoord(final Coord coord) {
+			throw new UnsupportedOperationException();
+		}
 
 		public Id getId() {
 			return this.id;
@@ -381,8 +385,12 @@ public class TransitRouterNetworkWrapper implements Network {
 		public void setId(final Id id) {
 			throw new UnsupportedOperationException();
 		}
-
+		
 		public Coord getCoord() {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setCoord(final Coord coord) {
 			throw new UnsupportedOperationException();
 		}
 

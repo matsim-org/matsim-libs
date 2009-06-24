@@ -66,6 +66,10 @@ public class TransitStopFacility implements Facility {
 		return this.coord;
 	}
 
+	public void setCoord(final Coord coord) {
+		this.coord.setXY(coord.getX(), coord.getY());
+	}
+
 	public Id getId() {
 		return this.id;
 	}
