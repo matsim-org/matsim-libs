@@ -104,13 +104,6 @@ public class ScenarioIO {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 		
-		System.out.println("--------------------------------------------------");
-		System.out.println(""+"fid"+"\t"+"lid");
-		for (Facility f : af.getFacilities().values()) {
-			System.out.println(""+f.getId()+"\t"+f.getLink().getId());
-		}
-		System.out.println("--------------------------------------------------");
-		
 		System.out.println("writing facilities...");
 		new FacilitiesWriter(af).write();
 		System.out.println("done. (writing facilities)");
