@@ -20,6 +20,10 @@
 
 package org.matsim.world.algorithms;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +34,8 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Layer;
@@ -59,6 +65,10 @@ public class WorldConnectLocations {
 	private final static Logger log = Logger.getLogger(WorldConnectLocations.class);
 	
 	private final Set<String> excludingLinkTypes;
+
+	public final static String CONFIG_F2L = "f2l";
+	public final static String CONFIG_F2L_INPUTF2LFile = "inputF2LFile";
+	public final static String CONFIG_F2L_OUTPUTF2LFile = "outputF2LFile";
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -120,6 +130,60 @@ public class WorldConnectLocations {
 	
 	//////////////////////////////////////////////////////////////////////
 
+	private final void connect(ActivityFacilities facilities, NetworkLayer network, World world, String file, Set<Id> remainingFacilities) {
+		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
+		try {
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			int lineCnt = 0;
+			// Skip header
+			String currLine = br.readLine(); lineCnt++;
+			while ((currLine = br.readLine()) != null) {
+				String[] entries = currLine.split("\t", -1);
+				// fid  lid
+				// 0    1
+				Id fid = new IdImpl(entries[0].trim());
+				Id lid = new IdImpl(entries[1].trim());
+				ActivityFacility f = facilities.getFacilities().get(fid);
+				Location l = network.getLink(lid);
+				if ((f != null) && (l != null)) {
+					// add the nearest right entry link mapping to the facility f
+					// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
+					l = world.getLayer(NetworkLayer.LAYER_TYPE).getLocation(l.getId());
+					if (world.addMapping(f,l)) { remainingFacilities.remove(f.getId()); }
+					else { throw new RuntimeException(lineCnt+": mapping not successful."); }
+				}
+				else { log.warn(lineCnt+": at least one of the two locations not found."); }
+				lineCnt++;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Error while reading given nputF2LFile='"+file+"'.");
+		}
+		log.info("      number of facilities that are still not connected to a link = "+remainingFacilities.size());
+		log.info("    done. (connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file+")");
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+
+	private final void writeF2LFile(ActivityFacilities facilities, String file) {
+		log.info("    writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file);
+		try {
+			FileWriter fw = new FileWriter(file);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write("fid\tlid\n");
+			for (ActivityFacility f : facilities.getFacilities().values()) {
+				bw.write(f.getId().toString()+"\t"+f.getLink().getId().toString()+"\n");
+			}
+			bw.close();
+			fw.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.");
+		}
+		log.info("    done. (writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file+")");
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Sets the mapping between each {@link ActivityFacility facility} of the given {@link ActivityFacilities facility layer} and
 	 * the {@link Link links} of the {@link NetworkLayer network layer}. The facilities layer should be part of the
@@ -137,16 +201,41 @@ public class WorldConnectLocations {
 	 */
 	private final void connect(ActivityFacilities facilities, NetworkLayer network, World world) {
 		log.info("  connecting facilities with links...");
+		log.info("    remove all given connections f<==>l...");
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			// remove previous mappings for facility f
 			if (!f.removeAllDownMappings()) { throw new RuntimeException("could not remove old factivity<-->link mappings"); }
+		}
+		log.info("    done.");
+
+		Set<Id> remainingFacilities = new HashSet<Id>(facilities.getFacilities().keySet());
+		if (Gbl.getConfig() != null) {
+			String inputF2LFile = Gbl.getConfig().findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
+			if (inputF2LFile != null) {
+				inputF2LFile = inputF2LFile.replace('\\', '/');
+				connect(facilities,network,world,inputF2LFile,remainingFacilities);
+			}
+		}
+		
+		log.info("    connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
+		for (Id fid : remainingFacilities) {
+			ActivityFacility f = facilities.getFacilities().get(fid);
 			// add the nearest right entry link mapping to the facility f
 			// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
 			Location l = network.getNearestRightEntryLink(f.getCoord());
 			l = world.getLayer(NetworkLayer.LAYER_TYPE).getLocation(l.getId());
 			if (!world.addMapping(f,l)) { throw new RuntimeException("could not add nearest right entry factivity<-->link mappings"); }
 		}
-		log.info("  done.");
+		log.info("    done.");
+
+		if (Gbl.getConfig() != null) {
+			String outputF2LFile = Gbl.getConfig().findParam(CONFIG_F2L,CONFIG_F2L_OUTPUTF2LFile);
+			if (outputF2LFile != null) {
+				outputF2LFile = outputF2LFile.replace('\\', '/');
+				writeF2LFile(facilities,outputF2LFile);
+			}
+		}
+		log.info("  done. (connecting facilities with links)");
 	}
 	
 	/**
