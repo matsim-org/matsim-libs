@@ -50,6 +50,7 @@ import playground.marcel.pt.transitSchedule.TransitLine;
 import playground.marcel.pt.transitSchedule.TransitRoute;
 import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.mohit.pt.agentGraph;
 
 public class AccessEgressDemo {
 
@@ -67,7 +68,7 @@ public class AccessEgressDemo {
 	
 	private final Scenario scenario = new ScenarioImpl();
 	private final TransitSchedule schedule = new TransitSchedule();
-	private final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];
+	public final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];
 
 	private void createIds() {
 		for (int i = 0; i < this.ids.length; i++) {
@@ -181,6 +182,7 @@ public class AccessEgressDemo {
 		sim.run();
 
 		analysis.printStats();
+		new agentGraph(this,analysis);
 	}
 
 	public void run() {
@@ -190,10 +192,13 @@ public class AccessEgressDemo {
 		createTransitSchedule();
 		createPopulation();
 		runSim();
+		
 	}
 
 	public static void main(final String[] args) {
-		new AccessEgressDemo().run();
+		
+		AccessEgressDemo a = new AccessEgressDemo();
+		a.run();
 	}
 
 }

@@ -39,8 +39,8 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 
 public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicleEventHandler, BasicPersonLeavesVehicleEventHandler {
 
-	private final TransitRoute transitRoute;
-	private Map<Id, Departure> headings = null;
+	public final TransitRoute transitRoute;
+	public Map<Id, Departure> headings = null;
 	private Map<Departure, Map<Id, Integer>> accessCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
 	private Map<Departure, Map<Id, Integer>> egressCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
 	private final VehicleTracker vehTracker;
@@ -128,7 +128,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		}
 	}
 	
-	private Map<Id, Integer> getAccessCounter(final Departure departure) {
+	public Map<Id, Integer> getAccessCounter(final Departure departure) {
 		Map<Id, Integer> counter = this.accessCounters.get(departure);
 		if (counter == null) {
 			counter = new HashMap<Id, Integer>();
@@ -137,7 +137,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		return counter;
 	}
 	
-	private Map<Id, Integer> getEgressCounter(final Departure departure) {
+	public Map<Id, Integer> getEgressCounter(final Departure departure) {
 		Map<Id, Integer> counter = this.egressCounters.get(departure);
 		if (counter == null) {
 			counter = new HashMap<Id, Integer>();
