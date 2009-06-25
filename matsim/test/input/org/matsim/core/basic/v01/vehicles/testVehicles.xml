@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
  
-<vehicleType typeId="normalCar">
+<vehicleType id="normalCar">
   <description></description>
   <!-- capacity including driver -->
   <capacity>
@@ -23,7 +23,7 @@
   </engineInformation>
 </vehicleType>
 
-<vehicleType typeId="defaultValueCar">
+<vehicleType id="defaultValueCar">
 </vehicleType>
 
 <vehicle id="23" type="normalCar" />

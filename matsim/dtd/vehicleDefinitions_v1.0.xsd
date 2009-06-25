@@ -27,6 +27,8 @@ xml:lang="en">
 </xs:element>
 
 <xs:complexType name="vehicleTypeType">
+  <xs:complexContent>
+    <xs:extension base="matsimObjectType">
   <xs:sequence>
     <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
     <xs:element name="capacity" type="capacityType" minOccurs="0" maxOccurs="1"/>
@@ -47,7 +49,9 @@ xml:lang="en">
     </xs:element>
     <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />    
   </xs:sequence>
-  <xs:attribute name="typeId" type="xs:string" use="required" />
+    </xs:extension>
+  </xs:complexContent>
+<!--  <xs:attribute name="typeId" type="xs:string" use="required" />-->
 </xs:complexType>
 
 <xs:complexType name="capacityType">

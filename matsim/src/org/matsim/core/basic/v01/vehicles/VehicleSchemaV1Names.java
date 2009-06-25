@@ -26,7 +26,6 @@ public interface VehicleSchemaV1Names {
 
 	public static final String VEHICLEDEFINITIONS = "vehicleDefinitions";
 	public static final String VEHICLETYPE = "vehicleType";
-	public static final String TYPEID = "typeId";
 	public static final String DESCRIPTION = "description";
 	public static final String CAPACITY = "capacity";
 	public static final String SEATS = "seats";

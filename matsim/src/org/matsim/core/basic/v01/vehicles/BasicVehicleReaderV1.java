@@ -111,7 +111,7 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase(name)) {
-			this.currentVehType = this.builder.createVehicleType(new IdImpl(atts.getValue(VehicleSchemaV1Names.TYPEID)));			
+			this.currentVehType = this.builder.createVehicleType(new IdImpl(atts.getValue(VehicleSchemaV1Names.ID)));			
 		}
 		else if (VehicleSchemaV1Names.LENGTH.equalsIgnoreCase(name)){
 			this.currentVehType.setLength(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.METER)));

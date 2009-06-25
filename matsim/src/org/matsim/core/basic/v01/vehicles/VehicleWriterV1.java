@@ -76,7 +76,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 	private void writeVehicleTypes(Map<Id, BasicVehicleType> vts) throws IOException {
 		for (BasicVehicleType vt : vts.values()) {
 			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.TYPEID, vt.getId().toString()));
+			atts.add(this.createTuple(VehicleSchemaV1Names.ID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV1Names.VEHICLETYPE, atts);
 			if (vt.getDescription() != null) {
 				this.writeStartTag(VehicleSchemaV1Names.DESCRIPTION, null);
