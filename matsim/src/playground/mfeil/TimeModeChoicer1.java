@@ -776,8 +776,14 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			((Leg)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
+			System.out.println("780: plan.getPlanElements().size() = "+plan.getPlanElements().size());
 			if (i!=plan.getPlanElements().size()-2){
+				System.out.println("782: plan.getPlanElements().get(i+1) = "+plan.getPlanElements().get(i+1));
 				((Activity)(plan.getPlanElements().get(i+1))).setStartTime(now);
+				System.out.println("787: plan.getPlanElements().get(i+2) = "+plan.getPlanElements().get(i+2));
+				System.out.println("787: ((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime() = "+((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime());
+				System.out.println("787: ((Leg)(plan.getPlanElements().get(i+2))).getArrivalTime() = "+((Leg)(plan.getPlanElements().get(i+2))).getArrivalTime());
+				System.out.println("787: ((Activity)(plan.getPlanElements().get(i+1))).getType()) = "+((Activity)(plan.getPlanElements().get(i+1))).getType());
 				travelTime = java.lang.Math.max(((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime()-((Leg)(plan.getPlanElements().get(i))).getArrivalTime()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
 				//travelTime = java.lang.Math.max(((Activity)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
 				((Activity)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
