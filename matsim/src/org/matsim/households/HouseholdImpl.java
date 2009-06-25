@@ -20,6 +20,7 @@
 package org.matsim.households;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +35,9 @@ import org.matsim.core.basic.v01.vehicles.BasicVehicle;
  */
 public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 
-	private Map<Id, Person> members;
+	private final Map<Id, Person> members;
 
-	private Map<Id, BasicVehicle> vehicles;
+	private final Map<Id, BasicVehicle> vehicles;
 
 	public HouseholdImpl(final Id id) {
 		super(id);
@@ -44,13 +45,12 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
 	}
 
-
+	/**
+	 * @see org.matsim.core.basic.v01.households.Household#getMemberIds()
+	 */
 	@Override
 	public List<Id> getMemberIds() {
-		if (this.members == null) {
-			return null;
-		}
-		return new ArrayList<Id>(this.members.keySet());
+		return (List<Id>) Collections.unmodifiableCollection(new ArrayList<Id>(this.members.keySet()));
 	}
 
 	@Override
@@ -69,12 +69,12 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 		"Use method addVehicle() instead!");
 	}
 
+	/**
+	 * @see org.matsim.core.basic.v01.households.Household#getVehicleIds()
+	 */
 	@Override
 	public List<Id> getVehicleIds() {
-		if (this.vehicles == null) {
-			return null;
-		}
-		return new ArrayList<Id>(this.vehicles.keySet());
+		return (List<Id>) Collections.unmodifiableCollection(new ArrayList<Id>(this.vehicles.keySet()));
 	}
 
 	public Map<Id, BasicVehicle> getVehicles() {
