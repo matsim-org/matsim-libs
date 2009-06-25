@@ -170,11 +170,11 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin/network/bb_5.xml.gz";
+		String netFilename = "../berlin/network/bb_5_v_notscaled.xml.gz";
 
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		mn2q.readNetwork(netFilename);
 		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../matsimTests/berlinQGIS/bb_5.shp");
+		mn2q.writeShapeFile("../matsimTests/berlinQGIS/bb_5_v_notscaled.shp");
 	}
 }

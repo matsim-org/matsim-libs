@@ -39,8 +39,8 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String fileBase = "../runs-svn/run689/";
-		String inputFile = fileBase + "scorestats.txt";
+		String fileBase = "../runs-svn/run686/";
+		String inputFile = fileBase + "traveldistancestats.txt";
 		String chartFile = inputFile.replace("txt", "png");
 		int maxIter = 1001;
 		String avgExec, avgWorst, avgAvg, avgBest;

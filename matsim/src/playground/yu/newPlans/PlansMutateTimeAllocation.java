@@ -44,13 +44,13 @@ public class PlansMutateTimeAllocation {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network)
-				.readFile("../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/bb_cl.xml.gz");
+				.readFile("D:/fromNB04/wm/Toronto/toronto/networks/changedNetworkWithManeuvers/network.xml");
 
 		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network)
-				.readFile("../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/plans3.xml.gz");
+				.readFile("D:/fromNB04/wm/Toronto/toronto/plans/xy/plans.xml.gz");
 
-		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(600,
+		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(1800,
 				MatsimRandom.getLocalInstance());
 
 		for (Person person : population.getPersons().values())
@@ -58,7 +58,7 @@ public class PlansMutateTimeAllocation {
 				pmta.run(plan);
 
 		new PopulationWriter(population,
-				"../matsimTests/PlansMutateTimeAllocation/Berlin/bb_cl/output/plans4_600s.xml.gz")
+				"D:/fromNB04/wm/Toronto/toronto/plans/xy/plansBlurred.xml.gz")
 				.write();
 
 		System.out.println("done.");

@@ -95,15 +95,15 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		String netFilename = "../berlin/network/bb_4.xml.gz";
-		String countsFilename = "../berlin/counts/counts4bb_4.xml";
+		String netFilename = "../berlin/network/bb_cl_old.xml.gz";
+		String countsFilename = "../berlin/counts/counts4bb_cl_old.xml";
 
 		Counts2QGIS c2q = new Counts2QGIS();
 		c2q.readNetwork(netFilename);
 		c2q.setCrs("DHDN_GK4");
 		c2q.setN2g(new Counts2PolygonGraph(c2q.network, c2q.crs, c2q
 				.readCounts(countsFilename)));
-		c2q.writeShapeFile("../berlin data/newOSM/counts.shp");
+		c2q.writeShapeFile("../matsimTests/berlinQGIS/counts4bb_cl_old.shp");
 
 		Gbl.printElapsedTime();
 	}

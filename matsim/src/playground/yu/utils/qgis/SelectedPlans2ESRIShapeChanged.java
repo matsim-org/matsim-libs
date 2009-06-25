@@ -94,6 +94,9 @@ public class SelectedPlans2ESRIShapeChanged extends
 	public SelectedPlans2ESRIShapeChanged(Population population,
 			CoordinateReferenceSystem crs, String outputDir) {
 		super(population, crs, outputDir);
+		this.outputDir = outputDir;
+		this.geofac = new GeometryFactory();
+		initFeatureType();
 	}
 
 	// private void drawOutputSample() {

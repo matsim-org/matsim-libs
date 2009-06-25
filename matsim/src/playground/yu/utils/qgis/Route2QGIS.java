@@ -184,7 +184,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		CoordinateReferenceSystem crs;
 		try {
 			crs = CRS.parseWKT(ch1903);
-			Route2QGIS r2q = new Route2QGIS(null, crs, outputDir, network, rs
+			Route2QGIS r2q = new Route2QGIS(population, crs, outputDir, network, rs
 					.getRouteCounters());
 			r2q.setOutputSample(// 0.05
 					1);
