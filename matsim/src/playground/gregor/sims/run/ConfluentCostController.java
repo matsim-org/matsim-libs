@@ -13,7 +13,6 @@ import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.riskaversion.RiskCostCalculator;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
-import org.matsim.evacuation.riskaversion.RiskCostFromFloodingDataTest;
 
 import playground.gregor.sims.confluent.LinkPenalty;
 import playground.gregor.sims.confluent.LinkPenaltyCalculatorII;
