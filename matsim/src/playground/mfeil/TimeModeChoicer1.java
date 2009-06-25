@@ -128,7 +128,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	public void run (Plan basePlan){
 		
 		/*Do nothing if the plan has only one activity (=24h home)*/
-		if (basePlan.getPlanElements().size()==1) return;
+		if (basePlan.getPlanElements().size()==3) return;
 		
 		/*Set all leg modes to car*/
 		for (int z=1;z<basePlan.getPlanElements().size();z+=2){
@@ -778,7 +778,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			
 			if (i!=plan.getPlanElements().size()-2){
 				((Activity)(plan.getPlanElements().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Activity)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
+				travelTime = java.lang.Math.max(((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime()-((Leg)(plan.getPlanElements().get(i))).getArrivalTime()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
+				//travelTime = java.lang.Math.max(((Activity)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
 				((Activity)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
 				((Activity)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;
