@@ -27,11 +27,11 @@ public class NOGATypes {
 	
 	// Exact definition of Supermarket etc.
 	public String [] shopGrocery = {
-			"B015227B",     // 52.27B Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getränken und Tabak a.n.g. (in Verkaufsräumen)
+			"B015227B",     // 52.27B Sonstiger Fachdetailhandel mit Nahrungsmitteln, GetrÃ¤nken und Tabak a.n.g. (in VerkaufsrÃ¤umen)
 	};
 	
 	public String [] shopNonGrocery = {
-		"B015274A",     // 52.74A Reparatur von sonstigen Gebrauchsgütern
+		"B015274A",     // 52.74A Reparatur von sonstigen GebrauchsgÃ¼tern
 	};
 	
 	public List<String> getGroceryTypes() {
