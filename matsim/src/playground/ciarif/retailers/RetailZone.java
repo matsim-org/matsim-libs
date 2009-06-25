@@ -37,17 +37,9 @@ public class RetailZone {
 			double x2 = this.personsQuadTree.getMinEasting();
 			double y1 = this.personsQuadTree.getMaxNorthing();
 			double y2 = this.personsQuadTree.getMinNorthing();
-//			log.info("x1 = " + x1 );
-//			log.info("x2 = " + x2 );
-//			log.info("y1 = " + y1 );
-//			log.info("y2 = " + y2 );
-//			log.info("Person's X home coord = " + c.getX() );
-//			log.info("Person's Y home coord = " + c.getY() );
-//			log.info("Person's Id = " + p.getId() );
-			if (c.getX()< x1 && c.getX()>=x2 && c.getY()<y1 && c.getY()>=y2) {
+			if (c.getX()< x1 && c.getX()>=x2 && c.getY()<y1 && c.getY()>=y2) { //TODO check if this souldn't be elsewhere, in principle such a method
+				// is not supposed to check anything but just to add elements, probably this check should happen outside this class
 				this.personsQuadTree.put(c.getX(),c.getY(),p);
-//				log.info("the person " + p.getId() + " has been added" );
-//				log.info(this.personsQuadTree.values().size() + " persons are living in this zone ");
 			}		
 		}		
 	}

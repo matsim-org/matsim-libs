@@ -177,6 +177,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
+		ArrayList<Consumer> consumers = new ArrayList<Consumer>();
 		// TODO could try to use a double ""for" cycle in order to avoid to use the getIteration method
 		// the first is 0...n where n is the number of times the gravity model needs to 
 		// be computed, the second is 0...k, where k is the number of iterations needed 
@@ -189,46 +190,64 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			log.info("matrix dimensions, columns (shops) = " + shops.size());
 			DenseDoubleMatrix2D prob_i_j = new DenseDoubleMatrix2D (this.retailZones.getRetailZones().values().size(),shops.size());
 			DenseDoubleMatrix1D avg_prob_i = new DenseDoubleMatrix1D (shops.size());
+			int consumer_count=0;
 			int j=0;
+			boolean first_shop = true;
 			for (ActivityFacility f:shops) {
+				
 				double sum_prob =0;
-				double  zone_numb =0;
+				double  zone_count =0;
+				
 				for (RetailZone rz : this.retailZones.getRetailZones().values()) {
+					zone_count++;
 					double counter = 0;
 					double prob = 0;
 					Collection<Person> persons = new ArrayList<Person> ();
 					rz.getPersonsQuadTree().get(rz.getPersonsQuadTree().getMinEasting(),rz.getPersonsQuadTree().getMinNorthing(), rz.getPersonsQuadTree().getMaxEasting(), rz.getPersonsQuadTree().getMaxNorthing(), persons );
+					
 					for (Person p:persons) {
 						//if (rz.getPersonsQuadTree().values().contains(p))
+						if (first_shop) {
+							Consumer consumer = new Consumer (consumer_count, p, rz.getId());
+							consumers.add(consumer);
+							consumer_count++;
+						}
 						for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
+							
 							if (pe2 instanceof Activity) {
 								Activity act = (Activity) pe2;
+								
 								if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
 									counter++;
 									log.info("The number of shop activities in the shop " + f.getId() + " is " + counter);
+									
+									if (persons.size()>0) {
+										int i =Integer.parseInt(rz.getId().toString());
+										prob = counter/persons.size();
+										prob_i_j.set(i,j,prob);
+										sum_prob = sum_prob+prob;
+									}
+									
+									else {} // TODO Throw an error, it is not possible that a zone hasn't inhabitants since they are constructed depending on 
+									// max/min coordinates of inhabitants' home location
 								}
 							}
 						}
 					}
-					if (persons.size()>0) {
-						log.info("counter = " + counter);
-						log.info("persons = " + ((Integer)persons.size()).doubleValue());
-						int i =Integer.parseInt(rz.getId().toString());
-						prob = counter/persons.size();
-						prob_i_j.set(i,j,prob);
-						log.info("prob (" + i + "," + j + ") = " + prob_i_j.get(i,j));
-						sum_prob = sum_prob+prob;
-						zone_numb++;
-						
-					}
-					else {} // TODO Throw an error, it is not possible that a zone hasn't inhabitants since they are constructed depending on 
-					// max/min coordinates of inhabitants' home location
+					log.info("counter = " + counter);
+					log.info("persons = " + ((Integer)persons.size()).doubleValue());
 				}
-				avg_prob_i.set(j, sum_prob/zone_numb);
-				log.info("avg_prob_i = " + avg_prob_i.get(j));
-				log.info("number of zones = " + zone_numb);
+				
+				first_shop=false;
+				//avg_prob_i.set(j, sum_prob/zone_count);
+				//log.info("avg_prob_i = " + avg_prob_i.get(j));
+				log.info("number of zones = " + zone_count);
 				j=j+1; //Integer.parseInt(f.getId().toString());
-			}	
+			}
+			log.info("Number of potential consumers in the area = " + consumer_count);
+			log.info("Consumers in the area = " + consumers.size());
+			ComputeGravityModelParameters cgmp = new ComputeGravityModelParameters ();
+			cgmp.computeInitialParameters (controler, prob_i_j, consumers);
 		}
 	}
 }
