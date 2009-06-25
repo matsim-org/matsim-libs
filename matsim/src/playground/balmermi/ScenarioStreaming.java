@@ -25,7 +25,6 @@ import java.util.TreeSet;
 
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -99,13 +98,6 @@ public class ScenarioStreaming {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 		
-		System.out.println("--------------------------------------------------");
-		System.out.println(""+"fid"+"\t"+"lid");
-		for (Facility f : af.getFacilities().values()) {
-			System.out.println(""+f.getId()+"\t"+f.getLink().getId());
-		}
-		System.out.println("--------------------------------------------------");
-		
 		System.out.println("writing facilities...");
 		new FacilitiesWriter(af).write();
 		System.out.println("done. (writing facilities)");
@@ -120,9 +112,6 @@ public class ScenarioStreaming {
 		PopulationWriter plansWriter = new PopulationWriter(population);
 
 		System.out.println("adding algorithms...");
-//		population.addAlgorithm(new PersonFacility2Link());
-//		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
-//		population.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
 		population.addAlgorithm(plansWriter);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (adding algorithms)");
