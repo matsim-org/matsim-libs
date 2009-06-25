@@ -47,6 +47,8 @@ import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 
 public class BellmanFordVertexIntervalls {
 	
+	
+
 	/**
 	 * The network on which we find routes. We expect the network not to change
 	 * between runs!
@@ -67,7 +69,7 @@ public class BellmanFordVertexIntervalls {
 	 * data structure to hold the present flow
 	 */
 	private Flow _flow;
-
+ 
 	/**
 	 * maximal time horizon
 	 */
@@ -77,7 +79,19 @@ public class BellmanFordVertexIntervalls {
 	 * sink node to which TimeExpandedPaths are searched
 	 */
 	private final Node _sink;
-
+	/**
+	 * 
+	 */
+	private TimeExpandedPath _timeexpandedpath;
+	 /**
+	  * 
+	  */
+	private static int _warmstart;
+	/**
+	 * 
+	 */
+	private LinkedList<Node> _warmstartlist;
+	
 	/**
 	 * debug variable, the higher the value the more it tells
 	 */
@@ -107,6 +121,14 @@ public class BellmanFordVertexIntervalls {
 	 */
 	public static void debug(int debug){
 		BellmanFordVertexIntervalls._debug = debug;
+	}
+	
+	/**
+	 * Setter for warmstart mode 
+	 * @param warmstart > 0 is warmstart mode is on
+	 */
+	public static void warmstart(int warmstart){
+		BellmanFordVertexIntervalls._warmstart = warmstart;
 	}
 	
 	/**
@@ -249,7 +271,19 @@ public class BellmanFordVertexIntervalls {
 		// queue to save nodes we have to scan
 		Queue<Node> queue = new LinkedList<Node>();
 		//set the startLabels and add active sources to to the queue
-		queue.addAll(refreshLabels());
+		LinkedList<Node> activesources = this.refreshLabels();
+		if(_warmstart>0 && _warmstartlist!=null){
+			queue.addAll(_warmstartlist);
+			for( Node node : activesources){
+				if(!queue.contains(node)){
+					queue.add(node);
+				}
+			}
+		}else{
+			queue.addAll(activesources);
+		}
+		
+		
 
 		// v is first vertex in the queue
 		// w is the vertex we probably want to insert to the queue and 
@@ -264,7 +298,9 @@ public class BellmanFordVertexIntervalls {
 			v = queue.poll();
 			
 			// Clean Up before we do anything!
+			System.out.println("cleanupnode:"+v.getId().toString()+"\n old: \n"+_labels.get(v).toString());
 			gain += _labels.get(v).cleanup();
+			System.out.println("new: \n"+_labels.get(v).toString());
 
 			// visit neighbors
 			
@@ -293,15 +329,29 @@ public class BellmanFordVertexIntervalls {
 		}
 		//System.out.println("finale labels: \n");
 		//printStatus();
-		TimeExpandedPath TimeExpandedPath = null;
+		_timeexpandedpath = null;
 		try{ 
-			TimeExpandedPath = constructRoute();
+			_timeexpandedpath = constructRoute();
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());
 		}
-		return TimeExpandedPath;
+		if(_warmstart>0){
+			createwarmstartList();
+		}
+		return _timeexpandedpath;
 		
 	}
+	
+	/**
+	 * creates a new warmstartlist, from the data of one run of the BF algorithm an sets _warmstartlist accordingly
+	 */
+	private void createwarmstartList() {
+		// use cases of _warmstart to decide what to do
+		
+		
+	}
+
+
 
 	/**
 	 * prints the Status on the console

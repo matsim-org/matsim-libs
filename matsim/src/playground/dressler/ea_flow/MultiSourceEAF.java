@@ -128,6 +128,7 @@ public class MultiSourceEAF {
 		//set debuging modes
 		MultiSourceEAF.debug(true);
 		BellmanFordVertexIntervalls.debug(0);
+		
 		VertexIntervalls.debug(false);
 		//VertexIntervall.debug(false);
 		EdgeIntervalls.debug(false);
@@ -141,21 +142,23 @@ public class MultiSourceEAF {
 
 		String networkfile = null;
 		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
-		networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
+		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
 		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
 		//networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
-
-
 		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
 
-
+		//***---------MANU------**//
+		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
+		//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
+		networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
+		
 		String plansfile = null;		
-		plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
+		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
-
+		plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
 
 
 
@@ -170,15 +173,17 @@ public class MultiSourceEAF {
 
 		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
 		//outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
-		outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
+		//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
+		outputplansfile = "/Users/manuel/testdata/testoutput.xml";
 		
-		int uniformDemands = 100;
+		int uniformDemands = 1;
 
 		//set parameters
 		int timeHorizon = 200000;
 		int rounds = 100000;
 		//String sinkid = "supersink";
-		String sinkid = "en2";
+		String sinkid = "en2";  //padang sink , line sink
+		//String sinkid ="supersink"; //siouxsink
 		//boolean emptylegs = false; // really bad! use EmptyPlans.class instead 		
 
 		//read network
