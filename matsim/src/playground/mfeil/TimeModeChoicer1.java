@@ -85,6 +85,17 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.minimumTime.put("work", 3600.0);
 		this.minimumTime.put("shopping", 3600.0);
 		this.minimumTime.put("leisure", 3600.0);
+		this.minimumTime.put("education_higher", 3600.0);
+		this.minimumTime.put("education_kindergarten", 3600.0);
+		this.minimumTime.put("education_other", 3600.0);
+		this.minimumTime.put("education_primary", 3600.0);
+		this.minimumTime.put("education_secondary", 3600.0);
+		this.minimumTime.put("shop", 3600.0);
+		this.minimumTime.put("work_sector2", 3600.0);
+		this.minimumTime.put("work_sector3", 3600.0);
+		this.minimumTime.put("tta", 3600.0);
+		this.minimumTime.put("w", 3600.0);
+		this.minimumTime.put("h", 7200.0);
 		this.introTime				= this.minimumTime;
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
 		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
@@ -111,6 +122,17 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.minimumTime.put("work", 3600.0);
 		this.minimumTime.put("shopping", 3600.0);
 		this.minimumTime.put("leisure", 3600.0);
+		this.minimumTime.put("education_higher", 3600.0);
+		this.minimumTime.put("education_kindergarten", 3600.0);
+		this.minimumTime.put("education_other", 3600.0);
+		this.minimumTime.put("education_primary", 3600.0);
+		this.minimumTime.put("education_secondary", 3600.0);
+		this.minimumTime.put("shop", 3600.0);
+		this.minimumTime.put("work_sector2", 3600.0);
+		this.minimumTime.put("work_sector3", 3600.0);
+		this.minimumTime.put("tta", 3600.0);
+		this.minimumTime.put("w", 3600.0);
+		this.minimumTime.put("h", 7200.0);
 		this.introTime				= this.minimumTime;
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
 		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
@@ -127,8 +149,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	
 	public void run (Plan basePlan){
 		
-		/*Do nothing if the plan has only one activity (=24h home)*/
-		if (basePlan.getPlanElements().size()==3) return;
+		/*Do nothing if the plan has only one or two activities (=24h home)*/
+		if (basePlan.getPlanElements().size()<=3) return;
 		
 		/*Set all leg modes to car*/
 		for (int z=1;z<basePlan.getPlanElements().size();z+=2){
@@ -776,18 +798,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			((Leg)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
-			log.warn("780: plan.getPlanElements().size() = "+plan.getPlanElements().size());
 			if (i!=plan.getPlanElements().size()-2){
-				log.warn("782: plan.getPlanElements().get(i+1) = "+plan.getPlanElements().get(i+1));
 				((Activity)(plan.getPlanElements().get(i+1))).setStartTime(now);
-				log.warn("789: plan.getPlanElements().get(i+2) = "+plan.getPlanElements().get(i+2));
-				log.warn("789: ((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime() = "+((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime());
-				log.warn("789: ((Leg)(plan.getPlanElements().get(i+2))).getArrivalTime() = "+((Leg)(plan.getPlanElements().get(i+2))).getArrivalTime());
-				log.warn("789: ((Activity)(plan.getPlanElements().get(i+1))).getType()) = "+((Activity)(plan.getPlanElements().get(i+1))).getType());
-				log.warn("789: this.minimumTime = "+this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
-				log.warn("789: java.lang.Math.max = "+java.lang.Math.max(((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime()-((Leg)(plan.getPlanElements().get(i))).getArrivalTime()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType())));
-				travelTime = java.lang.Math.max(((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime()-((Leg)(plan.getPlanElements().get(i))).getArrivalTime()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
-				//travelTime = java.lang.Math.max(((Activity)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
+				//travelTime = java.lang.Math.max(((Leg)(plan.getPlanElements().get(i+2))).getDepartureTime()-((Leg)(plan.getPlanElements().get(i))).getArrivalTime()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
+				travelTime = java.lang.Math.max(((Activity)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
 				((Activity)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
 				((Activity)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;
