@@ -23,12 +23,13 @@ package org.matsim.core.api.consistency;
 
 
 /**
- * Just a marker interface for ConsistencyCheckers.
+ * A marker interface for ConsistencyCheckers.
  * @author dgrether
  * @deprecated just a draft to be discussed, don't implement this interface yet.
  */
 @Deprecated
 public interface ConsistencyChecker {
 
+	public void checkConsistency();
 	
 }

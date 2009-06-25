@@ -21,14 +21,11 @@ package org.matsim.core.api.consistency;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
-
 
 /**
  * Classes implementing this interface are responsible to store 
  * several instances ConsistencyChecker type.
- * Furthermore it has to provide a method to check a complete
- * Scenario.
+ * Furthermore it has to provide a method to call all registered consistencyCheckers
  * @author dgrether
  * @deprecated just a draft to be discussed, don't implement this interface yet.
  */
@@ -37,6 +34,6 @@ public interface ConsistencyCheckerManager {
 
 	public List<ConsistencyChecker> getConsistencyCheckers();
 		
-	public void checkConsistency(Scenario scenario);
+	public void checkConsistency();
 
 }
