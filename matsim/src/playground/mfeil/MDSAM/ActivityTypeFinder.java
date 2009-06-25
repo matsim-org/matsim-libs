@@ -62,6 +62,9 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			run(f);
 		}
+		/* TODO Removing tta activity type but needs clarification! */ 
+		if (this.actTypes.remove("tta")) log.info("tta act type found and removed.");
+		else log.info("No tta act type found.");
 		log.info("Searching available activity types done.");
 	}
 	public void run(ActivityFacility facility){
