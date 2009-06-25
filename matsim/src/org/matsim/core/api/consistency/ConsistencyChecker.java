@@ -19,31 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.api.consistency;
 
-import java.util.List;
 
 
 
 /**
- * Just a marker interface to group all subtypes of the ConsistencyChecker 
- * framework.
+ * Just a marker interface for ConsistencyCheckers.
  * @author dgrether
  * @deprecated just a draft to be discussed, don't implement this interface yet.
  */
 @Deprecated
 public interface ConsistencyChecker {
-
-	/**
-	 * If we would introduce a marker interface e.g. ScenarioElement the ConsistencyChecker interface could 
-	 * contain this method with a generic type T extends ScenarioElement. This would enforce consistent 
-	 * syntax but would be more complicated than the consistency framework has to be.
-	 * 
-	 */
-//	public boolean checkConsistency();
-	
-	/**
-	 * for lazy failing consistency checks we have to store occured errors somewhere
-	 */
-	public List<ConsistencyException> getConsistencyExceptions();
 
 	
 }

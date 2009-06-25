@@ -26,17 +26,17 @@ import org.matsim.api.core.v01.Scenario;
 
 /**
  * Classes implementing this interface are responsible to store 
- * several instance of the different ConsistencyChecker subtypes.
+ * several instances ConsistencyChecker type.
  * Furthermore it has to provide a method to check a complete
- * Scenario with all ConsistencyCheckers attached to this instance.
+ * Scenario.
  * @author dgrether
  * @deprecated just a draft to be discussed, don't implement this interface yet.
  */
 @Deprecated
 public interface ConsistencyCheckerManager {
 
-	public List<ScenarioConsistencyChecker> getScenarioConsistencyCheckers();
+	public List<ConsistencyChecker> getConsistencyCheckers();
 		
-	public boolean checkConsistency(Scenario scenario);
+	public void checkConsistency(Scenario scenario);
 
 }
