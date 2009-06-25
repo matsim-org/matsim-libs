@@ -22,6 +22,7 @@ package org.matsim.core.basic.v01.households;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,6 +58,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
   
 	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
 		BasicScenarioImpl scenario = new BasicScenarioImpl();
+		scenario.getConfig().scenario().setUseHouseholds(true);
 		BasicHouseholds<BasicHousehold> households = scenario.getHouseholds();
 		BasicHouseholdsReaderV10 reader = new BasicHouseholdsReaderV10(households);
 		reader.readFile(this.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
@@ -79,6 +81,8 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 	
 	public void testReaderWriter() {
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().scenario().setUseHouseholds(true);
+		scenario.getConfig().scenario().setUseVehicles(true); 
 		createTestPopulation(scenario);
 		createTestVehicles(scenario);
 		
@@ -131,7 +135,8 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertNotNull(hh);
 		assertEquals(id23, hh.getId());
 		assertEquals(3, hh.getMemberIds().size());
-		List<Id> hhmemberIds = hh.getMemberIds();
+		List<Id> hhmemberIds = new ArrayList<Id>();
+		hhmemberIds.addAll(hh.getMemberIds());
 		Collections.sort(hhmemberIds);
 		assertEquals(id23, hhmemberIds.get(0));
 		assertEquals(id42, hhmemberIds.get(1));
@@ -139,7 +144,8 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 
 
 		assertNotNull(hh.getVehicleIds());
-		List<Id> vehIds = hh.getVehicleIds();
+		List<Id> vehIds = new ArrayList<Id>();
+		vehIds.addAll(hh.getVehicleIds());
 		Collections.sort(vehIds);
 		assertEquals(2, vehIds.size());
 		assertEquals(id23, vehIds.get(0));

@@ -50,7 +50,7 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 	 */
 	@Override
 	public List<Id> getMemberIds() {
-		return (List<Id>) Collections.unmodifiableCollection(new ArrayList<Id>(this.members.keySet()));
+		return (List<Id>) Collections.unmodifiableList(new ArrayList<Id>(this.members.keySet()));
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 	 */
 	@Override
 	public List<Id> getVehicleIds() {
-		return (List<Id>) Collections.unmodifiableCollection(new ArrayList<Id>(this.vehicles.keySet()));
+		return (List<Id>) Collections.unmodifiableList(new ArrayList<Id>(this.vehicles.keySet()));
 	}
 
 	public Map<Id, BasicVehicle> getVehicles() {

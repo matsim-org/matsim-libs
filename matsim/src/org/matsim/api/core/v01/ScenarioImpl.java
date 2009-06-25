@@ -91,9 +91,12 @@ public class ScenarioImpl implements Scenario {
 		this.facilities = new ActivityFacilitiesImpl();
 		this.getWorld().setFacilityLayer((ActivityFacilitiesImpl) this.facilities);
 	
-		this.households = new HouseholdsImpl();
-		this.vehicles = new BasicVehiclesImpl();
-		
+		if (this.config.scenario().isUseHouseholds()){
+			this.createHouseholdsContainer();
+		}
+		if (this.config.scenario().isUseVehicles()){
+			this.createVehicleContainer();
+		}
 		if (this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}
@@ -108,7 +111,15 @@ public class ScenarioImpl implements Scenario {
 		}
 	}
 	
-	private void createKnowledges() {
+	protected void createVehicleContainer(){
+		this.vehicles = new BasicVehiclesImpl();
+	}
+	
+	protected void createHouseholdsContainer(){
+		this.households = new HouseholdsImpl();
+	}
+	
+	protected void createKnowledges() {
 		this.knowledges = new KnowledgesImpl();
 	}
 
@@ -217,14 +228,23 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	public Households getHouseholds() {
+		if ((this.households == null) && this.config.scenario().isUseHouseholds()){
+			this.createHouseholdsContainer();
+		}
 		return this.households;
 	}
 	
 	public BasicVehicles getVehicles(){
+		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
+			this.createVehicleContainer();
+		}
 		return this.vehicles;
 	}
 	
 	public Knowledges getKnowledges(){
+		if ((this.knowledges == null) && this.config.scenario().isUseKnowledges()){
+			this.createKnowledges();
+		}
 		return this.knowledges;
 	}
 

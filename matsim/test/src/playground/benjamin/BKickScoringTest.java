@@ -109,6 +109,7 @@ public class BKickScoringTest extends MatsimTestCase {
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plansScoreTestV4.xml");
 		//hh loading
+		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
 		
 		
