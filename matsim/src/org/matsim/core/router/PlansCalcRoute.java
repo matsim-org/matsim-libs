@@ -317,10 +317,10 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			// create an empty route == staying on place if toLink == endLink
 			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink, toLink);
 			route.setTravelTime(0);
+			route.setDistance(0.0);
 			leg.setRoute(route);
 			travTime = 0;
 		}
-
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		leg.setArrivalTime(depTime + travTime);
