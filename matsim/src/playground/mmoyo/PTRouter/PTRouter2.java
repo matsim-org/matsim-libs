@@ -15,6 +15,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.MyDijkstra;
 import playground.mmoyo.PTRouter.PTNode;
+import playground.mmoyo.TransitSimulation.LogicToPlainConverter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -31,7 +32,6 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class PTRouter2{
 	private NetworkLayer logicNet;
-	private NetworkLayer plainNet;
 	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
 	public TravelTime ptTravelTime;   //> make private 
@@ -43,12 +43,11 @@ public class PTRouter2{
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
 	}
 	
-	public PTRouter2(NetworkLayer plainNet, NetworkLayer logicNet, PTTimeTable2 ptTimetable) {
+	public PTRouter2(NetworkLayer logicNet, PTTimeTable2 ptTimetable, LogicToPlainConverter logicToPlainConverter) {
 		this.logicNet = logicNet;
-		this.plainNet = plainNet;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
-		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
+		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);		
 	}
 	
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
@@ -73,7 +72,6 @@ public class PTRouter2{
 		logicNet.removeNode(origin);
 		logicNet.removeNode(destination);
 		
-		//convertToPlainPath(path);
 		return path;
 	}
 
@@ -161,15 +159,7 @@ public class PTRouter2{
 		}else{
 			System.out.println("The route is null");
 		}
-	}
-	
-	private void convertToPlainPath(Path logicPath){
-    	int i=0;
-    	for (Node logicNode : logicPath.nodes){
-    		Node plainNode = this.plainNet.getNode(logicNode.getType());
-    		logicPath.nodes.set(i++, plainNode);
-    	}
-    }
+	}	
 }
 
 

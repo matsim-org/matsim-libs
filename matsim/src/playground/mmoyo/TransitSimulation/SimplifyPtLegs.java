@@ -12,9 +12,9 @@ import org.matsim.api.basic.v01.TransportMode;
  * A sequence of PT-Acts and PT-Activities starts with a leg "walk to PT" and ends with a act "exit PT" and a walk leg 
  * This class deletes them and introduces a new empty PT leg instead
  */
-public class SimplifyPtLegs2 {
+public class SimplifyPtLegs {
 	
-	public SimplifyPtLegs2(){
+	public SimplifyPtLegs(){
 		
 	}
 	

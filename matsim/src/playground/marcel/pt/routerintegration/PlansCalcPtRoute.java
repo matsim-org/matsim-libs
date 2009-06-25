@@ -40,14 +40,14 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.mmoyo.PTRouter.PTTimeTable2;
-import playground.mmoyo.TransitSimulation.SimplifyPtLegs2;
+import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
 import playground.mmoyo.input.PTNetworkFactory2;
 
 public class PlansCalcPtRoute extends PlansCalcRoute {
 
-	private final SimplifyPtLegs2 planSimplifier;
+	private final SimplifyPtLegs planSimplifier;
 	private final TransitRouteFinder ptRouter;
 
 	private Plan currentPlan = null;
@@ -57,7 +57,7 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 			final TravelCost costCalculator, final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule) {
 		super(config, network, costCalculator, timeCalculator, factory);
-		this.planSimplifier = new SimplifyPtLegs2();
+		this.planSimplifier = new SimplifyPtLegs();
 
 //		String timeTableFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/inptnetfile.xml";
 //		String ptNewLinesFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/TestCase/InPTDIVA.xml";

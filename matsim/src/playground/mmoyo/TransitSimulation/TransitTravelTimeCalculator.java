@@ -81,9 +81,10 @@ public class TransitTravelTimeCalculator {
 
 	
 	public void fillTimeTable(PTTimeTable2 ptTimeTable2){
-		//-> look for a better implementation
 		ptTimeTable2.setLinkTravelTimeMap(linkTravelTimeMap);
 		ptTimeTable2.setNodeDeparturesMap(nodeDeparturesMap);
+		//linkTravelTimeMap = null;
+		//nodeDeparturesMap = null;
 	}
 	
 	

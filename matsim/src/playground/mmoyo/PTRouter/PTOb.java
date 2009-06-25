@@ -2,20 +2,22 @@ package playground.mmoyo.PTRouter;
 
 import playground.mmoyo.input.PTNetworkFactory2;
 import org.matsim.core.network.NetworkLayer;
+import playground.mmoyo.TransitSimulation.LogicToPlainConverter;
 
 /**
- * Contains the common objects for the route search: network, PTTimetable, PtRouter
+ * Contains the common objects for the route search: network, logicNet, PTTimetable, PtRouter
  */
 public class PTOb {
 	private NetworkLayer networkLayer; 
-	private NetworkLayer logicNetworkLayer;
+	private LogicToPlainConverter logicToPlainConverter;
 	public  PTRouter2 ptRouter2;  //-->: make private
 	private PTTimeTable2 ptTimeTable;
+
+	private PTNetworkFactory2 ptNetworkFactory =new PTNetworkFactory2();
 	private String outPutPlanFile; 
 	private String config;
 	private String plansFile;
 	private String ptNetFile; 
-	private PTNetworkFactory2 ptNetworkFactory =new PTNetworkFactory2();
 
 	@Deprecated
 	public PTOb(String configFile, String ptNetFileName, String timeTableFile, String plansFile, String outPutPlansFile){
@@ -91,11 +93,11 @@ public class PTOb {
 		this.ptTimeTable= ptTimeTable;
 	}
 
-	public NetworkLayer getLogicNetworkLayer() {
-		return logicNetworkLayer;
+	public LogicToPlainConverter getLogicToPlainConverter() {
+		return logicToPlainConverter;
 	}
 
-	public void setLogicNetworkLayer(final NetworkLayer logicNetworkLayer) {
-		this.logicNetworkLayer = logicNetworkLayer;
+	public void setLogicToPlainConverter(LogicToPlainConverter logicToPlainConverter) {
+		this.logicToPlainConverter = logicToPlainConverter;
 	}	
 }

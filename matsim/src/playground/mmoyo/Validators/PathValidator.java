@@ -26,22 +26,20 @@ public class PathValidator {
 		boolean valid = true;
 		if (path!=null){
 			Link lastLink = null;
-			boolean first= true;
 			for (Link link : path.links) {
-				if (!first){
+				if (lastLink!= null){
 					if (!canPassLink(lastLink, link)){
 						return false;
 					}
-				}else{
-					first=false;
+					lastLink= link;
 				}
-				lastLink= link;
 			}
 		}else{
 			valid=false;
 		}
 		return valid;
 	}
+	
 	
 	public boolean canPassLink(final Link lastLink, final Link link){
 		boolean pass = false;

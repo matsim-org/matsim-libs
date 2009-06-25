@@ -21,11 +21,14 @@ import playground.mmoyo.PTRouter.Walk;
  */
 public class TransitRouteFinder {
 	private PTRouter2 ptRouter;
+	private LogicToPlainConverter logicToPlainConverter;
 	private static Walk walk = new Walk();
 	
+	
 	public TransitRouteFinder(final TransitSchedule transitSchedule){
-		LogicTransitOb logicTransitOb = new LogicTransitOb(transitSchedule);
-		this.ptRouter = logicTransitOb.getPTRouter();
+		LogicFactory logicFactory = new LogicFactory(transitSchedule);
+		this.ptRouter = logicFactory.getPTRouter();
+		this.logicToPlainConverter = logicFactory.getLogicToPlainConverter();
 	}
 	
 	@Deprecated
@@ -71,6 +74,8 @@ public class TransitRouteFinder {
 			lastLinkType = linkType;
 			i++;
 		}
+		
+		//logicToPlainConverter.convertToPlain(legList);
 		return legList;
 	}
 	
@@ -87,21 +92,22 @@ public class TransitRouteFinder {
 	private Leg createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null);  
 		double travTime= arrivTime - depTime;
-		
-		legRoute.setLinks(null, routeLinks, null);
-		legRoute.setTravelTime(travTime);
 
 		double distance=0;
 		for(Link link : routeLinks) {
 			distance= distance + link.getLength();
 		} 
 		legRoute.setDistance(distance);
+		legRoute.setLinks(null, routeLinks, null);
+		legRoute.setTravelTime(travTime);
+
 		
 		Leg leg = new LegImpl(mode);
 		leg.setRoute(legRoute);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		leg.setArrivalTime(arrivTime);
+
 		return leg;
 	}
 	

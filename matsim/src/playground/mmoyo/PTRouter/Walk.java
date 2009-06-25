@@ -1,7 +1,7 @@
 package playground.mmoyo.PTRouter;
 
 /**
- * This class contains constant variables a constant values to pedestrian routing
+ * This class contains constant variables and constant values to pedestrian routing
  */
 
 public class Walk {
