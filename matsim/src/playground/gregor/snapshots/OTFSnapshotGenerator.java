@@ -70,26 +70,26 @@ public class OTFSnapshotGenerator {
 		SimpleBackgroundTextureDrawer sbg = new SimpleBackgroundTextureDrawer("./res/arrow.png");
 		ConfluenceArrowsFromEvents c = new ConfluenceArrowsFromEvents(sbg,this.scenario.getNetwork());
 		
-		SimpleBackgroundTextureDrawer sbgII = new SimpleBackgroundTextureDrawer("./res/arrow.png");
-		SimpleBackgroundTextureDrawer sbgIII = new SimpleBackgroundTextureDrawer("./res/blocked.png");
-		WrongDirectionArrowsFromEvents w = new WrongDirectionArrowsFromEvents(sbgII,sbgIII,this.scenario.getNetwork());
+//		SimpleBackgroundTextureDrawer sbgII = new SimpleBackgroundTextureDrawer("./res/arrow.png");
+//		SimpleBackgroundTextureDrawer sbgIII = new SimpleBackgroundTextureDrawer("./res/blocked.png");
+//		WrongDirectionArrowsFromEvents w = new WrongDirectionArrowsFromEvents(sbgII,sbgIII,this.scenario.getNetwork());
 		
 		ev.addHandler(c);
-		ev.addHandler(w);
+//		ev.addHandler(w);
 		new EventsReaderTXTv1(ev).readFile(this.eventsFile);
 		ev.removeHandler(d);
 		ev.removeHandler(t);
 		ev.removeHandler(c);
-		ev.removeHandler(w);
+//		ev.removeHandler(w);
 		c.createArrows();
-		w.createArrows();
+//		w.createArrows();
 		
 		PositionInfo.lsTree = new LineStringTree(getFeatures(),(NetworkLayer) this.scenario.getNetwork());
 		
 		MVISnapshotWriter writer = new MVISnapshotWriter(this.scenario);
 		writer.addSimpleBackgroundTextureDrawer(sbg);
-		writer.addSimpleBackgroundTextureDrawer(sbgII);
-		writer.addSimpleBackgroundTextureDrawer(sbgIII);
+//		writer.addSimpleBackgroundTextureDrawer(sbgII);
+//		writer.addSimpleBackgroundTextureDrawer(sbgIII);
 		
 		SnapshotGenerator sg = new SnapshotGenerator(this.scenario,writer);
 		sg.setVisOutputSample(VIS_OUTPUT_SAMPLE);
