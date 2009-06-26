@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.utils.misc.Time;
 
 public abstract class BasicEventImpl implements BasicEvent {
 
@@ -32,9 +31,6 @@ public abstract class BasicEventImpl implements BasicEvent {
 	public final static String ATTRIBUTE_TYPE = "type";
 
 	private final double time;
-
-	private static String timeString = null;
-	private static double timeCache = Time.UNDEFINED_TIME;
 
 	public BasicEventImpl(final double time) {
 		this.time = time;
