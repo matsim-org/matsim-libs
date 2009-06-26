@@ -103,8 +103,7 @@ public class ScenarioLoader extends BasicScenarioLoader {
 	}
 
 	private void loadHouseholds() {
-		if (this.getScenario() instanceof ScenarioImpl){
-			if ((((ScenarioImpl)this.getScenario()).getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
+			if ((this.getScenario().getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 				String hhFileName = this.config.households().getInputFile();
 				log.info("loading households from " + hhFileName);
 				try {
@@ -121,15 +120,10 @@ public class ScenarioLoader extends BasicScenarioLoader {
 			else {
 				log.warn("no households file set in config or feature disabled, not able to load anything");
 			}
-		}
-		else {
-			throw new IllegalStateException("Households only available if scenario is instance of ScenarioImpl!");
-		}
 	}
 
 	private void loadSignalSystemConfigurations() {
-		if (this.getScenario() instanceof ScenarioImpl) {
-			if ((((ScenarioImpl) this.getScenario()).getSignalSystemConfigurations() != null)
+			if ((this.getScenario().getSignalSystemConfigurations() != null)
 					&& (this.config.signalSystems().getSignalSystemConfigFile() != null)) {
 				BasicSignalSystemConfigurations signalSystemConfigurations = ((ScenarioImpl) this.getScenario())
 						.getSignalSystemConfigurations();
@@ -141,15 +135,10 @@ public class ScenarioLoader extends BasicScenarioLoader {
 			else {
 				log.info("no signal system configurations file set in config or feature disabled, not able to load anything");
 			}
-		}
-		else {
-			throw new IllegalStateException("SignalSystems only available if scenario is instance of ScenarioImpl!");
-		}
 	}
 
 	private void loadSignalSystems() {
-		if (this.getScenario() instanceof ScenarioImpl) {
-			if ((((ScenarioImpl) this.getScenario()).getSignalSystems() != null)
+			if (( this.getScenario().getSignalSystems() != null)
 					&& (this.config.signalSystems().getSignalSystemFile() != null)) {
 				BasicSignalSystems signalSystems = ((ScenarioImpl) this.getScenario()).getSignalSystems();
 				MatsimSignalSystemsReader reader = new MatsimSignalSystemsReader(signalSystems);
@@ -159,15 +148,9 @@ public class ScenarioLoader extends BasicScenarioLoader {
 			else {
 				log.info("no signal system definition file set in config or feature disabled, not able to load anything");
 			}
-		}
-		else {
-			throw new IllegalStateException("SignalSystems only available if scenario is instance of ScenarioImpl!");
-		}
-
 	}
 
 	private void loadLanes() {
-		if (this.getScenario() instanceof ScenarioImpl) {
 			BasicLaneDefinitions laneDefinitions;
 			if ((((ScenarioImpl) this.getScenario()).getLaneDefinitions() != null)
 					&& (this.config.network().getLaneDefinitionsFile() != null)) {
@@ -178,10 +161,6 @@ public class ScenarioLoader extends BasicScenarioLoader {
 			else {
 				log.info("no lane definition file set in config or feature disabled, not able to load anything");
 			}
-		}
-		else {
-			throw new IllegalStateException("Lanes only available if scenario is instance of ScenarioImpl!");
-		}
 	}
 
 	@SuppressWarnings("deprecation")
