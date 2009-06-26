@@ -141,8 +141,10 @@ public class CompareGAPV01 {
 							 * file for THIS hour only. Afterwards, a new line is created, and the current
 							 * GAP_ID is written to the new line.
 							 */
+							String writeActual = String.valueOf(valueActual);
+							String writeSimulated = String.valueOf(valueSim);
 							outputScatter.write( String.valueOf(a-1) + DELIMITER );
-							outputScatter.write(String.valueOf(valueActual) + DELIMITER + String.valueOf(valueSim) );
+							outputScatter.write(writeActual + DELIMITER + writeSimulated );
 							outputScatter.newLine();
 							outputScatter.write( String.valueOf(lineActual[0]) + DELIMITER);
 							/*
@@ -167,8 +169,10 @@ public class CompareGAPV01 {
 						/*
 						 * Scatter plot
 						 */
+						String writeActual = String.valueOf(valueActual);
+						String writeSimulated = String.valueOf(valueSim);
 						outputScatter.write( String.valueOf(lineActual.length - 2 ) + DELIMITER );
-						outputScatter.write(String.valueOf(valueActual) + DELIMITER + String.valueOf(valueSim) );
+						outputScatter.write(writeActual + DELIMITER + writeSimulated );
 						outputScatter.newLine();
 						/*
 						 * Boxplot
