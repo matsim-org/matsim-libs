@@ -32,7 +32,7 @@ public class DateString extends GregorianCalendar{
 	public String toString(){
 		String result = null;
 		int year = this.get(YEAR);
-		int month = this.get(MONTH);
+		int month = this.get(MONTH)+1; // Seems to be a java thing that month is started at 0... 
 		int day = this.get(DAY_OF_MONTH);
 		int hour = this.get(HOUR_OF_DAY);
 		int minute = this.get(MINUTE);
