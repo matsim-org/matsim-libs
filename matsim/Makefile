@@ -182,6 +182,11 @@ run: compile
 	$(JAVA) $(JAVAX) $(MAINCLASS) $(CONFIG) $(DTD)
 	@echo "------------------------------------------------------------"
 
+runonly:
+	@echo "------------------------------------------------------------"
+	$(JAVA) $(JAVAX) $(MAINCLASS) $(CONFIG) $(DTD)
+	@echo "------------------------------------------------------------"
+
 tags:
 	etags src/org/matsim/*.java
 	etags --append src/org/matsim/*/*.java
