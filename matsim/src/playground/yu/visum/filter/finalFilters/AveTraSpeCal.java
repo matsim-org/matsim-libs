@@ -54,13 +54,13 @@ public class AveTraSpeCal extends LinkAveCalA {
 	 * event)
 	 */
 	@Override
-	public void compute(final LinkEnterEvent enter, final double leaveTime) {
+	public void compute(final LinkEnterEvent event, final double leaveTime) {
 		// int linkId = 0;
 		try {
-			LinkEnterEvent event = rebuildEventLinkEnter(enter);
+//			LinkEnterEvent event = rebuildEventLinkEnter(enter);
 			computeInside(event.getLink().getLength()
-					/ (leaveTime - enter.getTime()), event.getLinkId().toString(),
-					(long)(enter.getTime() / 900));
+					/ (leaveTime - event.getTime()), event.getLinkId().toString(),
+					(long)(event.getTime() / 900));
 		} catch (NullPointerException e) {
 //			System.err.println(e);
 		}

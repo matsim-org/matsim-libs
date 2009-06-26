@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.yu.visum.filter.EventFilterA;
@@ -51,21 +50,21 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	}
 
 	/*-----------------------NORMAL METHOD---------------------*/
-	/**
-	 * rebuilds a real LinkEnterEvent-event.
-	 * 
-	 * @param enter
-	 *            - the event, that a Person enters in a link.
-	 * @return a real LinkEnterEvent-event.
-	 */
-	public LinkEnterEvent rebuildEventLinkEnter(LinkEnterEvent enter) {
+//	/**
+//	 * rebuilds a real LinkEnterEvent-event.
+//	 * 
+//	 * @param enter
+//	 *            - the event, that a Person enters in a link.
+//	 * @return a real LinkEnterEvent-event.
+//	 */
+//	public LinkEnterEvent rebuildEventLinkEnter(LinkEnterEvent enter) {
 		// very important to rebuild LinkEventData Object: event, aim to get
 		// the id and the length of the right link
 //		enter.setPerson(this.plans.getPersons().get(
 //				(new IdImpl(enter.getPersonId().toString()))));
-		enter.setLink(network.getLink(enter.getLinkId().toString()));
-		return enter;
-	}
+//		enter.setLink(network.getLink(enter.getLinkId().toString()));
+//		return enter;
+//	}
 
 	/*-----------------------ABSTRACT METHODS-----------------------*/
 	/**

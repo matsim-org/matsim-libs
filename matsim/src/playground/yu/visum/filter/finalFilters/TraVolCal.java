@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.network.NetworkLayer;
@@ -39,10 +40,10 @@ public class TraVolCal extends FinalEventFilterA {
 				timeBinMax = hour;
 			if (hour < timeBinMin)
 				timeBinMin = hour;
-			LinkEnterEvent ele = rebuildEventLinkEnter((LinkEnterEvent) enter);
+//			LinkEnterEvent ele = rebuildEventLinkEnter((LinkEnterEvent) enter);
 			String linkId = null;
 			try {
-				linkId = ele.getLinkId().toString();
+				linkId = ((BasicLinkEnterEvent) enter).getLinkId().toString();
 			} catch (NullPointerException npe) {
 				System.err.println(npe);
 			}

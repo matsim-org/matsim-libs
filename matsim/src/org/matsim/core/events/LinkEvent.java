@@ -36,7 +36,7 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 
 	LinkEvent(final double time, final Person agent, final Link link) {
 		super(time, agent);
-		this.setLink(link);
+		this.link = link;
 		this.linkId = link.getId();
 	}
 
@@ -54,11 +54,6 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 
 	public Id getLinkId() {
 		return this.linkId;
-	}
-
-	/** @deprecated set link in constructor */
-	public void setLink(Link link) {
-		this.link = link;
 	}
 
 	/** @deprecated use getLinkId() */

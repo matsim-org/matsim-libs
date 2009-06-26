@@ -108,10 +108,11 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	public void handleEvent(LinkLeaveEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
-		if (controler == null) {
-			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
-//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
-		}
+		Link link = controler2.getNetwork().getLinks().get(event.getLinkId());
+//		if (controler == null) {
+//			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
+////			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
+//		}
 
 		// change properties of roads
 		// if (event.linkId.equalsIgnoreCase("110") ||
@@ -132,7 +133,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// updated consumed energy for link
 		EnergyApplicatonSpecificState state = energyLevel.get(event.getPersonId().toString());
 		// System.out.print(state.energyLevel);
-		state.energyLevel -= getEnergyConsumption(event.getLink());
+		state.energyLevel -= getEnergyConsumption(link);
 		// System.out.print(" => " + state.energyLevel);
 
 		// if energy level is below zero: give huge penalty to agent

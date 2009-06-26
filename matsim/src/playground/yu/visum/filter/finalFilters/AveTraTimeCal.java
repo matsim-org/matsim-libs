@@ -58,7 +58,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	public void compute(LinkEnterEvent enter, double leaveTime_s) {
 		double tt = leaveTime_s - enter.getTime();
 		try {
-			computeInside(tt, rebuildEventLinkEnter(enter).getLinkId().toString(),
+			computeInside(tt, enter.getLinkId().toString(),
 					(long) (enter.getTime() / 900));
 		} catch (NullPointerException e) {
 			System.err.println("link exits not in the network");
