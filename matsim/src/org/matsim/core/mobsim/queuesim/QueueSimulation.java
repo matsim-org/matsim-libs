@@ -74,6 +74,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
 import org.matsim.signalsystems.control.PlanBasedSignalSystemControler;
@@ -316,9 +317,8 @@ public class QueueSimulation {
 			//within org.matsim here is the point to create those controlers
 			throw new IllegalArgumentException("Loading classes by name within the org.matsim packages is not allowed!");
 		}
-		else if (controllerName.equalsIgnoreCase("gregorträgteinenbezeichnerhierein")){
-			//der bezeichner kommt dann ins xml
-			//und hier steht dann controler = new SheltersDoorBlockerController();
+		else if (controllerName.equalsIgnoreCase("SheltersDoorBlockerController")){
+			controler = new SheltersDoorBlockerController(config);
 		}
 		else {
 			try {
@@ -541,7 +541,7 @@ public class QueueSimulation {
 	protected void cleanupSim() {
 		this.simEngine.afterSim();
 		double now = SimulationTimer.getTime();
-		for (Tuple<Double, DriverAgent> entry : teleportationList) {
+		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
 			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
@@ -585,8 +585,8 @@ public class QueueSimulation {
 		this.handleActivityEnds(time);
 		this.simEngine.simStep(time);
 
-		if (time >= infoTime) {
-			infoTime += INFO_PERIOD;
+		if (time >= this.infoTime) {
+			this.infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
@@ -641,10 +641,10 @@ public class QueueSimulation {
 	}
 
 	private final void moveVehiclesWithUnknownLegMode(final double now) {
-		while (teleportationList.peek() != null ) {
-			Tuple<Double, DriverAgent> entry = teleportationList.peek();
+		while (this.teleportationList.peek() != null ) {
+			Tuple<Double, DriverAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
-				teleportationList.poll();
+				this.teleportationList.poll();
 				DriverAgent driver = entry.getSecond();
 				Link destinationLink = driver.getDestinationLink();
 				driver.teleportToLink(destinationLink);
@@ -786,7 +786,7 @@ public class QueueSimulation {
 	}
 
 	public QueueNetwork getQueueNetwork() {
-		return network;
+		return this.network;
 	}
 	
 }

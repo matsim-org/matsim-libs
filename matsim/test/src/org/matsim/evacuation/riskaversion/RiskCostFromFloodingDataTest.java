@@ -102,9 +102,4 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		}
 		
 	}
-
-	private static class Vehicle {
-		Id id;
-		double enterTime;
-	}
 }

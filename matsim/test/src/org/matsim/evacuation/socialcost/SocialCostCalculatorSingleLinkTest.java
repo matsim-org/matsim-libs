@@ -154,10 +154,6 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 			this.agents.add(v);
 		}
 		
-		Id ag0 = this.sc.createId("0");
-		Id ag1 = this.sc.createId("0");
-		Id ag2 = this.sc.createId("0");
-		
 		this.l0 = this.sc.createId("0");
 		Id n0 = this.sc.createId("0");
 		Id n1 = this.sc.createId("1");
