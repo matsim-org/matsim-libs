@@ -57,7 +57,7 @@ public class LogicFactory{
 		this.logicToPlainConverter = new LogicToPlainConverter(plainNet,  logicToPlanStopMap);
 	}
 	
-	/**Creates a logic network file and a logic TransitSchedule file with individualized id's for nodes and stops*/
+	//Creates a logic network file and a logic TransitSchedule file with individualized id's for nodes and stops*/
 	private void createLogicNet(){
 	
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
@@ -69,11 +69,11 @@ public class LogicFactory{
 				Node lastPlainNode=null;
 				boolean first= true;
 				
-				/**iterates in each transit stop to create nodes and links */
+				//iterates in each transit stop to create nodes and links */
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
 					
-					/** Create nodes*/
+					//Create nodes
 					Coord coord = transitStopFacility.getCoord();
 					Id idStopFacility = transitStopFacility.getId();  
 					Id logicalId= createLogicalId(idStopFacility, transitRoute.getId()); 
@@ -81,14 +81,14 @@ public class LogicFactory{
 					Node plainNode= createPlainNode(transitStopFacility);
 					logicToPlanStopMap.put(logicNode, plainNode);
 					
-					/**fill the facilityNodeMap to create transfer links later on*/
+					//fill the facilityNodeMap to create transfer links later on
 					if (!facilityNodeMap.containsKey(idStopFacility)){
 						List<Node> nodeStationArray = new ArrayList<Node>();
 						facilityNodeMap.put(idStopFacility, nodeStationArray);
 					}
 					facilityNodeMap.get(idStopFacility).add(logicNode);
 
-					/**Create links*/
+					//Create links
 					if (!first){
 						createLogicLink(new IdImpl(newLinkId++), lastLogicNode, logicNode, "Standard");
 						createPlainLink(lastPlainNode, plainNode);
@@ -96,7 +96,7 @@ public class LogicFactory{
 						first=false;
 					}
 
-					/**create logical stops and stopFacilities*/
+					//create logical stops and stopFacilities
 					TransitStopFacility logicTransitStopFacility = new TransitStopFacility(logicalId, coord); 
 					logicTransitSchedule.addStopFacility(logicTransitStopFacility);
 					TransitRouteStop logicTransitRouteStop = new TransitRouteStop(logicTransitStopFacility, transitRouteStop.getArrivalDelay(), transitRouteStop.getDepartureDelay()); 
@@ -119,7 +119,7 @@ public class LogicFactory{
 		createDetachedTransferLinks(400);
 	}
 	
-	/**Created a new id for a new node. Besides important values are stores in logicStopMap. */ 
+	//Created a new id for a new node. Besides important values are stores in logicStopMap. */ 
 	private Id createLogicalId(final Id idStopFacility, final Id lineId){
 		Id newId = new IdImpl(newStopId++);
 		nodeLineMap.put(newId, lineId);
@@ -209,7 +209,7 @@ public class LogicFactory{
 		System.out.println("done.");
 	}
 
-	/****************get methods************/  // -->
+	/****************get methods************/
 	public NetworkLayer getLogicNet(){
 		return this.logicNet;
 	}

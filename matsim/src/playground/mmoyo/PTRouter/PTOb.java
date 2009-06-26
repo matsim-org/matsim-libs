@@ -9,7 +9,6 @@ import playground.mmoyo.TransitSimulation.LogicToPlainConverter;
  */
 public class PTOb {
 	private NetworkLayer networkLayer; 
-	private LogicToPlainConverter logicToPlainConverter;
 	public  PTRouter2 ptRouter2;  //-->: make private
 	private PTTimeTable2 ptTimeTable;
 
@@ -93,11 +92,5 @@ public class PTOb {
 		this.ptTimeTable= ptTimeTable;
 	}
 
-	public LogicToPlainConverter getLogicToPlainConverter() {
-		return logicToPlainConverter;
-	}
 
-	public void setLogicToPlainConverter(LogicToPlainConverter logicToPlainConverter) {
-		this.logicToPlainConverter = logicToPlainConverter;
-	}	
 }

@@ -176,7 +176,7 @@ public class PTLineAggregator {
 			// char lineType = 'b';
 			String direction1 = "H";
 			String direction2 = "R";
-			/** ficticious timetable for the being time */
+			/** fictitious timetable for the time being*/
 			for (int time = 18000; time < 82800; time = time + 900) {
 				departures.add(String.valueOf(time));
 			}

@@ -17,7 +17,6 @@ import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
 import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
 import playground.mmoyo.Validators.NetValidator;
@@ -188,15 +187,17 @@ public class PTControler2 {
 	    		}
 	    		
 	    		/**Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter*/
-	    		LogicFactory logicFactory = new LogicFactory(transitSchedule);
-	    		logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
+	    		//LogicFactory logicFactory = new LogicFactory(transitSchedule);
+	    		//logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
 	    		
 	    		/**Routes a population*/
 	    		PTActWriter ptActWriter4 = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 	    		ptActWriter4.findRouteForActivities();
-	    		break;
-  		
+
+	    		/**tests the TransitRouteFinder class*/
+	    		//ptActWriter4.printPTLegs(transitSchedule);
 	    		
+	    		break;
 		}
 	}
 }

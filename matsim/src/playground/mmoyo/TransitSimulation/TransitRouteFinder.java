@@ -17,7 +17,7 @@ import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.mmoyo.PTRouter.PTRouter2;
 import playground.mmoyo.PTRouter.Walk;
 /**
- * Receives two acts and returns a list of PT legs that join their coordinates 
+ * Receives two acts and returns a list of PT legs connecting their coordinates 
  */
 public class TransitRouteFinder {
 	private PTRouter2 ptRouter;
@@ -38,44 +38,45 @@ public class TransitRouteFinder {
 	
 	public List<Leg> calculateRoute (final Activity fromAct, final Activity toAct, final Person person ){
 		List<Leg> legList = new ArrayList<Leg>();
-
+		
 		double distToWalk = walk.distToWalk(person.getAge());
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
 
-		String linkType;
-		String lastLinkType= null;
-
-		List <Link> linkList = new ArrayList<Link>();
-		double depTime=fromAct.getEndTime();
-		double travTime= depTime;
-		
-		int i=1;
-		for (Link link: path.links){
-			linkType = link.getType();
+		if (path!= null){
+			List <Link> linkList = new ArrayList<Link>();
+			double depTime=fromAct.getEndTime();
+			double travTime= depTime;
 			
-			if (i>1){
-				if (!linkType.equals(lastLinkType)){
-					Leg newLeg = createLeg(selectMode(lastLinkType), linkList, depTime, travTime);  
-					legList.add(newLeg);
-					
-					depTime=travTime;
-					linkList = new ArrayList<Link>();
+			int i=1;
+			String linkType;
+			String lastLinkType= null;
+			for (Link link: path.links){
+				linkType = link.getType();
+				
+				if (i>1){
+					if (!linkType.equals(lastLinkType)){
+						Leg newLeg = createLeg(selectMode(lastLinkType), linkList, depTime, travTime);  
+						legList.add(newLeg);
+						
+						depTime=travTime;
+						linkList = new ArrayList<Link>();
+					}
+					if (i == path.links.size()){
+						//-> check time formats or if it must be converted in seconds
+						
+						travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
+						Leg newLeg = createLeg(selectMode(linkType), linkList, depTime, travTime);  
+						legList.add(newLeg);
+					}
 				}
-				if (i == path.links.size()){
-					//-> check time formats or if it must be converted in seconds
-					
-					travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
-					Leg newLeg = createLeg(selectMode(linkType), linkList, depTime, travTime);  
-					legList.add(newLeg);
-				}
+				travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
+				linkList.add(link);
+				lastLinkType = linkType;
+				i++;
 			}
-			travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
-			linkList.add(link);
-			lastLinkType = linkType;
-			i++;
+	
+			legList = logicToPlainConverter.convertToPlainLeg(legList);    //Translate into plain links
 		}
-		
-		//logicToPlainConverter.convertToPlain(legList);
 		return legList;
 	}
 	
@@ -90,6 +91,7 @@ public class TransitRouteFinder {
 	}
 	
 	private Leg createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
+		
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null);  
 		double travTime= arrivTime - depTime;
 

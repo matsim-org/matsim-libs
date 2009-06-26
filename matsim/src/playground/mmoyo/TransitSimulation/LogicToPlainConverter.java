@@ -6,20 +6,25 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.collections.map.MultiKeyMap;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.Leg;
-import org.matsim.core.api.population.Route;
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 
+/**
+ * 
+ * @author manuel
+ *
+ */
 public class LogicToPlainConverter {
 	private NetworkLayer plainNet;
 	private MultiKeyMap joiningLinkMap;
@@ -57,22 +62,14 @@ public class LogicToPlainConverter {
 	private Link findLastStandardLink (Link transferLink){
 		Link standardLink = null;
 		for (Link inLink: transferLink.getFromNode().getInLinks().values()){
-			if (inLink.getType().equals("Standard")){
+			if (inLink.getType().equals("Standard"))
 				standardLink = inLink;
-			}
 		}
-		
-		if (standardLink==null){
-			throw new java.lang.NullPointerException("Error with link " + transferLink.getId());
-			//Node plainNode = transferLink.getToNode();
-			//double length = 
-			//plainNet.getNodes(coord);
-		}
+		if (standardLink==null)
+			throw new java.lang.NullPointerException(this +  transferLink.getId().toString() + "Does not exist");
 		return standardLink;
 	}
 
-	
-	
 	private List<Link> convertToPlain(List<Link> logicLinks){
 		List<Link> plainLinks  = new ArrayList<Link>();
 		for (Link logicLink: logicLinks){
@@ -82,24 +79,14 @@ public class LogicToPlainConverter {
 		return plainLinks;
 	}
 	
-	public void convertToPlain (List<Leg> logicLegList){
-		for (Leg leg: logicLegList){
-			Route route = leg.getRoute();
-			//TODO
-		}
-	}
-	
 	public void convertToPlain(Population population){
 		for (Person person: population.getPersons().values()) {
-			//if (true){ Person person = population.getPersons().get(new IdImpl("3937204"));
 			Plan plan = person.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {  
 				if (pe instanceof Activity) {  				
 					Activity act =  (Activity) pe;					
-					//Link logicLink= act.getLink();
-					//Link plainLink= this.convertToPlain(logicLink); 
-					//act.setLink(plainLink);
-					act.setLink(plainNet.getNearestLink(act.getCoord()));
+					Link plainLink= plainNet.getNearestLink(act.getCoord()); 
+					act.setLink(plainLink);
 				}else{
 					Leg leg = (Leg)pe;
 					NetworkRoute logicRoute = (NetworkRoute)leg.getRoute();
@@ -109,6 +96,34 @@ public class LogicToPlainConverter {
 			}
 		}
 	}
+	
+	public List<Leg> convertToPlainLeg (List<Leg> logicLegList){
+		List<Leg> plainLegList = new ArrayList<Leg>();
+		for(Leg logicLeg : logicLegList){
+			NetworkRoute logicNetworkRoute= (NetworkRoute)logicLeg.getRoute();
+			List<Link> plainLinkList = new ArrayList<Link>();
+			
+			for (Link link: logicNetworkRoute.getLinks()){
+				if (link.getType().equals("Standard"))
+					plainLinkList.add(link);
+			}
+			if(plainLinkList.size()>0){
+				NetworkRoute plainRoute = new LinkNetworkRoute(null, null); 
+				plainRoute.setLinks(null, plainLinkList, null);
+				
+				Leg plainLeg = new LegImpl(TransportMode.pt);
+				plainLeg = logicLeg;
+				plainLeg.setRoute(plainRoute);
+				plainLegList.add(plainLeg);
+				
+				logicLeg.setRoute(plainRoute);
+			}
+		}
+		logicLegList = null;
+		return plainLegList;
+	}
+	
+	
 	
 	/*
 	public Path getPlainPath (final Path logicPath){

@@ -112,17 +112,25 @@ public class PTActWriter {
 	 */
 	public void printPTLegs(final TransitSchedule transitSchedule){
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
-		Person person = population.getPersons().get(new IdImpl("2180188"));
-
-		Plan plan = person.getPlans().get(0);
- 		Activity act1 = (Activity)plan.getPlanElements().get(0);
-		Activity act2 = (Activity)plan.getPlanElements().get(2);
-		List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
-		for (Leg leg : legList){
-			System.out.println(leg);
+		
+		for (Person person: this.population.getPersons().values()) {
+			//Person person = population.getPersons().get(new IdImpl("2180188"));
+	
+			Plan plan = person.getPlans().get(0);
+	 		Activity act1 = (Activity)plan.getPlanElements().get(0);
+			Activity act2 = (Activity)plan.getPlanElements().get(2);
+			List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
+			
+			for (Leg leg : legList){
+				NetworkRoute netRoute= (NetworkRoute) leg.getRoute(); 
+				System.out.println("");
+				for ( Link l : netRoute.getLinks()){
+					System.out.print("(" + l.getFromNode().getId() + ")----" + l.getId() + "---->(" + l.getToNode().getId() + ")" );
+				}
+			}
+			
 		}
 	}
-	
 	public void findRouteForActivities(){
 		Population newPopulation = new PopulationImpl();
 		int numPlans=0;

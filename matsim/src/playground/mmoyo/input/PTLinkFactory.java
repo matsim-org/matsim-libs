@@ -12,7 +12,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * Creates the links for the class PTLineAggregator
  * @param net current PT network 
  */
-public class PTLinkFactory {
+public class PTLinkFactory{
 	Network net;
 	int intNextId;
 	
