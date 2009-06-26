@@ -5,25 +5,25 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.events.PersonEvent;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 //TODO: write tests for this class
 
-public class ElectricCostHandler implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
+public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
+		BasicLinkEnterEventHandler, BasicActivityStartEventHandler, BasicActivityEndEventHandler,
 		BasicAgentMoneyEventHandler {
 	// key: agentId
 	// value: energyState
@@ -100,12 +100,12 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		initOutputFile();
 	}
 
-	private void initEnergyLevel(PersonEvent event) {
+	private void initEnergyLevel(BasicPersonEvent event) {
 		energyLevel.put(event.getPersonId().toString(), new EnergyApplicatonSpecificState(
 				fullEnergyLevel));
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
 		Link link = controler2.getNetwork().getLinks().get(event.getLinkId());
@@ -186,13 +186,13 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// 0sec)
 	}
 
-	public void handleEvent(ActivityStartEvent event) {
+	public void handleEvent(BasicActivityStartEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
-		if (controler == null) {
-			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
+//		if (controler == null) {
+//			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
 //			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
-		}
+//		}
 
 		// initialize the energyLevel at the beginning to full energy
 		if (!energyLevel.containsKey(event.getPersonId().toString())) {
@@ -205,13 +205,13 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		recordSOCOfVehicle(event);
 	}
 
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(BasicActivityEndEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
-		if (controler == null) {
-			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
+//		if (controler == null) {
+//			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
 //			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
-		}
+//		}
 
 		// initialize the energyLevel at the beginning to full energy
 		if (!energyLevel.containsKey(event.getPersonId().toString())) {
@@ -307,18 +307,18 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		}
 	}
 
-	private void recordSOCOfVehicle(PersonEvent event) {
+	private void recordSOCOfVehicle(BasicPersonEvent event) {
 		recordSOCOfVehicle(event, event.getTime());
 	}
 
-	private void recordSOCOfVehicle(PersonEvent event, double time) {
-		if (event.getPersonId().toString().toString().equalsIgnoreCase(observedVehicleId) && relevantIterationReached) {
+	private void recordSOCOfVehicle(BasicPersonEvent event, double time) {
+		if (event.getPersonId().toString().equalsIgnoreCase(observedVehicleId) && relevantIterationReached) {
 			recordedStateOfCharge.add(time,
 					energyLevel.get(observedVehicleId).energyLevel);
 		}
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 		// initialize the energyLevel at the beginning to full energy
 		if (!energyLevel.containsKey(event.getPersonId().toString())) {
 			initEnergyLevel(event);

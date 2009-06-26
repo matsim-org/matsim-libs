@@ -66,11 +66,6 @@ abstract class ActivityEvent extends PersonEvent implements BasicActivityEvent {
 		return this.acttype;
 	}
 
-	@Deprecated // should be set in Constructor
-	public void setLink(final Link link) {
-		this.link = link;
-	}
-
 	/** @deprecated use getLinkId() */
 	public Link getLink() {
 		return this.link;
