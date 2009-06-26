@@ -54,14 +54,14 @@ public class MyCommercialDemandGenerator3 {
 	// String value that must be set
 	final static String PROVINCE = "Gauteng";
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+	final static String ROOT = "/home/jjoubert/";
 	
 	private static final int populationSize = 5000;
 	private static final int firstIndex = 100000;
 	private static double WITHIN_THRESHOLD = 0.90;
-	private static final int numberOfSamples = 1;
+	private static final int numberOfSamples = 10;
 
 	private final static int dimensionStart = 24; 		// vales 00h00m00 - 23h59m59
 	private final static int dimensionActivities = 21; 	// index '0' should never be used
