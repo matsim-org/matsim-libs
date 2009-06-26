@@ -21,6 +21,12 @@ import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.basic.network.BasicLaneDefinitions;
+import org.matsim.core.basic.signalsystems.BasicSignalSystems;
+import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
+import org.matsim.core.basic.v01.vehicles.BasicVehicles;
+import org.matsim.households.Households;
+import org.matsim.knowledges.Knowledges;
 
 
 
@@ -41,5 +47,17 @@ public interface Scenario extends BasicScenario {
 	public ActivityFacilities getActivityFacilities() ;
 
 	public Population getPopulation() ;
+	
+	public Knowledges getKnowledges();
+	
+	public Households getHouseholds();
+	
+	public BasicVehicles getVehicles();
 
+	public BasicLaneDefinitions getLaneDefinitions();
+	
+	public BasicSignalSystems getSignalSystems();
+	
+	public BasicSignalSystemConfigurations getSignalSystemConfigurations();
+	
 }
