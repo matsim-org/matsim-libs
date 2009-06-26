@@ -130,7 +130,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			}
 		}
 		Collection<Person> persons = controler.getPopulation().getPersons().values();
-		int n =2; // TODO: get this from the config file  
+		int n =3; // TODO: get this from the config file  
 		System.out.println("Number of retail zones = "+  n*n);
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
@@ -204,9 +204,10 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 					double prob = 0;
 					Collection<Person> persons = new ArrayList<Person> ();
 					rz.getPersonsQuadTree().get(rz.getPersonsQuadTree().getMinEasting(),rz.getPersonsQuadTree().getMinNorthing(), rz.getPersonsQuadTree().getMaxEasting(), rz.getPersonsQuadTree().getMaxNorthing(), persons );
-					
+					log.info("In the retail zone " + rz.getId() + " " + persons.size() + " persons are living");
+					//log.info("minx_x = " + rz.getPersonsQuadTree().getMinEasting() + ", min_y = " + rz.getPersonsQuadTree().getMinNorthing() + ", max_x = " + rz.getPersonsQuadTree().getMaxEasting() + ", max_y" + rz.getPersonsQuadTree().getMaxNorthing());
 					for (Person p:persons) {
-						//if (rz.getPersonsQuadTree().values().contains(p))
+						
 						if (first_shop) {
 							Consumer consumer = new Consumer (consumer_count, p, rz.getId());
 							consumers.add(consumer);
@@ -219,35 +220,27 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 								
 								if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
 									counter++;
-									log.info("The number of shop activities in the shop " + f.getId() + " is " + counter);
-									
-									if (persons.size()>0) {
-										int i =Integer.parseInt(rz.getId().toString());
-										prob = counter/persons.size();
-										prob_i_j.set(i,j,prob);
-										sum_prob = sum_prob+prob;
-									}
-									
-									else {} // TODO Throw an error, it is not possible that a zone hasn't inhabitants since they are constructed depending on 
-									// max/min coordinates of inhabitants' home location
+									//log.info("The number of shop activities in the shop " + f.getId() + " is " + counter);
+									int i =Integer.parseInt(rz.getId().toString());
+									prob = counter/persons.size();
+									prob_i_j.set(i,j,prob);
 								}
 							}
 						}
 					}
-					log.info("counter = " + counter);
-					log.info("persons = " + ((Integer)persons.size()).doubleValue());
+					//log.info("counter = " + counter);
+					//log.info("persons = " + ((Integer)persons.size()).doubleValue());
+					log.info(persons.size() + " persons are living in the retail zone " + rz.getId());
 				}
 				
 				first_shop=false;
-				//avg_prob_i.set(j, sum_prob/zone_count);
-				//log.info("avg_prob_i = " + avg_prob_i.get(j));
 				log.info("number of zones = " + zone_count);
-				j=j+1; //Integer.parseInt(f.getId().toString());
+				j=j+1;
 			}
 			log.info("Number of potential consumers in the area = " + consumer_count);
 			log.info("Consumers in the area = " + consumers.size());
 			ComputeGravityModelParameters cgmp = new ComputeGravityModelParameters ();
-			cgmp.computeInitialParameters (controler, prob_i_j, consumers);
+			cgmp.computeInitialParameters (controler, prob_i_j, consumers, shops);
 		}
 	}
 }

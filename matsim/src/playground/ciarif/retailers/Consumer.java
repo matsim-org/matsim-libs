@@ -16,4 +16,15 @@ public class Consumer {
 		this.rzId = rzId;
 	}
 
+	public Id getId() {
+		return this.id;
+	}
+
+	public Person getPerson() {
+		return this.person;
+	}
+
+	public Id getRzId() {
+		return this.rzId;
+	}
 }
