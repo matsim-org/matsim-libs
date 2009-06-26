@@ -42,8 +42,4 @@ public class LinkEnterEvent extends LinkEvent implements BasicLinkEnterEvent {
 		return EVENT_TYPE;
 	}
 
-	public String getTextRepresentation() {
-		return asString() + "5\t" + EVENT_TYPE;
-	}
-
 }

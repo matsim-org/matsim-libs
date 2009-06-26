@@ -43,8 +43,4 @@ public class AgentWait2LinkEvent extends AgentEvent implements BasicAgentWait2Li
 		return EVENT_TYPE;
 	}
 
-	public String getTextRepresentation() {
-		return asString() + "4\t" + EVENT_TYPE;
-	}
-
 }

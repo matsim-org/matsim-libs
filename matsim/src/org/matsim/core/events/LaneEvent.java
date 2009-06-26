@@ -64,14 +64,9 @@ public abstract class LaneEvent extends LinkEvent {
 		attr.put(ATTRIBUTE_LANE, this.laneId.toString());
 		return attr;
 	}
-	
-	@Override
-	protected String asString() {
-		return super.asString() + "\t" + this.laneId.toString();
-	}
-	
+
 	public Id getLaneId() {
-		return laneId;
+		return this.laneId;
 	}
 
 

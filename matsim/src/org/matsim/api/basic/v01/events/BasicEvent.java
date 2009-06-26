@@ -20,8 +20,22 @@
 
 package org.matsim.api.basic.v01.events;
 
-public interface BasicEvent {
+import java.util.Map;
 
+/**
+ * The most basic interface for MATSim Events.
+ * Every event must have at least a timestamp.
+ * 
+ * @author mrieser
+ */
+public interface BasicEvent {
+	
+	/** @return the timestamp of this event */
 	public double getTime();
+
+	/** Returns a map of all the attribute names and values needed for serializing the event.
+	 *
+	 * @return Map of attribute-names and attribute-values that describe that event */
+	public Map<String, String> getAttributes();
 
 }

@@ -54,10 +54,6 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 		return attr;
 	}
 
-	protected String asString() {
-		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t"+ this.getLinkId().toString() + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
-	}
-
 	public Leg getLeg() {
 		return this.leg;
 	}

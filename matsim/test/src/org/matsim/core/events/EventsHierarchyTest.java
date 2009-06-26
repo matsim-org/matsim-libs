@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import java.util.Map;
+
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.testcases.MatsimTestCase;
@@ -59,6 +61,9 @@ public class EventsHierarchyTest extends MatsimTestCase {
 	private static class MockEvent1 implements D {
 		public double getTime() {
 			return 0;
+		}
+		public Map<String, String> getAttributes() {
+			return null;
 		}
 	}
 	

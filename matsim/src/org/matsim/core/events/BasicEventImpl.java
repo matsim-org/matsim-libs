@@ -47,34 +47,11 @@ public abstract class BasicEventImpl implements BasicEvent {
 		return attr;
 	}
 
-	/**
-	 * Returns a textual representation of this event used for writing the event to a text file.
-	 * The string <em>must</em> follow the following format:
-	 * <pre>time-stamp \t agentId \t legNumber \t linkId \t nodeId \t flag \t description</pre>
-	 */
-	public abstract String getTextRepresentation();
-
 	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
 	abstract public String getEventType();
 
-	/**
-	 * Returns the passed time as Seconds, including a trailing tab-character.
-	 * Internally caches the returned result to speed up writing many events with the same time.
-	 * This may no longer be useful if times are switched to double.
-	 *
-	 * @param time
-	 * @return
-	 */
-	protected static String getTimeString(final double time) {
-		if (time != timeCache) {
-			timeCache = time;
-			timeString = Long.toString((long) timeCache) + "\t";
-		}
-		return timeString;
-	}
-
 	public double getTime() {
-		return time;
+		return this.time;
 	}
 }
 

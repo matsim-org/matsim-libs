@@ -32,38 +32,17 @@ public class LaneLeaveEvent extends LaneEvent {
 	
 	public static final String EVENT_TYPE = "entered lane";
 	
-	/**
-	 * @param time
-	 * @param agent
-	 * @param link
-	 */
 	public LaneLeaveEvent(double time, Person agent, Link link, Id laneId) {
 		super(time, agent, link, laneId);
 	}
 
-	/**
-	 * @param time
-	 * @param agentId
-	 * @param linkId
-	 */
 	public LaneLeaveEvent(double time, Id agentId, Id linkId, Id laneId) {
 		super(time, agentId, linkId, laneId);
 	}
 
-	/**
-	 * @see org.matsim.core.events.BasicEventImpl#getEventType()
-	 */
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
 	
-	/**
-	 * @see org.matsim.core.events.BasicEventImpl#getTextRepresentation()
-	 */
-	@Override
-	public String getTextRepresentation() {
-		return asString() + "5\t" + EVENT_TYPE;
-	}
-
 }

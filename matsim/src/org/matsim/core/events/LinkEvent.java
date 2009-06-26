@@ -52,10 +52,6 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 		return attr;
 	}
 
-	protected String asString() {
-		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t" + this.getLinkId().toString() + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
-	}
-
 	public Id getLinkId() {
 		return this.linkId;
 	}
@@ -67,7 +63,7 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 
 	/** @deprecated use getLinkId() */
 	public Link getLink() {
-		return link;
+		return this.link;
 	}
 
 }

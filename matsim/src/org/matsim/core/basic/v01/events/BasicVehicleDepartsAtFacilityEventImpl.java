@@ -61,9 +61,4 @@ public class BasicVehicleDepartsAtFacilityEventImpl extends BasicEventImpl imple
 		return attributes;
 	}
 
-	@Override
-	public String getTextRepresentation() {
-		throw new UnsupportedOperationException("writing to txt events is not supported.");
-	}
-
 }

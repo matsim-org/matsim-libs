@@ -64,9 +64,4 @@ public class PersonLeavesVehicleEvent extends PersonEvent implements BasicPerson
 		return this.vehicleId;
 	}
 
-	@Override
-	public String getTextRepresentation() {
-		return "[" + EVENT_TYPE + ": agent: " + this.getPersonId().toString() + "; vehicle: " + this.vehicleId.toString() + "]";
-	}
-
 }

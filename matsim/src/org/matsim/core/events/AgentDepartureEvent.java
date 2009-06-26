@@ -43,8 +43,4 @@ public class AgentDepartureEvent extends AgentEvent implements BasicAgentDepartu
 		return EVENT_TYPE;
 	}
 
-	public String getTextRepresentation() {
-		return asString() + "6\t" + EVENT_TYPE;
-	}
-
 }

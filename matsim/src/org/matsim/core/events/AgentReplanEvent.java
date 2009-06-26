@@ -41,15 +41,6 @@ public class AgentReplanEvent extends PersonEvent {
 		return EVENT_TYPE;
 	}
 
-	public String getTextRepresentation() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(Double.valueOf(this.getTime()));
-		builder.append(' ');
-		builder.append(this.getPersonId().toString());
-
-		return builder.toString();
-	}
-
 	public NetworkRoute getReplannedRoute() {
 		return this.replannedRoute;
 	}

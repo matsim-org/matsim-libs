@@ -23,7 +23,8 @@ package org.matsim.core.events;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.*;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Person;
 
 public class ActivityStartEvent extends ActivityEvent implements BasicActivityStartEvent {
 
@@ -40,10 +41,6 @@ public class ActivityStartEvent extends ActivityEvent implements BasicActivitySt
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
-	}
-
-	public String getTextRepresentation() {
-		return asString() + "7\t" + EVENT_TYPE + " " + this.getActType();
 	}
 
 }

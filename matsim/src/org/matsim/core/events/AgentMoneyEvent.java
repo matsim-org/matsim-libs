@@ -82,10 +82,6 @@ public final class AgentMoneyEvent extends PersonEvent implements BasicAgentMone
 		return attr;
 	}
 
-	public String getTextRepresentation() {
-		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
-	}
-
 	public double getAmount() {
 		return this.amount;
 	}

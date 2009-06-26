@@ -62,10 +62,6 @@ abstract class ActivityEvent extends PersonEvent implements BasicActivityEvent {
 		return attr;
 	}
 
-	protected String asString() {
-		return getTimeString(this.getTime()) + this.getPersonId() + "\t\t"+ this.linkId.toString() + "\t0\t"; // FLAG + DESCRIPTION is missing here: concatenate later
-	}
-
 	public String getActType() {
 		return this.acttype;
 	}

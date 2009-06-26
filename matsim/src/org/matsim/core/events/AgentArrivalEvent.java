@@ -43,8 +43,4 @@ public class AgentArrivalEvent extends AgentEvent implements BasicAgentArrivalEv
 		return EVENT_TYPE;
 	}
 
-	public String getTextRepresentation() {
-		return asString() + "0\t" + EVENT_TYPE;
-	}
-
 }

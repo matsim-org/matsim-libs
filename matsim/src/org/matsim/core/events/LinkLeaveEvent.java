@@ -42,8 +42,4 @@ public class LinkLeaveEvent extends LinkEvent implements BasicLinkLeaveEvent {
 		return EVENT_TYPE;
 	}
 
-	public String getTextRepresentation() {
-		return asString() + "2\t" + EVENT_TYPE;
-	}
-
 }
