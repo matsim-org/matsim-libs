@@ -20,7 +20,7 @@
 package playground.mfeil;
 
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;

@@ -29,7 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;

@@ -3,7 +3,7 @@ package org.matsim.locationchoice.constrained;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.locationchoice.Initializer;

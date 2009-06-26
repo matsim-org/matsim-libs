@@ -24,8 +24,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.network.BasicLaneDefinitions;
 import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
@@ -51,7 +49,7 @@ import org.xml.sax.SAXException;
  * of the scenario assuming that required parts are already 
  * loaded or created by the user.
  * 
- * @see org.matsim.api.core.v01.Scenario
+ * @see org.matsim.core.api.Scenario
  * 
  * @author dgrether
  */

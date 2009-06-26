@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;

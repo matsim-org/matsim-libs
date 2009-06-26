@@ -28,7 +28,7 @@ import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;

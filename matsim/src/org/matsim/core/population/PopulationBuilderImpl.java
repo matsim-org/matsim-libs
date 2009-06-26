@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.Scenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;

@@ -20,8 +20,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.Scenario;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;

@@ -28,6 +28,8 @@ import org.geotools.feature.Feature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.core.api.Scenario;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.*;
 import org.matsim.core.network.*;
 import org.matsim.core.utils.geometry.geotools.MGC;

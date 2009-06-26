@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.Dijkstra;

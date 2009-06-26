@@ -27,12 +27,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.controler.Controler;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 
 import playground.mfeil.config.PlanomatXConfigGroup;

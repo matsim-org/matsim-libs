@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;

@@ -31,7 +31,7 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;

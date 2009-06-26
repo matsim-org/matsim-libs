@@ -38,7 +38,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.Scenario;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Leg;

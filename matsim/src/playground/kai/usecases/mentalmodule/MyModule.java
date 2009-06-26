@@ -14,7 +14,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.Scenario;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;

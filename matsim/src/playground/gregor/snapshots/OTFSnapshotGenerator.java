@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;

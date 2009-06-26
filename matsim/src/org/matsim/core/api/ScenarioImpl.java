@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.api.core.v01;
+package org.matsim.core.api;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -143,21 +143,21 @@ public class ScenarioImpl implements Scenario {
 	
 	
 	/**
-	 * @see org.matsim.api.core.v01.Scenario#getActivityFacilities()
+	 * @see org.matsim.core.api.Scenario#getActivityFacilities()
 	 */
 	public ActivityFacilities getActivityFacilities() {
 		return this.facilities;
 	}
 
 	/**
-	 * @see org.matsim.api.core.v01.Scenario#getNetwork()
+	 * @see org.matsim.core.api.Scenario#getNetwork()
 	 */
 	public Network getNetwork() {
 		return this.network;
 	}
 
 	/**
-	 * @see org.matsim.api.core.v01.Scenario#getPopulation()
+	 * @see org.matsim.core.api.Scenario#getPopulation()
 	 */
 	public Population getPopulation() {
 		return this.population;

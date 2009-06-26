@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.api.core.v01;
+package org.matsim.core.api;
 import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
