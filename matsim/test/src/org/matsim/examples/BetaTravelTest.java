@@ -26,8 +26,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.population.Activity;
@@ -41,10 +46,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
@@ -465,10 +466,10 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class BottleneckTravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+	private static class BottleneckTravelTimeAnalyzer implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 
-		private final HashMap<String, Double> agentDepTimes = new HashMap<String, Double>(); // <AgentId, Time>
-		private final HashSet<String> agentSeen = new HashSet<String>();
+		private final HashMap<Id, Double> agentDepTimes = new HashMap<Id, Double>(); // <AgentId, Time>
+		private final HashSet<Id> agentSeen = new HashSet<Id>();
 		private int agentCounter = 0;
 		private final double[] depTimes;
 		private final double[] arrTimes;
@@ -478,16 +479,15 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.arrTimes = new double[popSize];
 		}
 
-		public void handleEvent(final AgentDepartureEvent event) {
-			if (!this.agentSeen.contains(event.getPersonId().toString())) { // only store first departure
-				this.agentDepTimes.put(event.getPersonId().toString(), Double.valueOf(event.getTime()));
-				this.agentSeen.add(event.getPersonId().toString());
+		public void handleEvent(final BasicAgentDepartureEvent event) {
+			if (!this.agentSeen.contains(event.getPersonId())) { // only store first departure
+				this.agentDepTimes.put(event.getPersonId(), Double.valueOf(event.getTime()));
+				this.agentSeen.add(event.getPersonId());
 			}
 		}
 
-		public void handleEvent(final AgentArrivalEvent event) {
-			String agentId = event.getPersonId().toString();
-			Double depTime = this.agentDepTimes.remove(agentId);
+		public void handleEvent(final BasicAgentArrivalEvent event) {
+			Double depTime = this.agentDepTimes.remove(event.getPersonId());
 			if (depTime != null) {
 				this.depTimes[this.agentCounter] = depTime.doubleValue() / 3600.0;
 				this.arrTimes[this.agentCounter] = event.getTime() / 3600.0;
