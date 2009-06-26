@@ -30,6 +30,7 @@ import org.matsim.core.basic.v01.households.BasicHousehold;
 import org.matsim.core.basic.v01.households.BasicHouseholds;
 import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -50,6 +51,8 @@ public class BasicScenarioImpl implements BasicScenario {
 	public BasicScenarioImpl(Config config) {
 		this.config = config;
 		this.network = new NetworkLayer();  // TODO shoul be changed to a basic implementation
+		//never use the next line in new matsim code
+		Gbl.getWorld().setNetworkLayer((NetworkLayer)this.network);
 		this.population = new PopulationImpl();
 	}
 
