@@ -123,7 +123,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the freespeed at time <tt>time</tt>.
 	 */
 	@Override
-	public double getFreespeed(final double time) {
+	public synchronized double getFreespeed(final double time) {
 		
 		if ((this.aFreespeedTimes == null) || (this.aFreespeedTimes.length != this.aFreespeedEvents)) {
 			initFreespeedEventsArrays();
@@ -142,7 +142,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the freespeed travel time at time <tt>time</tt>.
 	 */
 	@Override
-	public double getFreespeedTravelTime(final double time) {
+	public synchronized double getFreespeedTravelTime(final double time) {
 		return getLength()/getFreespeed(time);
 	}
 
@@ -151,7 +151,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the flow capacity at time <tt>time</tt>.
 	 */
 	@Override
-	public double getFlowCapacity(final double time) {
+	public synchronized double getFlowCapacity(final double time) {
 		
 		if ((this.aFlowCapacityTimes == null) || (this.aFlowCapacityTimes.length != this.aFlowCapacityEvents)) {
 			initFlowCapacityEventsArrays();
@@ -172,7 +172,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the capacity per network's capperiod timestep
 	 */
 	@Override
-	public double getCapacity(final double time) {
+	public synchronized double getCapacity(final double time) {
 	
 		if ((this.aFlowCapacityTimes == null) || (this.aFlowCapacityTimes.length != this.aFlowCapacityEvents)) {
 			initFlowCapacityEventsArrays();
@@ -199,7 +199,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * encode the (min) width of the link to calculate the flow capacity - [GL] 13may08
 	 */
 	@Override
-	public double getNumberOfLanes(final double time) {
+	public synchronized double getNumberOfLanes(final double time) {
 		
 		
 		if ((this.aLanesTimes == null) || (this.aLanesTimes.length != this.aLanesEvents)) {
@@ -222,7 +222,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * could mark this method as deprecated [GL] - 13may2008   
 	 */
 	@Override
-	public int getLanesAsInt(final double time) {
+	public synchronized int getLanesAsInt(final double time) {
 		
 		if ((this.aLanesTimes == null) || (this.aLanesTimes.length != this.aLanesEvents)) {
 			initLanesEventsArrays();
