@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
@@ -35,7 +36,6 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -69,7 +69,7 @@ public class DemandGenerator {
 		String netFile = exampleDirectory + "network.xml";
 		String zonesFile = exampleDirectory + "zones.shp";
 		
-		BasicScenario scenario = new ScenarioImpl();
+		BasicScenario scenario = new BasicScenarioImpl();
 		
 		FeatureSource fts = ShapeFileReader.readDataFile(zonesFile); //reads the shape file in
 		Random rnd = new Random();
@@ -104,7 +104,7 @@ public class DemandGenerator {
 	}
 
 	private static void createActivities(BasicScenario scenario, Random rnd,  Feature recreation, Feature commercial) {
-		BasicPopulation<BasicPerson<BasicPlan>> pop = scenario.getPopulation();
+		BasicPopulation<BasicPerson<BasicPlan>> pop =  scenario.getPopulation();
 		BasicPopulationBuilder pb = pop.getPopulationBuilder(); //the population builder creates all we need 
 		
 		for (BasicPerson<BasicPlan> pers : pop.getPersons().values()) { //this loop iterates over all persons

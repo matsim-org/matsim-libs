@@ -22,15 +22,11 @@ package playground.benjamin.income;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.households.BasicHousehold;
-import org.matsim.core.basic.v01.households.BasicHouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicHouseholds;
 import org.matsim.core.basic.v01.households.BasicIncome;
 import org.matsim.core.basic.v01.households.HouseholdBuilder;
 import org.matsim.core.basic.v01.households.HouseholdsWriterV1;
@@ -51,13 +47,13 @@ public class BKickHouseholdsCreator {
 	
 	
 	public static void createHHForTestCase() throws FileNotFoundException, IOException {
-    BasicScenarioImpl sc = new BasicScenarioImpl();
+    ScenarioImpl sc = new ScenarioImpl();
     Id id1 = sc.createId("1");
     Id id2 = sc.createId("2");
-    BasicHouseholds<BasicHousehold> hhs = sc.getHouseholds();
-    BasicHouseholdBuilder b = hhs.getHouseholdBuilder();
+    Households hhs = sc.getHouseholds();
+    HouseholdBuilder b = hhs.getHouseholdBuilder();
 
-    BasicHousehold hh = b.createHousehold(id1);
+    Household hh = b.createHousehold(id1);
     hh.setIncome(b.createIncome(120000, BasicIncome.IncomePeriod.year));
     hh.getMemberIds().add(id1);
     hhs.getHouseholds().put(id1, hh);

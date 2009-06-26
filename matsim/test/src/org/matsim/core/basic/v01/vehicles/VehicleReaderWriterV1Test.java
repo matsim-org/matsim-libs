@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -39,8 +38,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
   private final Id id42 = new IdImpl("42");
   
 	public void testBasicParser() {
-		BasicScenarioImpl scenario = new BasicScenarioImpl();
-		BasicVehicles vehicles = scenario.getVehicles();
+		BasicVehicles vehicles = new BasicVehiclesImpl();
 		BasicVehicleReaderV1 reader = new BasicVehicleReaderV1(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		
@@ -51,8 +49,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 
 	public void testWriter() throws FileNotFoundException, IOException {
 		//read it
-		BasicScenarioImpl scenario = new BasicScenarioImpl();
-		BasicVehicles vehicles = scenario.getVehicles();
+		BasicVehicles vehicles = new BasicVehiclesImpl();
 		BasicVehicleReaderV1 reader = new BasicVehicleReaderV1(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it

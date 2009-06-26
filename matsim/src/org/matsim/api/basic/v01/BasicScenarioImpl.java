@@ -20,17 +20,18 @@
 
 package org.matsim.api.basic.v01;
 
+import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.basic.v01.BasicPopulationImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.households.BasicHousehold;
 import org.matsim.core.basic.v01.households.BasicHouseholds;
-import org.matsim.core.basic.v01.households.BasicHouseholdsImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicles;
 import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class BasicScenarioImpl implements BasicScenario {
@@ -49,16 +50,14 @@ public class BasicScenarioImpl implements BasicScenario {
 	public BasicScenarioImpl(Config config) {
 		this.config = config;
 		this.network = new NetworkLayer();  // TODO shoul be changed to a basic implementation
-		this.population = new BasicPopulationImpl();
-		this.households = new BasicHouseholdsImpl();
-		this.vehicles = new BasicVehiclesImpl();
+		this.population = new PopulationImpl();
 	}
 
-	public BasicNetwork<?, ?> getNetwork() {
+	public BasicNetwork<? extends BasicNode, ? extends BasicLink> getNetwork() {
 		return this.network;
 	}
 
-	public BasicPopulation<?> getPopulation() {
+	public BasicPopulation<? extends BasicPerson> getPopulation() {
 		return this.population;
 	}
 
@@ -74,12 +73,4 @@ public class BasicScenarioImpl implements BasicScenario {
 		return new CoordImpl(x, y);
 	}
 
-	public BasicHouseholds<BasicHousehold> getHouseholds() {
-		return this.households;
-	}
-
-	public BasicVehicles getVehicles(){
-		return this.vehicles;
-	}
-	
 }
