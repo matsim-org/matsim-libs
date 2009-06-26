@@ -233,6 +233,8 @@ public class PlanImpl implements Plan {
 					} else if (route instanceof GenericRoute) {
 						GenericRoute r = new GenericRouteImpl(route.getStartLink(), route.getEndLink());
 						r.setRouteDescription(route.getStartLink(), ((GenericRoute) route).getRouteDescription(), route.getEndLink());
+						r.setDistance(route.getDistance());
+						r.setTravelTime(route.getTravelTime());
 						l2.setRoute(r);
 					} else {
 						log.warn("could not fully copy plan to agent " + this.getPerson().getId() + " because of unknown Route-type.");
