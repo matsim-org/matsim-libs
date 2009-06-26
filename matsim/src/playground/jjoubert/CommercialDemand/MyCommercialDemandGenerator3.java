@@ -106,13 +106,12 @@ public class MyCommercialDemandGenerator3 {
 		ArrayList<Point> majorPoints = readLocations(ROOT + "Commercial/Input/CommercialMajor100000.shp");
 		// Read minor locations
 		ArrayList<Point> minorPoints = readLocations(ROOT + "Commercial/Input/CommercialMinor100000.shp");
-		
-		// Initiate the population builder
-		BasicScenario sc = new BasicScenarioImpl();		
-		BasicPopulation population = sc.getPopulation();
-		BasicPopulationBuilder pb = population.getPopulationBuilder();
-		
+				
 		for(int sampleNumber = 1; sampleNumber <= numberOfSamples; sampleNumber++){
+			// Initiate the population builder
+			BasicScenario sc = new BasicScenarioImpl();		
+			BasicPopulation population = sc.getPopulation();
+			BasicPopulationBuilder pb = population.getPopulationBuilder();
 
 			//TODO Check if it is 'better' to create 'i' truck agents, and split them into dummy agents
 			// if the duration is greater than 24 hours - thus probably ending with more than 'i' agents;
