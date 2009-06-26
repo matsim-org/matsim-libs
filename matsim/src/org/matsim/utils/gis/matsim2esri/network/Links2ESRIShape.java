@@ -21,19 +21,20 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import org.matsim.api.core.v01.*;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.network.*;
-import org.matsim.core.network.*;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Simple class to convert the links of MATSim network files to ESRI shape files. The network could be written either
