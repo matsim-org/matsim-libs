@@ -27,7 +27,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -40,7 +39,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		config.global().setNumberOfThreads(0);
 
-		final ChangeLegMode module = new ChangeLegMode();
+		final ChangeLegMode module = new ChangeLegMode(config);
 		final TransportMode[] modes = new TransportMode[] {TransportMode.car, TransportMode.pt};
 		runTest(module, modes);
 	}

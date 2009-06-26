@@ -276,7 +276,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			manager.addStrategy(strategy1, 0.80);
 
 			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck());
+			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config.global().getNumberOfThreads()));
 			manager.addStrategy(strategy2, 0.80);
 
 			// reduce the replanning probabilities over the iterations
@@ -373,8 +373,8 @@ public class BetaTravelTest extends MatsimTestCase {
 
 	/** A special variant of the TimeAllocationMutator, suitable for the Bottleneck Analysis */
 	private static class TimeAllocationMutatorBottleneck extends AbstractMultithreadedModule {
-		public TimeAllocationMutatorBottleneck() {
-			// empty public constructor for private class
+		/*package*/ TimeAllocationMutatorBottleneck(final int numOfThreads) {
+			super(numOfThreads);
 		}
 		
 		@Override

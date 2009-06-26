@@ -52,14 +52,8 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	private TransportMode[] availableModes = new TransportMode[] { TransportMode.car, TransportMode.pt };
 
-	public ChangeLegMode() {
-	}
-
-	public ChangeLegMode(final TransportMode[] availableModes) {
-		this.availableModes = availableModes.clone();
-	}
-
 	public ChangeLegMode(final Config config) {
+		super(config.global().getNumberOfThreads());
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
