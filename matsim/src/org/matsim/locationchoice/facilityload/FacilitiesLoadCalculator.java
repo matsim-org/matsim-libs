@@ -24,8 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
@@ -50,7 +48,6 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 
 	private EventsToFacilityLoad eventsToFacilityLoad;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
-	private final static Logger log = Logger.getLogger(FacilitiesLoadCalculator.class);
 	
 	/* 
 	 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers 
@@ -71,15 +68,6 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons,
 				this.facilityPenalties);
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
-
-//		// correctly initalize the world.
-//		//TODO: Move this to the controler
-//		controler.getWorld().complete();
-//		new WorldCheck().run(controler.getWorld());
-//		new WorldConnectLocations().run(controler.getWorld());
-//		new WorldMappingInfo().run(controler.getWorld());
-//		new WorldCheck().run(controler.getWorld());
-//		log.info("world checking done.");
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -111,7 +99,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 
 		try {
-				final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tAllVisitors\tCapacity\tsumPenaltyFactor";
+				final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tAllVisitors\tCapacity\tsumPenaltyFactor\tis shopping facility";
 				final BufferedWriter out = 
 					IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
 				final BufferedWriter out_summary = 
@@ -125,15 +113,22 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 				Iterator<? extends ActivityFacility> iter = facilities.getFacilities().values().iterator();
 				while (iter.hasNext()){
 					ActivityFacility facility = iter.next();
-					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());
-												
+					
+					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());													
 					out.write(facility.getId().toString() + "\t"+
 							facility.getCoord().getX() + "\t"+
 							facility.getCoord().getY() + "\t"+
 							facilityPenalty.getFacilityLoad().getNumberOfVisitorsPerDay() + "\t" +
 							facilityPenalty.getFacilityLoad().getAllVisitors() + "\t" +
 							facilityPenalty.getCapacity() + "\t" +
-							facilityPenalty.getSumCapacityPenaltyFactor());
+							facilityPenalty.getSumCapacityPenaltyFactor() + "\t");
+					if (facility.getActivityOptions().containsKey("shop")) {
+						out.write("shop");
+					}
+					else {
+						out.write("-");
+					}
+					
 					out.newLine();
 					
 					for (int i = 0; i < 24; i++) {
