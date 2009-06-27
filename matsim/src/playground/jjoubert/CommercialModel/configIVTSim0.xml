@@ -16,7 +16,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output_01/" />
+		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output/Run_01/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="100" />
 	</module>
