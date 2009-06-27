@@ -12,11 +12,11 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="/home/jjoubert/Commercial/Input/plansAll.xml" />
+		<param name="inputPlansFile" value="/home/jjoubert/Commercial/Input/plansAll_01.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output/" />
+		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output_01/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="100" />
 	</module>
