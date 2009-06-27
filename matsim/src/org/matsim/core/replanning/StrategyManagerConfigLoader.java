@@ -168,7 +168,10 @@ public class StrategyManagerConfigLoader {
 				 * The removal strategy must not be tight to a replanning-strategy, but is a general
 				 * option that should be set somewhere else.  marcel/9jun2009/CLEANUP
 				 */
-				manager.setPlanSelectorForRemoval(new ExpBetaPlanForRemovalSelector());
+				// not yet working correctly:
+				// compreh. tests needed
+				// ah/27jun2009
+				// manager.setPlanSelectorForRemoval(new ExpBetaPlanForRemovalSelector());
 			}
 			//if none of the strategies above could be selected we try to load the class by name
 			else {
