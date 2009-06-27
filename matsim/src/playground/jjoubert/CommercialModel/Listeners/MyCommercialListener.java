@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.core.api.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -61,7 +62,8 @@ public class MyCommercialListener implements StartupListener, IterationStartsLis
 			e.printStackTrace();
 		}
 		
-		this.cs = new MyCommercialSplitter(this.OUTPUT);
+		Network nw = event.getControler().getNetwork();
+		this.cs = new MyCommercialSplitter(this.OUTPUT, nw);
 		event.getControler().getEvents().addHandler(this.cs);
 	}	
 	

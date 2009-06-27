@@ -23,26 +23,35 @@ package playground.jjoubert.CommercialModel.Listeners;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 
-public class MyCommercialSplitter implements ActivityStartEventHandler{
+public class MyCommercialSplitter implements BasicActivityStartEventHandler{
 	
 	private BufferedWriter output;
+	private Network network;
 	
-	public MyCommercialSplitter(BufferedWriter output) {
+	public MyCommercialSplitter(BufferedWriter output, Network nw) {
 		this.output = output;
+		this.network = nw;
 	}
 
-	public void handleEvent(ActivityStartEvent event) {
-		
-		if(event.getAct().getType().equalsIgnoreCase("minor")){
+	public void reset(int iteration) {
+
+	}
+
+	public void handleEvent(BasicActivityStartEvent event) {
+
+		if(event.getActType().equalsIgnoreCase("minor")){
 			double timeSeconds = event.getTime();
 			int hour = (int) Math.floor((timeSeconds) / 3600);
-			
-			String outputString = event.getLink().getCoord().getX() + "," + 
-								  event.getLink().getCoord().getY() + "," +
-								  hour;
+
+			Link link = this.network.getLink( event.getLinkId() );
+			String outputString = link.getCoord().getX() + "," + 
+			link.getCoord().getY() + "," +
+			hour;
 			try {
 				this.output.write(outputString);
 				this.output.newLine();
@@ -50,10 +59,6 @@ public class MyCommercialSplitter implements ActivityStartEventHandler{
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public void reset(int iteration) {
-
 	}
 
 }
