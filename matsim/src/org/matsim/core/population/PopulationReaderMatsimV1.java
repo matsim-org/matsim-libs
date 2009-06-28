@@ -31,7 +31,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -73,7 +72,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private NetworkRoute currroute = null;
 	private String routeNodes = null;
 
-	private Activity prevAct = null;
+	private ActivityImpl prevAct = null;
 
 	public PopulationReaderMatsimV1(final BasicPopulation plans, final Network network) {
 		this.plans = plans;
@@ -190,7 +189,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private void startAct(final Attributes atts) {
 		Link link = null;
 		Coord coord = null;
-		Activity act = null;
+		ActivityImpl act = null;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
 			act = this.currplan.createActivity(atts.getValue("type"), link);

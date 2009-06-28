@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -52,13 +52,13 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 			}
 			stream.print(plan.getScore()+"\t");
 			for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-			Activity act = (Activity)plan.getPlanElements().get(z);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(z);
 				stream.print(act.getType()+"\t");
 			}
 			stream.println();
 			stream.print("\t");
 			for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-				stream.print(((Activity)(plan.getPlanElements()).get(z)).getDuration()+"\t");
+				stream.print(((ActivityImpl)(plan.getPlanElements()).get(z)).getDuration()+"\t");
 			}
 			stream.println();
 			
@@ -75,21 +75,21 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 			}
 			for (int i = 0;i<variation.length;i++){
 				double time = 70000;
-				((Activity)variation[i].getPlanElements().get(0)).setDuration(MatsimRandom.getRandom().nextDouble()*time);
-				((Activity)variation[i].getPlanElements().get(0)).setEndTime(((Activity)variation[i].getPlanElements().get(0)).getDuration());
-				time -=((Activity)variation[i].getPlanElements().get(0)).getDuration();
+				((ActivityImpl)variation[i].getPlanElements().get(0)).setDuration(MatsimRandom.getRandom().nextDouble()*time);
+				((ActivityImpl)variation[i].getPlanElements().get(0)).setEndTime(((ActivityImpl)variation[i].getPlanElements().get(0)).getDuration());
+				time -=((ActivityImpl)variation[i].getPlanElements().get(0)).getDuration();
 				for (int j=2; j<variation[i].getPlanElements().size()-2;j+=2){
-					((Activity)variation[i].getPlanElements().get(j)).setStartTime(((Activity)variation[i].getPlanElements().get(j-2)).getEndTime());
-					((Activity)variation[i].getPlanElements().get(j)).setDuration(MatsimRandom.getRandom().nextDouble()*time);
-					((Activity)variation[i].getPlanElements().get(j)).setEndTime(((Activity)variation[i].getPlanElements().get(j)).getDuration()+((Activity)variation[i].getPlanElements().get(j)).getStartTime());
-					time -= ((Activity)variation[i].getPlanElements().get(j)).getDuration();
+					((ActivityImpl)variation[i].getPlanElements().get(j)).setStartTime(((ActivityImpl)variation[i].getPlanElements().get(j-2)).getEndTime());
+					((ActivityImpl)variation[i].getPlanElements().get(j)).setDuration(MatsimRandom.getRandom().nextDouble()*time);
+					((ActivityImpl)variation[i].getPlanElements().get(j)).setEndTime(((ActivityImpl)variation[i].getPlanElements().get(j)).getDuration()+((ActivityImpl)variation[i].getPlanElements().get(j)).getStartTime());
+					time -= ((ActivityImpl)variation[i].getPlanElements().get(j)).getDuration();
 				}
-				((Activity)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-1)).setStartTime(((Activity)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-3)).getEndTime());
-				((Activity)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-1)).setDuration(86400-((Activity)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-1)).getStartTime());
+				((ActivityImpl)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-1)).setStartTime(((ActivityImpl)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-3)).getEndTime());
+				((ActivityImpl)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-1)).setDuration(86400-((ActivityImpl)variation[i].getPlanElements().get(variation[i].getPlanElements().size()-1)).getStartTime());
 				
 				stream.print("\t");
 				for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-					stream.print(((Activity)(variation[i].getPlanElements()).get(z)).getDuration()+"\t");
+					stream.print(((ActivityImpl)(variation[i].getPlanElements()).get(z)).getDuration()+"\t");
 				}
 				stream.println();
 			}
@@ -110,7 +110,7 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 				
 				stream.print(variation[i].getScore()+"\t");
 				for (int z= 0;z<plan.getPlanElements().size();z=z+2){
-					stream.print(((Activity)(variation[i].getPlanElements()).get(z)).getDuration()+"\t");
+					stream.print(((ActivityImpl)(variation[i].getPlanElements()).get(z)).getDuration()+"\t");
 				}
 				stream.println(statistics[i][1]);
 			}

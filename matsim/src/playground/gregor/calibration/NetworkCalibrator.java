@@ -9,7 +9,6 @@ import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -23,6 +22,7 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -101,12 +101,12 @@ public class NetworkCalibrator {
 			Person p = pb.createPerson(new IdImpl(i));
 			Plan plan = pb.createPlan(p);
 			p.addPlan(plan);
-			Activity a0 = pb.createActivityFromLinkId("h", l0.getId());
+			ActivityImpl a0 = pb.createActivityFromLinkId("h", l0.getId());
 			a0.setEndTime(0);
 			plan.addActivity(a0);
 			Leg l = pb.createLeg(TransportMode.car);
 			plan.addLeg(l);
-			Activity a1 = pb.createActivityFromLinkId("w", l2.getId());
+			ActivityImpl a1 = pb.createActivityFromLinkId("w", l2.getId());
 			plan.addActivity(a1);
 			pop.addPerson(p);
 		}

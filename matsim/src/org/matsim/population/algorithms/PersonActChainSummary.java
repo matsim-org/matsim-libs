@@ -23,10 +23,10 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 
 public class PersonActChainSummary extends AbstractPersonAlgorithm {
 
@@ -88,7 +88,7 @@ public class PersonActChainSummary extends AbstractPersonAlgorithm {
 		String chain = "";
 		Plan plan = person.getPlans().get(0);
 		for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
-			Activity act = (Activity)plan.getPlanElements().get(i);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			chain = chain.concat(act.getType());
 		}
 		if (!this.chain_freq.containsKey(chain)) {
@@ -101,7 +101,7 @@ public class PersonActChainSummary extends AbstractPersonAlgorithm {
 		// fill up the durations
 		double dur_sum = 0;
 		for (int a = 2; a < plan.getPlanElements().size()-2; a += 2) {
-			Activity act = (Activity)plan.getPlanElements().get(a);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(a);
 			double dur = act.getDuration();
 			dur_sum += dur;
 			int j = (int)(dur/3600);
@@ -120,7 +120,7 @@ public class PersonActChainSummary extends AbstractPersonAlgorithm {
 		this.plan_dur[index]++;
 
 		// fill up the starts
-		Activity act = (Activity)plan.getPlanElements().get(0);
+		ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(0);
 		index = (int)(act.getEndTime()/3600);
 		this.starts[index]++;
 

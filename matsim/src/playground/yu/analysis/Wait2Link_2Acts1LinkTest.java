@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -41,6 +40,7 @@ import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -90,7 +90,7 @@ public class Wait2Link_2Acts1LinkTest {
 					int max = actsLegs.size();
 					for (int i = 0; i < max; i++)
 						if (i % 2 == 0) {
-							Activity a = (Activity) actsLegs.get(i);
+							ActivityImpl a = (ActivityImpl) actsLegs.get(i);
 							nextTmpLinkId = a.getLink().getId().toString();
 							if (tmpLinkId != null && nextTmpLinkId != null)
 								if (tmpLinkId.equals(nextTmpLinkId)) {

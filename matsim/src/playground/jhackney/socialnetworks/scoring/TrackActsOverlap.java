@@ -25,12 +25,12 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -94,8 +94,8 @@ public class TrackActsOverlap {
 //		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
 		for (Person p1 : plans.getPersons().values()) {
 			for (PlanElement pe : p1.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act1 = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act1 = (ActivityImpl) pe;
 					ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
 					ArrayList<Person> actList=new ArrayList<Person>();
 					
@@ -136,8 +136,8 @@ public class TrackActsOverlap {
 	public double scoreAllFriendsInAct(Plan plan) {
 		double score = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				ActivityOption myActivity=act.getFacility().getActivityOption(act.getType());
 				ArrayList<Person> visitors=activityMap.get(myActivity);
 				// Go through the list of Persons and for each one pick one friend randomly
@@ -166,8 +166,8 @@ public class TrackActsOverlap {
 		double foe=0.;
 		Person p1=plan.getPerson();
 		for (PlanElement pe1 : plan.getPlanElements()) {
-			if (pe1 instanceof Activity) {
-				Activity act1 = (Activity) pe1;
+			if (pe1 instanceof ActivityImpl) {
+				ActivityImpl act1 = (ActivityImpl) pe1;
 				ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
 				ArrayList<Person> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
@@ -179,8 +179,8 @@ public class TrackActsOverlap {
 				// Go through the list of Persons and for each one pick one friend randomly
 				for (Person p2 : visitors) {
 					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
-						if (pe2 instanceof Activity) {
-							Activity act2 = (Activity) pe2;
+						if (pe2 instanceof ActivityImpl) {
+							ActivityImpl act2 = (ActivityImpl) pe2;
 							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 								EgoNet net = (EgoNet)p1.getCustomAttributes().get(EgoNet.NAME);
 								if(net.getAlters().contains(p2)){
@@ -217,8 +217,8 @@ public class TrackActsOverlap {
 
 		Person p1=plan.getPerson();
 		for (PlanElement pe1 : plan.getPlanElements()) {
-			if (pe1 instanceof Activity) {
-				Activity act1 = (Activity) pe1;
+			if (pe1 instanceof ActivityImpl) {
+				ActivityImpl act1 = (ActivityImpl) pe1;
 				ActivityOption myActivity=act1.getFacility().getActivityOption(act1.getType());
 				ArrayList<Person> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
@@ -230,8 +230,8 @@ public class TrackActsOverlap {
 				// Go through the list of Persons
 				for (Person p2 : visitors) {
 					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
-						if (pe2 instanceof Activity) {
-							Activity act2 = (Activity) pe2;
+						if (pe2 instanceof ActivityImpl) {
+							ActivityImpl act2 = (ActivityImpl) pe2;
 							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 								EgoNet net = (EgoNet)p1.getCustomAttributes().get(EgoNet.NAME);
 								if(net.getAlters().contains(p2)){
@@ -263,16 +263,16 @@ public class TrackActsOverlap {
 	 * @param plan
 	 * @return
 	 */
-	public LinkedHashMap<Activity,ArrayList<Double>> calculateTimeWindowActStats(Plan plan) {
+	public LinkedHashMap<ActivityImpl,ArrayList<Double>> calculateTimeWindowActStats(Plan plan) {
 
-		LinkedHashMap<Activity,ArrayList<Double>> actStats = new LinkedHashMap<Activity,ArrayList<Double>>();
+		LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats = new LinkedHashMap<ActivityImpl,ArrayList<Double>>();
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends
 		Person p1=plan.getPerson();
 		for (PlanElement pe1 : plan.getPlanElements()) {
-			if (pe1 instanceof Activity) {
-				Activity act1 = (Activity) pe1;
+			if (pe1 instanceof ActivityImpl) {
+				ActivityImpl act1 = (ActivityImpl) pe1;
 				
 				double friend=0.;
 				double foe=0.;
@@ -289,8 +289,8 @@ public class TrackActsOverlap {
 				// Go through the list of Persons
 				for (Person p2 : visitors) {
 					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
-						if (pe2 instanceof Activity) {
-							Activity act2 = (Activity) pe2;
+						if (pe2 instanceof ActivityImpl) {
+							ActivityImpl act2 = (ActivityImpl) pe2;
 							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 								EgoNet net = (EgoNet)p1.getCustomAttributes().get(EgoNet.NAME);
 								if(net.getAlters().contains(p2)){
@@ -331,7 +331,7 @@ public class TrackActsOverlap {
 		return actStats;
 	}	
 	
-	private double getTimeWindowDuration(Activity act1, Activity act2) {
+	private double getTimeWindowDuration(ActivityImpl act1, ActivityImpl act2) {
 		double duration=0.;
 		duration = Math.min(act1.getEndTime(),act2.getEndTime())-Math.max(act1.getStartTime(),act2.getStartTime());
 		return duration;

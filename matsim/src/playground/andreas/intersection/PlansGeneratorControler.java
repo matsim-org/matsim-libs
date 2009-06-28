@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -33,6 +32,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -164,13 +164,13 @@ public class PlansGeneratorControler extends Controler {
 		Person p = new PersonImpl(new IdImpl(String.valueOf(ii)));
 		Plan plan = new org.matsim.core.population.PlanImpl(p);
 		try {
-			Activity act1 = plan.createActivity("h", new CoordImpl(100., 100.));
+			ActivityImpl act1 = plan.createActivity("h", new CoordImpl(100., 100.));
 			act1.setLink(fromLink);
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
 			plan.createLeg(TransportMode.car);
-			Activity act2 = plan.createActivity("h", new CoordImpl(200., 200.));
+			ActivityImpl act2 = plan.createActivity("h", new CoordImpl(200., 200.));
 			act2.setLink(toLink);
 			act2.setStartTime(8 * 60 * 60);
 

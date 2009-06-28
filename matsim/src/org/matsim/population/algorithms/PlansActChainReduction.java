@@ -25,11 +25,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 
 public class PlansActChainReduction {
 
@@ -60,7 +60,7 @@ public class PlansActChainReduction {
 			String chain = "";
 			Plan plan = p.getPlans().get(0);
 			for (int i=0; i<plan.getPlanElements().size(); i+=2) {
-				Activity act = (Activity)plan.getPlanElements().get(i);
+				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				chain = chain.concat(act.getType());
 			}
 			if (!chains.containsKey(chain)) {

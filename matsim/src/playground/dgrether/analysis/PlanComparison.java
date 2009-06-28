@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Activity;
+import org.matsim.core.population.ActivityImpl;
 /**
  * This Class provides a data object to compare to iterations. It
  * is needed to save some memory while running the PlanComparator. 
@@ -48,7 +48,7 @@ public class PlanComparison {
 	 * @param score
 	 * @param home
 	 */
-	public void addFirstPlansData(Id id, double score, Activity home) {
+	public void addFirstPlansData(Id id, double score, ActivityImpl home) {
 		Triple t = new Triple(score, home);
 		_table.put(id, t);
 	}
@@ -90,7 +90,7 @@ public class PlanComparison {
 	 * @param personId
 	 * @return the home location of the agent with the given IdI
 	 */
-	public Activity getHomeLocation(Id personId) {
+	public ActivityImpl getHomeLocation(Id personId) {
 		return _table.get(personId)._act;
 	}
 	
@@ -111,13 +111,13 @@ public class PlanComparison {
 		/**
 		 * 
 		 */
-		private Activity _act;
+		private ActivityImpl _act;
 		/**
 		 * 
 		 * @param score the score of the first plan
 		 * @param a
 		 */
-		public Triple(double score, Activity a) {
+		public Triple(double score, ActivityImpl a) {
 			_score1 = score;
 			_act = a;
 		}
@@ -146,7 +146,7 @@ public class PlanComparison {
 		 * 
 		 * @return the home location
 		 */
-		public Activity getAct() {
+		public ActivityImpl getAct() {
 			return _act;
 		}
 		

@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -88,15 +87,15 @@ public class PlanImplTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_Between() {
 		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
-		Activity homeAct = plan.createActivity("h", new CoordImpl(0, 0));
+		ActivityImpl homeAct = plan.createActivity("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(TransportMode.car);
-		Activity workAct = plan.createActivity("w", new CoordImpl(100, 200));
+		ActivityImpl workAct = plan.createActivity("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		plan.insertLegAct(1, l, a);
 
@@ -114,15 +113,15 @@ public class PlanImplTest extends MatsimTestCase {
 	 */
 	public void testInsertActLeg_AtEnd() {
 		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
-		Activity homeAct = plan.createActivity("h", new CoordImpl(0, 0));
+		ActivityImpl homeAct = plan.createActivity("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(TransportMode.car);
-		Activity workAct = plan.createActivity("w", new CoordImpl(100, 200));
+		ActivityImpl workAct = plan.createActivity("w", new CoordImpl(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		plan.insertLegAct(3, l, a);
 
@@ -148,7 +147,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(2, l, a);
@@ -171,7 +170,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(0, l, a);
@@ -195,7 +194,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		Activity a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
+		ActivityImpl a = new org.matsim.core.population.ActivityImpl("l", new CoordImpl(200, 100));
 		Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
 		try {
 			plan.insertLegAct(4, l, a);

@@ -20,9 +20,9 @@
 
 package org.matsim.core.scoring;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.population.ActivityImpl;
 
 /**
  * A scoring function calculates the score for one plan of an agent.  The score
@@ -49,7 +49,7 @@ public interface ScoringFunction {
 	 * @param act The activity the agent starts. Can be used to get the activity
 	 * type, exact location, facility, opening times and other information.
 	 */
-	public void startActivity(final double time, final Activity act);
+	public void startActivity(final double time, final ActivityImpl act);
 
 	/**
 	 * Tells the scoring function that the agent stops with an activity.

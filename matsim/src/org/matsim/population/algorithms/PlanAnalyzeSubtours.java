@@ -25,11 +25,11 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 
 /**
  * Analyses plans for subtours. See documentation <a href="http://matsim.org/node/266">here</a>.
@@ -62,11 +62,11 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		Id locationId = null;
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
-			if (actsLegs.get(ii) instanceof Activity) {
+			if (actsLegs.get(ii) instanceof ActivityImpl) {
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
-					locationId = ((Activity) actsLegs.get(ii)).getFacilityId();
+					locationId = ((ActivityImpl) actsLegs.get(ii)).getFacilityId();
 				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
-					locationId = ((Activity) actsLegs.get(ii)).getLinkId();
+					locationId = ((ActivityImpl) actsLegs.get(ii)).getLinkId();
 				}
 				this.locationIds.add(locationId);
 			}

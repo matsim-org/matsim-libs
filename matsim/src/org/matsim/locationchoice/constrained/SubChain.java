@@ -25,14 +25,14 @@ import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
+import org.matsim.core.population.ActivityImpl;
 
 public class SubChain {
 	
-	private Activity firstPrimAct = null;
-	private Activity lastPrimAct = null;
+	private ActivityImpl firstPrimAct = null;
+	private ActivityImpl lastPrimAct = null;
 	
-	private List<Activity> secondaryActs = null;
+	private List<ActivityImpl> secondaryActs = null;
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
 	
@@ -56,10 +56,10 @@ public class SubChain {
 	}
 	
 	public SubChain() {
-		secondaryActs = new Vector<Activity>();		
+		secondaryActs = new Vector<ActivityImpl>();		
 	}
 	
-	public void addAct(Activity act) {
+	public void addAct(ActivityImpl act) {
 		this.secondaryActs.add(act);
 	}
 
@@ -89,27 +89,27 @@ public class SubChain {
 		this.endCoord = endCoord;
 	}
 
-	public List<Activity> getSlActs() {
+	public List<ActivityImpl> getSlActs() {
 		return secondaryActs;
 	}
 
-	public void setSlActs(List<Activity> slActs) {
+	public void setSlActs(List<ActivityImpl> slActs) {
 		this.secondaryActs = slActs;
 	}
 
-	public Activity getFirstPrimAct() {
+	public ActivityImpl getFirstPrimAct() {
 		return firstPrimAct;
 	}
 
-	public void setFirstPrimAct(Activity firstPrimAct) {
+	public void setFirstPrimAct(ActivityImpl firstPrimAct) {
 		this.firstPrimAct = firstPrimAct;
 	}
 
-	public Activity getLastPrimAct() {
+	public ActivityImpl getLastPrimAct() {
 		return lastPrimAct;
 	}
 
-	public void setLastPrimAct(Activity lastPrimAct) {
+	public void setLastPrimAct(ActivityImpl lastPrimAct) {
 		this.lastPrimAct = lastPrimAct;
 	}
 

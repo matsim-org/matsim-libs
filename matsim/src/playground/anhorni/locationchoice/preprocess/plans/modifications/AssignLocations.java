@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.Vector;
 //import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.preprocess.helper.QuadTreeRing;
@@ -74,7 +74,7 @@ public class AssignLocations {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignLocation(Activity act, ActivityFacility start, ActivityFacility end) {
+	private final void assignLocation(ActivityImpl act, ActivityFacility start, ActivityFacility end) {
 		CoordImpl c_start = (CoordImpl)start.getCoord();
 		CoordImpl c_end   = (CoordImpl)end.getCoord();
 
@@ -110,12 +110,12 @@ public class AssignLocations {
 
 	private void run(Plan plan, String type) {
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
-			Activity act = (Activity)plan.getPlanElements().get(i);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (act.getFacility() == null && act.getType().equals(type)) {
 				// get the prev act with a facility
 				ActivityFacility start = null;
 				for (int b = i - 2; b >= 0; b = b - 2) {
-					Activity b_act = (Activity)plan.getPlanElements().get(b);
+					ActivityImpl b_act = (ActivityImpl)plan.getPlanElements().get(b);
 					if (b_act.getFacility() != null) {
 						start = b_act.getFacility(); 
 						break; 
@@ -124,7 +124,7 @@ public class AssignLocations {
 				// get the next act with a facility
 				ActivityFacility end = null;
 				for (int a = i + 2; a < plan.getPlanElements().size(); a = a + 2) {
-					Activity a_act = (Activity)plan.getPlanElements().get(a);
+					ActivityImpl a_act = (ActivityImpl)plan.getPlanElements().get(a);
 					if (a_act.getFacility() != null) {
 						end = a_act.getFacility(); 
 						break;

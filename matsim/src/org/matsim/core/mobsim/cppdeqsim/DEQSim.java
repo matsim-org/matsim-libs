@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -46,6 +45,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -163,18 +163,18 @@ public class DEQSim extends ExternalMobsim {
 		// # legs, int, 32bit
 		out.writeInt((plan.getPlanElements().size()-1) / 2);
 
-		Activity nextAct = null;
+		ActivityImpl nextAct = null;
 		if (plan.getPlanElements().size() > 2) {
 			// we have at least one leg
-			nextAct = (Activity) plan.getPlanElements().get(0);
+			nextAct = (ActivityImpl) plan.getPlanElements().get(0);
 		}
 
 		// for each leg...
 		double time = 0;
 		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
 			Leg leg = (Leg) plan.getPlanElements().get(i);
-			Activity act = nextAct;
-			nextAct = (Activity) plan.getPlanElements().get(i+1);
+			ActivityImpl act = nextAct;
+			nextAct = (ActivityImpl) plan.getPlanElements().get(i+1);
 
 			if (act.getEndTime() != Time.UNDEFINED_TIME && act.getDuration() != Time.UNDEFINED_TIME) {
 				// use min (endtime, time + dur)

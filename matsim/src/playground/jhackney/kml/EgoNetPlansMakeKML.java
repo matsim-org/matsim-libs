@@ -50,7 +50,6 @@ import net.opengis.kml._2.StyleType;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -59,6 +58,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -330,7 +330,7 @@ public class EgoNetPlansMakeKML {
 		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(facilitiesFolder));
 
 		Iterator actLegIter = myPlan.getPlanElements().iterator();
-		Activity act0 = (Activity) actLegIter.next(); // assumes first plan element is always an Activity
+		ActivityImpl act0 = (ActivityImpl) actLegIter.next(); // assumes first plan element is always an Activity
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
 		while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 			Object o = actLegIter.next();
@@ -354,8 +354,8 @@ public class EgoNetPlansMakeKML {
 						agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
 					}
 				}
-			} else if (o instanceof Activity) {
-				Activity act = (Activity) o;
+			} else if (o instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) o;
 				makeActKML(myPerson, act, agentFolder,agentLinkStyle);
 			}
 		}
@@ -365,8 +365,8 @@ public class EgoNetPlansMakeKML {
 		// Fill the facilities folder
 
 		for (PlanElement pe : myPlan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity myAct = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl myAct = (ActivityImpl) pe;
 				StyleType myStyle=facStyle.get(myAct.getType());
 				
 				PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
@@ -471,7 +471,7 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static void makeActKML(Person myPerson, Activity act, FolderType agentFolder, StyleType agentLinkStyle) {
+	private static void makeActKML(Person myPerson, ActivityImpl act, FolderType agentFolder, StyleType agentLinkStyle) {
 		// TODO Auto-generated method stub
 
 		String styleUrl = null;

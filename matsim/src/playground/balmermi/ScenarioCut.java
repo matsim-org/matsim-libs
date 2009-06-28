@@ -35,7 +35,6 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -43,6 +42,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -76,8 +76,8 @@ public class ScenarioCut {
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement e : plan.getPlanElements()) {
-					if (e instanceof Activity) {
-						Activity a = (Activity)e;
+					if (e instanceof ActivityImpl) {
+						ActivityImpl a = (ActivityImpl)e;
 						if (a.getCoord() != null) {
 							if (a.getCoord().getX() < min.getX()) { min.setX(a.getCoord().getX()); }
 							if (a.getCoord().getY() < min.getY()) { min.setY(a.getCoord().getY()); }
@@ -210,8 +210,8 @@ public class ScenarioCut {
 			boolean removeIt = false;
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement e : plan.getPlanElements()) {
-					if (e instanceof Activity) {
-						Activity a = (Activity)e;
+					if (e instanceof ActivityImpl) {
+						ActivityImpl a = (ActivityImpl)e;
 						if ((a.getLinkId() != null) && (!linkIds.contains(a.getLinkId()))) { removeIt = true; }
 						if ((a.getFacilityId() != null) && (!facIds.contains(a.getFacilityId()))) { removeIt = true; }
 					}

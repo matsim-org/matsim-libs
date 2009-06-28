@@ -10,13 +10,13 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -164,7 +164,7 @@ public class ModdedConverter {
 							tmpCoord = getRandomCoordInZone(tabs[6]);
 						}
 						this.tmpType = tabs[7];
-						Activity act = pl.createActivity(tabs[4], tmpCoord);
+						ActivityImpl act = pl.createActivity(tabs[4], tmpCoord);
 						act.setEndTime(convertTime(tabs[3]));
 						act.setDuration(dur);
 					} else {
@@ -192,7 +192,7 @@ public class ModdedConverter {
 								this.count2+=1;
 								System.out.println(personId);
 							}
-							Activity lastAct = tmpPl.createActivity(this.tmpTabs[7], tmpCoord2);
+							ActivityImpl lastAct = tmpPl.createActivity(this.tmpTabs[7], tmpCoord2);
 						}
 
 						Person p = new PersonImpl(new IdImpl(personId));
@@ -219,7 +219,7 @@ public class ModdedConverter {
 							this.count1 += 1;
 							System.out.println(personId);
 						}
-						Activity homeAct = pl.createActivity(tabs[4], tmpCoord3);
+						ActivityImpl homeAct = pl.createActivity(tabs[4], tmpCoord3);
 						homeAct.setEndTime(convertTime(tabs[3]));
 						p.addPlan(pl);
 						this.pop.addPerson(p);
@@ -255,7 +255,7 @@ public class ModdedConverter {
 				this.count2+=1;
 				System.out.println(this.tmpPersonId);
 			}
-			Activity lastAct = tmpPl.createActivity(this.tmpTabs[7], tmpCoord2);
+			ActivityImpl lastAct = tmpPl.createActivity(this.tmpTabs[7], tmpCoord2);
 			System.out.println("# of chains that do not start at home: " + this.count1);
 			System.out.println("# of chains that do not end at home: " + this.count2);
 		}

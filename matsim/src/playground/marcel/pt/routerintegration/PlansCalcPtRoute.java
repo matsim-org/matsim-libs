@@ -26,11 +26,11 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -89,14 +89,14 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public double handleLeg(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	public double handleLeg(final Leg leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		if (TransportMode.pt.equals(leg.getMode())) {
 			return this.handlePtPlan(leg, fromAct, toAct, depTime);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	private double handlePtPlan(final Leg leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		List<Leg> legs= this.ptRouter.calculateRoute(fromAct, toAct, this.currentPlan.getPerson());
 		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 

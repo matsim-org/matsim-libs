@@ -21,11 +21,11 @@
 package playground.balmermi.census2000.modules;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -71,8 +71,8 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		Coord home_coord = null;
 		Coord work_coord = null;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if (H.equals(act.getType())) { home_coord = act.getCoord(); }
 				else if (W.equals(act.getType())) { home_coord = act.getCoord(); }
 			}

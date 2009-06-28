@@ -5,6 +5,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.population.ActivityImpl;
 
 public interface Plan extends BasicPlan<PlanElement> {
 
@@ -22,11 +23,11 @@ public interface Plan extends BasicPlan<PlanElement> {
 	@Deprecated
 	public static final double UNDEF_SCORE = Double.NaN;
 
-	public Activity createActivity(final String type, final Coord coord);
+	public ActivityImpl createActivity(final String type, final Coord coord);
 
-	public Activity createActivity(final String type, final ActivityFacility fac);
+	public ActivityImpl createActivity(final String type, final ActivityFacility fac);
 
-	public Activity createActivity(final String type, final Link link);
+	public ActivityImpl createActivity(final String type, final Link link);
 
 	public Leg createLeg(final TransportMode mode);
 
@@ -76,11 +77,11 @@ public interface Plan extends BasicPlan<PlanElement> {
 	 * @param act the act to insert, following the leg
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException;
+	public void insertLegAct(final int pos, final Leg leg, final ActivityImpl act) throws IllegalArgumentException;
 
-	public Leg getPreviousLeg(final Activity act);
+	public Leg getPreviousLeg(final ActivityImpl act);
 
-	public Activity getPreviousActivity(final Leg leg);
+	public ActivityImpl getPreviousActivity(final Leg leg);
 
 	/**
 	 * Returns the leg following the specified act. <b>Important Note: </b> This method (together with
@@ -91,22 +92,22 @@ public interface Plan extends BasicPlan<PlanElement> {
 	 * @param act
 	 * @return The Leg following <tt>act</tt> in the plan, null if <tt>act</tt> is the last Act in the plan.
 	 */
-	public Leg getNextLeg(final Activity act);
+	public Leg getNextLeg(final ActivityImpl act);
 
 	/**
 	 * Returns the activity following the specified leg. <b>Important Note: </b> This method (together with
-	 * {@link #getNextLeg(Activity)}) has a very bad performance if it is used to iterate over all Acts and Legs of
+	 * {@link #getNextLeg(ActivityImpl)}) has a very bad performance if it is used to iterate over all Acts and Legs of
 	 * a plan. In that case, it is advised to use a regular iterator over {@link #getPlanElements()} 
 	 * together with <code>instanceof</code>.
 	 *
 	 * @param leg
 	 * @return The Act following <tt>leg</tt> in the plan.
 	 */
-	public Activity getNextActivity(final Leg leg);
+	public ActivityImpl getNextActivity(final Leg leg);
 
-	public Activity getFirstActivity();
+	public ActivityImpl getFirstActivity();
 
-	public Activity getLastActivity();
+	public ActivityImpl getLastActivity();
 
 	@Deprecated
 	public void setType(Plan.Type type);

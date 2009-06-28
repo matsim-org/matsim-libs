@@ -9,7 +9,6 @@ import org.apache.commons.collections.map.MultiKeyMap;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -17,6 +16,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
@@ -83,8 +83,8 @@ public class LogicToPlainConverter {
 		for (Person person: population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {  
-				if (pe instanceof Activity) {  				
-					Activity act =  (Activity) pe;					
+				if (pe instanceof ActivityImpl) {  				
+					ActivityImpl act =  (ActivityImpl) pe;					
 					Link plainLink= plainNet.getNearestLink(act.getCoord()); 
 					act.setLink(plainLink);
 				}else{

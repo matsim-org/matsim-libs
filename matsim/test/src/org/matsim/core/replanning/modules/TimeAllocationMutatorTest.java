@@ -23,12 +23,12 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -114,7 +114,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 		// setup person
 		Plan plan;
-		Activity act1, act2;
+		ActivityImpl act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).

@@ -8,7 +8,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -19,6 +18,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -117,8 +117,8 @@ public class PTActWriter {
 			//Person person = population.getPersons().get(new IdImpl("2180188"));
 	
 			Plan plan = person.getPlans().get(0);
-	 		Activity act1 = (Activity)plan.getPlanElements().get(0);
-			Activity act2 = (Activity)plan.getPlanElements().get(2);
+	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
+			ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
 			List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
 			
 			for (Leg leg : legList){
@@ -150,8 +150,8 @@ public class PTActWriter {
 
 			boolean first =true;
 			boolean addPerson= true;
-			Activity lastAct = null;       
-			Activity thisAct= null;		 
+			ActivityImpl lastAct = null;       
+			ActivityImpl thisAct= null;		 
 			
 			double startTime=0;
 			double duration=0;
@@ -161,8 +161,8 @@ public class PTActWriter {
 			//for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
 			for	(int elemIndex=0; elemIndex<3; elemIndex++){            //jun09  finds only
 				PlanElement pe= plan.getPlanElements().get(elemIndex);  //jun09  the first trip
-				if (pe instanceof Activity) {  				
-					thisAct= (Activity) pe;					
+				if (pe instanceof ActivityImpl) {  				
+					thisAct= (ActivityImpl) pe;					
 					if (!first) {								
 						Coord lastActCoord = lastAct.getCoord();
 			    		Coord actCoord = thisAct.getCoord();
@@ -348,8 +348,8 @@ public class PTActWriter {
 	}//insert
 
 	
-	private Activity newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
-		Activity ptAct= new ActivityImpl(type, coord, link);
+	private ActivityImpl newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
+		ActivityImpl ptAct= new ActivityImpl(type, coord, link);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		return ptAct;
@@ -374,7 +374,7 @@ public class PTActWriter {
 		return leg;
 	}
 
-	private Leg walkLeg(final Activity act1, final Activity act2){
+	private Leg walkLeg(final ActivityImpl act1, final ActivityImpl act2){
 		double distance= CoordUtils.calcDistance(act1.getCoord(), act2.getCoord());
 		double walkTravelTime = walk.walkTravelTime(distance);
 		double depTime = act1.getEndTime();

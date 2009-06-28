@@ -32,7 +32,6 @@ import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -46,6 +45,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -139,7 +139,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate plan
 		plan = person.createPlan(true);
 
-		Activity act = plan.createActivity("home", facilityHome);
+		ActivityImpl act = plan.createActivity("home", facilityHome);
 		Link link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
@@ -379,7 +379,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		
 		testee.startLeg(Time.parseTime("08:00:00"), (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(Time.parseTime("08:30:00"));
-		testee.startActivity(Time.parseTime("08:30:00"), (Activity) this.plan.getPlanElements().get(2));
+		testee.startActivity(Time.parseTime("08:30:00"), (ActivityImpl) this.plan.getPlanElements().get(2));
 		testee.endActivity(Time.parseTime("14:30:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
@@ -393,7 +393,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		testee.startLeg(Time.parseTime("14:30:00"), (Leg) this.plan.getPlanElements().get(3));
 		testee.endLeg(Time.parseTime("14:35:00"));
-		testee.startActivity(Time.parseTime("14:35:00"), (Activity) this.plan.getPlanElements().get(4));
+		testee.startActivity(Time.parseTime("14:35:00"), (ActivityImpl) this.plan.getPlanElements().get(4));
 		testee.endActivity(Time.parseTime("14:55:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
@@ -407,7 +407,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		
 		testee.startLeg(Time.parseTime("14:55:00"), (Leg) this.plan.getPlanElements().get(5));
 		testee.endLeg(Time.parseTime("15:00:00"));
-		testee.startActivity(Time.parseTime("15:00:00"), (Activity) this.plan.getPlanElements().get(6));
+		testee.startActivity(Time.parseTime("15:00:00"), (ActivityImpl) this.plan.getPlanElements().get(6));
 		testee.endActivity(Time.parseTime("17:00:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
@@ -421,7 +421,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		testee.startLeg(Time.parseTime("17:00:00"), (Leg) this.plan.getPlanElements().get(7));
 		testee.endLeg(Time.parseTime("17:30:00"));
-		testee.startActivity(Time.parseTime("17:30:00"), (Activity) this.plan.getPlanElements().get(8));
+		testee.startActivity(Time.parseTime("17:30:00"), (ActivityImpl) this.plan.getPlanElements().get(8));
 		testee.endActivity(Time.parseTime("20:00:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
@@ -435,7 +435,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		testee.startLeg(Time.parseTime("20:00:00"), (Leg) this.plan.getPlanElements().get(9));
 		testee.endLeg(Time.parseTime("24:00:00"));
-		testee.startActivity(Time.parseTime("24:00:00"), (Activity) this.plan.getPlanElements().get(10));
+		testee.startActivity(Time.parseTime("24:00:00"), (ActivityImpl) this.plan.getPlanElements().get(10));
 		testee.endActivity(Time.parseTime("30:00:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
@@ -449,7 +449,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		testee.startLeg(Time.parseTime("30:00:00"), (Leg) this.plan.getPlanElements().get(11));
 		testee.endLeg(Time.parseTime("34:00:00"));
-		testee.startActivity(Time.parseTime("34:00:00"), (Activity) this.plan.getPlanElements().get(12));
+		testee.startActivity(Time.parseTime("34:00:00"), (ActivityImpl) this.plan.getPlanElements().get(12));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {

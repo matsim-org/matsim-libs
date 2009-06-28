@@ -4,9 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.preprocess.analyzeMZ.MZTrip;
@@ -24,7 +24,7 @@ public class ReaderTripHandler {
 		
 		Coord beforeShoppingCoord = new CoordImpl(
 				Double.parseDouble(entries[38].trim()), Double.parseDouble(entries[39].trim()));
-		Activity beforeShoppingAct = new org.matsim.core.population.ActivityImpl("start", beforeShoppingCoord);
+		ActivityImpl beforeShoppingAct = new org.matsim.core.population.ActivityImpl("start", beforeShoppingCoord);
 		// in seconds after midnight
 		double endTimeBeforeShoppingAct = 60.0 * Double.parseDouble(entries[12].trim());
 		beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
@@ -35,7 +35,7 @@ public class ReaderTripHandler {
 		ZHFacility chosenFacility = facilities.getZhFacilities().get(chosenFacilityId);
 		Link link = network.getLink(chosenFacility.getLinkId());
 
-		Activity shoppingAct = new org.matsim.core.population.ActivityImpl("shop", link);
+		ActivityImpl shoppingAct = new org.matsim.core.population.ActivityImpl("shop", link);
 		shoppingAct.setCoord(link.getCoord());
 		
 		double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
@@ -46,7 +46,7 @@ public class ReaderTripHandler {
 		this.chosenFacilityId = chosenFacilityId;
 			
 		Coord afterShoppingCoord = mzTrip.getCoordEnd();
-		Activity afterShoppingAct = new org.matsim.core.population.ActivityImpl("end", afterShoppingCoord);
+		ActivityImpl afterShoppingAct = new org.matsim.core.population.ActivityImpl("end", afterShoppingCoord);
 		afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
 		
 		if (!(mzTrip.getEndTime() > 0.0)) {

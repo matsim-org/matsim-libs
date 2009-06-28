@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.knowledges.Knowledges;
 
@@ -74,7 +74,7 @@ public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActi
 			double length = this.activityChains.get(i).size();
 			averageACLength+=weight*(java.lang.Math.ceil(length/2));
 			for (int j=0; j<length;j=j+2){
-				stream1.print(((Activity)(this.activityChains.get(i).get(j))).getType()+"\t");
+				stream1.print(((ActivityImpl)(this.activityChains.get(i).get(j))).getType()+"\t");
 			}
 			stream1.println();
 			stream1.print("\t");

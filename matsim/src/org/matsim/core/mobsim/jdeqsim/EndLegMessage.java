@@ -22,12 +22,12 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -57,7 +57,7 @@ public class EndLegMessage extends EventMessage {
 		if ((actsLegs.size() > this.vehicle.getLegIndex())) {
 			this.vehicle.setCurrentLeg((Leg) actsLegs.get(this.vehicle.getLegIndex()));
 			// current act
-			Activity currentAct = (Activity) actsLegs.get(this.vehicle.getLegIndex() - 1);
+			ActivityImpl currentAct = (ActivityImpl) actsLegs.get(this.vehicle.getLegIndex() - 1);
 			// the leg the agent performs
 
 			// if only duration or end time of act is defined, take that
@@ -106,7 +106,7 @@ public class EndLegMessage extends EventMessage {
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule ActStartEvent
-		Activity nextAct = this.vehicle.getNextActivity();
+		ActivityImpl nextAct = this.vehicle.getNextActivity();
 		double actStartEventTime = nextAct.getStartTime();
 
 		if (this.getMessageArrivalTime() > actStartEventTime) {

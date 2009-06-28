@@ -37,7 +37,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -49,6 +48,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -164,8 +164,8 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 					// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
 					boolean routeIt = false;
 					for (PlanElement pe : plan.getPlanElements()) {
-						if (pe instanceof Activity) {
-							Activity act = (Activity) pe;
+						if (pe instanceof ActivityImpl) {
+							ActivityImpl act = (ActivityImpl) pe;
 							if (movedFacilities.containsKey(act.getFacilityId())) {
 								act.setLink(act.getFacility().getLink());
 								routeIt = true;
@@ -178,8 +178,8 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 //				}
 				for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
 					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
-						if (pe2 instanceof Activity) {
-							Activity act = (Activity) pe2;
+						if (pe2 instanceof ActivityImpl) {
+							ActivityImpl act = (ActivityImpl) pe2;
 							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
 								// TODO here characteristics of persons are checked (in which shop the shop activity happened, distance from home, 
 								//dimension, etc., the information is then saved in a special data structure having the facility ID as ID field 

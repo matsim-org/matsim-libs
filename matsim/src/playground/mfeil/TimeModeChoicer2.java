@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
@@ -116,14 +116,14 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		}
 		
 		/* Initial clean-up of plan for the case actslegs is not sound*/
-		double move = this.cleanSchedule (((Activity)(basePlan.getPlanElements().get(0))).getEndTime(), basePlan);
+		double move = this.cleanSchedule (((ActivityImpl)(basePlan.getPlanElements().get(0))).getEndTime(), basePlan);
 		int loops=1;
 		while (move!=0.0){
 			if (loops>3) {
 				for (int i=0;i<basePlan.getPlanElements().size()-2;i=i+2){
-					((Activity)basePlan.getPlanElements().get(i)).setDuration(this.minimumTime.get(((Activity)basePlan.getPlanElements().get(i)).getType()));
+					((ActivityImpl)basePlan.getPlanElements().get(i)).setDuration(this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(i)).getType()));
 				}
-				move = this.cleanSchedule(this.minimumTime.get(((Activity)basePlan.getPlanElements().get(0)).getType()), basePlan);
+				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(0)).getType()), basePlan);
 				if (move!=0.0){
 					/*
 					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
@@ -150,9 +150,9 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 			}
 			loops++;
 			for (int i=0;i<basePlan.getPlanElements().size()-2;i=i+2){
-				((Activity)basePlan.getPlanElements().get(i)).setDuration(java.lang.Math.max(((Activity)basePlan.getPlanElements().get(i)).getDuration()*0.9, this.minimumTime.get(((Activity)(basePlan.getPlanElements().get(i))).getType())));
+				((ActivityImpl)basePlan.getPlanElements().get(i)).setDuration(java.lang.Math.max(((ActivityImpl)basePlan.getPlanElements().get(i)).getDuration()*0.9, this.minimumTime.get(((ActivityImpl)(basePlan.getPlanElements().get(i))).getType())));
 			}
-			move = this.cleanSchedule(((Activity)(basePlan.getPlanElements().get(0))).getDuration(), basePlan);
+			move = this.cleanSchedule(((ActivityImpl)(basePlan.getPlanElements().get(0))).getDuration(), basePlan);
 		}
 		// TODO Check whether allowed?
 		basePlan.setScore(this.scorer.getScore(basePlan));	
@@ -288,12 +288,12 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		double time;
 		for (int i = 0; i<al.size();i++){
 			if (i%2==0){
-				time = ((Activity)(bestSolution.get(i))).getDuration();
-				((Activity)al.get(i)).setDuration(time);
-				time = ((Activity)(bestSolution.get(i))).getStartTime();
-				((Activity)al.get(i)).setStartTime(time);
-				time = ((Activity)(bestSolution.get(i))).getEndTime();
-				((Activity)al.get(i)).setEndTime(time);
+				time = ((ActivityImpl)(bestSolution.get(i))).getDuration();
+				((ActivityImpl)al.get(i)).setDuration(time);
+				time = ((ActivityImpl)(bestSolution.get(i))).getStartTime();
+				((ActivityImpl)al.get(i)).setStartTime(time);
+				time = ((ActivityImpl)(bestSolution.get(i))).getEndTime();
+				((ActivityImpl)al.get(i)).setEndTime(time);
 			}
 			else {
 				time = ((Leg)(bestSolution.get(i))).getTravelTime();

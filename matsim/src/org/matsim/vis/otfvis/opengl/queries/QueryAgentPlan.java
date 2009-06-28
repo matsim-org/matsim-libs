@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -43,6 +42,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -88,7 +88,7 @@ public class QueryAgentPlan implements OTFQuery {
 	private static int countLines(Plan plan) {
 		int count = 0;
 		for (Object o : plan.getPlanElements()) {
-			if (o instanceof Activity) {
+			if (o instanceof ActivityImpl) {
 				count++;
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg)o;
@@ -129,9 +129,9 @@ public class QueryAgentPlan implements OTFQuery {
 		Color ptColor = Color.RED;
 
 		for (Object o : plan.getPlanElements()) {
-			if(o instanceof Activity) {
+			if(o instanceof ActivityImpl) {
 				Color col = actColor;
-				Activity act = (Activity)o;
+				ActivityImpl act = (ActivityImpl)o;
 				Coord coord = act.getCoord();
 				if (coord == null) coord = act.getLink().getCoord();
 				setCoord(pos++, coord, col);
@@ -162,7 +162,7 @@ public class QueryAgentPlan implements OTFQuery {
 		this.acts = new Object [plan.getPlanElements().size()/2];
 
 		for (int i=0;i< this.acts.length; i++) {
-			Activity act = (Activity)plan.getPlanElements().get(i*2);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i*2);
 			Coord coord = act.getCoord();
 			if (coord == null) coord = act.getLink().getCoord();
 			this.acts[i] = new MyInfoText( (float)coord.getX(), (float)coord.getY(), act.getType());

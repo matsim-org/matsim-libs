@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -36,7 +36,7 @@ public class TransitRouteFinder {
 		this.ptRouter = ptRouter; 
 	}
 	
-	public List<Leg> calculateRoute (final Activity fromAct, final Activity toAct, final Person person ){
+	public List<Leg> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final Person person ){
 		List<Leg> legList = new ArrayList<Leg>();
 		
 		double distToWalk = walk.distToWalk(person.getAge());

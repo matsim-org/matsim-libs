@@ -25,12 +25,12 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.population.ActivityImpl;
 
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
@@ -44,8 +44,8 @@ import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
-	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();
-	LinkedHashMap<Activity,Double> endMap = new LinkedHashMap<Activity,Double>();
+	LinkedHashMap<ActivityImpl,Double> startMap = new LinkedHashMap<ActivityImpl,Double>();
+	LinkedHashMap<ActivityImpl,Double> endMap = new LinkedHashMap<ActivityImpl,Double>();
 
 	static final private Logger log = Logger.getLogger(TrackEventsOverlap.class);
 

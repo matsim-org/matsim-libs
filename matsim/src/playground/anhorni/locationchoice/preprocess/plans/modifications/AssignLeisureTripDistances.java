@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;
 
 
@@ -50,7 +50,7 @@ public class AssignLeisureTripDistances {
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Activity act = (Activity)actslegs.get(j);
+				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith("shop")) {
 					numberOfShopActs++;
 				}
@@ -76,7 +76,7 @@ public class AssignLeisureTripDistances {
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Activity act = (Activity)actslegs.get(j);
+				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith("shop")) {
 					double random = MatsimRandom.getRandom().nextDouble();					
 					if (random <= 0.66) {

@@ -30,10 +30,10 @@ import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -79,8 +79,8 @@ public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgent
 			int legNr = this.agentLegs.get(event.getPersonId());
 			Plan plan = agent.getSelectedPlan();
 			int index = (legNr - 1) * 2;
-			String fromActType = ((Activity)plan.getPlanElements().get(index)).getType();
-			String toActType = ((Activity)plan.getPlanElements().get(index + 2)).getType();
+			String fromActType = ((ActivityImpl)plan.getPlanElements().get(index)).getType();
+			String toActType = ((ActivityImpl)plan.getPlanElements().get(index + 2)).getType();
 			String legType = fromActType + "---" + toActType;
 			int[] stats = this.legStats.get(legType);
 			if (stats == null) {

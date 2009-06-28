@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -68,7 +68,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 		double[] durs = new double[(acts_legs.size()-1)/2];
 		int index = 0;
 		for (int i=0; i<acts_legs.size()-2; i=i+2) {
-			Activity act = (Activity)acts_legs.get(i);
+			ActivityImpl act = (ActivityImpl)acts_legs.get(i);
 			durs[index] = act.getDuration();
 			index++;
 		}
@@ -113,7 +113,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 		index = 0;
 		plan_dur = 0.0;
 		for (int i=0; i<acts_legs.size()-2; i=i+2) {
-			Activity act = (Activity)acts_legs.get(i);
+			ActivityImpl act = (ActivityImpl)acts_legs.get(i);
 			Leg leg = (Leg)acts_legs.get(i+1);
 			double dur = durs[index];
 
@@ -136,11 +136,11 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 			index++;
 		}
 		
-		Activity last_act = (Activity)acts_legs.get(acts_legs.size()-1);
+		ActivityImpl last_act = (ActivityImpl)acts_legs.get(acts_legs.size()-1);
 		last_act.setStartTime(plan_dur);
 		last_act.setDuration(Time.UNDEFINED_TIME);
 		last_act.setEndTime(Time.UNDEFINED_TIME);
-		last_act.setType(((Activity)acts_legs.get(0)).getType());
+		last_act.setType(((ActivityImpl)acts_legs.get(0)).getType());
 	}
 
 	public void run(Plan plan) {

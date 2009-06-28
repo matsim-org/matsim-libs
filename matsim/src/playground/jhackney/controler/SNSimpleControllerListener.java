@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -38,6 +37,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.algorithms.WorldConnectLocations;
@@ -99,7 +99,7 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 
 	private EventsMapStartEndTimes epp=null;//static? I just need one
 	private MakeTimeWindowsFromEvents teo=null;// static? I just need one
-	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;// static? I just need one
+	private LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;// static? I just need one
 	private LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;// static? I just need one
 	//
 	private LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();// static? I just need one

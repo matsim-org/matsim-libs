@@ -20,9 +20,9 @@
 
 package playground.mfeil;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 public class ScheduleCleaner {
@@ -36,43 +36,43 @@ public class ScheduleCleaner {
 	}
 	
 	public double run (double now, Plan plan){
-		((Activity)(plan.getPlanElements().get(0))).setEndTime(now);
-		((Activity)(plan.getPlanElements().get(0))).setDuration(now);
+		((ActivityImpl)(plan.getPlanElements().get(0))).setEndTime(now);
+		((ActivityImpl)(plan.getPlanElements().get(0))).setDuration(now);
 			
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
 			((Leg)(plan.getPlanElements().get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(plan.getPlanElements().get(i-1)), (Activity)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
 			((Leg)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((Leg)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
 			if (i!=plan.getPlanElements().size()-2){
-				((Activity)(plan.getPlanElements().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Activity)(plan.getPlanElements().get(i+1))).getDuration()-travelTime, this.minimumTime);
-				((Activity)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
-				((Activity)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);	
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setStartTime(now);
+				travelTime = java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(i+1))).getDuration()-travelTime, this.minimumTime);
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;
 			}
 			else {
-				((Activity)(plan.getPlanElements().get(i+1))).setStartTime(now);
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setStartTime(now);
 				/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW*/
 				if (86400>now+this.minimumTime){
-					((Activity)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
-					((Activity)(plan.getPlanElements().get(i+1))).setEndTime(86400);
+					((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
+					((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(86400);
 				}
-				else if (86400+((Activity)(plan.getPlanElements().get(0))).getDuration()>now+this.minimumTime){
+				else if (86400+((ActivityImpl)(plan.getPlanElements().get(0))).getDuration()>now+this.minimumTime){
 					if (now<86400){
-						((Activity)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
-						((Activity)(plan.getPlanElements().get(i+1))).setEndTime(86400);
+						((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
+						((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(86400);
 					}
 					else {
-					((Activity)(plan.getPlanElements().get(i+1))).setDuration(this.minimumTime);
-					((Activity)(plan.getPlanElements().get(i+1))).setEndTime(now+this.minimumTime);
+					((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(this.minimumTime);
+					((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(now+this.minimumTime);
 					}
 				}
 				else {
-					return (now+this.minimumTime-(86400+((Activity)(plan.getPlanElements().get(0))).getDuration()));
+					return (now+this.minimumTime-(86400+((ActivityImpl)(plan.getPlanElements().get(0))).getDuration()));
 				}
 			}
 		}

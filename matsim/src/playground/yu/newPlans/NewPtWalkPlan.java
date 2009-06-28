@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -33,6 +32,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -87,8 +87,8 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);
 			if (i % 2 == 0) {
-				ptPlan.addActivity((Activity) o);
-				walkPlan.addActivity((Activity) o);
+				ptPlan.addActivity((ActivityImpl) o);
+				walkPlan.addActivity((ActivityImpl) o);
 			} else {
 				Leg leg = (Leg) o;
 				Leg ptLeg = new org.matsim.core.population.LegImpl(leg);

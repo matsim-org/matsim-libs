@@ -25,10 +25,10 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.ActivityImpl;
 
 /**
  * Filters out plans from persons where none of the act's locations are within
@@ -86,7 +86,7 @@ public class PlansFilterArea {
 			Plan plan = person.getPlans().get(i);
 
 			for (int j=0; j<plan.getPlanElements().size(); j+=2) {
-				Activity act = (Activity)plan.getPlanElements().get(j);
+				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);
 				cntActs++;
 				double x = act.getCoord().getX();
 				double y = act.getCoord().getY();

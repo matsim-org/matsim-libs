@@ -51,13 +51,13 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -402,7 +402,7 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 		Iterator actLegIter = myPlan.getPlanElements().iterator();
-		Activity act0 = (Activity) actLegIter.next(); // assume first is always an Activity
+		ActivityImpl act0 = (ActivityImpl) actLegIter.next(); // assume first is always an Activity
 		makeActKML(alter, act0, 0, planFolder, agentLinkStyle, iter);
 		int actNumber=0;
 		while(actLegIter.hasNext()) {
@@ -425,8 +425,8 @@ public class EgoNetPlansItersMakeKML {
 						planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
 					}
 				}
-			} else if (o instanceof Activity) {
-				Activity act = (Activity) o;
+			} else if (o instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) o;
 				actNumber++;
 				makeActKML(alter, act,actNumber, planFolder,agentLinkStyle, iter);
 			}
@@ -435,8 +435,8 @@ public class EgoNetPlansItersMakeKML {
 		// Fill the facilities folder
 
 		for (Object o : myPlan.getPlanElements()) {
-			if (o instanceof Activity) {
-				Activity myAct = (Activity) o;
+			if (o instanceof ActivityImpl) {
+				ActivityImpl myAct = (ActivityImpl) o;
 	//			Activity myActivity =myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString();
 				String myActivity=myAct.getFacility().getActivityOption(myAct.getType()).toString();
 				//Above lines call code that results in a null pointer. Test
@@ -579,9 +579,9 @@ public class EgoNetPlansItersMakeKML {
 
 		LineStringType lineString = kmlObjectFactory.createLineStringType();
 				
-		Coord coordFrom = trafo.transform(((Activity)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((ActivityImpl)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," + Double.toString(coordFrom.getY()) + ",0.0");
-		Coord coordTo = trafo.transform(((Activity)ai.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((ActivityImpl)ai.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," + Double.toString(coordTo.getY()) + ",0.0");
 		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
@@ -607,9 +607,9 @@ public class EgoNetPlansItersMakeKML {
 		socialLink.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 		
 		LineStringType lineString = kmlObjectFactory.createLineStringType();
-		Coord coordFrom = trafo.transform(((Activity)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((ActivityImpl)myPerson.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," +Double.toString(coordFrom.getY()) + ",0.0");
-		Coord coordTo = trafo.transform(((Activity)ego.getSelectedPlan().getPlanElements().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((ActivityImpl)ego.getSelectedPlan().getPlanElements().get(0)).getCoord());
 		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," +Double.toString(coordTo.getY()) + ",0.0");
 		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
@@ -783,7 +783,7 @@ public class EgoNetPlansItersMakeKML {
 //
 //	}
 
-	private static void makeActKML(Person myPerson, Activity act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
+	private static void makeActKML(Person myPerson, ActivityImpl act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
 
 		String styleUrl = null;
 		String fullActName = null;

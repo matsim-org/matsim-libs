@@ -29,7 +29,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -37,6 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -104,7 +104,7 @@ public class StaticPopulationGenerator {
 				for (int i = 0; i < li ; i++) {
 					final Person pers = new PersonImpl(new IdImpl(id++));
 					final Plan plan = new org.matsim.core.population.PlanImpl(pers);
-					final Activity act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
+					final ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
 					act.setStartTime(3 * 3600.0);
 					// (I still think it would make more sense to leave the starting time of the first activity undefined. kai)
 					act.setEndTime(3 *3600.0);

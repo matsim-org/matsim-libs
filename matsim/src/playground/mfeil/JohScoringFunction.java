@@ -25,10 +25,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 
@@ -77,7 +77,7 @@ public class JohScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfWaiting = -6; //war -6
 	private static double marginalUtilityOfLateArrival = -18; //war -40
 	private static double marginalUtilityOfEarlyDeparture = -0; // war -6
-	private static double marginalUtilityOfTraveling = -6; // war für alle -12
+	private static double marginalUtilityOfTraveling = -6; // war fï¿½r alle -12
 	private static double marginalUtilityOfTravelingPT = -6; // public transport
 	private static double marginalUtilityOfTravelingWalk = -6;
 	private static double marginalUtilityOfDistance = 0;
@@ -130,7 +130,7 @@ public class JohScoringFunction implements ScoringFunction {
 	}
 	
 	// the activity is currently handled by startLeg()
-	public void startActivity(final double time, final Activity act) {
+	public void startActivity(final double time, final ActivityImpl act) {
 	}
 
 	public void endActivity(final double time) {
@@ -177,7 +177,7 @@ public class JohScoringFunction implements ScoringFunction {
 		initialized = true;
 	}
 
-	private final double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+	private final double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
 		
 		JohActUtilityParameters params = utilParams.get(act.getType());
 		
@@ -284,7 +284,7 @@ public class JohScoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Activity act) {
+	protected double[] getOpeningInterval(final ActivityImpl act) {
 
 		JohActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -446,13 +446,13 @@ public class JohScoringFunction implements ScoringFunction {
 	}
 
 	private void handleAct(final double time) {
-		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
+		ActivityImpl act = (ActivityImpl)this.plan.getPlanElements().get(this.index);
 
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 				
@@ -460,7 +460,7 @@ public class JohScoringFunction implements ScoringFunction {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					// score first activity
-					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
+					ActivityImpl firstAct = (ActivityImpl)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION

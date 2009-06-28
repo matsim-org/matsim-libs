@@ -6,8 +6,8 @@ import java.util.Iterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -51,7 +51,7 @@ public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTime
 		return this.coordQuadTree;
 	}
 	
-	public double getEvacuationStartTime(Activity act) {
+	public double getEvacuationStartTime(ActivityImpl act) {
 		Coord c = act.getCoord();
 		if (c == null) {
 			c = act.getLink().getCoord();

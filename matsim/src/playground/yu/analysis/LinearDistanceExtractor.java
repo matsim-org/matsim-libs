@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -16,6 +15,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -60,8 +60,8 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-				Activity previousAct = plan.getPreviousActivity((Leg) pe);
-				Activity nextAct = plan.getNextActivity((Leg) pe);
+				ActivityImpl previousAct = plan.getPreviousActivity((Leg) pe);
+				ActivityImpl nextAct = plan.getNextActivity((Leg) pe);
 				double legLD = CoordUtils.calcDistance(previousAct.getCoord(),
 						nextAct.getCoord());
 				if (previousAct.getType().startsWith("w")

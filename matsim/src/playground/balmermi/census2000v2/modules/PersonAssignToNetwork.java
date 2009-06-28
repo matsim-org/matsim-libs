@@ -21,11 +21,11 @@
 package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -71,8 +71,8 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				act.setLink(act.getFacility().getLink());
 			}
 		}

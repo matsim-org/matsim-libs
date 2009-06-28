@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -30,6 +29,7 @@ import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -96,7 +96,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final Activity act) {
+	public void startActivity(final double time, final ActivityImpl act) {
 		// the activity is currently handled by startLeg()
 	}
 
@@ -163,7 +163,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		initialized = true;
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
 
 		ActivityUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -267,7 +267,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Activity act) {
+	protected double[] getOpeningInterval(final ActivityImpl act) {
 
 		ActivityUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -363,19 +363,19 @@ public class BKickScoringFunction implements ScoringFunction {
 	}
 
 	protected void handleAct(final double time) {
-		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
+		ActivityImpl act = (ActivityImpl)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					// score first activity
-					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
+					ActivityImpl firstAct = (ActivityImpl)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION

@@ -31,7 +31,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -71,7 +70,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private Leg currleg = null;
 	private NetworkRoute currroute = null;
 
-	private Activity prevAct = null;
+	private ActivityImpl prevAct = null;
 	private String routeNodes = null;
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
@@ -170,7 +169,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		
 		Link link = null;
 		Coord coord = null;
-		Activity act;
+		ActivityImpl act;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
 			act = this.currplan.createActivity(atts.getValue("type"), link);

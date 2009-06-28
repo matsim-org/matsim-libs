@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -39,6 +38,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -121,7 +121,7 @@ public class ExternalModule implements PlanStrategyModule {
 			// act/leg
 			for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 				if (jj % 2 == 0) {
-					Activity act = (Activity)plan.getPlanElements().get(jj);
+					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(jj);
 					this.handler.startAct(act, this.writer);
 					this.handler.endAct(this.writer);
 				} else {

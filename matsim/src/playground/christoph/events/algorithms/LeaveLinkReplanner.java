@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -34,6 +33,7 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -61,8 +61,8 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
 
 public class LeaveLinkReplanner {
 
-	protected Activity nextAct;
-	protected Activity prevAct;
+	protected ActivityImpl nextAct;
+	protected ActivityImpl prevAct;
 	protected Leg leg;
 	protected double time;
 	protected PersonAgent personAgent;
@@ -111,8 +111,8 @@ public class LeaveLinkReplanner {
 
 		leg = personAgent.getCurrentLeg();
 
-		prevAct = (Activity)plan.getPreviousActivity(leg);
-		nextAct = (Activity)plan.getNextActivity(leg);	
+		prevAct = (ActivityImpl)plan.getPreviousActivity(leg);
+		nextAct = (ActivityImpl)plan.getNextActivity(leg);	
 		
 		// if there is a next Activity...
 		if(nextAct != null)
@@ -149,7 +149,7 @@ public class LeaveLinkReplanner {
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 		
-		Activity newFromAct = new org.matsim.core.population.ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
+		ActivityImpl newFromAct = new org.matsim.core.population.ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 		newFromAct.setDuration(0);

@@ -7,7 +7,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -16,6 +15,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -98,7 +98,7 @@ public class CreatePlans1 {
 			// shop: 16-17.30
 			// home: 17.30-0:00
 
-			Activity a = plan.createActivity("home",home_facility.getCoord());
+			ActivityImpl a = plan.createActivity("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTimeHome);
 			Leg l = plan.createLeg(TransportMode.car);

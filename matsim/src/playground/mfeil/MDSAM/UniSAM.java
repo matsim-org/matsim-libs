@@ -24,12 +24,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.api.population.Plan;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 
@@ -72,11 +72,11 @@ public class UniSAM {
 		Plan plan = this.population.getPersons().get(new IdImpl ("324")).getSelectedPlan();
 		stream.print(1);
 		stream.print("\t"+1);
-		stream.print("\t"+(((Activity)(plan.getPlanElements().get(0))).getEndTime()-((Activity)(plan.getPlanElements().get(0))).getStartTime()+
-				((Activity)(plan.getPlanElements().get(6))).getEndTime()-((Activity)(plan.getPlanElements().get(6))).getStartTime()));
-		stream.print("\t"+(((Activity)(plan.getPlanElements().get(2))).getEndTime()-((Activity)(plan.getPlanElements().get(2))).getStartTime()));
+		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(0))).getStartTime()+
+				((ActivityImpl)(plan.getPlanElements().get(6))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(6))).getStartTime()));
+		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(2))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(2))).getStartTime()));
 		stream.print("\t"+0);
-		stream.print("\t"+(((Activity)(plan.getPlanElements().get(2))).getEndTime()-((Activity)(plan.getPlanElements().get(2))).getStartTime()));
+		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(2))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(2))).getStartTime()));
 		stream.print("\t"+2);
 		stream.print("\t"+1);
 		stream.print("\t"+0);

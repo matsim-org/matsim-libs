@@ -26,10 +26,10 @@ package playground.johannes.mobsim;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -102,7 +102,7 @@ public class PlanAgent implements MobsimAgent {
 			if (index % 2 != 0) {
 				index++;
 			}
-			return ((Activity) person.getSelectedPlan().getPlanElements().get(index))
+			return ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(index))
 					.getEndTime();
 		}
 	}
@@ -152,10 +152,10 @@ public class PlanAgent implements MobsimAgent {
 			if (isDone())
 				return getLink();
 			else
-				return ((Activity) person.getSelectedPlan().getPlanElements().get(
+				return ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(
 						currentPlanIndex + 2)).getLink();
 		else
-			return ((Activity) person.getSelectedPlan().getPlanElements().get(
+			return ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(
 					currentPlanIndex + 1)).getLink();
 	}
 
@@ -163,15 +163,15 @@ public class PlanAgent implements MobsimAgent {
 	 * Initializes the agent to its initial state, which is the first activity
 	 * in the selected plan.<br>
 	 * The first activity's start time is set to 00:00:00. If the end time is
-	 * undefined, it is set to {@link Activity#getDuration()}. If both, duration and end
+	 * undefined, it is set to {@link ActivityImpl#getDuration()}. If both, duration and end
 	 * time are defined, the end time is set to min[end time, duration].<br>
-	 * The current link is set to {@link Activity#getLink()}.
+	 * The current link is set to {@link ActivityImpl#getLink()}.
 	 */
 	public void beforeSim() {
 		currentRouteIndex = -1;
 		currentPlanIndex = 0;
 
-		Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(
+		ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		act.setStartTime(0);
 		if (act.getEndTime() != Time.UNDEFINED_TIME
@@ -201,7 +201,7 @@ public class PlanAgent implements MobsimAgent {
 	 * travel time to <tt>time</tt> - arrival time.<br>
 	 * Sets the start time of the following activity to <tt>time</tt>. If the
 	 * activity's end time is undefined, it is set to <tt>time</tt> +
-	 * {@link Activity#getDuration()}. If both, duration and end time are defined, the
+	 * {@link ActivityImpl#getDuration()}. If both, duration and end time are defined, the
 	 * end time is set to min[end time, <tt>time</tt> + duration].
 	 * 
 	 * @param time
@@ -215,7 +215,7 @@ public class PlanAgent implements MobsimAgent {
 		currentRouteIndex = -1;
 		currentPlanIndex++;
 
-		Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(
+		ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		act.setStartTime(time);
 		if (act.getEndTime() != Time.UNDEFINED_TIME
@@ -236,7 +236,7 @@ public class PlanAgent implements MobsimAgent {
 	 *            the current simulation time.
 	 */
 	public void departure(double time) {
-		Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(
+		ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		act.setEndTime(time);
 		act.setDuration(act.getEndTime() - act.getStartTime());

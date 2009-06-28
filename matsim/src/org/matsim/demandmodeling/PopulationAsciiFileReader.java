@@ -24,12 +24,12 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -113,12 +113,12 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			Coord primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
 			double homeEndTime = SIXOCLOCK + MatsimRandom.getRandom().nextDouble() * TWOHOURS;
 
-			Activity act1 = plan.createActivity(ACTTYPE_HOME, homeCoord);
+			ActivityImpl act1 = plan.createActivity(ACTTYPE_HOME, homeCoord);
 			act1.setEndTime(homeEndTime);
 
 			plan.createLeg(TransportMode.car);
 
-			Activity act2 = plan.createActivity(row[5], primaryCoord);
+			ActivityImpl act2 = plan.createActivity(row[5], primaryCoord);
 			act2.setDuration(WORKDURATION);
 
 			plan.createLeg(TransportMode.car);

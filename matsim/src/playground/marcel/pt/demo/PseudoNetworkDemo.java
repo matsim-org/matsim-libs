@@ -29,7 +29,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -39,6 +38,8 @@ import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
+
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
@@ -106,7 +107,7 @@ public class PseudoNetworkDemo {
 		population.getPersons().put(person.getId(), person);
 		Plan plan = population.getPopulationBuilder().createPlan(person);
 		person.addPlan(plan);
-		Activity act = population.getPopulationBuilder().createActivityFromLinkId("home", link1.getId());
+		ActivityImpl act = population.getPopulationBuilder().createActivityFromLinkId("home", link1.getId());
 		act.setEndTime(4*3600.0);
 		plan.addActivity(act);
 		Leg leg = population.getPopulationBuilder().createLeg(TransportMode.walk);

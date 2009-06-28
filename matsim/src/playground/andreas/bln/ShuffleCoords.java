@@ -1,7 +1,6 @@
 package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -10,6 +9,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -44,8 +44,8 @@ public class ShuffleCoords extends NewPopulation {
 			Plan plan = person.getPlans().get(0);
 			
 			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof Activity){
-					Activity act = (Activity) planElement;
+				if(planElement instanceof ActivityImpl){
+					ActivityImpl act = (ActivityImpl) planElement;
 					
 					double x = -0.5 + MatsimRandom.getRandom().nextDouble();
 					double y = -0.5 + MatsimRandom.getRandom().nextDouble();

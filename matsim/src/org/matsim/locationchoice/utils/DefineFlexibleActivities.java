@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 
 public class DefineFlexibleActivities {
@@ -23,8 +23,8 @@ public class DefineFlexibleActivities {
 		this.initFlexibleTypes();
 	}
 	
-	public List<Activity> getFlexibleActivities(final Plan plan) {		
-		List<Activity> flexibleActivities = new Vector<Activity>();
+	public List<ActivityImpl> getFlexibleActivities(final Plan plan) {		
+		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
 		if (flexibleTypes.size() > 0) {
 			this.getFlexibleActs(plan, flexibleActivities);
 		}
@@ -34,9 +34,9 @@ public class DefineFlexibleActivities {
 		return flexibleActivities;
 	}
 	
-	private void getFlexibleActs(Plan plan, List<Activity> flexibleActivities) {				
+	private void getFlexibleActs(Plan plan, List<ActivityImpl> flexibleActivities) {				
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
-			Activity act = (Activity)plan.getPlanElements().get(i);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (this.flexibleTypes.contains(act.getType())) {
 				flexibleActivities.add(act);
 			}
@@ -46,9 +46,9 @@ public class DefineFlexibleActivities {
 	/*
 	 * Get all activities which are allowed to be relocated (incl. "primaries")
 	 */
-	private void getFlexibleActsBasedOnKnowledge(Plan plan, List<Activity> flexibleActivities) {				
+	private void getFlexibleActsBasedOnKnowledge(Plan plan, List<ActivityImpl> flexibleActivities) {				
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
-			Activity act = (Activity)plan.getPlanElements().get(i);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			if (!isPrimary && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 				flexibleActivities.add(act);
@@ -60,13 +60,13 @@ public class DefineFlexibleActivities {
 	/*
 	 * Get only "primary" activities which are allowed to be relocated
 	 */	
-	public List<Activity> getMovablePrimaryActivities(final Plan plan) {
+	public List<ActivityImpl> getMovablePrimaryActivities(final Plan plan) {
 		
-		List<Activity> primaryActivities = new Vector<Activity>();
+		List<ActivityImpl> primaryActivities = new Vector<ActivityImpl>();
 		
 		final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);
+			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 			if (act.getType().startsWith("h") || act.getType().startsWith("tta")) continue;
 			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			
@@ -76,14 +76,14 @@ public class DefineFlexibleActivities {
 		}
 		Collections.shuffle(primaryActivities);
 		
-		List<Activity> movablePrimaryActivities = new Vector<Activity>();
+		List<ActivityImpl> movablePrimaryActivities = new Vector<ActivityImpl>();
 		
 		// key: activity.type + activity.facility
 		HashMap<String, Boolean> fixPrimaries = new HashMap<String, Boolean>();
 				
-		Iterator<Activity> it = primaryActivities.iterator();
+		Iterator<ActivityImpl> it = primaryActivities.iterator();
 		while (it.hasNext()) {
-			Activity a = it.next();		
+			ActivityImpl a = it.next();		
 			String key = a.getType()+a.getFacility().getId().toString();
 			if (fixPrimaries.containsKey(key)) {
 				// there is already one activity performed of the specific type at this location

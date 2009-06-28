@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
@@ -14,6 +13,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -106,7 +106,7 @@ public class CompareSelectedPlansTable {
 
 				if (person.getSelectedPlan().getFirstActivity().getType()
 						.substring(0, 1).equals("h")) {
-					Activity act = person.getSelectedPlan().getFirstActivity();
+					ActivityImpl act = person.getSelectedPlan().getFirstActivity();
 					Coord crd = act.getCoord();
 					out.write(crd.getX() + ";");
 					out.write(crd.getY() + ";");
@@ -159,11 +159,11 @@ public class CompareSelectedPlansTable {
 				out.write(tp1 + ";");
 				out.write(tp0 + "->" + tp1 + ";");
 
-				Activity fa0 = person.getSelectedPlan().getFirstActivity();
+				ActivityImpl fa0 = person.getSelectedPlan().getFirstActivity();
 				double dpt0 = fa0.getEndTime();
 				boolean hact0 = fa0.getType().startsWith("h");
 				out.write((hact0 ? dpt0 : 0.0) + ";");
-				Activity fa1 = person_comp.getSelectedPlan().getFirstActivity();
+				ActivityImpl fa1 = person_comp.getSelectedPlan().getFirstActivity();
 				double dpt1 = fa1.getEndTime();
 				boolean hact1 = fa1.getType().startsWith("h");
 				out.write((hact1 ? dpt1 : 0.0) + ";");

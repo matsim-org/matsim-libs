@@ -24,11 +24,11 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -90,7 +90,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 		
 		for (int i=0; i<plan.getPlanElements().size(); i++) {
 			if (i%2 == 0) {
-				Activity act = (Activity)plan.getPlanElements().get(i);
+				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				if (act.getType().startsWith("h")) {
 					if (prev_home != null) { log.warn("TODO pid="+person.getId()+": Two home acts in a row. Not sure yet how to handle that..."); }
 					act.setType(home_act.getType());

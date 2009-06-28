@@ -26,9 +26,9 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -105,7 +105,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		// use morning home, the first act in each selected plan
 		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
-			activities.add( (ActivityOption) ((Activity)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOption("home"));
+			activities.add( (ActivityOption) ((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOption("home"));
 		}
 		
 		Iterator<ActivityOption> a_it = null;

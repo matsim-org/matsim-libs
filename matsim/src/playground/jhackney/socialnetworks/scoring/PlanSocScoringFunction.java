@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -77,11 +77,11 @@ public class PlanSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 
 
-		LinkedHashMap<Activity,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
+		LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
 //		ArrayList<Double> stats = this.spatialScorer.calculateTimeWindowStats(plan);
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if(act.getType().equals(factype)){
 //				this.friendFoeRatio+=stats.get(0);
 //				this.nFriends+=stats.get(1);
@@ -126,7 +126,7 @@ public class PlanSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 	}
 
-	public void startActivity(final double time, final Activity act) {
+	public void startActivity(final double time, final ActivityImpl act) {
 		this.scoringFunction.startActivity(time, act);
 	}
 

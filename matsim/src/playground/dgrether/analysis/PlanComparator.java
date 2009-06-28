@@ -25,9 +25,9 @@ import java.util.Date;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -71,7 +71,7 @@ public class PlanComparator {
 		this.population = loadPlansFile(firstPlanPath, sl.getScenario().getNetwork());
 		this._result = new PlanComparison(this.population.getPersons().keySet().size());
 		Plan plan;
-		Activity act;
+		ActivityImpl act;
 		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPersons().get(id).getSelectedPlan();
 			act = plan.getFirstActivity();

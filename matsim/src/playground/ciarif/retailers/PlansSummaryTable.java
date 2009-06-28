@@ -5,9 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PlansSummaryTable implements PlanAlgorithm {
@@ -51,7 +51,7 @@ public class PlansSummaryTable implements PlanAlgorithm {
 			//out.write(plan.getScore() + "\t");
 			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
 				//Leg l = (Leg)plan.getActsLegs().get(i);
-				Activity a = (Activity)plan.getPlanElements().get(i+1);
+				ActivityImpl a = (ActivityImpl)plan.getPlanElements().get(i+1);
 				if (a.getType().contains("shop")) {
 					//Link arr_link = a.getLink();
 					//out.write(a.getType() + "\t");

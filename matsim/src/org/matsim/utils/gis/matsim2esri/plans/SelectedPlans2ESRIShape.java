@@ -39,7 +39,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -48,6 +47,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -135,8 +135,8 @@ public class SelectedPlans2ESRIShape {
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act = (ActivityImpl) pe;
 					fts.add(getActFeature(id, act));
 				}
 			}
@@ -162,7 +162,7 @@ public class SelectedPlans2ESRIShape {
 		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
-	private Feature getActFeature(final String id, final Activity act) {
+	private Feature getActFeature(final String id, final ActivityImpl act) {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
 		Double startTime = act.getStartTime();

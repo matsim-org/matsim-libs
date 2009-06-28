@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 
 /*
@@ -147,8 +147,8 @@ public class DeadEndRemover {
 		Plan plan = person.getSelectedPlan();
 		
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				
 				Node fromNode = act.getLink().getFromNode();
 				Node toNode = act.getLink().getToNode();

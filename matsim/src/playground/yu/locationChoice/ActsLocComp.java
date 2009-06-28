@@ -34,7 +34,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -42,6 +41,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -56,9 +56,9 @@ public class ActsLocComp {
 	public static class ActsLocRecorder extends AbstractPersonAlgorithm
 			implements PlanAlgorithm {
 /**@variable actsLocs - Map<"String personId, List<"Coord activityLocationCoordinate>>*/
-		private final Map<Id, List<Activity>> actsLocs = new HashMap<Id, List<Activity>>();
+		private final Map<Id, List<ActivityImpl>> actsLocs = new HashMap<Id, List<ActivityImpl>>();
 
-		public Map<Id, List<Activity>> getActsLocs() {
+		public Map<Id, List<ActivityImpl>> getActsLocs() {
 			return actsLocs;
 		}
 
@@ -68,23 +68,23 @@ public class ActsLocComp {
 		}
 
 		public void run(final Plan plan) {
-			List<Activity> acts = new ArrayList<Activity>();
+			List<ActivityImpl> acts = new ArrayList<ActivityImpl>();
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Activity)
-					acts.add((Activity) pe);
+				if (pe instanceof ActivityImpl)
+					acts.add((ActivityImpl) pe);
 			actsLocs.put(plan.getPerson().getId(), acts);
 		}
 	}
 
-	public static void compare2ActsLocs(final Map<Id, List<Activity>> mapA,
-			final Map<Id, List<Activity>> mapB, final SimpleWriter writer) {
-		for (Entry<Id, List<Activity>> entry : mapA.entrySet()) {
+	public static void compare2ActsLocs(final Map<Id, List<ActivityImpl>> mapA,
+			final Map<Id, List<ActivityImpl>> mapB, final SimpleWriter writer) {
+		for (Entry<Id, List<ActivityImpl>> entry : mapA.entrySet()) {
 			Id personId = entry.getKey();
-			List<Activity> listA = entry.getValue(), listB = mapB.get(personId);
+			List<ActivityImpl> listA = entry.getValue(), listB = mapB.get(personId);
 			int sizeA = listA.size();
 			if (sizeA == listB.size())
 				for (int i = 0; i < sizeA; i++) {
-					Activity actA = listA.get(i), actB = listB.get(i);
+					ActivityImpl actA = listA.get(i), actB = listB.get(i);
 					if (!actA.getCoord().equals(actB.getCoord())
 							&& (actA.getType().startsWith("w")
 									|| actA.getType().startsWith("h")

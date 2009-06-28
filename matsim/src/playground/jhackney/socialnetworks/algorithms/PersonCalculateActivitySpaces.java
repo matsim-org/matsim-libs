@@ -23,10 +23,10 @@ package playground.jhackney.socialnetworks.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -42,13 +42,13 @@ public class PersonCalculateActivitySpaces {
 
 		double aSd = 0.;
 
-		Activity myAct = (Activity) ego.getSelectedPlan().getPlanElements().get(0);
+		ActivityImpl myAct = (ActivityImpl) ego.getSelectedPlan().getPlanElements().get(0);
 		Coord egoHomeCoord = myAct.getCoord();
 		EgoNet personNet = (EgoNet)ego.getCustomAttributes().get(EgoNet.NAME);
 		ArrayList<Person> alters = personNet.getAlters();
 		for (Person myAlter : alters) {
 			//Coord myAlterCoord = (Coord) pfc.personGetCoords(myAlter,"home").get(0);
-			myAct = (Activity) myAlter.getSelectedPlan().getPlanElements().get(0);
+			myAct = (ActivityImpl) myAlter.getSelectedPlan().getPlanElements().get(0);
 			Coord myAlterCoord = myAct.getCoord();
 			aSd = aSd + CoordUtils.calcDistance(egoHomeCoord, myAlterCoord);
 		}
@@ -65,10 +65,10 @@ public class PersonCalculateActivitySpaces {
 
 		double aSd = 0.;
 		int numAct = 0;
-		Activity myAct = (Activity) plan.getPlanElements().get(0);//Note this is not safe if ego is not sleeping at home
+		ActivityImpl myAct = (ActivityImpl) plan.getPlanElements().get(0);//Note this is not safe if ego is not sleeping at home
 
 		for (int i = 2, max = plan.getPlanElements().size() - 2; i < max; i += 2) {
-			Activity act1 = (Activity) (plan.getPlanElements().get(i));
+			ActivityImpl act1 = (ActivityImpl) (plan.getPlanElements().get(i));
 
 			if (myAct != null && act1 != null) {
 				double dist = CoordUtils.calcDistance(act1.getCoord(), myAct.getCoord());

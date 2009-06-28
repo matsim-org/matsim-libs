@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 
 public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
@@ -51,7 +51,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		int time = 7*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 
 		// first act (= home)
-		Activity a = p.createActivity("home", home_facility.getCoord());
+		ActivityImpl a = p.createActivity("home", home_facility.getCoord());
 		a.setLink(home_facility.getLink());
 		a.setStartTime(0.0);
 		a.setDuration(time);

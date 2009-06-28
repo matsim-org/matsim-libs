@@ -43,7 +43,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -57,6 +56,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -131,7 +131,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 			for (int i= 0; i< actslegs.size(); i++) {
 				if( i%2 == 0) {
 					// handle act
-					Activity act = (Activity)plan.getPlanElements().get(i);
+					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 					Id id2 = act.getLink().getId();
 					if(id2.equals(this.linkId)) {
 						actPersons.add(plan);
@@ -197,8 +197,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 	protected void collectLinks(List<Plan> actPersons) {
 		for (Plan plan : actPersons) {
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act = (ActivityImpl) pe;
 					addLink(act.getLink());
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;

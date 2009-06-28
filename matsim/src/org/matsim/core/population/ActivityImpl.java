@@ -60,7 +60,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		this.setCoord(coord);
 	}
 
-	public ActivityImpl(final Activity act) {
+	public ActivityImpl(final ActivityImpl act) {
 		super(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
@@ -135,6 +135,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 	 * If the duration could neither be calculated nor the act.dur attribute is set to a value
 	 * not equal to Time.UNDEFINED_TIME an exception is thrown.
 	 * @return the duration in seconds
+	 * @deprecated define algo with activity_end_time.  kn, jun09
 	 */
 	public double calculateDuration() {
 		if ((this.getStartTime() == Time.UNDEFINED_TIME) && (this.getEndTime() == Time.UNDEFINED_TIME)) {
@@ -156,12 +157,12 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		}
 	}
 
-	@Deprecated // nov08, dg
+	/** @deprecated define algo with activity_end_time.  kn, jun09 */
 	public double getDuration() {
 		return this.dur;
 	}
 
-	@Deprecated // nov08, dg
+	/** @deprecated define algo with activity_end_time.  kn, jun09 */
 	public void setDuration(final double dur) {
 		this.dur = dur;
 	}

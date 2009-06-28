@@ -35,12 +35,12 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.world.Location;
 
@@ -94,8 +94,8 @@ public class MentalMap {
 //		Associate each act in the plan with a random facility on the link
 
 		for (PlanElement pe : myPlan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity myAct = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl myAct = (ActivityImpl) pe;
 				if(myAct.getFacility()==null){ // new Acts are assigned a facility in the Plans file
 					ActivityOption myActivity = null;
 					// If there is already knowledge in the initial plans file, use it
@@ -136,8 +136,8 @@ public class MentalMap {
 		if(aar==null) return;
 //		this.log.info("READING ACT-ACTIVITY MAP FROM FILE PERSON "+myPlan.getPerson().getId());
 		for (PlanElement pe : myPlan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity myAct = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl myAct = (ActivityImpl) pe;
 				
 				TreeMap<Id,String> nextFac = aar.getNextPoint();
 				Id myFacilityId = nextFac.firstKey();
@@ -162,8 +162,8 @@ public class MentalMap {
 //		or else a standard MATSim "type" when this becomes established
 
 		for (PlanElement pe : myPlan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity myAct = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl myAct = (ActivityImpl) pe;
 				
 				String type="none";
 				char typechar=myAct.getType().charAt(0);
@@ -216,8 +216,8 @@ public class MentalMap {
 			ArrayList<Id> currentActivities = new ArrayList<Id>();
 			for (Plan myPlan : myPlans) {
 				for (PlanElement pe : myPlan.getPlanElements()) {
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
+					if (pe instanceof ActivityImpl) {
+						ActivityImpl act = (ActivityImpl) pe;
 						currentActivities.add(act.getFacility().getId());
 					}
 				}
@@ -287,12 +287,12 @@ public class MentalMap {
 			}
 	}
 
-	public Activity getActFromActivity (Person person, ActivityOption myActivity){
-		Activity myAct=null;
+	public ActivityImpl getActFromActivity (Person person, ActivityOption myActivity){
+		ActivityImpl myAct=null;
 		for (Plan myPlan : person.getPlans()) {
 			for (PlanElement pe : myPlan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act = (ActivityImpl) pe;
 					if(act.getFacility()==myActivity.getFacility()){
 						myAct=act;
 					}

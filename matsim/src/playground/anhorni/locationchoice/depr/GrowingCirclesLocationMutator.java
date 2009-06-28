@@ -30,7 +30,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -38,6 +37,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -280,8 +280,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 		Coord prim_coord = null;
 		final Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				final Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				final ActivityImpl act = (ActivityImpl) pe;
 				if (act.getType().startsWith(H)) {
 					if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
 					if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
@@ -298,8 +298,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 			final double radius=10000.0;
 
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					final Activity act = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					final ActivityImpl act = (ActivityImpl) pe;
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 						final ActivityFacility f = this.getFacility(home_coord,radius,act.getType());
 						act.setLink(this.network.getNearestLink(f.getCoord()));
@@ -325,8 +325,8 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 			final CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
 			final CoordImpl coord2 = new CoordImpl(prim_coord.getX()-dx,prim_coord.getY()+dy);
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					final Activity act = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					final ActivityImpl act = (ActivityImpl) pe;
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 						final ActivityFacility f = this.getFacility(coord1,coord2,radius,act.getType());
 						act.setLink(this.network.getNearestLink(f.getCoord()));

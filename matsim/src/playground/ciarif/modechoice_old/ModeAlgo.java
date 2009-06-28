@@ -27,11 +27,11 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -72,9 +72,9 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 		
 		for (int i=2; i<acts_legs.size(); i=i+2) {
-			Activity act = (Activity)acts_legs.get(i);
-			Coord coord1 = ((Activity)acts_legs.get(i)).getCoord();
-			Coord coord2 = ((Activity)acts_legs.get(i - 2)).getCoord();
+			ActivityImpl act = (ActivityImpl)acts_legs.get(i);
+			Coord coord1 = ((ActivityImpl)acts_legs.get(i)).getCoord();
+			Coord coord2 = ((ActivityImpl)acts_legs.get(i - 2)).getCoord();
 			
 			dist = dist + CoordUtils.calcDistance(coord1, coord2);
 		}

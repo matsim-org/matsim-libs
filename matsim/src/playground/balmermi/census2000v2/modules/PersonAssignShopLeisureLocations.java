@@ -29,11 +29,11 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -204,7 +204,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignRemainingLocations(Activity act, ActivityFacility start, ActivityFacility end) {
+	private final void assignRemainingLocations(ActivityImpl act, ActivityFacility start, ActivityFacility end) {
 		Coord c_start = start.getCoord();
 		Coord c_end   = end.getCoord();
 
@@ -234,17 +234,17 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	}
 	
 	private final void assignRemainingLocations(Plan plan, int start, int end) {
-		Coord c_start = ((Activity)plan.getPlanElements().get(start)).getFacility().getCoord();
-		Coord c_end   = ((Activity)plan.getPlanElements().get(end)).getFacility().getCoord();
+		Coord c_start = ((ActivityImpl)plan.getPlanElements().get(start)).getFacility().getCoord();
+		Coord c_end   = ((ActivityImpl)plan.getPlanElements().get(end)).getFacility().getCoord();
 		
 		double dx = c_end.getX() - c_start.getX();
 		double dy = c_end.getX() - c_start.getX();
 		if ((dx == 0.0) && (dy == 0.0)) {
 			// c_start and c_end equal
-			Zone z = (Zone)((Activity)plan.getPlanElements().get(start)).getFacility().getUpMapping().values().iterator().next();
+			Zone z = (Zone)((ActivityImpl)plan.getPlanElements().get(start)).getFacility().getUpMapping().values().iterator().next();
 			double r = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (int i=start+2; i<end; i=i+2) {
-				Activity act = (Activity)plan.getPlanElements().get(i);
+				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				ActivityOption activity = this.getActivity(c_start,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
@@ -259,7 +259,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			Coord c1 = new CoordImpl(c_start.getX()+dx,c_start.getY()+dy);
 			Coord c2 = new CoordImpl(c_end.getX()-dx,c_end.getY()+dy);
 			for (int i=start+2; i<end; i=i+2) {
-				Activity act = (Activity)plan.getPlanElements().get(i);
+				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				ActivityOption activity = this.getActivity(c1,c2,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
@@ -281,18 +281,18 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	public void run(Plan plan) {
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
-			Activity act = (Activity)plan.getPlanElements().get(i);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (act.getFacility() == null) {
 				// get the prev act with a facility
 				ActivityFacility start = null;
 				for (int b=i-2; b>=0; b=b-2) {
-					Activity b_act = (Activity)plan.getPlanElements().get(b);
+					ActivityImpl b_act = (ActivityImpl)plan.getPlanElements().get(b);
 					if (b_act.getFacility() != null) { start = b_act.getFacility(); break; }
 				}
 				// get the next act with a facility
 				ActivityFacility end = null;
 				for (int a=i+2; a<plan.getPlanElements().size(); a=a+2) {
-					Activity a_act = (Activity)plan.getPlanElements().get(a);
+					ActivityImpl a_act = (ActivityImpl)plan.getPlanElements().get(a);
 					if (a_act.getFacility() != null) { end = a_act.getFacility(); break; }
 				}
 				if ((start == null) || (end == null)) { Gbl.errorMsg("That should not happen!"); }

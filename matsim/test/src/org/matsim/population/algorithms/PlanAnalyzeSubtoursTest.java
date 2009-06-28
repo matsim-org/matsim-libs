@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -36,6 +35,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.Layer;
@@ -165,7 +165,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = config.planomat().getTripStructureAnalysisLayer();
 		Location location = null;
-		Activity act = null;
+		ActivityImpl act = null;
 		for (Entry<String, String> entry: expectedSubtourIndexations.entrySet()) {
 			String facString  = entry.getKey();
 

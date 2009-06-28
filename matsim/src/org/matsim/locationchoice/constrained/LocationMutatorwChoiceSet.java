@@ -28,12 +28,12 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
@@ -117,9 +117,9 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		if (trialNr > this.maxRecursions) {		
 			this.unsuccessfullLC += 1;
 					
-			Iterator<Activity> act_it = subChain.getSlActs().iterator();
+			Iterator<ActivityImpl> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {
-				Activity act = act_it.next();
+				ActivityImpl act = act_it.next();
 				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
 			return 0;
@@ -129,11 +129,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		Coord endCoord = subChain.getEndCoord();
 		double ttBudget = subChain.getTtBudget();		
 		
-		Activity prevAct = subChain.getFirstPrimAct();
+		ActivityImpl prevAct = subChain.getFirstPrimAct();
 		
-		Iterator<Activity> act_it = subChain.getSlActs().iterator();
+		Iterator<ActivityImpl> act_it = subChain.getSlActs().iterator();
 		while (act_it.hasNext()) {
-			Activity act = act_it.next();
+			ActivityImpl act = act_it.next();
 			double radius = (ttBudget * speed) / 2.0;	
 			if (!this.modifyLocation(act, startCoord, endCoord, radius, 0)) {
 				return 1;
@@ -156,7 +156,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 
 	
-	protected boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
+	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 		
 		ArrayList<ActivityFacility> choiceSet = this.computeChoiceSetCircle
 		(startCoord, endCoord, radius, act.getType());
@@ -175,7 +175,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return false; 			
 	}
 	
-	protected double computeTravelTime(Activity fromAct, Activity toAct) {	
+	protected double computeTravelTime(ActivityImpl fromAct, ActivityImpl toAct) {	
 		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
@@ -191,7 +191,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);		
+			final ActivityImpl act = (ActivityImpl)actslegs.get(j);		
 			
 			if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) { // found secondary activity
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
@@ -210,11 +210,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	private List<SubChain> calcActChainsBasedOnKnowledge(final Plan plan) {
 		ManageSubchains manager = new ManageSubchains();	
-		List<Activity> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		List<ActivityImpl> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);
+			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 			
 			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
 			boolean movable = movablePrimaryActivities.contains(act);

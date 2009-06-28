@@ -1,17 +1,17 @@
 package playground.anhorni.locationchoice.cs.helper;
 
-import org.matsim.core.api.population.Activity;
+import org.matsim.core.population.ActivityImpl;
 
 public class Trip {
 	
 	int tripNr;
-	Activity beforeShoppingAct = null;
+	ActivityImpl beforeShoppingAct = null;
 	// TODO: handle multiple shopping acts
-	Activity shoppingAct = null;
-	Activity afterShoppingAct = null;
+	ActivityImpl shoppingAct = null;
+	ActivityImpl afterShoppingAct = null;
 	
-	public Trip(int tripNr, Activity beforeShoppingAct, Activity shoppingAct,
-			Activity afterShoppingAct) {
+	public Trip(int tripNr, ActivityImpl beforeShoppingAct, ActivityImpl shoppingAct,
+			ActivityImpl afterShoppingAct) {
 		super();
 		this.tripNr = tripNr;
 		this.beforeShoppingAct = beforeShoppingAct;
@@ -20,22 +20,22 @@ public class Trip {
 	}
 		
 	// --------------------------------------------------------
-	public Activity getBeforeShoppingAct() {
+	public ActivityImpl getBeforeShoppingAct() {
 		return beforeShoppingAct;
 	}
-	public void setBeforeShoppingAct(Activity beforeShoppingAct) {
+	public void setBeforeShoppingAct(ActivityImpl beforeShoppingAct) {
 		this.beforeShoppingAct = beforeShoppingAct;
 	}
-	public Activity getShoppingAct() {
+	public ActivityImpl getShoppingAct() {
 		return shoppingAct;
 	}
-	public void setShoppingAct(Activity shoppingAct) {
+	public void setShoppingAct(ActivityImpl shoppingAct) {
 		this.shoppingAct = shoppingAct;
 	}
-	public Activity getAfterShoppingAct() {
+	public ActivityImpl getAfterShoppingAct() {
 		return afterShoppingAct;
 	}
-	public void setAfterShoppingAct(Activity afterShoppingAct) {
+	public void setAfterShoppingAct(ActivityImpl afterShoppingAct) {
 		this.afterShoppingAct = afterShoppingAct;
 	}
 	public int getTripNr() {

@@ -6,11 +6,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 
 /**
  * transfer the "right" persons to next PersonFilter. These "right" persons
@@ -80,7 +80,7 @@ public class PersonRouteFilter extends PersonFilterA {
 								}
 						}
 					} else {
-						Activity act = (Activity) obj;
+						ActivityImpl act = (ActivityImpl) obj;
 						if (this.criterionLinkIds.contains(act.getLink()
 								.getId()))
 							return false;

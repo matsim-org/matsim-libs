@@ -24,11 +24,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 
 /**
  * Represents a vehicle.
@@ -74,7 +74,7 @@ public class Vehicle extends SimUnit {
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
-		Activity firstAct=(Activity) actsLegs.get(0);
+		ActivityImpl firstAct=(ActivityImpl) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
 		double departureTime = firstAct.getEndTime();
 
@@ -92,13 +92,13 @@ public class Vehicle extends SimUnit {
 	 * 
 	 * @return
 	 */
-	public Activity getPreviousActivity() {
+	public ActivityImpl getPreviousActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
-				return ((Activity) actsLegs.get(i - 1));
+				return ((ActivityImpl) actsLegs.get(i - 1));
 			}
 		}
 		return null;
@@ -110,13 +110,13 @@ public class Vehicle extends SimUnit {
 	 * 
 	 * @return
 	 */
-	public Activity getNextActivity() {
+	public ActivityImpl getNextActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
-				return ((Activity) actsLegs.get(i + 1));
+				return ((ActivityImpl) actsLegs.get(i + 1));
 			}
 		}
 		return null;
@@ -186,7 +186,7 @@ public class Vehicle extends SimUnit {
 	public void moveToFirstLinkInNextLeg() {
 		Plan plan = getOwnerPerson().getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
-		setCurrentLink(((Activity) actsLegs.get(getLegIndex() + 1)).getLink());
+		setCurrentLink(((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLink());
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class Vehicle extends SimUnit {
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
 			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
-			previousLink = ((Activity) actsLegs.get(legIndex - 1)).getLink();
+			previousLink = ((ActivityImpl) actsLegs.get(legIndex - 1)).getLink();
 			previousRoad = Road.getRoad(previousLink.getId().toString());
 		} else if (this.getLinkIndex() >= 1) {
 			previousLink = this.getCurrentLinkRoute()[this.getLinkIndex() - 1];

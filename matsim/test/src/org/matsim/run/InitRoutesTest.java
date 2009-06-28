@@ -23,7 +23,6 @@ package org.matsim.run;
 import java.io.File;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -35,6 +34,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -66,7 +66,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1"));
 		population.getPersons().put(person.getId(), person);
 		Plan plan = person.createPlan(true);
-		Activity a1 = plan.createActivity("h", network.getLink(new IdImpl("1")));
+		ActivityImpl a1 = plan.createActivity("h", network.getLink(new IdImpl("1")));
 		a1.setEndTime(3600);
 		plan.createLeg(TransportMode.car);
 		plan.createActivity("w", network.getLink(new IdImpl("20")));

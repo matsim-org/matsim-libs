@@ -28,11 +28,11 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -151,8 +151,8 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				Coord coord = act.getCoord();
 				QuadTree<ActivityFacility> qt = null;
 				if (act.getType().startsWith(H)) { qt = this.fqts.get(H); }

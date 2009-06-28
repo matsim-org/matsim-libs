@@ -24,13 +24,13 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -124,8 +124,8 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 				if (pe instanceof Leg) {
 					Leg l = (Leg) pe;
 					l.setRoute(null);
-				} else if (pe instanceof Activity) {
-					Activity a = (Activity) pe;
+				} else if (pe instanceof ActivityImpl) {
+					ActivityImpl a = (ActivityImpl) pe;
 					Coord coord = a.getCoord();
 					if (coord == null) { throw new RuntimeException("Something is wrong!"); }
 					char type = a.getType().charAt(0);

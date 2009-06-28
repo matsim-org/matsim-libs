@@ -20,10 +20,10 @@
 
 package playground.yu.bottleneck;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -56,7 +56,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 		for (int i = 0; i < max; i++) {
 
 			if (i % 2 == 0) {
-				Activity act = (Activity) (plan.getPlanElements().get(i));
+				ActivityImpl act = (ActivityImpl) (plan.getPlanElements().get(i));
 				// invalidate previous activity times because durations will change
 				act.setStartTime(Time.UNDEFINED_TIME);
 

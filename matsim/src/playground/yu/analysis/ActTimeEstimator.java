@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -69,8 +69,8 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity a = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl a = (ActivityImpl) pe;
 				String actType = a.getType();
 				ActDurCounter adc = this.actDurs.get(actType);
 				if (adc == null) {

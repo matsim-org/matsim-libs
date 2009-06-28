@@ -33,7 +33,6 @@ import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -43,6 +42,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -171,7 +171,7 @@ public class PrimaryLocationDrawing {
 			for (int i = 0; i < li ; i++) {
 				final Person pers = new PersonImpl(new IdImpl(this.id++));
 				final Plan plan = new org.matsim.core.population.PlanImpl(pers);
-				final Activity act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
+				final ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
 				act.setEndTime(6*3600);
 				plan.addActivity(act);
 				pers.addPlan(plan);
@@ -242,7 +242,7 @@ public class PrimaryLocationDrawing {
 				leg.setArrivalTime(Time.UNDEFINED_TIME);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);
 				leg.setTravelTime(Time.UNDEFINED_TIME);
-				Activity act = new org.matsim.core.population.ActivityImpl("w",link.getCoord(),link);
+				ActivityImpl act = new org.matsim.core.population.ActivityImpl("w",link.getCoord(),link);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addActivity(act);
 				try {

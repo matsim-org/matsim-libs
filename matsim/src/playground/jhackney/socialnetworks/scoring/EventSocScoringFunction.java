@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 
@@ -45,7 +45,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
-	private final LinkedHashMap<Activity,ArrayList<Double>> actStats;
+	private final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats;
 	private final String factype;
 
 	private double friendFoeRatio=0.;
@@ -59,7 +59,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;
@@ -81,8 +81,8 @@ public class EventSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if(act.getType().equals(factype)){
 					this.friendFoeRatio+=actStats.get(act).get(0);
 					this.nFriends+=actStats.get(act).get(1);
@@ -122,7 +122,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.reset();
 	}
 
-	public void startActivity(final double time, final Activity act) {
+	public void startActivity(final double time, final ActivityImpl act) {
 		this.scoringFunction.startActivity(time, act);
 	}
 

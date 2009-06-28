@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -43,6 +42,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -116,7 +116,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
-	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
+	private LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;
 //	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring = null;
 

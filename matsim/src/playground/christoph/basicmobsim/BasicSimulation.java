@@ -37,7 +37,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -49,6 +48,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 
 public class BasicSimulation {
 	
@@ -85,14 +85,14 @@ public class BasicSimulation {
 		// Zufallsgenerator eindeutig mit der Id der Person initialisieren -> reproduzierbare Ergebnisse!
 		Random random = new Random( Long.valueOf(person.getId().toString()) ); // better use MatsimRandom
 		
-		Activity act = null;
+		ActivityImpl act = null;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				act = (ActivityImpl) pe;
 			} else if (pe instanceof Leg) {
 				ArrayList<Node> routeNodes = new ArrayList<Node>();
 				Leg leg = (Leg) pe;
-				Activity nextAct = plan.getNextActivity(leg);
+				ActivityImpl nextAct = plan.getNextActivity(leg);
 				
 				// Ziellink holen
 				Link destinationLink = nextAct.getLink();

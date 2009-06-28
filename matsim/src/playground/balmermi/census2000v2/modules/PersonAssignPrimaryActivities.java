@@ -24,11 +24,11 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -68,7 +68,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
 		ArrayList<ActivityOptionImpl> prim_acts = k.getActivities(true);
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
-			Activity act = (Activity)plan.getPlanElements().get(i);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			String curr_type = act.getType();
 			ActivityOption a = act.getFacility().getActivityOption(curr_type);
 			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacility()+"!"); }

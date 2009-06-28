@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -38,7 +38,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelActEndReplanner.class);
 	
-	public static void run(ArrayList<Activity> fromActs, ArrayList<QueueVehicle> vehicles, double time)
+	public static void run(ArrayList<ActivityImpl> fromActs, ArrayList<QueueVehicle> vehicles, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -58,7 +58,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		for(int j = 0; j < vehicles.size(); j++)
 		{
 			QueueVehicle vehicle = vehicles.get(i);
-			Activity fromAct = fromActs.get(i);
+			ActivityImpl fromAct = fromActs.get(i);
 			
 			replannerThreads[i % numOfThreads].handleVehicle(vehicle, fromAct);
 			i++;
@@ -95,7 +95,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
 		private final List<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
-		private final List<Activity> fromActs = new LinkedList<Activity>();
+		private final List<ActivityImpl> fromActs = new LinkedList<ActivityImpl>();
 
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
 		{
@@ -105,7 +105,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			this.time = time;
 		}
 
-		public void handleVehicle(final QueueVehicle vehicle, final Activity fromAct)
+		public void handleVehicle(final QueueVehicle vehicle, final ActivityImpl fromAct)
 		{
 			this.vehicles.add(vehicle);
 			this.fromActs.add(fromAct);
@@ -118,7 +118,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			for(int i = 0; i < vehicles.size(); i++)
 			{	
 				QueueVehicle vehicle = vehicles.get(i);
-				Activity fromAct = fromActs.get(i);
+				ActivityImpl fromAct = fromActs.get(i);
 				
 				// replanner of the person
 				PlanAlgorithm replanner = (PlanAlgorithm)vehicle.getDriver().getPerson().getCustomAttributes().get("Replanner");

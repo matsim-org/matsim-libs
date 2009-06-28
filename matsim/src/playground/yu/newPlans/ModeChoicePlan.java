@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -32,6 +31,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 
@@ -70,7 +70,7 @@ public class ModeChoicePlan extends NewPopulation {
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
-					cp.addActivity((Activity) o);
+					cp.addActivity((ActivityImpl) o);
 				} else {
 					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(
@@ -88,7 +88,7 @@ public class ModeChoicePlan extends NewPopulation {
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
-					cp.addActivity((Activity) o);
+					cp.addActivity((ActivityImpl) o);
 				} else {
 					Leg cl = new org.matsim.core.population.LegImpl((Leg) o);
 					cl.setMode(

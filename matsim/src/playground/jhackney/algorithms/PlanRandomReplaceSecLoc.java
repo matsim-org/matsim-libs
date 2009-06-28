@@ -43,7 +43,6 @@ import java.util.List;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -51,6 +50,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -125,10 +125,10 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 //		Get all instances of this facility type in the plan
 
-		ArrayList<Activity> actsOfFacType= new ArrayList<Activity>();
+		ArrayList<ActivityImpl> actsOfFacType= new ArrayList<ActivityImpl>();
 		for (PlanElement pe : newPlan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity nextAct=(Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl nextAct=(ActivityImpl) pe;
 				if(nextAct.getType()== factype){
 					actsOfFacType.add(nextAct);
 				}
@@ -141,7 +141,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			Activity newAct = (Activity)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
+			ActivityImpl newAct = (ActivityImpl)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
@@ -160,15 +160,15 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 			if(newAct.getLinkId()!=f.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
 				if((newAct.getType() == plan.getFirstActivity().getType()) && (newAct.getLink() == plan.getFirstActivity().getLink())){
-					Activity lastAct = (Activity) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
+					ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 //					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					lastAct.setLink(f.getLink());
 					lastAct.setCoord(f.getCoord());
 					lastAct.setFacility(f);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if((newAct.getType() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
-					Activity firstAct = (Activity) newPlan.getFirstActivity();
+				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
+					ActivityImpl firstAct = (ActivityImpl) newPlan.getFirstActivity();
 					firstAct.setLink(f.getLink());
 					firstAct.setCoord(f.getCoord());
 					firstAct.setFacility(f);

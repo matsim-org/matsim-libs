@@ -27,13 +27,13 @@ import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -98,8 +98,8 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		Coord work_coord = null;
 		double dist_h_w = 0.0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if (H.equals(act.getType().substring(0,1))) { home_coord = act.getCoord();}
 				else if (W.equals(act.getType().substring(0,1))) { work_coord = act.getCoord(); }
 			}

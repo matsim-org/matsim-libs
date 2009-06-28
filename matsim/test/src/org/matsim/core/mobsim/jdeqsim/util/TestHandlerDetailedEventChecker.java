@@ -10,7 +10,6 @@ import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -29,6 +28,7 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements BasicPersonEventHandler {
@@ -70,11 +70,11 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 			Plan plan = p.getSelectedPlan();
 			int index = 0;
 
-			Activity act = null;
+			ActivityImpl act = null;
 			Leg leg = null;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					act = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					act = (ActivityImpl) pe;
 					
 					if (leg != null) {
 						// each leg ends with arrival on act link

@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -40,6 +39,7 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.Layer;
@@ -374,7 +374,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1000"));
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
 		Location location = null;
-		Activity act = null;
+		ActivityImpl act = null;
 		for (Entry<String, ArrayList<TransportMode[]>> entry : testCases.entrySet()) {
 
 			String facString  = entry.getKey();

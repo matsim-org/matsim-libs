@@ -22,13 +22,13 @@ package playground.ciarif.models;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -74,15 +74,15 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		int mainpurpose = 3; // 0 := w; 1 := e; 2 := s 3:=l
 		Coord home_coord = null;
 		Coord work_coord = null;
-		Activity prevAct = null;
+		ActivityImpl prevAct = null;
 		boolean isFirst = true;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
+			if (pe instanceof ActivityImpl) {
 				if (isFirst) {
 					isFirst = false;
 					// first is always 'home', ignore it
 				} else {
-					Activity act = (Activity) pe;
+					ActivityImpl act = (ActivityImpl) pe;
 					if (prevAct != null) {
 						if (H.equals(act.getType())) { home_coord = act.getCoord(); }
 						else if (W.equals(act.getType())) { work_coord = act.getCoord(); }

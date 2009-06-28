@@ -20,9 +20,9 @@
 
 package playground.marcel.template.replanning;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -30,8 +30,8 @@ public class TemplatePlanAlgorithm implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity activity = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl activity = (ActivityImpl) pe;
 				activity.setEndTime(Time.parseTime("06:00:00"));
 				return; // we only want to change the end time of the very first activity
 			}

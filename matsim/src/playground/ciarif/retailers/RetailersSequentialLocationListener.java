@@ -35,7 +35,6 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -46,6 +45,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -215,8 +215,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 						}
 						for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
 							
-							if (pe2 instanceof Activity) {
-								Activity act = (Activity) pe2;
+							if (pe2 instanceof ActivityImpl) {
+								ActivityImpl act = (ActivityImpl) pe2;
 								
 								if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
 									counter++;

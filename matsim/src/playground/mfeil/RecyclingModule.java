@@ -31,12 +31,12 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.knowledges.Knowledges;
@@ -176,7 +176,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		for (int i=0;i<list[0].size();i++){
 			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");
 			for (int j=0;j<list[0].get(i).getPlanElements().size();j+=2){
-				assignment.print(((Activity)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
+				assignment.print(((ActivityImpl)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
 			assignment.println();
 			if (i==this.testAgentsNumber-1) {
@@ -246,7 +246,7 @@ public class RecyclingModule implements PlanStrategyModule{
 					if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
 						assignment.print(this.list[1].get(x).getPerson().getId()+"\t\t"+this.list[1].get(x).getScore()+"\t");
 						for (int j=0;j<this.list[1].get(x).getPlanElements().size();j+=2){
-							assignment.print(((Activity)(this.list[1].get(x).getPlanElements().get(j))).getType()+"\t");
+							assignment.print(((ActivityImpl)(this.list[1].get(x).getPlanElements().get(j))).getType()+"\t");
 						}
 						assignment.println();
 						break;

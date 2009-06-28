@@ -29,7 +29,6 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -54,24 +53,24 @@ public class PlanImpl implements Plan {
 		this.delegate = new BasicPlanImpl(person);
 	}
 
-	public final Activity createActivity(final String type, final Coord coord) {
+	public final ActivityImpl createActivity(final String type, final Coord coord) {
 		verifyCreateAct();
-		Activity a = new ActivityImpl(type, coord);
+		ActivityImpl a = new ActivityImpl(type, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
-	public final Activity createActivity(final String type, final ActivityFacility fac) {
+	public final ActivityImpl createActivity(final String type, final ActivityFacility fac) {
 		verifyCreateAct();
-		Activity a = new ActivityImpl(type, fac);
+		ActivityImpl a = new ActivityImpl(type, fac);
 		getPlanElements().add(a);
 		return a;
 	}
 
 
-	public final Activity createActivity(final String type, final Link link) {
+	public final ActivityImpl createActivity(final String type, final Link link) {
 		verifyCreateAct();
-		Activity a = new ActivityImpl(type, link);
+		ActivityImpl a = new ActivityImpl(type, link);
 		getPlanElements().add(a);
 		return a;
 	}
@@ -212,8 +211,8 @@ public class PlanImpl implements Plan {
 		this.setType(in.getType());
 //		setPerson(in.getPerson()); // do not copy person, but keep the person we're assigned to
 		for (PlanElement pe : in.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity a = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl a = (ActivityImpl) pe;
 				getPlanElements().add(new ActivityImpl(a));
 			} else if (pe instanceof Leg) {
 				Leg l = (Leg) pe;
@@ -252,7 +251,7 @@ public class PlanImpl implements Plan {
 	 * @param act the act to insert, following the leg
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException {
+	public void insertLegAct(final int pos, final Leg leg, final ActivityImpl act) throws IllegalArgumentException {
 		if (pos < getPlanElements().size()) {
 			Object o = getPlanElements().get(pos);
 			if (!(o instanceof Leg)) {
@@ -266,7 +265,7 @@ public class PlanImpl implements Plan {
 		getPlanElements().add(pos, leg);
 	}
 
-	public Leg getPreviousLeg(final Activity act) {
+	public Leg getPreviousLeg(final ActivityImpl act) {
 		int index = this.getActLegIndex(act);
 		if (index != -1) {
 			return (Leg) getPlanElements().get(index-1);
@@ -274,15 +273,15 @@ public class PlanImpl implements Plan {
 		return null;
 	}
 
-	public Activity getPreviousActivity(final Leg leg) {
+	public ActivityImpl getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (Activity) getPlanElements().get(index-1);
+			return (ActivityImpl) getPlanElements().get(index-1);
 		}
 		return null;
 	}
 
-	public Leg getNextLeg(final Activity act) {
+	public Leg getNextLeg(final ActivityImpl act) {
 		int index = this.getActLegIndex(act);
 		if ((index < getPlanElements().size() - 1) && (index != -1)) {
 			return (Leg) getPlanElements().get(index+1);
@@ -290,16 +289,16 @@ public class PlanImpl implements Plan {
 		return null;
 	}
 
-	public Activity getNextActivity(final Leg leg) {
+	public ActivityImpl getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
-			return (Activity) getPlanElements().get(index+1);
+			return (ActivityImpl) getPlanElements().get(index+1);
 		}
 		return null;
 	}
 
 	private int getActLegIndex(final Object o) {
-		if ((o instanceof Leg) || (o instanceof Activity)) {
+		if ((o instanceof Leg) || (o instanceof ActivityImpl)) {
 			for (int i = 0; i < getPlanElements().size(); i++) {
 				if (getPlanElements().get(i).equals(o)) {
 					return i;
@@ -310,12 +309,12 @@ public class PlanImpl implements Plan {
 		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
 	}
 
-	public Activity getFirstActivity() {
-		return (Activity) getPlanElements().get(0);
+	public ActivityImpl getFirstActivity() {
+		return (ActivityImpl) getPlanElements().get(0);
 	}
 
-	public Activity getLastActivity() {
-		return (Activity) getPlanElements().get(getPlanElements().size() - 1);
+	public ActivityImpl getLastActivity() {
+		return (ActivityImpl) getPlanElements().get(getPlanElements().size() - 1);
 	}
 
 	public void addActivity(BasicActivity act) {

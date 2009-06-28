@@ -33,7 +33,6 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -41,6 +40,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -85,15 +85,15 @@ public class NewDemandWithFacilities4Zrh {
 
 		public void run(final Plan plan) {
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act = (ActivityImpl) pe;
 					String type = act.getType();
 					allocateFacility2PrimaryActs4Zrh(type, act);
 				}
 		}
 
 		private void allocateFacility2PrimaryActs4Zrh(final String type,
-				final Activity act) {
+				final ActivityImpl act) {
 			Coord coord = act.getCoord();
 			ActivityFacility af = afMap.get(coord);
 			if (af == null) {

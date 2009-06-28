@@ -26,7 +26,6 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -35,6 +34,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.StringUtils;
@@ -74,7 +74,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = new PersonImpl(new IdImpl("1"));
 		plan = person.createPlan(true);
-		Activity a = plan.createActivity("h", link1);
+		ActivityImpl a = plan.createActivity("h", link1);
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createLeg(TransportMode.car);
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
@@ -85,7 +85,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = new PersonImpl(new IdImpl("2"));
 		plan = person.createPlan(true);
-		Activity a2 = plan.createActivity("h", link1);
+		ActivityImpl a2 = plan.createActivity("h", link1);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createLeg(TransportMode.car);
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
@@ -96,7 +96,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = new PersonImpl(new IdImpl("3"));
 		plan = person.createPlan(true);
-		Activity a3 = plan.createActivity("h", link1);
+		ActivityImpl a3 = plan.createActivity("h", link1);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createLeg(TransportMode.car);
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
@@ -36,6 +35,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ItsumoSim extends ExternalMobsim {
@@ -119,7 +119,7 @@ public class ItsumoSim extends ExternalMobsim {
 				// act/leg
 				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Activity act = (Activity)plan.getPlanElements().get(jj);
+						ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(jj);
 
 						out.write("    <route>"); out.newLine();
 						out.write("     <laneset>" + act.getLinkId() + "</laneset>"); out.newLine();

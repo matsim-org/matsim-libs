@@ -26,7 +26,6 @@ package playground.yu.analysis;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -34,6 +33,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -100,7 +100,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		List<PlanElement> pes = plan.getPlanElements();
 
 		for (int i = 0; i < pes.size(); i += 2)
-			if (((Activity) pes.get(i)).getType().equals("tta"))
+			if (((ActivityImpl) pes.get(i)).getType().equals("tta"))
 				return;
 
 		if (!checkParkSensible(plan)) {
@@ -116,8 +116,8 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		sb.append(plan.getPerson().getId());
 		sb.append('\n');
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				// if(act.getType())
 				sb.append(act.getType());
 				sb.append("\tlinkId :\t");

@@ -18,7 +18,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -26,6 +25,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -215,8 +215,8 @@ public class ReadFromUrbansimParcelModel {
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
-					Activity oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();
-					Activity newHomeAct =    newPerson.getSelectedPlan().getFirstActivity() ;
+					ActivityImpl oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();
+					ActivityImpl newHomeAct =    newPerson.getSelectedPlan().getFirstActivity() ;
 					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -229,8 +229,8 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if work act has changed:
-					Activity oldWorkAct = (Activity) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
-					Activity newWorkAct = (Activity)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
+					ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
+					ActivityImpl newWorkAct = (ActivityImpl)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
 					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -269,7 +269,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info( "Done with reading persons." ) ;
 	}
 
-	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final NetworkLayer network ) {
+	private boolean actHasChanged ( final ActivityImpl oldAct, final ActivityImpl newAct, final NetworkLayer network ) {
 		if ( !oldAct.getCoord().equals( newAct.getCoord() ) ) {
 //			log.info( "act location changed" ) ;
 			return true ;

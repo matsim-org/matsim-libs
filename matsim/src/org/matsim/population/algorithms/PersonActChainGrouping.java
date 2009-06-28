@@ -25,10 +25,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 
 public class PersonActChainGrouping extends AbstractPersonAlgorithm {
 
@@ -61,7 +61,7 @@ public class PersonActChainGrouping extends AbstractPersonAlgorithm {
 		Plan plan = person.getPlans().get(0);
 		StringBuilder chainBuilder = new StringBuilder((plan.getPlanElements().size() + 1) / 2);
 		for (int j = 0; j < plan.getPlanElements().size(); j = j + 2) {
-			Activity act = (Activity)plan.getPlanElements().get(j);
+			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);
 			chainBuilder = chainBuilder.append(act.getType().substring(0, 1));
 		}
 

@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -121,7 +121,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
 			this.actCnt++;
-			Activity act = (Activity)actsLegs.get(j);
+			ActivityImpl act = (ActivityImpl)actsLegs.get(j);
 			String actType = act.getType();
 			double dur = act.getDuration();
 			int idx = getActTypeIndex(actType);

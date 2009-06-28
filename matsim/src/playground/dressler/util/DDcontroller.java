@@ -24,7 +24,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -35,6 +34,7 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.netvis.NetVis;
@@ -81,7 +81,7 @@ public class DDcontroller {
 					System.out.println("Person " + person.getId() + " has no plan.");
 					continue;
 				}
-				Activity act = plan.getFirstActivity();
+				ActivityImpl act = plan.getFirstActivity();
 				if (act == null) {
 					System.out.println("Person " + person.getId() + " has no act.");
 					continue;

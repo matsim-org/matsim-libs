@@ -24,10 +24,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -127,8 +127,8 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 		int e = 0;
 		int w = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if (L.equals(act.getType())) { l = 1; }
 				if (S.equals(act.getType())) { s = 1; }
 				if (E.equals(act.getType())) { e = 1; }

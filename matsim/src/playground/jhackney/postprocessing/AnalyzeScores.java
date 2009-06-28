@@ -24,12 +24,12 @@ import java.util.LinkedHashMap;
 
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
@@ -92,7 +92,7 @@ public class AnalyzeScores {
 		Events events = new Events();
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
-		LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
+		LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;
 		LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;
 		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
 //		EventsToScore scoring=null;

@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -49,7 +49,7 @@ public class PlanomatXPlanScorer extends PlanScorer {
 	public double getScore(final Plan plan) {
 		ScoringFunction function = this.factory.getNewScoringFunction(plan);
 		org.matsim.core.api.population.Leg leg;
-		org.matsim.core.api.population.Activity act;
+		org.matsim.core.population.ActivityImpl act;
 		for (int i = 1; i < plan.getPlanElements().size(); i++) {
 			if (i % 2 != 0) {
 				leg = (Leg) plan.getPlanElements().get(i);
@@ -57,7 +57,7 @@ public class PlanomatXPlanScorer extends PlanScorer {
 				double arrTime = 0;
 				for (int x = 0;x<i;x++){
 					if (x % 2 == 0){
-						Activity actHelp = (Activity) (plan.getPlanElements().get(x));
+						ActivityImpl actHelp = (ActivityImpl) (plan.getPlanElements().get(x));
 						if (actHelp.getDuration()>=0){
 								depTime = actHelp.getDuration() + depTime;
 						}

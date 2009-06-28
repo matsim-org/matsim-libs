@@ -25,11 +25,11 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -219,8 +219,8 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
-			Coord coord1 = ((Activity)acts_legs.get(i)).getCoord();
-			Coord coord2 = ((Activity)acts_legs.get(i-2)).getCoord();
+			Coord coord1 = ((ActivityImpl)acts_legs.get(i)).getCoord();
+			Coord coord2 = ((ActivityImpl)acts_legs.get(i-2)).getCoord();
 			dist = dist + CoordUtils.calcDistance(coord1, coord2);
 		}
 		return dist / 1000;
@@ -233,7 +233,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
-			String type = ((Activity)acts_legs.get(i)).getType();
+			String type = ((ActivityImpl)acts_legs.get(i)).getType();
 
 			if (main_type == "e"){
 				if (type == "w") {
@@ -262,7 +262,7 @@ public int detectTourMainActivity2 (Person person){
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
-			String type = ((Activity)acts_legs.get(i)).getType();
+			String type = ((ActivityImpl)acts_legs.get(i)).getType();
 
 			if (main_type == 1){
 				if (type == "w") {

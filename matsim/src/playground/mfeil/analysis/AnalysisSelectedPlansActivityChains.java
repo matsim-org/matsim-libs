@@ -31,13 +31,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.knowledges.Knowledges;
 
@@ -100,21 +100,21 @@ public class AnalysisSelectedPlansActivityChains {
 			for (int j=0;j<this.plans.get(i).size();j++){
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
 					if (k==0){
-						if ((((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration())<this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
-							log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((Activity)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration()));
+						if ((((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration())<this.minimumTime.get(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
+							log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()+((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-1))).getDuration()));
 							break;
 						}
 					}
-					else if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()<this.minimumTime.get(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
-						log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()));
+					else if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()<this.minimumTime.get(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
+						log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()));
 						break;
 					}
 				}
 				for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).size();k++){
 					boolean notIn = true;
 					for (int l=0;l<this.plans.get(i).get(j).getPlanElements().size()-2;l+=2){
-						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(l))).getType().equalsIgnoreCase(this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k).getType()) &&
-								((Activity)(this.plans.get(i).get(j).getPlanElements().get(l))).getFacilityId().toString().equalsIgnoreCase(this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k).getFacility().getId().toString())){
+						if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(l))).getType().equalsIgnoreCase(this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k).getType()) &&
+								((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(l))).getFacilityId().toString().equalsIgnoreCase(this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k).getFacility().getId().toString())){
 							notIn = false;
 							break;
 						}
@@ -122,8 +122,8 @@ public class AnalysisSelectedPlansActivityChains {
 					if (notIn) log.warn("Prim act error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" for prim act "+this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(k));
 				}
 				for (int k=0;k<this.plans.get(i).get(j).getPlanElements().size()-2;k+=2){
-					if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home")){
-						if (((Activity)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId()!=this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(0).getFacility().getId()){
+					if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home")){
+						if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getFacilityId()!=this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).get(0).getFacility().getId()){
 							log.warn("Non-primary home act found in plan of person "+this.plans.get(i).get(j).getPerson().getId());
 							break;
 						}
@@ -152,7 +152,7 @@ public class AnalysisSelectedPlansActivityChains {
 			double length = this.activityChains.get(i).size();
 			averageACLength+=weight*(java.lang.Math.ceil(length/2));
 			for (int j=0; j<length;j=j+2){
-				stream1.print(((Activity)(this.activityChains.get(i).get(j))).getType()+"\t");
+				stream1.print(((ActivityImpl)(this.activityChains.get(i).get(j))).getType()+"\t");
 			}
 			stream1.println();
 		}
@@ -198,10 +198,10 @@ public class AnalysisSelectedPlansActivityChains {
 			ArrayList<String> acts1 = new ArrayList<String> ();
 			ArrayList<String> acts2 = new ArrayList<String> ();
 			for (int i = 0;i<plan.getPlanElements().size();i=i+2){
-				acts1.add(((Activity)(plan.getPlanElements().get(i))).getType().toString());				
+				acts1.add(((ActivityImpl)(plan.getPlanElements().get(i))).getType().toString());				
 			}
 			for (int i = 0;i<activityChain.size();i=i+2){
-				acts2.add(((Activity)(activityChain.get(i))).getType().toString());				
+				acts2.add(((ActivityImpl)(activityChain.get(i))).getType().toString());				
 			}		
 			return (acts1.equals(acts2));
 		}

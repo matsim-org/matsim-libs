@@ -27,12 +27,12 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.matrices.Entry;
@@ -250,11 +250,11 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 
 	@Override
 	public void run(final Person person) {
-		ArrayList<Activity> work_list = new ArrayList<Activity>();
-		ArrayList<Activity> educ_list = new ArrayList<Activity>();
+		ArrayList<ActivityImpl> work_list = new ArrayList<ActivityImpl>();
+		ArrayList<ActivityImpl> educ_list = new ArrayList<ActivityImpl>();
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if (W.equals(act.getType())) {
 					work_list.add(act);
 				} else if (E.equals(act.getType())) {
@@ -280,7 +280,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			}
 			CoordImpl coord = (CoordImpl)to_fac.getCoord();
 			for (int i= 0; i<work_list.size(); i++) {
-				Activity a = work_list.get(i);
+				ActivityImpl a = work_list.get(i);
 				a.setCoord(coord);
 			}
 		}
@@ -302,7 +302,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			}
 			CoordImpl coord = (CoordImpl)to_fac.getCoord();
 			for (int i= 0; i<educ_list.size(); i++) {
-				Activity a = educ_list.get(i);
+				ActivityImpl a = educ_list.get(i);
 				a.setCoord(coord);
 			}
 		}

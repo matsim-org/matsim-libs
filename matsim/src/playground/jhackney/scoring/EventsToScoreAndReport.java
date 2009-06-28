@@ -32,7 +32,6 @@ import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -42,6 +41,7 @@ import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -151,7 +151,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
 				Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 				Iterator actLegIter = plan.getPlanElements().iterator();
-				Activity act = (Activity) actLegIter.next(); // assume first plan element is always an Activity
+				ActivityImpl act = (ActivityImpl) actLegIter.next(); // assume first plan element is always an Activity
 
 				int actNumber=0;
 				int legNumber=-1;
@@ -195,8 +195,8 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 								e.printStackTrace();
 							}
 							legNumber++;
-					}else if (o instanceof Activity && !(act.equals(plan.getLastActivity()))) {
-						act = (Activity) o;
+					}else if (o instanceof ActivityImpl && !(act.equals(plan.getLastActivity()))) {
+						act = (ActivityImpl) o;
 						try {
 							muout.write("\t"+actNumber+"\t"+act.getType()+"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
 							muout.newLine();

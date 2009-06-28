@@ -26,11 +26,11 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -74,7 +74,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		boolean agentPaysToll = false;
 
 		List<?> actslegs = plan.getPlanElements();
-		Activity fromAct = (Activity)actslegs.get(0);
+		ActivityImpl fromAct = (ActivityImpl)actslegs.get(0);
 
 		final int TOLL_INDEX = 0;
 		final int NOTOLL_INDEX = 1;
@@ -95,7 +95,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		for (int i = 2, n = actslegs.size(); i < n; i += 2) {
 
 			Leg leg = (Leg)actslegs.get(i-1);
-			Activity toAct = (Activity)actslegs.get(i);
+			ActivityImpl toAct = (ActivityImpl)actslegs.get(i);
 			isCarLeg[routeIndex] = TransportMode.car.equals(leg.getMode());
 			if (!isCarLeg[routeIndex]) {
 				super.handleLeg(leg, fromAct, toAct, depTimes[NOTOLL_INDEX][routeIndex]);

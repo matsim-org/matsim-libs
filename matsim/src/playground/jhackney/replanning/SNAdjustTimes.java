@@ -5,10 +5,10 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
@@ -35,8 +35,8 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		Plan newPlan = person.copySelectedPlan();
 
 		for (PlanElement pe : newPlan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity thisAct=(Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl thisAct=(ActivityImpl) pe;
 				// Ideally,
 				// last Act new departure time =
 				// last Act current departure time +
@@ -55,7 +55,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		newPlan.setScore(null);
 		person.setSelectedPlan(newPlan);
 	}
-	private double getAvgFriendArrTime(Activity act) {
+	private double getAvgFriendArrTime(ActivityImpl act) {
 		LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm = controler.getTwm();
 		int count=0;
 		double avgStartTime=0;

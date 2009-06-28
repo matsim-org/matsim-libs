@@ -27,12 +27,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -163,8 +163,8 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 	private final int calcChainIndex(Plan plan, int offset) {
 		int w = 0; int e = 0; int s = 0; int l = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if (H.equals(act.getType())) { ; }
 				else if (W.equals(act.getType())) { w = 1; }
 				else if (E.equals(act.getType())) { e = 1; }
@@ -179,10 +179,10 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 	private final int calcPlanIndex(Plan plan, int offset) {
 		double dist = 0.0;
-		Activity prevAct = null;
+		ActivityImpl prevAct = null;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if (prevAct != null) {
 					double curr_dist = CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
 					dist += curr_dist;
@@ -200,7 +200,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 	private final int countActs(Plan plan) {
 		int cnt = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
+			if (pe instanceof ActivityImpl) {
 				cnt++;
 			}
 		}
@@ -209,10 +209,10 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 	private final int[] countTrips(Plan plan) {
 		int[] cnts = {0,0,0,0,0};
-		Activity prevAct = null;
+		ActivityImpl prevAct = null;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				if (prevAct != null) {
 					double dist = CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
 					if (dist < 1000.0) { cnts[0]++; }

@@ -30,7 +30,6 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -39,6 +38,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -81,7 +81,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		for (int i= 0; i< actl.size() ; i++) {
 				if (i % 2 == 0) {
 					// activity
-					Activity a = (Activity)actl.get(i);
+					ActivityImpl a = (ActivityImpl)actl.get(i);
 					this.usedlinkList.add(a.getLink());
 				} else {
 					// Leg
@@ -105,7 +105,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 			try {
 				if (i % 2 == 0) {
 					// activity
-					Activity a = (Activity)actl.get(i);
+					ActivityImpl a = (ActivityImpl)actl.get(i);
 					ergPEs.add(new ActivityImpl(a));
 				} else {
 					// Leg

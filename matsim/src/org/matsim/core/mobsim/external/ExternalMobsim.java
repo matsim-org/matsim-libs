@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -40,6 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
@@ -144,7 +144,7 @@ public class ExternalMobsim {
 				// act/leg
 				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 					if (jj % 2 == 0) {
-						Activity act = (Activity)plan.getPlanElements().get(jj);
+						ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(jj);
 						handler.startAct(act, writer);
 						handler.endAct(writer);
 					} else {

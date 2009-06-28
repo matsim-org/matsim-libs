@@ -29,12 +29,12 @@ import java.util.Vector;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
@@ -56,22 +56,22 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 
-		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
+		List<ActivityImpl> flexibleActivities = this.getFlexibleActivities(plan);
 		
 		if (flexibleActivities.size() == 0) {
 			this.unsuccessfullLC++;
 			return;
 		}	
 		Collections.shuffle(flexibleActivities);
-		Activity actToMove = flexibleActivities.get(0);
+		ActivityImpl actToMove = flexibleActivities.get(0);
 		List<?> actslegs = plan.getPlanElements();
 		int indexOfActToMove = actslegs.indexOf(actToMove);
 		
 		// starting home and ending home are never flexible
 		final Leg legPre = (Leg)actslegs.get(indexOfActToMove -1);
 		final Leg legPost = (Leg)actslegs.get(indexOfActToMove + 1);
-		final Activity actPre = (Activity)actslegs.get(indexOfActToMove - 2);
-		final Activity actPost = (Activity)actslegs.get(indexOfActToMove + 2);
+		final ActivityImpl actPre = (ActivityImpl)actslegs.get(indexOfActToMove - 2);
+		final ActivityImpl actPost = (ActivityImpl)actslegs.get(indexOfActToMove + 2);
 		
 		double travelDistancePre = 0.0;
 		double travelDistancePost = 0.0;
@@ -102,8 +102,8 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		super.resetRoutes(plan);
 	}
 	
-	private List<Activity> getFlexibleActivities(final Plan plan) {
-		List<Activity> flexibleActivities = new Vector<Activity>();
+	private List<ActivityImpl> getFlexibleActivities(final Plan plan) {
+		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
 		if (!super.locationChoiceBasedOnKnowledge) {
 			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		}
@@ -111,7 +111,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			flexibleActivities = defineMovablePrimaryActivities(plan);			
 			List<?> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Activity act = (Activity)actslegs.get(j);		
+				final ActivityImpl act = (ActivityImpl)actslegs.get(j);		
 				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) && 
 						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
 					flexibleActivities.add(act);
@@ -121,7 +121,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		return flexibleActivities;
 	}
 			
-	protected boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius) {		
+	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius) {		
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;	
 		ArrayList<ActivityFacility> facilitySet = 

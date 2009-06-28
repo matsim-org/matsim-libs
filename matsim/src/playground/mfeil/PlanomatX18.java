@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -215,7 +215,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			/* Remove last secondary activity to make plan shorter*/
 			for (int z=plan.getPlanElements().size()-3;z>=2;z=z-2){
-				if (this.checkPrimary((Activity)plan.getPlanElements().get(z), primActs)		&&
+				if (this.checkPrimary((ActivityImpl)plan.getPlanElements().get(z), primActs)		&&
 					!(this.checkForSamePrimary(plan, z/2))) {
 					log.warn("In continue Schleife!");
 					continue;
@@ -444,7 +444,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			statistics.print(scoreStat.get(i)/bestScore+"\t");
 		}
 		for (int i=0;i<al.size();i++){
-			if (i%2==0)	statistics.print(((Activity)(al.get(i))).getType()+"\t");
+			if (i%2==0)	statistics.print(((ActivityImpl)(al.get(i))).getType()+"\t");
 			else statistics.print((((Leg)(al.get(i))).getTravelTime()/60)+"\t");
 		}
 		statistics.println();
@@ -505,20 +505,20 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					positions[1] = positions[1]+2;
 					
 					/*Activity swapping	*/		
-					Activity act0 = (Activity)(actslegs.get(planBasePos));
-					Activity act1 = (Activity)(actslegs.get(planRunningPos));
+					ActivityImpl act0 = (ActivityImpl)(actslegs.get(planBasePos));
+					ActivityImpl act1 = (ActivityImpl)(actslegs.get(planRunningPos));
 					if (act0.getType()!=act1.getType()){
 							
-						Activity actHelp = new ActivityImpl ((Activity)(actslegs.get(planBasePos)));
+						ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(planBasePos)));
 						
 						actslegs.set(planBasePos, actslegs.get(planRunningPos));
 						actslegs.set(planRunningPos, actHelp);
 						
 						positions[0] = planBasePos;
 						int[]pointer = {0,0,0};
-						if (this.checkPrimary((Activity)actslegs.get(planBasePos), primActs)) pointer [1]=-1;
+						if (this.checkPrimary((ActivityImpl)actslegs.get(planBasePos), primActs)) pointer [1]=-1;
 						else pointer[1]=planBasePos/2;
-						if (this.checkPrimary((Activity)actslegs.get(planRunningPos), primActs)) pointer[2]=-1;
+						if (this.checkPrimary((ActivityImpl)actslegs.get(planRunningPos), primActs)) pointer[2]=-1;
 						else pointer[2]=planRunningPos/2;
 						return pointer;
 					}
@@ -537,7 +537,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			/* Removing an activity, "cycling"*/
 			if (basePlan.getPlanElements().size()==5){
-				if (this.checkPrimary((Activity)basePlan.getPlanElements().get(2), primActs)		&&
+				if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(2), primActs)		&&
 						!(this.checkForSamePrimary(basePlan, 1))) return (new int[]{1,0,0});
 				else {
 					this.removeAct(1, basePlan);
@@ -556,7 +556,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				while (positions[3]<(int)(basePlan.getPlanElements().size()/2)){
 					
 					if (positions[1]<=(int)(basePlan.getPlanElements().size()/2)-1){
-						if (this.checkPrimary((Activity)basePlan.getPlanElements().get(positions[1]*2), primActs)	&&
+						if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs)	&&
 								!(this.checkForSamePrimary(basePlan, positions[1]))) {
 							positions[1]++;
 							positions[3]++;
@@ -566,7 +566,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					}
 					else {
 						positions[1] = 1;
-						if (this.checkPrimary((Activity)basePlan.getPlanElements().get(positions[1]*2), primActs)	&&
+						if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs)	&&
 								!(this.checkForSamePrimary(basePlan, positions[1]))) {
 							positions[1]++;
 							positions[3]++;
@@ -625,10 +625,10 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			List<PlanElement> actslegs = basePlan.getPlanElements();
 			
-			((Activity)actslegs.get(0)).setDuration(12*3600);
-			((Activity)actslegs.get(0)).setEndTime(12*3600);
+			((ActivityImpl)actslegs.get(0)).setDuration(12*3600);
+			((ActivityImpl)actslegs.get(0)).setEndTime(12*3600);
 			
-			Activity actHelp = new ActivityImpl ((Activity)(actslegs.get((0))));
+			ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
 			actHelp.setDuration(12*3600);
 			actHelp.setEndTime(24*3600);
 			actHelp.setStartTime(12*3600);
@@ -647,9 +647,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			if (position[0] == 1){
 				actsToBeAdded[1] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
 				this.removeAct(0, basePlan);
-				((Activity)basePlan.getPlanElements().get(0)).setDuration(24*3600);
-				((Activity)basePlan.getPlanElements().get(0)).setStartTime(0);
-				((Activity)basePlan.getPlanElements().get(0)).setEndTime(24*3600);
+				((ActivityImpl)basePlan.getPlanElements().get(0)).setDuration(24*3600);
+				((ActivityImpl)basePlan.getPlanElements().get(0)).setStartTime(0);
+				((ActivityImpl)basePlan.getPlanElements().get(0)).setEndTime(24*3600);
 				position[0]++;
 				return (new int[]{0,-1,-1});
 			}
@@ -674,7 +674,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		while (position[1]<=(actTypes.size()-1)*(((int)(basePlan.getPlanElements().size()/2))-1)){
 			if (position[0]>basePlan.getPlanElements().size()/2-1) position[0] = 1;		
 			
-			Activity act = (Activity) basePlan.getPlanElements().get(position[0]*2);
+			ActivityImpl act = (ActivityImpl) basePlan.getPlanElements().get(position[0]*2);
 			if (this.checkPrimary(act, primActs)	&&	!(this.checkForSamePrimary(basePlan, position[0]))){
 				position[0]++;
 				position[1]++;
@@ -690,9 +690,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			act.setType(type);
 			if (act.getType().equalsIgnoreCase("home")){
-				act.setFacility(((Activity)(basePlan.getPlanElements().get(0))).getFacility());
-				act.setCoord(((Activity)(basePlan.getPlanElements().get(0))).getCoord());
-				act.setLink(((Activity)(basePlan.getPlanElements().get(0))).getLink());
+				act.setFacility(((ActivityImpl)(basePlan.getPlanElements().get(0))).getFacility());
+				act.setCoord(((ActivityImpl)(basePlan.getPlanElements().get(0))).getCoord());
+				act.setLink(((ActivityImpl)(basePlan.getPlanElements().get(0))).getLink());
 				position[0]++;
 				position[1]++;
 				return (new int[]{0,-1,-1}); // no location choice if changed to home act type
@@ -849,10 +849,10 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			ArrayList<String> acts1 = new ArrayList<String> ();
 			ArrayList<String> acts2 = new ArrayList<String> ();
 			for (int i = 0;i<plan1.getPlanElements().size();i=i+2){
-				acts1.add(((Activity)(plan1.getPlanElements().get(i))).getType().toString());				
+				acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getType().toString());				
 			}
 			for (int i = 0;i<plan2.getPlanElements().size();i=i+2){
-				acts2.add(((Activity)(plan2.getPlanElements().get(i))).getType().toString());				
+				acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getType().toString());				
 			}
 		
 			return (acts1.equals(acts2));
@@ -867,7 +867,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		else {
 			boolean warning = true;
 			for (int i = 0; i<plan1.getPlanElements().size();i=i+2){
-				if (!((Activity)(plan1.getPlanElements().get(i))).getType().toString().equals(((Activity)(plan2.getPlanElements().get(i))).getType().toString())){
+				if (!((ActivityImpl)(plan1.getPlanElements().get(i))).getType().toString().equals(((ActivityImpl)(plan2.getPlanElements().get(i))).getType().toString())){
 					warning = false;
 					break;
 				}
@@ -882,10 +882,10 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<String> acts1 = new ArrayList<String> ();
 		ArrayList<String> acts2 = new ArrayList<String> ();
 		for (int i = 0;i<plan1.getPlanElements().size();i=i+2){
-			acts1.add(((Activity)(plan1.getPlanElements().get(i))).getType().toString());				
+			acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getType().toString());				
 		}
 		for (int i = 0;i<plan2.getPlanElements().size();i=i+2){
-			acts2.add(((Activity)(plan2.getPlanElements().get(i))).getType().toString());				
+			acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getType().toString());				
 		}	
 		return (acts1.equals(acts2));
 	}	
@@ -905,7 +905,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0; //sets the pointer back to the first activity type
 		
 		if (position!=1){ // ensures that no duplicate activity chains are created
-			if (actTypes.get(actToBeAdded[position]).equals(((Activity)(basePlan.getPlanElements().get(position*2-2))).getType().toString())){
+			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString())){
 				if (actToBeAdded[position]+1>=actTypes.size()){
 					actToBeAdded[position] = 0;
 				}
@@ -915,16 +915,16 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			}
 		}
 		List<PlanElement> actslegs = basePlan.getPlanElements();
-		Activity actHelp;
+		ActivityImpl actHelp;
 		if (!(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // copy activity Before/behind the gap
 		//	actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2)));
-			actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2-2)));
+			actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(position*2-2)));
 			actHelp.setDuration(0);
 			actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 			actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 		}
 		else { // copy first activity = home activity to ensure home is always primary
-			actHelp = new ActivityImpl ((Activity)(actslegs.get((0))));
+			actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
 			actHelp.setDuration(0);
 			actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 			actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
@@ -954,7 +954,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	
 	// NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	/* Checks whether an act is primary*/
-	public boolean checkPrimary (Activity act, ArrayList<ActivityOptionImpl> primActs){
+	public boolean checkPrimary (ActivityImpl act, ArrayList<ActivityOptionImpl> primActs){
 		
 		for (int i = 0; i<primActs.size();i++){
 			if (act.getFacilityId().equals(primActs.get(i).getFacility().getId())	&&	act.getType().equals(primActs.get(i).getType())){
@@ -968,14 +968,14 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	public boolean checkForSamePrimary (Plan plan, int position){
 		
 		for (int i = 0; i<position*2;i+=2){
-			if (((Activity)(plan.getPlanElements().get(position*2))).getFacilityId().equals(((Activity)(plan.getPlanElements().get(i))).getFacilityId())	&&
-					((Activity)(plan.getPlanElements().get(position*2))).getType().equals(((Activity)(plan.getPlanElements().get(i))).getType())){
+			if (((ActivityImpl)(plan.getPlanElements().get(position*2))).getFacilityId().equals(((ActivityImpl)(plan.getPlanElements().get(i))).getFacilityId())	&&
+					((ActivityImpl)(plan.getPlanElements().get(position*2))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(i))).getType())){
 				return true;
 			}
 		}
 		for (int i = position*2+2; i<plan.getPlanElements().size()-2;i+=2){
-			if (((Activity)(plan.getPlanElements().get(position*2))).getFacilityId().equals(((Activity)(plan.getPlanElements().get(i))).getFacilityId())	&&
-					((Activity)(plan.getPlanElements().get(position*2))).getType().equals(((Activity)(plan.getPlanElements().get(i))).getType())){
+			if (((ActivityImpl)(plan.getPlanElements().get(position*2))).getFacilityId().equals(((ActivityImpl)(plan.getPlanElements().get(i))).getFacilityId())	&&
+					((ActivityImpl)(plan.getPlanElements().get(position*2))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(i))).getType())){
 				return true;
 			}
 		}
@@ -990,27 +990,27 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			if (((Leg)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
 			if (((Leg)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
 			if (((Leg)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
-			manager.primaryActivityFound((Activity)plan.getPlanElements().get((first-1)*2), (Leg)plan.getPlanElements().get((first-1)*2+1));
-			manager.secondaryActivityFound((Activity)plan.getPlanElements().get(first*2), (Leg)plan.getPlanElements().get(first*2+1));
-			manager.secondaryActivityFound((Activity)plan.getPlanElements().get(second*2), (Leg)plan.getPlanElements().get(second*2+1));
-			manager.primaryActivityFound((Activity)plan.getPlanElements().get((second+1)*2), null);
+			manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (Leg)plan.getPlanElements().get((first-1)*2+1));
+			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (Leg)plan.getPlanElements().get(first*2+1));
+			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (Leg)plan.getPlanElements().get(second*2+1));
+			manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second+1)*2), null);
 		}
 		else{					// two short subchains
 			if (first!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
 				if (((Leg)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
 				if (((Leg)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
-				manager.primaryActivityFound((Activity)plan.getPlanElements().get((first-1)*2), (Leg)plan.getPlanElements().get((first-1)*2+1));
-				manager.secondaryActivityFound((Activity)plan.getPlanElements().get(first*2), (Leg)plan.getPlanElements().get(first*2+1));
-				manager.primaryActivityFound((Activity)plan.getPlanElements().get((first+1)*2), null);
+				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (Leg)plan.getPlanElements().get((first-1)*2+1));
+				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (Leg)plan.getPlanElements().get(first*2+1));
+				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first+1)*2), null);
 			}
 			if (second!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
 				if (((Leg)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(1);
 				if (((Leg)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
-				manager.primaryActivityFound((Activity)plan.getPlanElements().get((second-1)*2), (Leg)plan.getPlanElements().get((second-1)*2+1));
-				manager.secondaryActivityFound((Activity)plan.getPlanElements().get(second*2), (Leg)plan.getPlanElements().get(second*2+1));
-				manager.primaryActivityFound((Activity)plan.getPlanElements().get((second+1)*2), null);
+				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second-1)*2), (Leg)plan.getPlanElements().get((second-1)*2+1));
+				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (Leg)plan.getPlanElements().get(second*2+1));
+				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second+1)*2), null);
 			}			
 		}
 		return manager.getSubChains();

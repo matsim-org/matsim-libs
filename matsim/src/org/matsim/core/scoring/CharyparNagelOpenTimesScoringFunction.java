@@ -24,11 +24,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.utils.misc.Time;
 
@@ -46,7 +46,7 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 	}
 
 	@Override
-	protected double[] getOpeningInterval(Activity act) {
+	protected double[] getOpeningInterval(ActivityImpl act) {
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time

@@ -31,7 +31,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -81,17 +80,17 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		return new PlanImpl((Person) person);
 	}
 
-	public Activity createActivityFromCoord(String actType, Coord coord) {
+	public ActivityImpl createActivityFromCoord(String actType, Coord coord) {
 		ActivityImpl act = new ActivityImpl(actType, coord);
 		return act;
 	}
 
-	public Activity createActivityFromFacilityId(String actType, Id facilityId) {
+	public ActivityImpl createActivityFromFacilityId(String actType, Id facilityId) {
 		ActivityImpl act = new ActivityImpl(actType, this.facilities.getFacilities().get(facilityId));
 		return act;
 	}
 
-	public Activity createActivityFromLinkId(String actType, Id linkId) {
+	public ActivityImpl createActivityFromLinkId(String actType, Id linkId) {
 		ActivityImpl act = new ActivityImpl(actType, this.network.getLinks().get(linkId));
 		return act;
 	}

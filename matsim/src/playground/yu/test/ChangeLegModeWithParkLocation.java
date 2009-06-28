@@ -15,7 +15,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -29,6 +28,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
@@ -114,7 +114,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			List<PlanElement> pes = plan.getPlanElements();
 			int peSize = pes.size();
 			for (int i = 0; i < peSize; i += 2)
-				if (((Activity) pes.get(i)).getType().equals("tta"))
+				if (((ActivityImpl) pes.get(i)).getType().equals("tta"))
 					return;
 
 			Plan copyPlan = new PlanImpl(plan.getPerson());
@@ -183,10 +183,10 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			List<PlanElement> pes = plan.getPlanElements();
 			Set<Tuple<Integer, Integer>> tuples = new HashSet<Tuple<Integer, Integer>>();
 			// looks for "car" legs from left to right, where man can "get off"
-			ParkLocation leftPl = new ParkLocation((Activity) pes.get(l));
+			ParkLocation leftPl = new ParkLocation((ActivityImpl) pes.get(l));
 			int tmpL = l;
 			for (int i = l + 2; i < r; i += 2) {
-				if (new ParkLocation((Activity) pes.get(i)).equals(leftPl)) {
+				if (new ParkLocation((ActivityImpl) pes.get(i)).equals(leftPl)) {
 					tuples.add(new Tuple<Integer, Integer>(tmpL, i));
 					tmpL = i;
 				}
@@ -195,10 +195,10 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			// System.out.println("tuples Size :\t" + tuples.size());
 
 			// looks for "car" legs from right to left, where man can "get off"
-			ParkLocation rightPl = new ParkLocation((Activity) pes.get(r));
+			ParkLocation rightPl = new ParkLocation((ActivityImpl) pes.get(r));
 			int tmpR = r;
 			for (int j = r - 2; j > l; j -= 2)
-				if (new ParkLocation((Activity) pes.get(j)).equals(rightPl)) {
+				if (new ParkLocation((ActivityImpl) pes.get(j)).equals(rightPl)) {
 					tuples.add(new Tuple<Integer, Integer>(j, tmpR));
 					tmpR = j;
 				}
@@ -207,8 +207,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			// "get off"
 			for (int i = l + 2; i <= r - 4; i += 2)
 				for (int j = r - 2; j > i; j -= 2)
-					if (new ParkLocation((Activity) pes.get(i))
-							.equals(new ParkLocation((Activity) pes.get(j))))
+					if (new ParkLocation((ActivityImpl) pes.get(i))
+							.equals(new ParkLocation((ActivityImpl) pes.get(j))))
 						tuples.add(new Tuple<Integer, Integer>(i, j));
 
 			if (tuples.size() > 0) {
@@ -317,7 +317,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			int clcSize = carChainTuples.size();
 			ParkLocation firstPark = null;
 			if (clcSize > 0)
-				firstPark = new ParkLocation((Activity) pes.get(firstCarActIdx));
+				firstPark = new ParkLocation((ActivityImpl) pes.get(firstCarActIdx));
 			int pesSize = pes.size();
 
 			if (clcSize == 0) {// no car legs in this copyPlan
@@ -326,8 +326,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				List<Tuple<Integer, Integer>> samePLActIds = new ArrayList<Tuple<Integer, Integer>>();
 				for (int l = 0; l < pesSize; l += 2)
 					for (int r = pesSize - 1; r > l; r -= 2)
-						if (new ParkLocation((Activity) pes.get(l))
-								.equals(new ParkLocation((Activity) pes.get(r)))) {
+						if (new ParkLocation((ActivityImpl) pes.get(l))
+								.equals(new ParkLocation((ActivityImpl) pes.get(r)))) {
 							if (samePLActIds.size() > 0) {
 								Tuple<Integer, Integer> lastTuple = samePLActIds
 										.get(samePLActIds.size() - 1);
@@ -380,8 +380,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				for (int l = firstCarActIdx; l >= 0; l -= 2)
 					for (int r = lastCarActIdx; r < pesSize; r += 2)
 						// act"l" and act"r" has the same ParkLocations
-						if (new ParkLocation((Activity) pes.get(l))
-								.equals(new ParkLocation((Activity) pes.get(r))))
+						if (new ParkLocation((ActivityImpl) pes.get(l))
+								.equals(new ParkLocation((ActivityImpl) pes.get(r))))
 							if (l != firstCarActIdx || r != lastCarActIdx) {
 								if (firstL < 0 || firstR < 0) {
 									firstL = l;
@@ -394,7 +394,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 									boolean leftDone = false;
 									for (int ll = l + 2; ll < firstCarActIdx; ll += 2)
 										if (firstPark.equals(new ParkLocation(
-												(Activity) pes.get(ll)))) {
+												(ActivityImpl) pes.get(ll)))) {
 											leftDone = setLegChainMode(plan, l,
 													ll, TransportMode.car);
 											break;
@@ -407,7 +407,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 									boolean rightDone = false;
 									for (int rr = r - 2; rr > lastCarActIdx; rr -= 2)
 										if (firstPark.equals(new ParkLocation(
-												(Activity) pes.get(rr)))) {
+												(ActivityImpl) pes.get(rr)))) {
 											rightDone = setLegChainMode(plan,
 													rr, r, TransportMode.car);
 											break;
@@ -439,8 +439,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				}
 				List<Integer> sameParkActIdxs = new ArrayList<Integer>();
 				for (int i = l; i <= r; i += 2) {
-					if (new ParkLocation((Activity) pes.get(l))
-							.equals(new ParkLocation((Activity) pes.get(i))))
+					if (new ParkLocation((ActivityImpl) pes.get(l))
+							.equals(new ParkLocation((ActivityImpl) pes.get(i))))
 						sameParkActIdxs.add(i);
 				}
 				sameParkActIdxs.add(legIdx);
@@ -502,12 +502,12 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	 * 
 	 */
 	public static class ParkLocation {
-		private Activity act;
+		private ActivityImpl act;
 
 		// private Coord coord=null;
 		// private Link link=null;
 
-		public ParkLocation(Activity act) {
+		public ParkLocation(ActivityImpl act) {
 			this.act = act;
 			// coord=act.getCoord();
 			// link=act.getLink();

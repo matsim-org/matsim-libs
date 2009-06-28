@@ -20,8 +20,8 @@
 
 package playground.jhackney.socialnetworks.algorithms;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PlanEuclideanLength {
@@ -29,9 +29,9 @@ public class PlanEuclideanLength {
 	public double getPlanLength(Plan plan) {
 
 		double length = 0.;
-		Activity fromAct = (Activity) plan.getPlanElements().get(0);
+		ActivityImpl fromAct = (ActivityImpl) plan.getPlanElements().get(0);
 		for (int i = 2, max = plan.getPlanElements().size(); i < max; i += 2) {
-			Activity toAct = (Activity) (plan.getPlanElements().get(i));
+			ActivityImpl toAct = (ActivityImpl) (plan.getPlanElements().get(i));
 
 			if (fromAct != null && toAct != null) {
 				double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());

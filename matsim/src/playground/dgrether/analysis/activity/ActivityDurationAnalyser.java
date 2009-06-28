@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -33,6 +32,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityPar
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -119,14 +119,14 @@ public class ActivityDurationAnalyser {
 		}
 	}
 
-	private void calculateActivityDurations(final Map<String, List<Activity>> typeActivityMap) {
+	private void calculateActivityDurations(final Map<String, List<ActivityImpl>> typeActivityMap) {
 		System.out.println("Calculating activity durations...");
 		System.out.println("activity type \t number of activities \t absolute duration \t average duration" );
-		for (List<Activity> actList : typeActivityMap.values()) {
+		for (List<ActivityImpl> actList : typeActivityMap.values()) {
 			double durations = 0.0;
 			double dur, startTime, endTime;
 //			System.out.println("Processing activity type: " + actList.get(0).getType());
-			for (Activity act : actList) {
+			for (ActivityImpl act : actList) {
 				dur = act.getDuration();
 				ActivityParams actParams = this.config.charyparNagelScoring().getActivityParams(act.getType());
 				if (!(Double.isInfinite(dur) || Double.isNaN(dur))) {
@@ -170,28 +170,28 @@ public class ActivityDurationAnalyser {
 	 */
 	private class ActivityDurationCounter  {
 
-		private final Map<String, List<Activity>> typeActivityMap;
-		private final Map<String, List<Activity>> simpleTypeActivityMap;
+		private final Map<String, List<ActivityImpl>> typeActivityMap;
+		private final Map<String, List<ActivityImpl>> simpleTypeActivityMap;
 
 		ActivityDurationCounter() {
-			this.typeActivityMap = new HashMap<String, List<Activity>>();
-			this.simpleTypeActivityMap = new HashMap<String, List<Activity>>();
+			this.typeActivityMap = new HashMap<String, List<ActivityImpl>>();
+			this.simpleTypeActivityMap = new HashMap<String, List<ActivityImpl>>();
 		}
 
 		public void handlePlan(final Plan plan) {
 //			System.out.println("handling plan " + typeActivityMap);
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity activity = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl activity = (ActivityImpl) pe;
 //				System.out.println("handling act: " + activity.getType());
-					List<Activity> acts = this.typeActivityMap.get(activity.getType());
-					List<Activity> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
+					List<ActivityImpl> acts = this.typeActivityMap.get(activity.getType());
+					List<ActivityImpl> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
 					if (acts == null) {
-						acts = new ArrayList<Activity>();
+						acts = new ArrayList<ActivityImpl>();
 						this.typeActivityMap.put(activity.getType(), acts);
 					}
 					if (acts2 == null) {
-						acts2 = new ArrayList<Activity>();
+						acts2 = new ArrayList<ActivityImpl>();
 						this.simpleTypeActivityMap.put(activity.getType().substring(0,1), acts2);
 					}
 					acts.add(activity);
@@ -200,11 +200,11 @@ public class ActivityDurationAnalyser {
 			}
 		}
 
-		public Map<String, List<Activity>> getTypeActivityMap() {
+		public Map<String, List<ActivityImpl>> getTypeActivityMap() {
 			return this.typeActivityMap;
 		}
 
-		public Map<String, List<Activity>> getSimpleTypeActivityMap() {
+		public Map<String, List<ActivityImpl>> getSimpleTypeActivityMap() {
 			return this.simpleTypeActivityMap;
 		}
 	}

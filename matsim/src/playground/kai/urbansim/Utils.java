@@ -17,8 +17,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.kai.urbansim.ids.IdFactory;
@@ -148,7 +148,7 @@ public class Utils {
 	 * @param workCoord
 	 */
 	public static void completePlanToHwh ( Plan plan, Coord workCoord ) {
-		Activity act = plan.getFirstActivity();
+		ActivityImpl act = plan.getFirstActivity();
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
 

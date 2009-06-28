@@ -23,7 +23,6 @@ package org.matsim.core.scoring;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -33,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -126,11 +126,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
+		testee.startActivity(07*3600 + 30*60, (ActivityImpl) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
 		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.endLeg(16*3600 + 15*60);
-		testee.startActivity(16*3600 + 15*60, (Activity) this.plan.getPlanElements().get(4));
+		testee.startActivity(16*3600 + 15*60, (ActivityImpl) this.plan.getPlanElements().get(4));
 		testee.finish();
 		return testee.getScore();
 	}
@@ -338,7 +338,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
+		testee.startActivity(07*3600 + 30*60, (ActivityImpl) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
 		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.agentStuck(16*3600 + 7.5*60);
@@ -355,7 +355,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		testee.endActivity(07*3600);
 		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
+		testee.startActivity(07*3600 + 30*60, (ActivityImpl) this.plan.getPlanElements().get(2));
 		testee.endActivity(16*3600);
 		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.agentStuck(16*3600 + 7.5*60);
@@ -376,7 +376,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 	 */
 	public void testDifferentFirstLastAct() {
 		// change the last act to something different than the first act
-		((Activity) this.plan.getPlanElements().get(4)).setType("h2");
+		((ActivityImpl) this.plan.getPlanElements().get(4)).setType("h2");
 
 		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);

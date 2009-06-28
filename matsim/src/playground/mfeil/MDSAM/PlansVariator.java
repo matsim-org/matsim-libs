@@ -30,11 +30,11 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
@@ -147,17 +147,17 @@ public class PlansVariator implements PlanAlgorithm {
 					output[i].removeActivity(pos);
 					/* Recovers the route of the trip in front of the removed act */
 					router.handleLeg((Leg)output[i].getPlanElements().get(pos-1), 
-							(Activity)output[i].getPlanElements().get(pos-2), 
-							(Activity)output[i].getPlanElements().get(pos), 
-							((Activity)output[i].getPlanElements().get(pos-2)).getEndTime());
+							(ActivityImpl)output[i].getPlanElements().get(pos-2), 
+							(ActivityImpl)output[i].getPlanElements().get(pos), 
+							((ActivityImpl)output[i].getPlanElements().get(pos-2)).getEndTime());
 				}
 			}
 			while (j>output[i].getPlanElements().size()/2+1){
-				if (output[i].getPlanElements().size()==1) output[i].insertLegAct(1, new LegImpl(TransportMode.walk), (Activity)output[i].getPlanElements().get(0));
+				if (output[i].getPlanElements().size()==1) output[i].insertLegAct(1, new LegImpl(TransportMode.walk), (ActivityImpl)output[i].getPlanElements().get(0));
 				else {
 					int actPosition = ((int)(java.lang.Math.floor(MatsimRandom.getRandom().nextDouble() * (output[i].getPlanElements().size()/2))))*2+1;
 					String actType = this.actTypes.get((int)(MatsimRandom.getRandom().nextDouble() * this.actTypes.size()));
-					Activity actHelp = new ActivityImpl ((Activity)output[i].getPlanElements().get(0));
+					ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)output[i].getPlanElements().get(0));
 					actHelp.setType(actType);
 					Leg legHelp = new LegImpl ((Leg)output[i].getPlanElements().get(actPosition));
 					output[i].insertLegAct(actPosition, legHelp, actHelp);
@@ -266,12 +266,12 @@ public class PlansVariator implements PlanAlgorithm {
 					positions[1] = positions[1]+2;
 					
 					/*Activity swapping	*/		
-					Activity act0 = (Activity)(actslegs.get(planBasePos));
-					Activity act1 = (Activity)(actslegs.get(planRunningPos));
+					ActivityImpl act0 = (ActivityImpl)(actslegs.get(planBasePos));
+					ActivityImpl act1 = (ActivityImpl)(actslegs.get(planRunningPos));
 					if (act0.getType()!=act1.getType() &&
 							act0.getFacilityId() != act1.getFacilityId()){
 							
-						Activity actHelp = new ActivityImpl ((Activity)(actslegs.get(planBasePos)));
+						ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(planBasePos)));
 						
 						actslegs.set(planBasePos, actslegs.get(planRunningPos));
 						actslegs.set(planRunningPos, actHelp);
@@ -288,7 +288,7 @@ public class PlansVariator implements PlanAlgorithm {
 	
 	private int changeType (Plan plan, int [] position, int rotationPos){
 			
-		Activity act = (Activity) plan.getPlanElements().get(rotationPos*2);
+		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(rotationPos*2);
 		String type = act.getType();
 				
 		while (type.equals(this.actTypes.get(position[rotationPos]))) {
@@ -298,9 +298,9 @@ public class PlansVariator implements PlanAlgorithm {
 		
 		act.setType(this.actTypes.get(position[rotationPos]));
 		if (act.getType().equalsIgnoreCase("home")){
-			act.setFacility(((Activity)(plan.getPlanElements().get(0))).getFacility());
-			act.setCoord(((Activity)(plan.getPlanElements().get(0))).getCoord());
-			act.setLink(((Activity)(plan.getPlanElements().get(0))).getLink());
+			act.setFacility(((ActivityImpl)(plan.getPlanElements().get(0))).getFacility());
+			act.setCoord(((ActivityImpl)(plan.getPlanElements().get(0))).getCoord());
+			act.setLink(((ActivityImpl)(plan.getPlanElements().get(0))).getLink());
 		}
 		position[rotationPos]++;
 		if (position[rotationPos]>=this.actTypes.size()) position[rotationPos] = 0;
@@ -317,11 +317,11 @@ public class PlansVariator implements PlanAlgorithm {
 		ArrayList<String> acts2 = new ArrayList<String> ();
 		for (int i = 0;i<plan1.getPlanElements().size();i=i+2){
 			//acts1.add(((Activity)(plan1.getPlanElements().get(i))).getType().toString());	
-			acts1.add(((Activity)(plan1.getPlanElements().get(i))).getFacilityId().toString());	
+			acts1.add(((ActivityImpl)(plan1.getPlanElements().get(i))).getFacilityId().toString());	
 		}
 		for (int i = 0;i<plan2.getPlanElements().size();i=i+2){
 			//acts2.add(((Activity)(plan2.getPlanElements().get(i))).getType().toString());
-			acts2.add(((Activity)(plan2.getPlanElements().get(i))).getFacilityId().toString());	
+			acts2.add(((ActivityImpl)(plan2.getPlanElements().get(i))).getFacilityId().toString());	
 		}
 	
 		return (acts1.equals(acts2));
@@ -337,7 +337,7 @@ public class PlansVariator implements PlanAlgorithm {
 		double distance = 0;
 		for (int k=0;k<((int)(actslegs.size()/2));k++){
 			if ((planAnalyzeSubtours.getSubtourIndexation()[k])==pos){
-				distance=distance+CoordUtils.calcDistance(((Activity)(actslegs.get(k*2))).getCoord(), ((Activity)(actslegs.get(k*2+2))).getCoord());
+				distance=distance+CoordUtils.calcDistance(((ActivityImpl)(actslegs.get(k*2))).getCoord(), ((ActivityImpl)(actslegs.get(k*2+2))).getCoord());
 				if (distance>this.maxWalkingDistance) {
 					return 2;
 				}

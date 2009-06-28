@@ -36,7 +36,6 @@ import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -95,12 +94,12 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private ActivityFacility currfacility = null;
 	private ActivityOption curractivity = null;
 	private Plan currplan = null;
-	private Activity curract = null;
+	private ActivityImpl curract = null;
 	private Leg currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private Activity prevAct = null;
+	private ActivityImpl prevAct = null;
 
 	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 

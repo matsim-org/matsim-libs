@@ -29,11 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -135,7 +135,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 				for (int x=0;x<agents.getAgentPlan(j).getPlanElements().size()-2;x=x+2){
 					// try statement with print block to analyze some strange exceptions in Zurich scenario
 					try {
-					if (((Activity)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(i).getType())){
+					if (((ActivityImpl)(agents.getAgentPlan(j).getPlanElements().get(x))).getType().equals(this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(i).getType())){
 						in = true;
 						break;
 					}
@@ -143,7 +143,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 						log.warn(e);
 						log.warn("Acts im Plan des schon optimierten Agenten:");
 						for (int k=0;k<agents.getAgentPlan(j).getPlanElements().size();k++) {
-							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(((Activity)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
+							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(((ActivityImpl)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
 							else log.warn(((Leg)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
 						}
 						System.out.println();
@@ -164,7 +164,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// All act types complying with those eligible to the agent (see ActivityTypeFinder)
 			List<String> actTypes = this.finder.getActTypes(plan.getPerson());
 			for (int i=2;i<plan.getPlanElements().size()-2;i+=2){ // "home" does not need to be checked
-				if (!actTypes.contains(((Activity)(plan.getPlanElements().get(i))).getType())) {
+				if (!actTypes.contains(((ActivityImpl)(plan.getPlanElements().get(i))).getType())) {
 					continue optimizedAgentsLoop;
 				}
 			}
@@ -270,7 +270,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			prt.add(agents.getAgentPerson(assignedAgent).getId().toString());
 			prt.add(plan.getScore().toString());
 			for (int y=0;y<plan.getPlanElements().size();y+=2){
-				prt.add(((Activity)(plan.getPlanElements().get(y))).getType());
+				prt.add(((ActivityImpl)(plan.getPlanElements().get(y))).getType());
 			}
 			Statistics.list.add(prt);	
 		}	
@@ -288,12 +288,12 @@ public class AgentsAssigner implements PlanAlgorithm{
 		for (int i=2;i<bestPlan.getPlanElements().size()-2;i+=2){
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){
-					if (((Activity)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
+					if (((ActivityImpl)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
 						ActivityFacility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
-						((Activity)(bestPlan.getPlanElements().get(i))).setFacility(fac);
+						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setFacility(fac);
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
-						((Activity)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());
-						((Activity)(bestPlan.getPlanElements().get(i))).setLink(fac.getLink());
+						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());
+						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setLink(fac.getLink());
 						if (!primActs.get(j).getType().toString().equals("home")) primActs.remove(j);
 						break;
 					}

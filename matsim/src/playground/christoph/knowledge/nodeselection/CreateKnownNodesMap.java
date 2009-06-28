@@ -27,11 +27,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.DeadEndRemover;
@@ -93,10 +93,10 @@ public class CreateKnownNodesMap {
 		if(nodeSelector instanceof SelectNodesDijkstra)
 		{
 			// get all acts of the selected plan
-			ArrayList<Activity> acts = new ArrayList<Activity>();					
+			ArrayList<ActivityImpl> acts = new ArrayList<ActivityImpl>();					
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					acts.add((Activity) pe);
+				if (pe instanceof ActivityImpl) {
+					acts.add((ActivityImpl) pe);
 				}
 			}
 			

@@ -31,9 +31,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Time;
 
@@ -112,7 +112,7 @@ public class NetworkFeatureFactory {
 		return p;
 	}
 	
-	public AbstractFeatureType createActFeature(Activity act, StyleType style) {
+	public AbstractFeatureType createActFeature(ActivityImpl act, StyleType style) {
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName("Activity on link: " + act.getLinkId().toString());

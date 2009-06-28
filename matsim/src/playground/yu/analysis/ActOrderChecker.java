@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -17,6 +16,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -35,8 +35,8 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		public static String getActOder(final Plan plan) {
 			StringBuffer acts = new StringBuffer();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					acts.append(((Activity) pe).getType());
+				if (pe instanceof ActivityImpl) {
+					acts.append(((ActivityImpl) pe).getType());
 				}
 			}
 			return acts.toString();

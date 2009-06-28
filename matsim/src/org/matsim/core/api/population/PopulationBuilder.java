@@ -26,6 +26,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.population.ActivityImpl;
 
 /**
  * @author dgrether
@@ -36,11 +37,11 @@ public interface PopulationBuilder extends BasicPopulationBuilder {
 
 	Plan createPlan(BasicPerson person);
 
-	Activity createActivityFromCoord(String actType, Coord coord);
+	ActivityImpl createActivityFromCoord(String actType, Coord coord);
 	
-	Activity createActivityFromFacilityId(String actType, Id facilityId);
+	ActivityImpl createActivityFromFacilityId(String actType, Id facilityId);
 
-	Activity createActivityFromLinkId(String actType, Id linkId);
+	ActivityImpl createActivityFromLinkId(String actType, Id linkId);
 	
 	Leg createLeg(TransportMode legMode);
 

@@ -21,13 +21,13 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -47,15 +47,15 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 	
 	protected PlanAlgorithm replanner;
 	protected Person person;
-	protected Activity fromAct;
+	protected ActivityImpl fromAct;
 	protected Leg betweenLeg;
-	protected Activity toAct;
+	protected ActivityImpl toAct;
 	protected double time;
 		
 	private static final Logger log = Logger.getLogger(ActEndReplanner.class);
 
 	// used when starting the Replanner "by hand"
-	public ActEndReplanner(Activity fromAct, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
+	public ActEndReplanner(ActivityImpl fromAct, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	{
 		this.fromAct = fromAct;
 		this.person = vehicle.getDriver().getPerson();
@@ -67,7 +67,7 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 	
 		if(betweenLeg != null)
 		{
-			toAct = (Activity)plan.getNextActivity(betweenLeg);
+			toAct = (ActivityImpl)plan.getNextActivity(betweenLeg);
 		}
 		else 
 		{
@@ -104,7 +104,7 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 			
 			if(betweenLeg != null)
 			{
-				toAct = (Activity)plan.getNextActivity(betweenLeg);
+				toAct = (ActivityImpl)plan.getNextActivity(betweenLeg);
 			}
 			else 
 			{

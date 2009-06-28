@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.ActivityImpl;
 
 import playground.yu.newPlans.NewPopulation;
 
@@ -73,7 +73,7 @@ public class NewAgentPtPlan extends NewPopulation {
 				for (int i = 0; i < actsLegs.size(); i++) {
 					Object o = actsLegs.get(i);
 					if (i % 2 == 0) {
-						ptPlan.addActivity((Activity) o);
+						ptPlan.addActivity((ActivityImpl) o);
 //						walkPlan.addAct((Act) o);
 					} else {
 						Leg leg = (Leg) o;

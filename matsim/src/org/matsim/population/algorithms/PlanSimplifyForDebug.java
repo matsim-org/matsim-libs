@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -113,7 +113,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	private void removeUnwantedActs(final Plan plan) {
 		List<?> actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i += 2) {
-			Activity act = (Activity) actsLegs.get(i);
+			ActivityImpl act = (ActivityImpl) actsLegs.get(i);
 			if (this.homeActs.contains(act.getType())) {
 				act.setType("h");
 			} else if (this.workActs.contains(act.getType())) {
@@ -146,7 +146,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		if (plan.getPlanElements().size() != 5)
 			return;
 
-		Activity act = (Activity) plan.getPlanElements().get(0);
+		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(0);
 		int time = 6 * 3600 + (int) (MatsimRandom.getRandom().nextDouble() * 3600 * 3);
 		act.setStartTime(0);
 		act.setEndTime(time);
@@ -157,7 +157,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		leg.setArrivalTime(time);
 		leg.setTravelTime(0);
 
-		act = (Activity) plan.getPlanElements().get(2);
+		act = (ActivityImpl) plan.getPlanElements().get(2);
 		act.setStartTime(time);
 		act.setEndTime(24 * 3600);
 		act.setDuration(8 * 3600);
@@ -170,7 +170,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		leg.setArrivalTime(time + 8 * 3600);
 		leg.setTravelTime(0);
 
-		act = (Activity) plan.getPlanElements().get(4);
+		act = (ActivityImpl) plan.getPlanElements().get(4);
 		act.setStartTime(time + 8 * 3600);
 		act.setEndTime(24 * 3600);
 		act.setDuration(16 * 3600 - time);

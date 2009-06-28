@@ -19,7 +19,6 @@
 
 package org.matsim.core.population;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -32,7 +31,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class ActivityTest extends MatsimTestCase {
 
 	public void testCalculateDuration() {
-		Activity testee = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(0, 0));
+		ActivityImpl testee = new org.matsim.core.population.ActivityImpl("h", new CoordImpl(0, 0));
 		testee.setStartTime(0.0);
 		testee.setDuration(0.0);
 		testee.setEndTime(0.0);

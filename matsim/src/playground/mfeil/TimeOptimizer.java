@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -86,14 +86,14 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		
 		
 		/* Initial clean-up of plan for the case actslegs is not sound*/
-		double move = this.cleanSchedule (((Activity)(basePlan.getPlanElements().get(0))).getEndTime(), basePlan);
+		double move = this.cleanSchedule (((ActivityImpl)(basePlan.getPlanElements().get(0))).getEndTime(), basePlan);
 		int loops=1;
 		while (move!=0.0){
 			if (loops>3) {
 				for (int i=0;i<basePlan.getPlanElements().size()-2;i+=2){
-					((Activity)basePlan.getPlanElements().get(i)).setDuration(this.minimumTime.get(((Activity)basePlan.getPlanElements().get(i)).getType()));
+					((ActivityImpl)basePlan.getPlanElements().get(i)).setDuration(this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(i)).getType()));
 				}
-				move = this.cleanSchedule(this.minimumTime.get(((Activity)basePlan.getPlanElements().get(0)).getType()), basePlan);
+				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(0)).getType()), basePlan);
 				if (move!=0.0){
 					// TODO Check whether allowed?
 					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
@@ -104,9 +104,9 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 			}
 			loops++;
 			for (int i=0;i<basePlan.getPlanElements().size()-2;i=i+2){
-				((Activity)basePlan.getPlanElements().get(i)).setDuration(java.lang.Math.max(((Activity)basePlan.getPlanElements().get(i)).getDuration()*0.9, this.minimumTime.get(((Activity)basePlan.getPlanElements().get(i)).getType())));
+				((ActivityImpl)basePlan.getPlanElements().get(i)).setDuration(java.lang.Math.max(((ActivityImpl)basePlan.getPlanElements().get(i)).getDuration()*0.9, this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(i)).getType())));
 			}
-			move = this.cleanSchedule(((Activity)(basePlan.getPlanElements().get(0))).getDuration(), basePlan);
+			move = this.cleanSchedule(((ActivityImpl)(basePlan.getPlanElements().get(0))).getDuration(), basePlan);
 		}
 		
 		this.processPlan(basePlan);
@@ -225,12 +225,12 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		double time;
 		for (int i = 0; i<al.size();i++){
 			if (i%2==0){
-				time = ((Activity)(bestSolution.get(i))).getDuration();
-				((Activity)al.get(i)).setDuration(time);
-				time = ((Activity)(bestSolution.get(i))).getStartTime();
-				((Activity)al.get(i)).setStartTime(time);
-				time = ((Activity)(bestSolution.get(i))).getEndTime();
-				((Activity)al.get(i)).setEndTime(time);
+				time = ((ActivityImpl)(bestSolution.get(i))).getDuration();
+				((ActivityImpl)al.get(i)).setDuration(time);
+				time = ((ActivityImpl)(bestSolution.get(i))).getStartTime();
+				((ActivityImpl)al.get(i)).setStartTime(time);
+				time = ((ActivityImpl)(bestSolution.get(i))).getEndTime();
+				((ActivityImpl)al.get(i)).setEndTime(time);
 			}
 			else {
 				time = ((Leg)(bestSolution.get(i))).getTravelTime();
@@ -363,9 +363,9 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	private double increaseTime(PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, int outer, int inner){
 		
-		if ((((Activity)(actslegs.get(inner))).getDuration()>=(this.OFFSET+this.minimumTime.get(((Activity)(actslegs.get(inner))).getType())))	||	
+		if ((((ActivityImpl)(actslegs.get(inner))).getDuration()>=(this.OFFSET+this.minimumTime.get(((ActivityImpl)(actslegs.get(inner))).getType())))	||	
 				(outer==0	&&	inner==actslegs.size()-1)	||
-				((inner==actslegs.size()-1) && (86400+((Activity)(actslegs.get(0))).getEndTime()-((Activity)(actslegs.get(actslegs.size()-1))).getStartTime())>(OFFSET+this.minimumTime.get(((Activity)(actslegs.get(0))).getType())))){
+				((inner==actslegs.size()-1) && (86400+((ActivityImpl)(actslegs.get(0))).getEndTime()-((ActivityImpl)(actslegs.get(actslegs.size()-1))).getStartTime())>(OFFSET+this.minimumTime.get(((ActivityImpl)(actslegs.get(0))).getType())))){
 			
 			 return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
 		}
@@ -376,15 +376,15 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	private double decreaseTime(PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, int outer, int inner){
 		boolean checkFinalAct = false;
-		double time = OFFSET+this.minimumTime.get(((Activity)(actslegs.get(outer))).getType());
+		double time = OFFSET+this.minimumTime.get(((ActivityImpl)(actslegs.get(outer))).getType());
 		if (outer==0 && inner==actslegs.size()-1) time = OFFSET+1;
 		if (outer==0 && inner!=actslegs.size()-1){
 			checkFinalAct = true; // if first act is decreased always check final act also in setTimes() to be above minimum time!
-			if (((Activity)(actslegs.get(actslegs.size()-1))).getDuration()>=this.minimumTime.get(((Activity)(actslegs.get(0))).getType())) {
+			if (((ActivityImpl)(actslegs.get(actslegs.size()-1))).getDuration()>=this.minimumTime.get(((ActivityImpl)(actslegs.get(0))).getType())) {
 				time = OFFSET+1;
 			}
 		}
-		if (((Activity)(actslegs.get(outer))).getDuration()>=time){
+		if (((ActivityImpl)(actslegs.get(outer))).getDuration()>=time){
 			if (!checkFinalAct) return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
 			else return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, actslegs.size()-1);
 		}
@@ -394,7 +394,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	private double swapDurations (PlanomatXPlan plan, List<? extends BasicPlanElement> actslegs, int outer, int inner){
 		
-		double swaptime= java.lang.Math.max(((Activity)(actslegs.get(inner))).getDuration(), this.minimumTime.get(((Activity)(actslegs.get(outer))).getType()))-((Activity)(actslegs.get(outer))).getDuration();
+		double swaptime= java.lang.Math.max(((ActivityImpl)(actslegs.get(inner))).getDuration(), this.minimumTime.get(((ActivityImpl)(actslegs.get(outer))).getType()))-((ActivityImpl)(actslegs.get(outer))).getDuration();
 		if (outer==0 	&&	swaptime<0) return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, actslegs.size()-1); // check that first/last act does not turn below minimum time
 		else return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
 	}
@@ -408,43 +408,43 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	protected double cleanSchedule (double now, Plan plan){
 		
-		((Activity)(plan.getPlanElements().get(0))).setEndTime(now);
-		((Activity)(plan.getPlanElements().get(0))).setDuration(now);
+		((ActivityImpl)(plan.getPlanElements().get(0))).setEndTime(now);
+		((ActivityImpl)(plan.getPlanElements().get(0))).setDuration(now);
 			
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
 			((Leg)(plan.getPlanElements().get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(plan.getPlanElements().get(i-1)), (Activity)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
 			((Leg)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((Leg)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
 			if (i!=plan.getPlanElements().size()-2){
-				((Activity)(plan.getPlanElements().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Activity)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
-				((Activity)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
-				((Activity)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);	
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setStartTime(now);
+				travelTime = java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(i+1))).getDuration()/*-travelTime*/, this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i+1))).getType()));
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(travelTime);	
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;
 			}
 			else {
-				((Activity)(plan.getPlanElements().get(i+1))).setStartTime(now);
+				((ActivityImpl)(plan.getPlanElements().get(i+1))).setStartTime(now);
 				/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW*/
-				if (86400>now+this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType())){
-					((Activity)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
-					((Activity)(plan.getPlanElements().get(i+1))).setEndTime(86400);
+				if (86400>now+this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i+1))).getType())){
+					((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
+					((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(86400);
 				}
-				else if (86400+((Activity)(plan.getPlanElements().get(0))).getDuration()>now+this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType())){
+				else if (86400+((ActivityImpl)(plan.getPlanElements().get(0))).getDuration()>now+this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i+1))).getType())){
 					if (now<86400){
-						((Activity)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
-						((Activity)(plan.getPlanElements().get(i+1))).setEndTime(86400);
+						((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(86400-now);
+						((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(86400);
 					}
 					else {
-						((Activity)(plan.getPlanElements().get(i+1))).setDuration(this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
-						((Activity)(plan.getPlanElements().get(i+1))).setEndTime(now+this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType()));
+						((ActivityImpl)(plan.getPlanElements().get(i+1))).setDuration(this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i+1))).getType()));
+						((ActivityImpl)(plan.getPlanElements().get(i+1))).setEndTime(now+this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i+1))).getType()));
 					}
 				}
 				else {
-					return (now+this.minimumTime.get(((Activity)(plan.getPlanElements().get(i+1))).getType())-(86400+((Activity)(plan.getPlanElements().get(0))).getDuration()));
+					return (now+this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i+1))).getType())-(86400+((ActivityImpl)(plan.getPlanElements().get(0))).getDuration()));
 				}
 			}
 		}
@@ -462,53 +462,53 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		/* if start < outer (mode choice) */
 		for (int i=start+1;i<=outer-1;i=i+2){
 			((Leg)(actslegs.get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i-1)), (Activity)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i-1)), (ActivityImpl)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
 			
 			((Leg)(actslegs.get(i))).setArrivalTime(now+travelTime);
 			((Leg)(actslegs.get(i))).setTravelTime(travelTime);
-			now = java.lang.Math.max(now+travelTime+this.minimumTime.get(((Activity)(actslegs.get(i+1))).getType()), ((Activity)(actslegs.get(i+1))).getEndTime());
+			now = java.lang.Math.max(now+travelTime+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType()), ((ActivityImpl)(actslegs.get(i+1))).getEndTime());
 		}
 		
 		/* standard process */
 		for (int i=outer+1;i<=inner-1;i=i+2){
 			if (i==outer+1) {
 				if (outer!=0) {
-					now = java.lang.Math.max(now+offset, (((Leg)(actslegs.get(outer-1))).getArrivalTime())+this.minimumTime.get(((Activity)(actslegs.get(outer))).getType()));
+					now = java.lang.Math.max(now+offset, (((Leg)(actslegs.get(outer-1))).getArrivalTime())+this.minimumTime.get(((ActivityImpl)(actslegs.get(outer))).getType()));
 				}
 				else now +=offset;
 			}
 			((Leg)(actslegs.get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i-1)), (Activity)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i-1)), (ActivityImpl)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
 			
 			((Leg)(actslegs.get(i))).setArrivalTime(now+travelTime);
 			((Leg)(actslegs.get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
 			if (i!=inner-1){
-				now = java.lang.Math.max(now+this.minimumTime.get(((Activity)(actslegs.get(i+1))).getType()), (((Activity)(actslegs.get(i+1))).getEndTime()+offset));
-				if (((Activity)(actslegs.get(i+1))).getDuration()<this.minimumTime.get(((Activity)(actslegs.get(i+1))).getType())-2) log.warn("Eingehende duration < minimumTime! "+((Activity)(actslegs.get(i+1))).getDuration());
+				now = java.lang.Math.max(now+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType()), (((ActivityImpl)(actslegs.get(i+1))).getEndTime()+offset));
+				if (((ActivityImpl)(actslegs.get(i+1))).getDuration()<this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType())-2) log.warn("Eingehende duration < minimumTime! "+((ActivityImpl)(actslegs.get(i+1))).getDuration());
 			}
 			else {
-				double time1 = ((Activity)(actslegs.get(i+1))).getEndTime();
+				double time1 = ((ActivityImpl)(actslegs.get(i+1))).getEndTime();
 				if (inner==actslegs.size()-1) {
 					time1=((Leg)(actslegs.get(1))).getDepartureTime()+86400;
 				}
 				position = inner;
-				if (time1<now+this.minimumTime.get(((Activity)(actslegs.get(i+1))).getType())){	// check whether act "inner" has at least minimum time
+				if (time1<now+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType())){	// check whether act "inner" has at least minimum time
 					if (actslegs.size()>=i+3){
-						now+=this.minimumTime.get(((Activity)(actslegs.get(i+1))).getType());
+						now+=this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType());
 						((Leg)(actslegs.get(i+2))).setDepartureTime(now);
-						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i+1)), (Activity)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
+						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i+1)), (ActivityImpl)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
 						
 						((Leg)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
 						((Leg)(actslegs.get(i+2))).setTravelTime(travelTime);
 						now+=travelTime;
-						double time2 = ((Activity)(actslegs.get(i+3))).getEndTime();
+						double time2 = ((ActivityImpl)(actslegs.get(i+3))).getEndTime();
 						if (i+3==actslegs.size()-1) {
 							time2=((Leg)(actslegs.get(1))).getDepartureTime()+86400;
 						}
 						position = i+3;
-						if (time2<now+this.minimumTime.get(((Activity)(actslegs.get(i+3))).getType())){
+						if (time2<now+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+3))).getType())){
 							return -100000;
 						}
 					}
@@ -522,12 +522,12 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 			now = ((Leg)(actslegs.get(position+1))).getDepartureTime();
 			for (int i=position+1;i<=stop-1;i=i+2){
 				((Leg)(actslegs.get(i))).setDepartureTime(now);
-				travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i-1)), (Activity)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
+				travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i-1)), (ActivityImpl)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
 				
 				((Leg)(actslegs.get(i))).setArrivalTime(now+travelTime);
 				((Leg)(actslegs.get(i))).setTravelTime(travelTime);
 				now+=travelTime;
-				now = java.lang.Math.max(now+this.minimumTime.get(((Activity)(actslegs.get(i+1))).getType()), ((Activity)(actslegs.get(i+1))).getEndTime());
+				now = java.lang.Math.max(now+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType()), ((ActivityImpl)(actslegs.get(i+1))).getEndTime());
 				if (i+1==actslegs.size()-1){
 					double time=((Leg)(actslegs.get(1))).getDepartureTime()+86400;
 					if (time<now){
@@ -535,18 +535,18 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 					}
 				}
 				else {
-					if (now>((Activity)(actslegs.get(i+1))).getEndTime()){
+					if (now>((ActivityImpl)(actslegs.get(i+1))).getEndTime()){
 						((Leg)(actslegs.get(i+2))).setDepartureTime(now);
-						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Activity)(actslegs.get(i+1)), (Activity)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
+						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i+1)), (ActivityImpl)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
 						
 						((Leg)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
 						((Leg)(actslegs.get(i+2))).setTravelTime(travelTime);
 						now+=travelTime;
-						double time3 = ((Activity)(actslegs.get(i+3))).getEndTime();
+						double time3 = ((ActivityImpl)(actslegs.get(i+3))).getEndTime();
 						if ((i+3)==actslegs.size()-1) {
 							time3=((Leg)(actslegs.get(1))).getDepartureTime()+86400;
 						}
-						if (time3<now+this.minimumTime.get(((Activity)(actslegs.get(i+3))).getType())){
+						if (time3<now+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+3))).getType())){
 							return -100000;
 						}
 					}

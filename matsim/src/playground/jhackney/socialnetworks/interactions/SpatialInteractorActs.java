@@ -26,13 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -126,8 +126,8 @@ public class SpatialInteractorActs {
 		for (Person p1 : plans.getPersons().values()) {
 			Plan plan1 = p1.getSelectedPlan();
 			for (PlanElement pe : plan1.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act1 = (Activity) pe;
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act1 = (ActivityImpl) pe;
 					ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
 					ArrayList<Person> actList=new ArrayList<Person>();
 					
@@ -330,14 +330,14 @@ public class SpatialInteractorActs {
 				ArrayList<Person> others = new ArrayList<Person>();
 				//				othersList.put(p1,others);
 				for (PlanElement pe1 : plan1.getPlanElements()) {
-					if (pe1 instanceof Activity) {
-						Activity act1 = (Activity) pe1;
+					if (pe1 instanceof ActivityImpl) {
+						ActivityImpl act1 = (ActivityImpl) pe1;
 						//					personList.put(p1,act1);
 						for (Person p2 : visitors) {
 							Plan plan2=p2.getSelectedPlan();
 							for (PlanElement pe2 : plan2.getPlanElements()) {
-								if (pe2 instanceof Activity)	{
-									Activity act2 = (Activity) pe2;
+								if (pe2 instanceof ActivityImpl)	{
+									ActivityImpl act2 = (ActivityImpl) pe2;
 									if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 										//agents encounter and may befriend
 										others.add(p2);
@@ -426,12 +426,12 @@ public class SpatialInteractorActs {
 			while(vIt1.hasNext()){
 				Person p1= vIt1.next();
 				for (PlanElement pe1 : p1.getSelectedPlan().getPlanElements()) {
-					if (pe1 instanceof Activity) {
-						Activity act1 = (Activity) pe1;
+					if (pe1 instanceof ActivityImpl) {
+						ActivityImpl act1 = (ActivityImpl) pe1;
 						for (Person p2 : visitors) {
 							for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
-								if (pe2 instanceof Activity) {
-									Activity act2 = (Activity) pe2;
+								if (pe2 instanceof ActivityImpl) {
+									ActivityImpl act2 = (ActivityImpl) pe2;
 									if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 										//agents encoutner and may befriend
 										if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){

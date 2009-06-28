@@ -28,10 +28,10 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implements PersonAlgorithm {
@@ -110,7 +110,7 @@ public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implement
 			Gbl.errorMsg("Person id=" + person.getId() + " does not have a single plan");
 		}
 		BasicPlan plan = person.getPlans().get(0);
-		Activity act = (Activity)plan.getPlanElements().get(0);
+		ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(0);
 		if (act == null) {
 			Gbl.errorMsg("Person id=" + person.getId() + " does not have a first act");
 		}

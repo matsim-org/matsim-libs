@@ -29,7 +29,6 @@ import javax.media.opengl.GL;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -39,6 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -88,7 +88,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		for (int i= 0; i< actslegs.size(); i++) {
 			if(i%2==0) {
 				// handle act
-				Activity act = (Activity)plan.getPlanElements().get(i);
+				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				drivenLinks.add(act.getLink());
 			} else {
 				// handle leg

@@ -31,13 +31,13 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -196,8 +196,8 @@ public class Planomat implements PlanAlgorithm {
 
 		Route tempRoute = null;
 		Leg leg = null;
-		Activity origin = null;
-		Activity destination = null;
+		ActivityImpl origin = null;
+		ActivityImpl destination = null;
 
 		List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 		int numLegs = actslegs.size() / 2;

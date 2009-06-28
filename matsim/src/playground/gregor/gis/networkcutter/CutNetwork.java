@@ -32,7 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
@@ -46,6 +45,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -137,7 +137,7 @@ public class CutNetwork {
 		while (it.hasNext()) {
 			Person pers = it.next();
 
-			Id id = ((Activity)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
+			Id id = ((ActivityImpl)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
 
 			if (net.getLink(id) == null) {
 				it.remove();

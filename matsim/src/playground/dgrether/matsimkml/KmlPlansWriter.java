@@ -29,10 +29,10 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
@@ -74,7 +74,7 @@ public class KmlPlansWriter {
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 //		folder.addStyle(this.networkLinkStyle);
 //		folder.addStyle(this.networkNodeStyle);
-		Activity act;
+		ActivityImpl act;
 		FolderType planFolder;
 		Leg leg;
 		AbstractFeatureType abstractFeature;

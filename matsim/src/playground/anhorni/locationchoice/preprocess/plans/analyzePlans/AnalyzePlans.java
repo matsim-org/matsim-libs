@@ -31,7 +31,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -39,6 +38,7 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -141,7 +141,7 @@ public class AnalyzePlans {
 				
 				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final Activity act = (Activity)actslegs.get(j);
+					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 					if (act.getType().startsWith("shop")) {
 						numberOfShoppingActs++;
 						desiredShopPerPerson += person.getDesires().getActivityDuration("shop");
@@ -200,7 +200,7 @@ public class AnalyzePlans {
 
 				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final Activity act = (Activity)actslegs.get(j);
+					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 					if (act.getType().startsWith(type)) {
 						out.write(person.getId().toString()+"\t"+
 								String.valueOf(act.getDuration())+"\t"+
@@ -245,7 +245,7 @@ public class AnalyzePlans {
 
 				int countSL = 0;
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final Activity act = (Activity)actslegs.get(j);
+					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 					if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
 						countSL++;
 					}
@@ -281,7 +281,7 @@ public class AnalyzePlans {
 			Plan selectedPlan = person.getSelectedPlan();
 			List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Activity act = (Activity)actslegs.get(j);
+				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith("s")) {
 					if (!personSet) {
 						numberOfPersonsDoingSL++;

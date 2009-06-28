@@ -23,14 +23,14 @@ package org.matsim.core.events;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.population.ActivityImpl;
 
 public class ActivityEndEvent extends ActivityEvent implements BasicActivityEndEvent {
 
 	public static final String EVENT_TYPE = "actend";
 
-	public ActivityEndEvent(final double time, final Person agent, final Link link, final Activity act) {
+	public ActivityEndEvent(final double time, final Person agent, final Link link, final ActivityImpl act) {
 		super(time, agent, link, act);
 	}
 

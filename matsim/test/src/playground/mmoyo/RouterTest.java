@@ -28,13 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -87,8 +87,8 @@ public class RouterTest extends MatsimTestCase {
 		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile("test/input/playground/marcel/pt/plans.xml");
 		Person person = population.getPersons().get(new IdImpl(1));
-		Activity fromAct = (Activity) person.getPlans().get(0).getPlanElements().get(0);
-		Activity toAct = (Activity) person.getPlans().get(0).getPlanElements().get(2);
+		ActivityImpl fromAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(0);
+		ActivityImpl toAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(2);
 		
 		// make sure our setup is as expected
 		assertNotNull(person);

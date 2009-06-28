@@ -28,7 +28,6 @@ import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -52,6 +51,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.network.MatsimLaneDefinitionsWriter;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -206,7 +206,7 @@ public class DaganzoScenarioGenerator {
 				homeEndTime++;
 			}
 
-			Activity act1 = builder.createActivityFromLinkId("h", l1.getId());
+			ActivityImpl act1 = builder.createActivityFromLinkId("h", l1.getId());
 			act1.setEndTime(homeEndTime);
 			plan.addActivity(act1);
 			// leg to home
@@ -224,7 +224,7 @@ public class DaganzoScenarioGenerator {
 
 			plan.addLeg(leg);
 			
-			Activity act2 = builder.createActivityFromLinkId("h", l7.getId());
+			ActivityImpl act2 = builder.createActivityFromLinkId("h", l7.getId());
 			act2.setLink(l7);
 			plan.addActivity(act2);
 			population.addPerson(p);

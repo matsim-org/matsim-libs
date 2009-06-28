@@ -27,12 +27,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
@@ -156,8 +156,8 @@ public class SocialNetwork {
 //			for (int i = 0; i < numLinks; i++) {
 			Person person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			Person person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
-			Coord home1=((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
-			Coord home2=((Activity)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home1=((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home2=((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
 //			double pdist=c*Math.pow((distance+rmin),-alpha);
 			double pdist=p0*Math.pow((distance/rmin+1),-alpha);
@@ -282,8 +282,8 @@ public class SocialNetwork {
 //		for (int i = 0; i < numLinks; i++) {
 			Person person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			Person person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
-			Coord home1=((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
-			Coord home2=((Activity)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home1=((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
+			Coord home2=((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
 			
 //			makeSocialContact( person1, person2, -1);

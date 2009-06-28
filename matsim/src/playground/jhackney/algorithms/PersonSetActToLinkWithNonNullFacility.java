@@ -25,11 +25,11 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -97,8 +97,8 @@ public class PersonSetActToLinkWithNonNullFacility extends AbstractPersonAlgorit
 
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				String type = this.getFacilityActType(act.getType());
 				Coord coord = act.getCoord();
 				if (coord == null) { Gbl.errorMsg("Each act must have a coord!"); }

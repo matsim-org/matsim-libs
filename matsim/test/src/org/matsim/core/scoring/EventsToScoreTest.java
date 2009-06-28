@@ -20,7 +20,6 @@
 
 package org.matsim.core.scoring;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -28,6 +27,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -124,7 +124,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			this.cntReset++;
 		}
 
-		public void startActivity(final double time, final Activity act) {
+		public void startActivity(final double time, final ActivityImpl act) {
 			this.cntStartAct++;
 		}
 

@@ -32,7 +32,6 @@ import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
@@ -319,8 +318,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		}
 		if (act.getStartTime() != Time.UNDEFINED_TIME)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act instanceof Activity){
-			Activity a = (Activity)act;
+		if (act instanceof ActivityImpl){
+			ActivityImpl a = (ActivityImpl)act;
 			if (a.getDuration() != Time.UNDEFINED_TIME)
 				out.write(" dur=\"" + Time.writeTime(a.getDuration()) + "\"");
 		}

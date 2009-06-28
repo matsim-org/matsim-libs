@@ -1,9 +1,10 @@
 package playground.mmoyo.TransitSimulation;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.population.ActivityImpl;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
@@ -26,8 +27,8 @@ public class SimplifyPtLegs {
 		List<Integer> ptElements = new ArrayList<Integer>();
 		boolean marking =false;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				String actType = ((Activity)pe).getType();
+			if (pe instanceof ActivityImpl) {
+				String actType = ((ActivityImpl)pe).getType();
 				if (actType.equals("wait pt")) marking= true;
 				if (marking)  ptElements.add(i);
 				if (actType.equals("exit pt veh")){

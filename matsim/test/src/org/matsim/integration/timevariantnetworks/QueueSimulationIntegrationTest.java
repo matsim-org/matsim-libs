@@ -31,7 +31,6 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -46,6 +45,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -202,7 +202,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		for(int i = 0; i < count; i++) {
 			Person person = new PersonImpl(new IdImpl(i + (int)departureTime));
 			Plan plan1 = person.createPlan(true);
-			Activity a1 = plan1.createActivity("h", depLink);
+			ActivityImpl a1 = plan1.createActivity("h", depLink);
 			a1.setEndTime(departureTime);
 			Leg leg1 = plan1.createLeg(TransportMode.car);
 			leg1.setDepartureTime(departureTime);

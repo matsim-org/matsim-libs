@@ -30,12 +30,12 @@ import java.util.Map.Entry;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -62,8 +62,8 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) pe;
 				String actType = act.getType();
 				if ((!actType.equals("H")) && (!actType.equals("W"))) {
 					// duration

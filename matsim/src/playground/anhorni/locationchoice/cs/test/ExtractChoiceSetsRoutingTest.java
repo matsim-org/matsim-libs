@@ -3,13 +3,13 @@ package playground.anhorni.locationchoice.cs.test;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -35,10 +35,10 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 		NetworkLayer network = controler.getNetwork();
 		
 		Link link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
-		Activity fromAct = new org.matsim.core.population.ActivityImpl("home", link0);
+		ActivityImpl fromAct = new org.matsim.core.population.ActivityImpl("home", link0);
 		
 		Link link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
-		Activity toAct = new org.matsim.core.population.ActivityImpl("shop", link1);
+		ActivityImpl toAct = new org.matsim.core.population.ActivityImpl("shop", link1);
 		fromAct.setEndTime(0.0);
 		
 		Leg leg = computeLeg(fromAct, toAct, controler);	
@@ -46,7 +46,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	}
 	
 	
-	private Leg computeLeg(Activity fromAct, Activity toAct, Controler controler) {	
+	private Leg computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {	
 		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());	

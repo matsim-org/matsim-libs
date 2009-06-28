@@ -33,10 +33,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -115,7 +115,7 @@ public class PajekWriter {
 				if (know == null) {
 					Gbl.errorMsg("Knowledge is not defined!");
 				}
-				Coord xy = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getCoord();
+				Coord xy = ((ActivityImpl) p.getSelectedPlan().getPlanElements().get(0)).getCoord();
 				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
 				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
 				pjnet.write(iperson + " \"" + p.getId() + "\" "+x +" "+y+"\r\n");
@@ -135,8 +135,8 @@ public class PajekWriter {
 				Person printPerson1 = printLink.getPersonFrom();
 				Person printPerson2 = printLink.getPersonTo();
 
-				Coord xy1 = ((Activity) printPerson1.getSelectedPlan().getPlanElements().get(0)).getCoord();
-				Coord xy2 = ((Activity) printPerson2.getSelectedPlan().getPlanElements().get(0)).getCoord();
+				Coord xy1 = ((ActivityImpl) printPerson1.getSelectedPlan().getPlanElements().get(0)).getCoord();
+				Coord xy2 = ((ActivityImpl) printPerson2.getSelectedPlan().getPlanElements().get(0)).getCoord();
 				double dist = CoordUtils.calcDistance(xy1, xy2);
 
 				pjnet.write(" " + this.pajekIndex.get(printPerson1.getId()) + " "+ this.pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");

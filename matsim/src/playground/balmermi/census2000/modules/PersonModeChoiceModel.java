@@ -21,13 +21,13 @@
 package playground.balmermi.census2000.modules;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -77,13 +77,13 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		double plan_dist = 0.0;
 		int mainpurpose = 2; // 0 := w; 1 := e; 2 := s|l
 		boolean isFirst = true;
-		Activity prevAct = null;
+		ActivityImpl prevAct = null;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
+			if (pe instanceof ActivityImpl) {
 				if (isFirst) {
 					isFirst = false; // first act is always 'home', ignore it
 				} else {
-					Activity act = (Activity) pe;
+					ActivityImpl act = (ActivityImpl) pe;
 					if (prevAct != null) {
 						plan_dist += CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
 						String type = act.getType();

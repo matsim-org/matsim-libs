@@ -22,12 +22,12 @@ package playground.toronto.timeblur;
 
 import java.util.Random;
 
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -68,8 +68,8 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 	public void run(Plan plan) {
 		int now = 0;
 		for (PlanElement e : plan.getPlanElements()) {
-			if (e instanceof Activity) {
-				Activity a = (Activity)e;
+			if (e instanceof ActivityImpl) {
+				ActivityImpl a = (ActivityImpl)e;
 				if (!a.equals(plan.getLastActivity())) {
 					a.setStartTime(now);
 					int min = now;

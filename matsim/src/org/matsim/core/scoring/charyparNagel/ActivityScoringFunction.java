@@ -21,9 +21,9 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -76,7 +76,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final Activity act) {
+	public void startActivity(final double time, final ActivityImpl act) {
 		this.lastTime = time;
 	}
 
@@ -100,7 +100,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return this.score;
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -204,7 +204,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Activity act) {
+	protected double[] getOpeningInterval(final ActivityImpl act) {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -223,12 +223,12 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	}
 
 	protected void handleAct(final double time) {
-		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
+		ActivityImpl act = (ActivityImpl)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
@@ -242,7 +242,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 				    }					
 					
 					// score first activity
-					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
+					ActivityImpl firstAct = (ActivityImpl)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION

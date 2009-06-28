@@ -20,7 +20,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Activity;
+import org.matsim.core.population.ActivityImpl;
 
 
 /**
@@ -47,9 +47,9 @@ public interface EventsBuilder {
 
 	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId);
 
-	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, Activity act);
+	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, ActivityImpl act);
 
-	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, Activity act);
+	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, ActivityImpl act);
 
 	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
 	

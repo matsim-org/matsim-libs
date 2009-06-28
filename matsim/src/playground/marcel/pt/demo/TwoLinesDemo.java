@@ -28,7 +28,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
@@ -38,6 +37,7 @@ import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
@@ -225,15 +225,15 @@ public class TwoLinesDemo {
 		{ // person 1
 			Person person = pb.createPerson(this.ids[1]);
 			Plan plan = pb.createPlan(person);
-			Activity act1 = pb.createActivityFromLinkId("home", this.ids[1]);
+			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			Leg leg1 = pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
-			Activity act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
+			ActivityImpl act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:01:00"));
 			Leg leg2 = pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
-			Activity act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
+			ActivityImpl act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 			
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
@@ -248,15 +248,15 @@ public class TwoLinesDemo {
 		{ // person 2
 			Person person = pb.createPerson(this.ids[2]);
 			Plan plan = pb.createPlan(person);
-			Activity act1 = pb.createActivityFromLinkId("home", this.ids[1]);
+			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			Leg leg1 = pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
-			Activity act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
+			ActivityImpl act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:06:00"));
 			Leg leg2 = pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
-			Activity act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
+			ActivityImpl act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 			
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
@@ -271,15 +271,15 @@ public class TwoLinesDemo {
 		{ // person 3
 			Person person = pb.createPerson(this.ids[3]);
 			Plan plan = pb.createPlan(person);
-			Activity act1 = pb.createActivityFromLinkId("home", this.ids[1]);
+			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			Leg leg1 = pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
-			Activity act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
+			ActivityImpl act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:11:00"));
 			Leg leg2 = pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
-			Activity act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
+			ActivityImpl act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 			
 			plan.addActivity(act1);
 			plan.addLeg(leg1);

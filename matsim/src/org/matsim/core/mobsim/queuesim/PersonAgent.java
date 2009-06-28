@@ -25,13 +25,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -77,7 +77,7 @@ public class PersonAgent implements DriverAgent {
 
 	/**
 	 * Convenience method delegating to person's selected plan
-	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
+	 * @return list of {@link ActivityImpl}s and {@link Leg}s of this agent's plan
 	 */
 	public List<? extends PlanElement> getPlanElements() {
 		return this.person.getSelectedPlan().getPlanElements();
@@ -129,7 +129,7 @@ public class PersonAgent implements DriverAgent {
 		this.nextActivity = 0;
 		List<? extends PlanElement> planElements = this.getPlanElements();
 		this.currentPlanElementIndex = 0;
-		Activity firstAct = (Activity) planElements.get(0);
+		ActivityImpl firstAct = (ActivityImpl) planElements.get(0);
 		double departureTime = firstAct.getEndTime();
 		this.currentLink = firstAct.getLink();
 		if (departureTime != Time.UNDEFINED_TIME && planElements.size() > 1) {
@@ -162,7 +162,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param now the current time
 	 */
 	public void activityEnds(final double now) {
-		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
+		ActivityImpl act = (ActivityImpl) this.getPlanElements().get(this.currentPlanElementIndex);
 		QueueSimulation.getEvents().processEvent(new ActivityEndEvent(now, this.getPerson(), this.currentLink, act));
 		advancePlanElement(now);
 	}
@@ -186,8 +186,8 @@ public class PersonAgent implements DriverAgent {
 		this.currentPlanElementIndex++;
 
 		PlanElement pe = this.getPlanElements().get(this.currentPlanElementIndex);
-		if (pe instanceof Activity) {
-			reachActivity(now, (Activity) pe);
+		if (pe instanceof ActivityImpl) {
+			reachActivity(now, (ActivityImpl) pe);
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
@@ -210,7 +210,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param now the current time
 	 * @param act the activity the agent reaches
 	 */
-	private void reachActivity(final double now, final Activity act) {
+	private void reachActivity(final double now, final ActivityImpl act) {
 		QueueSimulation.getEvents().processEvent(new ActivityStartEvent(now, this.getPerson(), this.currentLink, act));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...

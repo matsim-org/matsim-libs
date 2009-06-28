@@ -25,12 +25,12 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.filters.AbstractPersonFilter;
 
 /**
@@ -58,12 +58,12 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}
 				// test departure link
-				Link link = ((Activity) plan.getPlanElements().get(i-1)).getLink();
+				Link link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
 				if (link != null) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}
 				// test arrival link
-				link = ((Activity) plan.getPlanElements().get(i+1)).getLink();
+				link = ((ActivityImpl) plan.getPlanElements().get(i+1)).getLink();
 				if (link != null) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}

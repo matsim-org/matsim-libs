@@ -26,12 +26,12 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.world.WorldUtils;
 
 /**
@@ -82,14 +82,14 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 			for (int i = 1, n = plan.getPlanElements().size(); i < n; i+=2) {
 				Leg leg = (Leg) plan.getPlanElements().get(i);
 				if (leg.getRoute() == null) {
-					if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
+					if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
 						return true;
 					}
 				}
 				else if (leg.getRoute() instanceof NetworkRoute) {
 					List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 					if (links.size() == 0) {
-						if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
+						if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
 							return true;
 						}
 					}
@@ -98,19 +98,19 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 						// test departure link
-						Link link = ((Activity) plan.getPlanElements().get(i-1)).getLink();
+						Link link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 						// test arrival link
-						link = ((Activity) plan.getPlanElements().get(i+1)).getLink();
+						link = ((ActivityImpl) plan.getPlanElements().get(i+1)).getLink();
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 					}
 				}
 				else { // leg.getRoute() instanceof GenericRoute
-					if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
+					if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
 						return true;
 					}
 				}
@@ -119,7 +119,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 		return false;
 	}
 
-	private boolean judgeByBeeline(final Activity fromAct, final Activity toAct) {
+	private boolean judgeByBeeline(final ActivityImpl fromAct, final ActivityImpl toAct) {
 		if (this.aoiCenter == null) {
 			// we cannot use the bee-line decision if we don't know the alternative aoi-center
 			return false;

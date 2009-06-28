@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
 
 import playground.anhorni.locationchoice.cs.helper.Trip;
 
@@ -38,15 +38,15 @@ public class ActTypeAndAreaTripFilter extends TripFilter {
 	protected boolean filterPlan(final Plan plan, String mode) {
 		boolean choiceSetAdded = false;		
 		final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
-		Activity previousAct = (Activity)actslegs.get(0);
+		ActivityImpl previousAct = (ActivityImpl)actslegs.get(0);
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			Activity act = (Activity)actslegs.get(j);
+			ActivityImpl act = (ActivityImpl)actslegs.get(j);
 			if (j < actslegs.size()-1) {
 				Leg leg = (Leg) actslegs.get(j+1);
 				if (act.getType().equals(actType) && 
 						this.withinArea(previousAct, act) && leg.getMode().toString().equals(mode)) {
 					// TODO: check if last = home else problem!
-					Activity afterShoppingAct = (Activity)actslegs.get(j+2);
+					ActivityImpl afterShoppingAct = (ActivityImpl)actslegs.get(j+2);
 					Trip trip = new Trip(j/2, previousAct, act, afterShoppingAct);
 //					ChoiceSet choiceSet = new ChoiceSet(plan.getPerson().getId(), trip);
 //					super.choiceSets.add(choiceSet);
@@ -58,7 +58,7 @@ public class ActTypeAndAreaTripFilter extends TripFilter {
 		return choiceSetAdded;
 	}
 	
-	private boolean withinArea(Activity act0, Activity act1) {
+	private boolean withinArea(ActivityImpl act0, ActivityImpl act1) {
 		GeometryFactory geometryFactory = new GeometryFactory();			
 		Coordinate coord0 = new Coordinate(act0.getCoord().getX(), act0.getCoord().getY());
 		Coordinate coord1 = new Coordinate(act1.getCoord().getX(), act1.getCoord().getY());
