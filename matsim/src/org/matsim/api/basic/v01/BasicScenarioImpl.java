@@ -50,7 +50,12 @@ public class BasicScenarioImpl implements BasicScenario {
 	
 	public BasicScenarioImpl(Config config) {
 		this.config = config;
-		this.network = new NetworkLayer();  // TODO shoul be changed to a basic implementation
+
+		this.network = new NetworkLayer();  
+		// TODO should be changed to a basic implementation
+		// I think that the full implementation is ok.  But should become a "normal" 
+		// implementation (not a "Layer"). kai, jun09
+		
 		//never use the next line in new matsim code
 		Gbl.getWorld().setNetworkLayer((NetworkLayer)this.network);
 		this.population = new PopulationImpl();

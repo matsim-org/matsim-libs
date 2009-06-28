@@ -25,10 +25,8 @@ import java.io.Serializable;
 /**
  * @author dgrether
  */
-public interface BasicLocation extends Identifiable, Serializable {
+public interface BasicLocation extends Serializable {
 
-	// TODO should not extend from BasicIdentifiable
-	
 	public Coord getCoord();
 	
 	public void setCoord( Coord coord ) ;

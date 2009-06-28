@@ -5,8 +5,10 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.BasicLocation;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.Identifiable;
 
-public interface Location extends BasicLocation {
+public interface Location extends BasicLocation, Identifiable {
+	// TODO kn Does not make sense that Location itself has an id.  jun09
 
 	/**
 	 * Calculates the distance from a given coordinate to that location.
@@ -15,6 +17,7 @@ public interface Location extends BasicLocation {
 	 * @return the distance to that location
 	 */
 	public abstract double calcDistance(final Coord coord);
+	// TODO kn I think this can be more easily implemented as a utility that compares two coordinates. jun09
 
 	/**
 	 * Connects two location of two different layers. The layers have to be 'neighbors' which

@@ -24,12 +24,13 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.BasicLocation;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.Identifiable;
 
 
 /**
  * A topological representation of an network node.
  */
-public interface BasicNode extends BasicLocation {
+public interface BasicNode extends BasicLocation, Identifiable {
 
     /**
      * Adds a non-<code>null</code> link to this node's set of ingoing links.
