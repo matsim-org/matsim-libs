@@ -65,6 +65,10 @@ public class TreesBuilder {
 			regionalScenario = true;
 			centerNode = this.network.getNode(new IdImpl(Gbl.getConfig().locationchoice().getCenterNode()));
 			radius = Double.parseDouble(Gbl.getConfig().locationchoice().getRadius());
+			log.info("Building trees regional scenario");
+		}
+		else {
+			log.info("Building trees complete scenario");
 		}
 		
 		TreeMap<String, TreeMap<Id, ActivityFacility>> trees = new TreeMap<String, TreeMap<Id, ActivityFacility>>();
