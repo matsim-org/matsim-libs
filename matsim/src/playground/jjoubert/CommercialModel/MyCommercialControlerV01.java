@@ -3,7 +3,8 @@ package playground.jjoubert.CommercialModel;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
-import playground.jjoubert.CommercialModel.Listeners.MyCommercialListener;
+import playground.jjoubert.CommercialModel.Listeners.MyCommercialActivityDensityListener;
+import playground.jjoubert.CommercialModel.Listeners.MyCommercialLegHistogramListener;
 
 public class MyCommercialControlerV01 {
 	
@@ -24,8 +25,11 @@ public class MyCommercialControlerV01 {
 		 * NOTE: The event handlers are added in the StartupListener
 		 * TODO: Check if this is true.
 		 */
-		MyCommercialListener cl = new MyCommercialListener();
-		c.addControlerListener(cl);
+		MyCommercialActivityDensityListener cadl = new MyCommercialActivityDensityListener();
+		c.addControlerListener(cadl);
+		
+		MyCommercialLegHistogramListener clhl = new MyCommercialLegHistogramListener();
+		c.addControlerListener(clhl);
 				
 		c.run();
 		long time = (System.currentTimeMillis() - t) / 1000;

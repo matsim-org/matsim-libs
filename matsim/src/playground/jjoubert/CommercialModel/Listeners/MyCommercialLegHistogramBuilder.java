@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyAllEventCounter.java
+ * MyCommercialLegHistogramBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,45 +20,33 @@
 
 package playground.jjoubert.CommercialModel.Listeners;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+public class MyCommercialLegHistogramBuilder implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler{
 
-public class MyCommercialSplitter implements BasicActivityStartEventHandler{
-	
-	private BufferedWriter output;
-	private Network network;
-	
-	public MyCommercialSplitter(BufferedWriter output, Network nw) {
-		this.output = output;
-		this.network = nw;
+	public void handleEvent(BasicAgentDepartureEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleEvent(BasicAgentArrivalEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleEvent(BasicAgentStuckEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void reset(int iteration) {
-
+		// TODO Auto-generated method stub
+		
 	}
-
-	public void handleEvent(BasicActivityStartEvent event) {
-
-		if(event.getActType().equalsIgnoreCase("minor")){
-			double timeSeconds = event.getTime();
-			int hour = (int) Math.floor((timeSeconds) / 3600);
-
-			Link link = this.network.getLink( event.getLinkId() );
-			String outputString = link.getCoord().getX() + "," + 
-			link.getCoord().getY() + "," +
-			hour;
-			try {
-				this.output.write(outputString);
-				this.output.newLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
+	
 }
