@@ -128,6 +128,7 @@ public class MyCommercialDemandGenerator3 {
 			int agentId  = firstIndex;
 			for(int i = 0; i < populationSize; i++ ){
 				Plan plan = new PlanImpl(null);
+				plan.setSelected(true);
 
 				// Sample start time
 				int startTimeBin = (int) cdfStartTime.sampleFromCDF();

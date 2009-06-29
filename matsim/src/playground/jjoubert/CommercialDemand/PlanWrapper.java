@@ -99,6 +99,12 @@ public class PlanWrapper {
 				 * Wrap the plan
 				 */
 				Plan dummyPlan = new PlanImpl(null);
+				if(plan.isSelected()){
+					dummyPlan.setSelected(true);
+				} else{
+					dummyPlan.setSelected(false);
+				}
+					
 				
 				int index = 0;
 				while(index < plan.getPlanElements().size()){
