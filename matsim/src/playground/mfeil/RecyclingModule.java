@@ -59,7 +59,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	private final AbstractMultithreadedModule		assignmentModule;
 	private final LocationMutatorwChoiceSet 		locator;
 	private final PlanScorer						scorer;
-	private final int								testAgentsNumber;
+	private final int								noOfSchedulingAgents;
 	private final Controler							controler;
 	private OptimizedAgents 						agents;
 	private LinkedList<String>						nonassignedAgents;
@@ -69,7 +69,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	private final Knowledges 						knowledges;
 	private final ActivityTypeFinder 				finder;
 	
-	private final int iterations, noOfAgents, noOfSoftCoefficients;
+	private final int iterations, noOfAssignmentAgents, noOfSoftCoefficients;
 	private final DistanceCoefficients 				coefficients;
 	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
 	private final ArrayList<String> 				softCoef; 
@@ -89,12 +89,12 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.testAgentsNumber		= 5;
+		this.noOfSchedulingAgents	= 5;
 		
 		this.finder					= finder;
 		
 		this.iterations 			= 20;
-		this.noOfAgents				= 10;
+		this.noOfAssignmentAgents	= 10;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.sex 					= "no";
@@ -154,7 +154,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		Statistics.noLicenseAssignment=false;
 		
 		/* Individual optimization of agents */
-		for (int i=0;i<this.testAgentsNumber;i++) {
+		for (int i=0;i<this.noOfSchedulingAgents;i++) {
 			int pos = (int)(MatsimRandom.getRandom().nextDouble()*this.list[1].size());
 			list[0].add(list[1].get(pos));
 			schedulingModule.handlePlan(list[1].get(pos));
@@ -168,6 +168,10 @@ public class RecyclingModule implements PlanStrategyModule{
 		/* Detect optimal coefficients metric */
 		Statistics.prt=false;
 		if ((Controler.getIteration()==1)	&&	(this.noOfSoftCoefficients>1)) this.detectCoefficients();
+		else {
+			this.calculate();
+			this.rescheduleNonassigedAgents();
+		}
 		Statistics.prt=true;
 		
 		/* Print statistics of individual optimization */
@@ -179,7 +183,7 @@ public class RecyclingModule implements PlanStrategyModule{
 				assignment.print(((ActivityImpl)(list[0].get(i).getPlanElements().get(j))).getType()+"\t");
 			}
 			assignment.println();
-			if (i==this.testAgentsNumber-1) {
+			if (i==this.noOfSchedulingAgents-1) {
 				assignment.println();
 				assignment.println("Individual optimization of non-assigend agents in metric detection phase");
 			}
@@ -281,12 +285,12 @@ public class RecyclingModule implements PlanStrategyModule{
 		double scoreAux, coefAux;
 		int [] modified = new int [this.noOfSoftCoefficients-1]; // last coefficient fixed
 		int modifiedAux;
-		list1Pointer.clear();
 		
 		/* Iteration 0 */
 		score [0]= this.calculate();		// calculate score for initial vector
 		
-		this.schedulingModule.prepareReplanning();
+		score[0]=this.rescheduleNonassigedAgents();		
+		/*this.schedulingModule.prepareReplanning();
 		Iterator<String> naa = this.nonassignedAgents.iterator();
 		while (naa.hasNext()) {
 			String st = naa.next();
@@ -310,7 +314,8 @@ public class RecyclingModule implements PlanStrategyModule{
 			this.nonassignedAgents.clear();
 			score [0]= this.calculate();// Do this again, now all agents must be assignable.
 			if (this.nonassignedAgents.size()>0) log.warn("Something went wrong when optimizing the non-assigned agents of the metric detection phase!");
-		}
+		}*/
+		
 		for (int i=1;i<this.iterations+1;i++) score[i]=-100000;	// set all other iterations' scores to minimum value
 	
 		/* Further iterations */
@@ -411,12 +416,43 @@ public class RecyclingModule implements PlanStrategyModule{
 	private double calculate (){
 		double score = 0;
 		this.assignmentModule.prepareReplanning();
-		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
+		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
 			assignmentModule.handlePlan(list[1].get(j));
 		}
 		assignmentModule.finishReplanning();
-		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
+		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
 			score += this.list[1].get(j).getScore().doubleValue(); 
+		}
+		return score;
+	}
+	
+	private double rescheduleNonassigedAgents (){
+		list1Pointer.clear();
+		this.schedulingModule.prepareReplanning();
+		Iterator<String> naa = this.nonassignedAgents.iterator();
+		while (naa.hasNext()) {
+			String st = naa.next();
+			for (int x=0;x<this.list[1].size();x++){
+				if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
+					schedulingModule.handlePlan(list[1].get(x));
+					this.list1Pointer.add(x);
+					break;
+				}
+			}
+		}
+		schedulingModule.finishReplanning();	
+		java.util.Collections.sort(this.list1Pointer);
+		for (int x=list1Pointer.size()-1;x>=0;x--){
+			this.list[0].add(this.list[1].get(list1Pointer.get(x)));
+			//this.list[1].remove(list1Pointer.get(x));
+			this.agents.addAgent((this.list[0].get(this.list[0].size()-1)));
+			
+		}
+		double score=0;
+		if (this.nonassignedAgents.size()>0){
+			this.nonassignedAgents.clear();
+			score = this.calculate();// Do this again, now all agents must be assignable.
+			if (this.nonassignedAgents.size()>0) log.warn("Something went wrong when optimizing the non-assigned agents of the metric detection phase!");
 		}
 		return score;
 	}
