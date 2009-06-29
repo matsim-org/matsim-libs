@@ -369,7 +369,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 			this.curract = this.currplan.createActivity(atts.getValue("type"), coord);
 		} else {
-			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
+			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
 		this.curract.setStartTime(Time.parseTime(atts.getValue("start_time")));
 		this.curract.setDuration(Time.parseTime(atts.getValue("dur")));
