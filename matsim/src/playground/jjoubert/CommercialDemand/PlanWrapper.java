@@ -135,6 +135,11 @@ public class PlanWrapper {
 							 *         the end times of each activity.
 							 */
 							dummyPlan = new PlanImpl(null);
+							if(plan.isSelected()){
+								dummyPlan.setSelected(true);
+							} else{
+								dummyPlan.setSelected(false);
+							}
 							ba.setStartTime(ba.getStartTime() - this.tw);
 							ba.setEndTime(ba.getEndTime() - this.tw);
 							dummyPlan.getPlanElements().add(ba);
