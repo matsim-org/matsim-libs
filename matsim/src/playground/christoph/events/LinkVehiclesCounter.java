@@ -99,7 +99,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	@Override
+	
 	public void handleEvent(BasicLinkEnterEvent event) {
 		// log.info("BasicLinkEnterEvent");
 
@@ -113,7 +113,6 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		countChangedMap.put(id, vehCount);
 	}
 
-	@Override
 	public void handleEvent(BasicLinkLeaveEvent event) {
 		// log.info("BasicLinkLeaveEvent");
 		
@@ -127,7 +126,6 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		countChangedMap.put(id, vehCount);
 	}
 
-	@Override
 	public void handleEvent(BasicAgentArrivalEvent event) {
 		// log.info("BasicAgentArrivalEvent");
 
@@ -148,7 +146,6 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	/*
 	 * Structure of this method: Have a look at QueueSimulation.agentDeparts()...
 	 */
-	@Override
 	public void handleEvent(BasicAgentDepartureEvent event) {
 		// log.info("BasicAgentDepartureEvent");
 
@@ -185,7 +182,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	@Override
+
 	public void handleEvent(BasicAgentWait2LinkEvent event) {
 		// log.info("BasicAgentWait2LinkEvent");
 
@@ -201,7 +198,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		bufferMap.put(id, vehCount);
 	}
 
-	@Override
+	
 	public void handleEvent(BasicAgentStuckEvent event) {
 		// log.info("BasicAgentStuckEvent");
 
@@ -333,18 +330,18 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		return count;
 	}
 
-	@Override
+	
 	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
 //		checkVehicleCount(e);
 		filterChangedLinks();
 	}
 
-	@Override
+	
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
 		createInitialCounts();
 	}
 
-	@Override
+	
 	public void reset(int iteration) {
 		createInitialCounts();
 	}

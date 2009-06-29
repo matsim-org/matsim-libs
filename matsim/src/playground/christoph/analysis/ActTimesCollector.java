@@ -25,9 +25,10 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.core.api.network.Link;
@@ -35,7 +36,6 @@ import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.api.basic.v01.Coord;
 
 public class ActTimesCollector implements BasicActivityStartEventHandler, BasicActivityEndEventHandler {
 
@@ -50,7 +50,6 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 	protected double startTime = 0.0;
 	protected double endTime = Double.MAX_VALUE;
 	
-	@Override
 	public void reset(int iteration) 
 	{
 		data.clear();
@@ -58,7 +57,6 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		population = null;
 	}
 	
-	@Override
 	public void handleEvent(BasicActivityStartEvent event) 
 	{	
 		Id personId = event.getPersonId();
@@ -95,7 +93,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		
 		EventData eventData = data.get(personId);
 				
-		if (event instanceof ActivityStartEvent && ((ActivityStartEvent)event).getAct() != null)
+		if ((event instanceof ActivityStartEvent) && (((ActivityStartEvent)event).getAct() != null))
 		{
 			eventData.addStartActivityEvent(event.getTime(), ((ActivityStartEvent)event).getAct().getCoord());
 		}
@@ -107,14 +105,13 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		}
 		else
 		{
-			if (startTime <= event.getTime() && event.getTime() >= endTime)
+			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
 			{
 				eventData.addStartActivityEvent(event.getTime(), linkId);
 			}
 		}
 	}
 
-	@Override
 	public void handleEvent(BasicActivityEndEvent event)
 	{
 		Id personId = event.getPersonId();
@@ -149,7 +146,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		
 		EventData eventData = data.get(personId);
 		
-		if (event instanceof ActivityEndEvent && ((ActivityEndEvent)event).getAct() != null)
+		if ((event instanceof ActivityEndEvent) && (((ActivityEndEvent)event).getAct() != null))
 		{
 			eventData.addEndActivityEvent(event.getTime(), ((ActivityEndEvent)event).getAct().getCoord());
 		}
@@ -161,7 +158,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		}
 		else
 		{
-			if (startTime <= event.getTime() && event.getTime() >= endTime)
+			if ((startTime <= event.getTime()) && (event.getTime() >= endTime))
 			{
 				eventData.addEndActivityEvent(event.getTime(), linkId);
 			}

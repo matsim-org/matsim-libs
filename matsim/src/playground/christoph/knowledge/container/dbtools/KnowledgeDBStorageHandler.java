@@ -30,6 +30,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 	}
 	
 	
+	
 	@Override
 	public void run()
 	{
@@ -57,7 +58,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 	{
 		running = true;
 		
-		while (personsToProcess.peek() != null && !stopHandler)
+		while ((personsToProcess.peek() != null) && !stopHandler)
 		{
 			Person person = personsToProcess.poll();
 			
@@ -88,7 +89,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		stopHandler = false;
 	}
 
-	@Override
+	
 	public void handleEvent(BasicActivityStartEvent event)
 	{
 		Person person = population.getPersons().get(event.getPersonId());
@@ -100,7 +101,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		}
 	}
 
-	@Override
+	
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 		

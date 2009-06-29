@@ -31,13 +31,13 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		nodes.remove(node.getId());
 	}
 	
-	@Override
+	
 	public boolean knowsNode(Node node)
 	{
 		return nodes.containsKey(node.getId());
 	}
 
-	@Override
+	
 	public boolean knowsLink(Link link)
 	{
 		// if no Map found or the Map is empty -> Person knows the entire network, return true
@@ -48,7 +48,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		else return false;
 	}
 	
-	@Override
+	
 	public Map<Id, Node> getKnownNodes() 
 	{
 		return nodes;

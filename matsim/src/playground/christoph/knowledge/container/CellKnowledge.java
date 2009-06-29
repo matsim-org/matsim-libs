@@ -40,7 +40,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 		System.out.println("Listsize: " + listCount);
 	}
 	
-	@Override
+	
 	public Map<Id, Node> getKnownNodes()
 	{
 		Map<Id, Node> nodes = new HashMap<Id, Node>();
@@ -77,7 +77,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 		whiteList = value;
 	}
 	
-	@Override
+	
 	public boolean knowsNode(Node node)
 	{
 		Cell cell = getKnowledgeCell(node);
@@ -111,7 +111,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 		else return false;
 	}
 	
-	@Override
+	
 	public boolean knowsLink(Link link)
 	{
 		// if no Map found or the Map is empty -> Person knows the entire network, return true

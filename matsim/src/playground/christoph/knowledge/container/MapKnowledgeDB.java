@@ -37,6 +37,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		localKnowledge = true;
 	}
 	
+	
 	@Override
 	public boolean knowsNode(Node node)
 	{
@@ -44,6 +45,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		
 		return super.knowsNode(node);
 	}
+	
 	
 	@Override
 	public boolean knowsLink(Link link)
@@ -53,6 +55,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		return super.knowsLink(link);
 	}
 	
+	
 	@Override
 	public Map<Id, Node> getKnownNodes()
 	{
@@ -61,7 +64,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		return super.getKnownNodes();
 	}
 	
-	@Override
+	
 	public synchronized void readFromDB()
 	{	
 		// If Knowledge is currently not in Memory, get it from the DataBase
@@ -93,7 +96,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		}
 	}
 
-	@Override
+	
 	public synchronized void writeToDB()
 	{		
 		Map<Id, Node> nodes = super.getKnownNodes();
@@ -107,14 +110,14 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		dbConnectionTool.disconnect();
 	}
 
-	@Override
+	
 	public void clearLocalKnowledge()
 	{
 		localKnowledge = false;
 		super.getKnownNodes().clear();
 	}
 	
-	@Override
+	
 	public void clearTable()
 	{
 		if (tableExists()) 
@@ -127,7 +130,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		}
 	}
 	
-	@Override
+	
 	public void createTable()
 	{
 		String createTable = "CREATE TABLE " + tableName + " (PersonId INTEGER, NodeIds LONGTEXT, PRIMARY KEY (PersonId))";
