@@ -185,9 +185,8 @@ public class MyCommercialDemandGenerator3 {
 				majorActivityEnd.setStartTime(endTime);
 				plan.getPlanElements().add(majorActivityEnd);
 
-				//			ArrayList<BasicPlan> planList = chopPlan(plan, pb);
-				PlanWrapper pw = new PlanWrapper(pb, 86400, 0);
-				ArrayList<BasicPlan> planList = pw.wrapPlan(plan);
+				PlanWrapper pw = new PlanWrapper(86400, 0);
+				ArrayList<Plan> planList = pw.wrapPlan(plan);
 
 				for (int p = 0; p < planList.size(); p++) {
 					// Create a truck agent

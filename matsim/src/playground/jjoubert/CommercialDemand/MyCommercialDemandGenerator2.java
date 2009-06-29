@@ -38,6 +38,7 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -180,8 +181,8 @@ public class MyCommercialDemandGenerator2 {
 			plan.getPlanElements().add(majorActivityEnd);
 						
 //			ArrayList<BasicPlan> planList = chopPlan(plan, pb);
-			PlanWrapper pw = new PlanWrapper(pb, 86400, 0);
-			ArrayList<BasicPlan> planList = pw.wrapPlan(plan);
+			PlanWrapper pw = new PlanWrapper(86400, 0);
+			ArrayList<Plan> planList = pw.wrapPlan((Plan)plan);
 
 			for (int p = 0; p < planList.size(); p++) {
 				// Create a truck agent

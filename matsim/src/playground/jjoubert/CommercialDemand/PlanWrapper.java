@@ -22,10 +22,11 @@ package playground.jjoubert.CommercialDemand;
 
 import java.util.ArrayList;
 
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * A class to wrap a plan around a given time window. This is achieved by adding a <i>dummy</i> 
@@ -38,7 +39,6 @@ import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
  *
  */
 public class PlanWrapper {
-	private final BasicPopulationBuilder pb; 	// Population builder 
 	private final int tw;						// Time window
 	private final int squeezeThreshold;			// Threshold 
 	
@@ -56,8 +56,7 @@ public class PlanWrapper {
 	 * TODO I am not quite sure if the <code>populationBuilder</code> is required. Maybe 
 	 * one can rather create a new one locally?
 	 */
-	public PlanWrapper(BasicPopulationBuilder populationBuilder, int timeWindow, int squeezeThreshold){
-		this.pb = populationBuilder;
+	public PlanWrapper(int timeWindow, int squeezeThreshold){
 		this.tw = timeWindow;
 		this.squeezeThreshold = squeezeThreshold;
 	}
@@ -69,25 +68,23 @@ public class PlanWrapper {
 	 * @param plan of type {@code BasicPlan}
 	 * @return an {@code ArrayList} of {@code BasicPlan}s
 	 */
-	@SuppressWarnings("unchecked")
-	
-	public ArrayList<BasicPlan> wrapPlan(BasicPlan plan) {
-		ArrayList<BasicPlan> result = new ArrayList<BasicPlan>();
+	public ArrayList<Plan> wrapPlan(Plan plan) {
+		ArrayList<Plan> result = new ArrayList<Plan>();
 		
 		Object firstActivity = plan.getPlanElements().get(0);
 		// Checks that the first plan element is an activity
-		if ( !(firstActivity instanceof BasicActivity) ){
+		if ( !(firstActivity instanceof Activity) ){
 			System.err.println("The last activity of the chain is not of type BasicActivity!!");
 		}
-		BasicActivity first = (BasicActivity) firstActivity;
+		Activity first = (Activity) firstActivity;
 	
 		Object lastActivity = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 			
 		// Checks that the last plan element is an activity. 
-		if( !(lastActivity instanceof BasicActivity) ){
+		if( !(lastActivity instanceof Activity) ){
 			System.err.println("The last activity of the chain is not of type BasicActivity!!");
 		} else{
-			BasicActivity la = (BasicActivity)lastActivity;
+			Activity la = (Activity) lastActivity;
 			if(la.getStartTime() < this.tw){
 				/*
 				 * The whole plan fits within the time window. Just return the complete plan.
@@ -101,13 +98,13 @@ public class PlanWrapper {
 				/*
 				 * Wrap the plan
 				 */
-				BasicPlan dummyPlan = this.pb.createPlan(null);
+				Plan dummyPlan = new PlanImpl(null);
 				
 				int index = 0;
 				while(index < plan.getPlanElements().size()){
 					Object object = plan.getPlanElements().get(index);
-					if(object instanceof BasicActivity ){
-						BasicActivity ba = (BasicActivity) object;
+					if(object instanceof Activity ){
+						Activity ba = (Activity) object;
 						if(ba.getEndTime() < this.tw){
 							/*
 							 * If the activity ends within the current time window, simply add the
@@ -122,7 +119,7 @@ public class PlanWrapper {
 							 *         forcing the traveling (if required) to occur in the current plan; the 
 							 *         activity type is the same as the first activity of the current plan.
 							 */ 
-							BasicActivity dummyActivity = this.pb.createActivityFromCoord(first.getType(), ba.getCoord());
+							Activity dummyActivity = new ActivityImpl(first.getType(), ba.getCoord());
 							dummyActivity.setStartTime(this.tw);
 							dummyPlan.getPlanElements().add(dummyActivity);
 							result.add(dummyPlan);
@@ -131,21 +128,21 @@ public class PlanWrapper {
 							 * STEP 2: Create a new dummy plan, and add the remaining plan elements to it, adjusting
 							 *         the end times of each activity.
 							 */
-							dummyPlan = this.pb.createPlan(null);
+							dummyPlan = new PlanImpl(null);
 							ba.setStartTime(ba.getStartTime() - this.tw);
 							ba.setEndTime(ba.getEndTime() - this.tw);
 							dummyPlan.getPlanElements().add(ba);
 							index++;
 							while(index < plan.getPlanElements().size()){
 								Object dummyObject = plan.getPlanElements().get(index);
-								if(dummyObject instanceof BasicActivity){
-									BasicActivity ba2 = (BasicActivity) dummyObject;
+								if(dummyObject instanceof Activity){
+									Activity ba2 = (Activity) dummyObject;
 									ba2.setStartTime( (ba2.getStartTime() - this.tw) >= 0 ? ba2.getStartTime() - this.tw : Double.NEGATIVE_INFINITY );
 									ba2.setEndTime((ba2.getEndTime() - this.tw) >= 0 ? ba2.getEndTime() - this.tw : Double.NEGATIVE_INFINITY );
 									dummyPlan.getPlanElements().add(ba2);
 									index++;
-								} else if(dummyObject instanceof BasicLeg){
-									BasicLeg bl2 = (BasicLeg) dummyObject;
+								} else if(dummyObject instanceof Leg){
+									Leg bl2 = (Leg) dummyObject;
 									bl2.setDepartureTime( bl2.getDepartureTime() >= 0 ? bl2.getDepartureTime() : Double.NEGATIVE_INFINITY );
 									dummyPlan.getPlanElements().add(bl2);
 									index++;
@@ -157,14 +154,14 @@ public class PlanWrapper {
 							/* 
 							 * STEP 3: Check the new dummy plan. 
 							 */
-							PlanWrapper pw = new PlanWrapper(this.pb,this.tw,squeezeThreshold);
-							ArrayList<BasicPlan> recursivePlans = pw.wrapPlan(dummyPlan);
-							for (BasicPlan bp : recursivePlans) {
+							PlanWrapper pw = new PlanWrapper(this.tw,squeezeThreshold);
+							ArrayList<Plan> recursivePlans = pw.wrapPlan(dummyPlan);
+							for (Plan bp : recursivePlans) {
 								result.add(bp);
 							}
 						}
-					} else if(object instanceof BasicLeg){
-						BasicLeg bl = (BasicLeg) object;
+					} else if(object instanceof Leg){
+						Leg bl = (Leg) object;
 						dummyPlan.getPlanElements().add(bl);
 						index++;
 					} else{
@@ -177,9 +174,6 @@ public class PlanWrapper {
 		return result;
 	}	
 	
-	public BasicPopulationBuilder getPopulationBuilder() {
-		return this.pb;
-	}
 	
 	public Integer getTimeWindow() {
 		return this.tw;
