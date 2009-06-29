@@ -183,7 +183,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
 		*/
-		
+		/*
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
 		FileOutputStream fileOverview;
 		PrintStream statistics;
@@ -195,7 +195,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 		statistics = new PrintStream (fileOverview);
 		ArrayList<Double> scoreStat = new ArrayList<Double>();
-		
+		*/
 		
 		//////////////////////////////////////////////////////////////////////
 		// Start calculation
@@ -252,7 +252,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		// TODO muss dann wieder raus! Nur fuer Planomat!
 		plan.setScore(scorer.getScore(plan));
 		double bestScore = plan.getScore().doubleValue();
-		scoreStat.add(bestScore);
+	//	scoreStat.add(bestScore);
 		
 		
 		/* Do Tabu Search iterations*/
@@ -355,7 +355,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//		ys[currentIteration]=bestIterSolution.getScore();
 	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());	
 			if (bestIterSolution.getScore().doubleValue()>bestScore) bestScore=bestIterSolution.getScore().doubleValue();
-			if (currentIteration%5==0) scoreStat.add(bestScore);
+	//		if (currentIteration%5==0) scoreStat.add(bestScore);
 			
 			if (this.MAX_ITERATIONS==currentIteration){
 			//	log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
@@ -388,7 +388,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		if (!this.finalOpt.equals("none")){
 			this.finalTimer.run(tabuList.get(tabuList.size()-1));
 			tabuList.get(tabuList.size()-1).setScore(this.scorer.getScore(tabuList.get(tabuList.size()-1)));
-			scoreStat.add(tabuList.get(tabuList.size()-1).getScore());
+	//		scoreStat.add(tabuList.get(tabuList.size()-1).getScore());
 	/*		stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
 			for (int i= 0;i<tabuList.get(tabuList.size()-1).getPlanElements().size();i=i+2){
 				Activity act = (Activity)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
@@ -436,7 +436,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		stream.close();
 		*/
 		
-		statistics.print(plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
+	/*	statistics.print(plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
 		for (int i=0;i<scoreStat.size();i++){
 			statistics.print(scoreStat.get(i)+"\t");
 		}
@@ -448,7 +448,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			else statistics.print((((Leg)(al.get(i))).getTravelTime()/60)+"\t");
 		}
 		statistics.println();
-		statistics.close();
+		statistics.close();*/
 	}
    
 				
