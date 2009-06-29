@@ -32,10 +32,7 @@ import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.core.api.population.Activity;
@@ -355,9 +352,12 @@ public class MyCommercialDemandGenerator3 {
 	 * used to generate a synthetic sample of commercial vehicle agents.
 	 * 
 	 * The characteristics extracted are:
-	 * 	- Activity chain start time (00h00m00 : 01h00m00 : 23h00m00)
-	 * 	- Number of activities per chain (1 : 1 : 20)
-	 * 	- Chain duration (01h00m00 : 01h00m00 : 48h00m00)
+	 * 	<ul>
+	 * 	<li> Activity chain start time (00h00m00 : 01h00m00 : 23h00m00)
+	 * 	<li> Number of activities per chain (1 : 1 : 20)
+	 * 	<li> Chain duration (01h00m00 : 01h00m00 : 48h00m00)
+	 * 	</ul>
+	 * 
 	 * @param args
 	 */
 	private static ArrayList<ArrayList<ArrayList<Integer>>> extractChainProperties() {
