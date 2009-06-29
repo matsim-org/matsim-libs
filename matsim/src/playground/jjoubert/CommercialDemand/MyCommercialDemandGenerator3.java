@@ -28,16 +28,16 @@ import java.util.GregorianCalendar;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.api.Scenario;
+import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Activity;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.population.Population;
+import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -112,9 +112,9 @@ public class MyCommercialDemandGenerator3 {
 				
 		for(int sampleNumber = 1; sampleNumber <= numberOfSamples; sampleNumber++){
 			// Initiate the population builder
-			BasicScenario sc = new BasicScenarioImpl();		
-			BasicPopulation population = sc.getPopulation();
-			BasicPopulationBuilder pb = population.getPopulationBuilder();
+			Scenario sc = new ScenarioImpl();
+			Population population = sc.getPopulation();
+			PopulationBuilder pb = population.getPopulationBuilder();
 
 			//TODO Check if it is 'better' to create 'i' truck agents, and split them into dummy agents
 			// if the duration is greater than 24 hours - thus probably ending with more than 'i' agents;
@@ -125,7 +125,6 @@ public class MyCommercialDemandGenerator3 {
 			int agentId  = firstIndex;
 			for(int i = 0; i < populationSize; i++ ){
 				Plan plan = new PlanImpl(null);
-				plan.setSelected(true);
 
 				// Sample start time
 				int startTimeBin = (int) cdfStartTime.sampleFromCDF();
@@ -186,17 +185,18 @@ public class MyCommercialDemandGenerator3 {
 				PlanWrapper pw = new PlanWrapper(86400, 0);
 				ArrayList<Plan> planList = pw.wrapPlan(plan);
 
-				for (int p = 0; p < planList.size(); p++) {
+				for (Plan pp : planList) {
 					// Create a truck agent
 					Id id = sc.createId(Long.toString(agentId));
-					BasicPerson truck = pb.createPerson(id);
-					truck.getPlans().add(planList.get(p));
-					population.getPersons().put(id, truck);
+					Person truck = pb.createPerson(id);
+					truck.addPlan(pp);
+					pp.setPerson(truck);
 					agentId++;
 					//TODO This is where I may want to include a ++populationComplete command if I only want a total of
 					// populationSize commercial vehicle agents.
+//					pp.setSelected(true);
 				}
-
+				
 				// Report progress
 				if(++populationComplete == populationLimit){
 					System.out.printf("   ... Agents built: %6d\n", populationComplete);
