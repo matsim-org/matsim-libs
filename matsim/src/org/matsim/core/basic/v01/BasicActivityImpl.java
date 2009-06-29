@@ -28,7 +28,10 @@ import org.matsim.core.utils.misc.Time;
 public class BasicActivityImpl implements BasicActivity {
 
 	private double endTime = Time.UNDEFINED_TIME;
+	
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	private double startTime = Time.UNDEFINED_TIME;
+	
 	private String type;
 	private Coord coord = null;
 	private Id linkId;
@@ -63,10 +66,12 @@ public class BasicActivityImpl implements BasicActivity {
 		this.coord = coord;
 	}
 
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	public final double getStartTime() {
 		return this.startTime;
 	}
 
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	public final void setStartTime(final double startTime) {
 		this.startTime = startTime;
 	}

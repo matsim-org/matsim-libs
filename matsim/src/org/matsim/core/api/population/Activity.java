@@ -7,11 +7,8 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 public interface Activity extends BasicActivity, PlanElement, BasicLocation {
 
 	public void setCoord(final Coord coord);
-	// FIXME kn not clear where this belongs.  Technically, the coordinate belongs to 
-	// the facility, not the activity.  Options to solve this:
-	// - one can _either_ set the coord _or_ the facility
-	// - once the facility is set, setCoord is ignored with a warning, and getCoord returns 
-	//   the coord of the facility
+	// FIXME kn I think this should go into the BasicActivity and be solved along the lines
+	// suggested in an email.  kai, jun09
 
 
 	

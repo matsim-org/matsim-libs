@@ -45,9 +45,10 @@ public interface BasicActivity extends BasicPlanElement {
 
 	public Coord getCoord();
 
-
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	public double getStartTime();
 
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
 	public void setStartTime(double seconds);
 
 	public Id getLinkId();

@@ -58,6 +58,7 @@ public class BasicScenarioImpl implements BasicScenario {
 		
 		//never use the next line in new matsim code
 		Gbl.getWorld().setNetworkLayer((NetworkLayer)this.network);
+
 		this.population = new PopulationImpl();
 	}
 
