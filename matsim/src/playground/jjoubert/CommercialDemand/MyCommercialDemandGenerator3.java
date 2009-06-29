@@ -38,7 +38,13 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.demandmodeling.primloc.CumulativeDistribution;
@@ -121,20 +127,19 @@ public class MyCommercialDemandGenerator3 {
 			int populationLimit = 1;
 			int agentId  = firstIndex;
 			for(int i = 0; i < populationSize; i++ ){
+				Plan plan = new PlanImpl(null);
+
 				// Sample start time
 				int startTimeBin = (int) cdfStartTime.sampleFromCDF();
 				int startTime = startTimeBin * 3600; // Convert hours to minutes
 
-				BasicPlan plan = pb.createPlan(null);
-
 				// Sample major location and add as first activity
 				Point major = majorPoints.get(MatsimRandom.getRandom().nextInt(majorPoints.size()));
-				BasicActivity majorActivityStart = pb.createActivityFromCoord("major", 
-						sc.createCoord(major.getCoordinate().x, major.getCoordinate().y));
+				Activity majorActivityStart = new ActivityImpl("major", sc.createCoord(major.getCoordinate().x, major.getCoordinate().y));
 				majorActivityStart.setEndTime(startTime);
 				plan.getPlanElements().add(majorActivityStart);
 
-				BasicLeg leg = pb.createLeg(TransportMode.car);
+				Leg leg = new LegImpl(TransportMode.car);
 				plan.addLeg(leg);
 
 				// Sample number of activities, given start time
@@ -167,8 +172,8 @@ public class MyCommercialDemandGenerator3 {
 				for(int activity = 0; activity < activitiesPerChain; activity++){
 					// Sample minor point
 					Point minor = minorPoints.get(MatsimRandom.getRandom().nextInt(minorPoints.size()));
-					BasicActivity minorActivity = pb.createActivityFromCoord("minor", 
-							sc.createCoord(minor.getCoordinate().x, minor.getCoordinate().y));
+					
+					Activity minorActivity = new ActivityImpl("minor", sc.createCoord(minor.getCoordinate().x, minor.getCoordinate().y));
 					minorActivity.setEndTime(activityEndTime);
 
 					plan.getPlanElements().add(minorActivity);	
@@ -176,7 +181,7 @@ public class MyCommercialDemandGenerator3 {
 
 					plan.addLeg(leg);				
 				}
-				BasicActivity majorActivityEnd = pb.createActivityFromCoord("major", majorActivityStart.getCoord());
+				Activity majorActivityEnd = new ActivityImpl("major", majorActivityStart.getCoord());
 				majorActivityEnd.setStartTime(endTime);
 				plan.getPlanElements().add(majorActivityEnd);
 
