@@ -98,15 +98,15 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 //		Pick a type of facility to replace in this plan according to config settings
 		double rand = MatsimRandom.getRandom().nextDouble();
 
-		if (rand < cum_p_factype[0]) {
+		if (rand < cum_p_factype[0] && cum_p_factype[0]!=0 ) {
 			factype = factypes[0];
-		}else if ((cum_p_factype[0] <= rand) && (rand < cum_p_factype[1])) {
+		}else if (cum_p_factype[0] <= rand && rand < cum_p_factype[1] && (cum_p_factype[1]!=cum_p_factype[0])) {
 			factype = factypes[1];
-		}else if ((cum_p_factype[1] <= rand) && (rand < cum_p_factype[2])) {
+		}else if (cum_p_factype[1] <= rand && rand < cum_p_factype[2] && (cum_p_factype[2]!=cum_p_factype[1])) {
 			factype = factypes[2];
-		}else if ((cum_p_factype[2] <= rand) && (rand < cum_p_factype[3])) {
+		}else if (cum_p_factype[2] <= rand && rand < cum_p_factype[3] && (cum_p_factype[3]!=cum_p_factype[2])) {
 			factype = factypes[3];
-		}else {
+		}else if (cum_p_factype[3] <= rand && rand < cum_p_factype[4] && (cum_p_factype[4]!=cum_p_factype[3])) {
 			factype = factypes[4];
 		}
 
