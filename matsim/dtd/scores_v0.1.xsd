@@ -3,7 +3,7 @@
            xmlns="http://www.matsim.org/files/dtd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xml:lang="en">
+           xml:lang="en"> 
            
 <!-- Editor: Florian Ostermann, Dominik Grether, VSP, Berlin Institute of Technology -->
 <!-- Scores of
@@ -26,3 +26,5 @@ the simulation -->
       <xs:element name="averageBest" type="xs:double" minOccurs="1" maxOccurs="1" />
   </xs:sequence>
 </xs:complexType>           
+
+</xs:schema>
