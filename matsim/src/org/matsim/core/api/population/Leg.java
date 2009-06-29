@@ -26,10 +26,10 @@ public interface Leg extends BasicLeg, PlanElement {
 
 	public Route getRoute();
 
-	public String toString();
-
 	public double getArrivalTime();
-
+	// TODO kn mv from interface to implementation
+	
 	public void setArrivalTime(final double seconds);
+	// TODO kn mv from interface to implementation
 
 }
