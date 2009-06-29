@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.api.basic.v01;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,16 +30,19 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -79,6 +83,8 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 	public void testDemandGeneration(){
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
+		
+		this.createFakeNetwork(sc, (Network)sc.getNetwork());
 		
 		BasicPopulation pop = sc.getPopulation();
 		BasicPopulationBuilder builder = pop.getPopulationBuilder();
@@ -151,11 +157,10 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		}
 		
 		//write created population
-		//TODO dg
-//		PopulationWriter writer = new PopulationWriter(pop, this.getOutputDirectory() + populationFile);
-//		writer.write();
-//		File outfile = new File(this.getOutputDirectory() + populationFile);
-//		assertTrue(outfile.exists());
+		BasicPopulationWriter writer = new BasicPopulationWriter(pop);
+		writer.write(this.getOutputDirectory() + populationFile);
+		File outfile = new File(this.getOutputDirectory() + populationFile);
+		assertTrue(outfile.exists());
 		
 		
 		//read population again, now the code gets really ugly, dirty and worth to refactor...
@@ -163,6 +168,14 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		Population population  = scenario.getPopulation();
 		NetworkLayer network = (NetworkLayer)scenario.getNetwork();
 		//this is really ugly...
+		this.createFakeNetwork(scenario, network);
+
+		MatsimPopulationReader reader = new  MatsimPopulationReader(population, network);
+		reader.readFile(outfile.getAbsolutePath());
+		checkContent(population);
+	}
+	
+	private void createFakeNetwork(BasicScenario scenario, Network network){
 		Node n1 = network.getFactory().createNode(ids.get(0), scenario.createCoord(0.0, 0.0), null);
 		network.getNodes().put(n1.getId(), n1);
 		Node n2 = network.getFactory().createNode(ids.get(1), scenario.createCoord(0.0, 0.0), null);
@@ -171,10 +184,6 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			Link l = network.getFactory().createLink(id, n1, n2, network, 23.0, 23.0, 23.0, 1.0);
 			network.getLinks().put(l.getId(), l);
 		}
-		//TODO dg
-//		MatsimPopulationReader reader = new  MatsimPopulationReader(population, network);
-//		reader.readFile(outfile.getAbsolutePath());
-//		checkContent(population);
 	}
 	
 	private void checkContent(Population population) {
