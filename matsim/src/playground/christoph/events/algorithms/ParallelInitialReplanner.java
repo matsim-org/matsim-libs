@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -47,7 +46,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	 * @param population
 	 * @param time
 	 */	
-	public static void run(ArrayList<Person> persons, Knowledges knowledges, double time)
+	public static void run(ArrayList<Person> persons, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -55,7 +54,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) 
 		{
-			ReplannerThread replannerThread = new ReplannerThread(knowledges, i, replannerArray, replanners, time);
+			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners, time);
 			replannerThread.setRemoveKnowledge(removeKnowledge);
 			replannerThreads[i] = replannerThread;
 			
@@ -91,7 +90,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	}
 	
 	
-	public static void run(Population population, Knowledges knowledges, double time)
+	public static void run(Population population, double time)
 	{
 		ArrayList<Person> persons = new ArrayList<Person>();
 		
@@ -100,7 +99,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 			persons.add(person);
 		}
 		
-		run(persons, knowledges, time);
+		run(persons, time);
 	}
 	
 	public static void setRemoveKnowledge(boolean value)
@@ -120,15 +119,13 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
 		private final List<Person> persons = new LinkedList<Person>();
-		private Knowledges knowledges;
 
-		public ReplannerThread(Knowledges kn, final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
+		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
 		{
 			this.threadId = i;
 			this.replannerArray = replannerArray;
 			this.replanners = replanners;
 			this.time = time;
-			this.knowledges = kn;
 		}
 
 		public void setRemoveKnowledge(boolean value)
@@ -171,7 +168,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 				// If flag is set, remove Knowledge after doing the replanning.
 				if (removeKnowledge)
 				{
-					KnowledgeTools.removeKnowledge(this.knowledges, person);
+					KnowledgeTools.removeKnowledge(person);
 				}
 				
 				numRuns++;

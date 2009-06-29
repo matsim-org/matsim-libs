@@ -20,37 +20,45 @@
 
 package playground.christoph.events;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.analysis.ActTimesCollector;
+import playground.christoph.analysis.Wardrop;
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.KMLPersonWriter;
+import playground.christoph.knowledge.container.MapKnowledgeDB;
+import playground.christoph.knowledge.container.NodeKnowledge;
+import playground.christoph.knowledge.nodeselection.CreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
-import playground.christoph.mobsim.MyQueueNetwork;
+import playground.christoph.mobsim.MyQueueSimEngine;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
@@ -58,8 +66,11 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
+import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
+import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 
 /**
@@ -94,9 +105,26 @@ public class EventControler extends Controler{
 	protected ArrayList<PlanAlgorithm> replanners;
 	protected ArrayList<SelectNodes> nodeSelectors;
 	
+	protected ActTimesCollector actTimesCollector;
+	protected boolean calcWardrop = false;
+	
+	// for Batch Runs
+	public double pNoReplanning = 1.0;
+	public double pInitialReplanning = 0.0;
+	public double pActEndReplanning = 0.0;
+	public double pLeaveLinkReplanning = 0.0;
+	
+	protected int noReplanningCounter = 0;
+	protected int initialReplanningCounter = 0;
+	protected int actEndReplanningCounter = 0;
+	protected int leaveLinkReplanningCounter = 0;
+	
+	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
+	
+	protected LinkVehiclesCounter linkVehiclesCounter;
+	
 	private static final Logger log = Logger.getLogger(EventControler.class);
 	
-
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
 	 *
@@ -107,17 +135,33 @@ public class EventControler extends Controler{
 	public EventControler(String[] args)
 	{
 		super(args);
+		
+		// Use a Scoring Function, that only scores the travel times!
+		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 
-		/*
-		 * Implement EndActReplanning
-		 * If the current Activity of a Persons ends, the route to the next Activity.
-		 * At the moment replanning when a link is left can't be handled via events -
-		 * there is no event that could be used for that purpose (NO, a LinkLeaveEvent
-		 * can NOT be used). Due to this fact replanning when leaving a links is
-		 * implemented in the MyQueueNode Class.
-		 */
-//		events.addHandler(new ActEndReplanner());
+		knowledgeTravelTime = new KnowledgeTravelTimeCalculator();
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(knowledgeTravelTime);
+//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+
+		this.setTravelCostCalculator(travelCost);
 	}
+	
+	
+	// only for Batch Runs
+	public EventControler(Config config)
+	{
+		super(config);
+		
+		// Use a Scoring Function, that only scores the travel times!
+		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
+
+		knowledgeTravelTime = new KnowledgeTravelTimeCalculator();
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(knowledgeTravelTime);
+//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+
+		this.setTravelCostCalculator(travelCost);
+	}
+	
 	
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's. 
@@ -126,41 +170,60 @@ public class EventControler extends Controler{
 	protected void initReplanningRouter()
 	{
 		replanners = new ArrayList<PlanAlgorithm>();
-		Knowledges knowledges = ((ScenarioImpl)this.getScenarioData()).getKnowledges();
-		
-		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
-		TravelTimeDistanceCostCalculator travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator);
+
+		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getMyQueueNetwork());
+		TravelTimeDistanceCostCalculator travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator, new CharyparNagelScoringConfigGroup());
 	
 		// Dijkstra
-		//replanners.add(new PlansCalcRouteDijkstra(network, travelCostCalculator, travelTimeCalculator));
+		//replanners.add(new PlansCalcRouteConfigGroup(), new PlansCalcRouteDijkstra(network, travelCostCalculator, travelTimeCalculator));
 
 		//AStarLandmarks
-		PreProcessLandmarks landmarks = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		landmarks.run(network);
-		replanners.add(new PlansCalcRoute(network, travelCostCalculator, travelTimeCalculator, new AStarLandmarksFactory(landmarks)));
+		//PreProcessLandmarks landmarks = new PreProcessLandmarks(new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()));
+		//landmarks.run(network);
+		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, new FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()));
+		replanners.add(new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCostCalculator, travelTimeCalculator, factory));
 		
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
-		replanners.add(new KnowledgePlansCalcRoute(network, new RandomRoute(knowledges), new RandomRoute(knowledges)));
-		replanners.add(new KnowledgePlansCalcRoute(network, new TabuRoute(knowledges), new TabuRoute(knowledges)));
-		replanners.add(new KnowledgePlansCalcRoute(network, new CompassRoute(knowledges), new CompassRoute(knowledges)));
-		replanners.add(new KnowledgePlansCalcRoute(network, new RandomCompassRoute(knowledges), new RandomCompassRoute(knowledges)));
+		KnowledgePlansCalcRoute randomRouter = new KnowledgePlansCalcRoute(network, new RandomRoute(), new RandomRoute());
+		randomRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		replanners.add(randomRouter);
+
+		
+		KnowledgePlansCalcRoute tabuRouter = new KnowledgePlansCalcRoute(network, new TabuRoute(), new TabuRoute());
+		tabuRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		replanners.add(tabuRouter);
+		
+		KnowledgePlansCalcRoute compassRouter = new KnowledgePlansCalcRoute(network, new CompassRoute(), new CompassRoute());
+		compassRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		replanners.add(compassRouter);
+		
+		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(network, new RandomCompassRoute(), new RandomCompassRoute());
+		randomCompassRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		replanners.add(randomCompassRouter);
+		
 		
 		// Dijkstra for Replanning
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
-		//KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
+		KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
 		
 		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
-		TravelTimeDistanceCostCalculator travelCost = new TravelTimeDistanceCostCalculator(travelTime);
-		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(knowledges, travelCost);
+//		TravelTimeDistanceCostCalculator travelCost = new TravelTimeDistanceCostCalculator(travelTime);
+//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
+		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
+		//OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+		
 		// Use the Wrapper with the same CostCalculator as the MobSim uses
 		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
 		
-		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
+//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
+//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
+		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
+		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
+		dijkstraRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
 		replanners.add(dijkstraRouter);
 		
 	}
@@ -200,22 +263,33 @@ public class EventControler extends Controler{
 		nodeSelectors.add(new SelectNodesCircular(this.network));
 		
 		SelectNodesDijkstra selectNodesDijkstra = new SelectNodesDijkstra(this.network);
-		selectNodesDijkstra.setCostFactor(1.05);
+		selectNodesDijkstra.setCostCalculator(new OnlyTimeDependentTravelCostCalculator(null));
+		selectNodesDijkstra.setCostFactor(5.00);
 		nodeSelectors.add(selectNodesDijkstra);
 	}
 
 	@Override
 	protected void runMobSim() 
-	{			
+	{		
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 		
 		sim.setControler(this);
 		
-		// CostCalculator entsprechend setzen!
-//		setCostCalculator();
+		linkVehiclesCounter = new LinkVehiclesCounter();
+		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());
+		this.events.addHandler(linkVehiclesCounter);
+		sim.getMyQueueNetwork().setLinkVehiclesCounter(linkVehiclesCounter);
+		
+		List<QueueSimulationListener> queueSimulationListeners = new ArrayList<QueueSimulationListener>();
+		queueSimulationListeners.add(linkVehiclesCounter);
+		sim.addQueueSimulationListeners(queueSimulationListeners);
 
-//		log.info("Remove not selected Plans");
-//		clearPlans();
+		
+		// set QueueNetwork in the Traveltime Calculator
+		if (knowledgeTravelTime != null) knowledgeTravelTime.setMyQueueNetwork(sim.getMyQueueNetwork());
+
+		log.info("Remove not selected Plans");
+		clearPlans();
 		
 		log.info("Read known Nodes Maps from a File");
 		readKnownNodesMap();
@@ -238,11 +312,17 @@ public class EventControler extends Controler{
 		log.info("Set Node Selectors");
 		setNodeSelectors();
 		
-//		log.info("Create known Nodes Maps");
-//		createKnownNodes();
+		log.info("Initialize Knowledge Data Handler");
+		initKnowledgeStorageHandler();
+		
+		log.info("Set Knowledge Data Handler");
+		setKnowledgeStorageHandler();
+		
+		log.info("Create known Nodes Maps");
+		createKnownNodes();
 
-//		log.info("Write known Nodes Maps to a File");
-//		writeKownNodesMap();
+		log.info("Write known Nodes Maps to a File");
+		writeKownNodesMap();
 		
 		/* 
 		 * Could be done before or after the creation of the activity rooms -
@@ -255,8 +335,8 @@ public class EventControler extends Controler{
 		 * The existing plans could for example be the results of a relaxed solution of
 		 * a standard MATSim simulation.
 		 */
-//		log.info("do initial Replanning");
-//		doInitialReplanning();
+		log.info("do initial Replanning");
+		doInitialReplanning();
 		
 		sim.run();
 	}
@@ -273,6 +353,75 @@ public class EventControler extends Controler{
 	 */
 	protected void setReplanningFlags()
 	{
+		noReplanningCounter = 0;
+		initialReplanningCounter = 0;
+		actEndReplanningCounter = 0;
+		leaveLinkReplanningCounter = 0;
+		
+		for(Person person : this.getPopulation().getPersons().values())
+		{
+			// get Person's Custom Attributes
+			Map<String,Object> customAttributes = person.getCustomAttributes();
+			
+			double probability = MatsimRandom.getRandom().nextDouble();
+			
+			// No Replanning
+			if (probability <= pNoReplanning)
+			{
+				noReplanningCounter++;
+				customAttributes.put("initialReplanning", new Boolean(false));
+				customAttributes.put("leaveLinkReplanning", new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(false));	
+			}
+
+			// Initial Replanning
+			else if (probability > pNoReplanning && probability <= pNoReplanning + pInitialReplanning)
+			{
+				initialReplanningCounter++;
+				customAttributes.put("initialReplanning", new Boolean(true));
+				customAttributes.put("leaveLinkReplanning", new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(false));	
+			}
+			
+			// Act End Replanning
+			else if (probability > pNoReplanning + pInitialReplanning 
+				  && probability <= pNoReplanning + pInitialReplanning + pActEndReplanning)
+			{
+				actEndReplanningCounter++;
+				customAttributes.put("initialReplanning", new Boolean(false));
+				customAttributes.put("leaveLinkReplanning", new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(true));	
+			}			
+			
+			// Leave Link Replanning
+			else
+			{
+				leaveLinkReplanningCounter++;
+				customAttributes.put("initialReplanning", new Boolean(false));
+				customAttributes.put("leaveLinkReplanning", new Boolean(true));
+				customAttributes.put("endActivityReplanning", new Boolean(false));	
+			}
+			
+			// (de)activate replanning
+			if (actEndReplanningCounter == 0) MyQueueSimEngine.doActEndReplanning(false);
+			else MyQueueSimEngine.doActEndReplanning(true);
+			
+			if (leaveLinkReplanningCounter == 0) MyQueueSimEngine.doLeaveLinkReplanning(false);
+			else MyQueueSimEngine.doLeaveLinkReplanning(true);
+			
+		}
+
+		log.info("No Replanning Probability: " + pNoReplanning);
+		log.info("Initial Replanning Probability: " + pInitialReplanning);
+		log.info("Act End Replanning Probability: " + pActEndReplanning);
+		log.info("Leave Link Replanning Probability: " + pLeaveLinkReplanning);
+		
+		double numPersons = this.population.getPersons().size();
+		log.info(noReplanningCounter + " persons don't replan their Plans (" + noReplanningCounter / numPersons * 100.0 + "%)");
+		log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
+		log.info(actEndReplanningCounter + " persons replan their plans after an activity (" + actEndReplanningCounter / numPersons * 100.0 + "%)");
+		log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
+/*		
 		int counter = 0;
 		
 		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
@@ -280,17 +429,20 @@ public class EventControler extends Controler{
 		{		
 			Person p = PersonIterator.next();
 			
+			// count persons - is decreased again, if a person is replanning
+			noReplanningCounter++;
+			
 			counter++;
 			if(counter < 1000000)
 			{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
 				customAttributes.put("initialReplanning", new Boolean(true));
-				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes.put("endActivityReplanning", new Boolean(false));
+				customAttributes.put("leaveLinkReplanning", new Boolean(true));
+				customAttributes.put("endActivityReplanning", new Boolean(true));
 				
 				// (de)activate replanning
-				MyQueueNetwork.doLeaveLinkReplanning(false);
-				MyQueueNetwork.doActEndReplanning(false);
+				MyQueueNetwork.doLeaveLinkReplanning(true);
+				MyQueueNetwork.doActEndReplanning(true);
 			}
 			else
 			{
@@ -304,6 +456,7 @@ public class EventControler extends Controler{
 				MyQueueNetwork.doActEndReplanning(false);
 			}
 		}
+*/
 	}
 
 	/*
@@ -344,22 +497,36 @@ public class EventControler extends Controler{
 	 * always returns true).
 	 */
 	protected void setNodeSelectors()
-	{
-//		int counter = 0;
-		
+	{		
+		// Create NodeSelectorContainer
 		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
-		{			
+		{	
 			Person p = PersonIterator.next();
 		
 			Map<String,Object> customAttributes = p.getCustomAttributes();
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
 			
-//			personNodeSelectors.add(nodeSelectors.get(1));	// Circular NodeSelector
+			customAttributes.put("NodeSelectors", personNodeSelectors);
+		}
+		
+		// Assign NodeSelectors
+		int counter = 0;
+		PersonIterator = this.getPopulation().getPersons().values().iterator();
+		while (PersonIterator.hasNext())
+		{	
+			counter++;
+			Person p = PersonIterator.next();
+			
+			Map<String,Object> customAttributes = p.getCustomAttributes();
+			
+			ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)customAttributes.get("NodeSelectors");
+		
+	//		personNodeSelectors.add(nodeSelectors.get(1));	// Circular NodeSelector
 			personNodeSelectors.add(nodeSelectors.get(1));	// Dijkstra NodeSelector
 			
-			customAttributes.put("NodeSelectors", personNodeSelectors);
+			if (counter >= 1000) break;
 		}
 	}
 	
@@ -398,7 +565,7 @@ public class EventControler extends Controler{
 			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
 			
 			// write single File
-			new SelectionWriter(this.population, (((ScenarioImpl)this.getScenarioData()).getKnowledges()), outPutFile, dtdFile, "1.0", "dummy").write();
+			new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write();
 			
 			// write multiple Files automatically
 			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(10000);
@@ -409,6 +576,29 @@ public class EventControler extends Controler{
 			log.info("Path: " + outPutFile);
 		}
 	}
+		
+	protected void initKnowledgeStorageHandler()
+	{
+		MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
+		mapKnowledgeDB.createTable();
+		mapKnowledgeDB.clearTable();
+	}
+		
+	protected void setKnowledgeStorageHandler()
+	{
+		for(Person person : this.getPopulation().getPersons().values())
+		{
+			Map<String, Object> customAttributes = person.getCustomAttributes();
+/*			
+			CellNetworkMapping cellNetworkMapping = new CellNetworkMapping(network);
+			cellNetworkMapping.createMapping();
+			
+			NodeKnowledge nodeKnowledge = new CellKnowledge(cellNetworkMapping);
+*/			
+			customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());
+		}
+	}
+	
 	
 	/*
 	 * Creates the Maps of Nodes that each Agents "knows".
@@ -416,12 +606,12 @@ public class EventControler extends Controler{
 	protected void createKnownNodes()
 	{
 		// create Known Nodes Maps on multiple Threads
-		ParallelCreateKnownNodesMap.run(this.population, (((ScenarioImpl)this.getScenarioData()).getKnowledges()), nodeSelectors, 2);
+		ParallelCreateKnownNodesMap.run(this.population, this.network, nodeSelectors, 2);
 		
 //		writePersonKML(this.population.getPerson("100139"));
 		
 		// non multi-core calculation
-//		CreateKnownNodesMap.collectAllSelectedNodes(this.population);
+//		CreateKnownNodesMap.collectAllSelectedNodes(this.population, this.network);
 
 	}	// setNodes()
 
@@ -444,7 +634,7 @@ public class EventControler extends Controler{
 		// Remove Knowledge after replanning to save memory.
 		ParallelInitialReplanner.setRemoveKnowledge(true);
 		// Run Replanner.
-		ParallelInitialReplanner.run(personsToReplan, (((ScenarioImpl)this.getScenarioData()).getKnowledges()), time);
+		ParallelInitialReplanner.run(personsToReplan, time);
 
 		// Number of Routes that could not be created...
 		log.info(RandomRoute.getErrorCounter() + " Routes could not be created by RandomRoute.");
@@ -494,6 +684,58 @@ public class EventControler extends Controler{
 		test.setOutputDirectory(outputDirectory);
 		
 		test.writeFile();
+	}
+
+	@Override
+	protected void setUp()
+	{
+		super.setUp();
+	
+		if (calcWardrop)
+		{
+			actTimesCollector = new ActTimesCollector();
+			
+			actTimesCollector.setNetwork(this.network);
+			actTimesCollector.setPopulation(this.population);
+			
+	//		actTimesCollector.setStartTime(startTime);
+	//		actTimesCollector.setEndTime(endTime);
+	
+			events.addHandler(actTimesCollector);
+		}
+		
+	}
+	
+	@Override
+	protected void shutdown(final boolean unexpected)
+	{
+		if (calcWardrop)
+		{
+			log.info("");
+			Wardrop wardrop = new Wardrop(network, population);
+			
+			//wardrop.setActTimesCollector(this.actTimesCollector);
+/*			
+			// with length Correction
+			wardrop.setUseLengthCorrection(true);
+			wardrop.fillMatrixViaActTimesCollectorObject(this.actTimesCollector);		
+			wardrop.getResults();
+			log.info("");
+*/	
+			// without length Correction
+			wardrop.setUseLengthCorrection(false);
+			wardrop.fillMatrixViaActTimesCollectorObject(this.actTimesCollector);		
+			wardrop.getResults();
+			log.info("");
+		}
+		
+		super.shutdown(unexpected);
+	}
+	
+
+	public void setConfig(Config config)
+	{
+		this.config.config();
 	}
 	
 	/* ===================================================================

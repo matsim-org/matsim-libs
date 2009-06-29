@@ -24,11 +24,11 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 import playground.christoph.router.util.KnowledgeTravelTime;
@@ -99,7 +99,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		}
 
 	}
-	
+		
 	public static int getErrorCounter()
 	{
 		return errorCounter;
@@ -110,22 +110,32 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		errorCounter = i;
 	}
 	
+	public TravelCost getTravelCostCalculator()
+	{
+		return costFunction;
+	}
+	
+	public TravelTime getTravelTimeCalculator()
+	{
+		return timeFunction;
+	}
+	
 	/*
 	 * We have to hand over the queueNetwork to the Cost- and TimeCalculators of the Router.
 	 */
 	@Override
-	public void setQueueNetwork(QueueNetwork queueNetwork)
+	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
 	{
-		this.queueNetwork = queueNetwork;
+		this.myQueueNetwork = myQueueNetwork;
 		
 		if(costFunction instanceof KnowledgeTravelCost)
 		{
-			((KnowledgeTravelCost)costFunction).setQueueNetwork(queueNetwork);
+			((KnowledgeTravelCost)costFunction).setMyQueueNetwork(myQueueNetwork);
 		}
 		
 		if(timeFunction instanceof KnowledgeTravelTime)
 		{
-			((KnowledgeTravelTime)timeFunction).setQueueNetwork(queueNetwork);
+			((KnowledgeTravelTime)timeFunction).setMyQueueNetwork(myQueueNetwork);
 		}
 	}
 	
@@ -140,7 +150,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	{
 		TravelCost costFunctionClone;
 		TravelTime timeFunctionClone;
-		Network networkClone = this.queueNetwork.getNetworkLayer();
+		Network networkClone = this.myQueueNetwork.getNetworkLayer();
 		
 		if(this.costFunction instanceof KnowledgeTravelCost)
 		{
@@ -164,7 +174,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		
 		Dijkstra dijkstraClone = new Dijkstra(networkClone, costFunctionClone, timeFunctionClone);
 		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, costFunctionClone, timeFunctionClone);
-		clone.setQueueNetwork(this.queueNetwork);
+		clone.setMyQueueNetwork(this.myQueueNetwork);
 		//clone.queueNetwork = this.queueNetwork;
 		
 		// TODO: how to handle an A*-Algorithm???

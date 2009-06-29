@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonLeastCostPathCalculator.java
+ * ReadEvents.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,70 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.router.util;
+package playground.christoph.analysis;
 
-import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsReaderTXTv1;
 
-import playground.christoph.mobsim.MyQueueNetwork;
 
-public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalculator, Cloneable{
-	
-	protected Person person;
-	protected MyQueueNetwork myQueueNetwork;
-	protected double time;
-	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person)
-	{
-		this.person = person;
+public class ReadEvents {
+
+	public static void main(String[] args) {
+		// Instance which takes over line by line of the events file
+		// and throws events of added types
+		Events events = new Events();
 		
-		return calcLeastCostPath(fromNode, toNode, starttime);
-	}
-	
-	public void setPerson(Person person)
-	{
-		this.person = person;
-	}
-	
-	public Person getPerson()
-	{
-		return this.person;
-	}
-	
-	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
-	{
-		this.myQueueNetwork = myQueueNetwork;
-	}
-	
-	public MyQueueNetwork getMyQueueNetwork()
-	{
-		return this.myQueueNetwork;
-	}
-	
-	public void setTime(double time)
-	{
-		this.time = time;
-	}
-	
-	public double getTime()
-	{
-		return this.time;
-	}
-	
-	public static int getErrorCounter()
-	{
-		return 0;
-	}
-	
-	public static void setErrorCounter(int i)
-	{
+		// An example of an events handler which takes
+		// "LinkLeaveEvents" to calculate total volumes per link of the network
+		ActTimesCollector atc = new ActTimesCollector();
 		
+		// register the handler to the events object
+		events.addHandler(atc);
+		
+		// Reader to read events line by line and parses it over to the events object
+		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		reader.readFile("C:\\events.txt.gz");
+		
+		// an example output of the DailyLinkVolumeCalc
+		System.out.println("Size: " + atc.data.size());
 	}
-	
-	@Override
-	public PersonLeastCostPathCalculator clone()
-	{
-		return this;
-	}
+
 }

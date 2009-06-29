@@ -35,6 +35,7 @@ import org.matsim.core.utils.io.Writer;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 
+import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 
 public class SelectionWriter extends Writer {
@@ -47,7 +48,6 @@ public class SelectionWriter extends Writer {
 	
 	private SelectionWriterHandler handler = null;
 	private final Population population;
-	private Knowledges knowledges;
 
 	private final static Logger log = Logger.getLogger(SelectionWriter.class);
 
@@ -60,7 +60,7 @@ public class SelectionWriter extends Writer {
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
 	 */
-	public SelectionWriter(final Population population, Knowledges knowledges, final String filename, final String dtdFile, final String version, final String description)
+	public SelectionWriter(final Population population, final String filename, final String dtdFile, final String version, final String description)
 	{
 		super();
 		
@@ -68,7 +68,6 @@ public class SelectionWriter extends Writer {
 		this.outfile = filename;
 		this.dtdFile = dtdFile;
 		this.description = description;
-		this.knowledges = knowledges;
 		this.fileNameCreator = new FileNameCreator(this.outfile);
 		createHandler(this.dtdFile);
 	}
@@ -112,11 +111,12 @@ public class SelectionWriter extends Writer {
 		{
 			this.handler.startPerson(p,this.out);
 
-			// knowledge
-			if (this.knowledges.getKnowledgesByPersonId().get(p.getId()) != null) 
+			// NodeKnowledge
+			if (p.getCustomAttributes().containsKey("NodeKnowledge")) 
 			{
-				Knowledge k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
-				this.handler.startKnowledge(k, this.out);
+				NodeKnowledge nodeKnowledge = (NodeKnowledge)p.getCustomAttributes().get("NodeKnowledge");
+				
+				this.handler.startKnowledge(nodeKnowledge, this.out);
 				
 					// activity space
 					this.handler.startActivitySpace(out);
@@ -124,7 +124,7 @@ public class SelectionWriter extends Writer {
 						// Nodes
 						this.handler.startNodes(out);
 						
-						Map<Id, Node> nodesMap = KnowledgeTools.getKnownNodes(this.knowledges, p);
+						Map<Id, Node> nodesMap = KnowledgeTools.getKnownNodes(p);
 						this.handler.nodes(nodesMap, out);
 						
 						this.handler.endNodes(out);

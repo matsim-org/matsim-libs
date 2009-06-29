@@ -34,6 +34,8 @@ import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -131,8 +133,8 @@ public class LeaveLinkReplanner {
 	 *
 	 * Idea:
 	 * - create a new Activity at the current Location
-	 * - create a new Route from the current Location to the Destionation
-	 * - merge allready passed parts of the current Route with the new created Route
+	 * - create a new Route from the current Location to the Destination
+	 * - merge already passed parts of the current Route with the new created Route
 	 */
 	protected void routing()
 	{	
@@ -149,10 +151,11 @@ public class LeaveLinkReplanner {
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 		
-		ActivityImpl newFromAct = new org.matsim.core.population.ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
+		ActivityImpl newFromAct = new ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
+
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
-		newFromAct.setDuration(0);
+		//newFromAct.setDuration(0);
 		
 		// Create a copy of the ArrayList - don't edit the ArrayList itself! 
 		ArrayList<Node> nodesRoute = new ArrayList<Node>();
@@ -174,21 +177,24 @@ public class LeaveLinkReplanner {
 		}
 
 		// create new, shortend Route
-		NetworkRoute subRoute = new NodeNetworkRoute();
-		subRoute.setNodes(nodesRoute);
+		//NetworkRoute subRoute = new NodeNetworkRoute();
+		//subRoute.setNodes(nodesRoute);
+		NodeNetworkRoute subRoute = new NodeNetworkRoute(this.vehicle.getCurrentLink(), route.getEndLink());
+		subRoute.setNodes(subRoute.getStartLink(), nodesRoute, subRoute.getEndLink());
 
 		// put the new route in a new leg
-		Leg newLeg = new org.matsim.core.population.LegImpl(leg.getMode());
+		Leg newLeg = new LegImpl(leg.getMode());
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
 		newLeg.setArrivalTime(leg.getArrivalTime());
 		newLeg.setRoute(subRoute);
-			
+		
 		// currently selected Plan
 		Plan currentPlan = person.getSelectedPlan();
 		
 		// create new plan and select it
-		Plan newPlan = new org.matsim.core.population.PlanImpl(person);
+		Plan newPlan = new PlanImpl(person);
+		person.addPlan(newPlan);
 		person.setSelectedPlan(newPlan);
 			
 		// here we are at the moment
@@ -218,13 +224,15 @@ public class LeaveLinkReplanner {
 		// Merge already driven parts of the Route with the new routed parts.
 		nodeBuffer.addAll(newRoute.getNodes());
 		
-		NetworkRoute mergedRoute = new NodeNetworkRoute();
-		mergedRoute.setNodes(nodeBuffer);
-				
+		//NetworkRoute mergedRoute = new NodeNetworkRoute();
+		//mergedRoute.setNodes(nodeBuffer);
+		NetworkRoute mergedRoute = new NodeNetworkRoute(route.getStartLink(), route.getEndLink());
+		mergedRoute.setNodes(route.getStartLink(), nodeBuffer, route.getEndLink());
+		
 		// replace Route
-//		leg.setRoute(mergedRoute);
-		((NetworkRoute) leg.getRoute()).getNodes().clear();
-		((NetworkRoute) leg.getRoute()).getNodes().addAll(mergedRoute.getNodes());
+		leg.setRoute(mergedRoute);
+//		((NetworkRoute) leg.getRoute()).getNodes().clear();
+//		((NetworkRoute) leg.getRoute()).getNodes().addAll(mergedRoute.getNodes());
 		
 		// check new created Route
 //		checkRoute(mergedRoute);
@@ -234,6 +242,17 @@ public class LeaveLinkReplanner {
 		
 		// ... and remove temporary used plan.
 		person.removePlan(newPlan);
+/*		
+		String newRouteString = "PersonId: " + person.getId();
+		newRouteString = newRouteString + "; LinkId: " + this.vehicle.getCurrentLink().getId();
+		newRouteString = newRouteString + "; LinkCount: " + mergedRoute.getLinks().size() + ";";
+		for (Link link : mergedRoute.getLinks())
+		{
+			newRouteString = newRouteString + " " + link.getId();
+		}
+		
+		log.info(newRouteString);
+*/
 	}
 	
 	/*

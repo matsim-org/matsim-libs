@@ -26,14 +26,16 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.knowledges.Knowledges;
 
+import playground.christoph.knowledge.container.MapKnowledge;
+import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.DeadEndRemover;
 
 public class CreateKnownNodesMap {
@@ -42,52 +44,52 @@ public class CreateKnownNodesMap {
 	
 	private final static Logger log = Logger.getLogger(CreateKnownNodesMap.class);
 	
-	public static void collectAllSelectedNodes(Population population, Knowledges knowledges)
+	public static void collectAllSelectedNodes(Population population, Network network)
 	{
 		for (Person person : population.getPersons().values()) 
 		{
-			collectAllSelectedNodes(person, knowledges);
+			collectAllSelectedNodes(person, network);
 		}
 	}
 	
-	private static void collectAllSelectedNodes(Person person, Knowledges knowledges)
-	{		
-		if(knowledges.getKnowledgesByPersonId().get(person.getId()) == null) knowledges.getBuilder().createKnowledge(person.getId(), "activityroom");
-			
-//		Plan plan = person.getSelectedPlan();
-//		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
-
+	private static void collectAllSelectedNodes(Person person, Network network)
+	{					
 		ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)person.getCustomAttributes().get("NodeSelectors");
 		
 		// for all node selectors of the person
 		for (SelectNodes nodeSelector : personNodeSelectors)
 		{
-			collectSelectedNodes(knowledges, person, nodeSelector);
+			collectSelectedNodes(person, network, nodeSelector);
 		}
 		// if Flag is set, remove Dead Ends from the Person's Activity Room
-		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(knowledges, person);
+		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
 	}
 	
 	/*
 	 * The handling of the nodeSelectors should probably be outsourced...
 	 * Implementing them direct in the nodeSelectors could be a good solution...
 	 */
-	public static void collectSelectedNodes(Knowledges knowledges, Person p, SelectNodes nodeSelector)
-	{	
-		if(knowledges.getKnowledgesByPersonId().get(p.getId()) == null) knowledges.getBuilder().createKnowledge(p.getId(), "activityroom");
-		
+	public static void collectSelectedNodes(Person p, Network network, SelectNodes nodeSelector)
+	{		
 		Plan plan = p.getSelectedPlan();
 		
 		// get Nodes from the Person's Knowledge
-		Map<Id, Node> nodesMap = (Map<Id, Node>)p.getCustomAttributes().get("Nodes");
-				
-		if (nodesMap == null) 
+		Map<Id, Node> nodesMap = null;
+		
+		if (p.getCustomAttributes().get("NodeKnowledge") == null)
 		{
 			nodesMap = new TreeMap<Id, Node>();
-
-			// add the new created Nodes to the knowledge of the person
-			Map<String,Object> customKnowledgeAttributes = p.getCustomAttributes();
-			customKnowledgeAttributes.put("Nodes", nodesMap);
+			
+			NodeKnowledge nodeKnowledge = new MapKnowledge(nodesMap);
+			nodeKnowledge.setPerson(p);
+			nodeKnowledge.setNetwork(network);
+			
+			p.getCustomAttributes().put("NodeKnowledge", nodeKnowledge);
+		}
+		else
+		{
+			NodeKnowledge nodeKnowledge = (NodeKnowledge)p.getCustomAttributes().get("NodeKnowledge");
+			nodesMap = nodeKnowledge.getKnownNodes();
 		}
 		
 		if(nodeSelector instanceof SelectNodesDijkstra)

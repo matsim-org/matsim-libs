@@ -25,14 +25,12 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.utils.io.WriterHandler;
-import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.Knowledge;
+
+import playground.christoph.knowledge.container.NodeKnowledge;
 
 public interface SelectionWriterHandler extends WriterHandler {
 
@@ -55,7 +53,7 @@ public interface SelectionWriterHandler extends WriterHandler {
 	// <knowledge ... > ... </knowledge>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startKnowledge(final Knowledge knowledge, final BufferedWriter out) throws IOException;
+	public void startKnowledge(final NodeKnowledge nodeKnowledge, final BufferedWriter out) throws IOException;
 
 	public void endKnowledge(final BufferedWriter out) throws IOException;
 

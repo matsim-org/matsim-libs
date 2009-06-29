@@ -21,7 +21,9 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.events.ActivityEndEvent;
@@ -59,6 +61,34 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 	{
 		this.fromAct = fromAct;
 		this.person = vehicle.getDriver().getPerson();
+		this.time = time;
+		this.replanner = replanner;
+
+		Plan plan = person.getSelectedPlan();
+		this.betweenLeg = plan.getNextLeg(fromAct);
+	
+		if(betweenLeg != null)
+		{
+			toAct = (ActivityImpl)plan.getNextActivity(betweenLeg);
+		}
+		else 
+		{
+			toAct = null;
+			log.error("An agents next activity is null - this should not happen!");
+		}
+		
+		// calculate new Route
+		if(toAct != null && replanner != null)
+		{	
+			doReplanning();
+		}
+	}
+	
+	// used when starting the Replanner "by hand"
+	public ActEndReplanner(ActivityImpl fromAct, Person person, double time, PlanAlgorithm replanner)
+	{
+		this.fromAct = fromAct;
+		this.person = person;
 		this.time = time;
 		this.replanner = replanner;
 
@@ -191,6 +221,17 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 		
 		// remove previously added new Plan
 		person.removePlan(newPlan);
+//		System.out.println("Do Replanning...");
+		
+
+		String newRouteString = "PersonId: " + person.getId();
+		newRouteString = newRouteString + "; LinkCount: " + ((NetworkRoute)betweenLeg.getRoute()).getLinks().size() + ";";
+		for (Link link : ((NetworkRoute)betweenLeg.getRoute()).getLinks())
+		{
+			newRouteString = newRouteString + " " + link.getId();
+		}
+		
+//		log.info(newRouteString);
 	}
 	
 }

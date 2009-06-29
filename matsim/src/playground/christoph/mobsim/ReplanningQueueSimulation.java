@@ -20,34 +20,89 @@
 
 package playground.christoph.mobsim;
 
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.concurrent.PriorityBlockingQueue;
+
 import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 
+import playground.christoph.events.algorithms.ParallelReplanner;
+import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
 public class ReplanningQueueSimulation extends QueueSimulation{
 
 	protected Controler controler;
-
-	public ReplanningQueueSimulation(final NetworkLayer network, final Population plans, final Events events)
+	
+	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
+	
+	/*
+	 * Basically a 1:1 copy of the activityEndsList of the Queuesimulation.
+	 * The difference is, that this implementation uses a Time Offset. That means
+	 * that we are informed that an activity will end a few Time Steps before it
+	 * really ends. This allows us for example to read the known nodes of a Person
+	 * from a Database before they are needed what should speed up the Simulation.
+	 */
+	protected final PriorityBlockingQueue<DriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final double timeOffset = 30.0;
+	
+	public ReplanningQueueSimulation(final NetworkLayer network, final Population population, final Events events)
 	{
-		super(network, plans, events);
+		super(network, population, events);
 
 		// eigenes Queuenetwork hinterlegen, welches MyQueueNodes enthaelt -> noetig fuer das Replanning!
-		this.network = new MyQueueNetwork(network, new MyQueueNetworkFactory());
+		//this.network = new MyQueueNetwork(network, new MyQueueNetworkFactory());
+		this.network = new MyQueueNetwork(network);
 		this.networkLayer = network;
-		setAgentFactory(new MyAgentFactory(this));
+		
+		// replace the QueueSimEngine with a MyQueueSimEngine
+		this.simEngine = new MyQueueSimEngine(this.network, MatsimRandom.getRandom());
+		
+		// set the QueueSimulation in the SimEngine
+		((MyQueueSimEngine)this.simEngine).setQueueSimulation(this);
+		
+		//setAgentFactory(new MyAgentFactory(this));
+		
+		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
+		getEvents().addHandler(knowledgeDBStorageHandler);
 	}
 
+	public MyQueueNetwork getMyQueueNetwork()
+	{
+		return (MyQueueNetwork) this.getQueueNetwork();
+	}
+	
+	public PriorityBlockingQueue<DriverAgent> getActivityEndsList()
+	{
+		return super.activityEndsList;
+	}
 
+	@Override
+	protected boolean doSimStep(final double time) 
+	{
+		ParallelReplanner.updateLinkTravelTimesLookupTables();
+		
+		if (MyQueueSimEngine.isActEndReplanning())
+		{
+			((MyQueueSimEngine)this.simEngine).actEndReplanning(time);
+		}
+		
+		handleOffsetActivityEnds(time);
+		
+		return super.doSimStep(time);
+	}
+
+/*	
 	public QueueNetwork getQueueNetwork()
 	{
 		return this.network;
 	}
-
+*/
 	public void setControler(final Controler controler)
 	{
 		this.controler = controler;
@@ -61,4 +116,53 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		return this.controler;
 	}
 
+	/**
+	 * Registers this agent as performing an activity and makes sure that the
+	 * agent will be informed once his departure time has come.
+	 * 
+	 * @param agent
+	 * 
+	 * @see DriverAgent#getDepartureTime()
+	 */
+	@Override
+	protected void scheduleActivityEnd(final DriverAgent agent)
+	{	
+		offsetActivityEndsList.add(agent);
+		super.scheduleActivityEnd(agent);
+	}
+	
+	private void handleOffsetActivityEnds(final double time)
+	{
+		knowledgeDBStorageHandler.stopProcessing();
+		
+		while (this.offsetActivityEndsList.peek() != null)
+		{
+			DriverAgent agent = this.offsetActivityEndsList.peek();
+			if (agent.getDepartureTime() <= time + timeOffset)
+			{
+				this.offsetActivityEndsList.poll();
+				knowledgeDBStorageHandler.addPerson(agent.getPerson());
+			} 
+			else
+			{
+				return;
+			}
+		}
+		
+		knowledgeDBStorageHandler.startProcessing();
+	}
+	
+	/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		public int compare(DriverAgent agent1, DriverAgent agent2) {
+			int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
+			if (cmp == 0) {
+				// Both depart at the same time -> let the one with the larger id be first (=smaller)
+				return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
+			}
+			return cmp;
+		}
+	}
 }

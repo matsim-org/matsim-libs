@@ -20,20 +20,15 @@
 
 package playground.christoph.router.costcalculators;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.knowledges.Knowledges;
 
+import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 import playground.christoph.router.util.KnowledgeTravelTime;
-
 
 /*
  * Adaption of TravelTimeDistanceCostCalculator
@@ -43,13 +38,11 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	protected TravelTime timeCalculator;
 	protected double travelCostFactor;
 	protected double marginalUtlOfDistance;
-	private Knowledges knowledges;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostCalculator.class);
 	
-	public KnowledgeTravelCostCalculator(Knowledges knowledges, TravelTime timeCalculator)
+	public KnowledgeTravelCostCalculator(TravelTime timeCalculator)
 	{
-		this.knowledges = knowledges;
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
@@ -59,14 +52,12 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	}
 	
 	public double getLinkTravelCost(final Link link, final double time) 
-	{
-		Map<Id, Node> knownNodesMap = null;
-		
-		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
+	{		
+		// try getting NodeKnowledge from the Persons Knowledge
+		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
 		
 		// if the Person doesn't know the link -> return max costs 
-		if (!KnowledgeTools.knowsLink(link, knownNodesMap))
+		if (!nodeKnowledge.knowsLink(link))
 		{
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;
@@ -101,7 +92,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 			timeCalculatorClone = timeCalculator;
 		}
 		
-		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(this.knowledges, timeCalculatorClone);
+		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(timeCalculatorClone);
 		clone.marginalUtlOfDistance = this.marginalUtlOfDistance;
 		clone.travelCostFactor = this.travelCostFactor;
 		

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.christoph.knowledge.nodeselection;
 
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,12 +27,15 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.knowledges.Knowledges;
 
+import playground.christoph.knowledge.container.MapKnowledge;
+import playground.christoph.knowledge.container.MapKnowledgeDB;
+import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.DeadEndRemover;
 
 
@@ -57,7 +59,7 @@ public class ParallelCreateKnownNodesMap {
 	 * @param nodeSelectors
 	 * @param numberOfThreads
 	 */
-	public static void run(final Population population, Knowledges knowledges, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
+	public static void run(final Population population, final Network network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
 	{
 		int numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
@@ -90,7 +92,7 @@ public class ParallelCreateKnownNodesMap {
 		for (int i = 0; i < numOfThreads; i++) 
 		{
 
-			SelectNodesThread selectionThread = new SelectNodesThread(i, nodeSelectorArray, nodeSelectors, knowledges);
+			SelectNodesThread selectionThread = new SelectNodesThread(i, network, nodeSelectorArray, nodeSelectors);
 			selectorThreads[i] = selectionThread;
 			
 			Thread thread = new Thread(selectionThread, "Thread#" + i);
@@ -141,17 +143,17 @@ public class ParallelCreateKnownNodesMap {
 	private static class SelectNodesThread implements Runnable 
 	{
 		public final int threadId;
+		private final Network network;
 		private final ArrayList<SelectNodes> nodeSelectors;
 		private final SelectNodes[][] nodeSelectorArray;
 		private final List<Person> persons = new LinkedList<Person>();
-		private Knowledges knowledges;
-
-		public SelectNodesThread(final int i, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors, Knowledges knowledges)
+		
+		public SelectNodesThread(final int i, Network network, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
 		{
 			this.threadId = i;
+			this.network = network;
 			this.nodeSelectorArray = nodeSelectorArray;
 			this.nodeSelectors = nodeSelectors;
-			this.knowledges = knowledges;
 		}
 
 		public void handlePerson(final Person person)
@@ -171,15 +173,18 @@ public class ParallelCreateKnownNodesMap {
 				 * No known nodes is handled as if the person would know the entire network.
 				 * This should be faster than using a Map that contains all Nodes of the network.
 				 */
-				if(this.knowledges.getKnowledgesByPersonId().get(person.getId()) == null) 
-				{
-					knowledges.getBuilder().createKnowledge(person.getId(), "activityroom");
-					
+				if(person.getCustomAttributes().get("NodeKnowledge") == null) 
+				{	
 					Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
-
+					
+					NodeKnowledge nodeKnowledge = new MapKnowledge(nodesMap);
+					nodeKnowledge.setPerson(person);
+					nodeKnowledge.setNetwork(network);
+										
 					// add the new created Nodes to the knowledge of the person
 					Map<String,Object> customKnowledgeAttributes = person.getCustomAttributes();
-					customKnowledgeAttributes.put("Nodes", nodesMap);
+					
+					customKnowledgeAttributes.put("NodeKnowledge", nodeKnowledge);
 				}
 				
 				// all NodeSelectors of the Person
@@ -193,8 +198,8 @@ public class ParallelCreateKnownNodesMap {
 					
 					// if there is a valid index returned -> get Nodes
 					if (index >= 0)
-					{			
-						CreateKnownNodesMap.collectSelectedNodes(knowledges, person, this.nodeSelectorArray[index][threadId]);
+					{	
+						CreateKnownNodesMap.collectSelectedNodes(person, network, this.nodeSelectorArray[index][threadId]);
 					}
 					else
 					{
@@ -204,7 +209,27 @@ public class ParallelCreateKnownNodesMap {
 				}	// for all NodeSelectors
 				
 				// if Flag is set, remove Dead Ends from the Person's Activity Room
-				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(knowledges, person);
+				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
+				
+				
+				if (person.getCustomAttributes().get("NodeKnowledgeStorageType") != null)
+				{
+					String NodeKnowledgeStorageType = (String)person.getCustomAttributes().get("NodeKnowledgeStorageType");
+					
+					if (MapKnowledgeDB.class.getName().equals(NodeKnowledgeStorageType))
+					{
+						NodeKnowledge nodeKnowledge = (NodeKnowledge)person.getCustomAttributes().get("NodeKnowledge");
+						Map<Id, Node> nodesMap = nodeKnowledge.getKnownNodes();
+						
+						MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB(nodesMap);
+						mapKnowledgeDB.setPerson(person);
+						mapKnowledgeDB.setNetwork(network);
+						mapKnowledgeDB.writeToDB();
+						mapKnowledgeDB.clearLocalKnowledge();
+												
+						person.getCustomAttributes().put("NodeKnowledge", mapKnowledgeDB);
+					}
+				}
 				
 				numRuns++;
 				if (numRuns % 500 == 0) 

@@ -22,13 +22,14 @@ package playground.christoph.router.util;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.router.util.TravelTime;
+
+import playground.christoph.mobsim.MyQueueNetwork;
 
 public abstract class KnowledgeTravelTime implements TravelTime, Cloneable {
 
 	protected Person person;
-	protected QueueNetwork queueNetwork;
+	protected MyQueueNetwork myQueueNetwork;
 	
 	public double getLinkTravelTime(Link link, double time, Person person)
 	{
@@ -46,14 +47,14 @@ public abstract class KnowledgeTravelTime implements TravelTime, Cloneable {
 		return this.person;
 	}
 	
-	public void setQueueNetwork(QueueNetwork queueNetwork)
+	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
 	{
-		this.queueNetwork = queueNetwork;
+		this.myQueueNetwork = myQueueNetwork;
 	}
 	
-	public QueueNetwork getQueueNetwork()
+	public MyQueueNetwork getMyQueueNetwork()
 	{
-		return this.queueNetwork;
+		return this.myQueueNetwork;
 	}
 	
 	@Override

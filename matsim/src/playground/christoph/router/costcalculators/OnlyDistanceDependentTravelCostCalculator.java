@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonLeastCostPathCalculator.java
+ * OnlyDistanceDependentTravelCostCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,70 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.router.util;
+package playground.christoph.router.costcalculators;
 
-import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.mobsim.MyQueueNetwork;
+public class OnlyDistanceDependentTravelCostCalculator implements TravelMinCost {
+	
+	public OnlyDistanceDependentTravelCostCalculator(final TravelTime timeCalculator)
+	{
+	}
 
-public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalculator, Cloneable{
-	
-	protected Person person;
-	protected MyQueueNetwork myQueueNetwork;
-	protected double time;
-	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person)
+	public double getLinkTravelCost(final Link link, final double time) 
 	{
-		this.person = person;
-		
-		return calcLeastCostPath(fromNode, toNode, starttime);
+		return link.getLength();
 	}
-	
-	public void setPerson(Person person)
+
+	public double getLinkMinimumTravelCost(final Link link) 
 	{
-		this.person = person;
-	}
-	
-	public Person getPerson()
-	{
-		return this.person;
-	}
-	
-	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
-	{
-		this.myQueueNetwork = myQueueNetwork;
-	}
-	
-	public MyQueueNetwork getMyQueueNetwork()
-	{
-		return this.myQueueNetwork;
-	}
-	
-	public void setTime(double time)
-	{
-		this.time = time;
-	}
-	
-	public double getTime()
-	{
-		return this.time;
-	}
-	
-	public static int getErrorCounter()
-	{
-		return 0;
-	}
-	
-	public static void setErrorCounter(int i)
-	{
-		
-	}
-	
-	@Override
-	public PersonLeastCostPathCalculator clone()
-	{
-		return this;
+		return link.getLength();
 	}
 }

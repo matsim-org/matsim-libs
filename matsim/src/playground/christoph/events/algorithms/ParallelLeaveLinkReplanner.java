@@ -154,7 +154,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 
 	
 				numRuns++;
-				//if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
+				if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
 			
 			}
 		

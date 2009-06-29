@@ -39,6 +39,8 @@ import org.matsim.knowledges.ActivitySpaceEllipse;
 import org.matsim.knowledges.ActivitySpaceSuperEllipse;
 import org.matsim.knowledges.Knowledge;
 
+import playground.christoph.knowledge.container.NodeKnowledge;
+
 public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
@@ -87,11 +89,9 @@ public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 	// <knowledge ... > ... </knowledge>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startKnowledge(final Knowledge knowledge, final BufferedWriter out) throws IOException 
+	public void startKnowledge(final NodeKnowledge nodeKnowledge, final BufferedWriter out) throws IOException 
 	{
 		out.write("\t\t<knowledge");
-		if (knowledge.getDescription() != null)
-			out.write(" desc=\"" + knowledge.getDescription() + "\"");
 		out.write(">\n");
 	}
 

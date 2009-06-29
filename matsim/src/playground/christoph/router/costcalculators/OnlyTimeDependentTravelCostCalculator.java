@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonLeastCostPathCalculator.java
+ * OnlyTimeDependentTravelCostCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,70 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.router.util;
+package playground.christoph.router.costcalculators;
 
-import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.api.network.Link;
+import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.Time;
 
-import playground.christoph.mobsim.MyQueueNetwork;
+public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost {
+	protected final TravelTime timeCalculator;
 
-public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalculator, Cloneable{
-	
-	protected Person person;
-	protected MyQueueNetwork myQueueNetwork;
-	protected double time;
-	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person)
+	public OnlyTimeDependentTravelCostCalculator(final TravelTime timeCalculator)
 	{
-		this.person = person;
-		
-		return calcLeastCostPath(fromNode, toNode, starttime);
+		this.timeCalculator = timeCalculator;
 	}
-	
-	public void setPerson(Person person)
+
+	public double getLinkTravelCost(final Link link, final double time) 
 	{
-		this.person = person;
+		if (timeCalculator != null)
+		{
+			double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+			return travelTime;
+		}
+		else
+		{
+			return link.getFreespeedTravelTime(time);
+		}
 	}
-	
-	public Person getPerson()
+
+	public double getLinkMinimumTravelCost(final Link link) 
 	{
-		return this.person;
-	}
-	
-	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
-	{
-		this.myQueueNetwork = myQueueNetwork;
-	}
-	
-	public MyQueueNetwork getMyQueueNetwork()
-	{
-		return this.myQueueNetwork;
-	}
-	
-	public void setTime(double time)
-	{
-		this.time = time;
-	}
-	
-	public double getTime()
-	{
-		return this.time;
-	}
-	
-	public static int getErrorCounter()
-	{
-		return 0;
-	}
-	
-	public static void setErrorCounter(int i)
-	{
-		
-	}
-	
-	@Override
-	public PersonLeastCostPathCalculator clone()
-	{
-		return this;
+		double TravelTime = this.timeCalculator.getLinkTravelTime(link, Time.UNDEFINED_TIME);
+		return TravelTime;
 	}
 }

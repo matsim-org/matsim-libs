@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -42,21 +41,16 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
-
-	private Knowledges knowledges;
 	
 	private final static Logger log = Logger.getLogger(CompassRoute.class);
 	
 	/**
-	 * Default constructor.
-	 * @param knowledges 
+	 * Default constructor. 
 	 *                    
 	 */
-	public CompassRoute(Knowledges knowledges) 
+	public CompassRoute() 
 	{
-		this.knowledges = knowledges;
 	}
-
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
@@ -75,7 +69,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 		
@@ -163,7 +157,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		{
 
 //			log.info("LinkCount " + route.getLinkRoute().length + " distance " + route.getDist());
-			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
+//			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
 
 		}
 		
@@ -229,7 +223,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	@Override
 	public CompassRoute clone()
 	{
-		CompassRoute clone = new CompassRoute(this.knowledges);
+		CompassRoute clone = new CompassRoute();
 		clone.removeLoops = this.removeLoops;
 		clone.tabuSearch = this.tabuSearch;
 		clone.maxLinks = this.maxLinks;

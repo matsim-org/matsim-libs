@@ -28,7 +28,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -41,23 +40,20 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 	
 	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
-	protected double compassProbability = 0.35;
+	public static double compassProbability = 0.50;	// only for the batch runs...
+	//protected double compassProbability = 0.50;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 
-	private Knowledges knowledges;
 	
 	private final static Logger log = Logger.getLogger(RandomCompassRoute.class);
 	
 	/**
 	 * Default constructor.
-	 * @param knowledges 
 	 *                    
 	 */
-	public RandomCompassRoute(Knowledges knowledges) 
+	public RandomCompassRoute() 
 	{	
-		this.knowledges = knowledges;
 	}
-
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
@@ -79,7 +75,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		nodes.add(fromNode);
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 
 		while(!currentNode.equals(toNode))
 		{
@@ -92,7 +88,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 			}
 			if (nodes.size() > maxLinks)
 			{
-				log.warn("Routelength has reached the maximum allows number of links - stop searching!");
+				log.warn("Routelength has reached the maximum allowed number of links - stop searching!");
 				break;
 			}
 			
@@ -239,7 +235,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 	@Override
 	public RandomCompassRoute clone()
 	{
-		RandomCompassRoute clone = new RandomCompassRoute(this.knowledges);
+		RandomCompassRoute clone = new RandomCompassRoute();
 		clone.compassProbability = this.compassProbability;
 		clone.maxLinks = this.maxLinks;
 		clone.removeLoops = this.removeLoops;

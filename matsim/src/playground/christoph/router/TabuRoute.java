@@ -28,7 +28,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.knowledges.Knowledges;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -45,19 +44,16 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 
-	private Knowledges knowledges;
 	 
 	/**
 	 * Default constructor.
-	 * @param knowledges 
 	 *
 	 * @param random
 	 * 			  Random number generator. Needed to create reproducible results.           
 	 *            
 	 */
-	public TabuRoute(Knowledges knowledges) 
+	public TabuRoute() 
 	{
-		this.knowledges = knowledges;
 	}
 
 	
@@ -77,7 +73,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 	
@@ -155,7 +151,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 	@Override
 	public TabuRoute clone()
 	{
-		TabuRoute clone = new TabuRoute(this.knowledges);
+		TabuRoute clone = new TabuRoute();
 		clone.removeLoops = this.removeLoops;
 		clone.maxLinks = this.maxLinks;
 		

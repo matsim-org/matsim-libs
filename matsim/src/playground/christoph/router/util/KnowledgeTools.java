@@ -28,43 +28,38 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
-import org.matsim.knowledges.Knowledges;
+
+import playground.christoph.knowledge.container.NodeKnowledge;
 
 public class KnowledgeTools {
 
 	private final static Logger log = Logger.getLogger(KnowledgeTools.class);
-	private Knowledges knowledges;	
 	
-	public KnowledgeTools(Knowledges knowledges){
-		this.knowledges = knowledges;
+	public KnowledgeTools()
+	{
 	}
 	
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static Map<Id, Node> getKnownNodes(Knowledges knowledges, Person person)
+	public static Map<Id, Node> getKnownNodes(Person person)
 	{
 		Map<Id, Node> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)
 		{		
-			if(knowledges.getKnowledgesByPersonId().get(person.getId()) != null)
+			Map<String,Object> customAttributes = person.getCustomAttributes();
+					
+			if(customAttributes.containsKey("NodeKnowledge"))
 			{
-				Map<String,Object> customAttributes = person.getCustomAttributes();
-				
-				if(customAttributes.containsKey("Nodes"))
-				{
-					knownNodesMap = (Map<Id, Node>)customAttributes.get("Nodes");
-				}
-				else
-				{
-					log.error("no knowledge found!");
-				}
+				NodeKnowledge nodeKnowledge = (NodeKnowledge)customAttributes.get("NodeKnowledge");
+			
+				knownNodesMap = nodeKnowledge.getKnownNodes();
 			}
 			else
 			{
-				log.error("knowledge = null!");
+				log.error("NodeKnowledge Object was not found in Person's Custom Attributes!");
 			}
 		}
 		else
@@ -73,6 +68,35 @@ public class KnowledgeTools {
 		}
 		
 		return knownNodesMap;
+	}
+	
+	/*
+	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
+	 */
+	public static NodeKnowledge getNodeKnowledge(Person person)
+	{
+		NodeKnowledge nodeKnowledge = null;
+		
+		// Try getting knowledge from the current Person.
+		if(person != null)
+		{		
+			Map<String,Object> customAttributes = person.getCustomAttributes();
+					
+			if(customAttributes.containsKey("NodeKnowledge"))
+			{
+				nodeKnowledge = (NodeKnowledge)customAttributes.get("NodeKnowledge");
+			}
+			else
+			{
+				log.error("NodeKnowledge Object was not found in Person's Custom Attributes!");
+			}
+		}
+		else
+		{
+			log.error("person = null!");
+		}
+		
+		return nodeKnowledge;
 	}
 	
 	/*
@@ -110,47 +134,43 @@ public class KnowledgeTools {
 	 * Returns true, if no known nodes are stored in the current Person.
 	 */
 	//public static boolean knowsLink(Link link, ArrayList<Node> knownNodes)
-	public static boolean knowsLink(Link link, Map<Id, Node> knownNodesMap)
+	//public static boolean knowsLink(Link link, Map<Id, Node> knownNodesMap)
+/*
+	public static boolean knowsLink(Link link, NodeKnowledge nodeKnowledge)
 	{
 		// if no Map found or the Map is empty -> Person knows the entire network, return true
-		if ( knownNodesMap == null ) return true;
-		if ( knownNodesMap.size() == 0) return true;
-		
-		if ( knownNodesMap.containsKey(link.getFromNode().getId()) && knownNodesMap.containsKey(link.getToNode().getId()) ) return true;
+		if ( nodeKnowledge == null ) return true;
+		//if ( nodeKnowledge.size() == 0) return true;
+				
+		//if ( nodeKnowledge.containsKey(link.getFromNode().getId()) && nodeKnowledge.containsKey(link.getToNode().getId()) ) return true;
+		if ( nodeKnowledge.knowsNode(link.getFromNode()) && nodeKnowledge.knowsNode(link.getToNode()) ) return true;
 		else return false;
 	}
-	
+*/	
 	/*
 	 * To save memory, some routers may want to remove a Person's Knowledge after
 	 * doing their routing. An Example would be a Random Router that does only an
 	 * initial planning before starting the mobsim.
 	 */ 
-	public static void removeKnowledge(Knowledges knowledges, Person person)
+	public static void removeKnowledge(Person person)
 	{
 		Map<Id, Node> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)
-		{		
-			if(knowledges.getKnowledgesByPersonId().get(person.getId()) != null)
+		{	
+			Map<String,Object> customAttributes = person.getCustomAttributes();
+			
+			if(customAttributes.containsKey("NodeKnowledge"))
 			{
-				Map<String,Object> customAttributes = person.getCustomAttributes();
-				
-				if(customAttributes.containsKey("Nodes"))
-				{
-					knownNodesMap = (Map<Id, Node>)customAttributes.get("Nodes");
-					
-					// remove all known nodes!
-					knownNodesMap.clear();
-				}
-				else
-				{
-					log.error("no knowledge found!");
-				}
+				NodeKnowledge nodeKnowledge = (NodeKnowledge)customAttributes.get("NodeKnowledge");
+			
+				knownNodesMap = nodeKnowledge.getKnownNodes();
+				knownNodesMap.clear();
 			}
 			else
 			{
-				log.error("knowledge = null!");
+				log.error("NodeKnowledge Object was not found in Person's Custom Attributes!");
 			}
 		}
 		else

@@ -1,28 +1,30 @@
 package playground.christoph.router.costcalculators;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.knowledges.Knowledges;
 
+import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 
 public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	
 	protected TravelCost travelCostcalculator;
-
-	private Knowledges knowledges;
+	protected Map<Link, Double> linkTravelCosts;
+	protected boolean useLookupTable = true;
+	protected boolean updateLookupTable = false;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
-	public KnowledgeTravelCostWrapper(Knowledges knowledges, TravelCost travelCost)
+	public KnowledgeTravelCostWrapper(TravelCost travelCost)
 	{
-		this.knowledges = knowledges;
 		this.travelCostcalculator = travelCost;
 	}
 	
@@ -38,13 +40,11 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	
 	public double getLinkTravelCost(final Link link, final double time) 
 	{
-		Map<Id, Node> knownNodesMap = null;
-		
-		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.knowledges, this.person);
+		// try getting NodeKnowledge from the Persons Knowledge
+		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
 		
 		// if the Person doesn't know the link -> return max costs 
-		if (!KnowledgeTools.knowsLink(link, knownNodesMap))
+		if (!nodeKnowledge.knowsLink(link))
 		{
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;
@@ -52,10 +52,55 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		else
 		{
 //			log.info("Link is part of the Persons knowledge!");
-			return travelCostcalculator.getLinkTravelCost(link, time);
+			if(useLookupTable)
+			{
+				if (linkTravelCosts == null) createLookupTable(time);
+			
+				if (updateLookupTable) updateLookupTable(time);
+				
+				return linkTravelCosts.get(link);
+			}
+			else return travelCostcalculator.getLinkTravelCost(link, time);
 		}
 	}
 	
+
+	private void createLookupTable(double time)
+	{
+//		log.info("Creating LookupTable f�r LinkTravelTimes. Time = " + time);
+		LinkIdComparator linkComparator = new LinkIdComparator();
+		linkTravelCosts = new TreeMap<Link, Double>(linkComparator);
+		
+		for (QueueLink queueLink : myQueueNetwork.getLinks().values())
+		{
+			Link link = queueLink.getLink();
+			linkTravelCosts.put(link, travelCostcalculator.getLinkTravelCost(link, time));
+		}
+	}
+	
+	private void updateLookupTable(double time)
+	{
+		Map<Id, Integer> links2Update = this.myQueueNetwork.getLinkVehiclesCounter().getChangedLinkVehiclesCounts();
+		
+		for (Id id : links2Update.keySet())
+		{
+			Link link = this.myQueueNetwork.getNetworkLayer().getLink(id);
+			linkTravelCosts.put(link, travelCostcalculator.getLinkTravelCost(link, time));
+		}
+	}
+	
+	public void updateLookupTable()
+	{
+		updateLookupTable = true;
+	}
+	
+	public void resetLookupTable()
+	{
+//		log.info("Resetting LookupTable");
+		linkTravelCosts = null;
+	}
+	
+
 	@Override
 	public KnowledgeTravelCostWrapper clone()
 	{
@@ -71,7 +116,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 			travelCostCalculatorClone = this.travelCostcalculator;
 		}
 		
-		KnowledgeTravelCostWrapper clone = new KnowledgeTravelCostWrapper(this.knowledges, travelCostCalculatorClone);
+		KnowledgeTravelCostWrapper clone = new KnowledgeTravelCostWrapper(travelCostCalculatorClone);
 
 		return clone;
 	}

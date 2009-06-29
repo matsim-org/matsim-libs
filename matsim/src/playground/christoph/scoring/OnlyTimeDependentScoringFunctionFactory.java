@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LimitedKnowledge.java
+ * OnlyTimeDependentScoringFunctionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,44 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.knowledge.replanning.modules;
+package playground.christoph.scoring;
 
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.replanning.modules.ReRouteDijkstra;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.christoph.knowledge.OldKnowledgeTravelCost;
+/**
+ * @author Christoph Dobler
+ */
 
-public class LimitedKnowledge extends ReRouteDijkstra {		
-
-	OldKnowledgeTravelCost knowledgeCostFunction;
+public class OnlyTimeDependentScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	// Erstmal alle Daten weiterleiten... 
-	public LimitedKnowledge(NetworkLayer network, TravelCost travelCostCalc, TravelTime travelTimeCalc)
-	{	
-		super(network, travelCostCalc, travelTimeCalc);
-
-		// Referenz auf die TravelCosts abspeichern - da schicken wir dann die jeweils aktuelle Person hin.
-		knowledgeCostFunction = (OldKnowledgeTravelCost) travelCostCalc;
-		System.out.println("----------------------LimitedKnowledge Router runs!----------------------");
-		
-	}	
-
-	@Override
-	public void handlePlan(Plan plan) {
-		// TODO Auto-generated method stub
-		//Knowledge myKnowledge = plan.getPerson().getKnowledge();
-		
-//		if(plan != null && plan.getPerson() != null) 
-//		{ System.out.println("handlePlan, PersonID: " + plan.getPerson().getId().toString()); }
-		
-		// Person weiterleiten...
-		knowledgeCostFunction.setPerson(plan.getPerson());
-
-		// ... und Plan abarbeiten lassen.
-		super.handlePlan(plan);
+	public ScoringFunction getNewScoringFunction(Plan plan) 
+	{
+		return new OnlyTimeDependentScoringFunction(plan);
 	}
-
 }
+
+
+

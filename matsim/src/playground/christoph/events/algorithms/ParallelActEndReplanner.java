@@ -82,9 +82,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			Gbl.errorMsg(e);
 		}
 	}
-	
-	
-	
+		
 	/**
 	 * The thread class that really handles the persons.
 	 */
