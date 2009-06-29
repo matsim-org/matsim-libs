@@ -120,6 +120,20 @@ public class ScenarioCut {
 	}
 
 	//////////////////////////////////////////////////////////////////////
+	
+	private static void reduceFacilities(ActivityFacilities facilities, Network network) {
+		System.out.println("removing facilities that refer to removed links of the network... " + (new Date()));
+		Set<Id> toRemove = new HashSet<Id>();
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			if (network.getLink(f.getLink().getId()) == null) { toRemove.add(f.getId()); }
+		}
+		System.out.println("=> "+toRemove.size()+" facilities to remove.");
+		for (Id id : toRemove) { facilities.getFacilities().remove(id); }
+		System.out.println("=> "+facilities.getFacilities().size()+" facilities left.");
+		System.out.println("done. " + (new Date()));
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 
 	private static void reduceFacilities(ActivityFacilities facilities, Coord center, double radius) {
 		System.out.println("removing facilities outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
@@ -243,16 +257,18 @@ public class ScenarioCut {
 			Coord center = new CoordImpl(args[1],args[2]);
 			double radius = Double.parseDouble(args[3]);
 			
-			reduceFacilities(scenario.getActivityFacilities(),center,radius);
 			reduceNetwork(scenario.getNetwork(),center,radius);
+			reduceFacilities(scenario.getActivityFacilities(),scenario.getNetwork());
+			reduceFacilities(scenario.getActivityFacilities(),center,radius);
 			reducePopulation(scenario);
 		}
 		else { // args.length == 5
 			Coord min = new CoordImpl(args[1],args[2]);
 			Coord max = new CoordImpl(args[3],args[4]);
 			
-			reduceFacilities(scenario.getActivityFacilities(),min,max);
 			reduceNetwork(scenario.getNetwork(),min,max);
+			reduceFacilities(scenario.getActivityFacilities(),scenario.getNetwork());
+			reduceFacilities(scenario.getActivityFacilities(),min,max);
 			reducePopulation(scenario);
 		}
 		calcExtent(scenario);
