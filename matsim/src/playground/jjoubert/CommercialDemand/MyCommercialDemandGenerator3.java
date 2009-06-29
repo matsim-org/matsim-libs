@@ -191,10 +191,10 @@ public class MyCommercialDemandGenerator3 {
 					Person truck = pb.createPerson(id);
 					truck.addPlan(pp);
 					pp.setPerson(truck);
+//					pp.setSelected(true);
 					agentId++;
 					//TODO This is where I may want to include a ++populationComplete command if I only want a total of
 					// populationSize commercial vehicle agents.
-//					pp.setSelected(true);
 				}
 				
 				// Report progress

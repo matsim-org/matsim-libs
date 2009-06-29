@@ -98,13 +98,7 @@ public class PlanWrapper {
 				/*
 				 * Wrap the plan
 				 */
-				Plan dummyPlan = new PlanImpl(null);
-				if(plan.isSelected()){
-					dummyPlan.setSelected(true);
-				} else{
-					dummyPlan.setSelected(false);
-				}
-					
+				Plan dummyPlan = new PlanImpl(null);					
 				
 				int index = 0;
 				while(index < plan.getPlanElements().size()){
@@ -148,13 +142,19 @@ public class PlanWrapper {
 								Object dummyObject = plan.getPlanElements().get(index);
 								if(dummyObject instanceof Activity){
 									Activity ba2 = (Activity) dummyObject;
-									ba2.setStartTime( (ba2.getStartTime() - this.tw) >= 0 ? ba2.getStartTime() - this.tw : Double.NEGATIVE_INFINITY );
-									ba2.setEndTime((ba2.getEndTime() - this.tw) >= 0 ? ba2.getEndTime() - this.tw : Double.NEGATIVE_INFINITY );
+									ba2.setStartTime( (ba2.getStartTime() - this.tw) >= 0 ? 
+											ba2.getStartTime() - this.tw : 
+											Double.NEGATIVE_INFINITY );
+									ba2.setEndTime((ba2.getEndTime() - this.tw) >= 0 ? 
+											ba2.getEndTime() - this.tw : 
+											Double.NEGATIVE_INFINITY );
 									dummyPlan.getPlanElements().add(ba2);
 									index++;
 								} else if(dummyObject instanceof Leg){
 									Leg bl2 = (Leg) dummyObject;
-									bl2.setDepartureTime( bl2.getDepartureTime() >= 0 ? bl2.getDepartureTime() : Double.NEGATIVE_INFINITY );
+									bl2.setDepartureTime( bl2.getDepartureTime() >= 0 ? 
+											bl2.getDepartureTime() : 
+											Double.NEGATIVE_INFINITY );
 									dummyPlan.getPlanElements().add(bl2);
 									index++;
 								} else{
@@ -176,7 +176,7 @@ public class PlanWrapper {
 						dummyPlan.getPlanElements().add(bl);
 						index++;
 					} else{
-						System.err.println("Plan element is neither a BasicActivity nor a BasicLeg!!");
+						System.err.println("Plan element is neither an Activity nor a Leg!!");
 					}
 				}
 				
