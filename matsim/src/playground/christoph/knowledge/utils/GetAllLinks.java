@@ -38,13 +38,13 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public class GetAllLinks {
 	
@@ -118,8 +118,8 @@ public class GetAllLinks {
 
 		// Routen holen, die die Acts verbinden
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg)pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl)pe;
 				NetworkRoute route = (NetworkRoute) leg.getRoute();
 				for (Link link : route.getLinks()) {
 					// Hinzufuegen, falls neues Element

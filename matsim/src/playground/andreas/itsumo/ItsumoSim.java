@@ -27,7 +27,6 @@ import java.util.Date;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -36,6 +35,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ItsumoSim extends ExternalMobsim {
@@ -129,7 +129,7 @@ public class ItsumoSim extends ExternalMobsim {
 							break ;  // we write only the first leg for itsumo!
 						}
 					} else {
-						Leg leg = (Leg)plan.getPlanElements().get(jj);
+						LegImpl leg = (LegImpl)plan.getPlanElements().get(jj);
 						// route
 						if (leg.getRoute() == null) {
 							System.err.println ( " WARNING: Empty route.  Not sure if itsumo can deal with this.  Continuing anyway ... " ) ;

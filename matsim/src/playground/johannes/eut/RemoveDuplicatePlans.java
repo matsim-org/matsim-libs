@@ -25,11 +25,11 @@ package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.population.LegImpl;
 
 /**
  * @author illenberger
@@ -76,8 +76,8 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 			boolean plansDiffer = false;
 			
 			for (int i = 1; i < plan1.getPlanElements().size(); i += 2) {
-				Leg leg2 = (Leg) plan2.getPlanElements().get(i);
-				Leg leg1 = (Leg) plan1.getPlanElements().get(i);
+				LegImpl leg2 = (LegImpl) plan2.getPlanElements().get(i);
+				LegImpl leg1 = (LegImpl) plan1.getPlanElements().get(i);
 				/*
 				 * Compare sequence of nodes.
 				 */

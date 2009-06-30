@@ -23,14 +23,14 @@ package org.matsim.core.events;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.population.LegImpl;
 
 public class AgentDepartureEvent extends AgentEvent implements BasicAgentDepartureEvent {
 
 	public static final String EVENT_TYPE = "departure";
 
-	public AgentDepartureEvent(final double time, final Person agent, final Link link, final Leg leg) {
+	public AgentDepartureEvent(final double time, final Person agent, final Link link, final LegImpl leg) {
 		super(time, agent, link, leg);
 	}
 

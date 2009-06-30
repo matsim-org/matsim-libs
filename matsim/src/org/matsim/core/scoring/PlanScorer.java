@@ -20,10 +20,10 @@
 
 package org.matsim.core.scoring;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 /**
  * @author dgrether
@@ -48,8 +48,8 @@ public class PlanScorer {
 					firstActivityDone = true;
 				}
 				function.endActivity(act.getEndTime());					
-			} else if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			} else if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				function.startLeg(leg.getDepartureTime(), leg);
 				function.endLeg(leg.getArrivalTime());
 			}

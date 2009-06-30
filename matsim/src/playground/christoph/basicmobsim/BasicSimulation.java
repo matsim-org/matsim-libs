@@ -37,7 +37,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -49,6 +48,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public class BasicSimulation {
 	
@@ -89,9 +89,9 @@ public class BasicSimulation {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				act = (ActivityImpl) pe;
-			} else if (pe instanceof Leg) {
+			} else if (pe instanceof LegImpl) {
 				ArrayList<Node> routeNodes = new ArrayList<Node>();
-				Leg leg = (Leg) pe;
+				LegImpl leg = (LegImpl) pe;
 				ActivityImpl nextAct = plan.getNextActivity(leg);
 				
 				// Ziellink holen

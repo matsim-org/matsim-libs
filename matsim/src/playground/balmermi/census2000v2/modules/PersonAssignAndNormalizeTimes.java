@@ -24,12 +24,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -80,7 +80,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
 			else {
-				Leg l = (Leg)p.getPlanElements().get(i);
+				LegImpl l = (LegImpl)p.getPlanElements().get(i);
 				prev_ttime = l.getTravelTime();
 				l.setDepartureTime(tod); l.setTravelTime(0.0); l.setArrivalTime(tod);
 			}
@@ -120,7 +120,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				tod = a.getEndTime();
 			}
 			else {
-				Leg l = (Leg)p.getPlanElements().get(i);
+				LegImpl l = (LegImpl)p.getPlanElements().get(i);
 				l.setDepartureTime(tod); l.setTravelTime(0.0); l.setArrivalTime(tod);
 			}
 		}
@@ -171,7 +171,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				}
 			}
 			else {
-				Leg leg = (Leg)acts_legs.get(i);
+				LegImpl leg = (LegImpl)acts_legs.get(i);
 				leg.setDepartureTime(leg.getDepartureTime()+bias);
 				leg.setArrivalTime(leg.getArrivalTime()+bias);
 			}

@@ -24,11 +24,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -100,8 +100,8 @@ public class PersonTripSummaryTable extends AbstractPersonAlgorithm implements P
 		Plan plan = person.getSelectedPlan();
 		if (plan == null) { Gbl.errorMsg("Person id=" + person.getId() + "does not have a selected plan assigned!"); }
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				String mode = leg.getMode().toString();
 				double dist = leg.getRoute().getDistance();
 				dist = dist / 1000; // km

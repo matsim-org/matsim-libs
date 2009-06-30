@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 import playground.anhorni.locationchoice.cs.helper.Trip;
 
@@ -42,7 +42,7 @@ public class ActTypeAndAreaTripFilter extends TripFilter {
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			ActivityImpl act = (ActivityImpl)actslegs.get(j);
 			if (j < actslegs.size()-1) {
-				Leg leg = (Leg) actslegs.get(j+1);
+				LegImpl leg = (LegImpl) actslegs.get(j+1);
 				if (act.getType().equals(actType) && 
 						this.withinArea(previousAct, act) && leg.getMode().toString().equals(mode)) {
 					// TODO: check if last = home else problem!

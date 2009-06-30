@@ -24,11 +24,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 /**
  * Represents a vehicle.
@@ -39,7 +39,7 @@ public class Vehicle extends SimUnit {
 
 	private static final Logger log = Logger.getLogger(Vehicle.class);
 	private Person ownerPerson = null;
-	private Leg currentLeg = null;
+	private LegImpl currentLeg = null;
 	private int legIndex;
 	private Link currentLink = null;
 	private int linkIndex;
@@ -73,7 +73,7 @@ public class Vehicle extends SimUnit {
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
-		setCurrentLeg((Leg) actsLegs.get(legIndex));
+		setCurrentLeg((LegImpl) actsLegs.get(legIndex));
 		ActivityImpl firstAct=(ActivityImpl) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
 		double departureTime = firstAct.getEndTime();
@@ -122,7 +122,7 @@ public class Vehicle extends SimUnit {
 		return null;
 	}
 
-	public void setCurrentLeg(Leg currentLeg) {
+	public void setCurrentLeg(LegImpl currentLeg) {
 		this.currentLeg = currentLeg;
 		if (currentLeg.getRoute() instanceof NetworkRoute) {
 			List<Link> links = ((NetworkRoute) currentLeg.getRoute()).getLinks();
@@ -144,7 +144,7 @@ public class Vehicle extends SimUnit {
 		return ownerPerson;
 	}
 
-	public Leg getCurrentLeg() {
+	public LegImpl getCurrentLeg() {
 		return currentLeg;
 	}
 

@@ -25,11 +25,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
@@ -305,7 +305,7 @@ public class ModularJohScoringFunction implements ActivityScoring, BasicScoring 
 		return openInterval;
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters

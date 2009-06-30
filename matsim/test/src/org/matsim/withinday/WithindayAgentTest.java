@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -44,6 +43,7 @@ import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -64,7 +64,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 	private NetworkRoute route2 = null;
 	private NetworkRoute agentRoute = null;
 	private Plan plan = null;
-	private Leg leg = null;
+	private LegImpl leg = null;
 	private QueueSimulation simulation = null;
 
 	@Override
@@ -198,7 +198,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
 	  // first testing the plan of the person
-		Leg newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
+		LegImpl newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
 		List<Node> newPlansRoute = ((NetworkRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(1));
@@ -220,7 +220,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
 	  // first testing the plan of the person
-		newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
+		newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
 		newPlansRoute = ((NetworkRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(2));
@@ -243,7 +243,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
 	  // first testing the plan of the person
-		newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
+		newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
 		newPlansRoute = ((NetworkRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(2));

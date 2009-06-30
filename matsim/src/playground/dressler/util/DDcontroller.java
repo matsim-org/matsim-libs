@@ -24,7 +24,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -35,6 +34,7 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.netvis.NetVis;
@@ -87,7 +87,7 @@ public class DDcontroller {
 					continue;
 				}
 
-				Leg leg = plan.getNextLeg(act);
+				LegImpl leg = plan.getNextLeg(act);
 				if (leg == null) {
 					System.out.println("Person " + person.getId() + " has no leg.");
 					continue;

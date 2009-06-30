@@ -31,13 +31,13 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -195,7 +195,7 @@ public class Planomat implements PlanAlgorithm {
 		double positionInTimeInterval = 0.5;
 
 		Route tempRoute = null;
-		Leg leg = null;
+		LegImpl leg = null;
 		ActivityImpl origin = null;
 		ActivityImpl destination = null;
 
@@ -244,7 +244,7 @@ public class Planomat implements PlanAlgorithm {
 			///////////////////////////////////////////////////////////////////////////////////////////
 			// move agent forward in time according to anticipated travel time...
 			///////////////////////////////////////////////////////////////////////////////////////////
-			leg = ((Leg) actslegs.get(geneIndex * 2 - 1));
+			leg = ((LegImpl) actslegs.get(geneIndex * 2 - 1));
 			destination = plan.getNextActivity(leg);
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {

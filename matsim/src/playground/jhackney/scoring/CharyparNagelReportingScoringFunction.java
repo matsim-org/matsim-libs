@@ -23,7 +23,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
@@ -31,6 +30,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -140,7 +140,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	public void endActivity(final double time) {
 	}
 
-	public void startLeg(final double time, final Leg leg) {
+	public void startLeg(final double time, final LegImpl leg) {
 		if (this.index % 2 == 0) {
 			// it seems we were not informed about activities
 			handleAct(time);
@@ -213,14 +213,14 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 				return 0;
 			}
 	}
-	public double getDulegt(Leg l){
+	public double getDulegt(LegImpl l){
 		if(dulegt.size()>0&&dulegt.keySet().contains(l)){
 			return dulegt.get(l);
 			}else{
 				return 0;
 			}
 	}
-	public double getDulegd(Leg l){
+	public double getDulegd(LegImpl l){
 		if(dulegd.size()>0&&dulegd.keySet().contains(l)){
 			return dulegd.get(l);
 			}else{
@@ -270,14 +270,14 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 				return 0;
 			}
 	}
-	public double getUlegt(Leg l){
+	public double getUlegt(LegImpl l){
 		if(ulegt.size()>0&&ulegt.keySet().contains(l)){
 			return ulegt.get(l);
 			}else{
 				return 0;
 			}
 	}
-	public double getUlegd(Leg l){
+	public double getUlegd(LegImpl l){
 		if(ulegd.size()>0&&ulegd.keySet().contains(l)){
 			return ulegd.get(l);
 			}else{
@@ -304,16 +304,16 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	private LinkedHashMap<ActivityImpl,Double> ula=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> ued=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> uld=new LinkedHashMap<ActivityImpl,Double>();
-	private LinkedHashMap<Leg,Double> ulegt=new LinkedHashMap<Leg,Double>();
-	private LinkedHashMap<Leg,Double> ulegd = new LinkedHashMap<Leg,Double>();
+	private LinkedHashMap<LegImpl,Double> ulegt=new LinkedHashMap<LegImpl,Double>();
+	private LinkedHashMap<LegImpl,Double> ulegd = new LinkedHashMap<LegImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> dudur=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> duw=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> dus=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> dula=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> dued=new LinkedHashMap<ActivityImpl,Double>();
 	private LinkedHashMap<ActivityImpl,Double> duld=new LinkedHashMap<ActivityImpl,Double>();
-	private LinkedHashMap<Leg,Double> dulegt=new LinkedHashMap<Leg,Double>();
-	private LinkedHashMap<Leg,Double> dulegd = new LinkedHashMap<Leg,Double>();
+	private LinkedHashMap<LegImpl,Double> dulegt=new LinkedHashMap<LegImpl,Double>();
+	private LinkedHashMap<LegImpl,Double> dulegd = new LinkedHashMap<LegImpl,Double>();
 	
 	private static void init() {
 		if (initialized) return;
@@ -482,7 +482,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		return openInterval;
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double tmpScore = 0.0;
 		double dtmpScore=0.;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
@@ -585,7 +585,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	}
 
 	private void handleLeg(final double time) {
-		Leg leg = (Leg)this.plan.getPlanElements().get(this.index);
+		LegImpl leg = (LegImpl)this.plan.getPlanElements().get(this.index);
 //		this.score += calcLegScore(this.lastTime, time, leg);
 		double temp=calcLegScore(this.lastTime, time, leg);
 		this.score += temp;

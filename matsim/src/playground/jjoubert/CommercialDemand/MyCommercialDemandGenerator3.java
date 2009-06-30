@@ -33,13 +33,13 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -136,7 +136,7 @@ public class MyCommercialDemandGenerator3 {
 				majorActivityStart.setEndTime(startTime);
 				plan.getPlanElements().add(majorActivityStart);
 
-				Leg leg = new LegImpl(TransportMode.car);
+				LegImpl leg = new LegImpl(TransportMode.car);
 				plan.addLeg(leg);
 
 				// Sample number of activities, given start time

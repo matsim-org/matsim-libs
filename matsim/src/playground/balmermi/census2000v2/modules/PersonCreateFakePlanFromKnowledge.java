@@ -24,12 +24,12 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -112,7 +112,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act.setEndTime(end_time);
 				act.setDuration(end_time);
 				act.setFacility(home.getFacility());
-				Leg leg = p.createLeg(TransportMode.car);
+				LegImpl leg = p.createLeg(TransportMode.car);
 				leg.setDepartureTime(end_time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(end_time);
@@ -128,7 +128,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(work.getFacility());
-					Leg leg2 = p.createLeg(TransportMode.car);
+					LegImpl leg2 = p.createLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);
@@ -145,7 +145,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(educ.getFacility());
-					Leg leg2 = p.createLeg(TransportMode.car);
+					LegImpl leg2 = p.createLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);

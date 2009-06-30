@@ -20,9 +20,9 @@
 
 package playground.mfeil;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 public class ScheduleCleaner {
@@ -41,10 +41,10 @@ public class ScheduleCleaner {
 			
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
-			((Leg)(plan.getPlanElements().get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (Leg)(plan.getPlanElements().get(i)));
-			((Leg)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
-			((Leg)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
+			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
+			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
+			((LegImpl)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
 			if (i!=plan.getPlanElements().size()-2){

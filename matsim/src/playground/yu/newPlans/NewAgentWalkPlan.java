@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -34,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -83,11 +83,11 @@ public class NewAgentWalkPlan extends NewPopulation {
 						if (i % 2 == 0) {
 							walkPlan.addActivity((ActivityImpl) o);
 						} else {
-							Leg leg = (Leg) o;
+							LegImpl leg = (LegImpl) o;
 							// -----------------------------------------------
 							// WITHOUT routeSetting!
 							// -----------------------------------------------
-							Leg walkLeg = new org.matsim.core.population.LegImpl(
+							LegImpl walkLeg = new org.matsim.core.population.LegImpl(
 									TransportMode.walk);
 							walkLeg.setDepartureTime(leg.getDepartureTime());
 							walkLeg.setTravelTime(leg.getTravelTime());
@@ -112,8 +112,8 @@ public class NewAgentWalkPlan extends NewPopulation {
 
 	private boolean hasLongLegs(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				if (CoordUtils.calcDistance(plan.getPreviousActivity(leg)
 						.getLink().getCoord(), plan.getNextActivity(leg)
 						.getLink().getCoord()) / 1000.0 > 3.0)

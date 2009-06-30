@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -130,7 +130,7 @@ public class PlanSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.startActivity(time, act);
 	}
 
-	public void startLeg(final double time, final Leg leg) {
+	public void startLeg(final double time, final LegImpl leg) {
 		this.scoringFunction.startLeg(time, leg);
 	}
 

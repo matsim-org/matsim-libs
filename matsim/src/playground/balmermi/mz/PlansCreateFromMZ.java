@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -39,6 +38,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -218,7 +218,7 @@ public class PlansCreateFromMZ {
 					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
-					Leg leg = plan.createLeg(mode);
+					LegImpl leg = plan.createLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
@@ -238,7 +238,7 @@ public class PlansCreateFromMZ {
 				else {
 					ActivityImpl homeAct = plan.createActivity(HOME,from);
 					homeAct.setEndTime(departure);
-					Leg leg = plan.createLeg(mode);
+					LegImpl leg = plan.createLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
@@ -326,8 +326,8 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
+				if (pe instanceof LegImpl) {
+					LegImpl leg = (LegImpl) pe;
 					if (leg.getMode().equals(UNDF)) { ids.add(p.getId()); }
 				}
 			}
@@ -373,7 +373,7 @@ public class PlansCreateFromMZ {
 
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
 				ActivityImpl prev_act = (ActivityImpl)plan.getPlanElements().get(i-2);
-				Leg leg = (Leg)plan.getPlanElements().get(i-1);
+				LegImpl leg = (LegImpl)plan.getPlanElements().get(i-1);
 				ActivityImpl curr_act = (ActivityImpl)plan.getPlanElements().get(i);
 				Coord prevc = prev_act.getCoord();
 				Coord currc = curr_act.getCoord();
@@ -435,8 +435,8 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
+				if (pe instanceof LegImpl) {
+					LegImpl leg = (LegImpl) pe;
 					if (leg.getRoute().getDistance() < 0) { ids.add(p.getId()); }
 				}
 			}
@@ -467,8 +467,8 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
+				if (pe instanceof LegImpl) {
+					LegImpl leg = (LegImpl) pe;
 					if ((leg.getMode().equals(TransportMode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(p.getId()); }
 				}
 			}

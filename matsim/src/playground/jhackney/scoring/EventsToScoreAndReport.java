@@ -32,7 +32,6 @@ import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -42,6 +41,7 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -169,8 +169,8 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 				
 				while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 					Object o = actLegIter.next();
-					if (o instanceof Leg ) {
-						Leg leg = (Leg) o;
+					if (o instanceof LegImpl ) {
+						LegImpl leg = (LegImpl) o;
 //						if(act.equals(plan.getFirstActivity())){
 //							try {
 //								muout.write("\t"+0.0);

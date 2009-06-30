@@ -22,7 +22,6 @@ package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -30,6 +29,7 @@ import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -50,7 +50,7 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 	protected PlanAlgorithm replanner;
 	protected Person person;
 	protected ActivityImpl fromAct;
-	protected Leg betweenLeg;
+	protected LegImpl betweenLeg;
 	protected ActivityImpl toAct;
 	protected double time;
 		

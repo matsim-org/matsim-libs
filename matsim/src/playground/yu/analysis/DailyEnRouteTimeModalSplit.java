@@ -4,7 +4,6 @@
 package playground.yu.analysis;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -12,6 +11,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYScatterChart;
@@ -79,8 +79,8 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 		int age = this.person.getAge();
 		String carAvail = this.person.getCarAvail();
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				double legTime = leg.getRoute().getTravelTime() / 60.0;
 				if (Integer.parseInt(this.person.getId().toString()) < 1000000000
 						&& leg.getDepartureTime() < 86400) {

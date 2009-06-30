@@ -49,7 +49,6 @@ import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -63,6 +62,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcLanes;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -433,7 +433,7 @@ public class MyRuns {
 						public void run(final Plan plan) {
 							final List actslegs = plan.getPlanElements();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
-								final Leg leg = (Leg)actslegs.get(i);
+								final LegImpl leg = (LegImpl)actslegs.get(i);
 								run((NetworkRoute) leg.getRoute(), leg.getDepartureTime());
 							}
 						}

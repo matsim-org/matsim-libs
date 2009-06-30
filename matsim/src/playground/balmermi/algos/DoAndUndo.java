@@ -23,10 +23,10 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -57,7 +57,7 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		if (!leg_modes.isEmpty()) { Gbl.errorMsg("Something is wrong!"); }
 		Plan plan = p.getSelectedPlan();
 		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
-			Leg leg = (Leg)plan.getPlanElements().get(i);
+			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			leg_modes.add(leg.getMode());
 			leg.setMode(TransportMode.car);
 		}
@@ -67,7 +67,7 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		if (leg_modes.isEmpty()) { Gbl.errorMsg("Something is wrong!"); }
 		Plan plan = p.getSelectedPlan();
 		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
-			Leg leg = (Leg)plan.getPlanElements().get(i);
+			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			leg.setMode(leg_modes.get((i-1)/2));
 		}
 		leg_modes.clear();

@@ -35,7 +35,6 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -47,6 +46,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -431,7 +431,7 @@ public class BetaTravelTest extends MatsimTestCase {
 
 				} else {
 
-					Leg leg = (Leg)(plan.getPlanElements().get(i));
+					LegImpl leg = (LegImpl)(plan.getPlanElements().get(i));
 
 					// assume that there will be no delay between end time of previous activity and departure time
 					leg.setDepartureTime(now);

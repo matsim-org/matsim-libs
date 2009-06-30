@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -130,7 +130,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 				this.actTypeDurations[idx] = this.actTypeDurations[idx] + dur;
 			}
 			if (j > 0) {
-				Leg leg = (Leg)actsLegs.get(j-1);
+				LegImpl leg = (LegImpl)actsLegs.get(j-1);
 				TransportMode legMode = leg.getMode();
 				idx = getLegModeIndex(legMode);
 				if ((idx >= 0) && (dur >= 0)) {

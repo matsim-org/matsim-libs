@@ -42,7 +42,6 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -53,6 +52,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -226,7 +226,7 @@ public class DistanceAnalysis {
 
 
 		for (Person person : persons) {
-			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
+			LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 			double l1 = leg.getRoute().getDistance();
 			List<Link> ls = ((NetworkRoute) leg.getRoute()).getLinks();
 			Link l = ls.get(ls.size()-1);
@@ -238,14 +238,14 @@ public class DistanceAnalysis {
 			dist[2] += person.getSelectedPlan().getScore().doubleValue();
 			Plan plan = new org.matsim.core.population.PlanImpl(person);
 			plan.addActivity(person.getSelectedPlan().getFirstActivity());
-			Leg ll = new org.matsim.core.population.LegImpl(TransportMode.car);
+			LegImpl ll = new org.matsim.core.population.LegImpl(TransportMode.car);
 			ll.setArrivalTime(0.0);
 			ll.setDepartureTime(0.0);
 			ll.setTravelTime(0.0);
 			plan.addLeg(ll);
 			plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
 			this.router.run(plan);
-			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
+			LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
 			double l2 = leg2.getRoute().getDistance();
 			dist[1] = l2;
 

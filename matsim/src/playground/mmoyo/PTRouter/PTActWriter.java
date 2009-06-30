@@ -8,7 +8,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -20,6 +19,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -119,9 +119,9 @@ public class PTActWriter {
 			Plan plan = person.getPlans().get(0);
 	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
 			ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
-			List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
+			List<LegImpl> legList = transitRouteFinder.calculateRoute (act1, act2, person);
 			
-			for (Leg leg : legList){
+			for (LegImpl leg : legList){
 				NetworkRoute netRoute= (NetworkRoute) leg.getRoute(); 
 				System.out.println("");
 				for ( Link l : netRoute.getLinks()){
@@ -355,7 +355,7 @@ public class PTActWriter {
 		return ptAct;
 	}
 
-	private Leg newPTLeg(TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private LegImpl newPTLeg(TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 		
 		if (mode!=TransportMode.walk){
@@ -366,7 +366,7 @@ public class PTActWriter {
 		
 		legRoute.setTravelTime(travTime);
 		legRoute.setDistance(distance);
-		Leg leg = new LegImpl(mode);
+		LegImpl leg = new LegImpl(mode);
 		leg.setRoute(legRoute);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
@@ -374,7 +374,7 @@ public class PTActWriter {
 		return leg;
 	}
 
-	private Leg walkLeg(final ActivityImpl act1, final ActivityImpl act2){
+	private LegImpl walkLeg(final ActivityImpl act1, final ActivityImpl act2){
 		double distance= CoordUtils.calcDistance(act1.getCoord(), act2.getCoord());
 		double walkTravelTime = walk.walkTravelTime(distance);
 		double depTime = act1.getEndTime();

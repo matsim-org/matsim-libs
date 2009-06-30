@@ -23,8 +23,8 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
@@ -42,7 +42,7 @@ public class EUTScoringFunction extends LegScoringFunction {
 	}
 
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
+	protected double calcLegScore(double departureTime, double arrivalTime, LegImpl leg) {
 		return this.params.marginalUtilityOfTraveling * utilFunc.evaluate(arrivalTime - departureTime);
 	}
 

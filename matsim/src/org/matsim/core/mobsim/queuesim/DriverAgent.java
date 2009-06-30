@@ -21,8 +21,8 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.population.LegImpl;
 
 public interface DriverAgent {
 
@@ -70,7 +70,7 @@ public interface DriverAgent {
 
 	public void moveOverNode();
 
-	public Leg getCurrentLeg();
+	public LegImpl getCurrentLeg();
 
 	public Person getPerson();
 

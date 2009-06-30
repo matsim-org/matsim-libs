@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 
 import playground.msieg.structure.Commodity;
@@ -82,7 +82,7 @@ public class BestFitTimeRouter extends CMCFRouter {
 				while (flow > 0.99) //0.99 because of rounding errors
 				{	//look for unrouted person with the same start and target
 					Person person = null;
-					Leg leg = null;
+					LegImpl leg = null;
 					for(Person p: unroutedPersons){
 						leg = p.getSelectedPlan().getNextLeg(p.getSelectedPlan().getFirstActivity());
 						Node 	from = leg.getRoute().getStartLink().getToNode(),

@@ -23,10 +23,10 @@ package playground.marcel.pt.mocks;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.GenericRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
@@ -38,7 +38,7 @@ import playground.marcel.pt.transitSchedule.TransitLine;
 public class MockAgent implements DriverAgent, PassengerAgent {
 
 	private final TransitStopFacility exitStop;
-	private final Leg dummyLeg;
+	private final LegImpl dummyLeg;
 	private final Person dummyPerson = new PersonImpl(new IdImpl(1));
 	
 	public MockAgent(final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
@@ -56,7 +56,7 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 		return null;
 	}
 
-	public Leg getCurrentLeg() {
+	public LegImpl getCurrentLeg() {
 		return this.dummyLeg;
 	}
 

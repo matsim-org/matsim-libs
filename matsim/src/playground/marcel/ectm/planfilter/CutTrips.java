@@ -28,11 +28,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class CutTrips implements PersonAlgorithm {
@@ -67,7 +67,7 @@ public class CutTrips implements PersonAlgorithm {
 		boolean startInside = this.aoi.containsKey(((ActivityImpl) plan.getPlanElements().get(0)).getLink().getId());
 
 		for (int legNr = 1, n = plan.getPlanElements().size(); legNr < n; legNr += 2) {
-			Leg leg = (Leg) plan.getPlanElements().get(legNr);
+			LegImpl leg = (LegImpl) plan.getPlanElements().get(legNr);
 			if (leg.getRoute() == null) {
 				throw new RuntimeException("route is null. person=" + person.getId().toString());
 			}
@@ -149,11 +149,11 @@ public class CutTrips implements PersonAlgorithm {
 			}
 			// remove all routes from legs before firstInsideLeg, as they are now all at the same location
 			for (int legNr = 1; legNr < firstInsideLeg; legNr += 2) {
-				Leg leg = (Leg) plan.getPlanElements().get(legNr);
+				LegImpl leg = (LegImpl) plan.getPlanElements().get(legNr);
 				leg.setRoute(null);
 			}
 			// find the time the agent is entering the AOI, and use that time as from-act endtime
-			Leg leg = (Leg) plan.getPlanElements().get(firstInsideLeg);
+			LegImpl leg = (LegImpl) plan.getPlanElements().get(firstInsideLeg);
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			double traveltime = 0.0;
 			for (Link link : route.getLinks()) {
@@ -194,13 +194,13 @@ public class CutTrips implements PersonAlgorithm {
 		if (firstOutsideLink != null) {
 			// remove all routes from legs after firstOutsideLeg, as they are now all at the same location
 			for (int legNr = firstOutsideLeg + 2; legNr < plan.getPlanElements().size(); legNr += 2) {
-				Leg leg = (Leg) plan.getPlanElements().get(legNr);
+				LegImpl leg = (LegImpl) plan.getPlanElements().get(legNr);
 				leg.setRoute(null);
 			}
 
 			// adapt route of leg that leads out of the AOI
 			boolean removing = false;
-			Leg leg = (Leg) plan.getPlanElements().get(firstOutsideLeg);
+			LegImpl leg = (LegImpl) plan.getPlanElements().get(firstOutsideLeg);
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			List<Node> nodes = route.getNodes();
 			Iterator<Node> iter = nodes.iterator();

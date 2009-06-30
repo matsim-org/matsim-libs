@@ -27,12 +27,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -279,7 +279,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		if ((index < 40) || (45 < index)) { Gbl.errorMsg("Person id=" + person.getId() + ": returning wrong index!"); }
 		vals[index]++;
 
-		String mode = ((Leg)person.getSelectedPlan().getPlanElements().get(1)).getMode().toString();
+		String mode = ((LegImpl)person.getSelectedPlan().getPlanElements().get(1)).getMode().toString();
 		if (WALK.equals(mode)) { vals[45]++; }
 		else if (BIKE.equals(mode)) { vals[46]++; }
 		else if (CAR.equals(mode)) { vals[47]++; }

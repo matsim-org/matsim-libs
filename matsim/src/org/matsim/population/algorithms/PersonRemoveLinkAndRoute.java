@@ -20,11 +20,11 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -39,8 +39,8 @@ public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				((ActivityImpl) pe).setLink(null);
-			} else if (pe instanceof Leg) {
-				((Leg) pe).setRoute(null);
+			} else if (pe instanceof LegImpl) {
+				((LegImpl) pe).setRoute(null);
 			}
 		}
 	}

@@ -24,13 +24,13 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -232,7 +232,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			}
 
 			if (!skipActivity) {
-				Leg l = this.currPlan.createLeg(mode);
+				LegImpl l = this.currPlan.createLeg(mode);
 				l.setDepartureTime(this.currTime);
 				l.setTravelTime(travTime);
 				l.setArrivalTime(arrTime);

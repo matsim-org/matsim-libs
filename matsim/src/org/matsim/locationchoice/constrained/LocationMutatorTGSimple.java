@@ -29,12 +29,12 @@ import java.util.Vector;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
@@ -68,8 +68,8 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		int indexOfActToMove = actslegs.indexOf(actToMove);
 		
 		// starting home and ending home are never flexible
-		final Leg legPre = (Leg)actslegs.get(indexOfActToMove -1);
-		final Leg legPost = (Leg)actslegs.get(indexOfActToMove + 1);
+		final LegImpl legPre = (LegImpl)actslegs.get(indexOfActToMove -1);
+		final LegImpl legPost = (LegImpl)actslegs.get(indexOfActToMove + 1);
 		final ActivityImpl actPre = (ActivityImpl)actslegs.get(indexOfActToMove - 2);
 		final ActivityImpl actPost = (ActivityImpl)actslegs.get(indexOfActToMove + 2);
 		

@@ -26,7 +26,6 @@ package playground.yu.analysis;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -34,6 +33,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -64,7 +64,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 
 		for (int i = 1; i < pes.size() - 1; i += 2) {
 
-			Leg leg = (Leg) pes.get(i);
+			LegImpl leg = (LegImpl) pes.get(i);
 			if (leg.getMode().equals(TransportMode.car)) {
 				ParkLocation prePark = new ParkLocation(plan
 						.getPreviousActivity(leg));
@@ -126,7 +126,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 				sb.append(act.getCoord());
 				sb.append('\n');
 			} else {
-				Leg leg = (Leg) pe;
+				LegImpl leg = (LegImpl) pe;
 				sb.append(leg.getMode());
 				sb.append('\n');
 			}

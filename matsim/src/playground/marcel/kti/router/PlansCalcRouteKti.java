@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -68,14 +68,14 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	}
 
 	@Override
-	public double handleLeg(final Leg leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		if (TransportMode.pt.equals(leg.getMode())) {
 			return handleSwissPtLeg(fromAct, leg, toAct);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);
 	}
 
-	public double handleSwissPtLeg(final ActivityImpl fromAct, final Leg leg, final ActivityImpl toAct) {
+	public double handleSwissPtLeg(final ActivityImpl fromAct, final LegImpl leg, final ActivityImpl toAct) {
 		Coord fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
 		Coord toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
 

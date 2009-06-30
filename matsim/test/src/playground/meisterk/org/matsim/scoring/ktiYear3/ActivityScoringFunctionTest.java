@@ -32,7 +32,6 @@ import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -46,6 +45,7 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -143,7 +143,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		Link link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-		Leg leg = this.plan.createLeg(TransportMode.car);
+		LegImpl leg = this.plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("00:30:00"));
@@ -377,7 +377,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedWaitingTimeSequence[0], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 		
-		testee.startLeg(Time.parseTime("08:00:00"), (Leg) this.plan.getPlanElements().get(1));
+		testee.startLeg(Time.parseTime("08:00:00"), (LegImpl) this.plan.getPlanElements().get(1));
 		testee.endLeg(Time.parseTime("08:30:00"));
 		testee.startActivity(Time.parseTime("08:30:00"), (ActivityImpl) this.plan.getPlanElements().get(2));
 		testee.endActivity(Time.parseTime("14:30:00"));
@@ -391,7 +391,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedWaitingTimeSequence[1], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[1], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
-		testee.startLeg(Time.parseTime("14:30:00"), (Leg) this.plan.getPlanElements().get(3));
+		testee.startLeg(Time.parseTime("14:30:00"), (LegImpl) this.plan.getPlanElements().get(3));
 		testee.endLeg(Time.parseTime("14:35:00"));
 		testee.startActivity(Time.parseTime("14:35:00"), (ActivityImpl) this.plan.getPlanElements().get(4));
 		testee.endActivity(Time.parseTime("14:55:00"));
@@ -405,7 +405,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedWaitingTimeSequence[2], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 		
-		testee.startLeg(Time.parseTime("14:55:00"), (Leg) this.plan.getPlanElements().get(5));
+		testee.startLeg(Time.parseTime("14:55:00"), (LegImpl) this.plan.getPlanElements().get(5));
 		testee.endLeg(Time.parseTime("15:00:00"));
 		testee.startActivity(Time.parseTime("15:00:00"), (ActivityImpl) this.plan.getPlanElements().get(6));
 		testee.endActivity(Time.parseTime("17:00:00"));
@@ -419,7 +419,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedWaitingTimeSequence[3], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[3], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
-		testee.startLeg(Time.parseTime("17:00:00"), (Leg) this.plan.getPlanElements().get(7));
+		testee.startLeg(Time.parseTime("17:00:00"), (LegImpl) this.plan.getPlanElements().get(7));
 		testee.endLeg(Time.parseTime("17:30:00"));
 		testee.startActivity(Time.parseTime("17:30:00"), (ActivityImpl) this.plan.getPlanElements().get(8));
 		testee.endActivity(Time.parseTime("20:00:00"));
@@ -433,7 +433,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedWaitingTimeSequence[4], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[4], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
-		testee.startLeg(Time.parseTime("20:00:00"), (Leg) this.plan.getPlanElements().get(9));
+		testee.startLeg(Time.parseTime("20:00:00"), (LegImpl) this.plan.getPlanElements().get(9));
 		testee.endLeg(Time.parseTime("24:00:00"));
 		testee.startActivity(Time.parseTime("24:00:00"), (ActivityImpl) this.plan.getPlanElements().get(10));
 		testee.endActivity(Time.parseTime("30:00:00"));
@@ -447,7 +447,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedWaitingTimeSequence[5], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[5], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
 
-		testee.startLeg(Time.parseTime("30:00:00"), (Leg) this.plan.getPlanElements().get(11));
+		testee.startLeg(Time.parseTime("30:00:00"), (LegImpl) this.plan.getPlanElements().get(11));
 		testee.endLeg(Time.parseTime("34:00:00"));
 		testee.startActivity(Time.parseTime("34:00:00"), (ActivityImpl) this.plan.getPlanElements().get(12));
 

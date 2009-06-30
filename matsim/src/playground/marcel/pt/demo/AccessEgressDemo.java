@@ -28,7 +28,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -38,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
@@ -153,7 +153,7 @@ public class AccessEgressDemo {
 				Plan plan = pb.createPlan(person);
 				ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[i]);
 				act1.setEndTime(departureTime + j * agentInterval);
-				Leg leg = pb.createLeg(TransportMode.pt);
+				LegImpl leg = pb.createLeg(TransportMode.pt);
 				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, lastStop));
 				ActivityImpl act2 = pb.createActivityFromLinkId("work", this.ids[nOfLinks - 1]);
 

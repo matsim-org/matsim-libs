@@ -41,7 +41,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
@@ -71,6 +70,7 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -699,7 +699,7 @@ public class QueueSimulation {
 	protected void agentDeparts(final DriverAgent agent, final Link link) {
 		double now = SimulationTimer.getTime();
 
-		Leg leg = agent.getCurrentLeg();
+		LegImpl leg = agent.getCurrentLeg();
 
 		events.processEvent(new AgentDepartureEvent(now, agent.getPerson(), link, leg));
 

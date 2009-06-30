@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -128,7 +128,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(s_act_idx);
 		if (act.getType().startsWith(H)) { return -1; }
-		Leg leg = (Leg)p.getPlanElements().get(s_act_idx-1);
+		LegImpl leg = (LegImpl)p.getPlanElements().get(s_act_idx-1);
 		if (leg.getMode().equals(TransportMode.car)) { return 0; }
 		else if (leg.getMode().equals(TransportMode.pt)) { return 1; }
 		else if (leg.getMode().equals(TransportMode.ride)) { return 2; }
@@ -297,7 +297,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 			// SET the mode for the legs of the subtour
 			for (int j=0; j<leg_indices.size(); j++) {
-				Leg l = (Leg)p.getPlanElements().get(leg_indices.get(j));
+				LegImpl l = (LegImpl)p.getPlanElements().get(leg_indices.get(j));
 				l.setMode(mode);
 			}
 			

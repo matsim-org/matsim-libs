@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
@@ -14,6 +13,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -203,8 +203,8 @@ public class CompareSelectedPlansTable {
 
 		double travelTime = 0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				travelTime += leg.getTravelTime();
 			}
 		}
@@ -215,8 +215,8 @@ public class CompareSelectedPlansTable {
 
 		double travelDist = 0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				travelDist += leg.getRoute().getDistance();
 			}
 		}
@@ -227,7 +227,7 @@ public class CompareSelectedPlansTable {
 
 		int numberOfLegs = 0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
+			if (pe instanceof LegImpl) {
 				numberOfLegs++;
 			}
 		}

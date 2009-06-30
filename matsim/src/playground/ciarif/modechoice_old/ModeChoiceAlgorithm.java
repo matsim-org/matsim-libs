@@ -25,11 +25,11 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -115,17 +115,17 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 			if (index == 0) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
-					Leg leg = (Leg)acts_legs.get(i);
+					LegImpl leg = (LegImpl)acts_legs.get(i);
 					leg.setMode(TransportMode.walk);
 				}
 			} else if (index == 1) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
-					Leg leg = (Leg)acts_legs.get(i);
+					LegImpl leg = (LegImpl)acts_legs.get(i);
 					leg.setMode(TransportMode.bike);
 				}
 			} else if (index == 2) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
-					Leg leg = (Leg)acts_legs.get(i);
+					LegImpl leg = (LegImpl)acts_legs.get(i);
 					leg.setMode(TransportMode.car);
 					// Modify because now also persons without driving license can have the option car available.
 					//which is correct, but they don't produce traffic,since they get a ride from someone else
@@ -133,12 +133,12 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 				}
 			} else if (index == 3) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
-					Leg leg = (Leg)acts_legs.get(i);
+					LegImpl leg = (LegImpl)acts_legs.get(i);
 					leg.setMode(TransportMode.pt);
 				}
 			} else if (index == 4) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
-					Leg leg = (Leg)acts_legs.get(i);
+					LegImpl leg = (LegImpl)acts_legs.get(i);
 					leg.setMode(TransportMode.undefined);
 				}
 			}

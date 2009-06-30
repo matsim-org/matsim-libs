@@ -4,10 +4,10 @@
 package playground.yu.analysis.MZComparison;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -56,17 +56,17 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				double legDist = ((Leg) pe).getRoute().getDistance();// leg
+			if (pe instanceof LegImpl) {
+				double legDist = ((LegImpl) pe).getRoute().getDistance();// leg
 				// distance
 				// [m]
-				String legMode = ((Leg) pe).getMode().name();
-				double legTime = ((Leg) pe).getTravelTime() / 60.0;// travel
+				String legMode = ((LegImpl) pe).getMode().name();
+				double legTime = ((LegImpl) pe).getTravelTime() / 60.0;// travel
 				// time
 				// [min]
 				double legLinearDist = CoordUtils.calcDistance(plan
-						.getPreviousActivity((Leg) pe).getCoord(), plan
-						.getNextActivity((Leg) pe).getCoord());// leg linear
+						.getPreviousActivity((LegImpl) pe).getCoord(), plan
+						.getNextActivity((LegImpl) pe).getCoord());// leg linear
 				// distance [m]
 				/*
 				 * linearDist += legLinearDist; if (inTollRange) linearDist_toll

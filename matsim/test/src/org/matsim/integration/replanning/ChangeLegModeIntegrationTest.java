@@ -23,7 +23,6 @@ package org.matsim.integration.replanning;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -33,6 +32,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -84,7 +84,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		// test that everything worked as expected
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
-		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
+		LegImpl newLeg = (LegImpl) newPlan.getPlanElements().get(1);
 		assertEquals(TransportMode.walk, newLeg.getMode());
 		assertNotNull("the leg should now have a route.", newLeg.getRoute());
 	}

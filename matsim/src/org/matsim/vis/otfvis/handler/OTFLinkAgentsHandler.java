@@ -29,10 +29,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
@@ -75,7 +75,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 					out.putInt(1);
 				} else {
 					DriverAgent driver = veh.getDriver(); 
-					Leg leg = driver.getCurrentLeg();
+					LegImpl leg = driver.getCurrentLeg();
 					if (leg != null) {
 						if(leg.getMode() == TransportMode.pt) {
 							out.putInt(2);

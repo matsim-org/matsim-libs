@@ -9,13 +9,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -72,9 +72,9 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		double bikeDayTime = 0.0;
 		double othersDayTime = 0.0;
 		for (PlanElement pe : plan.getPlanElements())
-			if (pe instanceof Leg) {
+			if (pe instanceof LegImpl) {
 
-				Leg bl = (Leg) pe;
+				LegImpl bl = (LegImpl) pe;
 
 				ActType at = null;
 				String tmpActType = plan.getNextActivity(bl).getType();

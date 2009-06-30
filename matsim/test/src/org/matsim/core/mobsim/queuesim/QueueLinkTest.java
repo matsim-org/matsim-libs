@@ -25,7 +25,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -37,6 +36,7 @@ import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -239,7 +239,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Plan plan = p.createPlan(true);
 		try {
 			plan.createActivity("h", link1);
-			Leg leg = plan.createLeg(TransportMode.car);
+			LegImpl leg = plan.createLeg(TransportMode.car);
 			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link2);
 			leg.setRoute(route);
 			route.setLinks(link1, null, link2);

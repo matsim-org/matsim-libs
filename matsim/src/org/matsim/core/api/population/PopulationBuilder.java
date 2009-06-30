@@ -27,6 +27,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 /**
  * @author dgrether
@@ -43,7 +44,7 @@ public interface PopulationBuilder extends BasicPopulationBuilder {
 
 	ActivityImpl createActivityFromLinkId(String actType, Id linkId);
 	
-	Leg createLeg(TransportMode legMode);
+	LegImpl createLeg(TransportMode legMode);
 
 	/**
 	 * Creates a new Route object

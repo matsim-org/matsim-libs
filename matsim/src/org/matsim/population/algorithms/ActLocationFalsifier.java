@@ -21,12 +21,12 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 /**
  * Moves the geographical location of act's a random amount to north/south and east/west,
@@ -60,8 +60,8 @@ public class ActLocationFalsifier extends AbstractPersonAlgorithm implements Pla
 				coord.setXY(coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) *  this.totalDistance,
 						coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * this.totalDistance);
 				act.setLink(null);
-			} else if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			} else if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				leg.setRoute(null);
 			}
 		}

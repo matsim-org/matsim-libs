@@ -26,12 +26,12 @@ import java.util.List;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -98,7 +98,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		// loop over all <act>s
 		for (int j = 2; j < actslegs.size(); j=j+2) {
 			ActivityImpl toAct = (ActivityImpl)actslegs.get(j);
-			Leg leg = (Leg)actslegs.get(j-1);
+			LegImpl leg = (LegImpl)actslegs.get(j-1);
 
 			travTime = handleLeg(leg, fromAct, toAct, now);
 
@@ -141,7 +141,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	protected double handleLeg(Leg leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
+	protected double handleLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		String legmode = leg.getMode().toString();
 
 		if (legmode == "car") {
@@ -164,7 +164,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	private double handleCarLeg(Leg leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
+	private double handleCarLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		double travTime = 0;
 		Link fromLink = fromAct.getLink();
 		Link toLink = toAct.getLink();
@@ -225,18 +225,18 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		return travTime;
 	}
 
-	private double handleRideLeg(Leg leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
+	private double handleRideLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		// handle a ride exactly the same was as a car
 		// the simulation has to take car that this leg is not really simulated as a stand-alone driver
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtLeg(Leg leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
+	private double handlePtLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		// currently: exactly the same as for Car Leg, because i'm just too lazy...
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handleWalkLeg(Leg leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
+	private double handleWalkLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		// make simple assumption about distance and walking speed
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
@@ -251,7 +251,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		return travTime;
 	}
 
-	private double handleBikeLeg(Leg leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
+	private double handleBikeLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		// make simple assumption about distance and cycling speed
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
@@ -266,7 +266,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		return travTime;
 	}
 
-	private double handleUndefLeg(Leg leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
+	private double handleUndefLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s

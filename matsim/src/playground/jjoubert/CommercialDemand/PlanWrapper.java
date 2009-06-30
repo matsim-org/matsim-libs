@@ -23,9 +23,9 @@ package playground.jjoubert.CommercialDemand;
 import java.util.ArrayList;
 
 import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -145,8 +145,8 @@ public class PlanWrapper {
 											Double.NEGATIVE_INFINITY );
 									dummyPlan.getPlanElements().add(ba2);
 									index++;
-								} else if(dummyObject instanceof Leg){
-									Leg bl2 = (Leg) dummyObject;
+								} else if(dummyObject instanceof LegImpl){
+									LegImpl bl2 = (LegImpl) dummyObject;
 									bl2.setDepartureTime( bl2.getDepartureTime() >= 0 ? 
 											bl2.getDepartureTime() : 
 											Double.NEGATIVE_INFINITY );
@@ -166,8 +166,8 @@ public class PlanWrapper {
 								result.add(bp);
 							}
 						}
-					} else if(object instanceof Leg){
-						Leg bl = (Leg) object;
+					} else if(object instanceof LegImpl){
+						LegImpl bl = (LegImpl) object;
 						dummyPlan.getPlanElements().add(bl);
 						index++;
 					} else{

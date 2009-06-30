@@ -28,11 +28,11 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -83,7 +83,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 		// get the subtour mode
 		int idx = -1;
-		TransportMode mode = ((Leg)plan.getPlanElements().get(start+1)).getMode();
+		TransportMode mode = ((LegImpl)plan.getPlanElements().get(start+1)).getMode();
 		if (mode.equals(TransportMode.walk)) { idx = WALK; }
 		else if (mode.equals(TransportMode.bike)) { idx = BIKE; }
 		else if (mode.equals(TransportMode.car)) { idx = CAR; }

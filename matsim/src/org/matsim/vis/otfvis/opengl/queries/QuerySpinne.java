@@ -43,7 +43,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -57,6 +56,7 @@ import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -139,7 +139,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					}
 				} else {
 					// handle leg
-					Leg leg = (Leg)actslegs.get(i);
+					LegImpl leg = (LegImpl)actslegs.get(i);
 					// just look at car routes right now
 					if(leg.getMode() != TransportMode.car) continue;
 					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
@@ -172,8 +172,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 //					}
 // I don't think that it is very plausible to include this, and since it makes the code longer, I removed it. kai, jun09				
 				
-				if ( pe instanceof Leg ) {
-					Leg leg = (Leg) pe ;
+				if ( pe instanceof LegImpl ) {
+					LegImpl leg = (LegImpl) pe ;
 					Route route = leg.getRoute();
 					if ( route instanceof NetworkRoute ) { // added in jun09, see below in "collectLinks". kai, jun09
 						List<Link> links = new ArrayList<Link>();
@@ -200,8 +200,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
 					addLink(act.getLink());
-				} else if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
+				} else if (pe instanceof LegImpl) {
+					LegImpl leg = (LegImpl) pe;
 
 //					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					/* I regularly got an exception with the above line:

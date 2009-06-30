@@ -20,11 +20,11 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class PersonSetAllTimes extends AbstractPersonAlgorithm {
@@ -147,7 +147,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 					act_end_time = act.getEndTime();
 				}
 				else {
-					Leg leg = (Leg)plan.getPlanElements().get(j);
+					LegImpl leg = (LegImpl)plan.getPlanElements().get(j);
 					leg.setDepartureTime(act_end_time);
 					leg.setTravelTime(0);
 					leg.setArrivalTime(act_end_time);

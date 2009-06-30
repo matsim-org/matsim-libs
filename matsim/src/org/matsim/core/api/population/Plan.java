@@ -6,6 +6,7 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public interface Plan extends BasicPlan<PlanElement> {
 
@@ -29,7 +30,7 @@ public interface Plan extends BasicPlan<PlanElement> {
 
 	public ActivityImpl createActivity(final String type, final Link link);
 
-	public Leg createLeg(final TransportMode mode);
+	public LegImpl createLeg(final TransportMode mode);
 
 	/**
 	 * Removes the specified act from the plan as well as a leg according to the following rule:
@@ -77,22 +78,22 @@ public interface Plan extends BasicPlan<PlanElement> {
 	 * @param act the act to insert, following the leg
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final Leg leg, final ActivityImpl act) throws IllegalArgumentException;
+	public void insertLegAct(final int pos, final LegImpl leg, final ActivityImpl act) throws IllegalArgumentException;
 
-	public Leg getPreviousLeg(final ActivityImpl act);
+	public LegImpl getPreviousLeg(final ActivityImpl act);
 
-	public ActivityImpl getPreviousActivity(final Leg leg);
+	public ActivityImpl getPreviousActivity(final LegImpl leg);
 
 	/**
 	 * Returns the leg following the specified act. <b>Important Note: </b> This method (together with
-	 * {@link #getNextActivity(Leg)}) has a very bad performance if it is used to iterate over all Acts and
+	 * {@link #getNextActivity(LegImpl)}) has a very bad performance if it is used to iterate over all Acts and
 	 * Legs of a plan. In that case, it is advised to use a regular iterator over {@link #getPlanElements()}
 	 * together with <code>instanceof</code>.
 	 *
 	 * @param act
 	 * @return The Leg following <tt>act</tt> in the plan, null if <tt>act</tt> is the last Act in the plan.
 	 */
-	public Leg getNextLeg(final ActivityImpl act);
+	public LegImpl getNextLeg(final ActivityImpl act);
 
 	/**
 	 * Returns the activity following the specified leg. <b>Important Note: </b> This method (together with
@@ -103,7 +104,7 @@ public interface Plan extends BasicPlan<PlanElement> {
 	 * @param leg
 	 * @return The Act following <tt>leg</tt> in the plan.
 	 */
-	public ActivityImpl getNextActivity(final Leg leg);
+	public ActivityImpl getNextActivity(final LegImpl leg);
 
 	public ActivityImpl getFirstActivity();
 

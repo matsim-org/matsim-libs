@@ -27,11 +27,11 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -58,7 +58,7 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
-			Leg leg = (Leg)acts_legs.get(i);
+			LegImpl leg = (LegImpl)acts_legs.get(i);
 			if (rd<0.5){
 				(leg).setMode(TransportMode.train);
 			}

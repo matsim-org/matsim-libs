@@ -10,7 +10,6 @@ import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -29,6 +28,7 @@ import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements BasicPersonEventHandler {
@@ -71,7 +71,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 			int index = 0;
 
 			ActivityImpl act = null;
-			Leg leg = null;
+			LegImpl leg = null;
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					act = (ActivityImpl) pe;
@@ -88,8 +88,8 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 						assertEquals(act.getLinkId(), ((ActivityStartEvent) list.get(index)).getLinkId());
 						index++;
 					}
-				} else if (pe instanceof Leg) {
-					leg = (Leg) pe;
+				} else if (pe instanceof LegImpl) {
+					leg = (LegImpl) pe;
 
 					// act end event
 					assertTrue(list.get(index) instanceof ActivityEndEvent);

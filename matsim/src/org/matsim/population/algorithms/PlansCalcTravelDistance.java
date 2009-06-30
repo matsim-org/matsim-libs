@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -86,7 +86,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 		// loop over all <act>s
 		for (int j = 2; j < actslegs.size(); j=j+2) {
 			ActivityImpl toAct = (ActivityImpl)actslegs.get(j);
-			Leg leg = (Leg)actslegs.get(j-1);
+			LegImpl leg = (LegImpl)actslegs.get(j-1);
 
 			Link startlink = fromAct.getLink();
 			if (startlink == null) throw new Exception("start link missing");

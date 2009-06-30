@@ -8,7 +8,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -16,6 +15,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
@@ -150,8 +150,8 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		double bikeDayDist = 0.0;
 		double othersDayDist = 0.0;
 		for (PlanElement pe : plan.getPlanElements())
-			if (pe instanceof Leg) {
-				Leg bl = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl bl = (LegImpl) pe;
 				ActType at = null;
 				String tmpActTypeStartsWith = plan.getNextActivity(bl)
 						.getType().substring(0, 1);

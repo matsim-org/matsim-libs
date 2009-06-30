@@ -22,10 +22,10 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -64,7 +64,7 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 
 			List acts_legs = plan.getPlanElements();
 			ActivityImpl act = null;
-			Leg leg = null;
+			LegImpl leg = null;
 			for (int j=0; j<acts_legs.size(); j++) {
 				if (j % 2 == 0) {
 					act = (ActivityImpl)acts_legs.get(j);
@@ -88,7 +88,7 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 					}
 				}
 				else {
-					leg = (Leg)acts_legs.get(j);
+					leg = (LegImpl)acts_legs.get(j);
 
 					leg.setDepartureTime(act.getEndTime());
 					double ttime = leg.getTravelTime();

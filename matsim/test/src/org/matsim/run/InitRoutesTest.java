@@ -23,7 +23,6 @@ package org.matsim.run;
 import java.io.File;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -35,6 +34,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -96,7 +96,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
-		Leg leg2 = (Leg) plan2.getPlanElements().get(1);
+		LegImpl leg2 = (LegImpl) plan2.getPlanElements().get(1);
 		NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
 		assertNotNull("no route assigned.", route2);
 		assertEquals("wrong route", 3, route2.getNodes().size());

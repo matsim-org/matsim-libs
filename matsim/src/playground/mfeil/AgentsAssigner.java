@@ -29,11 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -144,7 +144,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 						log.warn("Acts im Plan des schon optimierten Agenten:");
 						for (int k=0;k<agents.getAgentPlan(j).getPlanElements().size();k++) {
 							if (agents.getAgentPlan(j).getPlanElements().get(k).getClass().getName().equals("org.matsim.population.Act")) log.warn(((ActivityImpl)(agents.getAgentPlan(j).getPlanElements().get(k))).getType()+" ");
-							else log.warn(((Leg)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
+							else log.warn(((LegImpl)(agents.getAgentPlan(j).getPlanElements().get(k))).getMode()+" ");
 						}
 						System.out.println();
 						log.warn("Primacts im Knowledge des zuzuordnenden Agenten:");

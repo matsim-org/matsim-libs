@@ -28,7 +28,6 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -41,6 +40,7 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -59,7 +59,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	protected Person testPerson = null;
 	protected Plan testPlan = null;
-	protected Leg testLeg = null;
+	protected LegImpl testLeg = null;
 	protected ActivityImpl originAct = null;
 	protected ActivityImpl destinationAct = null;
 
@@ -91,7 +91,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.testPlan = this.testPerson.getPlans().get(TEST_PLAN_NR);
 		// first leg
 		List<? extends BasicPlanElement> actsLegs = this.testPlan.getPlanElements();
-		this.testLeg = (Leg) actsLegs.get(TEST_LEG_NR + 1);
+		this.testLeg = (LegImpl) actsLegs.get(TEST_LEG_NR + 1);
 		// activities before and after leg
 		this.originAct = (ActivityImpl) actsLegs.get(TEST_LEG_NR);
 		this.destinationAct = (ActivityImpl) actsLegs.get(TEST_LEG_NR + 2);

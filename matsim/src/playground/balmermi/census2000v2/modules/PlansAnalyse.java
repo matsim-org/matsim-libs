@@ -22,13 +22,13 @@ package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public class PlansAnalyse {
 
@@ -117,8 +117,8 @@ public class PlansAnalyse {
 			// mode types
 			int cnt = 0;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg l = (Leg) pe;
+				if (pe instanceof LegImpl) {
+					LegImpl l = (LegImpl) pe;
 					cnt++;
 					if (l.getMode().equals(TransportMode.car))       { mtype_cnt[0]++; }
 					else if (l.getMode().equals(TransportMode.pt))   { mtype_cnt[1]++; }

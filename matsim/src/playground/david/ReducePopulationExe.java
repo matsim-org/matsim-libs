@@ -30,7 +30,6 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -40,6 +39,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -85,7 +85,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					this.usedlinkList.add(a.getLink());
 				} else {
 					// Leg
-					Leg l = (Leg) actl.get(i);
+					LegImpl l = (LegImpl) actl.get(i);
 					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
 						
 						List<Link> ll = ((NetworkRoute) l.getRoute()).getLinks();
@@ -109,8 +109,8 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					ergPEs.add(new ActivityImpl(a));
 				} else {
 					// Leg
-					Leg l = (Leg) actl.get(i);
-					Leg l2 = new LegImpl(TransportMode.pt);
+					LegImpl l = (LegImpl) actl.get(i);
+					LegImpl l2 = new LegImpl(TransportMode.pt);
 					l2.setDepartureTime(l.getDepartureTime());
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
@@ -128,7 +128,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	public void run(final Person person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
 		Plan plan = person.getSelectedPlan();
-		Leg leg = plan.getNextLeg(plan.getFirstActivity());
+		LegImpl leg = plan.getNextLeg(plan.getFirstActivity());
 		if(leg.getMode().equals(TransportMode.car) && leg.getRoute() == null) {
 			// car leg without route make all legs mode = PT
 			plan.setSelected(false);

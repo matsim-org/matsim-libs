@@ -20,7 +20,7 @@
 
 package org.matsim.core.scoring.interfaces;
 
-import org.matsim.core.api.population.Leg;
+import org.matsim.core.population.LegImpl;
 
 /**
  * The scoring methods related to legs.
@@ -28,7 +28,7 @@ import org.matsim.core.api.population.Leg;
  * @author rashid_waraich
  */
 public interface LegScoring {
-	public abstract void startLeg(final double time, final Leg leg);
+	public abstract void startLeg(final double time, final LegImpl leg);
 
 	public abstract void endLeg(final double time);
 }

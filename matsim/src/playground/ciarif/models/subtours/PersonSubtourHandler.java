@@ -5,9 +5,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PersonSubtourHandler {
@@ -79,7 +79,7 @@ public class PersonSubtourHandler {
 				prev = curr;
 				
 				// Getting the main mode at the sub-tour level
-				TransportMode mode =((Leg)plan.getPlanElements().get(subtour.get(k)-1)).getMode();
+				TransportMode mode =((LegImpl)plan.getPlanElements().get(subtour.get(k)-1)).getMode();
 				int license = 0;
 				if (plan.getPerson().hasLicense()){license =1;}
 				int modechoice = 0;

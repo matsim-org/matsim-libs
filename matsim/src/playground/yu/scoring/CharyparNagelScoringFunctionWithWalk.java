@@ -4,8 +4,8 @@
 package playground.yu.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
@@ -25,7 +25,7 @@ public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
 
 	@Override
 	protected double calcLegScore(double departureTime, double arrivalTime,
-			Leg leg) {
+			LegImpl leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in
 		// seconds

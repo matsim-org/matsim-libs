@@ -22,12 +22,12 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -55,7 +55,7 @@ public class EndLegMessage extends EventMessage {
 		Plan plan = this.vehicle.getOwnerPerson().getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		if ((actsLegs.size() > this.vehicle.getLegIndex())) {
-			this.vehicle.setCurrentLeg((Leg) actsLegs.get(this.vehicle.getLegIndex()));
+			this.vehicle.setCurrentLeg((LegImpl) actsLegs.get(this.vehicle.getLegIndex()));
 			// current act
 			ActivityImpl currentAct = (ActivityImpl) actsLegs.get(this.vehicle.getLegIndex() - 1);
 			// the leg the agent performs

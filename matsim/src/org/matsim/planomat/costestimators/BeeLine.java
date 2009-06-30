@@ -22,8 +22,8 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -51,7 +51,7 @@ public class BeeLine implements LegTravelTimeEstimator {
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination, Leg legIntermediate) {
+			ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 		Node originFromNode = actOrigin.getLink().getFromNode();
 		Node destinationFromNode = actDestination.getLink().getFromNode();
 		/* why (unsafely) casting to Link to get a node? Why not just using

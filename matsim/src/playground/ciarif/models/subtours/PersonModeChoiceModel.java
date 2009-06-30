@@ -27,13 +27,13 @@ import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -220,8 +220,8 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			personSubtour.getSubtours().get(i).setStart_udeg(udeg);
 			
 			for (int k=1; k<sub.getNodes().size(); k=k+1){
-				((Leg)plan.getPlanElements().get(sub.getNodes().get(k)-1)).setMode(mode);
-				System.out.println("leg = " + ((Leg)plan.getPlanElements().get(sub.getNodes().get(k)-1)));
+				((LegImpl)plan.getPlanElements().get(sub.getNodes().get(k)-1)).setMode(mode);
+				System.out.println("leg = " + ((LegImpl)plan.getPlanElements().get(sub.getNodes().get(k)-1)));
 								
 			}
 		}

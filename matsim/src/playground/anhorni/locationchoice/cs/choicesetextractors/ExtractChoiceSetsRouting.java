@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -35,6 +34,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
@@ -108,7 +108,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		ActivityImpl toAct0 = new org.matsim.core.population.ActivityImpl("shop", link);
 		toAct0.setCoord(link.getCoord());
 					
-		Leg legBefore = computeLeg(fromAct0, toAct0, controler);				
+		LegImpl legBefore = computeLeg(fromAct0, toAct0, controler);				
 		double travelTimeBeforeShopping = legBefore.getTravelTime();
 		
 		//--------------------------------------------------			
@@ -124,7 +124,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		ActivityImpl toAct1 = new org.matsim.core.population.ActivityImpl("afterShop", linkAfter);
 		toAct1.setCoord(linkAfter.getCoord());
 					
-		Leg legAfter = computeLeg(fromAct1, toAct1, controler);	
+		LegImpl legAfter = computeLeg(fromAct1, toAct1, controler);	
 		double travelTimeAfterShopping = legAfter.getTravelTime();
 		//--------------------------------------------------
 		
@@ -164,8 +164,8 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	}
 	
 	
-	private Leg computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {	
-		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
+	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {	
+		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		

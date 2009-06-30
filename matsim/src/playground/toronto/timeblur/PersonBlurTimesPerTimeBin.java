@@ -22,12 +22,12 @@ package playground.toronto.timeblur;
 
 import java.util.Random;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -82,8 +82,8 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 					now = (int)Math.round(a.getEndTime());
 				}
 			}
-			else if (e instanceof Leg) {
-				Leg l = (Leg)e;
+			else if (e instanceof LegImpl) {
+				LegImpl l = (LegImpl)e;
 				l.setDepartureTime(now);
 				l.setArrivalTime(now);
 			}

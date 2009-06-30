@@ -23,12 +23,12 @@ package playground.balmermi.census2000.modules;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -232,7 +232,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setDuration(dur);
-					Leg l = plan.createLeg(TransportMode.undefined);
+					LegImpl l = plan.createLeg(TransportMode.undefined);
 					l.setArrivalTime(end_time);
 					l.setTravelTime(0);
 					l.setDepartureTime(end_time);

@@ -43,7 +43,6 @@ import java.util.List;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -51,6 +50,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -186,7 +186,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 				List<? extends BasicPlanElement> bestactslegs = newPlan.getPlanElements();
 //				ArrayList<?> bestactslegs = plan.getActsLegs();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
-					Leg leg = (Leg)bestactslegs.get(j);
+					LegImpl leg = (LegImpl)bestactslegs.get(j);
 					leg.setRoute(null);
 				}
 //				Reset the score to Undefined. Helps to see if the plan was really changed

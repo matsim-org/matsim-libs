@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -152,7 +152,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		act.setEndTime(time);
 		act.setDuration(time);
 
-		Leg leg = (Leg) plan.getPlanElements().get(1);
+		LegImpl leg = (LegImpl) plan.getPlanElements().get(1);
 		leg.setDepartureTime(time);
 		leg.setArrivalTime(time);
 		leg.setTravelTime(0);
@@ -165,7 +165,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// work
 		// before duration is over when they arrived late
 
-		leg = (Leg) plan.getPlanElements().get(3);
+		leg = (LegImpl) plan.getPlanElements().get(3);
 		leg.setDepartureTime(time + 8 * 3600);
 		leg.setArrivalTime(time + 8 * 3600);
 		leg.setTravelTime(0);
@@ -180,7 +180,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		boolean needsRouter = false;
 		List<?> actsLegs = plan.getPlanElements();
 		for (int i = 1, max = actsLegs.size(); i < max; i += 2) {
-			Leg leg = (Leg) actsLegs.get(i);
+			LegImpl leg = (LegImpl) actsLegs.get(i);
 			if (leg.getRoute() == null) {
 				needsRouter = true;
 			}

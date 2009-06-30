@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.knowledges.Knowledges;
 
@@ -81,9 +81,9 @@ public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActi
 			for (int k=0;k<this.plans.get(i).get(0).getPlanElements().size();k+=2){
 				double duration=0;
 				for (int j=0;j<this.plans.get(i).size();j++){
-					if (k==0) duration += ((Leg)(this.plans.get(i).get(j).getPlanElements().get(1))).getDepartureTime();
-					else if (k==this.plans.get(i).get(j).getPlanElements().size()-1) duration += 86400 - ((Leg)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-2))).getArrivalTime();
-					else duration += ((Leg)(this.plans.get(i).get(j).getPlanElements().get(k+1))).getDepartureTime() - ((Leg)(this.plans.get(i).get(j).getPlanElements().get(k-1))).getArrivalTime();
+					if (k==0) duration += ((LegImpl)(this.plans.get(i).get(j).getPlanElements().get(1))).getDepartureTime();
+					else if (k==this.plans.get(i).get(j).getPlanElements().size()-1) duration += 86400 - ((LegImpl)(this.plans.get(i).get(j).getPlanElements().get(this.plans.get(i).get(j).getPlanElements().size()-2))).getArrivalTime();
+					else duration += ((LegImpl)(this.plans.get(i).get(j).getPlanElements().get(k+1))).getDepartureTime() - ((LegImpl)(this.plans.get(i).get(j).getPlanElements().get(k-1))).getArrivalTime();
 				}
 				stream1.print((duration/this.plans.get(i).size())+"\t");
 			}
@@ -105,7 +105,7 @@ public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActi
 			for (int j=0;j<legs.size();j++){
 				stream1.print(numberOccurrence.get(j).intValue()+"\t");
 				for (int k=1;k<legs.get(j).size();k+=2){
-					stream1.print(((Leg)(legs.get(j).get(k))).getMode()+"\t");
+					stream1.print(((LegImpl)(legs.get(j).get(k))).getMode()+"\t");
 				}		
 				stream1.println();
 			}
@@ -128,10 +128,10 @@ public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActi
 			ArrayList<String> in1 = new ArrayList<String> ();
 			ArrayList<String> out1 = new ArrayList<String> ();
 			for (int i = 1;i<in.size();i=i+2){
-				in1.add(((Leg)(in.get(i))).getMode().toString());				
+				in1.add(((LegImpl)(in.get(i))).getMode().toString());				
 			}
 			for (int i = 1;i<out.size();i=i+2){
-				out1.add(((Leg)(out.get(i))).getMode().toString());				
+				out1.add(((LegImpl)(out.get(i))).getMode().toString());				
 			}		
 			return (in1.equals(out1));
 		}

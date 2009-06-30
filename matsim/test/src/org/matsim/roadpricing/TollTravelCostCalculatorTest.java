@@ -20,7 +20,6 @@
 
 package org.matsim.roadpricing;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -29,6 +28,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -65,11 +65,11 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		commonRouterData.run(network);
 
 		Person person1 = population.getPersons().get(new IdImpl("1"));
-		Leg leg = ((Leg) (person1.getPlans().get(0).getPlanElements().get(1)));
+		LegImpl leg = ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
 		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc, new DijkstraFactory()).run(population);
-		Fixture.compareRoutes("1 2 4 5", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
+		Fixture.compareRoutes("1 2 4 5", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 		// also test it with A*-Landmarks
 		clearRoutes(population);
 		assertNull(leg.getRoute()); // make sure the cleaning worked. we do this only once, then we believe it.
@@ -114,7 +114,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Person person1 = population.getPersons().get(new IdImpl("1"));
-		Leg leg = ((Leg) (person1.getPlans().get(0).getPlanElements().get(1)));
+		LegImpl leg = ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
 		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc).run(population);
@@ -155,8 +155,8 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof Leg) {
-						((Leg) pe).setRoute(null);
+					if (pe instanceof LegImpl) {
+						((LegImpl) pe).setRoute(null);
 					}
 				}
 			}

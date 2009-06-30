@@ -9,7 +9,6 @@ import org.apache.commons.collections.map.MultiKeyMap;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -17,6 +16,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
@@ -88,7 +88,7 @@ public class LogicToPlainConverter {
 					Link plainLink= plainNet.getNearestLink(act.getCoord()); 
 					act.setLink(plainLink);
 				}else{
-					Leg leg = (Leg)pe;
+					LegImpl leg = (LegImpl)pe;
 					NetworkRoute logicRoute = (NetworkRoute)leg.getRoute();
 					List<Link> plainLinks = convertToPlain(logicRoute.getLinks());
 					logicRoute.setLinks(null, plainLinks, null); 
@@ -97,9 +97,9 @@ public class LogicToPlainConverter {
 		}
 	}
 	
-	public List<Leg> convertToPlainLeg (List<Leg> logicLegList){
-		List<Leg> plainLegList = new ArrayList<Leg>();
-		for(Leg logicLeg : logicLegList){
+	public List<LegImpl> convertToPlainLeg (List<LegImpl> logicLegList){
+		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
+		for(LegImpl logicLeg : logicLegList){
 			NetworkRoute logicNetworkRoute= (NetworkRoute)logicLeg.getRoute();
 			List<Link> plainLinkList = new ArrayList<Link>();
 			
@@ -111,7 +111,7 @@ public class LogicToPlainConverter {
 				NetworkRoute plainRoute = new LinkNetworkRoute(null, null); 
 				plainRoute.setLinks(null, plainLinkList, null);
 				
-				Leg plainLeg = new LegImpl(TransportMode.pt);
+				LegImpl plainLeg = new LegImpl(TransportMode.pt);
 				plainLeg = logicLeg;
 				plainLeg.setRoute(plainRoute);
 				plainLegList.add(plainLeg);

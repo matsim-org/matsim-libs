@@ -25,10 +25,10 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.LegImpl;
 
 /**
  * This algorithm filters out all persons having plans with legs with a certain leg mode.
@@ -82,7 +82,7 @@ public class PlansFilterByLegMode {
 				boolean hasOtherLegMode = false;
 
 				for (int j=1; j<plan.getPlanElements().size(); j+=2) {
-					Leg leg = (Leg)plan.getPlanElements().get(j);
+					LegImpl leg = (LegImpl)plan.getPlanElements().get(j);
 					if (leg.getMode().equals(this.legMode)) {
 						hasSearchedLegMode = true;
 					} else {

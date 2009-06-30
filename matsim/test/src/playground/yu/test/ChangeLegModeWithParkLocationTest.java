@@ -4,12 +4,12 @@
 package playground.yu.test;
 
 import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -71,8 +71,8 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Leg)
-					legChainModes.append(((Leg) pe).getMode() + "|");
+				if (pe instanceof LegImpl)
+					legChainModes.append(((LegImpl) pe).getMode() + "|");
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
@@ -126,8 +126,8 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Leg)
-					legChainModes.append(((Leg) pe).getMode() + "|");
+				if (pe instanceof LegImpl)
+					legChainModes.append(((LegImpl) pe).getMode() + "|");
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
@@ -181,8 +181,8 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements())
-				if (pe instanceof Leg)
-					legChainModes.append(((Leg) pe).getMode() + "|");
+				if (pe instanceof LegImpl)
+					legChainModes.append(((LegImpl) pe).getMode() + "|");
 
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());

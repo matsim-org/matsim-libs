@@ -24,11 +24,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;
@@ -93,7 +93,7 @@ public class PlanScore implements AgentContentment {
 		double time = SimulationTimer.getTime();
 		if (time > this.lastCallTime) {
 			if (this.agent.isEnRoute()) {
-				Leg leg = this.agent.getVehicle().getDriver().getCurrentLeg();
+				LegImpl leg = this.agent.getVehicle().getDriver().getCurrentLeg();
 				if (leg.getRoute() != null) {
 					this.contentment = calcContentment(leg, time);
 				} else {
@@ -116,7 +116,7 @@ public class PlanScore implements AgentContentment {
 		}
 	}
 
-	private double calcContentment(final Leg leg, final double time) {
+	private double calcContentment(final LegImpl leg, final double time) {
 		TravelCost travelCost = this.agent.getBeliefs();
 		TravelTime travelTime = this.agent.getBeliefs();
 		if (travelCost == null) {
@@ -219,8 +219,8 @@ public class PlanScore implements AgentContentment {
 		this.zeroUtilDuration = new double[planEntries + 1];
 		int index = 0;
 		for (Object o : plan.getPlanElements()) {
-			if (o instanceof Leg) {
-				Leg leg = (Leg)o;
+			if (o instanceof LegImpl) {
+				LegImpl leg = (LegImpl)o;
 				ActivityImpl nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
 				double actDur = Math.max((nextAct.getEndTime() - nextAct.getStartTime()), 0.0d);
 				double endTime = Math.max(leg.getArrivalTime(), 0.0d);

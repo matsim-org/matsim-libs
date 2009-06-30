@@ -43,13 +43,13 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -176,20 +176,20 @@ public class EgressAnalysis {
 	private void handlePlans() {
 			log.info("handle plans");
 			for (Person person : this.population.getPersons().values()) {
-				Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
+				LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 				List<Node> route = ((NetworkRoute) leg.getRoute()).getNodes();
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				Plan plan = new org.matsim.core.population.PlanImpl(person);
 				plan.addActivity(person.getSelectedPlan().getFirstActivity());
-				Leg l = new org.matsim.core.population.LegImpl(TransportMode.car);
+				LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 				l.setDepartureTime(0.0);
 				l.setTravelTime(0.0);
 				l.setArrivalTime(0.0);
 				plan.addLeg(l);
 				plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
 				this.router.run(plan);
-				Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
+				LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
 				List<Node> route2 = ((NetworkRoute) leg2.getRoute()).getNodes();
 				Node node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;

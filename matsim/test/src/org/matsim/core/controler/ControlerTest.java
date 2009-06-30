@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -38,6 +37,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityPar
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -69,7 +69,7 @@ public class ControlerTest extends MatsimTestCase {
 		Plan plan1 = person1.createPlan(true);
 		ActivityImpl a1 = plan1.createActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
-		Leg leg1 = plan1.createLeg(TransportMode.car);
+		LegImpl leg1 = plan1.createLeg(TransportMode.car);
 		NetworkRoute route1 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg1.setRoute(route1);
 		ArrayList<Node> nodes = new ArrayList<Node>();
@@ -83,7 +83,7 @@ public class ControlerTest extends MatsimTestCase {
 		Plan plan2 = person2.createPlan(true);
 		ActivityImpl a2 = plan2.createActivity("h", f.link1);
 		a2.setEndTime(7.0*3600);
-		Leg leg2 = plan2.createLeg(TransportMode.car);
+		LegImpl leg2 = plan2.createLeg(TransportMode.car);
 		NetworkRoute route2 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg2.setRoute(route2);
 		route2.setNodes(f.link1, nodes, f.link3);
@@ -127,7 +127,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		// test that the plans have the correct times
 		assertEquals("ReRoute seems to have wrong travel times.",
-				151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
+				151.0, ((LegImpl) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
 	}
 
 	/**
@@ -172,8 +172,8 @@ public class ControlerTest extends MatsimTestCase {
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new PopulationImpl();
 		Person person1 = null;
-		Leg leg1 = null;
-		Leg leg2 = null;
+		LegImpl leg1 = null;
+		LegImpl leg2 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
@@ -233,8 +233,8 @@ public class ControlerTest extends MatsimTestCase {
 		ActivityImpl act1b = null;
 		ActivityImpl act2a = null;
 		ActivityImpl act2b = null;
-		Leg leg1 = null;
-		Leg leg2 = null;
+		LegImpl leg1 = null;
+		LegImpl leg2 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---

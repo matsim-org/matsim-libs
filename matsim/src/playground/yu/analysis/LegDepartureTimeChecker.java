@@ -4,7 +4,6 @@
 package playground.yu.analysis;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -12,6 +11,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
@@ -45,8 +45,8 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 	public void run(final Plan plan) {
 		int c = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				double legDepTime = ((Leg) pe).getDepartureTime();
+			if (pe instanceof LegImpl) {
+				double legDepTime = ((LegImpl) pe).getDepartureTime();
 				if (legDepTime >= 86400.0) {
 					this.sw.writeln(this.personId + "\t" + legDepTime + "\t"
 							+ Time.writeTime(legDepTime) + "\t" + c);

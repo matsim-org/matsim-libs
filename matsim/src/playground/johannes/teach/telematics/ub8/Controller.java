@@ -42,7 +42,6 @@ import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -67,6 +66,7 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -151,7 +151,7 @@ public class Controller extends Controler {
 			for(Person p : event.getControler().getPopulation().getPersons().values()) {
 				for(Plan plan : p.getPlans()) {
 					double tt = 0;
-					Leg leg = (Leg)plan.getPlanElements().get(1);
+					LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
 					Route route = leg.getRoute();
 					for(Id id : ((NetworkRoute) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
@@ -195,7 +195,7 @@ public class Controller extends Controler {
 			for(Person p : event.getControler().getPopulation().getPersons().values()) {
 				if(random.nextDouble() <= proba) {
 					Plan plan = p.getSelectedPlan();
-					((Leg)plan.getPlanElements().get(1)).setRoute(route);
+					((LegImpl)plan.getPlanElements().get(1)).setRoute(route);
 				}
 			}
 		}

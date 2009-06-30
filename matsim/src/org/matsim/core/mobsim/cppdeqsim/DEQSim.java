@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -46,6 +45,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -172,7 +172,7 @@ public class DEQSim extends ExternalMobsim {
 		// for each leg...
 		double time = 0;
 		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
-			Leg leg = (Leg) plan.getPlanElements().get(i);
+			LegImpl leg = (LegImpl) plan.getPlanElements().get(i);
 			ActivityImpl act = nextAct;
 			nextAct = (ActivityImpl) plan.getPlanElements().get(i+1);
 

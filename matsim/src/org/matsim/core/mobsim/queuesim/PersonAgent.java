@@ -25,13 +25,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -61,7 +61,7 @@ public class PersonAgent implements DriverAgent {
 
 	private transient Link destinationLink;
 
-	private Leg currentLeg;
+	private LegImpl currentLeg;
 	private List<Node> cacheRouteNodes = null;
 
 	private int currentNodeIndex;
@@ -77,7 +77,7 @@ public class PersonAgent implements DriverAgent {
 
 	/**
 	 * Convenience method delegating to person's selected plan
-	 * @return list of {@link ActivityImpl}s and {@link Leg}s of this agent's plan
+	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
 	 */
 	public List<? extends PlanElement> getPlanElements() {
 		return this.person.getSelectedPlan().getPlanElements();
@@ -103,11 +103,11 @@ public class PersonAgent implements DriverAgent {
 		return this.currentLink;
 	}
 
-	public Leg getCurrentLeg() {
+	public LegImpl getCurrentLeg() {
 		return this.currentLeg;
 	}
 
-	protected void setCurrentLeg(final Leg leg) {
+	protected void setCurrentLeg(final LegImpl leg) {
 		this.currentLeg  = leg;
 		this.cacheRouteNodes = null;
 	}
@@ -142,7 +142,7 @@ public class PersonAgent implements DriverAgent {
 		return false; // the agent has no leg, so nothing more to do
 	}
 
-	private void initNextLeg(final Leg leg) {
+	private void initNextLeg(final LegImpl leg) {
 		this.destinationLink = leg.getRoute().getEndLink();
 
 		// set the route according to the next leg
@@ -197,8 +197,8 @@ public class PersonAgent implements DriverAgent {
 				Simulation.decLiving();
 			}
 
-		} else if (pe instanceof Leg) {
-			initNextLeg((Leg) pe);
+		} else if (pe instanceof LegImpl) {
+			initNextLeg((LegImpl) pe);
 		} else {
 			throw new RuntimeException("Unknown PlanElement of type " + pe.getClass().getName());
 		}

@@ -31,7 +31,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -95,7 +94,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		return act;
 	}
 	
-	public Leg createLeg(final TransportMode legMode) {
+	public LegImpl createLeg(final TransportMode legMode) {
 		return new LegImpl(legMode);
 	}
 

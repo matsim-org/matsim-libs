@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -44,6 +43,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -93,9 +93,9 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 			double expTTSum = 0;
 			int tripcounts = 0;
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
+				if (pe instanceof LegImpl) {
 					tripcounts++;
-					Leg leg = ((Leg) pe);
+					LegImpl leg = ((LegImpl) pe);
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
 					double totaltravelcosts = 0;
 					double totaltraveltime = 0;

@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -43,6 +42,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -90,8 +90,8 @@ public class QueryAgentPlan implements OTFQuery {
 		for (Object o : plan.getPlanElements()) {
 			if (o instanceof ActivityImpl) {
 				count++;
-			} else if (o instanceof Leg) {
-				Leg leg = (Leg)o;
+			} else if (o instanceof LegImpl) {
+				LegImpl leg = (LegImpl)o;
 
 				if (leg.getMode().equals(TransportMode.car)) {
 					List<Link> route = ((NetworkRoute) leg.getRoute()).getLinks();
@@ -135,8 +135,8 @@ public class QueryAgentPlan implements OTFQuery {
 				Coord coord = act.getCoord();
 				if (coord == null) coord = act.getLink().getCoord();
 				setCoord(pos++, coord, col);
-			} else if (o instanceof Leg) {
-				Leg leg = (Leg)o;
+			} else if (o instanceof LegImpl) {
+				LegImpl leg = (LegImpl)o;
 
 				if (leg.getMode().equals(TransportMode.car)) {
 					Node last = null;

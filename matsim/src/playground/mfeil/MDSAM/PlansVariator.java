@@ -32,10 +32,10 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Plan;
@@ -146,7 +146,7 @@ public class PlansVariator implements PlanAlgorithm {
 					int pos = (1+((int)(MatsimRandom.getRandom().nextDouble()*((output[i].getPlanElements().size()-2)/2))))*2;
 					output[i].removeActivity(pos);
 					/* Recovers the route of the trip in front of the removed act */
-					router.handleLeg((Leg)output[i].getPlanElements().get(pos-1), 
+					router.handleLeg((LegImpl)output[i].getPlanElements().get(pos-1), 
 							(ActivityImpl)output[i].getPlanElements().get(pos-2), 
 							(ActivityImpl)output[i].getPlanElements().get(pos), 
 							((ActivityImpl)output[i].getPlanElements().get(pos-2)).getEndTime());
@@ -159,7 +159,7 @@ public class PlansVariator implements PlanAlgorithm {
 					String actType = this.actTypes.get((int)(MatsimRandom.getRandom().nextDouble() * this.actTypes.size()));
 					ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)output[i].getPlanElements().get(0));
 					actHelp.setType(actType);
-					Leg legHelp = new LegImpl ((Leg)output[i].getPlanElements().get(actPosition));
+					LegImpl legHelp = new LegImpl ((LegImpl)output[i].getPlanElements().get(actPosition));
 					output[i].insertLegAct(actPosition, legHelp, actHelp);
 				}
 			}
@@ -359,7 +359,7 @@ public class PlansVariator implements PlanAlgorithm {
 		int j=-1;
 		do {
 			j+=2;
-			currentMode = ((Leg)(plan.getPlanElements().get(j))).getMode();
+			currentMode = ((LegImpl)(plan.getPlanElements().get(j))).getMode();
 		} while (planAnalyzeSubtours.getSubtourIndexation()[j/2]!=subtourIndex);			
 		
 		// New mode
@@ -374,7 +374,7 @@ public class PlansVariator implements PlanAlgorithm {
 		/* Replacement of mode */
 		for (j=1;j<plan.getPlanElements().size();j+=2){
 			if (planAnalyzeSubtours.getSubtourIndexation()[j/2]==subtourIndex){
-				((Leg)(plan.getPlanElements().get(j))).setMode(this.possibleModes[modeIndex]);
+				((LegImpl)(plan.getPlanElements().get(j))).setMode(this.possibleModes[modeIndex]);
 			}
 		}
 	}

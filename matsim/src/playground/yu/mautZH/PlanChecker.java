@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -40,6 +39,7 @@ import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -118,8 +118,8 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			// if (pl.getType().equals("oev")) {
 			StringBuilder text = new StringBuilder("\t");
 			for (PlanElement pe : pl.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg l = (Leg) pe;
+				if (pe instanceof LegImpl) {
+					LegImpl l = (LegImpl) pe;
 					NetworkRoute r = (NetworkRoute) l.getRoute();
 					text.append(r.getDistance() + "\t" + r.getTravelTime()
 							+ "\t");

@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -38,6 +37,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -150,7 +150,7 @@ public class WithindayAgent extends PersonAgent {
 		Link destinationLink = nextAct.getLink();
 		NetworkRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
-		Leg currentLeg = this.getCurrentLeg();
+		LegImpl currentLeg = this.getCurrentLeg();
 		Route oldRoute = currentLeg.getRoute();
 
 		//create Route of already passed Nodes
@@ -177,8 +177,8 @@ public class WithindayAgent extends PersonAgent {
 			}
 		}
 		//remove the old leg in the plan and replace it with the new one
-    Leg oldLeg = (Leg) newPlan.getPlanElements().remove(currentLegIndex);
-    Leg newLeg = new org.matsim.core.population.LegImpl(oldLeg);
+    LegImpl oldLeg = (LegImpl) newPlan.getPlanElements().remove(currentLegIndex);
+    LegImpl newLeg = new org.matsim.core.population.LegImpl(oldLeg);
     //concat the Route of already passed nodes with the new route
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getNodes().size());
     newRouteConcatedList.addAll(passedNodesList);
@@ -261,7 +261,7 @@ public class WithindayAgent extends PersonAgent {
 		return l;
 	}
 
-	public void exchangeCurrentLeg(final Leg newLeg) {
+	public void exchangeCurrentLeg(final LegImpl newLeg) {
 		this.cachedNextLink = null;
 		this.setCurrentLeg(newLeg);
 	}

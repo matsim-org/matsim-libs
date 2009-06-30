@@ -23,7 +23,6 @@ package org.matsim.core.population;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
@@ -51,7 +50,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Person person = pb.createPerson(new IdImpl(1));
 		Plan plan = pb.createPlan(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));
-		Leg leg = pb.createLeg(TransportMode.undefined);
+		LegImpl leg = pb.createLeg(TransportMode.undefined);
 		Route route = new GenericRouteImpl(link1, link2);
 		route.setTravelTime(123);
 		route.setDistance(9876.54);
@@ -67,7 +66,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Population pop2 = new PopulationImpl();
 		new MatsimPopulationReader(pop2, network).readFile(filename);
 		Person person2 = pop2.getPersons().get(new IdImpl(1));
-		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
+		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();
 		assertEquals(123, route2.getTravelTime(), EPSILON); // if this succeeds, we know that writing/reading the data works
 		assertEquals(9876.54, route2.getDistance(), EPSILON);

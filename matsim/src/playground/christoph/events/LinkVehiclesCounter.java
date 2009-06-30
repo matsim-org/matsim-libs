@@ -20,7 +20,6 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -29,6 +28,7 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.population.LegImpl;
 
 public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
@@ -150,7 +150,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		// log.info("BasicAgentDepartureEvent");
 
 		//Handling depends on the Route of the Agent		
-		Leg leg = ((AgentDepartureEvent)event).getLeg();
+		LegImpl leg = ((AgentDepartureEvent)event).getLeg();
 		Link link = queueNetwork.getNetworkLayer().getLink(event.getLinkId());
 		
 		if(leg.getMode().equals(TransportMode.car))

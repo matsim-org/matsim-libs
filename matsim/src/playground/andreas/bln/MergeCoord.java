@@ -10,7 +10,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -18,6 +17,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -174,9 +174,9 @@ public class MergeCoord {
 			for(Plan plan : person.getPlans()){
 				for (PlanElement planelement : plan.getPlanElements()) {
 					
-					if(planelement instanceof Leg){					
-						if(((Leg) planelement).getMode() == TransportMode.walk){
-							if(((Leg) planelement).getTravelTime() > 60 * 60){
+					if(planelement instanceof LegImpl){					
+						if(((LegImpl) planelement).getMode() == TransportMode.walk){
+							if(((LegImpl) planelement).getTravelTime() > 60 * 60){
 								try {
 									Integer.valueOf(person.getId().toString());
 									agentIds.add(Integer.valueOf(person.getId().toString()));
@@ -254,9 +254,9 @@ public class MergeCoord {
 			for(Plan plan : person.getPlans()){
 				for (PlanElement planelement : plan.getPlanElements()) {
 					
-					if(planelement instanceof Leg){					
-						if(((Leg) planelement).getMode() == TransportMode.walk){
-							if(((Leg) planelement).getTravelTime() > 60 * 60){
+					if(planelement instanceof LegImpl){					
+						if(((LegImpl) planelement).getMode() == TransportMode.walk){
+							if(((LegImpl) planelement).getTravelTime() > 60 * 60){
 								try {
 									Integer.valueOf(person.getId().toString());
 									agentIds.add(Integer.valueOf(person.getId().toString()));

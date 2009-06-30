@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -121,7 +121,7 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 
 			for (int i=0; i<actslegs.size()-2; i=i+2) {
 				ActivityImpl from_act = (ActivityImpl)actslegs.get(i);
-				Leg leg = (Leg)actslegs.get(i+1);
+				LegImpl leg = (LegImpl)actslegs.get(i+1);
 
 				out.write("\t" + from_act.getType());
 				out.write("\t" + leg.getRoute().getDistance());

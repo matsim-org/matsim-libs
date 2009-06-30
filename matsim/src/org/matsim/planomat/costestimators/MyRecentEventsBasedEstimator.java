@@ -27,8 +27,8 @@ import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public class MyRecentEventsBasedEstimator
 implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
@@ -120,7 +120,7 @@ implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentAr
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination, Leg legIntermediate) {
+			ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
 		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, actOrigin.getLinkId(), actDestination.getLinkId(), "car"));
 	

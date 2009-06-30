@@ -22,9 +22,9 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 
@@ -58,7 +58,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegT
 
 	@Override
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination, Leg legIntermediate) {
+			ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
 		double legTravelTimeEstimation;
 		

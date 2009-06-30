@@ -28,12 +28,12 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
@@ -176,7 +176,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	protected double computeTravelTime(ActivityImpl fromAct, ActivityImpl toAct) {	
-		Leg leg = new org.matsim.core.population.LegImpl(TransportMode.car);
+		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
@@ -194,14 +194,14 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			final ActivityImpl act = (ActivityImpl)actslegs.get(j);		
 			
 			if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) { // found secondary activity
-				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
+				manager.secondaryActivityFound(act, (LegImpl)actslegs.get(j+1));
 			}			
 			else {		// found primary activity	
 				if (j == (actslegs.size()-1)) {
 					manager.primaryActivityFound(act, null);
 				}
 				else {
-					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
+					manager.primaryActivityFound(act, (LegImpl)actslegs.get(j+1));
 				}
 			}
 		}
@@ -221,14 +221,14 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			
 			// if home is accidentally not defined as primary
 			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) { // found secondary activity
-				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
+				manager.secondaryActivityFound(act, (LegImpl)actslegs.get(j+1));
 			}		
 			else {	// found primary activity		
 				if (j == (actslegs.size()-1)) {
 					manager.primaryActivityFound(act, null);
 				}
 				else {
-					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
+					manager.primaryActivityFound(act, (LegImpl)actslegs.get(j+1));
 				}
 			}
 		}

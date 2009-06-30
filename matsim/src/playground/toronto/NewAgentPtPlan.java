@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 import playground.yu.newPlans.NewPopulation;
 
@@ -76,8 +76,8 @@ public class NewAgentPtPlan extends NewPopulation {
 						ptPlan.addActivity((ActivityImpl) o);
 //						walkPlan.addAct((Act) o);
 					} else {
-						Leg leg = (Leg) o;
-						Leg ptLeg = new org.matsim.core.population.LegImpl(leg);
+						LegImpl leg = (LegImpl) o;
+						LegImpl ptLeg = new org.matsim.core.population.LegImpl(leg);
 						ptLeg.setMode(TransportMode.pt);
 						ptLeg.setRoute(null);
 						// -----------------------------------------------
@@ -86,7 +86,7 @@ public class NewAgentPtPlan extends NewPopulation {
 						// automaticly!!
 						// -----------------------------------------------
 						ptPlan.addLeg(ptLeg);
-						Leg walkLeg = new org.matsim.core.population.LegImpl(leg);
+						LegImpl walkLeg = new org.matsim.core.population.LegImpl(leg);
 						walkLeg.setMode(TransportMode.walk);
 						walkLeg.setRoute(null);
 //						walkPlan.addLeg(walkLeg);

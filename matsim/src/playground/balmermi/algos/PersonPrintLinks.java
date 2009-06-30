@@ -21,11 +21,11 @@
 package playground.balmermi.algos;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonPrintLinks extends AbstractPersonAlgorithm {
@@ -51,8 +51,8 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 		Plan plan = person.getPlans().get(0);
 		int counter = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				System.out.println("Person id=" + person.getId() + "; Leg nr=" + counter);
 				counter++;
 				NetworkRoute route = (NetworkRoute) leg.getRoute();

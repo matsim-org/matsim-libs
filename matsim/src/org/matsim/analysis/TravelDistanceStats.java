@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -37,6 +36,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -235,8 +235,8 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		int numberOfLegs=0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				final Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				final LegImpl leg = (LegImpl) pe;
 				planTravelDistance+=leg.getRoute().getDistance();
 				numberOfLegs++;
 			}

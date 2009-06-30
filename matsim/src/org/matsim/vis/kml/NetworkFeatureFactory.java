@@ -32,8 +32,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Time;
 
@@ -126,7 +126,7 @@ public class NetworkFeatureFactory {
 		return p;
 	}
 
-	public AbstractFeatureType createLegFeature(Leg leg, StyleType style) {
+	public AbstractFeatureType createLegFeature(LegImpl leg, StyleType style) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(leg.getMode().toString() + "_" + Time.writeTime(leg.getDepartureTime()));
 

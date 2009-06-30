@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
@@ -34,6 +33,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -139,7 +139,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		// routing is done after location choice
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 1; j < actslegs.size(); j=j+2) {
-			final Leg leg = (Leg)actslegs.get(j);
+			final LegImpl leg = (LegImpl)actslegs.get(j);
 			leg.setRoute(null);
 		}
 	}

@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 
@@ -98,10 +98,10 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	public double getUld(ActivityImpl a){
 		return super.getUld(a);
 	}
-	public double getUlegt(Leg l){
+	public double getUlegt(LegImpl l){
 		return super.getUlegt(l);
 	}
-	public double getUlegd(Leg l){
+	public double getUlegd(LegImpl l){
 		return super.getUlegd(l);
 	}
 
@@ -126,10 +126,10 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	public double getDuld(ActivityImpl a){
 		return super.getDuld(a);
 	}
-	public double getDulegt(Leg l){
+	public double getDulegt(LegImpl l){
 		return super.getDulegt(l);
 	}
-	public double getDulegd(Leg l){
+	public double getDulegd(LegImpl l){
 		return super.getDulegd(l);
 	}
 	

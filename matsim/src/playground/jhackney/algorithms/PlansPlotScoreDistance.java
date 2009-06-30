@@ -1,11 +1,11 @@
 package playground.jhackney.algorithms;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -27,8 +27,8 @@ public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements P
 		dist[i]=0;
 		score[i]= p.getScore().doubleValue();
 		for (PlanElement pe : p.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg l = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl l = (LegImpl) pe;
 				dist[i]+=l.getRoute().getDistance();
 			}
 		}

@@ -21,7 +21,7 @@
 package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
+import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicLegImpl;
@@ -40,7 +40,7 @@ public class LegImpl extends BasicLegImpl implements Leg {
 	 * instance of Route or BasicRoute. Other route instances are not considered.
 	 * @param leg
 	 */
-	public LegImpl(final Leg leg) {
+	public LegImpl(final LegImpl leg) {
 		super(leg.getMode());
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());

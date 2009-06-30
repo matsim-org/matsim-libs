@@ -26,11 +26,11 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -94,7 +94,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		 */
 		for (int i = 2, n = actslegs.size(); i < n; i += 2) {
 
-			Leg leg = (Leg)actslegs.get(i-1);
+			LegImpl leg = (LegImpl)actslegs.get(i-1);
 			ActivityImpl toAct = (ActivityImpl)actslegs.get(i);
 			isCarLeg[routeIndex] = TransportMode.car.equals(leg.getMode());
 			if (!isCarLeg[routeIndex]) {
@@ -224,7 +224,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 			// when the agent pays the toll, just take the cheaper route of the two
 			for (int i = 0; i < nofLegs; i++) {
 				if (isCarLeg[i]) {
-					Leg leg = (Leg)actslegs.get(i*2+1);
+					LegImpl leg = (LegImpl)actslegs.get(i*2+1);
 					if (routes[TOLL_INDEX][i].getTravelCost() < routes[NOTOLL_INDEX][i].getTravelCost()) {
 						leg.setRoute(routes[TOLL_INDEX][i]);
 					} else {
@@ -237,7 +237,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 			for (int i = 0; i < nofLegs; i++) {
 				if (isCarLeg[i]) {
 					// only set the route if its a leg with mode="car", otherwise it already should be handled.
-					Leg leg = (Leg)actslegs.get(i*2+1);
+					LegImpl leg = (LegImpl)actslegs.get(i*2+1);
 					leg.setRoute(routes[NOTOLL_INDEX][i]);
 				}
 			}

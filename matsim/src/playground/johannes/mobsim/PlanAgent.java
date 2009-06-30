@@ -27,9 +27,9 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -125,7 +125,7 @@ public class PlanAgent implements MobsimAgent {
 				index++;
 			}
 		}
-		return ((Leg) person.getSelectedPlan().getPlanElements().get(index))
+		return ((LegImpl) person.getSelectedPlan().getPlanElements().get(index))
 				.getMode();
 	}
 
@@ -208,7 +208,7 @@ public class PlanAgent implements MobsimAgent {
 	 *            the current simulation time.
 	 */
 	public void arrival(double time) {
-		Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(
+		LegImpl leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		leg.setArrivalTime(time);
 		leg.setTravelTime(leg.getArrivalTime() - leg.getDepartureTime());
@@ -242,7 +242,7 @@ public class PlanAgent implements MobsimAgent {
 		act.setDuration(act.getEndTime() - act.getStartTime());
 		currentPlanIndex++;
 
-		Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(
+		LegImpl leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex);
 		leg.setDepartureTime(time);
 		currentRouteIndex = 0;
@@ -264,7 +264,7 @@ public class PlanAgent implements MobsimAgent {
 	public void enterLink(Link link, double time) {
 		currentLink = link;
 		currentRouteIndex++;
-		Link desiredLink = ((NetworkRoute) ((Leg) person.getSelectedPlan().getPlanElements().get(
+		Link desiredLink = ((NetworkRoute) ((LegImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex)).getRoute()).getLinks().get(currentRouteIndex);
 		if (currentLink != desiredLink)
 			currentRouteIndex--;

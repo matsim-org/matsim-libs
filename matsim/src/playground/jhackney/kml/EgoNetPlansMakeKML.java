@@ -50,7 +50,6 @@ import net.opengis.kml._2.StyleType;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -59,6 +58,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -334,8 +334,8 @@ public class EgoNetPlansMakeKML {
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
 		while(actLegIter.hasNext()){//alternates Act-Leg-Act-Leg and ends with Act
 			Object o = actLegIter.next();
-			if (o instanceof Leg) {
-				Leg leg = (Leg) o;
+			if (o instanceof LegImpl) {
+				LegImpl leg = (LegImpl) o;
 	
 				for (Link routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);

@@ -30,7 +30,6 @@ import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -40,6 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
@@ -167,7 +167,7 @@ public class BlockingStopDemo {
 			Plan plan = pb.createPlan(person);
 			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[i]);
 			act1.setEndTime(startTime + i*60);
-			Leg leg = pb.createLeg(TransportMode.pt);
+			LegImpl leg = pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(this.schedule.getFacilities().get(this.ids[i-1]), tLine1, this.schedule.getFacilities().get(this.ids[nOfStops-1])));
 			ActivityImpl act2 = pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
 
@@ -185,7 +185,7 @@ public class BlockingStopDemo {
 			Plan plan = pb.createPlan(person);
 			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[nOfLinks+i]);
 			act1.setEndTime(startTime + i*60);
-			Leg leg = pb.createLeg(TransportMode.pt);
+			LegImpl leg = pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(this.schedule.getFacilities().get(this.ids[nOfStops+i-1]), tLine2, this.schedule.getFacilities().get(this.ids[2*nOfStops-1])));
 			ActivityImpl act2 = pb.createActivityFromLinkId("work", this.ids[2*nOfLinks-1]);
 
@@ -214,7 +214,7 @@ public class BlockingStopDemo {
 			Plan plan = pb.createPlan(person);
 			ActivityImpl act1a = pb.createActivityFromLinkId("home", this.ids[0]);
 			act1a.setEndTime(startTime + i*carsHeading);
-			Leg leg1 = pb.createLeg(TransportMode.car);
+			LegImpl leg1 = pb.createLeg(TransportMode.car);
 			leg1.setRoute(carRoute1);
 			ActivityImpl act1b = pb.createActivityFromLinkId("work", this.ids[4]);
 
@@ -229,7 +229,7 @@ public class BlockingStopDemo {
 			Plan plan2 = pb.createPlan(person2);
 			ActivityImpl act2a = pb.createActivityFromLinkId("home", this.ids[nOfLinks]);
 			act2a.setEndTime(startTime + i*carsHeading);
-			Leg leg2 = pb.createLeg(TransportMode.car);
+			LegImpl leg2 = pb.createLeg(TransportMode.car);
 			leg2.setRoute(carRoute2);
 			ActivityImpl act2b = pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
 

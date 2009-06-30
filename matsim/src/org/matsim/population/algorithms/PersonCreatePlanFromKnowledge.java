@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.knowledges.Knowledges;
 
 public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
@@ -57,7 +57,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		a.setDuration(time);
 		a.setEndTime(time);
 		a.setFacility(home_facility);
-		Leg l = p.createLeg(TransportMode.car);
+		LegImpl l = p.createLeg(TransportMode.car);
 		l.setDepartureTime(time);
 		l.setTravelTime(0);
 		l.setArrivalTime(time);

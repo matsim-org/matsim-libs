@@ -25,8 +25,8 @@ package playground.johannes.mobsim;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.LegImpl;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
@@ -57,7 +57,7 @@ public class ReroutingStrategy implements IntradayStrategy {
 			 * TODO: Do some route validation, e.g. check if departure and
 			 * destination links are consistent.
 			 */
-			adaptRoute(newRoute, (Leg) copy.getPlanElements().get(
+			adaptRoute(newRoute, (LegImpl) copy.getPlanElements().get(
 					agent.getCurrentPlanIndex()), agent.getCurrentRouteIndex(), time);
 
 			return copy;
@@ -81,7 +81,7 @@ public class ReroutingStrategy implements IntradayStrategy {
 		return router.requestRoute(origin, destination, time);
 	}
 	
-	protected void adaptRoute(NetworkRoute route, Leg leg, int index, double time) {
+	protected void adaptRoute(NetworkRoute route, LegImpl leg, int index, double time) {
 		/*
 		 * TODO: Need link-based route implementation here.
 		 * TODO: Move this to re-routing strategy?

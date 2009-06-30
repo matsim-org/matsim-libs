@@ -27,11 +27,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.Location;
 
@@ -111,8 +111,8 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
 			while (modeChainIsFeasible && peIterator.hasNext()) {
 				PlanElement pe = peIterator.next();
-				if (pe instanceof Leg) {
-					Leg currentLeg = (Leg) pe;
+				if (pe instanceof LegImpl) {
+					LegImpl currentLeg = (LegImpl) pe;
 	
 					TransportMode legMode = (TransportMode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
 					if (meisterk.getChainBasedModes().contains(legMode)) {

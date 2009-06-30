@@ -26,12 +26,12 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -51,7 +51,7 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 	private final TransitRouteFinder ptRouter;
 
 	private Plan currentPlan = null;
-	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
+	private final List<Tuple<LegImpl, List<LegImpl>>> legReplacements = new LinkedList<Tuple<LegImpl, List<LegImpl>>>();
 
 	public PlansCalcPtRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final TravelCost costCalculator, final TravelTime timeCalculator,
@@ -89,39 +89,39 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public double handleLeg(final Leg leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		if (TransportMode.pt.equals(leg.getMode())) {
 			return this.handlePtPlan(leg, fromAct, toAct, depTime);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtPlan(final Leg leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
-		List<Leg> legs= this.ptRouter.calculateRoute(fromAct, toAct, this.currentPlan.getPerson());
-		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
+	private double handlePtPlan(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
+		List<LegImpl> legs= this.ptRouter.calculateRoute(fromAct, toAct, this.currentPlan.getPerson());
+		this.legReplacements.add(new Tuple<LegImpl, List<LegImpl>>(leg, legs));
 
 		double travelTime = 0.0;
-		for (Leg leg2 : legs) {
+		for (LegImpl leg2 : legs) {
 			travelTime += leg2.getTravelTime();
 		}
 		return travelTime; // this is currently only the time traveling, not including the time waiting at stops etc.
 	}
 
 	private void replaceLegs() {
-		Iterator<Tuple<Leg, List<Leg>>> replacementIterator = this.legReplacements.iterator();
+		Iterator<Tuple<LegImpl, List<LegImpl>>> replacementIterator = this.legReplacements.iterator();
 		if (!replacementIterator.hasNext()) {
 			return;
 		}
 		List<PlanElement> planElements = this.currentPlan.getPlanElements();
-		Tuple<Leg, List<Leg>> currentTuple = replacementIterator.next();
+		Tuple<LegImpl, List<LegImpl>> currentTuple = replacementIterator.next();
 		for (int i = 0; i < this.currentPlan.getPlanElements().size(); i++) {
 			PlanElement pe = planElements.get(i);
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				if (leg == currentTuple.getFirst()) {
 					// do the replacement
 					boolean isFirstLeg = true;
-					for (Leg leg2 : currentTuple.getSecond()) {
+					for (LegImpl leg2 : currentTuple.getSecond()) {
 						if (isFirstLeg) {
 							planElements.set(i, leg2);
 						} else {

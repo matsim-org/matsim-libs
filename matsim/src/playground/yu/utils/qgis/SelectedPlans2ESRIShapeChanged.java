@@ -37,7 +37,6 @@ import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -45,6 +44,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -129,8 +129,8 @@ public class SelectedPlans2ESRIShapeChanged extends
 		for (Plan plan : this.getOutputSamplePlans()) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
+				if (pe instanceof LegImpl) {
+					LegImpl leg = (LegImpl) pe;
 					if (leg.getRoute().getDistance() > 0) {
 						fts.add(getLegFeature(leg, id));
 					}
@@ -161,7 +161,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	// return null;
 	// }
 
-	protected Feature getLegFeature(final Leg leg, final String id) {
+	protected Feature getLegFeature(final LegImpl leg, final String id) {
 		TransportMode mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();

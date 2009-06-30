@@ -22,9 +22,9 @@ package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -37,7 +37,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createActivity("home", new CoordImpl(0, 0));
-		Leg leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createLeg(TransportMode.car);
 		plan.createActivity("work", new CoordImpl(0, 0));
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;

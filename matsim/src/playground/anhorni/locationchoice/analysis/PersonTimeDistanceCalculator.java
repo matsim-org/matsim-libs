@@ -1,8 +1,8 @@
 package playground.anhorni.locationchoice.analysis;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.LegImpl;
 
 /*
  * This is a helper class for TravelTimeandDistanceStats
@@ -27,8 +27,8 @@ public class PersonTimeDistanceCalculator {
 		init();
 
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
-				final Leg leg = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				final LegImpl leg = (LegImpl) pe;
 				planTravelTime+=leg.getTravelTime();
 				planTravelDistance+=leg.getRoute().getDistance();
 				numberOfLegs++;

@@ -22,11 +22,11 @@ package org.matsim.population.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -75,8 +75,8 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 						needsReRoute = true;
 						break;
 					}
-				} else if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
+				} else if (pe instanceof LegImpl) {
+					LegImpl leg = (LegImpl) pe;
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
 					}

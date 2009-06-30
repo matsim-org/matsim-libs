@@ -21,8 +21,8 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 /**
  * Interface for the estimation of the travel time of a leg. Implement it
@@ -49,7 +49,7 @@ public interface LegTravelTimeEstimator {
 			double departureTime,
 			ActivityImpl actOrigin,
 			ActivityImpl actDestination,
-			Leg legIntermediate);
+			LegImpl legIntermediate);
 	
 	public void reset();
 	

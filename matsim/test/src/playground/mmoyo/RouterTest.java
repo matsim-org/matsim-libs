@@ -28,13 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -101,7 +101,7 @@ public class RouterTest extends MatsimTestCase {
 		
 		// now run the essential thing:
 		TransitRouteFinder routeFinder = new TransitRouteFinder(schedule);
-		List<Leg> legs = routeFinder.calculateRoute(fromAct, toAct, person);
+		List<LegImpl> legs = routeFinder.calculateRoute(fromAct, toAct, person);
 		
 		/* I would expect the following, although I could be wrong.
 		 * It must be checked once the code runs up to this line.     */

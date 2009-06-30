@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -53,6 +52,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -79,7 +79,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
-		Leg leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
@@ -116,7 +116,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Plan plan = person.createPlan(true);
 			ActivityImpl a1 = plan.createActivity("h", f.link1);
 			a1.setEndTime((6+i)*3600);
-			Leg leg = plan.createLeg(TransportMode.car);
+			LegImpl leg = plan.createLeg(TransportMode.car);
 			NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 			route.setNodes(f.link1, f.nodes23, f.link3);
 			leg.setRoute(route);
@@ -154,7 +154,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
-		Leg leg = plan.createLeg(TransportMode.other);
+		LegImpl leg = plan.createLeg(TransportMode.other);
 		Route route = f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3); // TODO [MR] use different factory/mode here
 		leg.setRoute(route);
 		leg.setTravelTime(15.0);
@@ -196,7 +196,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
-		Leg leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link1);
 		route.setNodes(f.link1, new ArrayList<Node>(0), f.link1);
 		leg.setRoute(route);
@@ -307,7 +307,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl act = plan.createActivity("home", f.link1);
 		act.setEndTime(6.0 * 3600);
-		Leg leg = plan.createLeg(TransportMode.walk);
+		LegImpl leg = plan.createLeg(TransportMode.walk);
 		leg.setRoute(new GenericRouteImpl(f.link1, f.link2));
 		act = plan.createActivity("work", f.link2);
 		act.setEndTime(6.0 * 3600 + 60);
@@ -340,7 +340,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
-		Leg leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
@@ -407,7 +407,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
-		Leg leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
@@ -463,7 +463,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
-		Leg leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		route.setNodes(f.link1, f.nodes23, f.link3);
 		leg.setRoute(route);
@@ -523,12 +523,12 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
-		Leg l1 = plan.createLeg(TransportMode.other);
+		LegImpl l1 = plan.createLeg(TransportMode.other);
 		l1.setTravelTime(10);
 		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link2)); // TODO [MR] use different factory / TransportationMode
 		ActivityImpl a2 = plan.createActivity("w", f.link2);
 		a2.setEndTime(7.0*3600 + 20);
-		Leg l2 = plan.createLeg(TransportMode.car);
+		LegImpl l2 = plan.createLeg(TransportMode.car);
 		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
 		route2.setNodes(f.link2, f.nodes3, f.link3);
 		l2.setRoute(route2);
@@ -567,12 +567,12 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
-		Leg l1 = plan.createLeg(TransportMode.other);
+		LegImpl l1 = plan.createLeg(TransportMode.other);
 		l1.setTravelTime(10);
 		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link2)); // TODO [MR] use different factory / TransportationMode
 		ActivityImpl a2 = plan.createActivity("w", f.link2);
 		a2.setEndTime(7.0*3600 + 20);
-		Leg l2 = plan.createLeg(TransportMode.car);
+		LegImpl l2 = plan.createLeg(TransportMode.car);
 		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
 		route2.setNodes(f.link2, f.nodes3, f.link3);
 		l2.setRoute(route2);
@@ -709,7 +709,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Plan plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(8*3600);
-		Leg leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, link5);
 		route.setLinks(f.network.getLink(new IdImpl(startLinkId)), NetworkUtils.getLinks(f.network, linkIds), f.network.getLink(new IdImpl(endLinkId)));
 		leg.setRoute(route);

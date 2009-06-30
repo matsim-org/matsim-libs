@@ -21,9 +21,9 @@
 package playground.christoph.scoring;
 
 import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 public class OnlyTimeDependentScoringFunction implements ScoringFunction {
@@ -37,7 +37,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	public static final double beta_travel = -6;
 	public static final double beta_late = -18;
 	
-	private Leg currentLeg;
+	private LegImpl currentLeg;
 	private Plan plan;
 	private double score;
 	private double startTime;
@@ -78,7 +78,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	 * @param leg The leg the agent starts. Can be used to get leg mode and other
 	 * information about the leg.
 	 */
-	public void startLeg(double time, Leg leg)
+	public void startLeg(double time, LegImpl leg)
 	{
 //		currentLeg = leg;
 		startTime = time;

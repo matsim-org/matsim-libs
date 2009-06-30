@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
+import org.matsim.core.population.LegImpl;
 
 /**
  * A builder class that builds {@link PlanAgent} instances out of {@link Person}
@@ -123,8 +123,8 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 			return false;
 		}
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				if (((Leg) pe).getRoute() == null) {
+			if (pe instanceof LegImpl) {
+				if (((LegImpl) pe).getRoute() == null) {
 					return false;
 				}
 			}

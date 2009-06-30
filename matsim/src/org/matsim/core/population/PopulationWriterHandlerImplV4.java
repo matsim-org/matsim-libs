@@ -33,7 +33,6 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.GenericRoute;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -342,8 +341,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
 		if (leg.getTravelTime() != Time.UNDEFINED_TIME)
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
-		if (leg instanceof Leg){
-			Leg l = (Leg)leg;
+		if (leg instanceof LegImpl){
+			LegImpl l = (LegImpl)leg;
 			if (l.getArrivalTime() != Time.UNDEFINED_TIME)
 				out.write(" arr_time=\"" + Time.writeTime(l.getArrivalTime()) + "\"");
 		}

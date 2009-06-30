@@ -2,9 +2,9 @@ package playground.yu.visum.filter;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class DepTimeFilter extends PersonFilterA {
@@ -20,7 +20,7 @@ public class DepTimeFilter extends PersonFilterA {
 		for (Plan plan : person.getPlans()) {
 			List actsLegs = plan.getPlanElements();
 			for (int i = 1; i < actsLegs.size(); i += 2) {
-				Leg leg = (Leg) actsLegs.get(i);
+				LegImpl leg = (LegImpl) actsLegs.get(i);
 				result = ((criterionMIN < leg.getDepartureTime()) && (leg
 						.getDepartureTime() < criterionMAX));
 				if (result)

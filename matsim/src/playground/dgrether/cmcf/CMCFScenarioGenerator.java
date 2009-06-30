@@ -23,7 +23,6 @@ package playground.dgrether.cmcf;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -35,6 +34,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityPar
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -181,7 +181,7 @@ public class CMCFScenarioGenerator {
 			act1.setLink(l1);
 			act1.setEndTime(homeEndTime);
 			//leg to home
-			Leg leg = plan.createLeg(TransportMode.car);
+			LegImpl leg = plan.createLeg(TransportMode.car);
 			NetworkRoute route = new NodeNetworkRoute(l1, l6);
 			if (isAlternativeRouteEnabled) {
 				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l6);

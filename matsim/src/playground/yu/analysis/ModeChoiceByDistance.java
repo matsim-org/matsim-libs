@@ -30,13 +30,13 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -130,8 +130,8 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg l = (Leg) pe;
+			if (pe instanceof LegImpl) {
+				LegImpl l = (LegImpl) pe;
 				double dist = (((int) l.getRoute().getDistance()) / 1000 * 1000);
 				if (dist < 320000) {
 					if (l.getMode().equals(TransportMode.car)) {

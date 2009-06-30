@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
@@ -30,6 +29,7 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -103,7 +103,7 @@ public class BKickScoringFunction implements ScoringFunction {
 	public void endActivity(final double time) {
 	}
 
-	public void startLeg(final double time, final Leg leg) {
+	public void startLeg(final double time, final LegImpl leg) {
 		if (this.index % 2 == 0) {
 			// it seems we were not informed about activities
 			handleAct(time);
@@ -285,7 +285,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		return openInterval;
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
@@ -388,7 +388,7 @@ public class BKickScoringFunction implements ScoringFunction {
 	}
 
 	private void handleLeg(final double time) {
-		Leg leg = (Leg)this.plan.getPlanElements().get(this.index);
+		LegImpl leg = (LegImpl)this.plan.getPlanElements().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index++;
 	}

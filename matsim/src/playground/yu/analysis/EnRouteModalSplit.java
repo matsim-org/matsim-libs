@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -41,6 +40,7 @@ import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -200,7 +200,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		allCount[binIdx]++;
 		Integer itg = legCounts.get(ae.getPersonId());
 		if (itg != null) {
-			switch (((Leg) plan.getPlanElements().get(2 * itg + 1)).getMode()) {
+			switch (((LegImpl) plan.getPlanElements().get(2 * itg + 1)).getMode()) {
 			case car:
 				carCount[binIdx]++;
 				break;

@@ -15,7 +15,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -29,6 +28,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
@@ -128,7 +128,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					// changed.
 					int legIdx = rnd.nextInt(peSize / 2) * 2 + 1;
 
-					TransportMode crtMode = ((Leg) copyPlan.getPlanElements()
+					TransportMode crtMode = ((LegImpl) copyPlan.getPlanElements()
 							.get(legIdx)).getMode();
 					TransportMode newMode = crtMode;
 					while (newMode.equals(crtMode)) {
@@ -155,7 +155,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				TransportMode mode) {
 			PlanElement pe = plan.getPlanElements().get(legIdx);
 			if (pe != null) {
-				((Leg) pe).setMode(mode);
+				((LegImpl) pe).setMode(mode);
 				return true;
 			}
 			return false;
@@ -473,7 +473,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				throw new RuntimeException(
 						"----->ERROR: legIdx should be an odd number! Or legIdx out of bound!");
 			}
-			((Leg) pes.get(legIdx)).setMode(mode);
+			((LegImpl) pes.get(legIdx)).setMode(mode);
 			return legIdx % 2 != 0 && legIdx > 0 && legIdx < size;
 		}
 		// reserve
@@ -569,7 +569,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			int actIdxA = -1, actIdxB = -1;
 			List<PlanElement> pes = plan.getPlanElements();
 			for (int i = 1; i <= pes.size() - 2; i += 2) {
-				if (((Leg) pes.get(i)).getMode().equals(TransportMode.car)) {
+				if (((LegImpl) pes.get(i)).getMode().equals(TransportMode.car)) {
 					if (actIdxA == -1)
 						actIdxA = i - 1;
 					actIdxB = i + 1;
@@ -666,8 +666,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				StringBuilder legChainModes = new StringBuilder("|");
 				for (PlanElement pe : pIt.next().getSelectedPlan()
 						.getPlanElements())
-					if (pe instanceof Leg)
-						legChainModes.append(((Leg) pe).getMode() + "|");
+					if (pe instanceof LegImpl)
+						legChainModes.append(((LegImpl) pe).getMode() + "|");
 				// writer.writeln(itr + "\t" + legChainModes.toString());
 				// writer.flush();
 				patterns.add(legChainModes.toString());

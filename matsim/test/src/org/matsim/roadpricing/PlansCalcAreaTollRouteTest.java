@@ -22,12 +22,12 @@ package org.matsim.roadpricing;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
@@ -64,8 +64,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Id id1 = new IdImpl("1");
-		Leg leg1 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
-		Leg leg2 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
+		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
+		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
 		// case 1: toll only in morning, it is cheaper to drive around
 		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, toll).run(population);
@@ -115,8 +115,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Id id1 = new IdImpl("1");
-		Leg leg1 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
-		Leg leg2 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
+		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
+		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
 		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (NetworkRoute) leg1.getRoute()); // agent should take shortest route
@@ -144,8 +144,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 		
 		Id id1 = new IdImpl("1");
-		Leg leg1 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
-		Leg leg2 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
+		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
+		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
 		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (NetworkRoute) leg1.getRoute()); // agent should take shortest route
@@ -169,8 +169,8 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 
 		Id id1 = new IdImpl("1");
-		Leg leg1 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
-		Leg leg2 = (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
+		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
+		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
 		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, toll).run(population);
 		Fixture.compareRoutes("1 2 4 5", (NetworkRoute) leg1.getRoute()); // agent should take shortest route, as tolls are not active at that time

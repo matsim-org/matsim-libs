@@ -20,11 +20,11 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -251,9 +251,9 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 //				System.out.println();
 
-			} else if (o instanceof Leg) {
-				depTime = ((Leg) o).getDepartureTime();
-				arrTime = ((Leg) o).getArrivalTime();
+			} else if (o instanceof LegImpl) {
+				depTime = ((LegImpl) o).getDepartureTime();
+				arrTime = ((LegImpl) o).getArrivalTime();
 
 			}
 		}

@@ -24,13 +24,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -230,8 +230,8 @@ public class CreateSelectedPlansTables {
 	private double getTravelTime(final Person person) {
 		double travelTime=0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
-				travelTime+=((Leg) pe).getTravelTime();
+			if (pe instanceof LegImpl) {
+				travelTime+=((LegImpl) pe).getTravelTime();
 			}
 		}
 		return travelTime;
@@ -240,8 +240,8 @@ public class CreateSelectedPlansTables {
 	private double getTravelDist(final Person person) {
 		double travelDist=0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
-				travelDist+=((Leg) pe).getRoute().getDistance();
+			if (pe instanceof LegImpl) {
+				travelDist+=((LegImpl) pe).getRoute().getDistance();
 			}
 		}
 		return travelDist;
@@ -250,7 +250,7 @@ public class CreateSelectedPlansTables {
 	private int getNumberOfTrips(final Person person) {
 		int numberOfLegs=0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
+			if (pe instanceof LegImpl) {
 				numberOfLegs++;
 			}
 		}

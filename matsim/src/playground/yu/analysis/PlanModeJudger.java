@@ -6,9 +6,9 @@ package playground.yu.analysis;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
+import org.matsim.core.population.LegImpl;
 
 /**
  * judge, which transport mode was taken. This class can only be used with
@@ -22,8 +22,8 @@ public class PlanModeJudger {
 		for (Iterator<PlanElement> li = plan.getPlanElements().iterator(); li
 				.hasNext();) {
 			Object o = li.next();
-			if (o instanceof Leg) {
-				Leg l = (Leg) o;
+			if (o instanceof LegImpl) {
+				LegImpl l = (LegImpl) o;
 				if (!l.getMode().equals(mode)) {
 					return false;
 				}
@@ -37,8 +37,8 @@ public class PlanModeJudger {
 		for (Iterator<PlanElement> li = plan.getPlanElements().iterator(); li
 				.hasNext();) {
 			Object o = li.next();
-			if (o instanceof Leg) {
-				Leg l = (Leg) o;
+			if (o instanceof LegImpl) {
+				LegImpl l = (LegImpl) o;
 				TransportMode tmpMode2 = l.getMode();
 				if (tmpMode != null) {
 					if (!tmpMode.equals(tmpMode2)) {

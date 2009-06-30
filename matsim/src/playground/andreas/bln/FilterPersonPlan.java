@@ -2,7 +2,6 @@ package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
@@ -10,6 +9,7 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -42,8 +42,8 @@ public class FilterPersonPlan extends NewPopulation {
 			
 			// only keep person if every leg is a car leg
 			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof Leg){
-					if(((Leg)planElement).getMode() != TransportMode.car){
+				if(planElement instanceof LegImpl){
+					if(((LegImpl)planElement).getMode() != TransportMode.car){
 						keepPlan = false;
 					}
 				}

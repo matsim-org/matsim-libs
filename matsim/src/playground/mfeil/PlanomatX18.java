@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
@@ -38,6 +37,7 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -204,7 +204,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 		if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){
-				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+				((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 			}
 		}
 	
@@ -230,7 +230,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			/* Routing*/
 			if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 				for (int z=1;z<plan.getPlanElements().size();z+=2){
-					((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+					((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 				}
 			}
 			this.locator.run(plan);
@@ -297,7 +297,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					/* Routing*/
 					if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 						for (int z=1;z<neighbourhood[x].getPlanElements().size();z+=2){
-							((Leg)(neighbourhood[x].getPlanElements().get(z))).setMode(TransportMode.car);
+							((LegImpl)(neighbourhood[x].getPlanElements().get(z))).setMode(TransportMode.car);
 						}
 					}
 					this.router.run(neighbourhood[x]);
@@ -633,7 +633,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			actHelp.setEndTime(24*3600);
 			actHelp.setStartTime(12*3600);
 			
-			Leg legHelp;
+			LegImpl legHelp;
 			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
 			
 			actslegs.add(legHelp);
@@ -920,22 +920,22 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//	actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2)));
 			actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(position*2-2)));
 			actHelp.setDuration(0);
-			actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
-			actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
+			actHelp.setEndTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
+			actHelp.setStartTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
 		}
 		else { // copy first activity = home activity to ensure home is always primary
 			actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
 			actHelp.setDuration(0);
-			actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
-			actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
+			actHelp.setEndTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
+			actHelp.setStartTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
 			HomeActInserted = true;
 		}
 		actHelp.setType(actTypes.get(actToBeAdded[position]));
 		actToBeAdded[position]++;
 		
-		Leg legHelp;
+		LegImpl legHelp;
 
-		legHelp = new LegImpl ((Leg)(actslegs.get((position*2)-1)));
+		legHelp = new LegImpl ((LegImpl)(actslegs.get((position*2)-1)));
 					
 		actslegs.add(position*2, legHelp);
 		actslegs.add(position*2, actHelp);
@@ -987,29 +987,29 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		ManageSubchains manager = new ManageSubchains();
 		if (second-first==1){	// one long subchain
 			/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-			if (((Leg)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
-			if (((Leg)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
-			if (((Leg)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
-			manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (Leg)plan.getPlanElements().get((first-1)*2+1));
-			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (Leg)plan.getPlanElements().get(first*2+1));
-			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (Leg)plan.getPlanElements().get(second*2+1));
+			if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
+			if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
+			if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
+			manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (LegImpl)plan.getPlanElements().get((first-1)*2+1));
+			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (LegImpl)plan.getPlanElements().get(first*2+1));
+			manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (LegImpl)plan.getPlanElements().get(second*2+1));
 			manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second+1)*2), null);
 		}
 		else{					// two short subchains
 			if (first!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-				if (((Leg)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
-				if (((Leg)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
-				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (Leg)plan.getPlanElements().get((first-1)*2+1));
-				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (Leg)plan.getPlanElements().get(first*2+1));
+				if (((LegImpl)plan.getPlanElements().get((first-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((first-1)*2+1)).setTravelTime(1);
+				if (((LegImpl)plan.getPlanElements().get(first*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(first*2+1)).setTravelTime(1);
+				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first-1)*2), (LegImpl)plan.getPlanElements().get((first-1)*2+1));
+				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(first*2), (LegImpl)plan.getPlanElements().get(first*2+1));
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((first+1)*2), null);
 			}
 			if (second!=-1){
 				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
-				if (((Leg)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(1);
-				if (((Leg)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((Leg)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
-				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second-1)*2), (Leg)plan.getPlanElements().get((second-1)*2+1));
-				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (Leg)plan.getPlanElements().get(second*2+1));
+				if (((LegImpl)plan.getPlanElements().get((second-1)*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get((second-1)*2+1)).setTravelTime(1);
+				if (((LegImpl)plan.getPlanElements().get(second*2+1)).getTravelTime()<1)((LegImpl)plan.getPlanElements().get(second*2+1)).setTravelTime(1);
+				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second-1)*2), (LegImpl)plan.getPlanElements().get((second-1)*2+1));
+				manager.secondaryActivityFound((ActivityImpl)plan.getPlanElements().get(second*2), (LegImpl)plan.getPlanElements().get(second*2+1));
 				manager.primaryActivityFound((ActivityImpl)plan.getPlanElements().get((second+1)*2), null);
 			}			
 		}

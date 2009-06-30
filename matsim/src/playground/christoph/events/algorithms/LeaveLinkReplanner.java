@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -34,6 +33,7 @@ import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -65,7 +65,7 @@ public class LeaveLinkReplanner {
 
 	protected ActivityImpl nextAct;
 	protected ActivityImpl prevAct;
-	protected Leg leg;
+	protected LegImpl leg;
 	protected double time;
 	protected PersonAgent personAgent;
 	protected Person person;
@@ -183,7 +183,7 @@ public class LeaveLinkReplanner {
 		subRoute.setNodes(subRoute.getStartLink(), nodesRoute, subRoute.getEndLink());
 
 		// put the new route in a new leg
-		Leg newLeg = new LegImpl(leg.getMode());
+		LegImpl newLeg = new LegImpl(leg.getMode());
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
 		newLeg.setArrivalTime(leg.getArrivalTime());

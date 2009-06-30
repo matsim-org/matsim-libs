@@ -23,11 +23,11 @@ package playground.balmermi.census2000.modules;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -165,7 +165,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		                   // (it's just a trick, since the mode is the same for a plan) (just temporary)
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
 			ActivityImpl prev_act = (ActivityImpl)acts_legs.get(i-1);
-			Leg leg = (Leg)acts_legs.get(i);
+			LegImpl leg = (LegImpl)acts_legs.get(i);
 			ActivityImpl next_act = (ActivityImpl)acts_legs.get(i+1);
 
 			// get row (mode type)

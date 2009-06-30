@@ -25,12 +25,12 @@ import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.api.population.Plan;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 
 /**
@@ -83,7 +83,7 @@ public class UniSAM {
 		stream.print("\t"+1);
 		double traveltime = 0;
 		for (int i=1;i<plan.getPlanElements().size();i+=2){
-			traveltime += ((Leg)(plan.getPlanElements().get(i))).getTravelTime();
+			traveltime += ((LegImpl)(plan.getPlanElements().get(i))).getTravelTime();
 		}
 		stream.print("\t"+traveltime);
 		stream.print("\t"+0);

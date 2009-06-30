@@ -39,7 +39,6 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
@@ -57,6 +56,7 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnetworks.statistics.Distribution;
@@ -130,7 +130,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		Id id = event.getControler().getNetwork().getLink("4").getId();
 		for(Person p : event.getControler().getPopulation().getPersons().values()) {
 			for(Plan plan : p.getPlans()) {
-				Leg leg = (Leg) plan.getPlanElements().get(1);
+				LegImpl leg = (LegImpl) plan.getPlanElements().get(1);
 				if(((NetworkRoute) leg.getRoute()).getLinkIds().contains(id)) {
 					riskyPlans.add(plan);
 				} else {
@@ -312,7 +312,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			events.remove(event.getPerson());
 			double triptime = event.getTime() - e.getTime();
 			traveltimes.put(event.getPerson(), triptime);
-			if (((NetworkRoute) ((Leg)event.getPerson().getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
+			if (((NetworkRoute) ((LegImpl)event.getPerson().getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
 				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 					// bad day
