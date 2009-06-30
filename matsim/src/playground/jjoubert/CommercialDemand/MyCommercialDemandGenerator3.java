@@ -211,7 +211,7 @@ public class MyCommercialDemandGenerator3 {
 					PROVINCE + String.valueOf(populationSize) + "_Sample" + sampleNumber + ".xml");
 			pw.write();
 			System.out.println("Done!");
-			System.out.printf("\nPlans generation: Completed for sample %d of %d\n", sampleNumber, numberOfSamples);
+			System.out.printf("Plans generation: Completed for sample %d of %d\n\n", sampleNumber, numberOfSamples);
 		}
 	}
 
