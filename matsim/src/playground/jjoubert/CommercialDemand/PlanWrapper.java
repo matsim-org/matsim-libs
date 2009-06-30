@@ -22,7 +22,7 @@ package playground.jjoubert.CommercialDemand;
 
 import java.util.ArrayList;
 
-import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;

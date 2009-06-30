@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.Scenario;
 import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Activity;
+import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.population.Leg;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
