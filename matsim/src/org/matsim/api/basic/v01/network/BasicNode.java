@@ -45,6 +45,7 @@ public interface BasicNode extends BasicLocation, Identifiable {
      *             if <code>link</code> is <code>null</code>
      */
     public boolean addInLink(BasicLink link);
+    // yyyy kn does not belong into "data" class.  but maybe this is not a data class
 
     /**
      * Adds a non-<code>null</code> link to this node's set of outgoing
@@ -60,6 +61,7 @@ public interface BasicNode extends BasicLocation, Identifiable {
      *             if <code>link</code> is <code>null</code>
      */
     public boolean addOutLink(BasicLink link);
+    // yyyy kn does not belong into "data" class.  but maybe this is not a data class
 
     /**
      * Returns this node's set of ingoing links. This set might be empty, but it
