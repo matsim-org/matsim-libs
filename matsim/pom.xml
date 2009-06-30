@@ -39,8 +39,8 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
-<!--           <showWarnings>true</showWarnings> -->
-<!--           <showDeprecation>true</showDeprecation> -->
+          <showWarnings>false</showWarnings>
+          <showDeprecation>false</showDeprecation>
           <!-- configure initial and maximal memory for compiling -->
           <fork>true</fork>
           <meminitial>128m</meminitial>
@@ -54,12 +54,12 @@
           <includes>
             <include>org/matsim/**/*.java</include>
             <include>tutorial/**/*.java</include>
-            <include>playground/**/*.java</include>
+             <include>playground/**/*.java</include> 
             <include>de/schlichtherle/**/*.java</include>
           </includes>
-         <excludes>
-           <exclude>playground/christoph/**/*.java</exclude>
-         </excludes>
+<!--          <excludes>-->
+<!--            <exclude></exclude>-->
+<!--          </excludes>-->
           <!-- Uncommenting the following lines can be used to in- or exclude
           TEST sources from compilation -->
 <!--          <testExcludes>-->
@@ -144,6 +144,15 @@
   </repositories>
   
   <dependencies>
+    <!--todo: take care about the library as it is not a registered
+    dependency shipped with the geotools maven version we use -->
+    <dependency>
+      <groupId>geotoolsmysql</groupId>
+      <artifactId>geotoolsmysql</artifactId>
+      <version>3.0.10</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/geotools/mysql-connector-java-3.0.10.jar</systemPath>
+    </dependency>
     <dependency>
       <groupId>jama</groupId>
       <artifactId>jama</artifactId>
