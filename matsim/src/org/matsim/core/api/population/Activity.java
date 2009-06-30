@@ -1,12 +1,12 @@
 package org.matsim.core.api.population;
 
-import org.matsim.api.basic.v01.BasicLocation;
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicActivity;
 
-public interface Activity extends BasicActivity, PlanElement, BasicLocation {
+public interface Activity extends BasicActivity, PlanElement
+//, BasicLocation 
+{
 
-	public void setCoord(final Coord coord);
+//	public void setCoord(final Coord coord);
 	// FIXME kn I think this should go into the BasicActivity and be solved along the lines
 	// suggested in an email.  kai, jun09
 
