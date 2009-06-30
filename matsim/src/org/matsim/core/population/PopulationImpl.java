@@ -22,15 +22,17 @@ package org.matsim.core.population;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.Scenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.PopulationBuilder;
-import org.matsim.core.basic.v01.BasicPopulationImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Counter;
@@ -38,7 +40,7 @@ import org.matsim.core.utils.misc.Counter;
 /**
  * Root class of the population description (previously also called "plans file")
  */
-public class PopulationImpl extends BasicPopulationImpl<Person> implements Population {
+public class PopulationImpl implements Population {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -47,19 +49,34 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 	private long counter = 0;
 	private long nextMsg = 1;
 	private boolean isStreaming = false;
+	
+	private Map<Id, Person> persons = new TreeMap<Id, Person>();
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
 
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
-	private final PopulationBuilder pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE));
+	private final PopulationBuilder pb ;
+	
+	private final Scenario sc ;
+
+	// constructors:
+	
+	public PopulationImpl() { 
+		this.sc = null ;
+		this.pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE));
+	}
+	
+	public PopulationImpl(Scenario sc) {
+		this.sc = sc ;
+		this.pb = new PopulationBuilderImpl( sc ) ;
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public final void addPerson(final Person p) {
 		// validation
 		if (this.getPersons().containsKey(p.getId())) {
@@ -142,9 +159,8 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 	//////////////////////////////////////////////////////////////////////
 
 
-	@Override
 	public final Map<Id, Person> getPersons() {
-		return super.getPersons();
+		return persons ;
 	}
 
 	public final boolean isStreaming() {
@@ -171,9 +187,18 @@ public class PopulationImpl extends BasicPopulationImpl<Person> implements Popul
 		log.info(" person # " + this.counter);
 	}
 
-	@Override
 	public PopulationBuilder getPopulationBuilder() {
 		return this.pb;
+	}
+	
+	private String name ;
+
+	public String getName() {
+		return this.name ;
+	}
+
+	public void setName(String name) {
+		this.name = name ;
 	}
 
 }

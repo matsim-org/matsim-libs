@@ -24,19 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
-import org.matsim.core.basic.v01.BasicPopulationImpl;
 import org.matsim.core.basic.v01.BasicRouteImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 
@@ -60,7 +62,8 @@ public class BkTestPlansCreatorWithPt {
 		double firstHomeEndTime = 6.0 * 3600.0;
 		double homeEndTime = firstHomeEndTime;
 		log.info("starting plans creation...");
-		BasicPopulation<BasicPerson<BasicPlan>> pop = new BasicPopulationImpl();
+		BasicPopulation pop = new PopulationImpl();
+		BasicPopulationBuilder pb = pop.getPopulationBuilder() ;
 		
 		for (int i = 1; i <= 2000; i++) {
 			BasicPerson<BasicPlan> p = new BasicPersonImpl(new IdImpl(i));
@@ -71,8 +74,9 @@ public class BkTestPlansCreatorWithPt {
 			
 			//adding carPlan to person
 			
-			BasicActivityImpl act1 = new BasicActivityImpl("h");
-			act1.setLinkId(id1);
+//			BasicActivityImpl act1 = new BasicActivityImpl("h");
+//			act1.setLinkId(id1);
+			BasicActivity act1 = pb.createActivityFromLinkId("h", id1);
 			act1.setEndTime(homeEndTime);
 			plan.addActivity(act1);
 			
@@ -85,8 +89,9 @@ public class BkTestPlansCreatorWithPt {
 			leg1Car.setRoute(routeCar);
 			plan.addLeg(leg1Car);
 			
-			BasicActivityImpl act2 = new BasicActivityImpl("w");
-			act2.setLinkId(id4);
+//			BasicActivityImpl act2 = new BasicActivityImpl("w");
+//			act2.setLinkId(id4);
+			BasicActivity act2 = pb.createActivityFromLinkId("w", id4) ;
 			act2.setStartTime(7.0 * 3600.0);
 			act2.setEndTime(15.0 * 3600.0);
 //			act2.setDuration(8.0 * 3600.0);
@@ -102,8 +107,9 @@ public class BkTestPlansCreatorWithPt {
 			leg2Car.setRoute(routeCar);
 			plan.addLeg(leg2Car);
 			
-			BasicActivityImpl act3 = new BasicActivityImpl("h");
-			act3.setLinkId(id1);
+//			BasicActivityImpl act3 = new BasicActivityImpl("h");
+//			act3.setLinkId(id1);
+			BasicActivity act3 = pb.createActivityFromLinkId("w", id1) ;
 			plan.addActivity(act3);
 			
 			//adding ptPlan to person

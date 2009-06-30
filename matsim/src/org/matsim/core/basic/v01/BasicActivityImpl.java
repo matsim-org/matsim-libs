@@ -81,14 +81,6 @@ public class BasicActivityImpl implements BasicActivity {
 //		return this.type.hashCode() ^ this.getLinkId().toString().hashCode(); // XOR of two hashes
 //	}
 
-	public void setFacilityId(Id locationId) {
-		this.facilityId = locationId;
-	}
-	
-	public void setLinkId(Id linkid) {
-		this.linkId = linkid;
-	}
-
 	public Id getLinkId() {
 		return this.linkId;
 	}
@@ -97,4 +89,15 @@ public class BasicActivityImpl implements BasicActivity {
 		return this.facilityId;
 	}
 	
+
+	// these should not come back since they cause headaches without end:
+	
+//	public void setFacilityId(Id locationId) {
+//	this.facilityId = locationId;
+//}
+
+//public void setLinkId(Id linkid) {
+//	this.linkId = linkid;
+//}
+
 }

@@ -54,10 +54,12 @@ public interface BasicActivity extends BasicPlanElement {
 
 	public Id getLinkId();
 
-	public void setLinkId(final Id id);
-	
+
 	public Id getFacilityId();
 	
-	public void setFacilityId(final Id id);
+	// the following should not come back since they cause headaches without end.  use builder methods instead.
+
+	//	public void setLinkId(final Id id);
+	//	public void setFacilityId(final Id id);
 
 }

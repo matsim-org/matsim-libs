@@ -20,7 +20,6 @@
 package org.matsim.api.basic.v01.population;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -38,7 +37,7 @@ public interface BasicPopulationBuilder extends Serializable{
 
 	public BasicActivity createActivityFromCoord(String actType, Coord coord);
 
-	public BasicActivity createActivityFromFacilityId(String actType, Id facilityId);
+//	public BasicActivity createActivityFromFacilityId(String actType, Id facilityId);
 
 	public BasicActivity createActivityFromLinkId(String actType, Id linkId);
 	
@@ -50,6 +49,6 @@ public interface BasicPopulationBuilder extends Serializable{
 	 * @return a BasicRoute Object with the links set accordingly
 	 * @deprecated needs to be verified
 	 */
-	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
+//	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
 
 }

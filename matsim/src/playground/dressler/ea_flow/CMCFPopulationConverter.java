@@ -29,23 +29,25 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.xml.sax.SAXException;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Activity;
+import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.BasicActivityImpl;
-import org.matsim.core.basic.v01.BasicLegImpl;
+import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.xml.sax.SAXException;
 /**
  * 
  * @author Manuel Schneider
@@ -57,6 +59,7 @@ public class CMCFPopulationConverter {
 	@SuppressWarnings("unchecked")
 	public static Population readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
 		Population result = new PopulationImpl();
+		PopulationBuilder pb = result.getPopulationBuilder() ;
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
 		Element demandgraph = cmcfdemands.getRootElement();
@@ -97,17 +100,24 @@ public class CMCFPopulationConverter {
 				 Id matsimid  = new IdImpl(id+"."+i);
 				 Person p = new PersonImpl(matsimid);
 				 Plan plan = new org.matsim.core.population.PlanImpl(p);
-				 BasicActivityImpl home = new BasicActivityImpl("home");
-				 home.setEndTime(0.);
-				 BasicActivityImpl work = new BasicActivityImpl("work");
-				 BasicLegImpl leg = new BasicLegImpl(TransportMode.walk);
+//				 BasicActivityImpl home = new BasicActivityImpl("home");
+//				 BasicActivityImpl work = new BasicActivityImpl("work");
+//				 BasicLegImpl leg = new BasicLegImpl(TransportMode.walk);
+				 Activity home ;
+				 Activity work ;
+				 Leg leg = pb.createLeg(TransportMode.walk);
 				 if (coordinates){
-					home.setCoord(coordfrom);
-					work.setCoord(coordto);
+//					home.setCoord(coordfrom);
+//					work.setCoord(coordto);
+					 home = pb.createActivityFromCoord("home", coordfrom) ;
+					 work = pb.createActivityFromCoord("work", coordto ) ;
 				 }else{
-					home.setLinkId(fromlink.getId());
-					work.setLinkId(tolink.getId());
+//					home.setLinkId(fromlink.getId());
+//					work.setLinkId(tolink.getId());
+					 home = pb.createActivityFromLinkId( "home" , fromlink.getId() ) ;
+					 work = pb.createActivityFromLinkId( "work" , tolink.getId() ) ;
 				 }
+				 home.setEndTime(0.);
 				 plan.addActivity(home);
 				 plan.addLeg(leg);
 				 plan.addActivity(work);

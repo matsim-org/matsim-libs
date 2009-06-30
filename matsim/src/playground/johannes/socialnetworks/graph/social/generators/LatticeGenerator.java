@@ -25,8 +25,8 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
-import org.matsim.core.basic.v01.BasicPopulationImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -37,7 +37,7 @@ public class LatticeGenerator {
 
 	public BasicPopulation<BasicPerson<?>> generate(int width, int hight) {
 //		SocialNetwork<BasicPerson<?>> socialnet = new SocialNetwork<BasicPerson<?>>();
-		BasicPopulation<BasicPerson<?>> population = new BasicPopulationImpl<BasicPerson<?>>();
+		BasicPopulation population = new PopulationImpl();
 		int counter = 0;
 		for(int row = 1; row < hight; row+=1) {
 			for(int col = 1; col < width; col+=1) {

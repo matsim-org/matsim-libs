@@ -20,7 +20,6 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 
 
@@ -147,9 +146,8 @@ BasicActivityEndEventHandler
 			List<Id> routeIdList = new ArrayList<Id>() ;
 			routeIdList.add(id) ; routeIdList.add(id) ;
 
-			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
-			
-			leg.setRoute(route) ;
+//			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
+//			leg.setRoute(route) ;
 			
 		} catch (Exception e) {
 			e.printStackTrace();

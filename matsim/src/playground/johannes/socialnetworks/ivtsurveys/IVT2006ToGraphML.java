@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
@@ -38,8 +39,8 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
-import org.matsim.core.basic.v01.BasicPopulationImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -76,7 +77,7 @@ public class IVT2006ToGraphML {
 		String graphfile = args[3];
 
 		SocialNetwork<BasicPerson<BasicPlan<BasicPlanElement>>> socialnet = new SocialNetwork<BasicPerson<BasicPlan<BasicPlanElement>>>();
-		BasicPopulation<BasicPerson<BasicPlan<BasicPlanElement>>> population = new BasicPopulationImpl<BasicPerson<BasicPlan<BasicPlanElement>>>();
+		BasicPopulation population = new PopulationImpl();
 		HashMap<String, Ego<BasicPerson<BasicPlan<BasicPlanElement>>>> egos = new HashMap<String, Ego<BasicPerson<BasicPlan<BasicPlanElement>>>>();
 		
 		int maxId = 0;

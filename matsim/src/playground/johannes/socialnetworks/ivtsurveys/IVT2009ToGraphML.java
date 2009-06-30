@@ -36,6 +36,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
@@ -44,8 +45,8 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
-import org.matsim.core.basic.v01.BasicPopulationImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -56,7 +57,6 @@ import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.io.SNGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
@@ -116,7 +116,7 @@ public class IVT2009ToGraphML {
 		/*
 		 * create an empty population and social network
 		 */
-		BasicPopulation<BasicPerson<?>> population = new BasicPopulationImpl<BasicPerson<?>>();
+		BasicPopulation population = new PopulationImpl();
 		SocialNetwork<BasicPerson<?>> socialnet = new SocialNetwork<BasicPerson<?>>();
 		
 		Set<Ego<BasicPerson<?>>> alters = new HashSet<Ego<BasicPerson<?>>>();
