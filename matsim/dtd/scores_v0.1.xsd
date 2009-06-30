@@ -19,7 +19,8 @@ the simulation -->
            
 <xs:complexType name="scoreType">
   <xs:sequence>
-      <xs:element name="iteration" type="xs:positiveInteger" minOccurs="1" maxOccurs="1" />
+      <xs:element name="iteration" type="xs:nonNegativeInteger"
+      	minOccurs="1" maxOccurs="1" />
       <xs:element name="averageExecuted" type="xs:double" minOccurs="1" maxOccurs="1" />
       <xs:element name="averageWorst" type="xs:double" minOccurs="1" maxOccurs="1" />
       <xs:element name="averageAverage" type="xs:double" minOccurs="1" maxOccurs="1" />
