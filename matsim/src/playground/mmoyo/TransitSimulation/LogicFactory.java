@@ -27,11 +27,12 @@ import playground.mmoyo.PTRouter.PTRouter2;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 
 /**
- * Reads a TransitSchedule and creates:
+ * Reads a TransitSchedule and creates from it:
  * -Plain network: A node represent a station. A link represents a simple connection between stations 
  * -logic layer network: with sequences of independent nodes for each TansitLine, include transfer links
- * -logic layer TransitSchedule: with a cloned stop facility for each transit stop of each Transit Line with new Id's mapped to the real transitFaciliteies
- * @param transitSchedule 
+ * -logicTransitSchedule: with a cloned stop facility for each transit stop of each Transit Line with new Id's mapped to the real transitFaciliteies
+ * -A PTRouter object containing departure information according o the logicTransitSchedule
+ * -logicToPlainConverter: translates logic nodes and links into plain nodes and links. 
  */
 
 public class LogicFactory{
@@ -39,10 +40,10 @@ public class LogicFactory{
 	private NetworkLayer logicNet= new NetworkLayer();
 	private NetworkLayer plainNet= new NetworkLayer();
 	private TransitSchedule logicTransitSchedule = new TransitSchedule(); 
-	private LogicToPlainConverter logicToPlainConverter; 
+	private LogicIntoPlainTranslator logicToPlainTranslator; 
 	
 	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /** <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
-	private Map<Node,Node> logicToPlanStopMap = new TreeMap<Node,Node>(); 
+	public Map<Node,Node> logicToPlanStopMap = new TreeMap<Node,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
 	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();
 	
 	long newLinkId=0;
@@ -54,7 +55,7 @@ public class LogicFactory{
 	public LogicFactory(final TransitSchedule transitSchedule){
 		this.transitSchedule = transitSchedule;
 		createLogicNet();
-		this.logicToPlainConverter = new LogicToPlainConverter(plainNet,  logicToPlanStopMap);
+		this.logicToPlainTranslator = new LogicIntoPlainTranslator(plainNet,  logicToPlanStopMap);
 	}
 	
 	//Creates a logic network file and a logic TransitSchedule file with individualized id's for nodes and stops*/
@@ -153,7 +154,7 @@ public class LogicFactory{
 		//NodeLineMap= null;??
 	}
 	
-	/**Asks if the fromNode has at least a standard inLink and also if the toNode has at least a standard outLink
+	/**Asks if the fromNode has at least one standard inLink and also if the toNode has at least a standard outLink
 	 * Otherwise it is senseless to create a transfer link between them */
 	private boolean willJoin2StandardLinks(Node fromNode, Node toNode){
 		int numInGoingStandards =0;
@@ -218,15 +219,15 @@ public class LogicFactory{
 		return this.plainNet;
 	}
 	
-	public LogicToPlainConverter getLogicToPlainConverter(){
-		return this.logicToPlainConverter ;
+	public LogicIntoPlainTranslator getLogicToPlainConverter(){
+		return this.logicToPlainTranslator ;
 	}
 
 	public PTRouter2 getPTRouter(){
 		PTTimeTable2 logicPTTimeTable = new PTTimeTable2();
 		TransitTravelTimeCalculator transitTravelTimeCalculator = new TransitTravelTimeCalculator(logicTransitSchedule,logicNet);
 		transitTravelTimeCalculator.fillTimeTable(logicPTTimeTable);
-		PTRouter2 ptRouter = new PTRouter2(logicNet, logicPTTimeTable, logicToPlainConverter);
+		PTRouter2 ptRouter = new PTRouter2(logicNet, logicPTTimeTable, logicToPlainTranslator);
 		return ptRouter; 
 	}
 

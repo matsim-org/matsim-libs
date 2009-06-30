@@ -2,7 +2,7 @@ package playground.mmoyo.PTRouter;
 
 import playground.mmoyo.input.PTNetworkFactory2;
 import org.matsim.core.network.NetworkLayer;
-import playground.mmoyo.TransitSimulation.LogicToPlainConverter;
+import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 
 /**
  * Contains the common objects for the route search: network, logicNet, PTTimetable, PtRouter

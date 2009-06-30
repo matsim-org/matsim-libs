@@ -1,24 +1,17 @@
 package playground.mmoyo.PTRouter;
 
-import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.xml.sax.SAXException;
-
-import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.mmoyo.TransitSimulation.ToTransitScheduleConverter;
-import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
+import playground.mmoyo.input.transitconverters.ToTransitScheduleConverter;
+import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.StationValidator;
 import playground.mmoyo.input.PTLineAggregator;
@@ -27,8 +20,8 @@ import playground.mmoyo.input.PTLineAggregator;
  * Executable class to perform data input, validations and routing test according to timetable information
  */
 public class PTControler2 {
-    private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
-    //private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
+   //private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
+	private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
     
 	private static final String CONFIG =  path  + "config.xml";
 	private static final String NETFILE = path + "network.xml";
@@ -36,17 +29,13 @@ public class PTControler2 {
 	private static final String INPTNETFILE = path + "inptnetfile.xml";
 	private static final String PLANFILE = path + "plans.xml";
 	private static final String OUTPUTPLANS = path + "output_plans.xml";
-	private static final String TRANSITSCHEDULEFILE = path + "transitSchedule.xml";
 	private static final String INPTNEWLINES = path + "TestCase/InPTDIVA.xml";
 	private static final String DIVNODES = path + "TestCase/DivNodes.xml";
-	private static final String PLAINNETWORK = path + "plainNetwork.xml";
-	private static final String LOGICNETWORK = path + "logicNetwork.xml";
-	private static final String LOGICTRANSITSCHEDULE = path + "logicTransitSchedule.xml";
 	
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, NETFILE, TIMETABLEFILE, PLANFILE, OUTPUTPLANS); 
 		
-		int option =5;
+		int option =2;
 		
 		if (option>0){pt.readPTNet(NETFILE);}
 		switch (option){
@@ -166,37 +155,6 @@ public class PTControler2 {
 	    		pt.setPTTimeTable(ptTimeTable);
 	    		PTActWriter ptActWriter3 = new PTActWriter(pt);
 	    		ptActWriter3.findRouteForActivities();
-	    		break;
-
-	    		/**Reads a TransitSchedule File and creates plainNet, LogicTransitSchedule and logicNet from it*/
-	    	case 5:
-	    		//read plain Net // this is temporal, the network must proceed of original data source, temporarly is the same plain network*/ 
-	    		Network plainNet= new NetworkLayer(new NetworkFactory());
-	    		new MatsimNetworkReader(plainNet).readFile(PLAINNETWORK);
-
-	    		/**read TransitSchedule */
-	    		TransitSchedule transitSchedule = new TransitSchedule();
-	    		try {
-	    			new TransitScheduleReaderV1(transitSchedule, plainNet).readFile(TRANSITSCHEDULEFILE);
-	    		} catch (SAXException e) {
-	    			e.printStackTrace();
-	    		} catch (ParserConfigurationException e) {
-	    			e.printStackTrace();
-	    		} catch (IOException e){
-	    			e.printStackTrace();
-	    		}
-	    		
-	    		/**Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter*/
-	    		//LogicFactory logicFactory = new LogicFactory(transitSchedule);
-	    		//logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
-	    		
-	    		/**Routes a population*/
-	    		PTActWriter ptActWriter4 = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
-	    		ptActWriter4.findRouteForActivities();
-
-	    		/**tests the TransitRouteFinder class*/
-	    		//ptActWriter4.printPTLegs(transitSchedule);
-	    		
 	    		break;
 		}
 	}

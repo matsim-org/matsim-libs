@@ -30,7 +30,6 @@ import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -42,7 +41,7 @@ import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-import playground.mmoyo.TransitSimulation.TransitScheduleToPTTimeTableConverter;
+import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
 import playground.mmoyo.input.PTNetworkFactory2;
 
 public class PlansCalcPtRoute extends PlansCalcRoute {

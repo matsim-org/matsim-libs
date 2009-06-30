@@ -23,13 +23,6 @@ public class PTTimeTable2{
 	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
 	private static Time time;
 	
-	/*
-	public PTTimeTable2(Map<Id,Double> linkTravelTimeMap,Map<Id,double[]> nodeDeparturesMap ){
-		this.linkTravelTimeMap = linkTravelTimeMap;
-		this.nodeDeparturesMap =  nodeDeparturesMap;
-	}
-	*/
-	
 	@Deprecated
 	public PTTimeTable2(final String TimeTableFile){
 		ptLineList = new ArrayList<PTLine>();
@@ -83,7 +76,7 @@ public class PTTimeTable2{
 	}
 	
 	public double getTravelTime(Link link){
-		return linkTravelTimeMap.get(link.getId()); 
+		return linkTravelTimeMap.get(link.getId())*60; // stored in minutes, returned in seconds
 	}
 
 	/**
@@ -95,7 +88,7 @@ public class PTTimeTable2{
 			transferTime= nextDeparture-time;
 		}else{
 			//wait till next day first departure
-			transferTime= 86400-time+ nextDeparture;
+			transferTime= 86400-time+ nodeDeparturesMap.get(link.getToNode().getId())[0];
 		}
 		return transferTime;
 	}
@@ -106,7 +99,7 @@ public class PTTimeTable2{
 	*returns the first departure(of the next day)*/
 	public double nextDepartureB(Id idPTNode,  double time){//,
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
-	int length = arrDep.length;
+		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){
 			index = -index;

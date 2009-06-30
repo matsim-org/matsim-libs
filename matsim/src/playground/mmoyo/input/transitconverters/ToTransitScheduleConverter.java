@@ -1,4 +1,4 @@
-package playground.mmoyo.TransitSimulation;
+package playground.mmoyo.input.transitconverters;
 
 import java.io.IOException;
 import java.util.ArrayList;

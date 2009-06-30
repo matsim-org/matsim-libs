@@ -220,7 +220,7 @@ public class PTNetworkFactory2 {
 							//createPTLink(net, strId, ptn2, ptn1, "DetTransfer");
 						}
 					//}
-				}
+					}
 			}	
 		}
 	}

@@ -1,4 +1,4 @@
-package playground.mmoyo.TransitSimulation;
+package playground.mmoyo.input.transitconverters;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,11 +21,9 @@ import playground.mmoyo.PTRouter.PTTimeTable2;
 import playground.mmoyo.PTRouter.PTLine;
 
 /**
- * Temporary Class to be deleted!
  * Reads a transitschedule to feed a PTTimetable
  */
 public class TransitScheduleToPTTimeTableConverter {
-	//->Ideally the router should use transitroute to get directly these data
 	private static Time time;
 	public TransitScheduleToPTTimeTableConverter() {
 

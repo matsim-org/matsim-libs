@@ -17,20 +17,18 @@ import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
 /**
- * 
- * @author manuel
- *
+ * Translates logic nodes and links into plain nodes and links. 
  */
-public class LogicToPlainConverter {
+public class LogicIntoPlainTranslator {
 	private NetworkLayer plainNet;
 	private MultiKeyMap joiningLinkMap;
 	private Map<Node,Node> logicToPlainStopMap;
 	
-	public LogicToPlainConverter(final NetworkLayer plainNetwork,  final Map<Node,Node> logicToPlanStopMap) {
+	/**the constructor creates the joiningLinkMap that stores the relation between logic and plain Nodes*/ 
+	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<Node,Node> logicToPlanStopMap) {
 		this.plainNet= plainNetwork;
 		this.logicToPlainStopMap = logicToPlanStopMap;
 		
@@ -43,7 +41,6 @@ public class LogicToPlainConverter {
 			joiningLinkMap.put(fromPlainNode, toPlainNode, plainLink);
 		}
 	}
-
 
 	private Node convertToPlain(Node logicNode){
 		return logicToPlainStopMap.get(logicNode);
@@ -59,6 +56,7 @@ public class LogicToPlainConverter {
 		return planLink;
 	}
 	
+	/**in case of a transfer link of the logic Network, the last standard link is returned, because transfer links do not exist in the pain network*/
 	private Link findLastStandardLink (Link transferLink){
 		Link standardLink = null;
 		for (Link inLink: transferLink.getFromNode().getInLinks().values()){
@@ -79,6 +77,7 @@ public class LogicToPlainConverter {
 		return plainLinks;
 	}
 	
+	/**translates the plans of a whole population*/
 	public void convertToPlain(Population population){
 		for (Person person: population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
@@ -104,7 +103,7 @@ public class LogicToPlainConverter {
 			List<Link> plainLinkList = new ArrayList<Link>();
 			
 			for (Link link: logicNetworkRoute.getLinks()){
-				if (link.getType().equals("Standard"))
+				//if (link.getType().equals("Standard"))
 					plainLinkList.add(link);
 			}
 			if(plainLinkList.size()>0){
@@ -122,8 +121,6 @@ public class LogicToPlainConverter {
 		logicLegList = null;
 		return plainLegList;
 	}
-	
-	
 	
 	/*
 	public Path getPlainPath (final Path logicPath){

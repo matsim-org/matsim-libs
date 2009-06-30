@@ -33,8 +33,7 @@ public class PTTravelTime implements TravelTime {
 		if (type.equals("Transfer")){
 			travelTime= transferTime(link,time); 
 		}else if (type.equals("Walking")){
-			travelTime= link.getLength()* walkSpeed;
-		
+			travelTime= (link.getLength()* walkSpeed);
 		}else if (type.equals("Standard")){
 			travelTime= ptTimeTable.getTravelTime(link);
 		}else if (type.equals("DetTransfer")){
@@ -46,11 +45,13 @@ public class PTTravelTime implements TravelTime {
 		return travelTime;
 	}
 	
-	private double transferTime(final Link link, final double time){
+	public double transferTime(final Link link, final double time){
 		transTime= ptTimeTable.getTransferTime(link, time);
 		if (transTime<0) {
-			costValidator.pushNegativeValue(link.getId(), time, transTime);
-			transTime = 600;
+			//costValidator.pushNegativeValue(link.getId(), time, transTime);
+			//transTime= 86400-time+ transTime;//first departure of next day
+			transTime=6000;
+			//if (transTime<0) System.out.println("negative value at" + link.getId().toString() + " " + time);
 		}
 		return transTime;  //-> Transfer factor
 	}

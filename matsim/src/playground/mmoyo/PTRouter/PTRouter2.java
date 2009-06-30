@@ -15,7 +15,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.MyDijkstra;
 import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.TransitSimulation.LogicToPlainConverter;
+import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -43,7 +43,7 @@ public class PTRouter2{
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
 	}
 	
-	public PTRouter2(NetworkLayer logicNet, PTTimeTable2 ptTimetable, LogicToPlainConverter logicToPlainConverter) {
+	public PTRouter2(NetworkLayer logicNet, PTTimeTable2 ptTimetable, LogicIntoPlainTranslator logicToPlainConverter) {
 		this.logicNet = logicNet;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
@@ -101,6 +101,7 @@ public class PTRouter2{
 		Node fromNode;
 		Node toNode;
 		int x=0;
+		
 		
 		for (Node node : nearNodes){
 			if (to){

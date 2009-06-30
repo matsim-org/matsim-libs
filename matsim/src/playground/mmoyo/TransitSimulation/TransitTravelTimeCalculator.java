@@ -16,9 +16,12 @@ import playground.marcel.pt.transitSchedule.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.TransitSchedule;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 
+/**
+ * Calculates and stores travel time according to the logicTransitSchedule object
+ **/
 public class TransitTravelTimeCalculator {
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
-	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
+	public Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	
 	public TransitTravelTimeCalculator(final TransitSchedule logicTransitSchedule, final Network logicNetwork){
 		calculateTravelTimes(logicTransitSchedule,logicNetwork);
@@ -65,6 +68,7 @@ public class TransitTravelTimeCalculator {
 							if (lastLink.getFromNode().equals(lastNode)){
 								departureDelay= transitRouteStop.getDepartureDelay();
 								linkTravelTime= departureDelay- lastDepartureDelay;
+								linkTravelTime = linkTravelTime/60;
 								linkTravelTimeMap.put(lastLink.getId(), linkTravelTime);
 							}
 						}
