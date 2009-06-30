@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api.consistency;
+package org.matsim.core.api.experimental.consistency;
 
 import java.util.List;
 
