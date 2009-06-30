@@ -1,14 +1,26 @@
 package playground.kai.usecases.basicmentalmodule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.api.basic.v01.*;
+import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.network.*;
-import org.matsim.api.basic.v01.population.*;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 
 
@@ -124,8 +136,8 @@ BasicActivityEndEventHandler
 //			act = pb.createActivityFromFacilityId( "home", id ) ; // FIXME
 			
 			act.setEndTime(123.);
-			act.setFacilityId(id) ;
-			act.setLinkId(id) ;
+//			act.setFacilityId(id) ;
+//			act.setLinkId(id) ;
 			act.setType("home") ;
 			act.setStartTime(122.) ;
 			
