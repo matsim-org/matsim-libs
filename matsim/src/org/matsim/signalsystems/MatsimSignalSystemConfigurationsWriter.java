@@ -19,8 +19,8 @@
 
 package org.matsim.signalsystems;
 
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 
 
 /**

@@ -20,8 +20,8 @@
 package playground.dgrether.daganzosignal;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
 
 
@@ -42,7 +42,7 @@ public class AdaptiveController extends
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition)
+	 * @see org.matsim.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
 	 */
 	public boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup) {
 		log.info("isGreen?");

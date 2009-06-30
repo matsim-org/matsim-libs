@@ -23,13 +23,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.network.BasicLane;
-import org.matsim.core.basic.network.BasicLaneDefinitions;
-import org.matsim.core.basic.network.BasicLaneDefinitionsImpl;
-import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimLaneDefinitionsReader;
 import org.matsim.core.network.MatsimLaneDefinitionsWriter;
+import org.matsim.lanes.basic.BasicLane;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
+import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.SignalSystemsReaderWriterTest;
 import org.matsim.testcases.MatsimTestCase;
 

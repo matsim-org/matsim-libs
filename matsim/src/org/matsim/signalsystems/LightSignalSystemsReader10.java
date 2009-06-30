@@ -28,14 +28,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.network.BasicLane;
-import org.matsim.core.basic.network.BasicLaneDefinitions;
-import org.matsim.core.basic.network.BasicLaneDefinitionsBuilder;
-import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
-import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalSystems;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemsBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lightsignalsystems10.ObjectFactory;
@@ -45,6 +37,15 @@ import org.matsim.jaxb.lightsignalsystems10.XMLLanesToLinkAssignmentType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalGroupDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
+import org.matsim.lanes.basic.BasicLane;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.basic.BasicLaneDefinitionsBuilder;
+import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
+import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.basic.BasicSignalSystemsBuilder;
+
 import org.xml.sax.SAXException;
 
 /**

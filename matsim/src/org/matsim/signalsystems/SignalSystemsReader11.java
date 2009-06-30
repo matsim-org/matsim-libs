@@ -28,16 +28,17 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalSystems;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemsBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystems11.XMLIdRefType;
 import org.matsim.jaxb.signalsystems11.XMLSignalGroupDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystemDefinitionType;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
+import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
+import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.basic.BasicSignalSystemsBuilder;
+
 import org.xml.sax.SAXException;
 
 /**

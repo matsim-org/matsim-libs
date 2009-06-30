@@ -28,12 +28,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsBuilder;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLAdaptiveLightSignalSystemControlInfoType;
@@ -43,6 +37,13 @@ import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemConfigurat
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemControlInfoType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLLightSignalSystemPlanType;
 import org.matsim.jaxb.lightsignalsystemsconfig10.XMLPlanbasedlightSignalSystemControlInfoType;
+import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicSignalGroupSettings;
+import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsBuilder;
+import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+
 import org.xml.sax.SAXException;
 
 /**

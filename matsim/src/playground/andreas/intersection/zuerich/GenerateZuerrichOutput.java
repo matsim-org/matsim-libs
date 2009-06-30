@@ -5,22 +5,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.network.BasicLaneDefinitions;
-import org.matsim.core.basic.network.BasicLaneDefinitionsImpl;
-import org.matsim.core.basic.network.BasicLaneImpl;
-import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
-import org.matsim.core.basic.network.BasicLanesToLinkAssignmentImpl;
-import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinitionImpl;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalSystems;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemsImpl;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
+import org.matsim.lanes.basic.BasicLaneImpl;
+import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.lanes.basic.BasicLanesToLinkAssignmentImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
+import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.basic.BasicSignalGroupDefinitionImpl;
+import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
+import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
+import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
 
 public class GenerateZuerrichOutput {
 

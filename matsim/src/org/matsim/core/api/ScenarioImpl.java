@@ -24,12 +24,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.network.BasicLaneDefinitions;
-import org.matsim.core.basic.network.BasicLaneDefinitionsImpl;
-import org.matsim.core.basic.signalsystems.BasicSignalSystems;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemsImpl;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.vehicles.BasicVehicles;
 import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
@@ -43,7 +37,13 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
 import org.matsim.world.World;
 
 

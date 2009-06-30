@@ -28,15 +28,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.basic.signalsystemsconfig.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsBuilder;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystemsconfig11.XMLAdaptivePlanbasedSignalSystemControlInfoType;
@@ -48,6 +39,16 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
+import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicSignalGroupSettings;
+import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsBuilder;
+import org.matsim.signalsystems.config.BasicSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicSignalSystemPlan;
+
 import org.xml.sax.SAXException;
 
 

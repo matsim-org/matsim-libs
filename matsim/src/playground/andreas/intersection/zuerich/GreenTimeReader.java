@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurationsImpl;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicSignalGroupSettings;
+import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 
 
 public class GreenTimeReader implements TabularFileHandler {

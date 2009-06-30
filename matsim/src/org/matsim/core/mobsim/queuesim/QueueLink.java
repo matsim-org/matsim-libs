@@ -32,14 +32,14 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.basic.network.BasicLane;
-import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.basic.BasicLane;
 import org.matsim.signalsystems.CalculateAngle;
+import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**

@@ -24,9 +24,6 @@ import org.matsim.core.api.Scenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.network.BasicLaneDefinitions;
-import org.matsim.core.basic.signalsystems.BasicSignalSystems;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.vehicles.BasicVehicles;
 import org.matsim.core.config.Config;
@@ -36,19 +33,23 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.knowledges.Knowledges;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 
+/** @deprecated this is a proposal; do not use */
 public class BasicScenarioImpl2 implements Scenario {
 
 	private final Config config;
 	private final Network network;
 	private final Population population;
 	
-	public BasicScenarioImpl2() {
+	private BasicScenarioImpl2() {
 		this(new Config());
 		this.config.addCoreModules();
 	}
 	
-	public BasicScenarioImpl2(Config config) {
+	private BasicScenarioImpl2(Config config) {
 		this.config = config;
 
 		this.network = new NetworkLayer();  

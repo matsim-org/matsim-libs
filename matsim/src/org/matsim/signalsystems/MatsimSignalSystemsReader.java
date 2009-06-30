@@ -25,10 +25,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.network.BasicLaneDefinitions;
-import org.matsim.core.basic.signalsystems.BasicSignalSystems;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.signalsystems.basic.BasicSignalSystems;
+
 import org.xml.sax.SAXException;
 
 /**

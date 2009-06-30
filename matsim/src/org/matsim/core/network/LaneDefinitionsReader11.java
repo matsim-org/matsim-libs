@@ -28,10 +28,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.network.BasicLane;
-import org.matsim.core.basic.network.BasicLaneDefinitions;
-import org.matsim.core.basic.network.BasicLaneDefinitionsBuilder;
-import org.matsim.core.basic.network.BasicLanesToLinkAssignment;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lanedefinitions11.ObjectFactory;
@@ -39,6 +35,11 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
+import org.matsim.lanes.basic.BasicLane;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.basic.BasicLaneDefinitionsBuilder;
+import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+
 import org.xml.sax.SAXException;
 
 

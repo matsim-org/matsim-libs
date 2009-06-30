@@ -23,11 +23,11 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.signalsystems.BasicSignalGroupDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemDefinition;
-import org.matsim.core.basic.signalsystems.BasicSignalSystems;
-import org.matsim.core.basic.signalsystems.BasicSignalSystemsImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
+import org.matsim.signalsystems.basic.BasicSignalSystems;
+import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

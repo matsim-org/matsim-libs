@@ -30,14 +30,6 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.signalsystemsconfig.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalGroupSettings;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemConfigurations;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemControlInfo;
-import org.matsim.core.basic.signalsystemsconfig.BasicSignalSystemPlan;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.signalsystemsconfig11.ObjectFactory;
@@ -55,6 +47,14 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLCycleTim
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStart;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStop;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLSynchronizationOffset;
+import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicSignalGroupSettings;
+import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.BasicSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 
 
 public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
