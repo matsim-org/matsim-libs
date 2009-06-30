@@ -27,9 +27,9 @@ public interface Leg extends BasicLeg, PlanElement {
 	public Route getRoute();
 
 	public double getArrivalTime();
-	// TODO kn mv from interface to implementation
+	// TODO kn Not sure what this means.  mv from interface to implementation?
 	
 	public void setArrivalTime(final double seconds);
-	// TODO kn mv from interface to implementation
+	// TODO kn Not sure what this means.  mv from interface to implementation?
 
 }

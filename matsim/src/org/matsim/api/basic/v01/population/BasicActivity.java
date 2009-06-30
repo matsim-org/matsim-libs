@@ -46,11 +46,11 @@ public interface BasicActivity extends BasicPlanElement {
 	public Coord getCoord();
 
 	public double getStartTime();
-	// TODO kn not clear what this means.  It may be something like a helper method that
-	// removes the burden of calculating "previous_act_end_time + leg_trav_time".
+	// TODO kn not clear what this means.  I guess that in the same sense as "expected travel time" in leg I should accept it
+	// as "expected activity start time".  --> remove for next version?
 
 	public void setStartTime(double seconds);
-	// TODO kn not clear what this means
+	// TODO kn not clear what this means (see above). --> remove for next version?
 
 	public Id getLinkId();
 

@@ -32,8 +32,10 @@ public interface BasicPlan<P extends BasicPlanElement> extends Serializable{
 	public List<P> getPlanElements();
 
 	public void addLeg(final BasicLeg leg);
+	// TODO kn This should not be in a pure data class.  (But maybe this is not a pure data class.)
 
 	public void addActivity(final BasicActivity act);
+	// TODO kn This should not be in a pure data class.  (But maybe this is not a pure data class.)
 
 	public boolean isSelected();
 	
