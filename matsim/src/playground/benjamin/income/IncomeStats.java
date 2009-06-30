@@ -25,14 +25,14 @@ import java.io.IOException;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.households.BasicHousehold;
-import org.matsim.core.basic.v01.households.BasicHouseholds;
-import org.matsim.core.basic.v01.households.BasicHouseholdsImpl;
-import org.matsim.core.basic.v01.households.BasicHouseholdsReaderV10;
-import org.matsim.core.basic.v01.households.HouseholdIncomeComparator;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Households;
+import org.matsim.households.basic.BasicHousehold;
+import org.matsim.households.basic.BasicHouseholds;
+import org.matsim.households.basic.BasicHouseholdsImpl;
+import org.matsim.households.basic.BasicHouseholdsReaderV10;
+import org.matsim.households.basic.HouseholdIncomeComparator;
 
 import playground.dgrether.DgPaths;
 

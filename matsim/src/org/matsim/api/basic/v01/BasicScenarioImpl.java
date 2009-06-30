@@ -26,14 +26,14 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.households.BasicHousehold;
-import org.matsim.core.basic.v01.households.BasicHouseholds;
-import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.households.basic.BasicHousehold;
+import org.matsim.households.basic.BasicHouseholds;
+import org.matsim.vehicles.BasicVehiclesImpl;
 
 public class BasicScenarioImpl implements BasicScenario {
 

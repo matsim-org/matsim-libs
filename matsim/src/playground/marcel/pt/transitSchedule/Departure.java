@@ -21,7 +21,7 @@
 package playground.marcel.pt.transitSchedule;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+import org.matsim.vehicles.BasicVehicle;
 
 public class Departure {
 

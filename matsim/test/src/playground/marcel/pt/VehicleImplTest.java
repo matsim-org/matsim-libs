@@ -21,12 +21,12 @@
 package playground.marcel.pt;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacity;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.BasicVehicleCapacity;
+import org.matsim.vehicles.BasicVehicleCapacityImpl;
+import org.matsim.vehicles.BasicVehicleImpl;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicleTypeImpl;
 
 import playground.marcel.pt.integration.TransitQueueVehicle;
 import playground.marcel.pt.interfaces.TransitVehicle;

@@ -20,10 +20,10 @@
 package org.matsim.households;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.households.BasicHouseholdBuilderImpl;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
+import org.matsim.households.basic.BasicHouseholdBuilderImpl;
+import org.matsim.households.basic.BasicIncome;
+import org.matsim.households.basic.HouseholdBuilder;
+import org.matsim.households.basic.BasicIncome.IncomePeriod;
 
 /**
  * @author dgrether

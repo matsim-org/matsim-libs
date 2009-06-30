@@ -29,17 +29,18 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacity;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.vehicles.BasicVehicleCapacity;
+import org.matsim.vehicles.BasicVehicleCapacityImpl;
+import org.matsim.vehicles.BasicVehicleImpl;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicleTypeImpl;
+
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;

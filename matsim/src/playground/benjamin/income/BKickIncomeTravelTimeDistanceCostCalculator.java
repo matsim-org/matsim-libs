@@ -21,11 +21,11 @@ package playground.benjamin.income;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.households.basic.BasicIncome;
+import org.matsim.households.basic.BasicIncome.IncomePeriod;
 
 
 /**

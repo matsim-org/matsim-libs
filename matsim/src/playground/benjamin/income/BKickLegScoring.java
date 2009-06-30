@@ -23,11 +23,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.households.basic.BasicIncome;
+import org.matsim.households.basic.BasicIncome.IncomePeriod;
 
 /**
  * @author dgrether

@@ -29,10 +29,6 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicle;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleTypeImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -40,6 +36,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.BasicVehicleImpl;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicleTypeImpl;
 
 /**
  * @author dgrether

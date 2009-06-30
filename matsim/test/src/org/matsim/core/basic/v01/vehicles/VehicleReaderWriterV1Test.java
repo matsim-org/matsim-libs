@@ -26,6 +26,13 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.BasicEngineInformation;
+import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.BasicVehicleReaderV1;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.BasicVehiclesImpl;
+import org.matsim.vehicles.VehicleWriterV1;
 
 /**
  * @author dgrether

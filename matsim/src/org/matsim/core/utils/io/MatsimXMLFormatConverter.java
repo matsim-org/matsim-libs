@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
-import org.matsim.core.network.MatsimLaneDefinitionsWriter;
+import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;

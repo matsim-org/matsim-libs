@@ -22,7 +22,7 @@ package playground.marcel.pt.interfaces;
 
 import java.util.Collection;
 
-import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+import org.matsim.vehicles.BasicVehicle;
 
 public interface TransitVehicle {
 //

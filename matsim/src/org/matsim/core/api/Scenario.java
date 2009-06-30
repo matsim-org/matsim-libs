@@ -21,12 +21,12 @@ import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.vehicles.BasicVehicles;
 import org.matsim.households.Households;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.vehicles.BasicVehicles;
 
 
 

@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.basic.v01.vehicles.BasicVehicle;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleCapacity;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
+import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.BasicVehicleCapacity;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.TransitVehicle;

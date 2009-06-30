@@ -27,13 +27,13 @@ import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
-import org.matsim.core.basic.v01.households.HouseholdsWriterV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.households.basic.BasicIncome;
+import org.matsim.households.basic.HouseholdBuilder;
+import org.matsim.households.basic.HouseholdsWriterV1;
 
 import playground.dgrether.DgPaths;
 

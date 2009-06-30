@@ -25,8 +25,6 @@ import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.vehicles.BasicVehicles;
-import org.matsim.core.basic.v01.vehicles.BasicVehiclesImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
@@ -44,6 +42,8 @@ import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.BasicVehiclesImpl;
 import org.matsim.world.World;
 
 

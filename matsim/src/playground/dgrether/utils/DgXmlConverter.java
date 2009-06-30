@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.network.MatsimLaneDefinitionsWriter;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
+import org.matsim.households.basic.HouseholdBuilder;
 
 
 /**

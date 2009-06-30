@@ -31,13 +31,18 @@ import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.households.BasicIncome.IncomePeriod;
-import org.matsim.core.basic.v01.vehicles.BasicVehicleType;
-import org.matsim.core.basic.v01.vehicles.BasicVehicles;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.households.basic.BasicHousehold;
+import org.matsim.households.basic.BasicHouseholds;
+import org.matsim.households.basic.BasicHouseholdsImpl;
+import org.matsim.households.basic.BasicHouseholdsReaderV10;
+import org.matsim.households.basic.HouseholdsWriterV1;
+import org.matsim.households.basic.BasicIncome.IncomePeriod;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicles;
 
 /**
  * @author dgrether

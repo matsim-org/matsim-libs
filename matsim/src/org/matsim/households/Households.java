@@ -22,8 +22,8 @@ package org.matsim.households;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.households.BasicHouseholds;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
+import org.matsim.households.basic.BasicHouseholds;
+import org.matsim.households.basic.HouseholdBuilder;
 
 
 /**

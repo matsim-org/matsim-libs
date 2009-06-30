@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.basic.v01.households.BasicHousehold;
-import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+import org.matsim.households.basic.BasicHousehold;
+import org.matsim.vehicles.BasicVehicle;
 
 /**
  * @author dgrether
@@ -33,12 +33,12 @@ import org.matsim.core.basic.v01.vehicles.BasicVehicle;
 public interface Household extends BasicHousehold {
 	/**
 	 * Returns an unmodifiable List of the vehicle ids.
-	 * @see org.matsim.core.basic.v01.households.BasicHousehold#getVehicleIds()
+	 * @see org.matsim.households.basic.BasicHousehold#getVehicleIds()
 	 */
 	public List<Id> getVehicleIds();
 	/**
 	 * Returns an unmodifiable List of the member ids.
-	 * @see org.matsim.core.basic.v01.households.BasicHousehold#getMemberIds()
+	 * @see org.matsim.households.basic.BasicHousehold#getMemberIds()
 	 */
 	public List<Id> getMemberIds();
 	

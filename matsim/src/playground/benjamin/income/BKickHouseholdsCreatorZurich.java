@@ -42,14 +42,14 @@ import org.matsim.core.api.ScenarioLoader;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Population;
-import org.matsim.core.basic.v01.households.BasicIncome;
-import org.matsim.core.basic.v01.households.HouseholdBuilder;
-import org.matsim.core.basic.v01.households.HouseholdsWriterV1;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.households.basic.BasicIncome;
+import org.matsim.households.basic.HouseholdBuilder;
+import org.matsim.households.basic.HouseholdsWriterV1;
 
 import playground.dgrether.DgPaths;
 

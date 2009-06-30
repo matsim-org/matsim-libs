@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
-import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+import org.matsim.vehicles.BasicVehicle;
 
 /**
  *

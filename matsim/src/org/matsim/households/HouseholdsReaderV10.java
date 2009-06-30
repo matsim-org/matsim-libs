@@ -24,10 +24,10 @@ import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.ScenarioImpl;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.basic.v01.households.BasicHousehold;
-import org.matsim.core.basic.v01.households.BasicHouseholds;
-import org.matsim.core.basic.v01.households.BasicHouseholdsReaderV10;
-import org.matsim.core.basic.v01.vehicles.BasicVehicle;
+import org.matsim.households.basic.BasicHousehold;
+import org.matsim.households.basic.BasicHouseholds;
+import org.matsim.households.basic.BasicHouseholdsReaderV10;
+import org.matsim.vehicles.BasicVehicle;
 
 /**
  * @author dgrether
