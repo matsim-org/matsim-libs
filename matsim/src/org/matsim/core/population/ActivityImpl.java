@@ -25,8 +25,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -40,7 +40,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public ActivityImpl(final String type, final Link link) {
+	public ActivityImpl(final String type, final LinkImpl link) {
 		super(type.intern());
 		this.setLink(link);
 	}
@@ -55,7 +55,7 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		this.setFacility(fac);
 	}
 
-	public ActivityImpl(final String type, final Coord coord, final Link link) {
+	public ActivityImpl(final String type, final Coord coord, final LinkImpl link) {
 		this(type, link);
 		this.setCoord(coord);
 	}
@@ -95,8 +95,8 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 
 
 	// here to return correct link type
-	public final Link getLink() {
-		return (Link)this.link;
+	public final LinkImpl getLink() {
+		return (LinkImpl)this.link;
 	}
 
 	public ActivityFacility getFacility() {

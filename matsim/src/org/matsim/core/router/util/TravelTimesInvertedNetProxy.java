@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 
 /**
@@ -31,21 +31,21 @@ import org.matsim.core.api.network.Network;
  */
 public class TravelTimesInvertedNetProxy implements TravelTime {
 
-	private Network originalNetwork;
+	private NetworkLayer originalNetwork;
 	
 	private LinkToLinkTravelTime linkToLinkTravelTime;
 
-	public TravelTimesInvertedNetProxy(Network originalNet, LinkToLinkTravelTime l2ltt){
+	public TravelTimesInvertedNetProxy(NetworkLayer originalNet, LinkToLinkTravelTime l2ltt){
 		this.linkToLinkTravelTime = l2ltt;
 		this.originalNetwork = originalNet;
 	}
 	
 	/**
-	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(org.matsim.core.api.network.Link, double)
+	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(org.matsim.core.network.LinkImpl, double)
 	 */
-	public double getLinkTravelTime(Link link, double time) {
-		Link fromLink = this.originalNetwork.getLink(link.getFromNode().getId());
-		Link toLink = this.originalNetwork.getLink(link.getToNode().getId());
+	public double getLinkTravelTime(LinkImpl link, double time) {
+		LinkImpl fromLink = this.originalNetwork.getLink(link.getFromNode().getId());
+		LinkImpl toLink = this.originalNetwork.getLink(link.getToNode().getId());
 		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
 	}
 

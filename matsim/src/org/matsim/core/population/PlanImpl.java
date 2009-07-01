@@ -31,11 +31,11 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.Time;
@@ -81,7 +81,7 @@ public class PlanImpl implements Plan {
 	}
 
 
-	public final ActivityImpl createActivity(final String type, final Link link) {
+	public final ActivityImpl createActivity(final String type, final LinkImpl link) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, link);
 		getPlanElements().add(a);

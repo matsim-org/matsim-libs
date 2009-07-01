@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Identifiable;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -89,7 +89,7 @@ public interface BasicLink extends Identifiable, Serializable {
 	 * @param time the time at which the capacity is requested. Use {@link Time#UNDEFINED_TIME} to get the default value.
 	 * @return the capacity per network's capperiod timestep
 	 * 
-	 * @see Network#getCapacityPeriod()
+	 * @see NetworkLayer#getCapacityPeriod()
 	 */
 	public double getCapacity(double time);
 

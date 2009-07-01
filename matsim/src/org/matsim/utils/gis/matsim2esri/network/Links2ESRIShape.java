@@ -29,9 +29,9 @@ import org.geotools.feature.Feature;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -52,15 +52,15 @@ public class Links2ESRIShape {
 	private static Logger log = Logger.getLogger(Links2ESRIShape.class);
 
 	private final FeatureGenerator featureGenerator;
-	private final Network network;
+	private final NetworkLayer network;
 	private final String filename;
 
 
-	public Links2ESRIShape(final Network network, final String filename) {
+	public Links2ESRIShape(final NetworkLayer network, final String filename) {
 		this(network, filename, new FeatureGeneratorBuilder(network));
 	}
 
-	public Links2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
+	public Links2ESRIShape(final NetworkLayer network, final String filename, final FeatureGeneratorBuilder builder) {
 		this.network = network;
 		this.filename = filename;
 		this.featureGenerator = builder.createFeatureGenerator();
@@ -70,7 +70,7 @@ public class Links2ESRIShape {
 
 	public void write() {
 		Collection<Feature> features = new ArrayList<Feature>();
-		for (Link link : this.network.getLinks().values()) {
+		for (LinkImpl link : this.network.getLinks().values()) {
 			features.add(this.featureGenerator.getFeature(link));
 		}
 		try {

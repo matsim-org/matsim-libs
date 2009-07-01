@@ -24,11 +24,11 @@ import java.io.File;
 import java.util.Iterator;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.vis.netvis.VisConfig;
@@ -46,7 +46,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 public class Events2Snapshot {
 
 	private Config config;
-	private Network network = null;
+	private NetworkLayer network = null;
 	private Events events = null;
 	private SnapshotGenerator visualizer = null;
 	private String configfile = null;
@@ -143,7 +143,7 @@ public class Events2Snapshot {
 	 * @param config
 	 * @param network
 	 */
-	public void run(final File eventsFile, final Config config, final Network network) {
+	public void run(final File eventsFile, final Config config, final NetworkLayer network) {
 		this.eventsfile = eventsFile.getAbsolutePath();
 		this.config = config;
 

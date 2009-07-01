@@ -26,12 +26,12 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -108,7 +108,7 @@ public class RouterVis {
  *
  * @return route
  */
-	public Path runRouter(final Node fromNode, final Node toNode, final double time){
+	public Path runRouter(final NodeImpl fromNode, final NodeImpl toNode, final double time){
 		final Path path = this.router.calcLeastCostPath(fromNode, toNode, time);
 
 		try {
@@ -204,8 +204,8 @@ public class RouterVis {
 		log.info("  done.");
 
 		log.info("  running RouterVis.");
-		final Node fromNode = network.getNode(fromNodeId.toString());
-		final Node toNode = network.getNode(toNodeId.toString());
+		final NodeImpl fromNode = network.getNode(fromNodeId.toString());
+		final NodeImpl toNode = network.getNode(toNodeId.toString());
 		vis.runRouter(fromNode, toNode,0.0);
 		log.info("  done.");
 

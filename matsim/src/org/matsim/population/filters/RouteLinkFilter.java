@@ -25,8 +25,8 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -49,7 +49,7 @@ public class RouteLinkFilter extends AbstractPlanFilter {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
-				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					if (this.linkIds.contains(link.getId())) {
 						return true;
 					}

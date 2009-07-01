@@ -29,8 +29,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 /**
  * Ensures that each link in the network can be reached by any other link. 
@@ -55,14 +55,14 @@ public class NetworkCleaner {
 	 * @param network the network the startNode is part of
 	 * @return cluster of nodes <pre>startNode</pre> is part of
 	 */
-	private Map<Id, Node> findCluster(final Node startNode, final Network network) {
+	private Map<Id, NodeImpl> findCluster(final NodeImpl startNode, final NetworkLayer network) {
 
-		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<Node, DoubleFlagRole>(network.getNodes().size());
+		final Map<NodeImpl, DoubleFlagRole> nodeRoles = new HashMap<NodeImpl, DoubleFlagRole>(network.getNodes().size());
 
-		ArrayList<Node> pendingForward = new ArrayList<Node>();
-		ArrayList<Node> pendingBackward = new ArrayList<Node>();
+		ArrayList<NodeImpl> pendingForward = new ArrayList<NodeImpl>();
+		ArrayList<NodeImpl> pendingBackward = new ArrayList<NodeImpl>();
 
-		TreeMap<Id, Node> clusterNodes = new TreeMap<Id, Node>();
+		TreeMap<Id, NodeImpl> clusterNodes = new TreeMap<Id, NodeImpl>();
 		clusterNodes.put(startNode.getId(), startNode);
 		DoubleFlagRole r = getDoubleFlag(startNode, nodeRoles);
 		r.forwardFlag = true;
@@ -74,8 +74,8 @@ public class NetworkCleaner {
 		// step through the network in forward mode
 		while (pendingForward.size() > 0) {
 			int idx = pendingForward.size() - 1;
-			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
-			for (Node node : currNode.getOutNodes().values()) {
+			NodeImpl currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
+			for (NodeImpl node : currNode.getOutNodes().values()) {
 				r = getDoubleFlag(node, nodeRoles);
 				if (!r.forwardFlag) {
 					r.forwardFlag = true;
@@ -87,8 +87,8 @@ public class NetworkCleaner {
 		// now step through the network in backward mode
 		while (pendingBackward.size() > 0) {
 			int idx = pendingBackward.size()-1;
-			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
-			for (Node node : currNode.getInNodes().values()) {
+			NodeImpl currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
+			for (NodeImpl node : currNode.getInNodes().values()) {
 				r = getDoubleFlag(node, nodeRoles);
 				if (!r.backwardFlag) {
 					r.backwardFlag = true;
@@ -104,9 +104,9 @@ public class NetworkCleaner {
 		return clusterNodes;
 	}
 
-	public void run(final Network network) {
-		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
-		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();
+	public void run(final NetworkLayer network) {
+		final Map<Id, NodeImpl> visitedNodes = new TreeMap<Id, NodeImpl>();
+		Map<Id, NodeImpl> biggestCluster = new TreeMap<Id, NodeImpl>();
 
 		log.info("running " + this.getClass().getName() + " algorithm...");
 
@@ -114,11 +114,11 @@ public class NetworkCleaner {
 		log.info("  checking " + network.getNodes().size() + " nodes and " + 
 				network.getLinks().size() + " links for dead-ends...");
 		boolean stillSearching = true;
-		Iterator<? extends Node> iter = network.getNodes().values().iterator();
+		Iterator<? extends NodeImpl> iter = network.getNodes().values().iterator();
 		while (iter.hasNext() && stillSearching) {
-			Node startNode = iter.next();
+			NodeImpl startNode = iter.next();
 			if (!visitedNodes.containsKey(startNode.getId())) {
-				Map<Id, Node> cluster = this.findCluster(startNode, network);
+				Map<Id, NodeImpl> cluster = this.findCluster(startNode, network);
 				visitedNodes.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
@@ -135,8 +135,8 @@ public class NetworkCleaner {
 		/* Reducing the network so it only contains nodes included in the biggest Cluster.
 		 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
 		 */
-		List<Node> allNodes2 = new ArrayList<Node>(network.getNodes().values());
-		for (Node node : allNodes2) {
+		List<NodeImpl> allNodes2 = new ArrayList<NodeImpl>(network.getNodes().values());
+		for (NodeImpl node : allNodes2) {
 			if (!biggestCluster.containsKey(node.getId())) {
 				network.removeNode(node);		// removeNode takes care of removing links too in the network
 			}
@@ -146,7 +146,7 @@ public class NetworkCleaner {
 		log.info("done.");
 	}
 
-	private static DoubleFlagRole getDoubleFlag(final Node n, final Map<Node, DoubleFlagRole> nodeRoles) {
+	private static DoubleFlagRole getDoubleFlag(final NodeImpl n, final Map<NodeImpl, DoubleFlagRole> nodeRoles) {
 		DoubleFlagRole r = nodeRoles.get(n);
 		if (null == r) {
 			r = new DoubleFlagRole();

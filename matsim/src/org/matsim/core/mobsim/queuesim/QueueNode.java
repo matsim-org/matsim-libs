@@ -26,10 +26,10 @@ import java.util.Comparator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -45,7 +45,7 @@ public class QueueNode {
 
 	private boolean active = false;
 
-	private final Node node;
+	private final NodeImpl node;
 
 	public QueueNetwork queueNetwork;
 	/**
@@ -53,7 +53,7 @@ public class QueueNode {
 	 */
 	private boolean signalized = false;
 
-	public QueueNode(final Node n, final QueueNetwork queueNetwork) {
+	public QueueNode(final NodeImpl n, final QueueNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
 
@@ -70,7 +70,7 @@ public class QueueNode {
 	 */
 	/*package*/ void init() {
 		int i = 0;
-		for (Link l : this.node.getInLinks().values()) {
+		for (LinkImpl l : this.node.getInLinks().values()) {
 			this.inLinksArrayCache[i] = this.queueNetwork.getLinks().get(l.getId());
 			i++;
 		}
@@ -80,7 +80,7 @@ public class QueueNode {
 		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
 	}
 
-	public Node getNode() {
+	public NodeImpl getNode() {
 		return this.node;
 	}
 
@@ -95,8 +95,8 @@ public class QueueNode {
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
 	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
-		Link nextLink = veh.getDriver().chooseNextLink();
-		Link currentLink = currentLane.queueLink.getLink();
+		LinkImpl nextLink = veh.getDriver().chooseNextLink();
+		LinkImpl currentLink = currentLane.queueLink.getLink();
 
 		// veh has to move over node
 		if (nextLink != null) {

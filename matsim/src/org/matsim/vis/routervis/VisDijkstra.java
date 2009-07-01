@@ -23,9 +23,9 @@ package org.matsim.vis.routervis;
 import java.io.IOException;
 import java.util.PriorityQueue;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -50,12 +50,12 @@ public class VisDijkstra extends Dijkstra implements VisLeastCostPathCalculator 
 	}
 	
 	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final NodeImpl fromNode, final NodeImpl toNode, final double startTime) {
 		doSnapshot();
 		final Path path = super.calcLeastCostPath(fromNode, toNode, startTime);
 
 		this.writer.reset();
-		for (Link link : path.links) {
+		for (LinkImpl link : path.links) {
 			this.writer.setLinkColor(link.getId(), 0.1);
 			doSnapshot();
 		}
@@ -64,15 +64,15 @@ public class VisDijkstra extends Dijkstra implements VisLeastCostPathCalculator 
 	}
 
 	@Override
-	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PriorityQueue<Node> pendingNodes, final double currTime,
-			final double currCost, final Node toNode) {
+	protected boolean addToPendingNodes(final LinkImpl l, final NodeImpl n,
+			final PriorityQueue<NodeImpl> pendingNodes, final double currTime,
+			final double currCost, final NodeImpl toNode) {
 		final boolean succ = super.addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
 
 		if (succ) {
 			/* test if the node was revisited - if so the former shortest
 			 * path has to be canceled... */
-			for (final Link link : l.getToNode().getInLinks().values()) {
+			for (final LinkImpl link : l.getToNode().getInLinks().values()) {
 				if (this.writer.getLinkDisplValue(link,0) == 0.25) {
 					this.writer.setLinkColor(link.getId(), 0.9);
 				}

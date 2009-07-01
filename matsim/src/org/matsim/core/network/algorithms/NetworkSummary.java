@@ -21,9 +21,9 @@
 package org.matsim.core.network.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -39,7 +39,7 @@ public class NetworkSummary {
 		super();
 	}
 
-	public void run(final Network network) {
+	public void run(final NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		int min_node_id = Integer.MAX_VALUE;
@@ -49,7 +49,7 @@ public class NetworkSummary {
 		int max_link_id = Integer.MIN_VALUE;
 		int link_cnt = 0;
 
-		for (Node node : network.getNodes().values()) {
+		for (NodeImpl node : network.getNodes().values()) {
 			node_cnt++;
 			int node_getID = Integer.parseInt(node.getId().toString());
 			if (min_node_id > node_getID) { min_node_id = node_getID; }
@@ -62,7 +62,7 @@ public class NetworkSummary {
 			if (y < this.minY) { this.minY = y; }
 		}
 
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			link_cnt++;
 			int link_getID = Integer.parseInt(link.getId().toString());
 			if (min_link_id > link_getID) { min_link_id = link_getID; }

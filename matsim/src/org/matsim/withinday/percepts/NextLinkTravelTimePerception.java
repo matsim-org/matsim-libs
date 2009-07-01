@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
 
@@ -38,20 +38,20 @@ import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
 public class NextLinkTravelTimePerception implements TravelTime, AgentPercepts {
 
 
-	Map<Link, Double> linkMap;
+	Map<LinkImpl, Double> linkMap;
 
 	private int sightDistance;
 
 
 	public NextLinkTravelTimePerception(final int agentVisibilityRange) {
-		this.linkMap = new HashMap<Link, Double>();
+		this.linkMap = new HashMap<LinkImpl, Double>();
 		this.sightDistance = agentVisibilityRange;
 	}
 
 	/**
 	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(org.matsim.core.network.LinkImpl, double)
 	 */
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final LinkImpl link, final double time) {
 		Double travelTime = this.linkMap.get(link);
 		if (travelTime != null) {
 			return travelTime.doubleValue();
@@ -59,15 +59,15 @@ public class NextLinkTravelTimePerception implements TravelTime, AgentPercepts {
 		return 0;
 	}
 
-	public void updatedPercepts(final Node currentNode) {
+	public void updatedPercepts(final NodeImpl currentNode) {
 		this.linkMap.clear();
-		Node current;
-		List<Node> nodes = new LinkedList<Node>();
+		NodeImpl current;
+		List<NodeImpl> nodes = new LinkedList<NodeImpl>();
 		nodes.add(currentNode);
 		int depth = 0;
 		while (!nodes.isEmpty()) {
 			current = nodes.remove(0);
-			for (Link l : current.getOutLinks().values()) {
+			for (LinkImpl l : current.getOutLinks().values()) {
 				this.linkMap.put(l, LinkTravelTimeCounter.getInstance().getLastLinkTravelTime(l.getId()));
 				if (depth < this.sightDistance) {
 					nodes.add(l.getToNode());

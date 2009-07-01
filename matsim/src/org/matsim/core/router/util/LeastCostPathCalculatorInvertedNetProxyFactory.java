@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
 
 
 
@@ -37,7 +37,7 @@ public class LeastCostPathCalculatorInvertedNetProxyFactory implements
 		LeastCostPathCalculatorFactory {
 
 	private LeastCostPathCalculatorFactory originalFactory;
-	private Network invertedNetwork;
+	private NetworkLayer invertedNetwork;
 	private TravelTimesInvertedNetProxy travelTimesProxy;
 	private TravelCostsInvertedNetProxy travelCostsProxy;
 
@@ -51,9 +51,9 @@ public class LeastCostPathCalculatorInvertedNetProxyFactory implements
 	}
 	
 	/**
-	 * @see org.matsim.core.router.util.LeastCostPathCalculatorFactory#createPathCalculator(org.matsim.core.api.network.Network, org.matsim.core.router.util.TravelCost, org.matsim.core.router.util.TravelTime)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculatorFactory#createPathCalculator(org.matsim.core.network.NetworkLayer, org.matsim.core.router.util.TravelCost, org.matsim.core.router.util.TravelTime)
 	 */
-	public LeastCostPathCalculator createPathCalculator(Network network,
+	public LeastCostPathCalculator createPathCalculator(NetworkLayer network,
 			TravelCost travelCosts, TravelTime travelTimes) {
 		if (!(travelTimes instanceof LinkToLinkTravelTime)){
 			throw new IllegalStateException("The TravelTimeCalculator must be an instance of LinkToLinkTravelTime" +

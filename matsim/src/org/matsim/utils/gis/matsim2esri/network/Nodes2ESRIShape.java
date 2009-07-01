@@ -36,11 +36,11 @@ import org.geotools.feature.SchemaException;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -60,11 +60,11 @@ public class Nodes2ESRIShape {
 	
 	private final static Logger log = Logger.getLogger(Nodes2ESRIShape.class);
 	
-	private Network network;
+	private NetworkLayer network;
 	private String filename;
 	private FeatureType featureType;
 
-	public Nodes2ESRIShape(final Network network, final String filename) {
+	public Nodes2ESRIShape(final NetworkLayer network, final String filename) {
 		this.network = network;
 		this.filename = filename;
 		initFeatureType();
@@ -72,7 +72,7 @@ public class Nodes2ESRIShape {
 	
 	public void write() {
 		Collection<Feature> features = new ArrayList<Feature>();
-		for (Node node : this.network.getNodes().values()) {
+		for (NodeImpl node : this.network.getNodes().values()) {
 			features.add(getFeature(node));
 		}
 		try {
@@ -83,7 +83,7 @@ public class Nodes2ESRIShape {
 	
 	}
 
-	private Feature getFeature(Node node) {
+	private Feature getFeature(NodeImpl node) {
 		Point p = MGC.coord2Point(node.getCoord());
 		try {
 			return this.featureType.create(new Object[]{p,node.getId().toString()});

@@ -21,11 +21,11 @@
 package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -126,13 +126,13 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public final Node getFromNode() {
-		return (Node)this.from;
+	public final NodeImpl getFromNode() {
+		return (NodeImpl)this.from;
 	}
 
 	@Override
-	public final Node getToNode() {
-		return (Node)this.to;
+	public final NodeImpl getToNode() {
+		return (NodeImpl)this.to;
 	}
 
 	public double getFreespeedTravelTime(final double time) {

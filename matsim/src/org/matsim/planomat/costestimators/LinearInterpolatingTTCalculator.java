@@ -29,9 +29,9 @@ import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
@@ -52,7 +52,7 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
-	private Network network = null;
+	private NetworkLayer network = null;
 	private final HashMap<Id, LinearInterpolatingTravelTimeData> linkData;
 	private final int timeslice;
 
@@ -113,9 +113,9 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 	private class LinearInterpolatingTravelTimeData {
 		private HashMap<Integer, Double> timeSum = null;	// map<timeslot-index, sum-of-travel-times>
 		private HashMap<Integer, Integer> timeCnt = null;		// map<timeslot-index, count-of-travel-times>
-		private final Link link;
+		private final LinkImpl link;
 
-		public LinearInterpolatingTravelTimeData(final Link link) {
+		public LinearInterpolatingTravelTimeData(final LinkImpl link) {
 			this.link = link;
 			this.timeSum = new HashMap<Integer, Double>();
 		}
@@ -189,7 +189,7 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 
 	}
 
-	public LinearInterpolatingTTCalculator(final Network network, final int timeslice) {
+	public LinearInterpolatingTTCalculator(final NetworkLayer network, final int timeslice) {
 		super();
 		this.network = network;
 		this.timeslice = timeslice;
@@ -197,12 +197,12 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 		resetTravelTimes();
 	}
 
-	public LinearInterpolatingTTCalculator(final Network network) {
+	public LinearInterpolatingTTCalculator(final NetworkLayer network) {
 		this(network, 15*60);
 	}
 
 	public void resetTravelTimes() {
-		for (Link link : this.network.getLinks().values()) {
+		for (LinkImpl link : this.network.getLinks().values()) {
 			getTravelTimeRole(link.getId()).resetTravelTimes();
 		}
 		this.enterEvents.clear();
@@ -239,7 +239,7 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 	}
 
 
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final LinkImpl link, final double time) {
 		return getTravelTimeRole(link.getId()).getTravelTime(time);
 	}
 	
@@ -252,7 +252,7 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 		return r;
 	}
 
-	private double getLinkMinimumTravelTime(final Link link) {
+	private double getLinkMinimumTravelTime(final LinkImpl link) {
 		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
 	}
 

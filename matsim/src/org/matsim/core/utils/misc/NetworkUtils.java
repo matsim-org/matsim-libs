@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 /**
- * Contains several helper methods for working with {@link Network networks}. 
+ * Contains several helper methods for working with {@link NetworkLayer networks}. 
  *
  * @author mrieser
  */
@@ -40,14 +40,14 @@ public class NetworkUtils {
 	 * @param nodes
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>
 	 */
-	public static double[] getBoundingBox(final Collection<? extends Node> nodes) {
+	public static double[] getBoundingBox(final Collection<? extends NodeImpl> nodes) {
 		double[] bBox = new double[4];
 		bBox[0] = Double.MIN_VALUE;
 		bBox[1] = Double.MAX_VALUE;
 		bBox[2] = Double.MIN_VALUE;
 		bBox[3] = Double.MAX_VALUE;
 
-		for (Node n : nodes) {
+		for (NodeImpl n : nodes) {
 			if (n.getCoord().getX() > bBox[0]) {
 				bBox[0] = n.getCoord().getX();
 			}
@@ -71,19 +71,19 @@ public class NetworkUtils {
 	 * @return list containing the specified nodes.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<Node> getNodes(final Network network, final String nodes) {
+	public static List<NodeImpl> getNodes(final NetworkLayer network, final String nodes) {
 		if (nodes == null) {
-			return new ArrayList<Node>(0);
+			return new ArrayList<NodeImpl>(0);
 		}
 		String trimmed = nodes.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<Node>(0);
+			return new ArrayList<NodeImpl>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<Node> nodesList = new ArrayList<Node>(parts.length);
+		final List<NodeImpl> nodesList = new ArrayList<NodeImpl>(parts.length);
 
 		for (String id : parts) {
-			Node node = network.getNode(new IdImpl(id));
+			NodeImpl node = network.getNode(new IdImpl(id));
 			if (node == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}
@@ -98,19 +98,19 @@ public class NetworkUtils {
 	 * @return list containing the specified links.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<Link> getLinks(final Network network, final String links) {
+	public static List<LinkImpl> getLinks(final NetworkLayer network, final String links) {
 		if (links == null) {
-			return new ArrayList<Link>(0);
+			return new ArrayList<LinkImpl>(0);
 		}
 		String trimmed = links.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<Link>(0);
+			return new ArrayList<LinkImpl>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<Link> linksList = new ArrayList<Link>(parts.length);
+		final List<LinkImpl> linksList = new ArrayList<LinkImpl>(parts.length);
 		
 		for (String id : parts) {
-			Link link = network.getLink(new IdImpl(id));
+			LinkImpl link = network.getLink(new IdImpl(id));
 			if (link == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}

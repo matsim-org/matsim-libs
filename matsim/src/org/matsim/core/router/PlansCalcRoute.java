@@ -23,13 +23,13 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -83,7 +83,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @deprecated use the constructor with the config group as argument
 	 */
 	@Deprecated
-	public PlansCalcRoute(final Network network, final TravelCost costCalculator,
+	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		this(null, network, costCalculator, timeCalculator, factory);
 	}
@@ -93,14 +93,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @deprecated use the constructor with the config group as argument
 	 */
 	@Deprecated
-	public PlansCalcRoute(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(null, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 	
 	/**
 	 * Uses the speed factors from the config group and the rerouting of the factory 
 	 */
-	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
+	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, 
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		this.factory = factory;
@@ -119,7 +119,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	/**
 	 * Creates a rerouting strategy module using dijkstra rerouting
 	 */
-	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 
@@ -129,7 +129,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @deprecated use one of the other constructors of this class
 	 */
 	@Deprecated
-	public PlansCalcRoute(final Network network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
+	public PlansCalcRoute(final NetworkLayer network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
 		super();
 		this.routeAlgo = router;
 		this.routeAlgoFreeflow = routerFreeflow;
@@ -239,13 +239,13 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	protected double handleCarLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		double travTime = 0;
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
+		LinkImpl fromLink = fromAct.getLink();
+		LinkImpl toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
-		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-		Node endNode = toLink.getFromNode(); // the target is the start of the link
+		NodeImpl startNode = fromLink.getToNode();	// start at the end of the "current" link
+		NodeImpl endNode = toLink.getFromNode(); // the target is the start of the link
 
 //		CarRoute route = null;
 		Path path = null;
@@ -284,16 +284,16 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// TODO [MR] later: use special pt-router
 
 		int travTime = 0;
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
+		LinkImpl fromLink = fromAct.getLink();
+		LinkImpl toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
 		Path path = null;
 //		CarRoute route = null;
 		if (toLink != fromLink) {
-			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
+			NodeImpl startNode = fromLink.getToNode();	// start at the end of the "current" link
+			NodeImpl endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
 			path = this.routeAlgoFreeflow.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");

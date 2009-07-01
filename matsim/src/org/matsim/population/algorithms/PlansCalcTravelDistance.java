@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -88,11 +88,11 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 			ActivityImpl toAct = (ActivityImpl)actslegs.get(j);
 			LegImpl leg = (LegImpl)actslegs.get(j-1);
 
-			Link startlink = fromAct.getLink();
+			LinkImpl startlink = fromAct.getLink();
 			if (startlink == null) throw new Exception("start link missing");
-			Node startnode = startlink.getFromNode();
+			NodeImpl startnode = startlink.getFromNode();
 
-			ArrayList<Node> nodes = new ArrayList<Node>();
+			ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
 			nodes.add(startnode);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
@@ -107,13 +107,13 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	private double calcDistance(final ArrayList<Node> nodes) {
+	private double calcDistance(final ArrayList<NodeImpl> nodes) {
 		double dist = 0.0;
 		for (int i=0; i<nodes.size()-1; i++) {
-			Node from = nodes.get(i);
-			Node to = nodes.get(i+1);
+			NodeImpl from = nodes.get(i);
+			NodeImpl to = nodes.get(i+1);
 
-			for (Link currlink : from.getOutLinks().values()) {
+			for (LinkImpl currlink : from.getOutLinks().values()) {
 				if (currlink.getToNode().equals(to)) {
 					dist += currlink.getLength();
 					break;

@@ -47,9 +47,9 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.MatsimResource;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
@@ -145,7 +145,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * the network
 	 */
-	private final Network network;
+	private final NetworkLayer network;
 	/**
 	 * the srs transformation used
 	 */
@@ -216,7 +216,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param network
 	 * @param coordTransform
 	 */
-	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Network network, final CoordinateTransformation coordTransform) {
+	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final NetworkLayer network, final CoordinateTransformation coordTransform) {
 		super(countSimCompList);
 		this.network = network;
 		this.coordTransform = coordTransform;
@@ -445,7 +445,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder) {
 		Id linkid;
-		Link link;
+		LinkImpl link;
 		PlacemarkType placemark;
 		double relativeError;
 		Coord coord;
@@ -493,7 +493,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param l
 	 * @return the CoordI instance
 	 */
-	private Coord calculatePlacemarkPosition(final Link l) {
+	private Coord calculatePlacemarkPosition(final LinkImpl l) {
 		Coord coordFrom = l.getFromNode().getCoord();
 		Coord coordTo = l.getToNode().getCoord();
 		double xDiff = coordTo.getX() - coordFrom.getX();

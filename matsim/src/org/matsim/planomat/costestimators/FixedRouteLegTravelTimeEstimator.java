@@ -25,9 +25,9 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -46,7 +46,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute plansCalcRoute;
 
-	private HashMap<Route, List<Link>> linkRoutesCache = new HashMap<Route, List<Link>>();
+	private HashMap<Route, List<LinkImpl>> linkRoutesCache = new HashMap<Route, List<LinkImpl>>();
 	private HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
 
 	public FixedRouteLegTravelTimeEstimator(
@@ -82,7 +82,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		
 	}
 
-	protected double processDeparture(final Link link, final double start) {
+	protected double processDeparture(final LinkImpl link, final double start) {
 
 		double departureDelayEnd = start + this.tDepDelayCalc.getLinkDepartureDelay(link, start);
 		return departureDelayEnd;
@@ -93,7 +93,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 		double now = start;
 
-		List<Link> links = null;
+		List<LinkImpl> links = null;
 		if (this.linkRoutesCache.containsKey(route)) {
 			links = this.linkRoutesCache.get(route);
 		} else {
@@ -101,14 +101,14 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			this.linkRoutesCache.put(route, links);
 		}
 
-		for (Link link : links) {
+		for (LinkImpl link : links) {
 			now = this.processLink(link, now);
 		}
 		return now;
 
 	}
 
-	protected double processLink(final Link link, final double start) {
+	protected double processLink(final LinkImpl link, final double start) {
 
 		double linkEnd = start + this.linkTravelTimeEstimator.getLinkTravelTime(link, start);
 		return linkEnd;

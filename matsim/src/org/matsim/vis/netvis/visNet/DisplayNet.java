@@ -28,9 +28,9 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.vis.netvis.DisplayableLinkI;
 import org.matsim.vis.netvis.DisplayableNetI;
 
@@ -58,7 +58,7 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 		// first create nodes
 		for (BasicNode node : layer.getNodes().values()) {
 			DisplayNode node2 = new DisplayNode(node.getId(), this);
-			node2.setCoord(((Node) node).getCoord());
+			node2.setCoord(((NodeImpl) node).getCoord());
 			nodes.put(node2.getId(), node2);
 		}
 
@@ -74,8 +74,8 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 			to.addInLink(link2);
 			link2.setToNode(to);
 
-			link2.setLength_m(((Link) link).getLength());
-			link2.setNumberOfLanes(((Link) link).getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+			link2.setLength_m(((LinkImpl) link).getLength());
+			link2.setNumberOfLanes(((LinkImpl) link).getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
 
 			links.put(link2.getId(), link2);
 		}

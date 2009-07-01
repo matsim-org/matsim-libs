@@ -27,9 +27,9 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
@@ -43,7 +43,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
  */
 public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 
-	private Network network = null;
+	private NetworkLayer network = null;
 	private Set<Id> aOI = new HashSet<Id>();
 	private PlansCalcRoute router = null;
 
@@ -54,7 +54,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	// count[3] --> # beeline intersect AOI, plan leg intersect AOI
 	public int[] count;
 
-	public RouteAndBeelineTransitionCheck(final Network net, final Set<Id> areaOfInterest) {
+	public RouteAndBeelineTransitionCheck(final NetworkLayer net, final Set<Id> areaOfInterest) {
 		this.network = net;
 		this.aOI = areaOfInterest;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
@@ -89,7 +89,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 
 	private int intersectAOI(final LegImpl leg) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
-		for (Link link : route.getLinks()) {
+		for (LinkImpl link : route.getLinks()) {
 			if (this.aOI.contains(link.getId()))
 				return 1;
 		}

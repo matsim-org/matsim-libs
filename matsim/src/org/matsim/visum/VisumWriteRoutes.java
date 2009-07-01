@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -71,7 +71,7 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 		for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			StringBuilder visum = new StringBuilder();
-			List<Node> route = ((NetworkRoute) leg.getRoute()).getNodes();
+			List<NodeImpl> route = ((NetworkRoute) leg.getRoute()).getNodes();
 
 			if (route.size() > 0) {
 				ArrayList<Location> locs = this.tvzLayer.getNearestLocations(route.get(0).getCoord(), null);
@@ -93,7 +93,7 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 				// anzahl
 				visum.append("1.0;");
 				// knoten
-				for (Node node : route) {
+				for (NodeImpl node : route) {
 					visum.append(node.getId());
 					visum.append(";");
 				}

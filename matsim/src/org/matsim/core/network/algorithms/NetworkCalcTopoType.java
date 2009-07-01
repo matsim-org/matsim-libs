@@ -23,9 +23,9 @@ package org.matsim.core.network.algorithms;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 /** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper. */
@@ -41,12 +41,12 @@ public class NetworkCalcTopoType {
 	public final static Integer END1WAY      = Integer.valueOf(7);
 	public final static Integer INTERSECTION = Integer.valueOf(8);
 
-	private final Map<Node, Integer> topoTypePerNode = new HashMap<Node, Integer>();
+	private final Map<NodeImpl, Integer> topoTypePerNode = new HashMap<NodeImpl, Integer>();
 	
-	public void run(final Network network) {
+	public void run(final NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		for (Node n : network.getNodes().values()) {
+		for (NodeImpl n : network.getNodes().values()) {
 			if (n.getIncidentLinks().size() == 0) { setTopoType(n, EMPTY); }
 			else if (n.getInLinks().size() == 0) { setTopoType(n, SOURCE); }
 			else if (n.getOutLinks().size() == 0) {setTopoType(n, SINK); }
@@ -66,7 +66,7 @@ public class NetworkCalcTopoType {
 		}
 
 		int [] cnt = {0,0,0,0,0,0,0,0,0};
-		for (Node n : network.getNodes().values()) {
+		for (NodeImpl n : network.getNodes().values()) {
 			cnt[getTopoType(n)]++;
 		}
 
@@ -84,11 +84,11 @@ public class NetworkCalcTopoType {
 		System.out.println("    done.");
 	}
 	
-	private void setTopoType(final Node node, final Integer topoType) {
+	private void setTopoType(final NodeImpl node, final Integer topoType) {
 		this.topoTypePerNode.put(node, topoType);
 	}
 	
-	public int getTopoType(final Node node) {
+	public int getTopoType(final NodeImpl node) {
 		Integer i = this.topoTypePerNode.get(node);
 		if (i == null) {
 			return Integer.MIN_VALUE;

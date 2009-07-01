@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -47,8 +47,8 @@ public class RoadPricingScheme {
 	/** The type to be used for area tolls. */
 	public static final String TOLL_TYPE_AREA = "area";
 
-	private Network network = null;
-	private TreeMap<Id, Link> links = null;
+	private NetworkLayer network = null;
+	private TreeMap<Id, LinkImpl> links = null;
 
 	private String name = null;
 	private String type = null;
@@ -58,14 +58,14 @@ public class RoadPricingScheme {
 	private boolean cacheIsInvalid = true;
 	private Cost[] costCache = null;
 
-	public RoadPricingScheme(final Network network) {
+	public RoadPricingScheme(final NetworkLayer network) {
 		this.network = network;
-		this.links = new TreeMap<Id, Link>();
+		this.links = new TreeMap<Id, LinkImpl>();
 		this.costs = new ArrayList<Cost>();
 	}
 
 	public void addLink(final String linkId) {
-		Link link = this.network.getLink(new IdImpl(linkId));
+		LinkImpl link = this.network.getLink(new IdImpl(linkId));
 		if (link == null) {
 			throw new RuntimeException("Link " + linkId + " for road pricing scheme cannot be found in associated network.");
 		}
@@ -107,7 +107,7 @@ public class RoadPricingScheme {
 		return this.costs.remove(cost);
 	}
 
-	public Collection<Link> getLinks() {
+	public Collection<LinkImpl> getLinks() {
 		return this.links.values();
 	}
 

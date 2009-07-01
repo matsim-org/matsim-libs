@@ -20,8 +20,8 @@
 
 package org.matsim.withinday.routeprovider;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 
 
 /**
@@ -49,6 +49,6 @@ public abstract class AbstractRouteProvider implements RouteProvider {
 		return this.priority;
 	}
 
-	public abstract NetworkRoute requestRoute(Link departureLink, Link destinationLink, double time);
+	public abstract NetworkRoute requestRoute(LinkImpl departureLink, LinkImpl destinationLink, double time);
 
 }

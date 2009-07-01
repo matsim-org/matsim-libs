@@ -37,10 +37,10 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
@@ -81,9 +81,9 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	protected double timeDifference;
 
-	protected Link altRouteNaturalBottleNeck;
+	protected LinkImpl altRouteNaturalBottleNeck;
 
-	protected Link mainRouteNaturalBottleNeck;
+	protected LinkImpl mainRouteNaturalBottleNeck;
 
 	protected double ttFreeSpeedAltRoute;
 
@@ -174,7 +174,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	public int getNumberOfVehiclesOnRoute(final NetworkRoute route) {
 		int ret = 0;
-		for (Link link : route.getLinks()) {
+		for (LinkImpl link : route.getLinks()) {
 			ret += this.numberOfAgents.get(link.getId());
 		}
 		return ret;
@@ -187,10 +187,10 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	public void init() {
 		this.writer.open();
 
-		List<Link> routeLinks = this.getAlternativeRoute().getLinks();
+		List<LinkImpl> routeLinks = this.getAlternativeRoute().getLinks();
 		this.firstLinkOnAlternativeRoute = routeLinks.get(0).getId();
 		this.lastLinkOnAlternativeRoute = routeLinks.get(routeLinks.size() - 1).getId();
-		for (Link l : routeLinks) {
+		for (LinkImpl l : routeLinks) {
 			if (!this.numberOfAgents.containsKey(l.getId())) {
 				this.numberOfAgents.put(l.getId(), Integer.valueOf(0));
 			}
@@ -201,7 +201,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.lastTimeAlternativeRoute = this.ttFreeSpeedAltRoute;
 
 		// find the natural bottleneck on the alternative route
-		List<Link> altRouteLinks = this.getAlternativeRoute().getLinks();
+		List<LinkImpl> altRouteLinks = this.getAlternativeRoute().getLinks();
 		this.altRouteNaturalBottleNeck = altRouteLinks.get(0);
 		for (int i = 1; i < altRouteLinks.size(); i++) {
 			if (altRouteLinks.get(i).getCapacity(Time.UNDEFINED_TIME) <= this.altRouteNaturalBottleNeck
@@ -213,7 +213,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.firstLinkOnMainRoute = routeLinks.get(0).getId();
 		this.lastLinkOnMainRoute = routeLinks.get(routeLinks.size() - 1).getId();
 		double tt;
-		for (Link l : routeLinks) {
+		for (LinkImpl l : routeLinks) {
 			if (!this.numberOfAgents.containsKey(l.getId())) {
 				this.numberOfAgents.put(l.getId(), Integer.valueOf(0));
 			}
@@ -224,7 +224,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.lastTimeMainRoute = this.ttFreeSpeedMainRoute;
 
 		// find the natural bottleneck on the main route
-		List<Link> mainRouteLinks = this.getMainRoute().getLinks();
+		List<LinkImpl> mainRouteLinks = this.getMainRoute().getLinks();
 		this.mainRouteNaturalBottleNeck = mainRouteLinks.get(0);
 		for (int i = 1; i < mainRouteLinks.size(); i++) {
 			if (mainRouteLinks.get(i).getCapacity(Time.UNDEFINED_TIME) < this.mainRouteNaturalBottleNeck
@@ -345,8 +345,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 			throw new IllegalArgumentException("This route object does not exist!");
 	}
 
-	public Link getNaturalBottleNeck(final NetworkRoute r) {
-		Link naturalBottleNeck;
+	public LinkImpl getNaturalBottleNeck(final NetworkRoute r) {
+		LinkImpl naturalBottleNeck;
 		if (r == this.mainRoute) {
 			naturalBottleNeck = this.mainRouteNaturalBottleNeck;
 		}
@@ -400,10 +400,10 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	protected double sumUpTTFreeSpeed(final Node node, final NetworkRoute route) {
+	protected double sumUpTTFreeSpeed(final NodeImpl node, final NetworkRoute route) {
 
 		double ttFS = 0;
-		for (Link l : route.getLinks()) {
+		for (LinkImpl l : route.getLinks()) {
 			ttFS += this.ttFreeSpeeds.get(l.getId());
 			if (l.getToNode() == node) {
 				break;

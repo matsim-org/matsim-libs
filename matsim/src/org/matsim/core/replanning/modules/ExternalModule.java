@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
@@ -35,6 +34,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -78,13 +78,13 @@ public class ExternalModule implements PlanStrategyModule {
 	protected PopulationWriter plansWriter = null;
 	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
-	private final Network network;
+	private final NetworkLayer network;
 	protected Config extConfig;
 	protected String exePath = "";
 	protected String moduleId = "";
 	protected String outFileRoot = "";
 
-	public ExternalModule(final String exePath, final String moduleId, final Network network) {
+	public ExternalModule(final String exePath, final String moduleId, final NetworkLayer network) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
 		this.outFileRoot = Controler.getTempPath() + "/";

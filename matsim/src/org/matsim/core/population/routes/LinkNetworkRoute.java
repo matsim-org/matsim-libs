@@ -25,24 +25,24 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 /**
- * Implementation of {@link NetworkRoute} which internally stores the route as a series of {@link Link}s.
+ * Implementation of {@link NetworkRoute} which internally stores the route as a series of {@link LinkImpl}s.
  *
  * @author mrieser
  */
 public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 
-	private final ArrayList<Link> route = new ArrayList<Link>();
+	private final ArrayList<LinkImpl> route = new ArrayList<LinkImpl>();
 	private double travelCost = Double.NaN;
 
-	public LinkNetworkRoute(Link startLink, Link endLink){
+	public LinkNetworkRoute(LinkImpl startLink, LinkImpl endLink){
 		super(startLink, endLink);
 	}
 	
@@ -51,7 +51,7 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 		double dist = super.getDistance();
 		if (Double.isNaN(dist)) {
 			dist = 0;
-			for (Link link : this.route) {
+			for (LinkImpl link : this.route) {
 				dist += link.getLength();
 			}
 			this.setDistance(dist);
@@ -61,7 +61,7 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	@Override
 	public void setLinkIds(final List<Id> linkIds) {
-		Network network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (network == null) {
 			throw new RuntimeException("NetworkLayer does not exist in world.");
 		}
@@ -75,22 +75,22 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	public List<Id> getLinkIds() {
 		ArrayList<Id> ids = new ArrayList<Id>(this.route.size());
-		for (Link link : this.route) {
+		for (LinkImpl link : this.route) {
 			ids.add(link.getId());
 		}
 		ids.trimToSize();
 		return ids;
 	}
 
-	public List<Link> getLinks() {
+	public List<LinkImpl> getLinks() {
 		return Collections.unmodifiableList(this.route);
 	}
 
-	public List<Node> getNodes() {
-		ArrayList<Node> nodes = new ArrayList<Node>(this.route.size() + 1);
+	public List<NodeImpl> getNodes() {
+		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>(this.route.size() + 1);
 		if (this.route.size() > 0) {
 			nodes.add(this.route.get(0).getFromNode());
-			for (Link link : this.route) {
+			for (LinkImpl link : this.route) {
 				nodes.add(link.getToNode());
 			}
 		} else if (this.getStartLink() != this.getEndLink()) {
@@ -100,21 +100,21 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 		return nodes;
 	}
 
-	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
-		Link fromLink = getStartLink();
-		Link toLink = getEndLink();
+	public NetworkRoute getSubRoute(final NodeImpl fromNode, final NodeImpl toNode) {
+		LinkImpl fromLink = getStartLink();
+		LinkImpl toLink = getEndLink();
 		int fromIndex = -1;
 		int toIndex = -1;
 		int max = this.route.size();
 		if (fromNode == toNode) {
 			boolean found = false;
 			for (int i = 0; i < max; i++) {
-				Link link = this.route.get(i);
+				LinkImpl link = this.route.get(i);
 				if (found) {
 					toLink = link;
 					break;
 				}
-				Node node = link.getToNode();
+				NodeImpl node = link.getToNode();
 				if (node.equals(fromNode)) {
 					found = true;
 					fromIndex = 0; // value doesn't really matter, just >= 0
@@ -134,8 +134,8 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 			}
 		} else {
 			for (int i = 0; i < max; i++) {
-				Link link = this.route.get(i);
-				Node node = link.getFromNode();
+				LinkImpl link = this.route.get(i);
+				NodeImpl node = link.getFromNode();
 				if (node.equals(fromNode)) {
 					fromIndex = i;
 					break;
@@ -146,12 +146,12 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 				throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
 			}
 			for (int i = fromIndex; i < max; i++) {
-				Link link = this.route.get(i);
+				LinkImpl link = this.route.get(i);
 				if (toIndex >= 0) {
 					toLink = link;
 					break;
 				}
-				Node node = link.getToNode();
+				NodeImpl node = link.getToNode();
 				if (node.equals(toNode)) {
 					toIndex = i;
 				}
@@ -177,7 +177,7 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 		this.travelCost = travelCost;
 	}
 
-	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
+	public void setLinks(final LinkImpl startLink, final List<LinkImpl> srcRoute, final LinkImpl endLink) {
 		this.route.clear();
 		setStartLink(startLink);
 		setEndLink(endLink);
@@ -187,19 +187,19 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 		this.route.trimToSize();
 	}
 
-	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
+	public void setNodes(final LinkImpl startLink, final List<NodeImpl> srcRoute, final LinkImpl endLink) {
 		setStartLink(startLink);
 		setEndLink(endLink);
 		setNodes(srcRoute);
 	}
 
-	public void setNodes(final List<Node> srcRoute) {
+	public void setNodes(final List<NodeImpl> srcRoute) {
 		this.route.clear();
-		Node prevNode = null;
-		for (Node node : srcRoute) {
+		NodeImpl prevNode = null;
+		for (NodeImpl node : srcRoute) {
 			if (prevNode != null) {
 				// find link from prevNode to node
-				for (Link link : prevNode.getOutLinks().values()) {
+				for (LinkImpl link : prevNode.getOutLinks().values()) {
 					if (link.getToNode().equals(node)) {
 						this.route.add(link);
 						break;

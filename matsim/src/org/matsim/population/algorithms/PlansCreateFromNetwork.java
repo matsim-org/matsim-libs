@@ -21,10 +21,10 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
@@ -35,7 +35,7 @@ public class PlansCreateFromNetwork {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Network network;
+	private final NetworkLayer network;
 	private final NetworkSummary network_summary;
 	private final double p2c_prop;
 
@@ -43,7 +43,7 @@ public class PlansCreateFromNetwork {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCreateFromNetwork(final Network network, final NetworkSummary network_summary,final double p2c_prop) {
+	public PlansCreateFromNetwork(final NetworkLayer network, final NetworkSummary network_summary,final double p2c_prop) {
 		super();
 		this.network_summary = network_summary;
 		this.network = network;

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -129,7 +128,7 @@ public class NetworkChangeEventsWriter extends MatsimXmlWriter {
 		writer.write(CLOSE_TAG_1);
 		writer.write(NL);
 		
-		for(Link link : event.getLinks()) {
+		for(LinkImpl link : event.getLinks()) {
 			writer.write(TAB);
 			writer.write(TAB);
 			writer.write(OPEN_TAG_1);

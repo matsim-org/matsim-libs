@@ -23,7 +23,6 @@ package org.matsim.core.network;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.matsim.core.api.network.Link;
 
 /**
  * Compares two links by their Id. A simple helper class so one is
@@ -31,11 +30,11 @@ import org.matsim.core.api.network.Link;
  *
  * @author mrieser
  */
-public class LinkIdComparator implements Comparator<Link>, Serializable {
+public class LinkIdComparator implements Comparator<LinkImpl>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public int compare(final Link o1, final Link o2) {
+	public int compare(final LinkImpl o1, final LinkImpl o2) {
 		return o1.getId().compareTo(o2.getId());
 	}
 

@@ -28,11 +28,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkIdComparator;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -49,14 +49,14 @@ import org.matsim.core.utils.misc.Time;
  */
 public class SubsequentLinksAnalyzer {
 
-	private final Network network;
+	private final NetworkLayer network;
 
 	private final static LinkIdComparator linkComparator = new LinkIdComparator();
 
 	/** Stores the logical subsequent link (value) for a given link (key). */
-	private final TreeMap<Link, Link> subsequentLinks = new TreeMap<Link, Link>(linkComparator);
+	private final TreeMap<LinkImpl, LinkImpl> subsequentLinks = new TreeMap<LinkImpl, LinkImpl>(linkComparator);
 
-	public SubsequentLinksAnalyzer(final Network network) {
+	public SubsequentLinksAnalyzer(final NetworkLayer network) {
 		this.network = network;
 		compute();
 	}
@@ -64,7 +64,7 @@ public class SubsequentLinksAnalyzer {
 	/**
 	 * @return a map, giving for each link (key in map) the computed subsequent link (value in map).
 	 */
-	public Map<Link, Link> getSubsequentLinks() {
+	public Map<LinkImpl, LinkImpl> getSubsequentLinks() {
 		return this.subsequentLinks;
 	}
 
@@ -74,20 +74,20 @@ public class SubsequentLinksAnalyzer {
 	 * ssLinks.
 	 */
 	private void compute() {
-		Map<Link, Double> absDeltaThetas = new TreeMap<Link, Double>(linkComparator);
-		for (Link l : this.network.getLinks().values()) {
-			Node from = l.getFromNode();
-			Node to = l.getToNode();
+		Map<LinkImpl, Double> absDeltaThetas = new TreeMap<LinkImpl, Double>(linkComparator);
+		for (LinkImpl l : this.network.getLinks().values()) {
+			NodeImpl from = l.getFromNode();
+			NodeImpl to = l.getToNode();
 			Coord cFrom = from.getCoord();
 			Coord cTo = to.getCoord();
 			double xTo = cTo.getX();
 			double yTo = cTo.getY();
 			double thetaL = Math.atan2(yTo - cFrom.getY(), xTo - cFrom.getX());
-			Collection<? extends Link> outLinks = to.getOutLinks().values();
+			Collection<? extends LinkImpl> outLinks = to.getOutLinks().values();
 			absDeltaThetas.clear();
 			if (outLinks.size() > 1) {
 
-				for (Link out : outLinks) {
+				for (LinkImpl out : outLinks) {
 					Coord cOut = out.getToNode().getCoord();
 					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut.getX()	- xTo) - thetaL;
 					while (deltaTheta < -Math.PI) {
@@ -105,21 +105,21 @@ public class SubsequentLinksAnalyzer {
 		}
 	}
 
-	private Link computeSubsequentLink(final Link l, final Map<Link, Double> thetas) {
-		Link outLink = null;
-		List<Link> minThetaOutLinks = new ArrayList<Link>();
+	private LinkImpl computeSubsequentLink(final LinkImpl l, final Map<LinkImpl, Double> thetas) {
+		LinkImpl outLink = null;
+		List<LinkImpl> minThetaOutLinks = new ArrayList<LinkImpl>();
 		while (outLink == null) {
 			minThetaOutLinks.clear();
 			double absMin = Collections.min(thetas.values()).doubleValue();
-			for (Map.Entry<Link, Double> entry : thetas.entrySet()) {
+			for (Map.Entry<LinkImpl, Double> entry : thetas.entrySet()) {
 				if (absMin == (entry.getValue()).doubleValue())
 					minThetaOutLinks.add(entry.getKey());
 			}
 			if (minThetaOutLinks.size() == 1) {
 				outLink = minThetaOutLinks.get(0);
 			} else if (minThetaOutLinks.size() == 2) {
-				Link outLinkA = minThetaOutLinks.get(0);
-				Link outLinkB = minThetaOutLinks.get(1);
+				LinkImpl outLinkA = minThetaOutLinks.get(0);
+				LinkImpl outLinkB = minThetaOutLinks.get(1);
 				double capA = outLinkA.getCapacity(Time.UNDEFINED_TIME);
 				double capB = outLinkB.getCapacity(Time.UNDEFINED_TIME);
 				if (l.getCapacity(Time.UNDEFINED_TIME) > Math.min(capA, capB)) {

@@ -32,11 +32,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -92,7 +92,7 @@ public class WorldConnectLocations {
 	 * It returns a newly created network. The given one will not be changed.
 	 * 
 	 * <p><b>Note:</b> The new network that will be returned is not necessarily a 
-	 * "cleaned one" (strongly connected digraph), but "empty {@link Node nodes}" are removed.</p>
+	 * "cleaned one" (strongly connected digraph), but "empty {@link NodeImpl nodes}" are removed.</p>
 	 * 
 	 * @param network the network that will be the base for created a sub-network
 	 * @return copy of the given network without links with type given in {@link #excludingLinkTypes}
@@ -101,8 +101,8 @@ public class WorldConnectLocations {
 	private final NetworkLayer extractSubNetwork(final NetworkLayer network) {
 		log.info("  extracting sub network...");
 		// get all links from the network with specified link types
-		ArrayList<Link> remainingLinks = new ArrayList<Link>();
-		for (Link l : network.getLinks().values()) {
+		ArrayList<LinkImpl> remainingLinks = new ArrayList<LinkImpl>();
+		for (LinkImpl l : network.getLinks().values()) {
 			if (!excludingLinkTypes.contains(l.getType())) { remainingLinks.add(l); }
 		}
 		if (remainingLinks.isEmpty()) {
@@ -113,13 +113,13 @@ public class WorldConnectLocations {
 		}
 		NetworkLayer subNetwork = new NetworkLayer();
 		// add nodes and links to the subNetwork
-		for (Link l : remainingLinks) {
-			Node fn = l.getFromNode();
-			Node nfn = subNetwork.getNode(fn.getId());
+		for (LinkImpl l : remainingLinks) {
+			NodeImpl fn = l.getFromNode();
+			NodeImpl nfn = subNetwork.getNode(fn.getId());
 			if (nfn == null) { nfn = subNetwork.createNode(fn.getId(),fn.getCoord()); }
 
-			Node tn = l.getToNode();
-			Node ntn = subNetwork.getNode(tn.getId());
+			NodeImpl tn = l.getToNode();
+			NodeImpl ntn = subNetwork.getNode(tn.getId());
 			if (ntn == null) { ntn = subNetwork.createNode(tn.getId(),tn.getCoord()); }
 
 			subNetwork.createLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME));
@@ -186,7 +186,7 @@ public class WorldConnectLocations {
 
 	/**
 	 * Sets the mapping between each {@link ActivityFacility facility} of the given {@link ActivityFacilities facility layer} and
-	 * the {@link Link links} of the {@link NetworkLayer network layer}. The facilities layer should be part of the
+	 * the {@link LinkImpl links} of the {@link NetworkLayer network layer}. The facilities layer should be part of the
 	 * given {@link World world}, but the {@link NetworkLayer network} does not have to be necessarily part of the
 	 * world. It could also be a sub-network of the network of the {@link World world} as created by the method {@link #extractSubNetwork(NetworkLayer)}.
 	 * In both cases the facility layer will be connected with the network in the same world.
@@ -274,9 +274,9 @@ public class WorldConnectLocations {
 
 	/**
 	 * Sets the mapping between each {@link Zone zone} of the given {@link ZoneLayer zone layer} and
-	 * the {@link Link links} of the {@link NetworkLayer network layer} as part of a {@link World world}.
+	 * the {@link LinkImpl links} of the {@link NetworkLayer network layer} as part of a {@link World world}.
 	 * 
-	 * <p><b>Mapping rule:</b> each {@link Link link} of the {@link NetworkLayer network layer} will be
+	 * <p><b>Mapping rule:</b> each {@link LinkImpl link} of the {@link NetworkLayer network layer} will be
 	 * connected with zero or one zone. A zone will only be assigned if the center of the link is located within the zone.
 	 * If more than one zone exists for which the center of the link is located in, the first one (smallest zone {@link Id id})
 	 * will be chosen. (zones[?]-[*]links)</p>
@@ -287,7 +287,7 @@ public class WorldConnectLocations {
 	 */
 	private final void connect(ZoneLayer zones, NetworkLayer network, World world) {
 		log.info("  connecting zones with links...");
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 			// remove previous mappings for link l
 			if (!l.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->link mappings");  }
 			// add the zone mapping to link l

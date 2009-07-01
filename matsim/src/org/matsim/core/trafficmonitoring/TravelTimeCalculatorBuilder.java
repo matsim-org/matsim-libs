@@ -20,7 +20,8 @@
 package org.matsim.core.trafficmonitoring;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Network;
+
+import org.matsim.core.network.NetworkLayer;
 
 
 /**
@@ -31,7 +32,7 @@ abstract public class TravelTimeCalculatorBuilder {
 
 	private static final Logger log = Logger.getLogger(TravelTimeCalculatorBuilder.class);
 
-	public static TravelTimeCalculator createTravelTimeCalculator(final Network network, final TravelTimeCalculatorConfigGroup group) {
+	public static TravelTimeCalculator createTravelTimeCalculator(final NetworkLayer network, final TravelTimeCalculatorConfigGroup group) {
 		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
 		
 		// set travelTimeData factory

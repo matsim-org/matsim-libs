@@ -22,7 +22,7 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
 
 
@@ -43,7 +43,7 @@ public abstract class LaneEvent extends LinkEvent {
 	 * @param link
 	 * @param laneId 
 	 */
-	public LaneEvent(double time, PersonImpl agent, Link link, Id laneId) {
+	public LaneEvent(double time, PersonImpl agent, LinkImpl link, Id laneId) {
 		super(time, agent, link);
 		this.laneId = laneId;
 	}

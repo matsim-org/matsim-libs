@@ -32,8 +32,8 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
@@ -80,11 +80,11 @@ public class TravelTimeCalculator
 	
 	private TravelTimeDataFactory ttDataFactory = null; 
 	
-	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+	public TravelTimeCalculator(final NetworkLayer network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
 
-	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
+	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime,
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
@@ -164,7 +164,7 @@ public class TravelTimeCalculator
 		return data;
 	}
 
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final LinkImpl link, final double time) {
 		if (this.calculateLinkTravelTimes) {
 			DataContainer data = getTravelTimeData(link.getId(), true);
 			if (data.needsConsolidation) {
@@ -176,7 +176,7 @@ public class TravelTimeCalculator
 				"if calculation is switched off by config option!");
 	}
 	
-	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
+	public double getLinkToLinkTravelTime(LinkImpl fromLink, LinkImpl toLink, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
 			"if calculation is switched off by config option!");			

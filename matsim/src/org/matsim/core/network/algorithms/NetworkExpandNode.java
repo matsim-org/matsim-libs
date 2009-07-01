@@ -27,11 +27,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -55,7 +55,7 @@ public class NetworkExpandNode {
 
 	private final static Logger log = Logger.getLogger(NetworkExpandNode.class);
 
-	private Node node = null;
+	private NodeImpl node = null;
 	private ArrayList<Tuple<Id,Id>> turns = null;
 	private double radius = Double.NaN;
 	private double offset = Double.NaN;
@@ -73,7 +73,7 @@ public class NetworkExpandNode {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void setNode(Node node) {
+	public final void setNode(NodeImpl node) {
 		this.node = node;
 	}
 
@@ -110,16 +110,16 @@ public class NetworkExpandNode {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Expands the {@link Node node} that is part of the {@link NetworkLayer network} and holds
+	 * Expands the {@link NodeImpl node} that is part of the {@link NetworkLayer network} and holds
 	 * {@link Id nodeId}.
 	 * 
 	 * <p>It is done in the following way:
 	 * <ol>
-	 * <li>creates for each in- and out-{@link LinkImpl link} a new {@link Node node} with
+	 * <li>creates for each in- and out-{@link LinkImpl link} a new {@link NodeImpl node} with
 	 * <ul>
 	 * <li><code>{@link Id new_nodeId} = {@link Id nodeId+"-"+index}; index=[0..#incidentLinks]</code></li>
-	 * <li><code>{@link Coord new_coord}</code> with distance <code>r</code> to the given {@link Node node}
-	 * in direction of the corresponding incident {@link LinkImpl link} of the given {@link Node node} with
+	 * <li><code>{@link Coord new_coord}</code> with distance <code>r</code> to the given {@link NodeImpl node}
+	 * in direction of the corresponding incident {@link LinkImpl link} of the given {@link NodeImpl node} with
 	 * offset <code>e</code>.</li>
 	 * </ul>
 	 * <pre>
@@ -138,8 +138,8 @@ public class NetworkExpandNode {
 	 *               v       |
 	 * </pre>
 	 * </li>
-	 * <li>connects each incident {@link LinkImpl link} of the given {@link Node node} with the corresponding
-	 * {@link Node new_node}
+	 * <li>connects each incident {@link LinkImpl link} of the given {@link NodeImpl node} with the corresponding
+	 * {@link NodeImpl new_node}
 	 * <pre>
 	 * <-----12------ o     o <----21-------
 	 *                   O 
@@ -153,7 +153,7 @@ public class NetworkExpandNode {
 	 *                 v   |
 	 * </pre>
 	 * </li>
-	 * <li>removes the given {@link Node node} from the {@link NetworkLayer network}
+	 * <li>removes the given {@link NodeImpl node} from the {@link NetworkLayer network}
 	 * <pre>
 	 * <-----12------ o     o <----21-------
 	 *                    
@@ -167,7 +167,7 @@ public class NetworkExpandNode {
 	 *                 v   |
 	 * </pre>
 	 * </li>
-	 * <li>inter-connects the {@link Node new_nodes} with {@link LinkImpl new_links} as defined in the
+	 * <li>inter-connects the {@link NodeImpl new_nodes} with {@link LinkImpl new_links} as defined in the
 	 * <code>turns</code> list, with:<br>
 	 * <ul>
 	 * <li><code>{@link Id new_linkId} = {@link Id fromLinkId+"-"+index}; index=[0..#turn-tuples]</code></li>
@@ -195,23 +195,23 @@ public class NetworkExpandNode {
 	 * </p>
 	 * 
 	 * @param network MATSim {@link NetworkLayer network} DB
-	 * @param nodeId the {@link Id} of the {@link Node} to expand
+	 * @param nodeId the {@link Id} of the {@link NodeImpl} to expand
 	 * @param turns The {@link ArrayList} of {@link Tuple tuples} of {@link Id linkIds}
-	 * of the incident {@link LinkImpl links} of the given {@link Node node} that define
-	 * which driving direction is allowed on that {@link Node node}.
+	 * of the incident {@link LinkImpl links} of the given {@link NodeImpl node} that define
+	 * which driving direction is allowed on that {@link NodeImpl node}.
 	 * @param r the expansion radius. If zero, all new nodes have the same coordinate
 	 * and the new links with have length equals zero
 	 * @param e the offset between a link pair with the same incident nodes. If zero, the two new
 	 * nodes created for that link pair will have the same coordinates
 	 * @return The {@link Tuple} of {@link ArrayList array lists} containing the new
-	 * {@link Node nodes}, new {@link LinkImpl links} resp.
+	 * {@link NodeImpl nodes}, new {@link LinkImpl links} resp.
 	 */
-	public final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
+	public final Tuple<ArrayList<NodeImpl>,ArrayList<LinkImpl>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
 		// check the input
 		if (Double.isNaN(r)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (Double.isNaN(e)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (network == null) { throw new IllegalArgumentException("network not defined."); }
-		Node node = network.getNode(nodeId);
+		NodeImpl node = network.getNode(nodeId);
 		if (node == null) { throw new IllegalArgumentException("nodeid="+nodeId+": not found in the network."); }
 		if (turns == null) {throw new IllegalArgumentException("nodeid="+nodeId+": turn list not defined!"); }
 		for (int i=0; i<turns.size(); i++) {
@@ -224,35 +224,35 @@ public class NetworkExpandNode {
 		}
 		
 		// remove the node
-		Map<Id,Link> inlinks = new TreeMap<Id, Link>(node.getInLinks());
-		Map<Id,Link> outlinks = new TreeMap<Id, Link>(node.getOutLinks());
+		Map<Id,LinkImpl> inlinks = new TreeMap<Id, LinkImpl>(node.getInLinks());
+		Map<Id,LinkImpl> outlinks = new TreeMap<Id, LinkImpl>(node.getOutLinks());
 		if (!network.removeNode(node)) { throw new RuntimeException("nodeid="+nodeId+": Failed to remove node from the network."); }
 
-		ArrayList<Node> newNodes = new ArrayList<Node>(inlinks.size()+outlinks.size());
-		ArrayList<Link> newLinks = new ArrayList<Link>(turns.size());
+		ArrayList<NodeImpl> newNodes = new ArrayList<NodeImpl>(inlinks.size()+outlinks.size());
+		ArrayList<LinkImpl> newLinks = new ArrayList<LinkImpl>(turns.size());
 		// add new nodes and connect them with the in and out links
 		int nodeIdCnt = 0;
 		double d = Math.sqrt(r*r-e*e);
-		for (Link inlink : inlinks.values()) {
+		for (LinkImpl inlink : inlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = inlink.getFromNode().getCoord();
 			Coord pc = new CoordImpl(c.getX()-p.getX(),c.getY()-p.getY());
 			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
 			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
 			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
-			Node n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			NodeImpl n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),inlink.getOrigId(),inlink.getType());
 		}
-		for (Link outlink : outlinks.values()) {
+		for (LinkImpl outlink : outlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = outlink.getToNode().getCoord();
 			Coord cp = new CoordImpl(p.getX()-c.getX(),p.getY()-c.getY());
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			double x = c.getX()+d/lcp*cp.getX()+e/lcp*cp.getY();
 			double y = c.getY()+d/lcp*cp.getY()-e/lcp*cp.getX();
-			Node n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			NodeImpl n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),outlink.getOrigId(),outlink.getType());
@@ -261,11 +261,11 @@ public class NetworkExpandNode {
 		// add virtual links for the turn restrictions
 		for (int i=0; i<turns.size(); i++) {
 			Tuple<Id,Id> turn = turns.get(i);
-			Link fromLink = network.getLink(turn.getFirst());
-			Link toLink = network.getLink(turn.getSecond());
-			Link l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME),fromLink.getOrigId(),fromLink.getType());
+			LinkImpl fromLink = network.getLink(turn.getFirst());
+			LinkImpl toLink = network.getLink(turn.getSecond());
+			LinkImpl l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME),fromLink.getOrigId(),fromLink.getType());
 			newLinks.add(l);
 		}
-		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);
+		return new Tuple<ArrayList<NodeImpl>, ArrayList<LinkImpl>>(newNodes,newLinks);
 	}
 }

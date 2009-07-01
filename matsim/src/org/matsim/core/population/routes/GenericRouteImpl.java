@@ -20,15 +20,15 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.GenericRoute;
+import org.matsim.core.network.LinkImpl;
 
 
 public class GenericRouteImpl extends AbstractRoute implements GenericRoute {
 
 	private String routeDescription = null;
 	
-	public GenericRouteImpl(final Link startLink, final Link endLink	) {
+	public GenericRouteImpl(final LinkImpl startLink, final LinkImpl endLink	) {
 		super(startLink, endLink);
 	}
 
@@ -36,7 +36,7 @@ public class GenericRouteImpl extends AbstractRoute implements GenericRoute {
 		return this.routeDescription;
 	}
 
-	public void setRouteDescription(Link startLink, String routeDescription, Link endLink) {
+	public void setRouteDescription(LinkImpl startLink, String routeDescription, LinkImpl endLink) {
 		setStartLink(startLink);
 		this.routeDescription = routeDescription;
 		setEndLink(endLink);

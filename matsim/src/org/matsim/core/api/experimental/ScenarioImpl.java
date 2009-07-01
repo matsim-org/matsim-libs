@@ -23,11 +23,11 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -55,7 +55,7 @@ public class ScenarioImpl implements Scenario {
 
 	//mandatory attributes 
 	private Config config;
-	private Network network;
+	private NetworkLayer network;
 	private Population population;
 	private ActivityFacilities facilities;
 	
@@ -152,7 +152,7 @@ public class ScenarioImpl implements Scenario {
 	/**
 	 * @see org.matsim.core.api.experimental.Scenario#getNetwork()
 	 */
-	public Network getNetwork() {
+	public NetworkLayer getNetwork() {
 		return this.network;
 	}
 

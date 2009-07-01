@@ -23,17 +23,15 @@ package org.matsim.core.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkWriterHandlerImplTLinks {
 
-	private final Network network;
+	private final NetworkLayer network;
 
-	public NetworkWriterHandlerImplTLinks(final Network network) {
+	public NetworkWriterHandlerImplTLinks(final NetworkLayer network) {
 		this.network = network;
 	}
 
@@ -43,7 +41,7 @@ public class NetworkWriterHandlerImplTLinks {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
 
 			startLinks(out);
-			for (Link l : this.network.getLinks().values()) {
+			for (LinkImpl l : this.network.getLinks().values()) {
 				writeLink(l, out);
 			}
 			out.close();
@@ -84,7 +82,7 @@ public class NetworkWriterHandlerImplTLinks {
 
 	}
 
-	private void writeLink(final Link link, final BufferedWriter out) throws IOException {
+	private void writeLink(final LinkImpl link, final BufferedWriter out) throws IOException {
 		
 		out.write(link.getId() + "\t");			// ID
 		out.write("[UNKNOWN]\t");					// NAME

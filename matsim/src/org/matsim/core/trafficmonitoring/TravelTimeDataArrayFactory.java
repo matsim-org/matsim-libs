@@ -21,14 +21,14 @@
 package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
 
 public class TravelTimeDataArrayFactory implements TravelTimeDataFactory {
 
-	private final Network network;
+	private final NetworkLayer network;
 	private final int numSlots;
 	
-	public TravelTimeDataArrayFactory(final Network network, final int numSlots) {
+	public TravelTimeDataArrayFactory(final NetworkLayer network, final int numSlots) {
 		this.network = network;
 		this.numSlots = numSlots;
 	}

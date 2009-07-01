@@ -31,10 +31,10 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
@@ -46,7 +46,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	private static final Logger log = Logger.getLogger(PopulationBuilderImpl.class);
 
 //	private final Population population;
-	private final Network network;
+	private final NetworkLayer network;
 	private final ActivityFacilities facilities;
 //	private final Scenario scenario;
 
@@ -97,8 +97,8 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	}
 
 	public Route createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
-		Link start = this.network.getLink(startLinkId);
-		Link end = this.network.getLink(endLinkId);
+		LinkImpl start = this.network.getLink(startLinkId);
+		LinkImpl end = this.network.getLink(endLinkId);
 		if (start == null) {
 			throw new IllegalStateException("Cann't create Route with StartLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
 		}
@@ -106,8 +106,8 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 			throw new IllegalStateException("Cann't create Route with EndLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
 		}
 		NetworkRoute route = new LinkNetworkRoute(start, end);
-		List<Link> links = new ArrayList<Link>();
-		Link link;
+		List<LinkImpl> links = new ArrayList<LinkImpl>();
+		LinkImpl link;
 		for (Id id : currentRouteLinkIds) {
 			link = this.network.getLink(id);
 			if (link == null) {

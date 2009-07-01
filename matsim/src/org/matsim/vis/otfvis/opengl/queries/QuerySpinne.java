@@ -43,8 +43,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
@@ -53,6 +51,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -70,7 +70,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 	private static final long serialVersionUID = -749787121253826794L;
 	protected Id linkId;
-	private transient Map<Link,Integer> drivenLinks = null;
+	private transient Map<LinkImpl,Integer> drivenLinks = null;
 	private float[] vertex = null;
 	private int[] count = null;
 	private boolean calcOffset = true;
@@ -107,7 +107,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		return com;
 	}
 	
-	private void addLink(Link driven) {
+	private void addLink(LinkImpl driven) {
 		Integer count = this.drivenLinks.get(driven);
 		if (count == null) this.drivenLinks.put(driven, 1);
 		else  this.drivenLinks.put(driven, count + 1);
@@ -142,7 +142,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					LegImpl leg = (LegImpl)actslegs.get(i);
 					// just look at car routes right now
 					if(leg.getMode() != TransportMode.car) continue;
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					for (LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						Id id2 = link.getId();
 						if(id2.equals(this.linkId) ) {
 							actPersons.add(plan);
@@ -176,15 +176,15 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					LegImpl leg = (LegImpl) pe ;
 					Route route = leg.getRoute();
 					if ( route instanceof NetworkRoute ) { // added in jun09, see below in "collectLinks". kai, jun09
-						List<Link> links = new ArrayList<Link>();
-						for (Link link : ((NetworkRoute) route).getLinks() ) {
+						List<LinkImpl> links = new ArrayList<LinkImpl>();
+						for (LinkImpl link : ((NetworkRoute) route).getLinks() ) {
 							links.add(link);
 							if(link.getId().equals(this.linkId) ) {
 								// only if this specific route includes link, add the route
 								addthis = true;
 							}
 						}
-						if(addthis) for (Link link : links) addLink(link);
+						if(addthis) for (LinkImpl link : links) addLink(link);
 						addthis = false;
 					}
 				}
@@ -215,7 +215,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					Route route = leg.getRoute() ;
 					if ( route instanceof NetworkRoute ) {
 						NetworkRoute nr = (NetworkRoute) route ;
-						for (Link link : nr.getLinks() ) {
+						for (LinkImpl link : nr.getLinks() ) {
 							addLink(link);
 						}
 					}
@@ -225,7 +225,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 	}
 	
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		this.drivenLinks = new HashMap<Link,Integer> ();
+		this.drivenLinks = new HashMap<LinkImpl,Integer> ();
 //		QueueLink link = net.getQueueLink(this.linkId);
 //		String start = link.getLink().getFromNode().getId().toString();
 //		String end = link.getLink().getToNode().getId().toString();
@@ -241,9 +241,9 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		this.vertex = new float[this.drivenLinks.size()*4];
 		this.count = new int[this.drivenLinks.size()];
 		int pos = 0;
-		for(Link qlink : this.drivenLinks.keySet()) {
+		for(LinkImpl qlink : this.drivenLinks.keySet()) {
 			this.count[pos/4] = this.drivenLinks.get(qlink);
-			Node node = qlink.getFromNode();
+			NodeImpl node = qlink.getFromNode();
 			this.vertex[pos++] = (float)node.getCoord().getX();
 			this.vertex[pos++] = (float)node.getCoord().getY();
 			node = qlink.getToNode();

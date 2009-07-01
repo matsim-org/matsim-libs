@@ -20,8 +20,8 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.network.LinkImpl;
 
 
 /**
@@ -32,7 +32,7 @@ import org.matsim.core.api.population.Route;
 public class NodeNetworkRouteFactory implements RouteFactory {
 
 
-	public Route createRoute(Link startLink, Link endLink) {
+	public Route createRoute(LinkImpl startLink, LinkImpl endLink) {
 		return new NodeNetworkRoute(startLink, endLink);
 	}
 

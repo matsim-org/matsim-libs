@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.Config;
@@ -42,6 +41,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -193,18 +193,18 @@ public class DEQSim extends ExternalMobsim {
 			out.writeDouble(time);
 
 			Route route = leg.getRoute();
-			List<Link> linkRoute = null;
+			List<LinkImpl> linkRoute = null;
 			if (route instanceof NetworkRoute) {
 				// in the binary format, we write the link-ids instead of the node-ids
 				 linkRoute = ((NetworkRoute) route).getLinks();
 			} else {
-				linkRoute = new LinkedList<Link>();
+				linkRoute = new LinkedList<LinkImpl>();
 			}
 			// # links, int, 32bit
 			out.writeInt(linkRoute.size() + 2);
 			// the first link where the departure happens
 			out.writeInt(Integer.parseInt(act.getLink().getId().toString()));
-			for (Link link : linkRoute) {
+			for (LinkImpl link : linkRoute) {
 				// node id, int, 32bit
 				out.writeInt(Integer.parseInt(link.getId().toString()));
 			}

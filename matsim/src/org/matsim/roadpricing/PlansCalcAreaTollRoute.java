@@ -23,11 +23,11 @@ package org.matsim.roadpricing;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -60,7 +60,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param factory
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator,
+	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final RoadPricingScheme scheme) {
 		super(configGroup, network, costCalculator, timeCalculator, factory);
 		this.scheme = scheme;
@@ -103,18 +103,18 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				// it is a car leg...
 
 				// # init some values before searching for routes:
-				Link fromLink = fromAct.getLink();
-				Link toLink = toAct.getLink();
+				LinkImpl fromLink = fromAct.getLink();
+				LinkImpl toLink = toAct.getLink();
 				if (fromLink == null) {
 					throw new RuntimeException("fromLink missing.");
 				}
 				if (toLink == null) {
 					throw new RuntimeException("toLink missing.");
 				}
-				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-				Node endNode = toLink.getFromNode(); // the target is the start of the link
+				NodeImpl startNode = fromLink.getToNode();	// start at the end of the "current" link
+				NodeImpl endNode = toLink.getFromNode(); // the target is the start of the link
 
-				NetworkRoute tollRoute = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
+				NetworkRoute tollRoute = (NetworkRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
 				NetworkRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
@@ -146,7 +146,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (NetworkRoute) ((Network) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
+					noTollRoute = (NetworkRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
 					noTollRoute.setNodes(fromLink, path.nodes, toLink);
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);
@@ -257,7 +257,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */
-	private boolean routeOverlapsTollLinks(final Link startLink, final Path route, final Link endLink, final double depTime) {
+	private boolean routeOverlapsTollLinks(final LinkImpl startLink, final Path route, final LinkImpl endLink, final double depTime) {
 		double time = depTime;
 
 		// handle first link
@@ -270,7 +270,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		 */
 
 		// handle following links
-		for (Link link : route.links) {
+		for (LinkImpl link : route.links) {
 			if (isLinkTolled(link, time)) {
 				return true;
 			}
@@ -281,7 +281,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		return isLinkTolled(endLink, time);
 	}
 
-	private boolean isLinkTolled(final Link link, final double time) {
+	private boolean isLinkTolled(final LinkImpl link, final double time) {
 		return this.scheme.getLinkCost(link.getId(), time) != null;
 	}
 

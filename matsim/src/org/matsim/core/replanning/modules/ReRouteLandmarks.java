@@ -20,8 +20,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -39,13 +39,13 @@ public class ReRouteLandmarks extends ReRouteDijkstra {
 	 * as argument 
 	 */
 	@Deprecated
-	public ReRouteLandmarks(Network network, TravelCost costCalculator,
+	public ReRouteLandmarks(NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
 		super(network, costCalculator, timeCalculator);
 		this.factory = new AStarLandmarksFactory(commonRouterData);
 	}
 	
-	public ReRouteLandmarks(PlansCalcRouteConfigGroup configGroup, Network network, TravelCost costCalculator,
+	public ReRouteLandmarks(PlansCalcRouteConfigGroup configGroup, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
 		this(network, costCalculator, timeCalculator, commonRouterData);
 		this.configGroup = configGroup;

@@ -29,7 +29,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.api.network.Link;
+
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -79,7 +80,7 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 	}
 
 
-	public Feature getFeature(final Link link) {
+	public Feature getFeature(final LinkImpl link) {
 		double width = this.widthCalculator.getWidth(link);
 		width += 0;
 

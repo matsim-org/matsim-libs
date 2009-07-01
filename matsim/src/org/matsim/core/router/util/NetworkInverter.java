@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -24,15 +24,15 @@ public class NetworkInverter {
 
 	final private static Logger log = Logger.getLogger(NetworkInverter.class);
 	
-	private Network originalNetwork;
+	private NetworkLayer originalNetwork;
 	
 	private NetworkLayer invertedNetwork = null;
 
-	public NetworkInverter(Network originalNet) {
+	public NetworkInverter(NetworkLayer originalNet) {
 		this.originalNetwork = originalNet;
 	}
 
-	public Network getInvertedNetwork() {
+	public NetworkLayer getInvertedNetwork() {
 		if (this.invertedNetwork == null){
 			invertNetwork();
 		}
@@ -44,15 +44,15 @@ public class NetworkInverter {
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
-		for (Link link : this.originalNetwork.getLinks().values()) {
+		for (LinkImpl link : this.originalNetwork.getLinks().values()) {
 			this.invertedNetwork.createNode(link.getId(), link.getToNode().getCoord());
 			numberOfNodesGenerated++;
 		}
 
-		for (Node node : this.originalNetwork.getNodes().values()) {
-			for (Link inLink : node.getInLinks().values()) {
-				for (Link outLink : node.getOutLinks().values()) {
-					Link link = this.invertedNetwork.createLink(new IdImpl(numberOfLinksGenerated),
+		for (NodeImpl node : this.originalNetwork.getNodes().values()) {
+			for (LinkImpl inLink : node.getInLinks().values()) {
+				for (LinkImpl outLink : node.getOutLinks().values()) {
+					LinkImpl link = this.invertedNetwork.createLink(new IdImpl(numberOfLinksGenerated),
 							this.invertedNetwork.getNode(inLink.getId()), this.invertedNetwork.getNode(outLink.getId().toString()),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),
@@ -73,17 +73,17 @@ public class NetworkInverter {
 	}
 	
 	
-	public List<Node> convertInvertedLinksToNodes(List<Link> links) {
-		List<Node> ret = new ArrayList<Node>(links.size());
-		for (Link l : links){
+	public List<NodeImpl> convertInvertedLinksToNodes(List<LinkImpl> links) {
+		List<NodeImpl> ret = new ArrayList<NodeImpl>(links.size());
+		for (LinkImpl l : links){
 			ret.add(this.originalNetwork.getNode(l.getId()));
 		}
 		return ret;
 	}
 
-	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
-		List<Link> ret = new ArrayList<Link>(nodes.size());
-		for (Node n : nodes){
+	public List<LinkImpl> convertInvertedNodesToLinks(List<NodeImpl> nodes) {
+		List<LinkImpl> ret = new ArrayList<LinkImpl>(nodes.size());
+		for (NodeImpl n : nodes){
 			ret.add(this.originalNetwork.getLink(n.getId()));
 		}
 		return ret;

@@ -40,8 +40,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -54,6 +52,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
@@ -106,7 +106,7 @@ public class QueueSimulation {
 	private final Config config;
 	protected final Population plans;
 	protected QueueNetwork network;
-	protected Network networkLayer;
+	protected NetworkLayer networkLayer;
 
 	private static Events events = null;
 	protected  SimStateWriterI netStateWriter = null;
@@ -166,7 +166,7 @@ public class QueueSimulation {
 	 * @param plans
 	 * @param events
 	 */
-	public QueueSimulation(final Network network, final Population plans, final Events events) {
+	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
 		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
@@ -646,7 +646,7 @@ public class QueueSimulation {
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
 				DriverAgent driver = entry.getSecond();
-				Link destinationLink = driver.getDestinationLink();
+				LinkImpl destinationLink = driver.getDestinationLink();
 				driver.teleportToLink(destinationLink);
 
 				getEvents().processEvent(new AgentArrivalEvent(now, driver.getPerson(),
@@ -659,7 +659,7 @@ public class QueueSimulation {
 	private void handleNetworkChangeEvents(final double time) {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
-			for (Link link : event.getLinks()) {
+			for (LinkImpl link : event.getLinks()) {
 				this.network.getQueueLink(link.getId()).recalcTimeVariantAttributes(time);
 			}
 		}
@@ -696,7 +696,7 @@ public class QueueSimulation {
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	protected void agentDeparts(final DriverAgent agent, final Link link) {
+	protected void agentDeparts(final DriverAgent agent, final LinkImpl link) {
 		double now = SimulationTimer.getTime();
 
 		LegImpl leg = agent.getCurrentLeg();

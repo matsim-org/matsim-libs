@@ -23,16 +23,14 @@ package org.matsim.core.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class NetworkWriterHandlerImplTNodes {
 
-	private final Network network;
+	private final NetworkLayer network;
 
-	public NetworkWriterHandlerImplTNodes(final Network network) {
+	public NetworkWriterHandlerImplTNodes(final NetworkLayer network) {
 		this.network = network;
 	}
 
@@ -42,7 +40,7 @@ public class NetworkWriterHandlerImplTNodes {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
 
 			startNodes(out);
-			for (Node n : this.network.getNodes().values()) {
+			for (NodeImpl n : this.network.getNodes().values()) {
 				writeNode(n, out);
 			}
 			out.close();
@@ -60,7 +58,7 @@ public class NetworkWriterHandlerImplTNodes {
 		out.write("NOTES\n");
 	}
 
-	private void writeNode(final Node node, final BufferedWriter out) throws IOException {
+	private void writeNode(final NodeImpl node, final BufferedWriter out) throws IOException {
 
 		out.write(node.getId() + "\t");
 		out.write(node.getCoord().getX() + "\t");

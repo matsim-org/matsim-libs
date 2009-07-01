@@ -20,12 +20,12 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.network.LinkImpl;
 
 public class GenericRouteFactory implements RouteFactory {
 
-	public Route createRoute(final Link startLink, final Link endLink) {
+	public Route createRoute(final LinkImpl startLink, final LinkImpl endLink) {
 		return new GenericRouteImpl(startLink, endLink);
 	}
 

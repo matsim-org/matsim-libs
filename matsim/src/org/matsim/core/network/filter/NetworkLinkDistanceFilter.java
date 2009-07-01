@@ -19,8 +19,8 @@
 
 package org.matsim.core.network.filter;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -29,7 +29,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 
 	private final double distanceFilter;
-	private final Node distanceFilterNode;
+	private final NodeImpl distanceFilterNode;
 	
 	/**
 	 * Extract all links with a distance (in m) smaller than the distance parameter 
@@ -37,7 +37,7 @@ public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 	 * @param distance
 	 * @param centerNode
 	 */
-	public NetworkLinkDistanceFilter (final double distance, final Node centerNode) {
+	public NetworkLinkDistanceFilter (final double distance, final NodeImpl centerNode) {
 		this.distanceFilter = distance;
 		this.distanceFilterNode = centerNode;
 	}
@@ -48,7 +48,7 @@ public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 	 * @return <code>true</true> if the Link is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */	
-	public boolean judgeLink(Link l) {
+	public boolean judgeLink(LinkImpl l) {
 		double dist = CoordUtils.calcDistance(l.getCoord(), this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter;
 	}

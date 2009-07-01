@@ -26,10 +26,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
@@ -83,7 +83,7 @@ public class BasicScenarioLoader {
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			networkFileName = this.config.network().getInputFile();
 			log.info("loading network from " + networkFileName);
-			Network network = (Network) this.scenario.getNetwork();
+			NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());

@@ -30,15 +30,15 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 class LandmarkerPieSlices {
 
-	private Node[] landmarks;
+	private NodeImpl[] landmarks;
 
 	private Coord center = null;
 
@@ -49,12 +49,12 @@ class LandmarkerPieSlices {
 	private static final double ZONE_EXPANSION = 0.1;
 
 	LandmarkerPieSlices(final int landmarkCount, final Rectangle2D.Double travelZone) {
-		this.landmarks = new Node[landmarkCount];
+		this.landmarks = new NodeImpl[landmarkCount];
 		this.travelZone = travelZone;
 	}
 
-	public void run(final Network network) {
-		Collection<? extends Node> nodes;
+	public void run(final NetworkLayer network) {
+		Collection<? extends NodeImpl> nodes;
 		if (this.travelZone.getHeight() == 0 || this.travelZone.getWidth() == 0) {
 			nodes = network.getNodes().values();
 		} else {
@@ -63,7 +63,7 @@ class LandmarkerPieSlices {
 		run(nodes);
 	}
 
-	private Set<Node> getNodesInTravelZone(final Network network) {
+	private Set<NodeImpl> getNodesInTravelZone(final NetworkLayer network) {
 		double minX = travelZone.getX();
 		double maxX = travelZone.getWidth() + minX;
 		double minY = travelZone.getY();
@@ -74,8 +74,8 @@ class LandmarkerPieSlices {
 		minX -= (maxX - minX) * ZONE_EXPANSION;
 		maxY += (maxY - minY) * ZONE_EXPANSION;
 		minY -= (maxY - minY) * ZONE_EXPANSION;
-		Set<Node> resultNodes = new TreeSet<Node>();
-		for (Node n : network.getNodes().values()) {
+		Set<NodeImpl> resultNodes = new TreeSet<NodeImpl>();
+		for (NodeImpl n : network.getNodes().values()) {
 			if (n.getCoord().getX() <= maxX && n.getCoord().getX() >= minX
 					&& n.getCoord().getY() <= maxY && n.getCoord().getY() >= minY) {
 				resultNodes.add(n);
@@ -85,21 +85,21 @@ class LandmarkerPieSlices {
 		return resultNodes;
 	}
 
-	public void run(final Collection<? extends Node> nodes) {
+	public void run(final Collection<? extends NodeImpl> nodes) {
 		this.center = getCenter(nodes);
 		putLandmarks(nodes, this.landmarks.length);
 	}
 
-	private void putLandmarks(final Collection<? extends Node> nodes, final int landmarkCount) {
+	private void putLandmarks(final Collection<? extends NodeImpl> nodes, final int landmarkCount) {
 
-		ArrayList<ArrayList<Node>> sectors = new ArrayList<ArrayList<Node>>();
+		ArrayList<ArrayList<NodeImpl>> sectors = new ArrayList<ArrayList<NodeImpl>>();
 
 		log.info("Filling sectors...");
 		double[][] angles = fillSectors(sectors, nodes);
 
 		if (angles.length < landmarkCount) {
 			log.info("Reducing number of landmarks from " + landmarkCount + " to " + angles.length + "...");
-			this.landmarks = new Node[angles.length];
+			this.landmarks = new NodeImpl[angles.length];
 		}
 		for (int i = 0; i < this.landmarks.length; i++) {
 			this.landmarks[i] = getLandmark(sectors.get(i), angles[i]);
@@ -110,21 +110,21 @@ class LandmarkerPieSlices {
 		log.info("done");
 	}
 
-	private double[][] fillSectors(final ArrayList<ArrayList<Node>> sectors, final Collection<? extends Node> nodes) {
+	private double[][] fillSectors(final ArrayList<ArrayList<NodeImpl>> sectors, final Collection<? extends NodeImpl> nodes) {
 		ArrayList<double[]> angles = new ArrayList<double[]>();
 		// Sort nodes according to angle
-		TreeMap<Double, Node[]> sortedNodes = new TreeMap<Double, Node[]>();
-		Node[] nodeList;
-		for (Node node : nodes) {
+		TreeMap<Double, NodeImpl[]> sortedNodes = new TreeMap<Double, NodeImpl[]>();
+		NodeImpl[] nodeList;
+		for (NodeImpl node : nodes) {
 			double x = node.getCoord().getX() - this.center.getX();
 			double y = node.getCoord().getY() - this.center.getY();
 			double angle = Math.atan2(y, x) + Math.PI;
 			nodeList = sortedNodes.get(angle);
 			if (nodeList == null) {
-				nodeList = new Node[1];
+				nodeList = new NodeImpl[1];
 				nodeList[0] = node;
 			} else {
-				Node[] nodeList2 = new Node[nodeList.length + 1];
+				NodeImpl[] nodeList2 = new NodeImpl[nodeList.length + 1];
 				for (int i = 0; i < nodeList.length; i++) {
 					nodeList2[i] = nodeList[i];
 				}
@@ -134,14 +134,14 @@ class LandmarkerPieSlices {
 			sortedNodes.put(angle, nodeList);
 		}
 		double lastAngle = 0;
-		Iterator<Node[]> it = sortedNodes.values().iterator();
+		Iterator<NodeImpl[]> it = sortedNodes.values().iterator();
 		// Fill sectors such that each sector contains on average the same number of nodes
-		Node[] tmpNodes = it.next();
+		NodeImpl[] tmpNodes = it.next();
 		int k = 0;
 		for (int i = 0; i < this.landmarks.length; i++) {
 
-			sectors.add(new ArrayList<Node>());
-			Node node = null;
+			sectors.add(new ArrayList<NodeImpl>());
+			NodeImpl node = null;
 			for (int j = 0; j < nodes.size() / this.landmarks.length; j++) {
 				if (k == tmpNodes.length) {
 					tmpNodes = it.next();
@@ -180,10 +180,10 @@ class LandmarkerPieSlices {
 		return angles.toArray(new double[0][2]);
 	}
 
-	private Node getLandmark(final ArrayList<Node> nodes, final double[] angles) {
+	private NodeImpl getLandmark(final ArrayList<NodeImpl> nodes, final double[] angles) {
 		double maxDist = Double.NEGATIVE_INFINITY;
-		Node landmark = null;
-		for (Node node : nodes) {
+		NodeImpl landmark = null;
+		for (NodeImpl node : nodes) {
 			if ((node.getOutLinks().size() > 1 && node.getInLinks().size() > 1)
 					|| landmark == null) {
 				double x = node.getCoord().getX() - this.center.getX();
@@ -207,7 +207,7 @@ class LandmarkerPieSlices {
 		return landmark;
 	}
 
-	private void refineLandmarks(final ArrayList<ArrayList<Node>> sectors, final double[][] sectorAngles) {
+	private void refineLandmarks(final ArrayList<ArrayList<NodeImpl>> sectors, final double[][] sectorAngles) {
 		boolean doRefine = true;
 		double[] landmarkAngels = new double[this.landmarks.length];
 		for (int i = 0; i < this.landmarks.length; i++) {
@@ -260,11 +260,11 @@ class LandmarkerPieSlices {
 		}
 	}
 
-	private void removeNodesFromSector(final ArrayList<Node> sector,
+	private void removeNodesFromSector(final ArrayList<NodeImpl> sector,
 			final double[] sectorAngles) {
 		int i = 0;
 		while (i < sector.size()) {
-			Node node = sector.get(i);
+			NodeImpl node = sector.get(i);
 			double x = node.getCoord().getX() - this.center.getX();
 			double y = node.getCoord().getY() - this.center.getY();
 			double angle = Math.atan2(y, x) + Math.PI;
@@ -276,7 +276,7 @@ class LandmarkerPieSlices {
 		}
 	}
 
-	private Coord getCenter(final Collection<? extends Node> nodes) {
+	private Coord getCenter(final Collection<? extends NodeImpl> nodes) {
 		double[] bBox = NetworkUtils.getBoundingBox(nodes);
 		double maxX = bBox[0];
 		double minX = bBox[1];
@@ -289,7 +289,7 @@ class LandmarkerPieSlices {
 		return new CoordImpl(centerX, centerY);
 	}
 
-	public Node[] getLandmarks() {
+	public NodeImpl[] getLandmarks() {
 		return this.landmarks.clone();
 	}
 

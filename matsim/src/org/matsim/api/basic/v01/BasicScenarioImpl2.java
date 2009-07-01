@@ -23,10 +23,10 @@ package org.matsim.api.basic.v01;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -41,7 +41,7 @@ import org.matsim.vehicles.BasicVehicles;
 /* package */ class BasicScenarioImpl2 implements Scenario {
 
 	private final Config config;
-	private final Network network;
+	private final NetworkLayer network;
 	private final Population population;
 	
 	private BasicScenarioImpl2() {
@@ -60,7 +60,7 @@ import org.matsim.vehicles.BasicVehicles;
 		this.population = new PopulationImpl( this );
 	}
 
-	public Network getNetwork() {
+	public NetworkLayer getNetwork() {
 		return this.network;
 	}
 

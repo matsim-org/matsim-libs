@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -30,7 +30,7 @@ public class AgentArrivalEvent extends AgentEvent implements BasicAgentArrivalEv
 
 	public static final String EVENT_TYPE = "arrival";
 
-	public AgentArrivalEvent(final double time, final PersonImpl agent, final Link link, final LegImpl leg) {
+	public AgentArrivalEvent(final double time, final PersonImpl agent, final LinkImpl link, final LegImpl leg) {
 		super(time, agent, link, leg);
 	}
 

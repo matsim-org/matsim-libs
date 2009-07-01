@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import java.util.Stack;
 
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -46,11 +46,11 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	private final static String ATTR_END_TIME = "end_time";
 	private final static String ATTR_AMOUNT = "amount";
 
-	private Network network = null;
+	private NetworkLayer network = null;
 
 	private RoadPricingScheme scheme = null;
 
-	public RoadPricingReaderXMLv1(final Network network) {
+	public RoadPricingReaderXMLv1(final NetworkLayer network) {
 		this.network = network;
 	}
 

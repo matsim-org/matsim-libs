@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -41,9 +41,9 @@ public class Vehicle extends SimUnit {
 	private PersonImpl ownerPerson = null;
 	private LegImpl currentLeg = null;
 	private int legIndex;
-	private Link currentLink = null;
+	private LinkImpl currentLink = null;
 	private int linkIndex;
-	private Link[] currentLinkRoute = null;
+	private LinkImpl[] currentLinkRoute = null;
 
 	public Vehicle(Scheduler scheduler, PersonImpl ownerPerson) {
 		super(scheduler);
@@ -125,14 +125,14 @@ public class Vehicle extends SimUnit {
 	public void setCurrentLeg(LegImpl currentLeg) {
 		this.currentLeg = currentLeg;
 		if (currentLeg.getRoute() instanceof NetworkRoute) {
-			List<Link> links = ((NetworkRoute) currentLeg.getRoute()).getLinks();
-			currentLinkRoute = links.toArray(new Link[links.size()]);
+			List<LinkImpl> links = ((NetworkRoute) currentLeg.getRoute()).getLinks();
+			currentLinkRoute = links.toArray(new LinkImpl[links.size()]);
 		} else {
 			currentLinkRoute = null;
 		}
 	}
 
-	private Link[] getCurrentLinkRoute() {
+	private LinkImpl[] getCurrentLinkRoute() {
 		return currentLinkRoute;
 	}
  
@@ -152,7 +152,7 @@ public class Vehicle extends SimUnit {
 		return legIndex;
 	}
 
-	public Link getCurrentLink() {
+	public LinkImpl getCurrentLink() {
 		return currentLink;
 	}
 
@@ -160,7 +160,7 @@ public class Vehicle extends SimUnit {
 		return linkIndex;
 	}
 
-	public void setCurrentLink(Link currentLink) {
+	public void setCurrentLink(LinkImpl currentLink) {
 		this.currentLink = currentLink;
 	}
 
@@ -231,7 +231,7 @@ public class Vehicle extends SimUnit {
 
 	public void scheduleLeavePreviousRoadMessage(double scheduleTime) {
 		Road previousRoad = null;
-		Link previousLink = null;
+		LinkImpl previousLink = null;
 		/*
 		 * we need to handle the first road in a leg specially, because the load
 		 * to be left is accessed over the last act performed instead of the leg

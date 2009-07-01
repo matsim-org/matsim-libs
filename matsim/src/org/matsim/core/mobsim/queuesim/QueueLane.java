@@ -33,7 +33,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
@@ -41,6 +40,7 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.basic.BasicLane;
@@ -151,7 +151,7 @@ public class QueueLane {
 	/**
 	 * Contains all Link instances which are reachable from this lane
 	 */
-	private final List<Link> destinationLinks = new ArrayList<Link>();
+	private final List<LinkImpl> destinationLinks = new ArrayList<LinkImpl>();
 
 	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
 
@@ -475,10 +475,10 @@ public class QueueLane {
 		boolean moveOn = true;
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
 			QueueVehicle veh = this.buffer.peek();
-			Link nextLink = veh.getDriver().chooseNextLink();
+			LinkImpl nextLink = veh.getDriver().chooseNextLink();
 			if (nextLink != null) {
 				for (QueueLane toQueueLane : this.toLanes) {
-					for (Link qLink : toQueueLane.getDestinationLinks()) {
+					for (LinkImpl qLink : toQueueLane.getDestinationLinks()) {
 						if (qLink.equals(nextLink)) {
 							if (toQueueLane.hasSpace()) {
 								this.buffer.poll();
@@ -933,11 +933,11 @@ public class QueueLane {
 		this.toLanes.add(lane);
 	}
 
-	protected void addDestinationLink(final Link l) {
+	protected void addDestinationLink(final LinkImpl l) {
 		this.destinationLinks.add(l);
 	}
 
-	protected List<Link> getDestinationLinks(){
+	protected List<LinkImpl> getDestinationLinks(){
 		return this.destinationLinks;
 	}
 

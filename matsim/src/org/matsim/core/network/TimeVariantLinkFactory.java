@@ -21,13 +21,10 @@
 package org.matsim.core.network;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 
 public class TimeVariantLinkFactory implements LinkFactory {
 
-	public Link createLink(Id id, Node from, Node to, Network network, double length, double freespeedTravelTime,
+	public LinkImpl createLink(Id id, NodeImpl from, NodeImpl to, NetworkLayer network, double length, double freespeedTravelTime,
 			double capacity, double nOfLanes) {
 		return new TimeVariantLinkImpl(id, from, to, (NetworkLayer) network, length, freespeedTravelTime, capacity, nOfLanes);
 	}

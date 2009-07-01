@@ -22,9 +22,6 @@ package org.matsim.core.network;
 
 import java.io.IOException;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
@@ -32,13 +29,13 @@ import org.matsim.core.utils.io.Writer;
 public class NetworkWriter extends Writer {
 
 	private NetworkWriterHandler handler = null;
-	private final Network network;
+	private final NetworkLayer network;
 
-	public NetworkWriter(final Network network) {
+	public NetworkWriter(final NetworkLayer network) {
 		this(network, Gbl.getConfig().network().getOutputFile());
 	}
 
-	public NetworkWriter(final Network network, final String filename) {
+	public NetworkWriter(final NetworkLayer network, final String filename) {
 
 		super();
 		this.network = network;
@@ -58,14 +55,14 @@ public class NetworkWriter extends Writer {
 			this.handler.startNetwork(this.network, this.out);
 			this.handler.writeSeparator(this.out);
 			this.handler.startNodes(this.network, this.out);
-			for (Node n : this.network.getNodes().values()) {
+			for (NodeImpl n : this.network.getNodes().values()) {
 				this.handler.startNode(n, this.out);
 				this.handler.endNode(this.out);
 			}
 			this.handler.endNodes(this.out);
 			this.handler.writeSeparator(this.out);
 			this.handler.startLinks(this.network, this.out);
-			for (Link l : this.network.getLinks().values()) {
+			for (LinkImpl l : this.network.getLinks().values()) {
 				this.handler.startLink(l, this.out);
 				this.handler.endLink(this.out);
 			}

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.AStarLandmarks;
 
 
@@ -31,7 +31,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
 	private PreProcessLandmarks preProcessData;
 	
-	public AStarLandmarksFactory(Network network, final TravelMinCost fsttc){
+	public AStarLandmarksFactory(NetworkLayer network, final TravelMinCost fsttc){
 		synchronized (this) {
 				this.preProcessData = new PreProcessLandmarks(fsttc);
 				this.preProcessData.run(network);
@@ -46,7 +46,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		this.preProcessData = preProcessData;
 	}
 	
-	public LeastCostPathCalculator createPathCalculator(Network network,
+	public LeastCostPathCalculator createPathCalculator(NetworkLayer network,
 			TravelCost travelCosts, TravelTime travelTimes) {
 		return new AStarLandmarks(network, this.preProcessData, travelCosts, travelTimes);
 	}

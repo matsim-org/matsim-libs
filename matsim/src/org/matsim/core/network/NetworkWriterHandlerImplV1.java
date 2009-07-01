@@ -25,9 +25,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
@@ -42,7 +39,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <network ... > ... </network>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
+	public void startNetwork(final NetworkLayer network, final BufferedWriter out) throws IOException {
 		out.write("<network");
 		if (network.getName() != null) {
 			out.write(" name=\"" + network.getName() + "\"");
@@ -58,7 +55,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <nodes ... > ... </nodes>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNodes(final Network network, final BufferedWriter out) throws IOException {
+	public void startNodes(final NetworkLayer network, final BufferedWriter out) throws IOException {
 		out.write("\t<nodes");
 		out.write(">\n");
 	}
@@ -71,7 +68,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <links ... > ... </links>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLinks(final Network network, final BufferedWriter out) throws IOException {
+	public void startLinks(final NetworkLayer network, final BufferedWriter out) throws IOException {
 		out.write("\t<links");
 		if (network.getCapacityPeriod() != Integer.MIN_VALUE) {
 			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
@@ -91,7 +88,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <node ... > ... </node>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startNode(final Node node, final BufferedWriter out) throws IOException {
+	public void startNode(final NodeImpl node, final BufferedWriter out) throws IOException {
 		out.write("\t\t<node");
 		out.write(" id=\"" + node.getId() + "\"");
 		out.write(" x=\"" + node.getCoord().getX() + "\"");
@@ -112,7 +109,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	// <link ... > ... </link>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLink(final Link link, final BufferedWriter out) throws IOException {
+	public void startLink(final LinkImpl link, final BufferedWriter out) throws IOException {
 		out.write("\t\t<link");
 		out.write(" id=\"" + link.getId() + "\"");
 		out.write(" from=\"" + link.getFromNode().getId() + "\"");

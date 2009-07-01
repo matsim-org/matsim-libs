@@ -20,7 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 /**
  * Implementation of {@link TravelTimeData} that stores the data per time bin
@@ -33,9 +33,9 @@ public class TravelTimeDataArray implements TravelTimeData {
 	private final double[] timeSum;
 	private final int[] timeCnt;
 	private final double[] travelTimes;
-	private final Link link;
+	private final LinkImpl link;
 
-	public TravelTimeDataArray(final Link link, final int numSlots) {
+	public TravelTimeDataArray(final LinkImpl link, final int numSlots) {
 		this.timeSum = new double[numSlots];
 		this.timeCnt = new int[numSlots];
 		this.travelTimes = new double[numSlots];

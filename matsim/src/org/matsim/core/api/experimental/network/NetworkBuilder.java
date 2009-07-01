@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Node.java
+ * NetworkBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.core.api.network;
-
-import java.util.Map;
+package org.matsim.core.api.experimental.network;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
-public interface Node extends BasicNode, Comparable<Node> {
 
-	public void setOrigId(final String id);
+/**
+ * @author dgrether
+ *
+ */
+public interface NetworkBuilder extends BasicNetworkBuilder {
 
-	public void setType(final String type);
-
-	public void removeInLink(final Link inlink);
-
-	public void removeOutLink(final Link outlink);
-
-	public String getOrigId();
-
-	public String getType();
-
-	public Map<Id, ? extends Link> getIncidentLinks();
-
-	public Map<Id, ? extends Node> getInNodes();
-
-	public Map<Id, ? extends Node> getOutNodes();
-
-	public Map<Id, ? extends Node> getIncidentNodes();
-
-	public Map<Id, ? extends Link> getInLinks();
-
-	public Map<Id, ? extends Link> getOutLinks();
-
+	public NodeImpl createNode(final Id id);
+	
+	public LinkImpl createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	
+	
 }

@@ -29,8 +29,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -129,7 +129,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 			log.info("  removed "+down_mapping.size()+" down-mappings (link).");
 			removeAllDownMappings();
 			NetworkLayer network = (NetworkLayer)layer.getDownRule().getDownLayer();
-			Link l = network.getNearestRightEntryLink(center);
+			LinkImpl l = network.getNearestRightEntryLink(center);
 			addDownMapping(l);
 			l.addUpMapping(this);
 			log.info("  added "+down_mapping.size()+" down-mapping (link):");
@@ -163,10 +163,10 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 		return this.activities.get(type);
 	}
 
-	public final Link getLink() {
+	public final LinkImpl getLink() {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
-		return (Link)this.getDownMapping().get(this.down_mapping.firstKey());
+		return (LinkImpl)this.getDownMapping().get(this.down_mapping.firstKey());
 	}
 	
 	public Id getLinkId() {

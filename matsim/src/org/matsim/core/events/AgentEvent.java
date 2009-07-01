@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentEvent;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -36,7 +36,7 @@ public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent 
 
 	private final Id linkId;
 
-	AgentEvent(final double time, final PersonImpl agent, final Link link, final LegImpl leg) {
+	AgentEvent(final double time, final PersonImpl agent, final LinkImpl link, final LegImpl leg) {
 		super(time, agent);
 		this.linkId = link.getId();
 		this.leg = leg;

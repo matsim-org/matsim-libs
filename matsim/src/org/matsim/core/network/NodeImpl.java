@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.BasicNodeImpl;
 import org.matsim.core.gbl.Gbl;
 
@@ -41,7 +41,7 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 	private String type = null;
 	private String origid = null;
 
-	private final static Logger log = Logger.getLogger(Node.class);
+	private final static Logger log = Logger.getLogger(NodeImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -60,7 +60,7 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 		super(id);
 	}
 
-	public int compareTo(final Node o) {
+	public int compareTo(final NodeImpl o) {
 		return this.id.toString().compareTo(o.getId().toString());
 	}
 
@@ -122,13 +122,13 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 	// normally, the removed object should be passed back (like in other utils) balmermi
 	// the new collections convention seems to be that the return type is boolean, and "true" is returned when
 	// the collection is modified, and "false" else.  kai, dec06
-	public final void removeInLink(final Link inlink) {
+	public final void removeInLink(final LinkImpl inlink) {
 		this.inlinks.remove(inlink.getId());
 	}
 
 	// normally, the removed object should be passed back (like in other utils) balmermi
 	// see above (removeInLink).  kai, dec06
-	public final void removeOutLink(final Link outlink) {
+	public final void removeOutLink(final LinkImpl outlink) {
 		this.outlinks.remove(outlink.getId());
 	}
 
@@ -144,46 +144,46 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 		return this.type;
 	}
 
-	public final Map<Id, ? extends Link> getIncidentLinks() {
-		Map<Id, Link> links = new TreeMap<Id, Link>(getInLinks());
+	public final Map<Id, ? extends LinkImpl> getIncidentLinks() {
+		Map<Id, LinkImpl> links = new TreeMap<Id, LinkImpl>(getInLinks());
 		links.putAll(getOutLinks());
 		return links;
 	}
 
-	public final Map<Id, ? extends Node> getInNodes() {
-		Map<Id, Node> nodes = new TreeMap<Id, Node>();
-		for (Link link : getInLinks().values()) {
-			Node node = link.getFromNode();
+	public final Map<Id, ? extends NodeImpl> getInNodes() {
+		Map<Id, NodeImpl> nodes = new TreeMap<Id, NodeImpl>();
+		for (LinkImpl link : getInLinks().values()) {
+			NodeImpl node = link.getFromNode();
 			nodes.put(node.getId(), node);
 		}
 		return nodes;
 	}
 
-	public final Map<Id, ? extends Node> getOutNodes() {
-		Map<Id, Node> nodes = new TreeMap<Id, Node>();
-		for (Link link : getOutLinks().values()) {
-			Node node = link.getToNode();
+	public final Map<Id, ? extends NodeImpl> getOutNodes() {
+		Map<Id, NodeImpl> nodes = new TreeMap<Id, NodeImpl>();
+		for (LinkImpl link : getOutLinks().values()) {
+			NodeImpl node = link.getToNode();
 			nodes.put(node.getId(), node);
 		}
 		return nodes;
 	}
 
-	public final Map<Id, ? extends Node> getIncidentNodes() {
-		Map<Id, Node> nodes = new TreeMap<Id, Node>(getInNodes());
+	public final Map<Id, ? extends NodeImpl> getIncidentNodes() {
+		Map<Id, NodeImpl> nodes = new TreeMap<Id, NodeImpl>(getInNodes());
 		nodes.putAll(getOutNodes());
 		return nodes;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<Id, ? extends Link> getInLinks() {
-		return (Map<Id, Link>) super.getInLinks();
+	public Map<Id, ? extends LinkImpl> getInLinks() {
+		return (Map<Id, LinkImpl>) super.getInLinks();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<Id, ? extends Link> getOutLinks() {
-		return (Map<Id, Link>)super.getOutLinks();
+	public Map<Id, ? extends LinkImpl> getOutLinks() {
+		return (Map<Id, LinkImpl>)super.getOutLinks();
 	}
 
 	//////////////////////////////////////////////////////////////////////

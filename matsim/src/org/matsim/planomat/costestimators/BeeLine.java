@@ -21,7 +21,7 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -52,8 +52,8 @@ public class BeeLine implements LegTravelTimeEstimator {
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
-		Node originFromNode = actOrigin.getLink().getFromNode();
-		Node destinationFromNode = actDestination.getLink().getFromNode();
+		NodeImpl originFromNode = actOrigin.getLink().getFromNode();
+		NodeImpl destinationFromNode = actDestination.getLink().getFromNode();
 		/* why (unsafely) casting to Link to get a node? Why not just using
 		 * Location.getCenter() as coordinate? In that case, that would be:
 		 *   double d = origin.getCenter().calcDistance(destination.getCenter());

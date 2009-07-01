@@ -22,7 +22,7 @@ package org.matsim.vis.snapshots.writers;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 /**
  * A helper class to store information about agents (id, position, speed), mainly used to create
@@ -66,7 +66,7 @@ public class PositionInfo {
 	final private double speed;
 
 	final private VehicleState vehicleState;
-	final private Link link;
+	final private LinkImpl link;
 
 
 
@@ -83,7 +83,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(final Id agentId, final LinkImpl link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -168,7 +168,7 @@ public class PositionInfo {
 		return this.vehicleState;
 	}
 
-	public Link getLink() {
+	public LinkImpl getLink() {
 		return this.link;
 	}
 

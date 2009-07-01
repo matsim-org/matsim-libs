@@ -27,12 +27,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.NetworkBuilder;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.api.experimental.network.Network;
+import org.matsim.core.api.experimental.network.NetworkBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.world.Layer;
@@ -47,9 +46,9 @@ public class NetworkLayer extends Layer implements Network {
 
 	private double capperiod = 3600.0 ;
 
-	private final Map<Id, Node> nodes = new TreeMap<Id, Node>();
+	private final Map<Id, NodeImpl> nodes = new TreeMap<Id, NodeImpl>();
 
-	private QuadTree<Node> nodeQuadTree = null;
+	private QuadTree<NodeImpl> nodeQuadTree = null;
 
 	private static final double DEFAULT_EFFECTIVE_CELL_SIZE = 7.5;
 
@@ -78,15 +77,15 @@ public class NetworkLayer extends Layer implements Network {
 		this.factory.setNetwork(this);
 	}
 
-	public final Node createNode(final Id id, final Coord coord) {
+	public final NodeImpl createNode(final Id id, final Coord coord) {
 		return createNode(id, coord, null);
 	}
 
-	public final Node createNode(final Id id, final Coord coord, final String nodeType) {
+	public final NodeImpl createNode(final Id id, final Coord coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
-		Node n = this.factory.createNode(id, coord, nodeType);
+		NodeImpl n = this.factory.createNode(id, coord, nodeType);
 		this.nodes.put(id, n);
 		if (this.nodeQuadTree != null) {
 			// we changed the nodes, invalidate the quadTree
@@ -96,11 +95,11 @@ public class NetworkLayer extends Layer implements Network {
 		return n;
 	}
 
-	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
+	public final LinkImpl createLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 		return createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
 
-	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
+	public final LinkImpl createLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
 
 		if (this.nodes.get(fromNode.getId()) == null) {
 			throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");
@@ -114,7 +113,7 @@ public class NetworkLayer extends Layer implements Network {
 			throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!");
 		}
 
-		Link link = this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
+		LinkImpl link = this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 		link.setType(type);
 		link.setOrigId(origId);
 		fromNode.addOutLink(link);
@@ -165,13 +164,13 @@ public class NetworkLayer extends Layer implements Network {
 					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
 		}
 
-		for(Link link : getLinks().values()) {
+		for(LinkImpl link : getLinks().values()) {
 			((TimeVariantLinkImpl)link).clearEvents();
 		}
 
 		this.networkChangeEvents = events;
 		for (NetworkChangeEvent event : events) {
-			for (Link link : event.getLinks()) {
+			for (LinkImpl link : event.getLinks()) {
 				((TimeVariantLinkImpl)link).applyEvent(event);
 			}
 		}
@@ -195,7 +194,7 @@ public class NetworkLayer extends Layer implements Network {
 		}
 
 		this.networkChangeEvents.add(event);
-		for (Link link : event.getLinks()) {
+		for (LinkImpl link : event.getLinks()) {
 			((TimeVariantLinkImpl)link).applyEvent(event);
 		}
 	}
@@ -212,15 +211,15 @@ public class NetworkLayer extends Layer implements Network {
 		return this.effectiveLaneWidth;
 	}
 
-	public Map<Id, Node> getNodes() {
+	public Map<Id, NodeImpl> getNodes() {
 		return this.nodes;
 	}
 
-	public final Node getNode(final String id) {
+	public final NodeImpl getNode(final String id) {
 		return this.nodes.get(new IdImpl(id));
 	}
 
-	public final Node getNode(final Id id) {
+	public final NodeImpl getNode(final Id id) {
 		return this.nodes.get(id);
 	}
 
@@ -233,9 +232,9 @@ public class NetworkLayer extends Layer implements Network {
 	 *          the coordinate for which the closest link should be found
 	 * @return the link found closest to coord
 	 */
-	public Link getNearestLink(final Coord coord) {
-		Link nearestLink = null;
-		Node nearestNode = null;
+	public LinkImpl getNearestLink(final Coord coord) {
+		LinkImpl nearestLink = null;
+		NodeImpl nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
 		if ( nearestNode == null ) {
@@ -253,7 +252,7 @@ public class NetworkLayer extends Layer implements Network {
 		// It would be nicer to find the nearest link on the "right" side of the coordinate.
 		// (For Great Britain it would be the "left" side. Could be a global config param...)
 		double shortestDistance = Double.MAX_VALUE;
-		for (Link link : nearestNode.getIncidentLinks().values()) {
+		for (LinkImpl link : nearestNode.getIncidentLinks().values()) {
 			double dist = link.calcDistance(coord);
 			if (dist < shortestDistance) {
 				shortestDistance = dist;
@@ -312,10 +311,10 @@ public class NetworkLayer extends Layer implements Network {
 	// TODO [balmermi] there should be only one 'getNearestLink' method
 	// which returns either the nearest 'left' or 'right' entry link, based on a global
 	// config param.
-	public Link getNearestRightEntryLink(final Coord coord) {
-		Link nearestRightLink = null;
-		Link nearestOverallLink = null;
-		Node nearestNode = null;
+	public LinkImpl getNearestRightEntryLink(final Coord coord) {
+		LinkImpl nearestRightLink = null;
+		LinkImpl nearestOverallLink = null;
+		NodeImpl nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
 
@@ -326,7 +325,7 @@ public class NetworkLayer extends Layer implements Network {
 		// now find nearest link from the nearest node
 		double shortestRightDistance = Double.MAX_VALUE; // reset the value
 		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
-		for (Link link : nearestNode.getIncidentLinks().values()) {
+		for (LinkImpl link : nearestNode.getIncidentLinks().values()) {
 			double dist = link.calcDistance(coord);
 			if (dist <= shortestRightDistance) {
 				// Generate a vector representing the link
@@ -379,7 +378,7 @@ public class NetworkLayer extends Layer implements Network {
 	 * @param coord the coordinate to which the closest node should be found
 	 * @return the closest node found, null if none
 	 */
-	public Node getNearestNode(final Coord coord) {
+	public NodeImpl getNearestNode(final Coord coord) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.get(coord.getX(), coord.getY());
 	}
@@ -391,7 +390,7 @@ public class NetworkLayer extends Layer implements Network {
 	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
 	 * @return all nodes within distance to <code>coord</code>
 	 */
-	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
+	public Collection<NodeImpl> getNearestNodes(final Coord coord, final double distance) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
 	}
@@ -419,18 +418,18 @@ public class NetworkLayer extends Layer implements Network {
 	 * @return <tt>true</tt> if the specified link is part of the network and
 	 * is successfully removed.
 	 */
-	public boolean removeLink(final Link link) {
+	public boolean removeLink(final LinkImpl link) {
 		Id id = link.getId();
-		Link l = (Link)this.locations.get(id);
+		LinkImpl l = (LinkImpl)this.locations.get(id);
 
 		if ((l == null) || (link != l)) {
 			// there is no link with the specified id, or there is another link than the requested one.
 			return false;
 		}
 
-		Node from = link.getFromNode();
+		NodeImpl from = link.getFromNode();
 		from.removeOutLink(link);
-		Node to = link.getToNode();
+		NodeImpl to = link.getToNode();
 		to.removeInLink(link);
 
 		return this.locations.remove(id) != null;
@@ -451,13 +450,13 @@ public class NetworkLayer extends Layer implements Network {
      * is successfully removed AND all incident links are removed successfully
      *
 	 */
-	public boolean removeNode(final Node node) {
+	public boolean removeNode(final NodeImpl node) {
 		Id id = node.getId();
-		Node n = this.nodes.get(id);
+		NodeImpl n = this.nodes.get(id);
 
 		if (n == null) { return false; }
 
-		for (Link l : n.getIncidentLinks().values()) {
+		for (LinkImpl l : n.getIncidentLinks().values()) {
 			if (!this.removeLink(l)) {
 				throw new RuntimeException("Link id=" + l.getId() + " could not be removed while removing Node id=" + n.getId());
 			}
@@ -502,7 +501,7 @@ public class NetworkLayer extends Layer implements Network {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (Node n : this.nodes.values()) {
+		for (NodeImpl n : this.nodes.values()) {
 			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
 			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
 			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
@@ -513,8 +512,8 @@ public class NetworkLayer extends Layer implements Network {
 		maxx += 1.0;
 		maxy += 1.0;
 		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
-		for (Node n : this.nodes.values()) {
+		QuadTree<NodeImpl> quadTree = new QuadTree<NodeImpl>(minx, miny, maxx, maxy);
+		for (NodeImpl n : this.nodes.values()) {
 			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
 		}
 		/* assign the quadTree at the very end, when it is complete.
@@ -525,17 +524,17 @@ public class NetworkLayer extends Layer implements Network {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Id, Link> getLinks() {
-		return (Map<Id, Link>) this.getLocations();
+	public Map<Id, LinkImpl> getLinks() {
+		return (Map<Id, LinkImpl>) this.getLocations();
 	}
 
-	public Link getLink(final String linkId) {
+	public LinkImpl getLink(final String linkId) {
 		IdImpl i = new IdImpl(linkId);
-		return (Link) this.locations.get(i);
+		return (LinkImpl) this.locations.get(i);
 	}
 
-	public Link getLink(final Id linkId) {
-		return (Link) this.locations.get(linkId);
+	public LinkImpl getLink(final Id linkId) {
+		return (LinkImpl) this.locations.get(linkId);
 	}
 
 	public void setFactory(NetworkFactory networkFactory) {

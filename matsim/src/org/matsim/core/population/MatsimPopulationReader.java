@@ -30,8 +30,8 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.knowledges.Knowledges;
@@ -53,7 +53,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V4 = "plans_v4.dtd";
 	
 	private final BasicPopulation plans;
-	private final Network network;
+	private final NetworkLayer network;
 	private final ActivityFacilities facilities;
 	private MatsimXmlParser delegate = null;
 	private Knowledges knowledges;
@@ -66,7 +66,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * @param plans The data structure where to store the persons with their plans.
 	 * @param network The network the plans are linked to, e.g. for routes, locations, ...
 	 */
-	public MatsimPopulationReader(final BasicPopulation plans, final Network network) {
+	public MatsimPopulationReader(final BasicPopulation plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 		this.facilities = (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE);

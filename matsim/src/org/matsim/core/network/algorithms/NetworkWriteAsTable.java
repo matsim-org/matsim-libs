@@ -23,10 +23,10 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -97,7 +97,7 @@ public class NetworkWriteAsTable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Network network) {
+	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		double capperiod = network.getCapacityPeriod();
@@ -105,13 +105,13 @@ public class NetworkWriteAsTable {
 		System.out.println("      capperiod = " + capperiod);
 
 		try {
-			for (Node n : network.getNodes().values()) {
+			for (NodeImpl n : network.getNodes().values()) {
 				this.out_n.write(n.getId() + "\t" + n.getCoord().getX() + "\t" + n.getCoord().getY() + "\n");
 				this.out_n.flush();
 			}
-			for (Link l : network.getLinks().values()) {
-				Node f = l.getFromNode();
-				Node t = l.getToNode();
+			for (LinkImpl l : network.getLinks().values()) {
+				NodeImpl f = l.getFromNode();
+				NodeImpl t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
 				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t1\n");

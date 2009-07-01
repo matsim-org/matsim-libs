@@ -25,15 +25,15 @@ import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * Adds additional speed restrictions to a MATSim {@link Network network} created
+ * Adds additional speed restrictions to a MATSim {@link NetworkLayer network} created
  * by {@link NetworkReaderTeleatlas}. The input speed restriction DBF file is based on
  * <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
  * document version Final v1.0, June 2007</strong>.
@@ -63,7 +63,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * To add speed restrictions to a Tele Atlas MultiNet {@link Network network}.
+	 * To add speed restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
 	 * 
 	 * @param srDbfFileName Tele Atlas MultiNet speed restriction DBF file
 	 */
@@ -78,7 +78,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reading and assigning speed restrictions to the {@link Link links} of a {@link Network network}.
+	 * Reading and assigning speed restrictions to the {@link LinkImpl links} of a {@link NetworkLayer network}.
 	 * 
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet speed restriction DBF file:
 	 * <ul>
@@ -112,7 +112,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	 * @param network
 	 * @throws Exception
 	 */
-	public void run(final Network network) throws Exception {
+	public void run(final NetworkLayer network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 		FileChannel in = new FileInputStream(this.srDbfFileName).getChannel();
 		DbaseFileReader r = new DbaseFileReader(in,true);
@@ -148,8 +148,8 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 				String id = entries[srIdNameIndex].toString();
 				if (valdir == 1) {
 					// Valid in Both Directions
-					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
-					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					LinkImpl ftLink = network.getLinks().get(new IdImpl(id+"FT"));
+					LinkImpl tfLink = network.getLinks().get(new IdImpl(id+"TF"));
 					if ((ftLink == null) || (tfLink == null)) { log.trace("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -160,7 +160,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 				}
 				else if (valdir == 2) {
 					// Valid Only in Positive Direction
-					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
+					LinkImpl ftLink = network.getLinks().get(new IdImpl(id+"FT"));
 					if (ftLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -170,7 +170,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 				}
 				else if (valdir == 3) {
 					// Valid Only in Negative Direction
-					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					LinkImpl tfLink = network.getLinks().get(new IdImpl(id+"TF"));
 					if (tfLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;

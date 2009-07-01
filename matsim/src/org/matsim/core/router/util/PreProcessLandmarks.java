@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 /**
  * Pre-processes a given network, gathering information which can be used by
@@ -47,7 +47,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 	private final int landmarkCount;
 
-	private Node[] landmarks;
+	private NodeImpl[] landmarks;
 
 	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
 
@@ -89,7 +89,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	@Override
-	public void run(final Network network) {
+	public void run(final NetworkLayer network) {
 		super.run(network);
 
 		log.info("Putting landmarks on network...");
@@ -107,12 +107,12 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			expandLandmark(this.landmarks[i], i);
 		}
 
-		for (Node node : network.getNodes().values()) {
+		for (NodeImpl node : network.getNodes().values()) {
 			LandmarksData r = (LandmarksData) getNodeData(node);
 			r.updateMinMaxTravelTimes();
 		}
 
-		for (Node node : network.getNodes().values()) {
+		for (NodeImpl node : network.getNodes().values()) {
 			LandmarksData r = (LandmarksData) getNodeData(node);
 			for (int i = 0; i < this.landmarks.length; i++) {
 				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
@@ -124,15 +124,15 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		log.info("done in " + (System.currentTimeMillis() - now) + " ms");
 	}
 
-	private void expandLandmark(final Node startNode, final int landmarkIndex) {
+	private void expandLandmark(final NodeImpl startNode, final int landmarkIndex) {
 		LandmarksTravelTimeComparator comparator = new LandmarksTravelTimeComparator(this.nodeData, landmarkIndex);
-		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100, comparator);
+		PriorityQueue<NodeImpl> pendingNodes = new PriorityQueue<NodeImpl>(100, comparator);
 		LandmarksData role = (LandmarksData) getNodeData(startNode);
 		role.setToLandmarkTravelTime(landmarkIndex, 0.0);
 		role.setFromLandmarkTravelTime(landmarkIndex, 0.0);
 		pendingNodes.add(startNode);
 		while (pendingNodes.isEmpty() == false) {
-			Node node = pendingNodes.poll();
+			NodeImpl node = pendingNodes.poll();
 			double toTravTime = ((LandmarksData) getNodeData(node)).getToLandmarkTravelTime(landmarkIndex);
 			expandLinks(landmarkIndex, pendingNodes, node.getInLinks().values(), toTravTime, false);
 			double fromTravTime = ((LandmarksData) getNodeData(node)).getFromLandmarkTravelTime(landmarkIndex);
@@ -140,13 +140,13 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 	}
 
-	private void expandLinks(final int landmarkIndex, final PriorityQueue<Node> nodes,
-			final Collection<? extends Link> links, final double travTime, final boolean expandFromLandmark) {
+	private void expandLinks(final int landmarkIndex, final PriorityQueue<NodeImpl> nodes,
+			final Collection<? extends LinkImpl> links, final double travTime, final boolean expandFromLandmark) {
 		LandmarksData role;
 		Iterator<?> iter = links.iterator();
 		while (iter.hasNext()) {
-			Link l = (Link) iter.next();
-			Node n;
+			LinkImpl l = (LinkImpl) iter.next();
+			NodeImpl n;
 			if (expandFromLandmark == true) {
 				n = l.getToNode();
 			} else {
@@ -169,12 +169,12 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 	}
 
-	public Node[] getLandmarks() {
+	public NodeImpl[] getLandmarks() {
 		return this.landmarks.clone();
 	}
 
 	@Override
-	public DeadEndData getNodeData(final Node n) {
+	public DeadEndData getNodeData(final NodeImpl n) {
 		DeadEndData r = this.nodeData.get(n);
 		if (r == null) {
 			r = new LandmarksData(this.landmarkCount);
@@ -247,16 +247,16 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 *
 	 * @author lnicolas
 	 */
-	static class LandmarksTravelTimeComparator implements Comparator<Node> {
-		private final Map<Node, DeadEndData> roleData;
+	static class LandmarksTravelTimeComparator implements Comparator<NodeImpl> {
+		private final Map<NodeImpl, DeadEndData> roleData;
 		private final int landmarkIndex;
 
-		protected LandmarksTravelTimeComparator(final Map<Node, DeadEndData> roleData, final int landmarkIndex) {
+		protected LandmarksTravelTimeComparator(final Map<NodeImpl, DeadEndData> roleData, final int landmarkIndex) {
 			this.roleData = roleData;
 			this.landmarkIndex = landmarkIndex;
 		}
 
-		public int compare(final Node n1, final Node n2) {
+		public int compare(final NodeImpl n1, final NodeImpl n2) {
 
 			double c1 = ((LandmarksData) this.roleData.get(n1)).getToLandmarkTravelTime(this.landmarkIndex);
 			double c2 = ((LandmarksData) this.roleData.get(n2)).getToLandmarkTravelTime(this.landmarkIndex);

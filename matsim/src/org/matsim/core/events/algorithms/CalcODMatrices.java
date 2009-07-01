@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -38,7 +38,7 @@ import org.matsim.world.ZoneLayer;
 
 public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler {
 
-	private final Network network;
+	private final NetworkLayer network;
 	private final ZoneLayer tvzLayer;
 	private final TreeMap<Id, Location> agents = new TreeMap<Id, Location>(); // <AgentID, StartLoc>
 	private final TreeMap<Id, Double> agentsTime = new TreeMap<Id, Double>();
@@ -47,7 +47,7 @@ public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgent
 	private double maxTime = Double.POSITIVE_INFINITY;//Integer.MAX_VALUE;
 	public int counter = 0;
 
-	public CalcODMatrices(final Network network, final ZoneLayer tvzLayer, final Matrix matrix) {
+	public CalcODMatrices(final NetworkLayer network, final ZoneLayer tvzLayer, final Matrix matrix) {
 		this.network = network;
 		this.tvzLayer = tvzLayer;
 		this.matrix = matrix;
@@ -107,7 +107,7 @@ public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgent
 	}
 
 	private Location getLocation(final Id linkId) {
-		Link link = this.network.getLinks().get(linkId);
+		LinkImpl link = this.network.getLinks().get(linkId);
 
 		ArrayList<Location> locs = this.tvzLayer.getNearestLocations(link.getCoord(), null);
 		if (locs.size() > 0) {

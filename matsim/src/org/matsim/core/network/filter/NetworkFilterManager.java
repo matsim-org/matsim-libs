@@ -24,9 +24,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 /**
  * Add several filter instances to this class and create a new 
@@ -40,13 +40,13 @@ public class NetworkFilterManager {
 	private static final Logger log = Logger
 			.getLogger(NetworkFilterManager.class);
 	
-	private final BasicNetwork<Node, Link> network;
+	private final BasicNetwork<NodeImpl, LinkImpl> network;
 	
 	private List<NetworkLinkFilter> linkFilters;
 	
 	private List<NetworkNodeFilter> nodeFilters;
 	
-	public NetworkFilterManager(final BasicNetwork<Node, Link> net) {
+	public NetworkFilterManager(final BasicNetwork<NodeImpl, LinkImpl> net) {
 		this.network = net;
 		this.linkFilters = new ArrayList<NetworkLinkFilter>();
 		this.nodeFilters = new ArrayList<NetworkNodeFilter>();
@@ -64,13 +64,13 @@ public class NetworkFilterManager {
 	 * Call this method to filter the network.
 	 * @return
 	 */
-	public BasicNetwork<Node, Link> applyFilters() {
+	public BasicNetwork<NodeImpl, LinkImpl> applyFilters() {
 		log.info("applying filters to network...");
 		int nodeCount = 0;
 		int linkCount = 0;
-		BasicNetwork<Node, Link> net = new NetworkLayer();
+		BasicNetwork<NodeImpl, LinkImpl> net = new NetworkLayer();
 		if (!this.nodeFilters.isEmpty()) {
-			for (Node n : this.network.getNodes().values()) {
+			for (NodeImpl n : this.network.getNodes().values()) {
 				boolean add = true;
 				for (NetworkNodeFilter f : nodeFilters) {
 					if (!f.judgeNode(n)) {
@@ -85,7 +85,7 @@ public class NetworkFilterManager {
 			}
 		}
 		if (!this.linkFilters.isEmpty()) {
-			for (Link l : this.network.getLinks().values()) {
+			for (LinkImpl l : this.network.getLinks().values()) {
 				boolean add = true;
 				for (NetworkLinkFilter f : linkFilters) {
 					if (!f.judgeLink(l)) {
@@ -94,8 +94,8 @@ public class NetworkFilterManager {
 					}
 				}
 				if (add) {
-					Node from = l.getFromNode();
-					Node to = l.getToNode();
+					NodeImpl from = l.getFromNode();
+					NodeImpl to = l.getToNode();
 					if (!net.getNodes().containsKey(from.getId())) {
 						net.getNodes().put(from.getId(), from);
 					}

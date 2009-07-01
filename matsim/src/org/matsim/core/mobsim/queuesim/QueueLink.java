@@ -31,11 +31,11 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.signalsystems.CalculateAngle;
@@ -111,7 +111,7 @@ public class QueueLink {
 	/**
 	 * The Link instance containing the data
 	 */
-	private final Link link;
+	private final LinkImpl link;
 	/**
 	 * Reference to the QueueNetwork instance this link belongs to.
 	 */
@@ -153,7 +153,7 @@ public class QueueLink {
 	 * @param toNode
 	 * @see QueueLink#createLanes(List)
 	 */
-	public QueueLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) {
+	public QueueLink(final LinkImpl l, final QueueNetwork queueNetwork, final QueueNode toNode) {
 		this.link = l;
 		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
@@ -243,10 +243,10 @@ public class QueueLink {
 	}
 	
 	private void findLayout(){
-		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
+		SortedMap<Double, LinkImpl> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
 		for (QueueLane lane : this.queueLanes) {
 			int laneNumber = 1;
-			for (Link link : result.values()) {
+			for (LinkImpl link : result.values()) {
 				if (lane.getDestinationLinks().contains(link)){
 					lane.setVisualizerLane(laneNumber);
 					break;
@@ -257,7 +257,7 @@ public class QueueLink {
 	}
 
 	private void addUTurn() {
-		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
+		for (LinkImpl outLink : this.getLink().getToNode().getOutLinks().values()) {
 			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
 				QueueLane tempPseudoLink = null;
 				for (QueueLane pseudoLink : this.queueLanes) {
@@ -432,7 +432,7 @@ public class QueueLink {
 		return count;
 	}
 
-	public Link getLink() {
+	public LinkImpl getLink() {
 		return this.link;
 	}
 	

@@ -21,10 +21,10 @@
 package org.matsim.core.network.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -42,15 +42,15 @@ public class NetworkFalsifier {
 		this.distance = distance;
 	}
 
-	public void run(Network network) {
+	public void run(NetworkLayer network) {
 		double maxDistance = this.distance * 2.0;
-		for (Node node : network.getNodes().values()) {
+		for (NodeImpl node : network.getNodes().values()) {
 			Coord coord = node.getCoord();
 			coord.setXY(coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) *  maxDistance,
 					coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * maxDistance);
 		}
 
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			Coord fromCoord = link.getFromNode().getCoord();
 			Coord toCoord = link.getToNode().getCoord();
 			link.setLength(CoordUtils.calcDistance(fromCoord, toCoord));

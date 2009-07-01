@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -61,7 +61,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
-	public PlanSimplifyForDebug(final Network network) {
+	public PlanSimplifyForDebug(final NetworkLayer network) {
 		this.homeActs = new HashSet<String>();
 		// this.homeActs.add("h0.5");
 

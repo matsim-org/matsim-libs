@@ -26,10 +26,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.NetworkBuilder;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.api.experimental.network.NetworkBuilder;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.NodeNetworkRouteFactory;
@@ -45,9 +42,9 @@ public class NetworkFactory implements Serializable, NetworkBuilder {
 	private final Map<TransportMode, RouteFactory> routeFactories = new HashMap<TransportMode, RouteFactory>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 
-	private Network network;
+	private NetworkLayer network;
 
-	public NetworkFactory(Network network) {
+	public NetworkFactory(NetworkLayer network) {
 		this();
 		this.network = network;
 	}
@@ -58,26 +55,26 @@ public class NetworkFactory implements Serializable, NetworkBuilder {
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 
-	public Node createNode(final Id id){
+	public NodeImpl createNode(final Id id){
 		return new NodeImpl(id);
 	}
 	
 	/**
 	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
 	 */
-	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
+	public LinkImpl createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
 		return this.linkFactory.createLink(id, this.network.getNode(fromNodeId), this.network.getNode(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
 	}
 	/**
 	 * @deprecated use createNode(Id id) instead and set the rest yourself
 	 */
 	@Deprecated
-	public Node createNode(final Id id, final Coord coord, final String type) {
+	public NodeImpl createNode(final Id id, final Coord coord, final String type) {
 		return new NodeImpl(id, coord, type);
 	}
 
-	public Link createLink(final Id id, final Node from, final Node to,
-			final Network network, final double length, final double freespeedTT, final double capacity,
+	public LinkImpl createLink(final Id id, final NodeImpl from, final NodeImpl to,
+			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
@@ -90,7 +87,7 @@ public class NetworkFactory implements Serializable, NetworkBuilder {
 	 *
 	 * @see #setRouteFactory(TransportMode, RouteFactory)
 	 */
-	public Route createRoute(final TransportMode mode, final Link startLink, final Link endLink) {
+	public Route createRoute(final TransportMode mode, final LinkImpl startLink, final LinkImpl endLink) {
 		RouteFactory factory = this.routeFactories.get(mode);
 		if (factory == null) {
 			factory = this.defaultFactory;

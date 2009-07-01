@@ -20,19 +20,19 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
 public class CapacityBasedWidthCalculator implements WidthCalculator {
 
 	private final double widthCoefficient;
 
-	public CapacityBasedWidthCalculator(final Network network, final Double coef) {
+	public CapacityBasedWidthCalculator(final NetworkLayer network, final Double coef) {
 		this.widthCoefficient = coef;
 	}
 
-	public double getWidth(final Link link) {
+	public double getWidth(final LinkImpl link) {
 		return link.getCapacity(Time.UNDEFINED_TIME) * this.widthCoefficient;
 	}
 }

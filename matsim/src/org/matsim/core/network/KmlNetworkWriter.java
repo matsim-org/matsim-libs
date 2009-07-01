@@ -30,9 +30,6 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
@@ -45,7 +42,7 @@ public class KmlNetworkWriter {
 
 	private static final Logger log = Logger.getLogger(KmlNetworkWriter.class);
 
-	private Network network;
+	private NetworkLayer network;
 
 	private MatsimKmlStyleFactory styleFactory;
 
@@ -57,7 +54,7 @@ public class KmlNetworkWriter {
 
 	private StyleType networkNodeStyle;
 
-	public KmlNetworkWriter(final Network network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
+	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform);
@@ -74,7 +71,7 @@ public class KmlNetworkWriter {
 		FolderType nodeFolder = kmlObjectFactory.createFolderType();
 		nodeFolder.setName("Nodes");
 //		linkFolder.addStyle(this.networkNodeStyle);
-		for (Node n : this.network.getNodes().values()) {
+		for (NodeImpl n : this.network.getNodes().values()) {
 			
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(n, this.networkNodeStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
@@ -91,7 +88,7 @@ public class KmlNetworkWriter {
 		FolderType linkFolder = kmlObjectFactory.createFolderType();
 		linkFolder.setName("Links");
 //		linkFolder.addStyle(this.networkLinkStyle);
-		for (Link l : this.network.getLinks().values()) {
+		for (LinkImpl l : this.network.getLinks().values()) {
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(l, this.networkLinkStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));

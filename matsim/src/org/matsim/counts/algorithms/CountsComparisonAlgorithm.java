@@ -26,11 +26,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
@@ -59,17 +59,17 @@ public class CountsComparisonAlgorithm {
 	 */
 	private final List<CountSimComparison> countSimComp;
 
-	private Node distanceFilterNode = null;
+	private NodeImpl distanceFilterNode = null;
 
 	private Double distanceFilter = null;
 
-	private final Network network;
+	private final NetworkLayer network;
 
 	private double countsScaleFactor;
 
 	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
 
-	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final Network network) {
+	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final NetworkLayer network) {
 		this.linkStats = linkStats;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();
@@ -123,7 +123,7 @@ public class CountsComparisonAlgorithm {
 		if ((this.distanceFilterNode == null) || (this.distanceFilter == null)) {
 			return true;
 		}
-		Link l = this.network.getLink(linkid);
+		LinkImpl l = this.network.getLink(linkid);
 		if (l == null) {
 			log.warn("Cannot find requested link: " + linkid.toString());
 			return false;

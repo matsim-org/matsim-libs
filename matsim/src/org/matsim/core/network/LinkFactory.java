@@ -23,12 +23,9 @@ package org.matsim.core.network;
 import java.io.Serializable;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 
 public interface LinkFactory extends Serializable{
 	
-	public Link createLink(Id id, Node from, Node to, Network network, double length, double freespeedTravelTime, double capacity, double nOfLanes);
+	public LinkImpl createLink(Id id, NodeImpl from, NodeImpl to, NetworkLayer network, double length, double freespeedTravelTime, double capacity, double nOfLanes);
 
 }

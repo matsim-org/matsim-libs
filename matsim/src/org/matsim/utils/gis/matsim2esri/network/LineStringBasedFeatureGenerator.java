@@ -26,7 +26,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.*;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class LineStringBasedFeatureGenerator implements FeatureGenerator{
@@ -71,7 +71,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 	}
 
 
-	public Feature getFeature(final Link link) {
+	public Feature getFeature(final LinkImpl link) {
 		double width = this.widthCalculator.getWidth(link);
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});

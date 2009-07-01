@@ -31,11 +31,11 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -68,14 +68,14 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	private final String mpDbfFileName; // teleatlas maneuver paths dbf file name
 	
 	/**
-	 * option flag: if set, expanded {@link Node nodes} (nodes that contains maneuver restrictions)
-	 * will not include new virtual {@link Link links} providing a u-turn maneuver at the
+	 * option flag: if set, expanded {@link NodeImpl nodes} (nodes that contains maneuver restrictions)
+	 * will not include new virtual {@link LinkImpl links} providing a u-turn maneuver at the
 	 * junction.
 	 */
 	public boolean removeUTurns = false;
 
 	/**
-	 * option parameter: defines the radius how much a {@link Node node} will be expanded.
+	 * option parameter: defines the radius how much a {@link NodeImpl node} will be expanded.
 	 * <p><b>Default:</b> <code>0.000030</code> (appropriate for world coordinate system WGS84)</p>
 	 * 
 	 * @see NetworkExpandNode
@@ -83,7 +83,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	public double expansionRadius = 0.000030; // WGS84
 
 	/**
-	 * option parameter: defines the offset of a in- and out-link pair of an expanded {@link Node node}.
+	 * option parameter: defines the offset of a in- and out-link pair of an expanded {@link NodeImpl node}.
 	 * <p><b>Default:</b> <code>0.000005</code> (appropriate for world coordinate system WGS84)</p>
 	 * 
 	 * @see NetworkExpandNode
@@ -120,7 +120,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reading and assigning (expanding {@link Node nodes}) maneuver restrictions to the {@link NetworkLayer network}.
+	 * Reading and assigning (expanding {@link NodeImpl nodes}) maneuver restrictions to the {@link NetworkLayer network}.
 	 * 
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet maneuver Shape file:
 	 * <ul>
@@ -149,7 +149,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	 *   <li>Maneuver restriction sequences that contain links that are not incident to the given
 	 *   junction are ignored</li>
 	 *   <li>Maneuver restrictions will be modelled in the natwork topology by expanding
-	 *   {@link Node nodes} with {@link NetworkExpandNode node expanding procedure}.</li>
+	 *   {@link NodeImpl nodes} with {@link NetworkExpandNode node expanding procedure}.</li>
 	 * </ul></p>
 	 * 
 	 * @param network MATSim {@link NetworkLayer network} created by {@link NetworkReaderTeleatlas}.
@@ -234,7 +234,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 			if (network.getNode(nodeId) == null) { log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
 			else {
 				// node found
-				Node n = network.getNode(nodeId);
+				NodeImpl n = network.getNode(nodeId);
 				// init maneuver matrix
 				// TreeMap<fromLinkId,TreeMap<toLinkId,turnAllowed>>
 				TreeMap<Id,TreeMap<Id,Boolean>> mmatrix = new TreeMap<Id, TreeMap<Id,Boolean>>();
@@ -250,9 +250,9 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 					// go through each other element (target link of the maneuver) of the sequence by sequence number
 					for (Id otherLinkId : mSequence.values()) {
 						// get the start link and the target link of the maneuver
-						Link inLink = n.getInLinks().get(new IdImpl(firstLinkid+"FT"));
+						LinkImpl inLink = n.getInLinks().get(new IdImpl(firstLinkid+"FT"));
 						if (inLink == null) { inLink = n.getInLinks().get(new IdImpl(firstLinkid+"TF")); }
-						Link outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"FT"));
+						LinkImpl outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"FT"));
 						if (outLink == null) { outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"TF")); }
 						if ((inLink != null) && (outLink != null)) {
 							// start and target link found and they are incident to the given node
@@ -321,7 +321,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 					}
 				}
 				// expand the node
-				Tuple<ArrayList<Node>,ArrayList<Link>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
+				Tuple<ArrayList<NodeImpl>,ArrayList<LinkImpl>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
 				virtualNodesCnt += t.getFirst().size();
 				virtualLinksCnt += t.getSecond().size();
 				nodesAssignedCnt++;

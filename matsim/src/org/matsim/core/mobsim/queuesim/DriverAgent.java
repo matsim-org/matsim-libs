@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -38,14 +38,14 @@ public interface DriverAgent {
 	 * internally, e.g. in legEnds().
 	 */
 	
-	public Link getDestinationLink();
+	public LinkImpl getDestinationLink();
 	
 	/**
 	 * Returns the next link the vehicle will drive along.
 	 *
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
-	public Link chooseNextLink();
+	public LinkImpl chooseNextLink();
 
 	/**
 	 * Informs the agent that it arrived at the destination of the current leg.
@@ -64,7 +64,7 @@ public interface DriverAgent {
 	 */
 	public void activityEnds(final double now);
 	
-	public void teleportToLink(final Link link);
+	public void teleportToLink(final LinkImpl link);
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 

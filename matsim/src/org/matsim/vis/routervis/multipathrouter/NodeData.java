@@ -27,13 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NodeImpl;
 
 public class NodeData {
-	private final Node node;
+	private final NodeImpl node;
 	private double cost;
 	private double time;
-	private Node fromMatSimNode;
+	private NodeImpl fromMatSimNode;
 	private int iterationID;
 	private double trace;
 	private NodeData prev = null;
@@ -42,7 +42,7 @@ public class NodeData {
 	private int shadowID = Integer.MIN_VALUE;
 	private double prob;
 	
-	public NodeData(final Node n,final  boolean isShadow) {
+	public NodeData(final NodeImpl n,final  boolean isShadow) {
 		this.node = n;
 		this.cost = Double.POSITIVE_INFINITY;
 		this.shadowNodes = new HashMap<Integer,NodeData>();
@@ -61,7 +61,7 @@ public class NodeData {
 	}
 
 
-	public Node getMatsimNode() {
+	public NodeImpl getMatsimNode() {
 		return this.node;
 	}
 	
@@ -128,7 +128,7 @@ public class NodeData {
 		
 	}
 	
-	public boolean isUTurn(final Node n) {
+	public boolean isUTurn(final NodeImpl n) {
 		return this.fromMatSimNode == n ? true : false;
 	}
 	

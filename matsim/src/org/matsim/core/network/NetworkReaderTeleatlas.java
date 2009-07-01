@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.BasicLinkImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -188,9 +187,9 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	 *   <li><code>6: Internal Data Set Border Crossing</code></li>
 	 *   </ul>
 	 * </ul></p>
-	 * The MATSim {@link Node#type} is set as
+	 * The MATSim {@link NodeImpl#type} is set as
 	 * <pre>
-	 * <code>{@link Node#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
+	 * <code>{@link NodeImpl#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
 	 * </pre>
 	 * 
 	 * @throws
@@ -312,8 +311,8 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 			double speed = Double.parseDouble(f.getAttribute(LINK_SPEED_NAME).toString());
 			double lanes = Double.parseDouble(f.getAttribute(LINK_LANES_NAME).toString());
 			// ignore link where from node or to node is missing
-			Node fNode = network.getNode(fromJunctionId);
-			Node tNode = network.getNode(toJunctionId);
+			NodeImpl fNode = network.getNode(fromJunctionId);
+			NodeImpl tNode = network.getNode(toJunctionId);
 			if ((fNode == null) || (tNode == null)) { log.warn("  linkId="+id.toString()+": at least one of the two junctions do not exist. Ignoring and proceeding anyway..."); ignore = true; }
 			// ignore link that is not a 'Road Element' (4110) or a 'Ferry Connection Element' (4130)
 			// There are 'Address Area Boundary Element' (4165) links that will be ignored

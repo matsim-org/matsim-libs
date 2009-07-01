@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import java.io.IOException;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
@@ -55,7 +55,7 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 
 		// links
 		this.writer.write("\t<links>\n");
-		for (Link link : this.scheme.getLinks()) {
+		for (LinkImpl link : this.scheme.getLinks()) {
 			this.writer.write("\t\t<link id=\"" + link.getId().toString() + "\" />\n");
 		}
 		this.writer.write("\t</links>\n");

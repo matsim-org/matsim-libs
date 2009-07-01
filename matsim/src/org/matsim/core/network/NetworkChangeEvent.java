@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
 
 /**
  * A container class for events that represent time-variant changes for link
@@ -69,9 +68,9 @@ public class NetworkChangeEvent {
 	// private members
 	// ========================================================================
 
-	private List<Link> links = new ArrayList<Link>();
+	private List<LinkImpl> links = new ArrayList<LinkImpl>();
 	
-	private List<Link> unmodifiableLinks = Collections.unmodifiableList(links);
+	private List<LinkImpl> unmodifiableLinks = Collections.unmodifiableList(links);
 
 	private double startTime;
 
@@ -112,7 +111,7 @@ public class NetworkChangeEvent {
 	 * 
 	 * @param link a link that is affected by this event.
 	 */
-	public void addLink(Link link) {
+	public void addLink(LinkImpl link) {
 		links.add(link);
 	}
 	
@@ -120,7 +119,7 @@ public class NetworkChangeEvent {
 	 * 
 	 * @param links a collection of links affected by this event.
 	 */
-	public void addLinks(Collection<Link> links) {
+	public void addLinks(Collection<LinkImpl> links) {
 		links.addAll(links);
 	}
 	
@@ -128,7 +127,7 @@ public class NetworkChangeEvent {
 	 * 
 	 * @param link the link to remove.
 	 */
-	public void removeLink(Link link) {
+	public void removeLink(LinkImpl link) {
 		links.remove(link);
 	}
 	
@@ -136,7 +135,7 @@ public class NetworkChangeEvent {
 	 * 
 	 * @return a read-only view of the links that are affected by this event.
 	 */
-	public Collection<Link> getLinks() {
+	public Collection<LinkImpl> getLinks() {
 		return unmodifiableLinks;
 	}
 

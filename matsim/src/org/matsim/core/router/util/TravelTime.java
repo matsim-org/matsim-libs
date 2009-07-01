@@ -20,7 +20,7 @@
 
 package org.matsim.core.router.util;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 
 /**
@@ -39,5 +39,5 @@ public interface TravelTime {
 	 * @return The time (in seconds) needed to travel over the link
 	 * 		<code>link</code>, departing at time <code>time</code>.
 	 */
-	public double getLinkTravelTime(Link link, double time);
+	public double getLinkTravelTime(LinkImpl link, double time);
 }

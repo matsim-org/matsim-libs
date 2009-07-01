@@ -29,9 +29,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -52,11 +49,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private final static String NODE = "node";
 	private final static String LINK = "link";
 
-	private final Network network;
+	private final NetworkLayer network;
 
 	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
-	public NetworkReaderMatsimV1(final Network network) {
+	public NetworkReaderMatsimV1(final NetworkLayer network) {
 		super();
 		this.network = network;
 	}
@@ -148,7 +145,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startNode(final Attributes atts) {
 		//TODO dg refactor network to support factory and remove cast
-		Node node = ((NetworkLayer)this.network).createNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		NodeImpl node = ((NetworkLayer)this.network).createNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
 		node.setType(atts.getValue("type"));
 		if (atts.getValue("origid") != null) {
 			node.setOrigId(atts.getValue("origid"));
@@ -157,7 +154,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startLink(final Attributes atts) {
 		//TODO dg refactor network to support factory/builder and remove cast
-		Link l = ((NetworkLayer)this.network).createLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
+		LinkImpl l = ((NetworkLayer)this.network).createLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
 				Double.parseDouble(atts.getValue("length")), Double.parseDouble(atts.getValue("freespeed")), Double.parseDouble(atts.getValue("capacity")),
 				Double.parseDouble(atts.getValue("permlanes")));
 		l.setOrigId(atts.getValue("origid"));

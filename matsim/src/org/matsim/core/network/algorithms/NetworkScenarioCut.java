@@ -25,8 +25,8 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 public class NetworkScenarioCut {
 
@@ -45,13 +45,13 @@ public class NetworkScenarioCut {
 		this.maxY = max.getY();
 	}
 
-	public void run(final Network network) {
+	public void run(final NetworkLayer network) {
 		log.info("running module...");
 
-		TreeSet<Node> n_set = new TreeSet<Node>();
-		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
+		TreeSet<NodeImpl> n_set = new TreeSet<NodeImpl>();
+		Iterator<? extends NodeImpl> n_it = network.getNodes().values().iterator();
 		while (n_it.hasNext()) {
-			Node n = n_it.next();
+			NodeImpl n = n_it.next();
 			Coord coord = n.getCoord();
 			double x = coord.getX();
 			double y = coord.getY();
@@ -64,7 +64,7 @@ public class NetworkScenarioCut {
 		n_it = n_set.iterator();
 		int l_cnt = 0;
 		while (n_it.hasNext()) {
-			Node n = n_it.next();
+			NodeImpl n = n_it.next();
 			l_cnt += n.getIncidentLinks().size();
 			network.removeNode(n);
 		}

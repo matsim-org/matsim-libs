@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class Road extends SimUnit {
 
-	protected Link link;
+	protected LinkImpl link;
 
 	// see method enterRequest for a detailed description of variable 'gap'
 	private LinkedList<Double> gap;
@@ -78,7 +78,7 @@ public class Road extends SimUnit {
 	 */
 	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages = new LinkedList<DeadlockPreventionMessage>();
 
-	public Road(Scheduler scheduler, Link link) {
+	public Road(Scheduler scheduler, LinkImpl link) {
 		super(scheduler);
 		this.link = link;
 
@@ -290,7 +290,7 @@ public class Road extends SimUnit {
 		noOfCarsPromisedToEnterRoad++;
 	}
 
-	public Link getLink() {
+	public LinkImpl getLink() {
 		return link;
 	}
 

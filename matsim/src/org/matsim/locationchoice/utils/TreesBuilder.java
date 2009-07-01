@@ -10,10 +10,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 public class TreesBuilder {
 	
@@ -58,7 +58,7 @@ public class TreesBuilder {
 		
 		boolean regionalScenario = false;
 		double radius = 0.0;
-		Node centerNode = null; 
+		NodeImpl centerNode = null; 
 		
 		if (!Gbl.getConfig().locationchoice().getCenterNode().equals("null") &&
 				!Gbl.getConfig().locationchoice().getRadius().equals("null")) {

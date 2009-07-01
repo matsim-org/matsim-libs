@@ -23,7 +23,7 @@ package org.matsim.transitSchedule;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
@@ -34,7 +34,7 @@ public class TransitStopFacility implements Facility {
 
 	private final Id id;
 	private final Coord coord;
-	private Link link = null;
+	private LinkImpl link = null;
 	private final boolean isBlockingLane;
 
 	public TransitStopFacility(final Id id, final Coord coord) {
@@ -47,11 +47,11 @@ public class TransitStopFacility implements Facility {
 		this.isBlockingLane = isBlockingLane;
 	}
 
-	public Link getLink() {
+	public LinkImpl getLink() {
 		return this.link;
 	}
 
-	public void setLink(final Link link) {
+	public void setLink(final LinkImpl link) {
 		this.link = link;
 	}
 

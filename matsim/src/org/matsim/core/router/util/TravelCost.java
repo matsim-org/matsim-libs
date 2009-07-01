@@ -20,7 +20,7 @@
 
 package org.matsim.core.router.util;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 
 /**
@@ -37,6 +37,6 @@ public interface TravelCost {
 	 * @param time The departure time (in seconds since 00:00) at the beginning of the link for which the cost is calculated.
 	 * @return The costs to travel over the link <code>link</code>, departing at time <code>time</code>.
 	 */
-	public double getLinkTravelCost(Link link, double time);
+	public double getLinkTravelCost(LinkImpl link, double time);
 
 }

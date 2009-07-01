@@ -21,9 +21,9 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicRouteImpl;
+import org.matsim.core.network.LinkImpl;
 
 /**
  * Default, abstract implementation of the {@link Route}-interface.
@@ -32,8 +32,8 @@ import org.matsim.core.basic.v01.BasicRouteImpl;
  */
 public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 
-	private Link startLink = null;
-	private Link endLink = null;
+	private LinkImpl startLink = null;
+	private LinkImpl endLink = null;
 	
 	/**
 	 * This constructor is only needed for backwards compatibility reasons and thus is
@@ -44,25 +44,25 @@ public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 	protected AbstractRoute(){
 	}
 	
-	public AbstractRoute(Link startLink, Link endLink) {
+	public AbstractRoute(LinkImpl startLink, LinkImpl endLink) {
 		super((startLink == null ? null : startLink.getId()), (endLink == null ? null : endLink.getId()));
 		this.startLink = startLink;
 		this.endLink = endLink;
 	}
 
-	public Link getEndLink() {
+	public LinkImpl getEndLink() {
 		return this.endLink;
 	}
 
-	public Link getStartLink() {
+	public LinkImpl getStartLink() {
 		return this.startLink;
 	}
 
-	public void setEndLink(final Link link) {
+	public void setEndLink(final LinkImpl link) {
 		this.endLink = link;
 	}
 
-	public void setStartLink(final Link link) {
+	public void setStartLink(final LinkImpl link) {
 		this.startLink = link;
 	}
 

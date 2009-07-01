@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;
@@ -117,7 +117,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private VDSSign vdsSign;
 
-	private ArrayList<Node> currentRouteNodes;
+	private ArrayList<NodeImpl> currentRouteNodes;
 
 	private NetworkLayer network;
 
@@ -146,11 +146,11 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.vdsSign = new VDSSign();
 		}
 		else if (name.equalsIgnoreCase(MAINROUTE) || name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			this.currentRouteNodes = new ArrayList<Node>();
+			this.currentRouteNodes = new ArrayList<NodeImpl>();
 		}
 		else if (name.equalsIgnoreCase(NODE)) {
 			String id = atts.getValue(ID);
-			Node node = this.network.getNode(id);
+			NodeImpl node = this.network.getNode(id);
 			if (node != null) {
 				this.currentRouteNodes.add(node);
 			}
@@ -258,7 +258,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.vdsSign.setDeadZoneSystemOutput(Double.parseDouble(content2));
 		}
 		else if (name.equalsIgnoreCase(SIGNLINK)) {
-			Link l = this.network.getLink(content2);
+			LinkImpl l = this.network.getLink(content2);
 			if (l != null) {
 				this.vdsSign.setSignLink(l);
 			}
@@ -267,7 +267,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			}
 		}
 		else if (name.equalsIgnoreCase(DIRECTIONLINKS)) {
-			Link l = this.network.getLink(content2);
+			LinkImpl l = this.network.getLink(content2);
 			if (l != null) {
 				this.vdsSign.setDirectionLink(l);
 			}

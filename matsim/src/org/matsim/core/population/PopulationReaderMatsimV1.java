@@ -29,11 +29,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -58,7 +58,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private final static String ROUTE = "route";
 
 	private final BasicPopulation plans;
-	private final Network network;
+	private final NetworkLayer network;
 
 	private PersonImpl currperson = null;
 
@@ -71,7 +71,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private ActivityImpl prevAct = null;
 
-	public PopulationReaderMatsimV1(final BasicPopulation plans, final Network network) {
+	public PopulationReaderMatsimV1(final BasicPopulation plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 	}
@@ -184,7 +184,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startAct(final Attributes atts) {
-		Link link = null;
+		LinkImpl link = null;
 		Coord coord = null;
 		ActivityImpl act = null;
 		if (atts.getValue("link") != null) {

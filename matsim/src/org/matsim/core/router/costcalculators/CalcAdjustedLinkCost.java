@@ -20,8 +20,8 @@
 
 package org.matsim.core.router.costcalculators;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelCost;
 
 /**
@@ -43,7 +43,7 @@ public class CalcAdjustedLinkCost implements TravelCost {
 		this.flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
 	}
 
-	public double getLinkTravelCost(final Link link, final double time) {
+	public double getLinkTravelCost(final LinkImpl link, final double time) {
 		double factor = (4000.0/3600.0*this.flowCapFactor - link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME))*0.1 + 1.0;
 		return this.baseCost.getLinkTravelCost(link, time) * factor;
 	}
