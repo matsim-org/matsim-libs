@@ -25,7 +25,7 @@ package playground.johannes.mobsim;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * @author illenberger
@@ -33,6 +33,6 @@ import org.matsim.core.api.population.Plan;
  */
 public interface OptionsFilter {
 
-	public Plan filterOptions(List<Plan> options);
+	public PlanImpl filterOptions(List<PlanImpl> options);
 	
 }

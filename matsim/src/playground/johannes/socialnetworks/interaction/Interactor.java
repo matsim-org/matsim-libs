@@ -23,7 +23,7 @@
  */
 package playground.johannes.socialnetworks.interaction;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * @author illenberger
@@ -31,6 +31,6 @@ import org.matsim.core.api.population.Person;
  */
 public interface Interactor {
 
-	public void interact(Person p1, Person p2, double startTime, double endTime);
+	public void interact(PersonImpl p1, PersonImpl p2, double startTime, double endTime);
 	
 }

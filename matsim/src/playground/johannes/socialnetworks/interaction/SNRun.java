@@ -26,12 +26,12 @@ package playground.johannes.socialnetworks.interaction;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.Edge;
 import playground.johannes.socialnetworks.graph.Graph;
@@ -48,7 +48,7 @@ import playground.johannes.socialnetworks.statistics.Distribution;
  */
 public class SNRun {
 
-	private static SocialNetwork<Person> socialnet;
+	private static SocialNetwork<PersonImpl> socialnet;
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -76,7 +76,7 @@ public class SNRun {
 		private InteractionHandler handler;
 		
 		public void notifyStartup(StartupEvent event) {
-			socialnet = new SocialNetwork<Person>(event.getControler().getPopulation());
+			socialnet = new SocialNetwork<PersonImpl>(event.getControler().getPopulation());
 			/*
 			 * Setup interaction mechanism.
 			 */

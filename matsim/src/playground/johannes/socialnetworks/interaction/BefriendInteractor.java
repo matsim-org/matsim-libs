@@ -25,9 +25,9 @@ package playground.johannes.socialnetworks.interaction;
 
 import java.util.Random;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
@@ -39,7 +39,7 @@ import playground.johannes.socialnetworks.graph.social.SocialTie;
  */
 public class BefriendInteractor implements Interactor, IterationStartsListener {
 
-	private SocialNetwork<Person> socialnet;
+	private SocialNetwork<PersonImpl> socialnet;
 	
 	private double tieProba;
 	
@@ -47,15 +47,15 @@ public class BefriendInteractor implements Interactor, IterationStartsListener {
 	
 	private int currentIteration;
 	
-	public BefriendInteractor(SocialNetwork<Person> socialnet, double p, long randomSeed) {
+	public BefriendInteractor(SocialNetwork<PersonImpl> socialnet, double p, long randomSeed) {
 		this.socialnet = socialnet;
 		this.tieProba = p;
 		random = new Random(randomSeed);
 	}
 	
-	public void interact(Person p1, Person p2, double startTime, double endTime) {
-		Ego<Person> e1 = socialnet.getEgo(p1);
-		Ego<Person> e2 = socialnet.getEgo(p2);
+	public void interact(PersonImpl p1, PersonImpl p2, double startTime, double endTime) {
+		Ego<PersonImpl> e1 = socialnet.getEgo(p1);
+		Ego<PersonImpl> e2 = socialnet.getEgo(p2);
 
 		SocialTie tie = socialnet.getEdge(e1, e2);
 		if(tie == null) {

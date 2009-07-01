@@ -25,8 +25,8 @@ package playground.johannes.mobsim;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
@@ -43,12 +43,12 @@ public class ReroutingStrategy implements IntradayStrategy {
 		this.agent = agent;
 	}
 
-	public Plan replan(double time) {
+	public PlanImpl replan(double time) {
 		if (allowReroute(time)) {
 			/*
 			 * TODO: Introduce standard clone() methods!
 			 */
-			Plan copy = new org.matsim.core.population.PlanImpl(agent.getPerson());
+			PlanImpl copy = new org.matsim.core.population.PlanImpl(agent.getPerson());
 			copy.copyPlan(agent.getPerson().getSelectedPlan());
 
 			NetworkRoute newRoute = getRoute(agent.getLink(), agent

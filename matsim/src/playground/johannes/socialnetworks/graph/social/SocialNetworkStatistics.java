@@ -25,7 +25,7 @@ package playground.johannes.socialnetworks.graph.social;
 
 
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 
 /**
@@ -35,14 +35,14 @@ import org.matsim.core.api.population.Person;
 public class SocialNetworkStatistics {
 	
 	@SuppressWarnings("unchecked")
-	public static double ageCorrelation(SocialNetwork<Person> g) {
+	public static double ageCorrelation(SocialNetwork<PersonImpl> g) {
 		double product = 0;
 		double sum = 0;
 		double squareSum = 0;
 
 		for (SocialTie e : g.getEdges()) {
-			Ego<Person> v1 = (Ego<Person>) e.getVertices().getFirst();
-			Ego<Person> v2 = (Ego<Person>) e.getVertices().getSecond();
+			Ego<PersonImpl> v1 = (Ego<PersonImpl>) e.getVertices().getFirst();
+			Ego<PersonImpl> v2 = (Ego<PersonImpl>) e.getVertices().getSecond();
 			int age1 = v1.getPerson().getAge();
 			int age2 = v2.getPerson().getAge();
 

@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -44,6 +43,7 @@ import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -55,9 +55,9 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 
 	private final static String TAB = "\t";
 	
-	private Map<Person, Double> departures;
+	private Map<PersonImpl, Double> departures;
 	
-	private Map<Person, Double> tripDurations;
+	private Map<PersonImpl, Double> tripDurations;
 	
 	private EUTRouterAnalyzer analyzer;
 	
@@ -95,7 +95,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			/*
 			 * Total average
 			 */
-			Collection<Person> population = event.getControler().getPopulation().getPersons().values();
+			Collection<PersonImpl> population = event.getControler().getPopulation().getPersons().values();
 			double avrTripDur = avrTripDuration(population, samplesAll);
 			double avrScore = avrSelectedScore(population);
 			dump(avrTripDur, avrScore);
@@ -108,7 +108,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			/*
 			 * Unguided agents
 			 */
-			Collection<Person> unguided = CollectionUtils.subtract(population, analyzer.getGuidedPersons());
+			Collection<PersonImpl> unguided = CollectionUtils.subtract(population, analyzer.getGuidedPersons());
 			avrTripDur = avrTripDuration(unguided, samplesUnguided);
 			avrScore = avrSelectedScore(unguided);
 			dump(avrTripDur, avrScore);
@@ -153,12 +153,12 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		
 	}
 
-	private double avrTripDuration(Collection<Person> persons, List<Double> samples) {
+	private double avrTripDuration(Collection<PersonImpl> persons, List<Double> samples) {
 		if(persons == null || persons.isEmpty())
 			return 0;
 		
 		double sum = 0;
-		for(Person p : persons) {
+		for(PersonImpl p : persons) {
 			Double d = tripDurations.get(p);
 			if(d != null) {// unfortunately this can happen -> within-day bug!
 				sum += d;
@@ -169,12 +169,12 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		return sum/(double)persons.size();
 	}
 	
-	private double avrSelectedScore(Collection<Person> persons) {
+	private double avrSelectedScore(Collection<PersonImpl> persons) {
 		if(persons == null || persons.isEmpty())
 			return 0;
 		
 		double sum = 0;
-		for(Person p : persons) {
+		for(PersonImpl p : persons) {
 			sum += p.getSelectedPlan().getScore().doubleValue();
 		}
 		
@@ -186,8 +186,8 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	}
 
 	public void reset(int iteration) {
-		departures = new HashMap<Person, Double>();
-		tripDurations = new HashMap<Person, Double>();
+		departures = new HashMap<PersonImpl, Double>();
+		tripDurations = new HashMap<PersonImpl, Double>();
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
@@ -272,7 +272,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		return sum/(double)samples.size();
 	}
 
-	public Map<Person, Double> getTripDurations() {
+	public Map<PersonImpl, Double> getTripDurations() {
 		return tripDurations;
 	}
 }

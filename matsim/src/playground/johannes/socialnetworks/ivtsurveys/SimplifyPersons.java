@@ -27,13 +27,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 
 /**
@@ -63,12 +63,12 @@ public class SimplifyPersons {
 		double maxY = centerY + halfradius;
 		
 		Population pop = data.getPopulation();
-		List<Person> remove = new LinkedList<Person>();
-		for(Person p : pop.getPersons().values()) {
+		List<PersonImpl> remove = new LinkedList<PersonImpl>();
+		for(PersonImpl p : pop.getPersons().values()) {
 			for(int i = 1; i < p.getPlans().size(); i = 1)
 				p.getPlans().remove(i);
 			
-			Plan selected = p.getSelectedPlan();
+			PlanImpl selected = p.getSelectedPlan();
 			for(int i = 1; i < selected.getPlanElements().size(); i = 1) {
 				selected.getPlanElements().remove(i);
 			}
@@ -77,7 +77,7 @@ public class SimplifyPersons {
 				remove.add(p);
 		}
 		
-		for(Person p : remove)
+		for(PersonImpl p : remove)
 			pop.getPersons().remove(p.getId());
 		
 		PopulationWriter writer = new PopulationWriter(pop, args[1] + "plans.09.xml", "v4", 0.009);

@@ -35,11 +35,9 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.OrPredicate;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -48,6 +46,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -66,7 +66,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private SummaryWriter summaryWriter;
 	
-	private Collection<Person> persons = null;
+	private Collection<PersonImpl> persons = null;
 	
 	public TraversedRiskyLink(Population population, List<Link> riskyLinks, SummaryWriter summaryWriter) {
 		this.summaryWriter = summaryWriter;
@@ -92,7 +92,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		}
 	}
 	
-	public Collection<Person> getPersons() {
+	public Collection<PersonImpl> getPersons() {
 		return persons;
 	}
 	
@@ -120,7 +120,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		}
 		
 		public boolean evaluate(Object arg0) {
-			Person person = (Person)arg0;
+			PersonImpl person = (PersonImpl)arg0;
 			return linkPlanPredicat.evaluate(person.getSelectedPlan());
 		}
 		
@@ -135,7 +135,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		}
 		
 		public boolean evaluate(Object arg0) {
-			Plan plan = (Plan)arg0;
+			PlanImpl plan = (PlanImpl)arg0;
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;

@@ -23,10 +23,10 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * @author illenberger
@@ -38,8 +38,8 @@ public class RemoveScores implements StartupListener {
 	 * @see org.matsim.controler.listener.StartupListener#notifyStartup(org.matsim.controler.events.StartupEvent)
 	 */
 	public void notifyStartup(StartupEvent event) {
-		for(Person p : event.getControler().getPopulation().getPersons().values()) {
-			for(Plan plan : p.getPlans())
+		for(PersonImpl p : event.getControler().getPopulation().getPersons().values()) {
+			for(PlanImpl plan : p.getPlans())
 				plan.setScore(0.0);
 		}
 	}

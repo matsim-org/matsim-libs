@@ -25,7 +25,7 @@ package playground.johannes.socialnetworks.graph.social.util;
 
 import java.io.IOException;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
@@ -47,10 +47,10 @@ public class GraphML2PajekDegree {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SocialNetwork<Person> socialNet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
+		SocialNetwork<PersonImpl> socialNet = SNGraphMLReader.loadFromConfig(args[0], args[1]);
 		
-		PajekDegreeColorizer<Ego<Person>, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego<Person>, SocialTie>(socialNet, false);
-		PajekClusteringColorizer<Ego<Person>, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego<Person>, SocialTie>(socialNet);
+		PajekDegreeColorizer<Ego<PersonImpl>, SocialTie> colorizer1 = new PajekDegreeColorizer<Ego<PersonImpl>, SocialTie>(socialNet, false);
+		PajekClusteringColorizer<Ego<PersonImpl>, SocialTie> colorizer2 = new PajekClusteringColorizer<Ego<PersonImpl>, SocialTie>(socialNet);
 		PajekDistanceColorizer colorizer3 = new PajekDistanceColorizer(socialNet, false);
 		SpatialPajekWriter pwriter = new SpatialPajekWriter();
 		pwriter.write(socialNet, colorizer1, args[2] + "socialnet.degree.net");

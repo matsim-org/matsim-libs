@@ -25,7 +25,7 @@ package playground.johannes.mobsim;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * @author illenberger
@@ -64,12 +64,12 @@ public class BDIStrategy implements IntradayStrategy {
 		return agent;
 	}
 
-	public Plan replan(double time) {
+	public PlanImpl replan(double time) {
 		/*
 		 * TODO: What about replanAllowed()? -> no options
 		 */
 		beliefs.update();
-		List<Plan> options = generator.generateOptions();
+		List<PlanImpl> options = generator.generateOptions();
 		return filter.filterOptions(options);
 	}
 

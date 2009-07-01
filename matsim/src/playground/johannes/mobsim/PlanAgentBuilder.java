@@ -29,13 +29,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
- * A builder class that builds {@link PlanAgent} instances out of {@link Person}
+ * A builder class that builds {@link PlanAgent} instances out of {@link PersonImpl}
  * objects.
  * 
  * @author illenberger
@@ -73,12 +73,12 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	/**
 	 * @return a list of newly created {@link PlanAgent} instances built out of
 	 *         persons. Each person will be validated by calling
-	 *         {@link #validatePerson(Person)} before the agent is built.
+	 *         {@link #validatePerson(PersonImpl)} before the agent is built.
 	 */
 	public List<PlanAgent> buildAgents() {
 		List<PlanAgent> agents = new ArrayList<PlanAgent>(population.getPersons().size());
 		int countInvalid = 0;
-		for(Person p : population.getPersons().values()) {
+		for(PersonImpl p : population.getPersons().values()) {
 			if(validatePerson(p)) {
 				agents.add(buildAgent(p));
 			} else
@@ -105,7 +105,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 *            the person which will act as underlying data source.
 	 * @return a new {@link PlanAgent} instance.
 	 */
-	protected PlanAgent buildAgent(Person p) {
+	protected PlanAgent buildAgent(PersonImpl p) {
 		return new PlanAgent(p);
 	}
 
@@ -118,8 +118,8 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 * @return <tt>true</tt> if the person is valid, <tt>false</tt>
 	 *         otherwise.
 	 */
-	protected boolean validatePerson(Person p) {
-		Plan plan = p.getSelectedPlan();
+	protected boolean validatePerson(PersonImpl p) {
+		PlanImpl plan = p.getSelectedPlan();
 		if(plan == null) {
 			return false;
 		}

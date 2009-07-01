@@ -27,13 +27,13 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * An implementation of {@link MobsimAgent} that uses a {@link Person} as
+ * An implementation of {@link MobsimAgent} that uses a {@link PersonImpl} as
  * underlying data source. A PlanAgent serves the {@link MobsimAgent} interface
  * according to the person's selected plan.
  * 
@@ -46,7 +46,7 @@ public class PlanAgent implements MobsimAgent {
 	// private fields
 	// =======================================================
 
-	private final Person person;
+	private final PersonImpl person;
 
 	private int currentPlanIndex;
 
@@ -67,7 +67,7 @@ public class PlanAgent implements MobsimAgent {
 	 *            the underlying data source. <tt>person</tt> must have a
 	 *            selected plan!
 	 */
-	public PlanAgent(Person person) {
+	public PlanAgent(PersonImpl person) {
 		this.person = person;
 	}
 
@@ -284,7 +284,7 @@ public class PlanAgent implements MobsimAgent {
 	/**
 	 * @return the underlying person.
 	 */
-	public Person getPerson() {
+	public PersonImpl getPerson() {
 		return person;
 	}
 

@@ -23,7 +23,7 @@
  */
 package playground.johannes.itsc08;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -35,7 +35,7 @@ public class SimpleScoringFactory implements ScoringFunctionFactory {
 
 	private SimpleScoring scoring = new SimpleScoring();
 	
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
 		return new SimpleScoring();
 	}
 

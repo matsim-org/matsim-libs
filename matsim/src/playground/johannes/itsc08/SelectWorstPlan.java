@@ -23,8 +23,8 @@
  */
 package playground.johannes.itsc08;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
@@ -36,10 +36,10 @@ public class SelectWorstPlan implements PlanSelector {
 	/* (non-Javadoc)
 	 * @see org.matsim.replanning.selectors.PlanSelector#selectPlan(org.matsim.population.Person)
 	 */
-	public Plan selectPlan(Person person) {
-		Plan worst = null;
+	public PlanImpl selectPlan(PersonImpl person) {
+		PlanImpl worst = null;
 		double worstScore = Double.MAX_VALUE;
-		for(Plan p : person.getPlans()) {
+		for(PlanImpl p : person.getPlans()) {
 			if(p.getScore().doubleValue() < worstScore) {
 				worst = p;
 				worstScore = p.getScore().doubleValue();

@@ -31,15 +31,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -130,16 +131,16 @@ public class InteractionHandler implements ActivityStartEventHandler,
 		
 		private DescriptiveStatistics concurrentVisitors = new DescriptiveStatistics();
 		
-		private Map<Person, Visitor> visitors = new HashMap<Person, Visitor>();
+		private Map<PersonImpl, Visitor> visitors = new HashMap<PersonImpl, Visitor>();
 		
-		private void enterPerson(Person p, double time) {
+		private void enterPerson(PersonImpl p, double time) {
 			visitors.put(p, new Visitor(p, time));
 			
 			// only for statistics
 			totalVisitors++;
 		}
 		
-		private void leavePerson(Person p, double time) {
+		private void leavePerson(PersonImpl p, double time) {
 			Visitor v = visitors.remove(p);
 			if(v == null)
 				throw new RuntimeException("Tried to remove a visitor that did not enter this facility!");

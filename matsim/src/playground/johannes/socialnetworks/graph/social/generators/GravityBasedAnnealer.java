@@ -26,12 +26,13 @@ package playground.johannes.socialnetworks.graph.social.generators;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
@@ -69,9 +70,9 @@ public class GravityBasedAnnealer {
 		/*
 		 * Setup social network and adjacency matrix.
 		 */
-		SNGraphMLReader<Person> reader = new SNGraphMLReader<Person>(population);
-		SocialNetwork<Person> socialnet = reader.readGraph(config.getParam(MODULE_NAME,"socialnetwork"));
-		SNAdjacencyMatrix<Person> matrix = new SNAdjacencyMatrix<Person>(socialnet);
+		SNGraphMLReader<PersonImpl> reader = new SNGraphMLReader<PersonImpl>(population);
+		SocialNetwork<PersonImpl> socialnet = reader.readGraph(config.getParam(MODULE_NAME,"socialnetwork"));
+		SNAdjacencyMatrix<PersonImpl> matrix = new SNAdjacencyMatrix<PersonImpl>(socialnet);
 		/*
 		 * Setup ergm terms.
 		 */

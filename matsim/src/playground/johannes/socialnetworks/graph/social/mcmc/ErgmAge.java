@@ -23,7 +23,7 @@
  */
 package playground.johannes.socialnetworks.graph.social.mcmc;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
@@ -36,8 +36,8 @@ public class ErgmAge extends ErgmTerm {
 
 	@Override
 	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
-		int age1 = ((SNAdjacencyMatrix<Person>)m).getVertex(i).getPerson().getAge();
-		int age2 = ((SNAdjacencyMatrix<Person>)m).getVertex(j).getPerson().getAge();
+		int age1 = ((SNAdjacencyMatrix<PersonImpl>)m).getVertex(i).getPerson().getAge();
+		int age2 = ((SNAdjacencyMatrix<PersonImpl>)m).getVertex(j).getPerson().getAge();
 		
 //		if(age1 == age2)
 //			return getTheta();

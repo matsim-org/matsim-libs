@@ -32,8 +32,6 @@ import java.util.Map;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -44,6 +42,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -62,9 +62,9 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	
 	private ArrowPrattRiskAversionI utilFunc;
 	
-	private Map<Person, Double> ceMap;
+	private Map<PersonImpl, Double> ceMap;
 	
-	private Map<Person, Double> expTTMap;
+	private Map<PersonImpl, Double> expTTMap;
 	
 	private List<Double> samplesCE;
 	
@@ -86,9 +86,9 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	 * This is ugly, but there is no event between initialization and actual run
 	 * of the queue sim.
 	 */
-	public void addGuidedPerson(Person p) {
+	public void addGuidedPerson(PersonImpl p) {
 		
-			Plan plan = p.getSelectedPlan();
+			PlanImpl plan = p.getSelectedPlan();
 			double cesum = 0;
 			double expTTSum = 0;
 			int tripcounts = 0;
@@ -135,7 +135,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 		 */
 		double benefitsumExpTT = 0;
 		double benefitsumCE = 0;
-		for(Person p : ceMap.keySet()) {
+		for(PersonImpl p : ceMap.keySet()) {
 			Double triptime = tripStats.getTripDurations().get(p);
 			if (triptime != null) { // unfortunately this can happen -> withinday bug
 				double ce = ceMap.get(p);
@@ -194,8 +194,8 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	}
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		ceMap = new HashMap<Person, Double>();
-		expTTMap = new HashMap<Person, Double>();
+		ceMap = new HashMap<PersonImpl, Double>();
+		expTTMap = new HashMap<PersonImpl, Double>();
 	}
 
 	public void notifyStartup(StartupEvent event) {

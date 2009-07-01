@@ -25,12 +25,12 @@ package playground.johannes.itsc08;
 
 import java.util.Set;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -119,7 +119,7 @@ public class Controler extends WithindayControler {
 		sim.run();
 	}
 
-	public Set<Person> getGuidedPersons() {
+	public Set<PersonImpl> getGuidedPersons() {
 		return ((GuidedAgentFactory)factory).getGuidedPersons();
 	}
 	

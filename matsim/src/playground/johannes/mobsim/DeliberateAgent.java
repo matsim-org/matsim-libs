@@ -25,7 +25,7 @@ package playground.johannes.mobsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * A DeliberateAgent is an agent that can modify its plan conforming to a
@@ -137,7 +137,7 @@ public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
 		if (time - lastReplanTime > replanCoolDownTime) {
 			lastReplanTime = time;
 
-			Plan newPlan = strategy.replan(time);
+			PlanImpl newPlan = strategy.replan(time);
 			if (newPlan != null) {
 				/*
 				 * Do some simple plan validation. The new plan size must be

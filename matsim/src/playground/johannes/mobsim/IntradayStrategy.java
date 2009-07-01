@@ -23,7 +23,7 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * An IntradayStrategy encapsulates the behavioral model for
@@ -53,6 +53,6 @@ public interface IntradayStrategy {
 	 * @return a new plan, or <tt>null</tt> if re-planning failed or is
 	 *         currently not allowed.
 	 */
-	public Plan replan(double time);
+	public PlanImpl replan(double time);
 	
 }

@@ -28,12 +28,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
@@ -64,7 +64,7 @@ public class PopDensityGrid {
 		double maxY = 0;
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
-		for(Person person : population.getPersons().values()) {
+		for(PersonImpl person : population.getPersons().values()) {
 			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
 			maxX = Math.max(maxX, homeLoc.getX());
 			maxY = Math.max(maxY, homeLoc.getY());
@@ -90,7 +90,7 @@ public class PopDensityGrid {
 		}
 		gridWriter.close();
 		
-		for(Person person : population.getPersons().values()) {
+		for(PersonImpl person : population.getPersons().values()) {
 			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
 			
 			popWriter.write(String.valueOf(homeLoc.getX()));

@@ -31,12 +31,12 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.statistics.Distribution;
@@ -59,12 +59,12 @@ public class DistanceDistribution {
 		Scenario data = loader.getScenario();
 		Population population = data.getPopulation();
 		
-		Collection<Person> persons2 = new HashSet<Person>();
+		Collection<PersonImpl> persons2 = new HashSet<PersonImpl>();
 		double xmin = 678000;
 		double ymin = 243000;
 		double xmax = 687000;
 		double ymax = 254000;
-		for(Person p : population.getPersons().values()) {
+		for(PersonImpl p : population.getPersons().values()) {
 			Coord c = p.getSelectedPlan().getFirstActivity().getCoord();
 			if((c.getX() >= xmin) && (c.getX() <= xmax) && (c.getY() >= ymin) && (c.getY() <= ymax))
 				persons2.add(p);
@@ -73,9 +73,9 @@ public class DistanceDistribution {
 		TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
 		double binsize = 1000;
 		int count = 0;
-		for(Person p1 : population.getPersons().values()) {
+		for(PersonImpl p1 : population.getPersons().values()) {
 			persons2.remove(p1);
-			for(Person p2 : persons2) {
+			for(PersonImpl p2 : persons2) {
 				Coord c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
 				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
 				double d = CoordUtils.calcDistance(c1, c2);

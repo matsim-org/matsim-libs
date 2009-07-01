@@ -28,12 +28,12 @@ import net.opengis.kml._2.LinkType;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
@@ -85,7 +85,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		Scenario scenario = loader.getScenario();
 		Population population = scenario.getPopulation();
 		
-		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
+		SocialNetwork<PersonImpl> socialnet = new SocialNetwork<PersonImpl>(population);
 		KMLWriter writer = new KMLWriter();
 		writer.setDrawEdges(false);
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());

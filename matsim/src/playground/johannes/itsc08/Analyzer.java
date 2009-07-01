@@ -40,8 +40,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -57,6 +55,8 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnetworks.statistics.Distribution;
@@ -68,19 +68,19 @@ import playground.johannes.socialnetworks.statistics.Distribution;
 public class Analyzer implements StartupListener, IterationEndsListener, AgentDepartureEventHandler,
 		AgentArrivalEventHandler, LinkEnterEventHandler, ShutdownListener, IterationStartsListener {
 
-	private Set<Person> riskyUsers;
+	private Set<PersonImpl> riskyUsers;
 	
-	private Set<Person> safeUsers;
+	private Set<PersonImpl> safeUsers;
 	
-	private Set<Plan> riskyPlans;
+	private Set<PlanImpl> riskyPlans;
 	
-	private Set<Plan> safePlans;
+	private Set<PlanImpl> safePlans;
 	
-	private HashMap<Person, AgentDepartureEvent> events;
+	private HashMap<PersonImpl, AgentDepartureEvent> events;
 	
-	private HashMap<Person, AgentDepartureEvent> eventsReturn;
+	private HashMap<PersonImpl, AgentDepartureEvent> eventsReturn;
 	
-	private HashMap<Person, Double> traveltimes;
+	private HashMap<PersonImpl, Double> traveltimes;
 	
 	private double riskyTriptime;
 	
@@ -125,11 +125,11 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			e.printStackTrace();
 		}
 
-		riskyPlans = new HashSet<Plan>();
-		safePlans = new HashSet<Plan>();
+		riskyPlans = new HashSet<PlanImpl>();
+		safePlans = new HashSet<PlanImpl>();
 		Id id = event.getControler().getNetwork().getLink("4").getId();
-		for(Person p : event.getControler().getPopulation().getPersons().values()) {
-			for(Plan plan : p.getPlans()) {
+		for(PersonImpl p : event.getControler().getPopulation().getPersons().values()) {
+			for(PlanImpl plan : p.getPlans()) {
 				LegImpl leg = (LegImpl) plan.getPlanElements().get(1);
 				if(((NetworkRoute) leg.getRoute()).getLinkIds().contains(id)) {
 					riskyPlans.add(plan);
@@ -141,14 +141,14 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	}
 
 	public void reset(int iteration) {
-		riskyUsers = new HashSet<Person>();
-		safeUsers = new HashSet<Person>();
+		riskyUsers = new HashSet<PersonImpl>();
+		safeUsers = new HashSet<PersonImpl>();
 		riskyTriptime = 0;
 		safeTriptime = 0;
 		returnTripTime = 0;
-		events = new HashMap<Person, AgentDepartureEvent>();
-		eventsReturn = new HashMap<Person, AgentDepartureEvent>();
-		traveltimes = new HashMap<Person, Double>();
+		events = new HashMap<PersonImpl, AgentDepartureEvent>();
+		eventsReturn = new HashMap<PersonImpl, AgentDepartureEvent>();
+		traveltimes = new HashMap<PersonImpl, Double>();
 		
 		
 	}
@@ -197,8 +197,8 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			/*
 			 * guidance
 			 */
-			Set<Person> guided = controler.getGuidedPersons();
-			Collection<Person> unguided = CollectionUtils.subtract(event.getControler().getPopulation().getPersons().values(), guided);
+			Set<PersonImpl> guided = controler.getGuidedPersons();
+			Collection<PersonImpl> unguided = CollectionUtils.subtract(event.getControler().getPopulation().getPersons().values(), guided);
 			
 			writer.write(double2String(getAvrScore(guided)));
 			writer.write("\t");
@@ -209,10 +209,10 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			writer.write(double2String(getAvrTripTime(unguided)));
 			writer.write("\t");
 			
-			Collection<Person> guidedSafe = CollectionUtils.intersection(guided, safeUsers);
-			Collection<Person> guidedRisky = CollectionUtils.intersection(guided, riskyUsers);
-			Collection<Person> unguidedSafe = CollectionUtils.intersection(unguided, safeUsers);
-			Collection<Person> unguidedRisky = CollectionUtils.intersection(unguided, riskyUsers);
+			Collection<PersonImpl> guidedSafe = CollectionUtils.intersection(guided, safeUsers);
+			Collection<PersonImpl> guidedRisky = CollectionUtils.intersection(guided, riskyUsers);
+			Collection<PersonImpl> unguidedSafe = CollectionUtils.intersection(unguided, safeUsers);
+			Collection<PersonImpl> unguidedRisky = CollectionUtils.intersection(unguided, riskyUsers);
 			
 			writer.write(String.valueOf(guidedSafe.size()));
 			writer.write("\t");
@@ -262,12 +262,12 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		
 	}
 
-	private double getAvrScorePlan(Set<Plan> plans) {
+	private double getAvrScorePlan(Set<PlanImpl> plans) {
 		if(plans.size() == 0)
 			return 0.0;
 		
 		double scoresum = 0;
-		for(Plan p : plans) {
+		for(PlanImpl p : plans) {
 			scoresum += p.getScore().doubleValue();
 		}
 		double result = scoresum/(double)plans.size();
@@ -277,23 +277,23 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			return result;	
 	}
 	
-	private double getAvrScore(Collection<Person> persons) {
+	private double getAvrScore(Collection<PersonImpl> persons) {
 		if(persons.size() == 0)
 			return 0.0;
 		
 		double scoresum = 0;
-		for(Person p : persons) {
+		for(PersonImpl p : persons) {
 			scoresum += p.getSelectedPlan().getScore().doubleValue();
 		}
 		return scoresum/(double)persons.size();
 	}
 	
-	private double getAvrTripTime(Collection<Person> persons) {
+	private double getAvrTripTime(Collection<PersonImpl> persons) {
 		if(persons.size() == 0)
 			return 0.0;
 		
 		double scoresum = 0;
-		for(Person p : persons) {
+		for(PersonImpl p : persons) {
 			scoresum += traveltimes.get(p);
 		}
 		return scoresum/(double)persons.size();
@@ -386,8 +386,8 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		int countPiAvrUsers = 0;
 		int countPiGuidedUsers = 0;
 		int t_last_guided = 327;
-		for(Person p : controler.getPopulation().getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
+		for(PersonImpl p : controler.getPopulation().getPersons().values()) {
+			PlanImpl plan = p.getSelectedPlan();
 			int starttime = (int) plan.getFirstActivity().getEndTime();
 			int t_good = (int)avrRiskyGoodTriptimes.get(starttime);
 			int t_bad = (int)avrRiskyBadTriptimes.get(starttime);

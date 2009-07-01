@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -37,6 +36,7 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.eut.EstimReactiveLinkTT;
@@ -45,7 +45,7 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 
 	private EstimReactiveLinkTT linktt;
 	
-	private Map<Person, LinkEnterEvent> events;
+	private Map<PersonImpl, LinkEnterEvent> events;
 	
 	private BufferedWriter realTTWriter;
 	
@@ -77,7 +77,7 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 	}
 
 	public void reset(int iteration) {
-		events = new HashMap<Person, LinkEnterEvent>();
+		events = new HashMap<PersonImpl, LinkEnterEvent>();
 		
 	}
 

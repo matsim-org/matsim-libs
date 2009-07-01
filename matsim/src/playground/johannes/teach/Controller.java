@@ -40,8 +40,6 @@ import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -64,6 +62,8 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -139,8 +139,8 @@ public class Controller extends Controler {
 		public void notifyScoring(ScoringEvent event) {
 			double alpha = Double.parseDouble(event.getControler().getConfig().getParam("planCalcScore", "learningRate"));
 			
-			for(Person p : event.getControler().getPopulation().getPersons().values()) {
-				for(Plan plan : p.getPlans()) {
+			for(PersonImpl p : event.getControler().getPopulation().getPersons().values()) {
+				for(PlanImpl plan : p.getPlans()) {
 					double tt = 0;
 					LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
 					Route route = leg.getRoute();
@@ -169,13 +169,13 @@ public class Controller extends Controler {
 	
 	public static class RouteTTObserver implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
 
-		private Set<Person> route1;
+		private Set<PersonImpl> route1;
 		
-		private Set<Person> route2;
+		private Set<PersonImpl> route2;
 		
-		private TObjectDoubleHashMap<Person> personTTs;
+		private TObjectDoubleHashMap<PersonImpl> personTTs;
 		
-		private TObjectDoubleHashMap<Person> departureTimes;
+		private TObjectDoubleHashMap<PersonImpl> departureTimes;
 		
 		private BufferedWriter writer;
 		
@@ -203,10 +203,10 @@ public class Controller extends Controler {
 		}
 
 		public void reset(int iteration) {
-			route1 = new HashSet<Person>();
-			route2 = new HashSet<Person>();
-			personTTs = new TObjectDoubleHashMap<Person>();
-			departureTimes = new TObjectDoubleHashMap<Person>();
+			route1 = new HashSet<PersonImpl>();
+			route2 = new HashSet<PersonImpl>();
+			personTTs = new TObjectDoubleHashMap<PersonImpl>();
+			departureTimes = new TObjectDoubleHashMap<PersonImpl>();
 		}
 
 		public void handleEvent(AgentArrivalEvent event) {
@@ -258,10 +258,10 @@ public class Controller extends Controler {
 			TDoubleArrayList route1TTs = new TDoubleArrayList();
 			TDoubleArrayList route2TTs = new TDoubleArrayList();
 			
-			for(Person p : route1) {
+			for(PersonImpl p : route1) {
 				route1TTs.add(personTTs.get(p));
 			}
-			for(Person p : route2) {
+			for(PersonImpl p : route2) {
 				route2TTs.add(personTTs.get(p));
 			}
 			
