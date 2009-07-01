@@ -22,23 +22,23 @@ package playground.marcel.pt.integration;
 
 import java.util.Map;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.population.PersonImpl;
 
 public class TransitAgentFactory extends AgentFactory {
 
-	private final Map<Person, DriverAgent> agentsMap;
+	private final Map<PersonImpl, DriverAgent> agentsMap;
 
-	public TransitAgentFactory(final QueueSimulation simulation, final Map<Person, DriverAgent> agents) {
+	public TransitAgentFactory(final QueueSimulation simulation, final Map<PersonImpl, DriverAgent> agents) {
 		super(simulation);
 		this.agentsMap = agents;
 	}
 
 	@Override
-	public PersonAgent createPersonAgent(final Person p) {
+	public PersonAgent createPersonAgent(final PersonImpl p) {
 		PersonAgent agent = new TransitAgent(p, this.simulation);
 		this.agentsMap.put(p, agent);
 		return agent;

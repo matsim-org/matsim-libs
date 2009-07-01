@@ -26,11 +26,11 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.filters.AbstractPersonFilter;
 
 /**
@@ -46,9 +46,9 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 	}
 
 	@Override
-	public boolean judge(final Person person) {
-		List<Plan> plans = person.getPlans();
-		for (Plan plan : plans) {
+	public boolean judge(final PersonImpl person) {
+		List<PlanImpl> plans = person.getPlans();
+		for (PlanImpl plan : plans) {
 			for (int i = 1, n = plan.getPlanElements().size(); i < n; i+=2) {
 				LegImpl leg = (LegImpl) plan.getPlanElements().get(i);
 				if (leg.getRoute() == null) {

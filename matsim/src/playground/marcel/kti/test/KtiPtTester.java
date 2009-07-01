@@ -23,14 +23,14 @@ package playground.marcel.kti.test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -89,7 +89,7 @@ public class KtiPtTester {
 		Gbl.printRoundTime();
 		Counter counter = new Counter("handle person #");
 		PlansCalcRouteKti calcPtLeg = new PlansCalcRouteKti((NetworkLayer) this.data.getNetwork(), commonRoutingData, fttc, fttc, this.ptTravelTimes, haltestellen, ((ScenarioImpl)this.data).getWorld().getLayer("municipality"));
-		for (Person person : population.getPersons().values()) {
+		for (PersonImpl person : population.getPersons().values()) {
 			counter.incCounter();
 			calcPtLeg.run(person.getSelectedPlan());
 		}

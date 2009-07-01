@@ -27,10 +27,10 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -49,7 +49,7 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 	private final SimplifyPtLegs planSimplifier;
 	private final TransitRouteFinder ptRouter;
 
-	private Plan currentPlan = null;
+	private PlanImpl currentPlan = null;
 	private final List<Tuple<LegImpl, List<LegImpl>>> legReplacements = new LinkedList<Tuple<LegImpl, List<LegImpl>>>();
 
 	public PlansCalcPtRoute(final PlansCalcRouteConfigGroup config, final Network network,
@@ -77,7 +77,7 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public void handlePlan(final Plan plan) {
+	public void handlePlan(final PlanImpl plan) {
 		this.planSimplifier.run(plan);
 		this.currentPlan = plan;
 		this.legReplacements.clear();

@@ -24,10 +24,9 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -35,6 +34,7 @@ import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
@@ -55,7 +55,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	private TransitScheduleImpl schedule = null;
 	/*package*/ final TransitStopAgentTracker agentTracker;
-	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
+	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
 
 	public TransitQueueSimulation(final Network network, final Population population, final Events events) {
 		super(network, population, events);
@@ -96,7 +96,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		}
 	}
 
-	public Object getAgent(final Person p) {
+	public Object getAgent(final PersonImpl p) {
 		return this.agents.get(p);
 	}
 

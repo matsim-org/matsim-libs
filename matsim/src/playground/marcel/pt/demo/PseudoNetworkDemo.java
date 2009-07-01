@@ -25,13 +25,11 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -39,6 +37,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 import org.xml.sax.SAXException;
 
@@ -103,9 +103,9 @@ public class PseudoNetworkDemo {
 		Link link1 = network.getLink(scenario.createId("1"));
 
 		Population population = scenario.getPopulation();
-		Person person = population.getPopulationBuilder().createPerson(new IdImpl(1));
+		PersonImpl person = population.getPopulationBuilder().createPerson(new IdImpl(1));
 		population.getPersons().put(person.getId(), person);
-		Plan plan = population.getPopulationBuilder().createPlan(person);
+		PlanImpl plan = population.getPopulationBuilder().createPlan(person);
 		person.addPlan(plan);
 		ActivityImpl act = population.getPopulationBuilder().createActivityFromLinkId("home", link1.getId());
 		act.setEndTime(4*3600.0);

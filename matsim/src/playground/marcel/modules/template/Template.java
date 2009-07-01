@@ -22,13 +22,13 @@ package playground.marcel.modules.template;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -78,7 +78,7 @@ public class Template implements MatsimModule {
 		// *** ScoringFunction *********************
 		
 		ScoringFunctionFactory scoringFactory = new ScoringFunctionFactory() {
-			public ScoringFunction getNewScoringFunction(Plan plan) {
+			public ScoringFunction getNewScoringFunction(PlanImpl plan) {
 				return null;
 			}
 		};

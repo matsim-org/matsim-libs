@@ -21,8 +21,8 @@
 package playground.marcel.template.replanning;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
+import org.matsim.core.population.PlanImpl;
 
 public class TemplateStrategyModule implements PlanStrategyModule {
 
@@ -39,7 +39,7 @@ public class TemplateStrategyModule implements PlanStrategyModule {
 		this.counter = 0;
 	}
 
-	public void handlePlan(final Plan plan) {
+	public void handlePlan(final PlanImpl plan) {
 		this.counter++;
 		this.planAlgo.run(plan);
 	}

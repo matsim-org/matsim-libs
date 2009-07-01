@@ -24,20 +24,20 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
@@ -149,8 +149,8 @@ public class AccessEgressDemo {
 				continue;
 			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
-				Person person = pb.createPerson(this.scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
-				Plan plan = pb.createPlan(person);
+				PersonImpl person = pb.createPerson(this.scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
+				PlanImpl plan = pb.createPlan(person);
 				ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[i]);
 				act1.setEndTime(departureTime + j * agentInterval);
 				LegImpl leg = pb.createLeg(TransportMode.pt);

@@ -26,8 +26,9 @@ import java.io.File;
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;

@@ -27,7 +27,6 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -37,6 +36,7 @@ import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
@@ -59,7 +59,7 @@ public class TransitDriver implements TransitDriverAgent {
 		private final TransitQueueSimulation sim;
 
 		private final LegImpl currentLeg = new LegImpl(TransportMode.car);
-		private final Person dummyPerson;
+		private final PersonImpl dummyPerson;
 
 		private final Iterator<TransitRouteStopImpl> stopIterator;
 		private TransitRouteStopImpl nextStop;
@@ -183,7 +183,7 @@ public class TransitDriver implements TransitDriverAgent {
 			return this.currentLeg.getRoute().getEndLink();
 		}
 
-		public Person getPerson() {
+		public PersonImpl getPerson() {
 			return this.dummyPerson;
 		}
 

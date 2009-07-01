@@ -24,20 +24,20 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
@@ -223,8 +223,8 @@ public class TwoLinesDemo {
 		TransitStopFacility stop6 = this.schedule.getFacilities().get(this.ids[6]);
 		
 		{ // person 1
-			Person person = pb.createPerson(this.ids[1]);
-			Plan plan = pb.createPlan(person);
+			PersonImpl person = pb.createPerson(this.ids[1]);
+			PlanImpl plan = pb.createPlan(person);
 			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			LegImpl leg1 = pb.createLeg(TransportMode.pt);
@@ -246,8 +246,8 @@ public class TwoLinesDemo {
 		}
 
 		{ // person 2
-			Person person = pb.createPerson(this.ids[2]);
-			Plan plan = pb.createPlan(person);
+			PersonImpl person = pb.createPerson(this.ids[2]);
+			PlanImpl plan = pb.createPlan(person);
 			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			LegImpl leg1 = pb.createLeg(TransportMode.pt);
@@ -269,8 +269,8 @@ public class TwoLinesDemo {
 		}
 
 		{ // person 3
-			Person person = pb.createPerson(this.ids[3]);
-			Plan plan = pb.createPlan(person);
+			PersonImpl person = pb.createPerson(this.ids[3]);
+			PlanImpl plan = pb.createPlan(person);
 			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			LegImpl leg1 = pb.createLeg(TransportMode.pt);

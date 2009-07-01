@@ -21,14 +21,14 @@
 package playground.marcel.template.replanning;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class TemplatePlanAlgorithm implements PlanAlgorithm {
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl activity = (ActivityImpl) pe;

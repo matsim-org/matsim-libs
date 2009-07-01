@@ -20,9 +20,9 @@
 
 package playground.marcel.pt.integration;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
@@ -30,7 +30,7 @@ import playground.marcel.pt.transitSchedule.TransitLineImpl;
 
 public class TransitAgent extends PersonAgent implements PassengerAgent {
 
-	public TransitAgent(final Person p, final QueueSimulation simulation) {
+	public TransitAgent(final PersonImpl p, final QueueSimulation simulation) {
 		super(p, simulation);
 	}
 
