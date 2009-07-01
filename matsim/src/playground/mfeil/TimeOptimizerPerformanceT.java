@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -38,7 +38,7 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 		
 	}
 	
-	public void run (Plan plan){
+	public void run (PlanImpl plan){
 		
 		if (plan.getPerson().getId().toString().equals("2")){
 		

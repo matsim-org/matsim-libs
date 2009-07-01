@@ -30,13 +30,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Plan;
+
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.knowledges.Knowledges;
@@ -54,7 +55,7 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
 
 public class RecyclingModule implements PlanStrategyModule{
 		
-	private  ArrayList<Plan> []						list;
+	private  ArrayList<PlanImpl> []						list;
 	private final AbstractMultithreadedModule 		schedulingModule;
 	private final AbstractMultithreadedModule		assignmentModule;
 	private final LocationMutatorwChoiceSet 		locator;
@@ -136,12 +137,12 @@ public class RecyclingModule implements PlanStrategyModule{
 		
 		this.list = new ArrayList[2];
 		for (int i=0;i<2;i++){
-			list[i] = new ArrayList<Plan>();
+			list[i] = new ArrayList<PlanImpl>();
 		}
 		this.schedulingModule.prepareReplanning();
 	}
 
-	public void handlePlan(final Plan plan) {	
+	public void handlePlan(final PlanImpl plan) {	
 		
 		this.list[1].add(plan);
 	}

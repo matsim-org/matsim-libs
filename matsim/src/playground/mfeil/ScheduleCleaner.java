@@ -20,9 +20,9 @@
 
 package playground.mfeil;
 
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 public class ScheduleCleaner {
@@ -35,7 +35,7 @@ public class ScheduleCleaner {
 		this.minimumTime = minimumTime;
 	}
 	
-	public double run (double now, Plan plan){
+	public double run (double now, PlanImpl plan){
 		((ActivityImpl)(plan.getPlanElements().get(0))).setEndTime(now);
 		((ActivityImpl)(plan.getPlanElements().get(0))).setDuration(now);
 			

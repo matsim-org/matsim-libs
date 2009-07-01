@@ -29,9 +29,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -39,6 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
@@ -133,7 +133,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run (Plan plan){
+	public void run (PlanImpl plan){
 		
 		//////////////////////////////////////////////////////////////////////
 		// Initialization
@@ -944,7 +944,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	/* Removes the activity at the given position*/
-	private void removeAct (int position, Plan basePlan){
+	private void removeAct (int position, PlanImpl basePlan){
 		// why writing everything yourself, if it's already here? see basePlan.removeAct(position);
 		List<? extends BasicPlanElement> actslegs = basePlan.getPlanElements();
 		actslegs.remove(position*2);
@@ -965,7 +965,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 		
 	/* Checks whether a primary act is several times in the plan so that it can be dropped as requested*/
-	public boolean checkForSamePrimary (Plan plan, int position){
+	public boolean checkForSamePrimary (PlanImpl plan, int position){
 		
 		for (int i = 0; i<position*2;i+=2){
 			if (((ActivityImpl)(plan.getPlanElements().get(position*2))).getFacilityId().equals(((ActivityImpl)(plan.getPlanElements().get(i))).getFacilityId())	&&
@@ -983,7 +983,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	
-	private List<SubChain> getSubChains (Plan plan, int first, int second){
+	private List<SubChain> getSubChains (PlanImpl plan, int first, int second){
 		ManageSubchains manager = new ManageSubchains();
 		if (second-first==1){	// one long subchain
 			/* Set travel time to 1sec as otherwise location choice wouldn't react!*/

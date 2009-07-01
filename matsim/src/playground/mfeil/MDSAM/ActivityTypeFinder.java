@@ -27,13 +27,14 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.ScenarioImpl;
+
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.api.population.Person;
 
 import playground.mfeil.config.PlanomatXConfigGroup;
 
@@ -80,7 +81,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		return this.actTypes;
 	}
 	
-	public List<String> getActTypes (Person agent){
+	public List<String> getActTypes (PersonImpl agent){
 		if (PlanomatXConfigGroup.getActTypes().equals("knowledge")){
 			return this.getKnActTypes(agent);
 		}
@@ -111,7 +112,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		else return this.actTypes;
 	}
 	
-	private List<String> getKnActTypes (Person agent){
+	private List<String> getKnActTypes (PersonImpl agent){
 		// get act options of agent
 		Collection<ActivityOption> agentActOptions = ((ScenarioImpl)(this.controler.getScenarioData())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
 		// convert them into act types

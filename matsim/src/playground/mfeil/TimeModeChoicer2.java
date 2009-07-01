@@ -29,13 +29,13 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
@@ -74,7 +74,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 
 	
 	// TODO: this is bad programming style... needs to be improved!
-	public void run (Plan basePlan){
+	public void run (PlanImpl basePlan){
 		
 		/*Do nothing if the plan has only one activity (=24h home)*/
 		if (basePlan.getPlanElements().size()==1) return;

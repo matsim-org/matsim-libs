@@ -22,8 +22,8 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 
@@ -36,11 +36,11 @@ import org.matsim.knowledges.Knowledges;
 
 public class OptimizedAgents {
 	
-	private ArrayList<Plan> list;
+	private ArrayList<PlanImpl> list;
 	private ArrayList<Double> distancesTestAgents;
 	private Knowledges knowledges;
 	
-	public OptimizedAgents (ArrayList<Plan> list, Knowledges knowledges){
+	public OptimizedAgents (ArrayList<PlanImpl> list, Knowledges knowledges){
 		this.list = list;
 		this.knowledges = knowledges;
 		this.run();
@@ -68,15 +68,15 @@ public class OptimizedAgents {
 		return this.list.size();
 	}
 	
-	public Plan getAgentPlan (int agent){
+	public PlanImpl getAgentPlan (int agent){
 		return this.list.get(agent);
 	}
 	
-	public Person getAgentPerson (int agent){
+	public PersonImpl getAgentPerson (int agent){
 		return this.list.get(agent).getPerson();
 	}
 	
-	public void addAgent (Plan plan){
+	public void addAgent (PlanImpl plan){
 		/* this.list.add(plan); */	// this is not necessary as there is a flat link to list[0] anyway.
 		double tmpDistance=0;
 		if (this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size()>1){

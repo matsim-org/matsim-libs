@@ -34,11 +34,11 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -89,7 +89,7 @@ public class PlansVariator implements PlanAlgorithm {
 	}
 	
 	
-	public void run (Plan plan){
+	public void run (PlanImpl plan){
 		
 		/* Ensure that noOfMaxActs is greater or equal than the noOfActs of current plan */
 		this.noOfMaxActs = java.lang.Math.max(this.noOfMaxActs, plan.getPlanElements().size()/2);
@@ -107,7 +107,7 @@ public class PlansVariator implements PlanAlgorithm {
 			return;
 		}
 		
-		Plan[] output = new PlanImpl [this.noOfVariedPlans];
+		PlanImpl[] output = new PlanImpl [this.noOfVariedPlans];
 		
 		/* Copy the plan into all fields of the output array and vary plans */
 		for (int i = 0; i < output.length; i++){
@@ -127,7 +127,7 @@ public class PlansVariator implements PlanAlgorithm {
 		//popwriter.write();
 	}
 	
-	private void varyPlans (Plan[] output, Plan plan){
+	private void varyPlans (PlanImpl[] output, PlanImpl plan){
 		int counter = 0;
 		
 		/* Change number */
@@ -253,7 +253,7 @@ public class PlansVariator implements PlanAlgorithm {
 		
 	}
 	
-	private boolean changeOrder (Plan plan, int [] positions){
+	private boolean changeOrder (PlanImpl plan, int [] positions){
 		
 		List<PlanElement> actslegs = plan.getPlanElements();
 
@@ -286,7 +286,7 @@ public class PlansVariator implements PlanAlgorithm {
 		}
 	}
 	
-	private int changeType (Plan plan, int [] position, int rotationPos){
+	private int changeType (PlanImpl plan, int [] position, int rotationPos){
 			
 		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(rotationPos*2);
 		String type = act.getType();
@@ -311,7 +311,7 @@ public class PlansVariator implements PlanAlgorithm {
 	
 	
 	/* Method that returns true if two plans feature the same activity chain and the same locations, or false otherwise.*/
-	private boolean checkEqualityOfLocations (Plan plan1, Plan plan2){
+	private boolean checkEqualityOfLocations (PlanImpl plan1, PlanImpl plan2){
 			
 		ArrayList<String> acts1 = new ArrayList<String> ();
 		ArrayList<String> acts2 = new ArrayList<String> ();
@@ -347,7 +347,7 @@ public class PlansVariator implements PlanAlgorithm {
 		return 1;	
 	}
 	
-	private void changeMode (Plan plan){
+	private void changeMode (PlanImpl plan){
 		/* Selection of subtour to be changed */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(plan);

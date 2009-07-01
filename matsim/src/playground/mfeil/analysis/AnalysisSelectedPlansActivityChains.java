@@ -30,15 +30,15 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledges;
 
 
@@ -53,7 +53,7 @@ public class AnalysisSelectedPlansActivityChains {
 	protected final Population population;
 	protected final String outputDir;
 	protected ArrayList<List<PlanElement>> activityChains;
-	protected ArrayList<ArrayList<Plan>> plans;
+	protected ArrayList<ArrayList<PlanImpl>> plans;
 	protected final Map<String,Double> minimumTime;
 	protected final Knowledges knowledges;
 	protected static final Logger log = Logger.getLogger(AnalysisSelectedPlansActivityChains.class);
@@ -75,10 +75,10 @@ public class AnalysisSelectedPlansActivityChains {
 	protected void initAnalysis(){
 		
 		this.activityChains = new ArrayList<List<PlanElement>>();
-		this.plans = new ArrayList<ArrayList<Plan>>();
+		this.plans = new ArrayList<ArrayList<PlanImpl>>();
 		
-		Map<Id,Person> agents = this.population.getPersons();
-		for (Person person:agents.values()){
+		Map<Id,PersonImpl> agents = this.population.getPersons();
+		for (PersonImpl person:agents.values()){
 			boolean alreadyIn = false;
 			for (int i=0;i<this.activityChains.size();i++){
 				if (this.checkForEquality(person.getSelectedPlan(), this.activityChains.get(i))){
@@ -89,7 +89,7 @@ public class AnalysisSelectedPlansActivityChains {
 			}
 			if (!alreadyIn){
 				this.activityChains.add(person.getSelectedPlan().getPlanElements());
-				this.plans.add(new ArrayList<Plan>());
+				this.plans.add(new ArrayList<PlanImpl>());
 				this.plans.get(this.plans.size()-1).add(person.getSelectedPlan());
 			}
 		}
@@ -188,7 +188,7 @@ public class AnalysisSelectedPlansActivityChains {
 		*/
 	}
 	
-	protected boolean checkForEquality (Plan plan, List<PlanElement> activityChain){
+	protected boolean checkForEquality (PlanImpl plan, List<PlanElement> activityChain){
 		
 		if (plan.getPlanElements().size()!=activityChain.size()){
 		

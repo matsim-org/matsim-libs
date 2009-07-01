@@ -21,13 +21,14 @@ package playground.mfeil.MDSAM;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -69,7 +70,7 @@ public class UniSAM {
 				"\tx51\tx52\tx53\tx54\tx55\tx56\tx57\tx58\tx59\tx510\tx511");
 		
 		/* Write selected plan*/
-		Plan plan = this.population.getPersons().get(new IdImpl ("324")).getSelectedPlan();
+		PlanImpl plan = this.population.getPersons().get(new IdImpl ("324")).getSelectedPlan();
 		stream.print(1);
 		stream.print("\t"+1);
 		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(0))).getStartTime()+

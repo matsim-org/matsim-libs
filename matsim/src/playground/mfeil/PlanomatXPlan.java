@@ -22,7 +22,7 @@ package playground.mfeil;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 
@@ -37,7 +37,7 @@ import org.matsim.core.population.PlanImpl;
  */
 public class PlanomatXPlan extends PlanImpl implements Comparable<PlanomatXPlan>{
 
-	public PlanomatXPlan (Person person){
+	public PlanomatXPlan (PersonImpl person){
 		super(person);
 	}
 	

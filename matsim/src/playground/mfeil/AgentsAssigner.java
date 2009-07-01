@@ -26,14 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.ScenarioImpl;
+
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -116,7 +117,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run (Plan plan){
+	public void run (PlanImpl plan){
 		
 		OptimizedAgents agents = this.module.getOptimizedAgents();
 		
@@ -277,8 +278,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 	}
 	
 	
-	protected void writePlan (Plan in, Plan out){
-		Plan bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
+	protected void writePlan (PlanImpl in, PlanImpl out){
+		PlanImpl bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
 		bestPlan.copyPlan(in);
 		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
 		

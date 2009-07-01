@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -80,7 +80,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public void run (Plan basePlan){
+	public void run (PlanImpl basePlan){
 		
 		if (basePlan.getPlanElements().size()==1) return;
 		
@@ -112,7 +112,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		this.processPlan(basePlan);
 	}
 		
-	protected void processPlan (Plan basePlan){
+	protected void processPlan (PlanImpl basePlan){
 		// TODO Check whether allowed?
 		basePlan.setScore(this.scorer.getScore(basePlan));	
 		
@@ -406,7 +406,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	protected double cleanSchedule (double now, Plan plan){
+	protected double cleanSchedule (double now, PlanImpl plan){
 		
 		((ActivityImpl)(plan.getPlanElements().get(0))).setEndTime(now);
 		((ActivityImpl)(plan.getPlanElements().get(0))).setDuration(now);

@@ -20,8 +20,8 @@
 package playground.mfeil;
 
 
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -64,7 +64,7 @@ public class TimeOptimizerWIGIC extends TimeOptimizer implements PlanAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public void run (Plan basePlan){
+	public void run (PlanImpl basePlan){
 		
 		if (basePlan.getPlanElements().size()==1) return;		
 		this.processPlan(basePlan);
