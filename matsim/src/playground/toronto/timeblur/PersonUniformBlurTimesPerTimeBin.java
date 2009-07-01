@@ -25,10 +25,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -58,13 +58,13 @@ public class PersonUniformBlurTimesPerTimeBin extends AbstractPersonAlgorithm im
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
-		for (Plan p : person.getPlans()) {
+	public void run(PersonImpl person) {
+		for (PlanImpl p : person.getPlans()) {
 			this.run(p);
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		Map<Integer,ArrayList<ActivityImpl>> actBins = new TreeMap<Integer, ArrayList<ActivityImpl>>();
 		ActivityImpl currAct = plan.getFirstActivity();
 		while (!currAct.equals(plan.getLastActivity())) {

@@ -11,14 +11,14 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -116,7 +116,7 @@ public class Converter {
 				// "extend" the plan of that person with a Leg and an Act
 
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
-				Plan pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
+				PlanImpl pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
 				endTime = convertTime(tabs[3]);
 				double dur = endTime - this.tmpEndTime;
 
@@ -138,8 +138,8 @@ public class Converter {
 				// then start the new person
 
 				if (!this.pop.getPersons().isEmpty()) {
-					Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
-					Plan tmpPl = p.getSelectedPlan();
+					PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+					PlanImpl tmpPl = p.getSelectedPlan();
 
 					LegImpl leg = tmpPl.createLeg(TransportMode.car);
 					leg.setDepartureTime(convertTime(this.tmpTabs[3]));
@@ -152,7 +152,7 @@ public class Converter {
 					ActivityImpl lastAct = tmpPl.createActivity(this.tmpTabs[10], tmpCoord2);
 
 					// make a copy of the just finished plan and set it to use public transit mode
-					Plan nonCarPlan = new org.matsim.core.population.PlanImpl(p);
+					PlanImpl nonCarPlan = new org.matsim.core.population.PlanImpl(p);
 					nonCarPlan.copyPlan(tmpPl);
 					for (PlanElement pe : nonCarPlan.getPlanElements()) {
 						if (pe instanceof LegImpl) {
@@ -162,8 +162,8 @@ public class Converter {
 					p.addPlan(nonCarPlan);
 				}
 
-				Person p = new PersonImpl(new IdImpl(personId));
-				Plan pl = new org.matsim.core.population.PlanImpl(p);
+				PersonImpl p = new PersonImpl(new IdImpl(personId));
+				PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				endTime = convertTime(tabs[3]);
 
