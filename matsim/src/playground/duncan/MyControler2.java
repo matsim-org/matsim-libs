@@ -32,18 +32,18 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -96,9 +96,9 @@ public class MyControler2 {
 			// generate correct number of persons:
 			for ( int ii=0 ; ii<nPersons ; ii++ ) {
 				Id id = new IdImpl( popCnt ) ; popCnt++ ;
-				Person newPerson = new PersonImpl( id ) ;
+				PersonImpl newPerson = new PersonImpl( id ) ;
 				population.addPerson( newPerson ) ;
-				Plan plan = newPerson.createPlan(true);
+				PlanImpl plan = newPerson.createPlan(true);
 				plan.setSelected(true) ;
 				playground.kai.urbansim.Utils.makeHomePlan(plan, coord) ;
 			}
@@ -109,8 +109,8 @@ public class MyControler2 {
 			}
 		}
 
-		for ( Person pp : population.getPersons().values() ) {
-			Plan plan = pp.getSelectedPlan();
+		for ( PersonImpl pp : population.getPersons().values() ) {
+			PlanImpl plan = pp.getSelectedPlan();
 			int idx = (int)( Math.random()*workPlaces.size() ) ; // TODO: replace by matsim rnd generator
 			Coord workCoord = workPlaces.get( idx ) ;
 //			workPlaces.remove( idx ) ;
