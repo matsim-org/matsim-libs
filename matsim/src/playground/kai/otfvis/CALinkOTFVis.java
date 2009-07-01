@@ -16,7 +16,6 @@ import javax.swing.JSplitPane;
 
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -27,6 +26,7 @@ import org.matsim.core.mobsim.queuesim.VisData;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
@@ -447,7 +447,7 @@ class CALiveServer implements OTFLiveServerRemote{
 	}
 	public void step() throws RemoteException {
 	}
-	public Plan getAgentPlan(String id) throws RemoteException {
+	public PlanImpl getAgentPlan(String id) throws RemoteException {
 		return null;
 	}
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException {

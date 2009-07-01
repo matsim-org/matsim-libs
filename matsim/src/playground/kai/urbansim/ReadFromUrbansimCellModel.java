@@ -12,13 +12,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Layer;
@@ -136,7 +136,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				// generate persons only after it's clear that they have a home location:
 				for ( int ii=0 ; ii<nPersons ; ii++ ) {
 					Id personId = new IdImpl( personCnt ) ;
-					Person person = new PersonImpl( personId ) ;
+					PersonImpl person = new PersonImpl( personId ) ;
 					personCnt++ ;
 					if ( personCnt > 10 ) {
 						log.error( "hack" ) ;
@@ -145,7 +145,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 					population.addPerson(person) ;
 
-					Plan plan = person.createPlan(true);
+					PlanImpl plan = person.createPlan(true);
 					plan.setSelected(true) ;
 					Utils.makeHomePlan(plan, homeCoord) ;
 

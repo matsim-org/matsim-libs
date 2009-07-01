@@ -16,17 +16,17 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -157,7 +157,7 @@ public class ReadFromUrbansimParcelModel {
 				String[] parts = line.split("[\t\n]+");
 
 				Id personId = new IdImpl( parts[idxFromKey.get("person_id")] ) ;
-				Person newPerson = new PersonImpl( personId ) ;
+				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
 					continue ;
@@ -176,7 +176,7 @@ public class ReadFromUrbansimParcelModel {
 					continue ;
 				}
 
-				Plan plan = newPerson.createPlan(true);
+				PlanImpl plan = newPerson.createPlan(true);
 				plan.setSelected(true) ;
 				Utils.makeHomePlan(plan, homeCoord) ;
 
@@ -203,7 +203,7 @@ public class ReadFromUrbansimParcelModel {
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
 
 				while ( true ) { // loop from which we can "break":
-					Person oldPerson ;
+					PersonImpl oldPerson ;
 					if ( oldPop==null ) { // no pre-existing population.  Accept:
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -254,9 +254,9 @@ public class ReadFromUrbansimParcelModel {
 				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
 		log.warn("why is bakPopSize not approx as large as samplingRate*NUrbansimPersons?" ) ;
 
-		List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
+		List<PersonImpl> bakPersons = new ArrayList<PersonImpl>( backupPop.getPersons().values() ) ; // Population data structure not needed!
 		Collections.shuffle( bakPersons ) ;
-		for ( Person person : bakPersons ) {
+		for ( PersonImpl person : bakPersons ) {
 			if ( newPop.getPersons().size() >= samplingRate*NUrbansimPersons ) {
 				break ;
 			}

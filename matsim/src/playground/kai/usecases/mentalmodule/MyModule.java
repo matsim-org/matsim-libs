@@ -14,11 +14,9 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
@@ -35,6 +33,8 @@ import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 @SuppressWarnings("unused")
 public class MyModule implements
@@ -85,7 +85,7 @@ ActivityStartEventHandler
 		}
 		
 		// go through population and copy to my personal population:
-		for ( Person person : pop.getPersons().values() ) {
+		for ( PersonImpl person : pop.getPersons().values() ) {
 			
 			Id id = person.getId();
 			
@@ -93,7 +93,7 @@ ActivityStartEventHandler
 			String carAvail = person.getCarAvail(); // TODO: String??
 			person.getDesires(); // TODO: Do we understand this well enough to have it in the basic interface? 
 
-			List<Plan> plans = person.getPlans() ;
+			List<PlanImpl> plans = person.getPlans() ;
 			
 			for ( BasicPlan plan : plans ) {
 //				BasicPlanImpl.ActLegIterator it = plan.getIterator() ;

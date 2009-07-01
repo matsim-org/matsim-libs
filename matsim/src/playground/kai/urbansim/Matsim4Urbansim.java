@@ -1,10 +1,11 @@
 package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
+
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;

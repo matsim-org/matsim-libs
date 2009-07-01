@@ -11,11 +11,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 
@@ -100,8 +100,8 @@ public class PseudoGravityModel {
 		// NOTE: For the time being, I need this model only for U_CELL, not for U_PARCEL.  So it does not need to be general.
 		
 		// compute the extent of the coordinates for persons:
-		for ( Person person : population.getPersons().values() ) {
-			Plan plan = person.getSelectedPlan() ;
+		for ( PersonImpl person : population.getPersons().values() ) {
+			PlanImpl plan = person.getSelectedPlan() ;
 			ActivityImpl act = plan.getFirstActivity();
 			Coord homeCoord = act.getCoord() ;
 			checkMax( homeCoord ) ;
@@ -132,7 +132,7 @@ public class PseudoGravityModel {
 		}
 		
 		// for every worker, add it to the pseudoCell
-		for ( Person pp : population.getPersons().values() ) {
+		for ( PersonImpl pp : population.getPersons().values() ) {
 			if ( pp.getEmployed().equals("yes") ) {
 				Coord cc = pp.getSelectedPlan().getFirstActivity().getCoord(); // awkward
 				int bin = binFromXY( cc.getX(), cc.getY() ) ;
@@ -199,9 +199,9 @@ public class PseudoGravityModel {
 		log.info("done with IPF") ;
 		printArray( zone2zone ) ;
 		
-		for ( Person pp : population.getPersons().values() ) {
+		for ( PersonImpl pp : population.getPersons().values() ) {
 			// pull plan:
-			Plan plan = pp.getSelectedPlan();
+			PlanImpl plan = pp.getSelectedPlan();
 
 			// get home coordinates:
 			Coord homeCoord = pp.getSelectedPlan().getFirstActivity().getCoord(); // awkward
