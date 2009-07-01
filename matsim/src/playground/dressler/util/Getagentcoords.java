@@ -33,19 +33,19 @@ import javax.imageio.ImageIO;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 
 public class Getagentcoords {
@@ -111,8 +111,8 @@ public class Getagentcoords {
 					height,BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = image.createGraphics();
 
-			for (Person p : population.getPersons().values()) {
-				Plan plan = p.getSelectedPlan();
+			for (PersonImpl p : population.getPersons().values()) {
+				PlanImpl plan = p.getSelectedPlan();
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) continue;
 
@@ -148,8 +148,8 @@ public class Getagentcoords {
 
 			Integer foundpeople = 0;
 			Integer notfoundpeople = 0;
-			for (Person p : population.getPersons().values()) {
-				Plan plan = p.getSelectedPlan();
+			for (PersonImpl p : population.getPersons().values()) {
+				PlanImpl plan = p.getSelectedPlan();
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) {notfoundpeople++; continue;}
 

@@ -30,13 +30,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.util.TravelCost;
@@ -98,9 +98,9 @@ public class MultiSourceEAF {
 		network.connect();
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 
-		for(Person person : population.getPersons().values() ){
+		for(PersonImpl person : population.getPersons().values() ){
 
-			Plan plan = person.getPlans().get(0);
+			PlanImpl plan = person.getPlans().get(0);
 			if(plan.getFirstActivity().getLinkId()==null){
 				continue;
 			}

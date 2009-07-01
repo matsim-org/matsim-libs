@@ -20,14 +20,12 @@
 
 package playground.dressler.util;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -36,6 +34,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.netvis.NetVis;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -75,8 +75,8 @@ public class DDcontroller {
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		if (testplans) {
-			for (Person person : population.getPersons().values()) {
-				Plan plan = person.getSelectedPlan();
+			for (PersonImpl person : population.getPersons().values()) {
+				PlanImpl plan = person.getSelectedPlan();
 				if (plan == null) {
 					System.out.println("Person " + person.getId() + " has no plan.");
 					continue;

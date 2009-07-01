@@ -36,16 +36,16 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.Leg;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 /**
@@ -98,8 +98,8 @@ public class CMCFPopulationConverter {
 			 }
 			 for (int i = 1 ; i<= dem ;i++) {
 				 Id matsimid  = new IdImpl(id+"."+i);
-				 Person p = new PersonImpl(matsimid);
-				 Plan plan = new org.matsim.core.population.PlanImpl(p);
+				 PersonImpl p = new PersonImpl(matsimid);
+				 PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 //				 BasicActivityImpl home = new BasicActivityImpl("home");
 //				 BasicActivityImpl work = new BasicActivityImpl("work");
 //				 BasicLegImpl leg = new BasicLegImpl(TransportMode.walk);
