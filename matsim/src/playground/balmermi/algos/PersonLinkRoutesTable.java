@@ -26,10 +26,10 @@ import java.io.IOException;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -101,9 +101,9 @@ public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements Pl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		try {
-			Plan plan = person.getSelectedPlan();
+			PlanImpl plan = person.getSelectedPlan();
 			for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
 				LegImpl l = (LegImpl)plan.getPlanElements().get(i);
 				ActivityImpl a = (ActivityImpl)plan.getPlanElements().get(i+1);
@@ -127,6 +127,6 @@ public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements Pl
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

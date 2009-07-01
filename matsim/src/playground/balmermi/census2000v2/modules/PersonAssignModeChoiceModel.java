@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -103,7 +103,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final boolean isRidePossible(Person person) {
+	private final boolean isRidePossible(PersonImpl person) {
 		double r = MatsimRandom.getRandom().nextDouble();
 		if (!person.hasLicense()) {
 			if (r < 0.54) { return true; }
@@ -114,7 +114,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final boolean isPtPossible(Person person) {
+	private final boolean isPtPossible(PersonImpl person) {
 		double r = MatsimRandom.getRandom().nextDouble();
 		if (person.getCarAvail().equals(ALWAYS)) {
 			if (r < 0.40) { return true; }
@@ -124,7 +124,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		else { return false; }
 	}
 	
-	private final int getPrevMode(int s_act_idx, Plan p) {
+	private final int getPrevMode(int s_act_idx, PlanImpl p) {
 		// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(s_act_idx);
 		if (act.getType().startsWith(H)) { return -1; }
@@ -139,7 +139,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final int getUrbanDegree(ArrayList<Integer> act_indices, Plan p) {
+	private final int getUrbanDegree(ArrayList<Integer> act_indices, PlanImpl p) {
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(act_indices.get(0));
 		Zone zone = (Zone)act.getFacility().getUpMapping().values().iterator().next();
 		return this.municipalities.getMunicipality(zone.getId()).getRegType();
@@ -147,7 +147,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final double calcTourDistance(ArrayList<Integer> act_indices, Plan p) {
+	private final double calcTourDistance(ArrayList<Integer> act_indices, PlanImpl p) {
 		double dist = 0.0;
 		for (int j=1; j<act_indices.size(); j++) {
 			ActivityImpl from_act = (ActivityImpl)p.getPlanElements().get(act_indices.get(j-1));
@@ -159,7 +159,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final ModelModeChoice createModel(int mainpurpose, Plan p) {
+	private final ModelModeChoice createModel(int mainpurpose, PlanImpl p) {
 		ModelModeChoice m = null;
 		if (p.getPerson().getAge() >= 18) {
 			if (mainpurpose == 0) { m = new ModelModeChoiceWork18Plus(); }
@@ -177,7 +177,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final int getMainPurpose(ArrayList<Integer> act_indices, Plan p) {
+	private final int getMainPurpose(ArrayList<Integer> act_indices, PlanImpl p) {
 		//   GET the mainpurpose of the subtour
 		int mainpurpose = 3; // 0 := work; 1 := edu; 2 := shop 3:=leisure
 		for (int j=1; j<act_indices.size()-1; j++) {
@@ -207,10 +207,10 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 
 		// GET the subtours
-		Plan p = person.getSelectedPlan();
+		PlanImpl p = person.getSelectedPlan();
 		past.run(p);
 		int[] subtour_leg_indices = past.getSubtourIndexation();
 		
@@ -344,7 +344,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		}
 	}
 	
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 	
 	//////////////////////////////////////////////////////////////////////

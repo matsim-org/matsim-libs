@@ -22,10 +22,10 @@ package playground.balmermi.census2000.modules;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -66,7 +66,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Coord home_coord = null;
 		Coord work_coord = null;
@@ -103,6 +103,6 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		if ((2 == mobtype) || (mobtype == 5)) { person.setCarAvail(ALWAYS); }
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

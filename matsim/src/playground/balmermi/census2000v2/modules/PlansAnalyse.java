@@ -23,12 +23,12 @@ package playground.balmermi.census2000v2.modules;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PlansAnalyse {
 
@@ -87,7 +87,7 @@ public class PlansAnalyse {
 		double[] trip_dist = new double[30];
 		for (int i=0; i<trip_dist.length; i++) { trip_dist[i]=0; }
 		
-		for (Person p : plans.getPersons().values()) {
+		for (PersonImpl p : plans.getPersons().values()) {
 			// license
 			if (p.hasLicense()) { lic_cnt[0]++; } else { lic_cnt[1]++; }
 			// mob tools
@@ -101,7 +101,7 @@ public class PlansAnalyse {
 			mt_cnt[idx]++;
 			// act types
 			if (p.getPlans().size() != 1) { Gbl.errorMsg("pid="+p.getId()+": There must be exactly one plan per person!"); }
-			Plan plan = p.getPlans().get(0);
+			PlanImpl plan = p.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl a = (ActivityImpl) pe;

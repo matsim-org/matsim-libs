@@ -21,9 +21,9 @@
 package playground.balmermi.algos;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -50,7 +50,7 @@ public class PersonAddAttsFromData extends AbstractPersonAlgorithm implements Pl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		Id id = person.getId();
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(id.toString()));
 		if (p == null) {
@@ -63,6 +63,6 @@ public class PersonAddAttsFromData extends AbstractPersonAlgorithm implements Pl
 		person.setEmployed(p.getEmployed());
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

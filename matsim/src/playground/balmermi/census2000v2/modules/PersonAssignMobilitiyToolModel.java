@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -75,7 +75,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignHHSizeModelParamsFromHH(Person p, Household hh) {
+	private final void assignHHSizeModelParamsFromHH(PersonImpl p, Household hh) {
 		// nump
 		int nump = hh.getPersons().size();
 		if (nump > MAXNUMP) { nump = MAXNUMP; }
@@ -91,7 +91,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 //		}
 	}
 	
-	private final void assignHHSizeModelParamsFromCatts(Person p, Household hh) {
+	private final void assignHHSizeModelParamsFromCatts(PersonImpl p, Household hh) {
 		// nump
 		int nump = (Integer)p.getCustomAttributes().get(CAtts.P_APERW);
 		if (nump < 1) { nump = (Integer)p.getCustomAttributes().get(CAtts.P_WKATA); }
@@ -115,7 +115,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		Map<String,Object> atts = person.getCustomAttributes();
 		Household hh = (Household)atts.get(CAtts.HH_W);
 		
@@ -169,6 +169,6 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		if ((2 == mobtype) || (mobtype == 5)) { person.setCarAvail(ALWAYS); }
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

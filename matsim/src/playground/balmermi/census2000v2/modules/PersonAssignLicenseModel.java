@@ -23,10 +23,10 @@ package playground.balmermi.census2000v2.modules;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -66,7 +66,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignHHSizeModelParamsFromHH(Person p, Household hh) {
+	private final void assignHHSizeModelParamsFromHH(PersonImpl p, Household hh) {
 		// nump
 		int nump = hh.getPersons().size();
 		if (nump > MAXNUMP) { nump = MAXNUMP; }
@@ -82,7 +82,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		}
 	}
 	
-	private final void assignHHSizeModelParamsFromCatts(Person p, Household hh) {
+	private final void assignHHSizeModelParamsFromCatts(PersonImpl p, Household hh) {
 		// nump
 		int nump = (Integer)p.getCustomAttributes().get(CAtts.P_APERW);
 		if (nump < 1) { nump = (Integer)p.getCustomAttributes().get(CAtts.P_WKATA); }
@@ -106,7 +106,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		Map<String,Object> atts = person.getCustomAttributes();
 		Household hh = (Household)atts.get(CAtts.HH_W);
 
@@ -137,6 +137,6 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

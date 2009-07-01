@@ -26,9 +26,9 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
@@ -36,13 +36,13 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -73,8 +73,8 @@ public class ScenarioCut {
 
 		min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		for (Person p : scenario.getPopulation().getPersons().values()) {
-			for (Plan plan : p.getPlans()) {
+		for (PersonImpl p : scenario.getPopulation().getPersons().values()) {
+			for (PlanImpl plan : p.getPlans()) {
 				for (PlanElement e : plan.getPlanElements()) {
 					if (e instanceof ActivityImpl) {
 						ActivityImpl a = (ActivityImpl)e;
@@ -220,9 +220,9 @@ public class ScenarioCut {
 		Set<Id> linkIds = scenario.getNetwork().getLinks().keySet();
 		Set<Id> facIds = scenario.getActivityFacilities().getFacilities().keySet();
 		Set<Id> toRemove = new HashSet<Id>();
-		for (Person p : scenario.getPopulation().getPersons().values()) {
+		for (PersonImpl p : scenario.getPopulation().getPersons().values()) {
 			boolean removeIt = false;
-			for (Plan plan : p.getPlans()) {
+			for (PlanImpl plan : p.getPlans()) {
 				for (PlanElement e : plan.getPlanElements()) {
 					if (e instanceof ActivityImpl) {
 						ActivityImpl a = (ActivityImpl)e;

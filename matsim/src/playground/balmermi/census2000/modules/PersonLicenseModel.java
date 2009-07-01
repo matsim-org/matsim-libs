@@ -20,8 +20,8 @@
 
 package playground.balmermi.census2000.modules;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -55,7 +55,7 @@ public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanA
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		model.setAge(p.getAge());
 		model.setHHDimension(p.getHousehold().getPersonCount());
@@ -71,6 +71,6 @@ public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanA
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

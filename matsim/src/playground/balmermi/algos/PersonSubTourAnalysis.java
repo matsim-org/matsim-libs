@@ -28,11 +28,11 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -75,7 +75,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 	// private method
 	//////////////////////////////////////////////////////////////////////
 
-	private final void handleSubTour(final Plan plan, final int start, final int i, final int j, final int end) {
+	private final void handleSubTour(final PlanImpl plan, final int start, final int i, final int j, final int end) {
 //		System.out.println("[" + start + "," + i + "]&[" + j + "," + end + "]");
 
 		// calc number of trips
@@ -133,7 +133,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 		this.dist_mode_sumdist.put(dist,mode_dist);
 	}
 
-	private final void extractSubTours(Plan plan, int start, int end) {
+	private final void extractSubTours(PlanImpl plan, int start, int end) {
 		boolean is_leaf = true;
 		for (int i=start+2; i<end-1; i=i+2) {
 			ActivityImpl acti = (ActivityImpl)plan.getPlanElements().get(i);
@@ -173,13 +173,13 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
-		Plan plan = person.getSelectedPlan();
+	public void run(PersonImpl person) {
+		PlanImpl plan = person.getSelectedPlan();
 		if (plan == null) { Gbl.errorMsg("Person id=" + person.getId() + "does not have a selected plan."); }
 		this.run(plan);
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 //		System.out.println("----------------------------------------");
 //		System.out.println("pid=" + plan.getPerson().getId() + ":");
 //		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {

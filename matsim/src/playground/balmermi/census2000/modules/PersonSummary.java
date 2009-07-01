@@ -23,11 +23,11 @@ package playground.balmermi.census2000.modules;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -93,7 +93,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		if (person.getAge() > 99) {
 			return;
 		}
@@ -146,7 +146,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {
-			Plan plan = person.getPlans().get(i);
+			PlanImpl plan = person.getPlans().get(i);
 
 			int acts = 0;
 			for (int j=0; j<plan.getPlanElements().size(); j=j+2) {
@@ -289,6 +289,6 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		System.out.println("----------------------------------------");
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

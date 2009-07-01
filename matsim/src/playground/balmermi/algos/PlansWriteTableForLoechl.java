@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -82,7 +82,7 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		int nofPlans = person.getPlans().size();
 
 		try {
@@ -94,7 +94,7 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 		}
 		
 		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
+			PlanImpl plan = person.getPlans().get(planId);
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
@@ -103,7 +103,7 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
@@ -115,7 +115,7 @@ public class PlansWriteTableForLoechl extends AbstractPersonAlgorithm implements
 	// helper methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void handlePlan(Plan plan) throws Exception {
+	public void handlePlan(PlanImpl plan) throws Exception {
 		try {
 			List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 

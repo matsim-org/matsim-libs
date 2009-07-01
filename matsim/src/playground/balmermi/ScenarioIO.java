@@ -23,16 +23,16 @@ package playground.balmermi;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
@@ -127,8 +127,8 @@ public class ScenarioIO {
 		preProcessLandmarks.run(network);
 		ReRouteLandmarks router = new ReRouteLandmarks(network,timeCostCalc,timeCostCalc,preProcessLandmarks);
 		router.prepareReplanning();
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
+		for (PersonImpl person : population.getPersons().values()) {
+			for (PlanImpl plan : person.getPlans()) {
 				router.handlePlan(plan);
 			}
 		}

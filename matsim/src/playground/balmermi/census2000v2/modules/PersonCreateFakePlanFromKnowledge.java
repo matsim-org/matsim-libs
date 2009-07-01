@@ -24,12 +24,12 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -65,7 +65,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 		ActivityOption home = null;
@@ -92,7 +92,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 			if (!educ_acts.isEmpty()) { educ = educ_acts.get(0); }
 		}
 		
-		Plan p = person.createPlan(true);
+		PlanImpl p = person.createPlan(true);
 		try {
 			if ((work==null)&&(educ==null)) {
 				ActivityImpl act = p.createActivity(home.getType(),home.getFacility().getCoord());

@@ -26,11 +26,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 public class MicroCensus {
@@ -64,33 +64,33 @@ public class MicroCensus {
 	//////////////////////////////////////////////////////////////////////
 
 	class Group {
-		private final List<Tuple<Double,Person>> list = new ArrayList<Tuple<Double,Person>>();
+		private final List<Tuple<Double,PersonImpl>> list = new ArrayList<Tuple<Double,PersonImpl>>();
 
-		private final void addTuple(Double weight, Person person) {
-			Tuple<Double,Person> t = new Tuple<Double, Person>(weight,person);
+		private final void addTuple(Double weight, PersonImpl person) {
+			Tuple<Double,PersonImpl> t = new Tuple<Double, PersonImpl>(weight,person);
 			list.add(t);
 		}
 
 		private final void setWeight(double weight, int index) {
-			Tuple<Double,Person> t = list.remove(index);
+			Tuple<Double,PersonImpl> t = list.remove(index);
 			if (t == null) { Gbl.errorMsg("No tuple at index "+ index); }
-			Tuple<Double,Person> t_new = new Tuple<Double, Person>(weight,t.getSecond());
+			Tuple<Double,PersonImpl> t_new = new Tuple<Double, PersonImpl>(weight,t.getSecond());
 			list.add(index,t_new);
 		}
 
 		private final void print() {
 			for (int i=0; i<list.size(); i++) {
-				Tuple<Double,Person> t = list.get(i);
+				Tuple<Double,PersonImpl> t = list.get(i);
 				System.out.println(i+": ("+t.getFirst()+","+t.getSecond().getId()+")");
 			}
 		}
 
-		private final Person getRandomPerson() {
+		private final PersonImpl getRandomPerson() {
 			int i = MatsimRandom.getRandom().nextInt(list.size());
 			return list.get(i).getSecond();
 		}
 
-		private final Person getRandomWeightedPerson() {
+		private final PersonImpl getRandomWeightedPerson() {
 			double r = MatsimRandom.getRandom().nextDouble();
 			double weight_sum = 0.0;
 			for (int i=0; i<list.size(); i++) {
@@ -142,10 +142,10 @@ public class MicroCensus {
 
 	private final void create(Population pop) {
 		double weight_sum = 0.0;
-		for (Person p : pop.getPersons().values()) {
+		for (PersonImpl p : pop.getPersons().values()) {
 			weight_sum += p.getSelectedPlan().getScore().doubleValue();
 		}
-		for (Person p : pop.getPersons().values()) {
+		for (PersonImpl p : pop.getPersons().values()) {
 			int age = p.getAge();
 			String sex = p.getSex();
 			String lic = p.getLicense();
@@ -173,7 +173,7 @@ public class MicroCensus {
 					group_weight_sum += g.list.get(j).getFirst();
 				}
 				for (int j=0; j<g.list.size(); j++) {
-					Tuple<Double,Person> t = g.list.get(j);
+					Tuple<Double,PersonImpl> t = g.list.get(j);
 					g.setWeight(t.getFirst()/group_weight_sum,j);
 				}
 			}
@@ -184,7 +184,7 @@ public class MicroCensus {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Person getRandomMZPerson(int age, String sex, String lic, boolean has_work, boolean has_educ) {
+	public final PersonImpl getRandomMZPerson(int age, String sex, String lic, boolean has_work, boolean has_educ) {
 		int index = this.group2index(age,sex,lic,has_work,has_educ);
 		Group g = groups[index];
 		if (g == null) {
@@ -194,7 +194,7 @@ public class MicroCensus {
 		return g.getRandomPerson();
 	}
 
-	public final Person getRandomWeightedMZPerson(int age, String sex, String lic, boolean has_work, boolean has_educ) {
+	public final PersonImpl getRandomWeightedMZPerson(int age, String sex, String lic, boolean has_work, boolean has_educ) {
 		int index = this.group2index(age,sex,lic,has_work,has_educ);
 		Group g = groups[index];
 		if (g == null) {

@@ -26,12 +26,12 @@ import java.util.List;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -71,16 +71,16 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
+			PlanImpl plan = person.getPlans().get(planId);
 			handlePlan(plan);
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		handlePlan(plan);
 	}
 
@@ -89,7 +89,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	// changed the method from public to private. use run(plan) instead
-	protected void handlePlan(Plan plan) {
+	protected void handlePlan(PlanImpl plan) {
 		List<?> actslegs = plan.getPlanElements();
 		ActivityImpl fromAct = (ActivityImpl)actslegs.get(0);
 		double travTime = 0;

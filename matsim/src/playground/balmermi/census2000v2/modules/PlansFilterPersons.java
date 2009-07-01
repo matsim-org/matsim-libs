@@ -25,11 +25,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.balmermi.census2000v2.data.CAtts;
@@ -68,11 +68,11 @@ public class PlansFilterPersons {
 		
 		// remove persons which are only part of the 'zivilrechtliche' population
 		Set<Id> pids = new HashSet<Id>();
-		for (Person p : plans.getPersons().values()) {
+		for (PersonImpl p : plans.getPersons().values()) {
 			if (p.getCustomAttributes().get(CAtts.HH_W) == null) { pids.add(p.getId()); }
 		}
 		for (Id pid : pids) {
-			Person p = plans.getPersons().remove(pid);
+			PersonImpl p = plans.getPersons().remove(pid);
 			Object o = p.getCustomAttributes().get(CAtts.HH_Z);
 			if (o == null) { Gbl.errorMsg("pid="+p.getId()+": no hh_z. That must not happen!"); }
 			((Household)o).removePersonZ(p.getId());
@@ -80,7 +80,7 @@ public class PlansFilterPersons {
 		log.info("      "+pids.size()+" persons without '"+CAtts.HH_W+"' household.");
 		
 		// remove 'zivilrechtliche' data from the population
-		for (Person p : plans.getPersons().values()) {
+		for (PersonImpl p : plans.getPersons().values()) {
 			Object o = p.getCustomAttributes().get(CAtts.HH_Z);
 			if (o != null) {
 				ActivityFacility f = ((Household)o).getFacility();

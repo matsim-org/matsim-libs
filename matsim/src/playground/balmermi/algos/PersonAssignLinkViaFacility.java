@@ -25,12 +25,12 @@ import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -118,8 +118,8 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
-		for (Plan p : person.getPlans()) {
+	public void run(final PersonImpl person) {
+		for (PlanImpl p : person.getPlans()) {
 			for (PlanElement pe : p.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl l = (LegImpl) pe;

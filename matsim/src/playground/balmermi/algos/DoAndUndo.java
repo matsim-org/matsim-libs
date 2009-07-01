@@ -23,10 +23,10 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -53,9 +53,9 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	// private method
 	//////////////////////////////////////////////////////////////////////
 
-	private final void doIt(Person p) {
+	private final void doIt(PersonImpl p) {
 		if (!leg_modes.isEmpty()) { Gbl.errorMsg("Something is wrong!"); }
-		Plan plan = p.getSelectedPlan();
+		PlanImpl plan = p.getSelectedPlan();
 		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
 			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			leg_modes.add(leg.getMode());
@@ -63,9 +63,9 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		}
 	}
 	
-	private final void undoIt(Person p) {
+	private final void undoIt(PersonImpl p) {
 		if (leg_modes.isEmpty()) { Gbl.errorMsg("Something is wrong!"); }
-		Plan plan = p.getSelectedPlan();
+		PlanImpl plan = p.getSelectedPlan();
 		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {
 			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			leg.setMode(leg_modes.get((i-1)/2));
@@ -78,7 +78,7 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		if (doIt == true) {
 			this.doIt(person);
 			doIt = false;
@@ -89,6 +89,6 @@ public class DoAndUndo extends AbstractPersonAlgorithm implements PlanAlgorithm 
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

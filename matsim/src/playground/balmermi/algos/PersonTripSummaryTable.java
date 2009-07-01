@@ -25,10 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -95,9 +95,9 @@ public class PersonTripSummaryTable extends AbstractPersonAlgorithm implements P
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		// plans
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		if (plan == null) { Gbl.errorMsg("Person id=" + person.getId() + "does not have a selected plan assigned!"); }
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
@@ -127,6 +127,6 @@ public class PersonTripSummaryTable extends AbstractPersonAlgorithm implements P
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

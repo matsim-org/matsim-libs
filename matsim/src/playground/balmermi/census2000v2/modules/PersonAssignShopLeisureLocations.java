@@ -29,11 +29,11 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -233,7 +233,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		}
 	}
 	
-	private final void assignRemainingLocations(Plan plan, int start, int end) {
+	private final void assignRemainingLocations(PlanImpl plan, int start, int end) {
 		Coord c_start = ((ActivityImpl)plan.getPlanElements().get(start)).getFacility().getCoord();
 		Coord c_end   = ((ActivityImpl)plan.getPlanElements().get(end)).getFacility().getCoord();
 		
@@ -273,13 +273,13 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		if (person.getPlans().size() != 1) { Gbl.errorMsg("pid="+person.getId()+": There must be exactly one plan."); }
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		this.run(plan);
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (act.getFacility() == null) {

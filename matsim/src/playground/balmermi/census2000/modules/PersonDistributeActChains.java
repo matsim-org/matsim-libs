@@ -23,12 +23,12 @@ package playground.balmermi.census2000.modules;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -196,11 +196,11 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void setChain(Person p, int bitcode) {
+	private final void setChain(PersonImpl p, int bitcode) {
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
 		int index = MatsimRandom.getRandom().nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
-		Plan plan =  p.createPlan(true);
+		PlanImpl plan =  p.createPlan(true);
 		int time_sum = 0;
 		for (int i=0; i<chain.size(); i=i+2) {
 			int val = chain.get(i);
@@ -252,7 +252,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		int age = person.getAge();
 		boolean employed = person.isEmployed();
 		int row = -1;
@@ -272,6 +272,6 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

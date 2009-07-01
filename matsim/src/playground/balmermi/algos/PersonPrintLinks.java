@@ -23,9 +23,9 @@ package playground.balmermi.algos;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonPrintLinks extends AbstractPersonAlgorithm {
@@ -47,8 +47,8 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
-		Plan plan = person.getPlans().get(0);
+	public void run(PersonImpl person) {
+		PlanImpl plan = person.getPlans().get(0);
 		int counter = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {

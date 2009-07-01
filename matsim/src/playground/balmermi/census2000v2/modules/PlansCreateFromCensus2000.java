@@ -32,14 +32,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -124,7 +124,7 @@ public class PlansCreateFromCensus2000 {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private ActivityOption chooseEducActBasedOnSchoolType(final Person p, String act_type) {
+	private ActivityOption chooseEducActBasedOnSchoolType(final PersonImpl p, String act_type) {
 		if (act_type.equals(CAtts.ACT_EKIGA) || act_type.equals(CAtts.ACT_EPRIM)) { // assign nearest act
 			QuadTree<ActivityFacility> qt = this.fqts.get(act_type);
 			ActivityFacility home_f = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility();
@@ -176,7 +176,7 @@ public class PlansCreateFromCensus2000 {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void chooseEducFacility(final Person p, String[] entries, Layer municipalityLayer) {
+	private final void chooseEducFacility(final PersonImpl p, String[] entries, Layer municipalityLayer) {
 		
 		// 1. get the school activity type
 		int gegw = Integer.parseInt(entries[CAtts.I_GEGW]);
@@ -256,7 +256,7 @@ public class PlansCreateFromCensus2000 {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void chooseWorkFacility(final Person p, final String agde, final String pber, final Layer municipalityLayer) {
+	private final void chooseWorkFacility(final PersonImpl p, final String agde, final String pber, final Layer municipalityLayer) {
 
 		// 1. examine the job type
 		// possible job numbers: job = -1,0,1,2,3,4,5,6,7,81,82,83,84,85,86,87,9
@@ -402,7 +402,7 @@ public class PlansCreateFromCensus2000 {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void addDemographics(final Person p, final String[] entries, int wkat, Layer municipalityLayer) {
+	private final void addDemographics(final PersonImpl p, final String[] entries, int wkat, Layer municipalityLayer) {
 		Map<String,Object> p_atts = p.getCustomAttributes();
 
 		// adding home knowledge
@@ -504,7 +504,7 @@ public class PlansCreateFromCensus2000 {
 				// 3     id    id      2/person   person is part of w and z. current line reflects w
 				// 4     id    id      2/person   person is part of w and z. current line reflects z
 				if ((wkat == 1) && (gem2 == -9) && (partnr == -9)) {
-					Person p = plans.getPersons().get(pid);
+					PersonImpl p = plans.getPersons().get(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
@@ -514,7 +514,7 @@ public class PlansCreateFromCensus2000 {
 					this.addDemographics(p,entries,wkat,municipalityLayer);
 				}
 				else if ((wkat == 3) && (gem2 == -7) && (partnr == -7)) {
-					Person p = plans.getPersons().get(pid);
+					PersonImpl p = plans.getPersons().get(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
@@ -524,7 +524,7 @@ public class PlansCreateFromCensus2000 {
 					this.addDemographics(p,entries,wkat,municipalityLayer);
 				}
 				else if ((wkat == 4) && (gem2 == -7) && (partnr == -7)) {
-					Person p = plans.getPersons().get(pid);
+					PersonImpl p = plans.getPersons().get(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
@@ -534,7 +534,7 @@ public class PlansCreateFromCensus2000 {
 					this.addDemographics(p,entries,wkat,municipalityLayer);
 				}
 				else if ((wkat == 3) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					Person p = plans.getPersons().get(new IdImpl(partnr));
+					PersonImpl p = plans.getPersons().get(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
 						p = new PersonImpl(pid);
@@ -553,7 +553,7 @@ public class PlansCreateFromCensus2000 {
 					}
 				}
 				else if ((wkat == 4) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					Person p = plans.getPersons().get(new IdImpl(partnr));
+					PersonImpl p = plans.getPersons().get(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
 						p = new PersonImpl(pid);
@@ -585,7 +585,7 @@ public class PlansCreateFromCensus2000 {
 			// some info
 			log.info("    "+plans.getPersons().size()+" persons created! (#pids="+pids.size()+")");
 			int same_cnt = 0; int diff_cnt = 0; int wonly_cnt = 0; int zonly_cnt = 0; int diff_f_cnt = 0;
-			for (Person p : plans.getPersons().values()) {
+			for (PersonImpl p : plans.getPersons().values()) {
 				Map<String,Object> p_atts = p.getCustomAttributes();
 				if ((p_atts.get(CAtts.HH_W)==null)&&(p_atts.get(CAtts.HH_Z)==null)) { Gbl.errorMsg("WAHHH!"); }
 				else if ((p_atts.get(CAtts.HH_W)==null)&&(p_atts.get(CAtts.HH_Z)!=null)) { zonly_cnt++; }

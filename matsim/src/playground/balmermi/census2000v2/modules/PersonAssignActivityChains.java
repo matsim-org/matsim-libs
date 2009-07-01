@@ -21,9 +21,9 @@
 package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -59,7 +59,7 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		boolean has_work = false;
 		if (!this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W2).isEmpty() ||
 		    !this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W3).isEmpty()) {
@@ -74,7 +74,7 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 			has_educ = true;
 		}
 
-		Person mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, has_educ);
+		PersonImpl mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, has_educ);
 		if (mz_p == null) {
 			log.warn("pid="+person.getId()+": Person does not belong to a micro census group!");
 			mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),"f",person.getLicense(), has_work, has_educ);
@@ -87,6 +87,6 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 		person.setSelectedPlan(mz_p.getSelectedPlan());
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

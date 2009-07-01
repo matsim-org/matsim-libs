@@ -26,9 +26,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -86,7 +86,7 @@ public class PersonInitDemandSummaryTable extends AbstractPersonAlgorithm implem
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		try {
 			// person attributes
 			out.write(person.getId() + "\t");
@@ -168,6 +168,6 @@ public class PersonInitDemandSummaryTable extends AbstractPersonAlgorithm implem
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

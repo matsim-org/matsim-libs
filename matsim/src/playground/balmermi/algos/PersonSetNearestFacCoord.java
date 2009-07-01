@@ -26,10 +26,10 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -85,9 +85,9 @@ public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		if (person.getPlans().size() != 1) { Gbl.errorMsg("Each person must have one plan!"); }
-		Plan plan = person.getPlans().get(0);
+		PlanImpl plan = person.getPlans().get(0);
 		this.run(plan);
 	}
 
@@ -95,7 +95,7 @@ public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;

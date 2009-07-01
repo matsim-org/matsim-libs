@@ -22,10 +22,10 @@ package playground.balmermi.algos;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -55,8 +55,8 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
-		Plan plan = person.getSelectedPlan();
+	public void run(PersonImpl person) {
+		PlanImpl plan = person.getSelectedPlan();
 		if (plan == null) { throw new RuntimeException("Person id=" + person.getId() + "does not have a selected plan assigned!"); }
 		for (int i=1; i<plan.getPlanElements().size()-1; i=i+2) {
 			ActivityImpl prev = (ActivityImpl)plan.getPlanElements().get(i-1);
@@ -80,6 +80,6 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }

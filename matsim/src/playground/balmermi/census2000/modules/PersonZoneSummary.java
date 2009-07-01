@@ -28,11 +28,11 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -160,7 +160,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final int calcChainIndex(Plan plan, int offset) {
+	private final int calcChainIndex(PlanImpl plan, int offset) {
 		int w = 0; int e = 0; int s = 0; int l = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -177,7 +177,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		return index + offset;
 	}
 
-	private final int calcPlanIndex(Plan plan, int offset) {
+	private final int calcPlanIndex(PlanImpl plan, int offset) {
 		double dist = 0.0;
 		ActivityImpl prevAct = null;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -197,7 +197,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		else { return 4 + offset; }
 	}
 
-	private final int countActs(Plan plan) {
+	private final int countActs(PlanImpl plan) {
 		int cnt = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -207,7 +207,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		return cnt;
 	}
 
-	private final int[] countTrips(Plan plan) {
+	private final int[] countTrips(PlanImpl plan) {
 		int[] cnts = {0,0,0,0,0};
 		ActivityImpl prevAct = null;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -232,7 +232,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 		Id zone_id = p.getHousehold().getMunicipality().getZone().getId();
 		int[] vals = this.zones.get(zone_id);
@@ -288,6 +288,6 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		else { Gbl.errorMsg("mode=" + mode + " not known!"); }
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 	}
 }
