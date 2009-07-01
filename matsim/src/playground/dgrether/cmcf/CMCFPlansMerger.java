@@ -20,12 +20,12 @@ package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.MatsimIo;
@@ -59,12 +59,12 @@ public class CMCFPlansMerger {
 		Population plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
 		Population plans = MatsimIo.loadPlans(plansFile, net);
 		
-		for (Person person : plansCmcf.getPersons().values()) {
+		for (PersonImpl person : plansCmcf.getPersons().values()) {
 			String idstring = person.getId().toString();
 			String[] idLegNumber = idstring.split("leg");
 			Id id = new IdImpl(idLegNumber[0]);
-			Person p = plans.getPersons().get(id);
-			Plan plan = p.getSelectedPlan();
+			PersonImpl p = plans.getPersons().get(id);
+			PlanImpl plan = p.getSelectedPlan();
 			int legNumber = Integer.parseInt(idLegNumber[1]);
 			legNumber = (legNumber * 2) + 1;
 			LegImpl leg = (LegImpl) plan.getPlanElements().get(legNumber);

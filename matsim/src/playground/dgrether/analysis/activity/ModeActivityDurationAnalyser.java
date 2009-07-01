@@ -21,15 +21,15 @@ package playground.dgrether.analysis.activity;
 import java.io.File;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -85,29 +85,29 @@ public class ModeActivityDurationAnalyser {
 		int workActivityNonCarCount = 0;
 		double durTemp;
 
-		for (Person pers : plans.getPersons().values()){
-			Plan p = pers.getSelectedPlan();
+		for (PersonImpl pers : plans.getPersons().values()){
+			PlanImpl p = pers.getSelectedPlan();
 			for (PlanElement pe : p.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
 					try {
 						durTemp = act.calculateDuration();
 						if (act.getType().equalsIgnoreCase("h")) {
-							if (p.getType().equals(Plan.Type.CAR)) {
+							if (p.getType().equals(PlanImpl.Type.CAR)) {
 								homeActivityDurationsCar += durTemp;
 								homeActivityCarCount++;
 							}
-							else if (p.getType().equals(Plan.Type.PT)){
+							else if (p.getType().equals(PlanImpl.Type.PT)){
 								homeActivityDurationsNonCar += durTemp;
 								homeActivityNonCarCount++;
 							}
 						}
 						else if (act.getType().equalsIgnoreCase("w")) {
-							if (p.getType().equals(Plan.Type.CAR)) {
+							if (p.getType().equals(PlanImpl.Type.CAR)) {
 								workActivityDurationsCar += durTemp;
 								workActivityCarCount++;
 							}
-							else if (p.getType().equals(Plan.Type.PT)){
+							else if (p.getType().equals(PlanImpl.Type.PT)){
 								workActivityDurationsNonCar += durTemp;
 								workActivityNonCarCount++;
 							}

@@ -22,11 +22,9 @@ package playground.dgrether;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -35,6 +33,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
@@ -75,8 +75,8 @@ public class Plansgenerator {
 		final Coord homeCoord = new CoordImpl(-25000, 0);
 		final Coord workCoord = new CoordImpl(10000, 0);
 		for (int i = 1; i <= 100; i++) {
-			Person p = new PersonImpl(new IdImpl(i));
-			Plan plan = new org.matsim.core.population.PlanImpl(p);
+			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			//home
 			homeEndtime += 0.5 * 60;

@@ -29,10 +29,10 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
@@ -65,7 +65,7 @@ public class KmlPlansWriter {
 		this.featureFactory = new NetworkFeatureFactory(coordTransform);
 	}
 
-	public FolderType getPlansFolder(Set<Plan> planSet) throws IOException {
+	public FolderType getPlansFolder(Set<PlanImpl> planSet) throws IOException {
 		
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		
@@ -78,7 +78,7 @@ public class KmlPlansWriter {
 		FolderType planFolder;
 		LegImpl leg;
 		AbstractFeatureType abstractFeature;
-		for (Plan plan : planSet) {
+		for (PlanImpl plan : planSet) {
 			planFolder = kmlObjectFactory.createFolderType();
 			planFolder.setName("Selected Plan of Person: " + plan.getPerson().getId());
 			act = plan.getFirstActivity();

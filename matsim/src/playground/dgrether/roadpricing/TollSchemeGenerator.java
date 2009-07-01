@@ -38,7 +38,7 @@ import net.opengis.kml._2.ScreenOverlayType;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;

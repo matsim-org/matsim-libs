@@ -25,13 +25,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
@@ -91,9 +91,9 @@ public class SubPopScorer {
 		}
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);
 		selectedPlanFilter.run(plans);
-		Set<Plan> planSet = collector.getPlans();
+		Set<PlanImpl> planSet = collector.getPlans();
 		Set<Id> idSet = new HashSet<Id>(planSet.size());
-		for (Plan p : planSet) {
+		for (PlanImpl p : planSet) {
 			idSet.add(p.getPerson().getId());
 		}
   	return idSet;

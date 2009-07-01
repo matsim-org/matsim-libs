@@ -22,11 +22,9 @@ package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -36,6 +34,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -179,8 +179,8 @@ public class CMCFScenarioGeneratorNoReroute {
 		Link l6 = this.network.getLink(IdFactory.get(6));
 
 		for (int i = 1; i <= 7200; i++) {
-			Person p = new PersonImpl(new IdImpl(i));
-			Plan plan = new org.matsim.core.population.PlanImpl(p);
+			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			// home % 2
 			homeEndTime = homeEndTime + firstHomeEndTime + ((i - 1) % 2);

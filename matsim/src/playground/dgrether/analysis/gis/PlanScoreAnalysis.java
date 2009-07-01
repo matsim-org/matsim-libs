@@ -40,13 +40,13 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.factory.GeotoolsFactory;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
@@ -165,11 +165,11 @@ public class PlanScoreAnalysis {
 //			Collection<Feature> features = new ArrayList<Feature>(plans.getPersons()
 //					.size());
 
-			Plan plan;
+			PlanImpl plan;
 			double score1, score2;
 			Coord loc;
 			Id id;
-			for (Person person : plans.getPersons().values()) {
+			for (PersonImpl person : plans.getPersons().values()) {
 				plan = person.getSelectedPlan();
 				id = person.getId();
 				score1 = plan.getScore().doubleValue();

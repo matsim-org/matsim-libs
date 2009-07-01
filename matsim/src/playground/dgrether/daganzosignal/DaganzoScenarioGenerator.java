@@ -23,22 +23,22 @@ package playground.dgrether.daganzosignal;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -196,9 +196,9 @@ public class DaganzoScenarioGenerator {
 		PopulationBuilder builder = population.getPopulationBuilder();
 
 		for (int i = 1; i <= 3600; i++) {
-			Person p = builder.createPerson(scenario.createId(Integer
+			PersonImpl p = builder.createPerson(scenario.createId(Integer
 					.toString(i)));
-			Plan plan = builder.createPlan(p);
+			PlanImpl plan = builder.createPlan(p);
 			p.addPlan(plan);
 			// home
 			// homeEndTime = homeEndTime + ((i - 1) % 3);

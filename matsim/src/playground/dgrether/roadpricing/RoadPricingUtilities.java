@@ -20,7 +20,7 @@ package playground.dgrether.roadpricing;
 
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
@@ -28,7 +28,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
  */
 public class RoadPricingUtilities {
 
-	public static boolean hasActInTollArea(Plan plan1,
+	public static boolean hasActInTollArea(PlanImpl plan1,
 			RoadPricingScheme roadPricingScheme) {
 		for (PlanElement pe : plan1.getPlanElements()) {
 			if (pe instanceof BasicActivity) {
