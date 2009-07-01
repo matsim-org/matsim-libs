@@ -25,7 +25,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.TransitLine;
+import playground.marcel.pt.transitSchedule.TransitLineImpl;
 
 public class BusPassenger extends PersonImpl implements PassengerAgent {
 
@@ -40,7 +40,7 @@ public class BusPassenger extends PersonImpl implements PassengerAgent {
 		return this.exitStop == stop;
 	}
 
-	public boolean ptLineAvailable(final TransitLine line) {
+	public boolean ptLineAvailable(final TransitLineImpl line) {
 		// TODO [MR] Auto-generated method stub
 		return true;
 	}

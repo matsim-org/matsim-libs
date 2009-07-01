@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitLine.java
+ * Departure.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,44 +20,41 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.basic.v01.Id;
+import org.matsim.vehicles.BasicVehicle;
 
 /**
- * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
+ * Describes a single departure along a route in a transit line.
  * 
  * @author mrieser
  */
-public class TransitLine {
+public class DepartureImpl {
 
-	private final Id lineId;
-	private final Map<Id, TransitRoute> transitRoutes = new LinkedHashMap<Id, TransitRoute>();
+	private final Id id;
+	private final double departureTime;
+	
+	private BasicVehicle vehicle = null;
 
-	public TransitLine(final Id id) {
-		this.lineId = id;
+	public DepartureImpl(final Id id, final double departureTime) {
+		this.id = id;
+		this.departureTime = departureTime;
 	}
 
 	public Id getId() {
-		return this.lineId;
+		return this.id;
 	}
 
-	public void addRoute(final TransitRoute transitRoute) {
-		final Id id = transitRoute.getId();
-		if (this.transitRoutes.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit route with id " + id.toString());
-		}
-		this.transitRoutes.put(id, transitRoute);
+	public double getDepartureTime() {
+		return this.departureTime;
 	}
-
-	public Map<Id, TransitRoute> getRoutes() {
-		return Collections.unmodifiableMap(this.transitRoutes);
+	
+	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
+	public void setVehicle(final BasicVehicle vehicle) {
+		this.vehicle = vehicle;
 	}
-
-	public void removeRoute(final TransitRoute route) {
-		this.transitRoutes.remove(route.getId());
+	
+	public BasicVehicle getVehicle() {
+		return this.vehicle;
 	}
 
 }

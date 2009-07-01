@@ -17,11 +17,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.core.api.network.Link;
 
-import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitRoute;
-import playground.marcel.pt.transitSchedule.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
-import playground.marcel.pt.transitSchedule.Departure;
+import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.DepartureImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
 import playground.mmoyo.PTRouter.PTRouter2;
 import playground.mmoyo.PTRouter.PTTimeTable2;
@@ -36,10 +36,10 @@ import playground.mmoyo.PTRouter.PTTimeTable2;
  */
 
 public class LogicFactory{
-	private TransitSchedule transitSchedule;
+	private TransitScheduleImpl transitSchedule;
 	private NetworkLayer logicNet= new NetworkLayer();
 	private NetworkLayer plainNet= new NetworkLayer();
-	private TransitSchedule logicTransitSchedule = new TransitSchedule(); 
+	private TransitScheduleImpl logicTransitSchedule = new TransitScheduleImpl(); 
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
 	
 	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /** <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
@@ -52,7 +52,7 @@ public class LogicFactory{
 	
 	final String STANDARDLINK = "Standard";
 	
-	public LogicFactory(final TransitSchedule transitSchedule){
+	public LogicFactory(final TransitScheduleImpl transitSchedule){
 		this.transitSchedule = transitSchedule;
 		createLogicNet();
 		this.logicToPlainTranslator = new LogicIntoPlainTranslator(plainNet,  logicToPlanStopMap);
@@ -61,17 +61,17 @@ public class LogicFactory{
 	//Creates a logic network file and a logic TransitSchedule file with individualized id's for nodes and stops*/
 	private void createLogicNet(){
 	
-		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
-			TransitLine logicTransitLine = new TransitLine(transitLine.getId()); 
+		for (TransitLineImpl transitLine : transitSchedule.getTransitLines().values()){
+			TransitLineImpl logicTransitLine = new TransitLineImpl(transitLine.getId()); 
 			
-			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
-				List<TransitRouteStop> logicTransitStops = new ArrayList<TransitRouteStop>();
+			for (TransitRouteImpl transitRoute : transitLine.getRoutes().values()){
+				List<TransitRouteStopImpl> logicTransitStops = new ArrayList<TransitRouteStopImpl>();
 				Node lastLogicNode = null;
 				Node lastPlainNode=null;
 				boolean first= true;
 				
 				//iterates in each transit stop to create nodes and links */
-				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
+				for (TransitRouteStopImpl transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
 					
 					//Create nodes
@@ -100,14 +100,14 @@ public class LogicFactory{
 					//create logical stops and stopFacilities
 					TransitStopFacility logicTransitStopFacility = new TransitStopFacility(logicalId, coord); 
 					logicTransitSchedule.addStopFacility(logicTransitStopFacility);
-					TransitRouteStop logicTransitRouteStop = new TransitRouteStop(logicTransitStopFacility, transitRouteStop.getArrivalDelay(), transitRouteStop.getDepartureDelay()); 
+					TransitRouteStopImpl logicTransitRouteStop = new TransitRouteStopImpl(logicTransitStopFacility, transitRouteStop.getArrivalDelay(), transitRouteStop.getDepartureDelay()); 
 					logicTransitStops.add(logicTransitRouteStop);
 					
 					lastLogicNode= logicNode;
 					lastPlainNode= plainNode;
 				}
-				TransitRoute logicTransitRoute = new TransitRoute(transitRoute.getId(), null, logicTransitStops, transitRoute.getTransportMode());
-				for (Departure departure: transitRoute.getDepartures().values()) {
+				TransitRouteImpl logicTransitRoute = new TransitRouteImpl(transitRoute.getId(), null, logicTransitStops, transitRoute.getTransportMode());
+				for (DepartureImpl departure: transitRoute.getDepartures().values()) {
 					logicTransitRoute.addDeparture(departure);
 				}
 				logicTransitRoute.setDescription(transitRoute.getDescription());

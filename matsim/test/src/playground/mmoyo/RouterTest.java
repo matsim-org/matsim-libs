@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Population;
@@ -42,7 +43,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.mmoyo.PTRouter.PTOb;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
@@ -82,7 +83,7 @@ public class RouterTest extends MatsimTestCase {
 		// setup very simple scenario
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/input/playground/marcel/pt/transitSchedule/network.xml");
-		TransitSchedule schedule = new TransitSchedule();
+		TransitScheduleImpl schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile("test/input/playground/marcel/pt/plans.xml");
@@ -102,6 +103,10 @@ public class RouterTest extends MatsimTestCase {
 		// now run the essential thing:
 		TransitRouteFinder routeFinder = new TransitRouteFinder(schedule);
 		List<LegImpl> legs = routeFinder.calculateRoute(fromAct, toAct, person);
+		
+		for (Leg leg : legs) {
+			System.out.println("TransportMode: " + leg.getMode());
+		}
 		
 		/* I would expect the following, although I could be wrong.
 		 * It must be checked once the code runs up to this line.     */

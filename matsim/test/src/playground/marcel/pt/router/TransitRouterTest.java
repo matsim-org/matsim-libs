@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 
@@ -50,7 +50,7 @@ public class TransitRouterTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitSchedule schedule = new TransitSchedule();
+		TransitScheduleImpl schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitRouter router = new TransitRouter(schedule);
@@ -67,7 +67,7 @@ public class TransitRouterTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitSchedule schedule = new TransitSchedule();
+		TransitScheduleImpl schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitRouter router = new TransitRouter(schedule);

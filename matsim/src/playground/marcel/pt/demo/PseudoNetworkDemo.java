@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
 import playground.marcel.pt.integration.TransitQueueSimulation;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.tryout.CreatePseudoNetwork;
 
@@ -83,7 +83,7 @@ public class PseudoNetworkDemo {
 			}
 		}
 		
-		TransitSchedule schedule = new TransitSchedule();
+		TransitScheduleImpl schedule = new TransitScheduleImpl();
 		try {
 			new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 		} catch (SAXException e1) {

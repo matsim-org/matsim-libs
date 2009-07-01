@@ -28,7 +28,7 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
@@ -74,7 +74,7 @@ public class PTActWriter {
 	}
 	
 	/** Constructor with Transit Schedule*/
-	public PTActWriter(TransitSchedule transitSchedule, final String configFile, final String plansFile, final String outputFile){
+	public PTActWriter(TransitScheduleImpl transitSchedule, final String configFile, final String plansFile, final String outputFile){
 		withTransitSchedule= true;
 		this.outputFile= outputFile;
 		this.plansFile= plansFile;
@@ -113,7 +113,7 @@ public class PTActWriter {
 	/**
 	 * Shows in console the legs that are created between the plan activities 
 	 */
-	public void printPTLegs(final TransitSchedule transitSchedule){
+	public void printPTLegs(final TransitScheduleImpl transitSchedule){
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
 		
 		for (Person person: this.population.getPersons().values()) {

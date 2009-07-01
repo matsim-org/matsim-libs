@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitRouteStop.java
+ * TransitLine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,35 +20,44 @@
 
 package playground.marcel.pt.transitSchedule;
 
-import org.matsim.transitSchedule.TransitStopFacility;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.matsim.api.basic.v01.Id;
 
 /**
- * Describes the stop within a route of a transit line. Specifies also at
- * what time a headway is expected at the stop as offset from the route start.
+ * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
  * 
  * @author mrieser
  */
-public class TransitRouteStop {
+public class TransitLineImpl {
 
-	private final TransitStopFacility stop;
-	private final double departureDelay;
-	private final double arrivalDelay;
+	private final Id lineId;
+	private final Map<Id, TransitRouteImpl> transitRoutes = new LinkedHashMap<Id, TransitRouteImpl>();
 
-	public TransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		this.stop = stop;
-		this.departureDelay = departureDelay;
-		this.arrivalDelay = arrivalDelay;
+	public TransitLineImpl(final Id id) {
+		this.lineId = id;
 	}
 
-	public TransitStopFacility getStopFacility() {
-		return this.stop;
+	public Id getId() {
+		return this.lineId;
 	}
 
-	public double getDepartureDelay() {
-		return this.departureDelay;
+	public void addRoute(final TransitRouteImpl transitRoute) {
+		final Id id = transitRoute.getId();
+		if (this.transitRoutes.containsKey(id)) {
+			throw new IllegalArgumentException("There is already a transit route with id " + id.toString());
+		}
+		this.transitRoutes.put(id, transitRoute);
 	}
 
-	public double getArrivalDelay() {
-		return this.arrivalDelay;
+	public Map<Id, TransitRouteImpl> getRoutes() {
+		return Collections.unmodifiableMap(this.transitRoutes);
 	}
+
+	public void removeRoute(final TransitRouteImpl route) {
+		this.transitRoutes.remove(route.getId());
+	}
+
 }

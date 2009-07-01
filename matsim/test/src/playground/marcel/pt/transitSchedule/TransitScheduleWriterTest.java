@@ -60,23 +60,23 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		TransitStopFacility stop4 = new TransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
 
 		// prepare some schedule, without network-route
-		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(4);
-		stops.add(new TransitRouteStop(stop1, Time.UNDEFINED_TIME, 0));
-		stops.add(new TransitRouteStop(stop2, 90, 120));
-		stops.add(new TransitRouteStop(stop3, Time.UNDEFINED_TIME, 300));
-		stops.add(new TransitRouteStop(stop4, 400, Time.UNDEFINED_TIME));
+		List<TransitRouteStopImpl> stops = new ArrayList<TransitRouteStopImpl>(4);
+		stops.add(new TransitRouteStopImpl(stop1, Time.UNDEFINED_TIME, 0));
+		stops.add(new TransitRouteStopImpl(stop2, 90, 120));
+		stops.add(new TransitRouteStopImpl(stop3, Time.UNDEFINED_TIME, 300));
+		stops.add(new TransitRouteStopImpl(stop4, 400, Time.UNDEFINED_TIME));
 
-		TransitRoute route1 = new TransitRoute(new IdImpl(1), null, stops, TransportMode.bus);
+		TransitRouteImpl route1 = new TransitRouteImpl(new IdImpl(1), null, stops, TransportMode.bus);
 		route1.setDescription("Just a comment.");
 
-		route1.addDeparture(new Departure(new IdImpl("2"), 7.0*3600));
-		route1.addDeparture(new Departure(new IdImpl("4"), 7.0*3600 + 300));
-		route1.addDeparture(new Departure(new IdImpl("7"), 7.0*3600 + 600));
+		route1.addDeparture(new DepartureImpl(new IdImpl("2"), 7.0*3600));
+		route1.addDeparture(new DepartureImpl(new IdImpl("4"), 7.0*3600 + 300));
+		route1.addDeparture(new DepartureImpl(new IdImpl("7"), 7.0*3600 + 600));
 
-		TransitLine line1 = new TransitLine(new IdImpl("8"));
+		TransitLineImpl line1 = new TransitLineImpl(new IdImpl("8"));
 		line1.addRoute(route1);
 
-		TransitSchedule schedule1 = new TransitSchedule();
+		TransitScheduleImpl schedule1 = new TransitScheduleImpl();
 		schedule1.addStopFacility(stop1);
 		schedule1.addStopFacility(stop2);
 		schedule1.addStopFacility(stop3);
@@ -86,7 +86,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		// write and read it
 		String filename = getOutputDirectory() + "scheduleNoRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
-		TransitSchedule schedule2 = new TransitSchedule();
+		TransitScheduleImpl schedule2 = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule2, network).readFile(filename);
 
 		// first test, without network-route
@@ -98,19 +98,19 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		links.add(l2);
 		links.add(l3);
 		route.setLinks(l1, links, l4);
-		TransitRoute route2 = new TransitRoute(new IdImpl(2), route, stops, TransportMode.bus);
+		TransitRouteImpl route2 = new TransitRouteImpl(new IdImpl(2), route, stops, TransportMode.bus);
 		line1.addRoute(route2);
 
 		// write and read version with network-route
 		filename = getOutputDirectory() + "scheduleWithRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
-		TransitSchedule schedule3 = new TransitSchedule();
+		TransitScheduleImpl schedule3 = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule3, network).readFile(filename);
 
 		assertEquals(schedule1, schedule3);
 	}
 
-	private static void assertEquals(final TransitSchedule expected, final TransitSchedule actual) {
+	private static void assertEquals(final TransitScheduleImpl expected, final TransitScheduleImpl actual) {
 		
 		assertEquals("different number of stopFacilities.", expected.getFacilities().size(), actual.getFacilities().size());
 		for (TransitStopFacility stopE : expected.getFacilities().values()) {
@@ -122,20 +122,20 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		}
 		
 		assertEquals("different number of transitLines.", expected.getTransitLines().size(), actual.getTransitLines().size());
-		for (TransitLine lineE : expected.getTransitLines().values()) {
+		for (TransitLineImpl lineE : expected.getTransitLines().values()) {
 			// *E = expected, *A = actual
-			TransitLine lineA = actual.getTransitLines().get(lineE.getId());
+			TransitLineImpl lineA = actual.getTransitLines().get(lineE.getId());
 			assertNotNull("transit line not found: " + lineE.getId().toString(), lineA);
 			assertEquals("different number of routes in line.", lineE.getRoutes().size(), lineA.getRoutes().size());
-			for (TransitRoute routeE : lineE.getRoutes().values()) {
-				TransitRoute routeA = lineA.getRoutes().get(routeE.getId());
+			for (TransitRouteImpl routeE : lineE.getRoutes().values()) {
+				TransitRouteImpl routeA = lineA.getRoutes().get(routeE.getId());
 				assertNotNull("transit route not found: " + routeE.getId().toString(), routeA);
 				assertEquals("different route descriptions.", routeE.getDescription(), routeA.getDescription());
 
 				assertEquals("different number of stops.", routeE.getStops().size(), routeA.getStops().size());
 				for (int i = 0, n = routeE.getStops().size(); i < n; i++) {
-					TransitRouteStop stopE = routeE.getStops().get(i);
-					TransitRouteStop stopA = routeA.getStops().get(i);
+					TransitRouteStopImpl stopE = routeE.getStops().get(i);
+					TransitRouteStopImpl stopA = routeA.getStops().get(i);
 					assertNotNull("stop not found", stopA);
 					assertEquals("different stop facilities.", stopE.getStopFacility().getId(), stopA.getStopFacility().getId());
 					assertEquals("different arrival delay.", stopE.getArrivalDelay(), stopA.getArrivalDelay(), EPSILON);
@@ -158,8 +158,8 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 				}
 
 				assertEquals("different number of departures in route.", routeE.getDepartures().size(), routeA.getDepartures().size());
-				for (Departure departureE : routeE.getDepartures().values()) {
-					Departure departureA = routeA.getDepartures().get(departureE.getId());
+				for (DepartureImpl departureE : routeE.getDepartures().values()) {
+					DepartureImpl departureA = routeA.getDepartures().get(departureE.getId());
 					assertNotNull("departure not found: " + departureE.getId().toString(), departureA);
 					assertEquals("different departure times.", departureE.getDepartureTime(), departureA.getDepartureTime(), EPSILON);
 				}

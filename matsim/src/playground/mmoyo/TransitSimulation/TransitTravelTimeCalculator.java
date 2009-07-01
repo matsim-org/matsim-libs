@@ -9,11 +9,11 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.core.api.network.Network;
-import playground.marcel.pt.transitSchedule.Departure;
-import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitRoute;
-import playground.marcel.pt.transitSchedule.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.DepartureImpl;
+import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 
 /**
@@ -23,14 +23,14 @@ public class TransitTravelTimeCalculator {
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	public Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	
-	public TransitTravelTimeCalculator(final TransitSchedule logicTransitSchedule, final Network logicNetwork){
+	public TransitTravelTimeCalculator(final TransitScheduleImpl logicTransitSchedule, final Network logicNetwork){
 		calculateTravelTimes(logicTransitSchedule,logicNetwork);
 	}
 	
 	/**fills  a map of travelTime for links and  a map of departures for each node to create a TransitTimeTable*/
-	public void calculateTravelTimes(TransitSchedule logicTransitSchedule, Network logicNetwork){
-		for (TransitLine transitLine : logicTransitSchedule.getTransitLines().values()){
-			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
+	public void calculateTravelTimes(TransitScheduleImpl logicTransitSchedule, Network logicNetwork){
+		for (TransitLineImpl transitLine : logicTransitSchedule.getTransitLines().values()){
+			for (TransitRouteImpl transitRoute : transitLine.getRoutes().values()){
 				Node lastNode = null;
 				boolean first= true;
 				double departureDelay=0;
@@ -41,13 +41,13 @@ public class TransitTravelTimeCalculator {
 				int numDepartures= transitRoute.getDepartures().size();
 				double[] departuresArray =new double[numDepartures];
 				int i=0;
-				for (Departure departure : transitRoute.getDepartures().values()){
+				for (DepartureImpl departure : transitRoute.getDepartures().values()){
 					departuresArray[i]=departure.getDepartureTime();
 					i++;
 				}
 			
 				/**iterates in each stop to calculate departures travel times*/
-				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
+				for (TransitRouteStopImpl transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
 					Node node = logicNetwork.getNode(transitStopFacility.getId());
 					

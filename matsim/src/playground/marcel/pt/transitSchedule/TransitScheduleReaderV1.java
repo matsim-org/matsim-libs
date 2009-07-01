@@ -66,14 +66,14 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private static final String ARRIVAL_OFFSET = "arrivalOffset";
 	private static final String DEPARTURE_OFFSET = "departureOffset";
 
-	private final TransitSchedule schedule;
+	private final TransitScheduleImpl schedule;
 	private final Network network;
 
-	private TransitLine currentTransitLine = null;
+	private TransitLineImpl currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
+	public TransitScheduleReaderV1(final TransitScheduleImpl schedule, final Network network) {
 		this.schedule = schedule;
 		this.network = network;
 	}
@@ -97,14 +97,14 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			this.schedule.addStopFacility(stop);
 		} else if (TRANSIT_LINE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(ID));
-			this.currentTransitLine = new TransitLine(id);
+			this.currentTransitLine = new TransitLineImpl(id);
 			this.schedule.addTransitLine(this.currentTransitLine);
 		} else if (TRANSIT_ROUTE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(ID));
 			this.currentTransitRoute = new TempTransitRoute(id);
 		} else if (DEPARTURE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(ID));
-			Departure departure = new Departure(id, Time.parseTime(atts.getValue("departureTime")));
+			DepartureImpl departure = new DepartureImpl(id, Time.parseTime(atts.getValue("departureTime")));
 			this.currentTransitRoute.departures.put(id, departure);
 		} else if (ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRoute();
@@ -140,18 +140,18 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (TRANSPORT_MODE.equals(name)) {
 			this.currentTransitRoute.mode = TransportMode.valueOf(content);
 		} else if (TRANSIT_ROUTE.equals(name)) {
-			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentTransitRoute.stops.size());
+			List<TransitRouteStopImpl> stops = new ArrayList<TransitRouteStopImpl>(this.currentTransitRoute.stops.size());
 			for (TempStop tStop : this.currentTransitRoute.stops) {
-				stops.add(new TransitRouteStop(tStop.stop, tStop.arrival, tStop.departure));
+				stops.add(new TransitRouteStopImpl(tStop.stop, tStop.arrival, tStop.departure));
 			}
 			NetworkRoute route = null;
 			if (this.currentRouteProfile.firstLink != null) {
 				route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
 				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
 			}
-			TransitRoute transitRoute = new TransitRoute(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
+			TransitRouteImpl transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
 			transitRoute.setDescription(this.currentTransitRoute.description);
-			for (Departure departure : this.currentTransitRoute.departures.values()) {
+			for (DepartureImpl departure : this.currentTransitRoute.departures.values()) {
 				transitRoute.addDeparture(departure);
 			}
 			this.currentTransitLine.addRoute(transitRoute);
@@ -161,7 +161,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private static class TempTransitRoute {
 		protected final Id id;
 		protected String description = null;
-		protected Map<Id, Departure> departures = new LinkedHashMap<Id, Departure>();
+		protected Map<Id, DepartureImpl> departures = new LinkedHashMap<Id, DepartureImpl>();
 		/*package*/ List<TempStop> stops = new ArrayList<TempStop>();
 		/*package*/ TransportMode mode = null;
 

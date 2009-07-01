@@ -20,7 +20,7 @@ import playground.mmoyo.PTRouter.PTLine;
  * From PTtimeTable to transitShcedule converter 
  */
 public class ToTransitScheduleConverter {
-	final TransitSchedule transitSchedule = new TransitSchedule();
+	final TransitScheduleImpl transitSchedule = new TransitScheduleImpl();
 	
 	public ToTransitScheduleConverter (){
 				
@@ -28,7 +28,7 @@ public class ToTransitScheduleConverter {
 	
 	/**reads a PTTimetable and writes a transitFile*/
 	public void createTransitSchedule(final PTTimeTable2 ptTimeTable, final Network ptNet, String outTransitFile) {
-		TransitLine transitLine;
+		TransitLineImpl transitLine;
 		/*
 		for (Node node:  ptNet.getNodes().values()){
 			this.transitSchedule.addStopFacility(new TransitStopFacility(node.getId(), node.getCoord()));
@@ -38,13 +38,13 @@ public class ToTransitScheduleConverter {
 			Id ptLineId = ptLine.getId();
 			boolean transitLineExists = this.transitSchedule.getTransitLines().containsKey(ptLineId); 
 			if (!transitLineExists){
-				transitLine = new TransitLine(ptLineId);
+				transitLine = new TransitLineImpl(ptLineId);
 			}else{
 				transitLine = transitSchedule.getTransitLines().get(ptLineId);
 			}
 			
 			int x=0;
-			List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
+			List<TransitRouteStopImpl> transitRouteStops = new ArrayList<TransitRouteStopImpl>();
 			for (Id idNode : ptLine.getNodeRoute()){				
 				if (!transitSchedule.getFacilities().containsKey(idNode)){
 					TransitStopFacility transitStopFacility =  new 	TransitStopFacility(idNode, ptNet.getNode(idNode).getCoord());
@@ -53,19 +53,19 @@ public class ToTransitScheduleConverter {
 				double min = ptLine.getMinutes().get(x++).doubleValue();  
 				double arrivalDelay = min*60;
 				double departureDelay = min*60;
-				transitRouteStops.add(new TransitRouteStop(transitSchedule.getFacilities().get(idNode), arrivalDelay, departureDelay));
+				transitRouteStops.add(new TransitRouteStopImpl(transitSchedule.getFacilities().get(idNode), arrivalDelay, departureDelay));
 			}
 			
 			Id idTransitRoute = new IdImpl(ptLineId + "-" +  ptLine.getDirection());
 			NetworkRoute networkRoute= null; //new NodeNetworkRoute(null, null);
-			TransitRoute transitRoute = new  TransitRoute(idTransitRoute, networkRoute, transitRouteStops, TransportMode.pt);
+			TransitRouteImpl transitRoute = new  TransitRouteImpl(idTransitRoute, networkRoute, transitRouteStops, TransportMode.pt);
 			transitRoute.setTransportMode(ptLine.getTransportMode());
 			x=0;
 			for (String strDeparture : ptLine.getDepartures()){
 				Id idDeparture = new IdImpl(x);
 				//double dblDeparture =x;			// fictional departures
 				double dblDeparture=  Time.parseTime(strDeparture);
-				Departure departure = new Departure (idDeparture, dblDeparture);
+				DepartureImpl departure = new DepartureImpl (idDeparture, dblDeparture);
 				transitRoute.addDeparture(departure);
 				x++;
 			}

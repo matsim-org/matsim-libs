@@ -59,9 +59,9 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 	private static final String DEPARTURE_OFFSET = "departureOffset";
 	private static final String ARRIVAL_OFFSET = "arrivalOffset";
 
-	private final TransitSchedule schedule;
+	private final TransitScheduleImpl schedule;
 
-	public TransitScheduleWriterV1(final TransitSchedule schedule) {
+	public TransitScheduleWriterV1(final TransitScheduleImpl schedule) {
 		this.schedule = schedule;
 	}
 
@@ -72,7 +72,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		this.writeStartTag(TRANSIT_SCHEDULE, null);
 
 		this.writeTransitStops();
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
+		for (TransitLineImpl line : this.schedule.getTransitLines().values()) {
 			writeTransitLine(line);
 		}
 		this.writeEndTag(TRANSIT_SCHEDULE);
@@ -97,12 +97,12 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(TRANSIT_STOPS);
 	}
 
-	private void writeTransitLine(final TransitLine line) throws IOException {
+	private void writeTransitLine(final TransitLineImpl line) throws IOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
 		attributes.add(this.createTuple(ID, line.getId().toString()));
 		this.writeStartTag(TRANSIT_LINE, attributes);
 
-		for (TransitRoute route : line.getRoutes().values()) {
+		for (TransitRouteImpl route : line.getRoutes().values()) {
 			writeTransitRoute(route);
 		}
 
@@ -110,7 +110,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 
 	}
 
-	private void writeTransitRoute(final TransitRoute route) throws IOException {
+	private void writeTransitRoute(final TransitRouteImpl route) throws IOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
 		attributes.add(this.createTuple(ID, route.getId().toString()));
 		this.writeStartTag(TRANSIT_ROUTE, attributes);
@@ -132,13 +132,13 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(TRANSIT_ROUTE);
 	}
 
-	private void writeRouteProfile(final List<TransitRouteStop> stops) throws IOException {
+	private void writeRouteProfile(final List<TransitRouteStopImpl> stops) throws IOException {
 		if (stops != null) {
 			this.writeStartTag(ROUTE_PROFILE, null);
 
 			// optimization: only create one List for multiple departures
 			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(3);
-			for (TransitRouteStop stop : stops) {
+			for (TransitRouteStopImpl stop : stops) {
 				attributes.clear();
 				attributes.add(this.createTuple(REF_ID, stop.getStopFacility().getId().toString()));
 				if (stop.getArrivalDelay() != Time.UNDEFINED_TIME) {
@@ -177,14 +177,14 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeDepartures(final Map<Id, Departure> departures) throws IOException {
+	private void writeDepartures(final Map<Id, DepartureImpl> departures) throws IOException {
 		if (departures != null) {
 			this.writeStartTag(DEPARTURES, null);
 
 			// optimization: only create one List for multiple departures
 			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(2);
 
-			for (Departure dep : departures.values()) {
+			for (DepartureImpl dep : departures.values()) {
 				attributes.clear();
 				attributes.add(this.createTuple(ID, dep.getId().toString()));
 				attributes.add(this.createTimeTuple(DEPARTURE_TIME, dep.getDepartureTime()));

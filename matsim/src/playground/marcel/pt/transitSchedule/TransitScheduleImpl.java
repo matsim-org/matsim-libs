@@ -32,15 +32,15 @@ import org.matsim.transitSchedule.TransitStopFacility;
  * 
  * @author mrieser
  */
-public class TransitSchedule {
+public class TransitScheduleImpl {
 
-	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
+	private final Map<Id, TransitLineImpl> transitLines = new TreeMap<Id, TransitLineImpl>();
 	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
 
-	public TransitSchedule() {
+	public TransitScheduleImpl() {
 	}
 
-	public void addTransitLine(final TransitLine line) {
+	public void addTransitLine(final TransitLineImpl line) {
 		final Id id = line.getId();
 		if (this.transitLines.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
@@ -56,7 +56,7 @@ public class TransitSchedule {
 		this.stopFacilities.put(id, stop);
 	}
 
-	public Map<Id, TransitLine> getTransitLines() {
+	public Map<Id, TransitLineImpl> getTransitLines() {
 		return Collections.unmodifiableMap(this.transitLines);
 	}
 	

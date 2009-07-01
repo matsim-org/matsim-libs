@@ -38,17 +38,17 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import playground.marcel.pt.integration.TransitStopAgentTracker;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 
 public class FacilityDrawer {
 	
 	public static class DataWriter_v1_0 extends OTFDataWriter {
 
 		private static final long serialVersionUID = 1L;
-		private final transient TransitSchedule schedule;
+		private final transient TransitScheduleImpl schedule;
 		private final transient TransitStopAgentTracker agentTracker;
 		
-		public DataWriter_v1_0(final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
+		public DataWriter_v1_0(final TransitScheduleImpl schedule, final TransitStopAgentTracker agentTracker) {
 			this.schedule = schedule;
 			this.agentTracker = agentTracker;
 		}

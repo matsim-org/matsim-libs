@@ -11,7 +11,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.mmoyo.PTRouter.PTActWriter;
 import playground.mmoyo.PTRouter.PTRouter2;
@@ -32,7 +32,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		NetworkLayer plainNet= new NetworkLayer(new NetworkFactory());
-		TransitSchedule transitSchedule = new TransitSchedule();
+		TransitScheduleImpl transitSchedule = new TransitScheduleImpl();
 		PTActWriter ptActWriter;
 		
 		/***************reads the transitSchedule file**********/

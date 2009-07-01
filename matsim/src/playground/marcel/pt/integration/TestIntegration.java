@@ -35,7 +35,7 @@ import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderBerta;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 
@@ -70,7 +70,7 @@ public class TestIntegration {
 
 		sl.loadScenario();	
 
-		final TransitSchedule schedule = new TransitSchedule();
+		final TransitScheduleImpl schedule = new TransitScheduleImpl();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
@@ -118,7 +118,7 @@ public class TestIntegration {
 		
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 
-		final TransitSchedule schedule = new TransitSchedule();
+		final TransitScheduleImpl schedule = new TransitScheduleImpl();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);

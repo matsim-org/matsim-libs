@@ -49,10 +49,10 @@ import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.integration.TransitQueueVehicle;
 import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.mocks.MockAgent;
-import playground.marcel.pt.transitSchedule.Departure;
-import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitRoute;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.DepartureImpl;
+import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 
@@ -68,15 +68,15 @@ public class TransitDriverTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitSchedule schedule = new TransitSchedule();
+		TransitScheduleImpl schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
+		TransitLineImpl lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 //		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
-		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
-		Map<Id, Departure> departures = route1.getDepartures();
+		TransitRouteImpl route1 = lineT1.getRoutes().get(new IdImpl("1"));
+		Map<Id, DepartureImpl> departures = route1.getDepartures();
 
 		Events events = new Events();
 		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);
@@ -143,15 +143,15 @@ public class TransitDriverTest extends MatsimTestCase {
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitSchedule schedule = new TransitSchedule();
+		TransitScheduleImpl schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
+		TransitLineImpl lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 //		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
 		assertNotNull("could not get transit line.", lineT1);
 
-		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
-		Map<Id, Departure> departures = route1.getDepartures();
+		TransitRouteImpl route1 = lineT1.getRoutes().get(new IdImpl("1"));
+		Map<Id, DepartureImpl> departures = route1.getDepartures();
 
 		Events events = new Events();
 		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);

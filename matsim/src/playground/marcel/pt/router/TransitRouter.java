@@ -34,19 +34,19 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
-import playground.marcel.pt.transitSchedule.Departure;
-import playground.marcel.pt.transitSchedule.TransitLine;
-import playground.marcel.pt.transitSchedule.TransitRoute;
-import playground.marcel.pt.transitSchedule.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.DepartureImpl;
+import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 
 public class TransitRouter {
 
-	private final TransitSchedule schedule;
+	private final TransitScheduleImpl schedule;
 	private final TransitRouterNetwork transitNetwork;
 	private final TransitRouterNetworkWrapper wrappedNetwork;
 
-	public TransitRouter(final TransitSchedule schedule) {
+	public TransitRouter(final TransitScheduleImpl schedule) {
 		this.schedule = schedule;
 		this.transitNetwork = buildNetwork();
 		this.wrappedNetwork = new TransitRouterNetworkWrapper(this.transitNetwork);
@@ -81,10 +81,10 @@ public class TransitRouter {
 		final TransitRouterNetwork network = new TransitRouterNetwork();
 
 		// build nodes and links connecting the nodes according to the transit routes
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
+		for (TransitLineImpl line : this.schedule.getTransitLines().values()) {
+			for (TransitRouteImpl route : line.getRoutes().values()) {
 				TransitRouterNetworkNode prevNode = null;
-				for (TransitRouteStop stop : route.getStops()) {
+				for (TransitRouteStopImpl stop : route.getStops()) {
 					TransitRouterNetworkNode node = network.createNode(stop, route, line);
 					if (prevNode != null) {
 						/*TransitRouterNetworkLink link = */network.createLink(prevNode, node, route, line);
@@ -113,8 +113,8 @@ public class TransitRouter {
 			double depDelay = node.stop.getDepartureDelay();
 			double routeStartTime = time - depDelay;
 			double diff = Double.POSITIVE_INFINITY;
-			Departure bestDeparture = null;
-			for (Departure departure : node.route.getDepartures().values()) {
+			DepartureImpl bestDeparture = null;
+			for (DepartureImpl departure : node.route.getDepartures().values()) {
 				if (routeStartTime <= (departure.getDepartureTime()) && ((departure.getDepartureTime() - routeStartTime) < diff)) {
 					bestDeparture = departure;
 					diff = departure.getDepartureTime() - routeStartTime;

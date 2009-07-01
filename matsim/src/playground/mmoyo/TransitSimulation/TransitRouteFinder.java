@@ -12,7 +12,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.mmoyo.PTRouter.PTRouter2;
 import playground.mmoyo.PTRouter.Walk;
 /**
@@ -23,7 +23,7 @@ public class TransitRouteFinder {
 	private LogicIntoPlainTranslator logicToPlainTranslator;
 	private static Walk walk = new Walk();
 	
-	public TransitRouteFinder(final TransitSchedule transitSchedule){
+	public TransitRouteFinder(final TransitScheduleImpl transitSchedule){
 		LogicFactory logicFactory = new LogicFactory(transitSchedule);
 		this.ptRouter = logicFactory.getPTRouter();
 		this.logicToPlainTranslator = logicFactory.getLogicToPlainConverter();
