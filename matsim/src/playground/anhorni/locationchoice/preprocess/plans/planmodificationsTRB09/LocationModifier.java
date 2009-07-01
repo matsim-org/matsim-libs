@@ -9,16 +9,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
@@ -69,7 +69,7 @@ public class LocationModifier extends Modifier {
 	private void assignRandomLocation(Coord coords, double radius) {
 
 		log.info("running assignRandomLocation:");
-		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
 		ArrayList<ActivityFacility> zhShopFacilities = (ArrayList<ActivityFacility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
@@ -79,12 +79,12 @@ public class LocationModifier extends Modifier {
 		
 
 		while (person_iter.hasNext()) {
-			Person person = person_iter.next();
+			PersonImpl person = person_iter.next();
 				counter.incCounter();
 
-				Iterator<Plan> plan_iter = person.getPlans().iterator();
+				Iterator<PlanImpl> plan_iter = person.getPlans().iterator();
 				while (plan_iter.hasNext()) {
-					Plan plan = plan_iter.next();
+					PlanImpl plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
 						exchangeFacilities("s", zhShopFacilities, plan);
@@ -100,7 +100,7 @@ public class LocationModifier extends Modifier {
 	}
 
 	private void exchangeFacilities(final String type, ArrayList<ActivityFacility>  exchange_facilities,
-			final Plan plan) {
+			final PlanImpl plan) {
 
 			final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {

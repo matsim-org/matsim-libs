@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 
@@ -18,17 +19,17 @@ public abstract class TripFilter {
 	private final static Logger log = Logger.getLogger(TripFilter.class);
 		
 	public List<ChoiceSet> apply(Population population, String mode) {	
-		Iterator<Person> person_it = population.getPersons().values().iterator();
+		Iterator<PersonImpl> person_it = population.getPersons().values().iterator();
 		while (person_it.hasNext()) {
-			Person person = person_it.next();		
+			PersonImpl person = person_it.next();		
 			// Person only has one plan at this stage
-			Plan plan = person.getSelectedPlan();		
+			PlanImpl plan = person.getSelectedPlan();		
 			filterPlan(plan, mode);
 		}	
 		log.info("Number of "+ mode + " trips :  " + this.choiceSets.size());
 		return this.choiceSets;
 	}
 	
-	protected abstract boolean filterPlan(final Plan plan, String mode);
+	protected abstract boolean filterPlan(final PlanImpl plan, String mode);
 	
 }

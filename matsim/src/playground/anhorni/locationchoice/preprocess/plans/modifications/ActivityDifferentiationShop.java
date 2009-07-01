@@ -7,15 +7,15 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.World;
 
@@ -57,15 +57,15 @@ public class ActivityDifferentiationShop {
 	private int getNumberOfShopActs() {
 		int numberOfShopActs = 0;
 		
-		Iterator<Person> person_it = this.plans.getPersons().values().iterator();
+		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
 		while (person_it.hasNext()) {
-			Person person = person_it.next();
+			PersonImpl person = person_it.next();
 			
 			// intitially only one plan is available
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + person.getId());
 			}
-			Plan selectedPlan = person.getSelectedPlan();
+			PlanImpl selectedPlan = person.getSelectedPlan();
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -83,15 +83,15 @@ public class ActivityDifferentiationShop {
 		int assignedNumberOf_GroceryActs = 0;
 		int assignedNumberOf_NonGroceryActs = 0;
 		
-		Iterator<Person> person_it = this.plans.getPersons().values().iterator();
+		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
 		while (person_it.hasNext()) {
-			Person person = person_it.next();
+			PersonImpl person = person_it.next();
 			
 			// intitially only one plan is available
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + person.getId());
 			}
-			Plan selectedPlan = person.getSelectedPlan();
+			PlanImpl selectedPlan = person.getSelectedPlan();
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {

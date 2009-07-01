@@ -30,16 +30,16 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -129,10 +129,10 @@ public class AnalyzePlans {
 			int numberOfLeisureActs = 0;
 			double totalDesiredLeisureDuration = 0.0;
 			
-			Iterator<Person> person_it = this.plans.getPersons().values().iterator();
+			Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
 			while (person_it.hasNext()) {
-				Person person = person_it.next();
-				Plan selectedPlan = person.getSelectedPlan();
+				PersonImpl person = person_it.next();
+				PlanImpl selectedPlan = person.getSelectedPlan();
 				
 				int numberOfShoppingActsPerPerson = 0;
 				int numberOfLeisureActsPerPerson = 0;
@@ -189,14 +189,14 @@ public class AnalyzePlans {
 			out.newLine();
 			int numberOfPersonsDoingType = 0;
 
-			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+			Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 			Counter counter = new Counter(" person # ");
 			while (person_iter.hasNext()) {
-				Person person = person_iter.next();
+				PersonImpl person = person_iter.next();
 				counter.incCounter();
 				boolean personSet = false;
 
-				Plan selectedPlan = person.getSelectedPlan();
+				PlanImpl selectedPlan = person.getSelectedPlan();
 
 				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -235,12 +235,12 @@ public class AnalyzePlans {
 			out.newLine();
 
 
-			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+			Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 			Counter counter = new Counter(" person # ");
 			while (person_iter.hasNext()) {
-				Person person = person_iter.next();
+				PersonImpl person = person_iter.next();
 				counter.incCounter();
-				Plan selectedPlan = person.getSelectedPlan();
+				PlanImpl selectedPlan = person.getSelectedPlan();
 				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 
 				int countSL = 0;
@@ -271,14 +271,14 @@ public class AnalyzePlans {
 		int numberOfPersonsDoingSL = 0;
 		int numberOfTrips = 0;
 
-		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
-			Person person = person_iter.next();
+			PersonImpl person = person_iter.next();
 			counter.incCounter();
 			boolean personSet = false;
 
-			Plan selectedPlan = person.getSelectedPlan();
+			PlanImpl selectedPlan = person.getSelectedPlan();
 			List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final ActivityImpl act = (ActivityImpl)actslegs.get(j);

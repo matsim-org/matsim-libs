@@ -6,10 +6,10 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 
 public class RemoveBorderCrossingTraffic extends Modifier {
 
@@ -31,9 +31,9 @@ public class RemoveBorderCrossingTraffic extends Modifier {
 
 		// find border crossing persons
 		log.info("running removeBorderCrossingPersonsTraffic:");
-		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 		while (person_iter.hasNext()) {
-			Person person = person_iter.next();
+			PersonImpl person = person_iter.next();
 			//if (person.getId().compareTo(new IdImpl(1000000000))>0) {
 			if (Integer.valueOf(person.getId().toString())>1000000000) {
 				toRemoveList.add(person.getId());

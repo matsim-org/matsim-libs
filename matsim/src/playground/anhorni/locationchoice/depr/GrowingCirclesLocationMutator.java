@@ -31,13 +31,13 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -275,10 +275,10 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		Coord home_coord = null;
 		Coord prim_coord = null;
-		final Plan plan = person.getSelectedPlan();
+		final PlanImpl plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				final ActivityImpl act = (ActivityImpl) pe;
@@ -349,7 +349,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 	}
 }
 

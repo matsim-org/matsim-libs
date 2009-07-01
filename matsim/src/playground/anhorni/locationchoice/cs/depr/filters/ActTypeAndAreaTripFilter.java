@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 
 import playground.anhorni.locationchoice.cs.helper.Trip;
 
@@ -35,7 +35,7 @@ public class ActTypeAndAreaTripFilter extends TripFilter {
 			log.info("Number of polygons: " + this.areaPolygons.size());
 		}
 	}
-	protected boolean filterPlan(final Plan plan, String mode) {
+	protected boolean filterPlan(final PlanImpl plan, String mode) {
 		boolean choiceSetAdded = false;		
 		final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 		ActivityImpl previousAct = (ActivityImpl)actslegs.get(0);

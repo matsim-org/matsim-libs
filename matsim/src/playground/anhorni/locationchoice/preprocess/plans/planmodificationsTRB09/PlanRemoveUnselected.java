@@ -3,14 +3,15 @@ package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB0
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -53,10 +54,10 @@ public class PlanRemoveUnselected {
 
 	private void runModifications() {
 
-		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
-			Person person = person_iter.next();
+			PersonImpl person = person_iter.next();
 				counter.incCounter();
 				person.removeUnselectedPlans();
 		}
