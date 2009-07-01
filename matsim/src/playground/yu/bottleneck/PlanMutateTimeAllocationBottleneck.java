@@ -20,10 +20,10 @@
 
 package playground.yu.bottleneck;
 
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -41,12 +41,12 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 		this.mutationRange = mutationRange;
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		mutatePlan(plan);
 	}
 
 	@SuppressWarnings("deprecation")
-	private void mutatePlan(Plan plan) {
+	private void mutatePlan(PlanImpl plan) {
 
 		int max = plan.getPlanElements().size();
 

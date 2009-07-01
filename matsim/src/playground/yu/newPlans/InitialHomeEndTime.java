@@ -3,12 +3,12 @@
  */
 package playground.yu.newPlans;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -28,13 +28,13 @@ public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Person person) {
-		for (Plan pl : person.getPlans())
+	public void run(final PersonImpl person) {
+		for (PlanImpl pl : person.getPlans())
 			run(pl);
 		this.pw.writePerson(person);
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		plan.getFirstActivity().setEndTime(21600.0);
 	}
 

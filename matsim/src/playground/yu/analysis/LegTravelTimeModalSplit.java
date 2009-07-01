@@ -29,8 +29,7 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -42,6 +41,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
@@ -157,7 +157,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			this.travelTimes[binIdx] += travelTime;
 			this.arrCount[binIdx]++;
 
-			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
+			PlanImpl selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
 			TransportMode mode = PlanModeJudger.getMode(selectedplan);
 			switch (mode) {

@@ -7,14 +7,14 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.charts.XYScatterChart;
@@ -97,7 +97,7 @@ public class CompareSelectedPlansTable {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString() + ";");
-				Person person = this.plans0.getPersons().get(person_id);
+				PersonImpl person = this.plans0.getPersons().get(person_id);
 				out.write(person.getSex() + ";");
 				out.write(person.getAge() + ";");
 				out.write(person.getLicense() + ";");
@@ -120,7 +120,7 @@ public class CompareSelectedPlansTable {
 				double s0 = person.getSelectedPlan().getScore().doubleValue();
 				out.write(s0 + ";");
 				score0s[i] = s0;
-				Person person_comp = this.plans1.getPersons().get(person_id);
+				PersonImpl person_comp = this.plans1.getPersons().get(person_id);
 				double s1 = person_comp.getSelectedPlan().getScore()
 						.doubleValue();
 				out.write(s1 + ";");
@@ -199,7 +199,7 @@ public class CompareSelectedPlansTable {
 	 * to have everything in one single class
 	 */
 
-	protected static double getTravelTime(final Person person) {
+	protected static double getTravelTime(final PersonImpl person) {
 
 		double travelTime = 0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
@@ -211,7 +211,7 @@ public class CompareSelectedPlansTable {
 		return travelTime;
 	}
 
-	protected static double getTravelDist(final Person person) {
+	protected static double getTravelDist(final PersonImpl person) {
 
 		double travelDist = 0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
@@ -223,7 +223,7 @@ public class CompareSelectedPlansTable {
 		return travelDist;
 	}
 
-	protected static int getNumberOfTrips(final Person person) {
+	protected static int getNumberOfTrips(final PersonImpl person) {
 
 		int numberOfLegs = 0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {

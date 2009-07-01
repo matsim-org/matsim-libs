@@ -1,6 +1,6 @@
 package playground.yu.visum.test;
 
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;

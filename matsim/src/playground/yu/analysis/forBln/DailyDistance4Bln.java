@@ -6,13 +6,13 @@ package playground.yu.analysis.forBln;
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -57,7 +57,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 	}
 
 	@Override
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
 		double ptDayDist = 0.0;

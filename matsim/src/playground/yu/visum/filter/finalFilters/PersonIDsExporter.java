@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 import playground.yu.visum.filter.PersonFilterA;
 
@@ -24,7 +24,7 @@ public class PersonIDsExporter extends PersonFilterA {
 	 */
 	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 	@Override
-	public boolean judge(Person person) {
+	public boolean judge(PersonImpl person) {
 		return true;
 	}
 
@@ -45,7 +45,7 @@ public class PersonIDsExporter extends PersonFilterA {
 	 * into the idSet.
 	 */
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		idSet.add(person.getId());
 	}
 }

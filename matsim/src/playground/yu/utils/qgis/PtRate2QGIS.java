@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -56,11 +56,11 @@ public class PtRate2QGIS implements X2QGIS {
 		}
 
 		@Override
-		public void run(Person person) {
+		public void run(PersonImpl person) {
 			run(person.getSelectedPlan());
 		}
 
-		public void run(Plan plan) {
+		public void run(PlanImpl plan) {
 			ActivityImpl fa = plan.getFirstActivity();
 			Id linkId = fa.getLinkId();
 			if (fa.getType().startsWith("h")) {

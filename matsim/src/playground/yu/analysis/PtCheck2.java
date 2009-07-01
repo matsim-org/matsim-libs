@@ -23,8 +23,8 @@ package playground.yu.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -80,12 +80,12 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		this.personCnt++;
 		if (person.getLicense().equals("yes")) {
 			this.licensedCnt++;
 			// Plan.Type planType = person.getSelectedPlan().getType();
-			Plan selectedPlan = person.getSelectedPlan();
+			PlanImpl selectedPlan = person.getSelectedPlan();
 			if (
 			// (planType != null) && (Plan.Type.UNDEFINED != planType)
 			!PlanModeJudger.useUndefined(selectedPlan)) {

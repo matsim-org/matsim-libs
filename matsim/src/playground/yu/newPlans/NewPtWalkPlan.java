@@ -25,15 +25,15 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -47,8 +47,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  */
 public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
-	private Person person;
-	private List<Plan> copyPlans = new ArrayList<Plan>();
+	private PersonImpl person;
+	private List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 
 	// copyPlans: the copy of the plans.
 	/**
@@ -66,13 +66,13 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
 			this.person = person;
-			for (Plan pl : person.getPlans()) {
+			for (PlanImpl pl : person.getPlans()) {
 				run(pl);
 			}
-			for (Plan copyPlan : copyPlans) {
+			for (PlanImpl copyPlan : copyPlans) {
 				person.addPlan(copyPlan);
 			}
 			copyPlans.clear();
@@ -80,9 +80,9 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 		this.pw.writePerson(person);
 	}
 
-	public void run(Plan plan) {
-		Plan ptPlan = new PlanImpl(person);
-		Plan walkPlan = new PlanImpl(person);
+	public void run(PlanImpl plan) {
+		PlanImpl ptPlan = new PlanImpl(person);
+		PlanImpl walkPlan = new PlanImpl(person);
 		List<PlanElement> actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);

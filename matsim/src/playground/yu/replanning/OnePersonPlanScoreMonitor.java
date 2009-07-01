@@ -25,7 +25,6 @@ package playground.yu.replanning;
 
 import java.util.Random;
 
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -38,6 +37,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PlanImpl;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -50,7 +50,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 	private SimpleWriter writer = null;
 
 	private void writeFirstPlans(ControlerEvent event) {
-		for (Plan plan : event.getControler().getPopulation().getPersons()
+		for (PlanImpl plan : event.getControler().getPopulation().getPersons()
 				.values().iterator().next().getPlans()) {
 			writer.write("\t" + plan.getScore().toString());
 		}
@@ -59,7 +59,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 	}
 
 	private void writeOnePersonPlans(ControlerEvent event, int id) {
-		for (Plan plan : event.getControler().getPopulation().getPersons().get(
+		for (PlanImpl plan : event.getControler().getPopulation().getPersons().get(
 				new IdImpl(id)).getPlans()) {
 			writer.write("\t" + plan.getScore().toString());
 		}
@@ -72,7 +72,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 		r.setSeed(4711);
 		for (int i = 0; i < 10; i++) {
 			int id = r.nextInt(100);
-			Plan plan = event.getControler().getPopulation().getPersons().get(
+			PlanImpl plan = event.getControler().getPopulation().getPersons().get(
 					new IdImpl(id)).getSelectedPlan();
 			writer.write("\t" + id);
 			writer.write("\t" + plan.getScore().toString());

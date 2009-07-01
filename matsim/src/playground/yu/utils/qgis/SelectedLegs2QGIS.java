@@ -10,12 +10,12 @@ import org.geotools.feature.Feature;
 import org.jfree.util.Log;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -41,7 +41,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 	protected void writeLegs() throws IOException {
 		String outputFile = this.getOutputDir() + "/legs.shp";
 		ArrayList<Feature> fts = new ArrayList<Feature>();
-		for (Plan plan : this.getOutputSamplePlans()) {
+		for (PlanImpl plan : this.getOutputSamplePlans()) {
 			if (plan.getFirstActivity().getEndTime() == 21600.0) {
 				String id = plan.getPerson().getId().toString();
 				for (PlanElement pe : plan.getPlanElements()) {

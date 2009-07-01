@@ -24,17 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -65,18 +65,18 @@ public class NewAgentWalkPlan extends NewPopulation {
 
 	@SuppressWarnings( { "deprecation", "unchecked" })
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
-			List<Plan> copyPlans = new ArrayList<Plan>();
+			List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 			// copyPlans: the copy of the plans.
-			for (Plan pl : person.getPlans()) {
+			for (PlanImpl pl : person.getPlans()) {
 				if (hasLongLegs(pl))
 					break;
 				// set plan type for car, pt, walk
 				if (PlanModeJudger.usePt(pl)) {
-					Plan walkPlan = new org.matsim.core.population.PlanImpl(
+					PlanImpl walkPlan = new org.matsim.core.population.PlanImpl(
 							person);
-					walkPlan.setType(Plan.Type.WALK);
+					walkPlan.setType(PlanImpl.Type.WALK);
 					List actsLegs = pl.getPlanElements();
 					for (int i = 0; i < actsLegs.size(); i++) {
 						Object o = actsLegs.get(i);
@@ -103,14 +103,14 @@ public class NewAgentWalkPlan extends NewPopulation {
 					copyPlans.add(walkPlan);
 				}
 			}
-			for (Plan copyPlan : copyPlans) {
+			for (PlanImpl copyPlan : copyPlans) {
 				person.addPlan(copyPlan);
 			}
 		}
 		this.pw.writePerson(person);
 	}
 
-	private boolean hasLongLegs(Plan plan) {
+	private boolean hasLongLegs(PlanImpl plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;

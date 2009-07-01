@@ -23,16 +23,16 @@ package playground.yu.newPlans;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -53,13 +53,13 @@ public class ModeChoicePlan extends NewPopulation {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void run(final Person person) {
-		Plan sp = person.getSelectedPlan();
+	public void run(final PersonImpl person) {
+		PlanImpl sp = person.getSelectedPlan();
 		person.getPlans().clear();
 		person.addPlan(sp);
 
 		// Plan.Type t = sp.getType();
-		Plan cp = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl cp = new org.matsim.core.population.PlanImpl(person);
 		List actsLegs = sp.getPlanElements();
 
 		if (

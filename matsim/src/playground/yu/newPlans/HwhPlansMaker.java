@@ -25,13 +25,13 @@ package playground.yu.newPlans;
 
 import java.util.Set;
 
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -74,7 +74,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		super.run(person);
 		if (person.getPlans().size() > 0) {
 			pw.writePerson(person);

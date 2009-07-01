@@ -27,13 +27,13 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -115,8 +115,8 @@ public class LegCountTest2 {
 		}
 
 		@Override
-		public void run(final Person person) {
-			Plan p = person.getSelectedPlan();
+		public void run(final PersonImpl person) {
+			PlanImpl p = person.getSelectedPlan();
 			if (p != null) {
 				int nLegs = (p.getPlanElements().size() + 1) / 2;
 				try {

@@ -31,16 +31,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -83,10 +83,10 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		int ivCnt = 0;
 		int oevCnt = 0;
-		for (Plan pl : person.getPlans())
+		for (PlanImpl pl : person.getPlans())
 			if (
 			// pl.getType().equals(Type.CAR)
 			PlanModeJudger.useCar(pl))
@@ -105,16 +105,16 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			run14(person);
 	}
 
-	public void run14(final Person person) {
+	public void run14(final PersonImpl person) {
 		run_(person, out14);
 	}
 
-	public void run41(final Person person) {
+	public void run41(final PersonImpl person) {
 		run_(person, out41);
 	}
 
-	public void run_(final Person person, final DataOutputStream out) {
-		for (Plan pl : person.getPlans()) {
+	public void run_(final PersonImpl person, final DataOutputStream out) {
+		for (PlanImpl pl : person.getPlans()) {
 			// if (pl.getType().equals("oev")) {
 			StringBuilder text = new StringBuilder("\t");
 			for (PlanElement pe : pl.getPlanElements()) {

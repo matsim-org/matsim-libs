@@ -6,13 +6,13 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -23,8 +23,8 @@ import playground.yu.analysis.PlanModeJudger;
  * 
  */
 public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
-	private Person person = null;
-	private List<Plan> tmpPersonPlans = new ArrayList<Plan>();
+	private PersonImpl person = null;
+	private List<PlanImpl> tmpPersonPlans = new ArrayList<PlanImpl>();
 
 	/**
 	 * @param plans
@@ -42,18 +42,18 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
 			this.person = person;
 			tmpPersonPlans.addAll(person.getPlans());
-			for (Plan pl : tmpPersonPlans)
+			for (PlanImpl pl : tmpPersonPlans)
 				run(pl);
 			tmpPersonPlans.clear();
 		}
 		pw.writePerson(person);
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		if (PlanModeJudger.usePt(plan)) {
 			person.getPlans().remove(plan);
 		}

@@ -27,17 +27,17 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -84,13 +84,13 @@ public class SameActLocTest {
 		}
 
 		@Override
-		public void run(final Person person) {
+		public void run(final PersonImpl person) {
 			this.actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			int i = 0;
 			if (person != null) {
-				Plan p = person.getSelectedPlan();
+				PlanImpl p = person.getSelectedPlan();
 				if (p != null) {
 					// Plan.Type planType = p.getType();
 					for (PlanElement pe : p.getPlanElements()) {

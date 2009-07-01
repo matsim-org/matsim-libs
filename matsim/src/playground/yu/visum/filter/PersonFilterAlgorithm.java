@@ -1,6 +1,6 @@
 package playground.yu.visum.filter;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -20,7 +20,7 @@ public class PersonFilterAlgorithm extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		count();
 		this.nextFilter.run(person);
 	}
@@ -33,7 +33,7 @@ public class PersonFilterAlgorithm extends AbstractPersonAlgorithm implements
 	 *            a person to be judge
 	 * @return true if the Person meets the criterion
 	 */
-	public boolean judge(Person person) {
+	public boolean judge(PersonImpl person) {
 		return true;
 	}
 

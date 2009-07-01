@@ -7,10 +7,10 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * transfer the "right" persons to next PersonFilter. These "right" persons
@@ -53,9 +53,9 @@ public class PersonRouteFilter extends PersonFilterA {
 	 * which should not exist in network(file).
 	 */
 	@Override
-	public boolean judge(Person person) {
-		List<Plan> plans = person.getPlans();
-		for (Plan plan : plans) {
+	public boolean judge(PersonImpl person) {
+		List<PlanImpl> plans = person.getPlans();
+		for (PlanImpl plan : plans) {
 			if (plan.isSelected()) {
 				List<? extends BasicPlanElement> acts_Legs = plan.getPlanElements();
 				boolean even = false;

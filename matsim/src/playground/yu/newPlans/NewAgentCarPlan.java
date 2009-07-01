@@ -23,12 +23,12 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -44,8 +44,8 @@ import playground.yu.analysis.PlanModeJudger;
  * 
  */
 public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
-	private Person person = null;
-	private final List<Plan> plans = new ArrayList<Plan>();
+	private PersonImpl person = null;
+	private final List<PlanImpl> plans = new ArrayList<PlanImpl>();
 
 	/**
 	 * Constructor, writes file-head
@@ -58,17 +58,17 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		this.person = person;
 		this.plans.clear();
 		this.plans.addAll(person.getPlans());
-		for (Plan p : this.plans) {
+		for (PlanImpl p : this.plans) {
 			run(p);
 		}
 		this.pw.writePerson(person);
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		if (!PlanModeJudger.useCar(plan))
 			this.person.removePlan(plan);
 	}

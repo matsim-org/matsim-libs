@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 
@@ -52,7 +52,7 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 
 		int maxPlansPerAgent = getMaxPlansPerAgent();
 		// then go through the population and assign each person to a strategy
-		for (Person person : population.getPersons().values()) {
+		for (PersonImpl person : population.getPersons().values()) {
 			if (maxPlansPerAgent > 0)
 				removeOldestPlan(person, maxPlansPerAgent);// removes the plan,
 			// which was not
@@ -76,29 +76,29 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 		// make the new selected Plan "young" (with the biggest index in List),
 		// if no new plan was created by the strategy.
 		for (Id personId : noNewPlans) {
-			Person person = population.getPersons().get(personId);
+			PersonImpl person = population.getPersons().get(personId);
 			makeSelectedPlanYoung(person, person.getSelectedPlan());
 		}
 		// empty noNewPlans
 		noNewPlans.clear();
 	}
 
-	private void makeSelectedPlanYoung(Person person, Plan selectedPlan) {
+	private void makeSelectedPlanYoung(PersonImpl person, PlanImpl selectedPlan) {
 		person.removePlan(selectedPlan);
 		person.addPlan(selectedPlan);
 		person.setSelectedPlan(selectedPlan);
 	}
 
-	private void removeOldestPlan(Person person, int maxSize) {
-		List<Plan> plans = person.getPlans();
+	private void removeOldestPlan(PersonImpl person, int maxSize) {
+		List<PlanImpl> plans = person.getPlans();
 		int size = plans.size();
 		if (size <= maxSize) {
 			return;
 		}
 
-		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
+		HashMap<PlanImpl.Type, Integer> typeCounts = new HashMap<PlanImpl.Type, Integer>();
 		// initialize list of types
-		for (Plan plan : plans) {
+		for (PlanImpl plan : plans) {
 			Integer cnt = typeCounts.get(plan.getType());
 			if (cnt == null) {
 				typeCounts.put(plan.getType(), 1);
@@ -108,9 +108,9 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 		}
 
 		while (size > maxSize) {
-			Plan oldestPlan = null;
+			PlanImpl oldestPlan = null;
 			for (int i = 0; i < size; i++) {
-				Plan plan_i = plans.get(i);
+				PlanImpl plan_i = plans.get(i);
 				if (typeCounts.get(plan_i.getType()) > 1) {
 					oldestPlan = plan_i;
 					break;

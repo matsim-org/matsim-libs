@@ -27,22 +27,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -73,17 +73,17 @@ public class NewDemandWithFacilities4Zrh {
 		// }
 
 		@Override
-		public void run(final Person person) {
+		public void run(final PersonImpl person) {
 			currentPerson = (PersonImpl) person;
 			currentKnowledge = currentPerson.getKnowledge();
 			if (currentKnowledge == null)
 				currentKnowledge = new Knowledge();
-			for (Plan plan : person.getPlans())
+			for (PlanImpl plan : person.getPlans())
 				run(plan);
 			currentPerson.setKnowledge(currentKnowledge);
 		}
 
-		public void run(final Plan plan) {
+		public void run(final PlanImpl plan) {
 			for (PlanElement pe : plan.getPlanElements())
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;

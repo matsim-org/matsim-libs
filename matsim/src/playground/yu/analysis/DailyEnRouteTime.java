@@ -9,14 +9,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -58,7 +58,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			bikeOtherTime, bikeHomeTime;
 	protected double othersWorkTime, othersEducTime, othersShopTime,
 			othersLeisTime, othersOtherTime, othersHomeTime;
-	protected Person person;
+	protected PersonImpl person;
 	protected RoadPricingScheme toll = null;
 	private static final String CAR = "car", BIKE = "bike", OTHERS = "others";
 
@@ -126,9 +126,9 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		this.person = person;
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		if (toll == null) {
 			count++;
 			run(plan);
@@ -138,7 +138,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		}
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		double dayTime = 0.0;
 		double carDayTime = 0.0;
 		double ptDayTime = 0.0;

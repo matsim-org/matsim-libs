@@ -8,12 +8,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentEvent;
 import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -80,7 +80,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		super(scenario, ppl, toll);
 	}
 
-	protected void internalCompute(int binIdx, AgentEvent ae, Plan plan,
+	protected void internalCompute(int binIdx, AgentEvent ae, PlanImpl plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] throughCount) {
 		allCount[binIdx]++;
@@ -136,7 +136,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] throughCount) {
 		int binIdx = getBinIndex(ae.getTime());
-		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
+		PlanImpl selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
 			if (TollTools.isInRange(selectedPlan.getFirstActivity().getLink(),

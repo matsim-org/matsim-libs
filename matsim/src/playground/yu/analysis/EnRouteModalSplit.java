@@ -27,8 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentEvent;
@@ -42,6 +41,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -179,7 +179,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] bikeCount, double[] othersCount) {
 		int binIdx = getBinIndex(ae.getTime());
-		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
+		PlanImpl selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
 			if (TollTools.isInRange(selectedPlan.getFirstActivity().getLink(),
@@ -194,7 +194,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	}
 
-	protected void internalCompute(int binIdx, AgentEvent ae, Plan plan,
+	protected void internalCompute(int binIdx, AgentEvent ae, PlanImpl plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] bikeCount, double[] othersCount) {
 		allCount[binIdx]++;

@@ -9,14 +9,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -63,7 +63,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	protected double wlkHomeDist, ptHomeDist, carHomeDist, bikeHomeDist,
 			othersHomeDist;
 	protected int count;
-	protected Person person;
+	protected PersonImpl person;
 	protected RoadPricingScheme toll = null;
 
 	public DailyDistance(final RoadPricingScheme toll) {
@@ -130,9 +130,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		this.person = person;
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		if (toll == null) {
 			count++;
 			run(plan);
@@ -142,7 +142,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		}
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
 		double ptDayDist = 0.0;

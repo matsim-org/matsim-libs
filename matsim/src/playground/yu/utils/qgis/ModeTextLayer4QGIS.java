@@ -9,12 +9,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -47,7 +47,7 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		writer.writeln("mode");
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		Coord homeLoc = plan.getFirstActivity().getCoord();
 		String mode = "";
 		if (PlanModeJudger.useCar(plan)) {

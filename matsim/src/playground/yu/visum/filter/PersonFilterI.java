@@ -3,7 +3,7 @@
  */
 package playground.yu.visum.filter;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
@@ -21,7 +21,7 @@ public interface PersonFilterI extends FilterI {
 	 *            who is being judged
 	 * @return true if the Person meets the criterion of the PersonFilterA
 	 */
-	boolean judge(Person person);
+	boolean judge(PersonImpl person);
 
 	/**
 	 * sends the person to the next PersonFilterA
@@ -30,7 +30,7 @@ public interface PersonFilterI extends FilterI {
 	 * @param person -
 	 *            a person being run
 	 */
-	void run(Person person);
+	void run(PersonImpl person);
 
 	/**sets the next PersonFilter
 	 * @param nextFilter - the next PersonFilter to set

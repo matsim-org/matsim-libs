@@ -4,8 +4,8 @@
 package playground.yu.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
@@ -18,7 +18,7 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 public class CharyparNagelScoringFunctionWithWalk extends LegScoringFunction {
 	private static double offsetWlk = 6.0;
 
-	public CharyparNagelScoringFunctionWithWalk(Plan plan,
+	public CharyparNagelScoringFunctionWithWalk(PlanImpl plan,
 			final CharyparNagelScoringParameters params) {
 		super(plan, params);
 	}

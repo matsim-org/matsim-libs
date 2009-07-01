@@ -23,13 +23,13 @@
  */
 package playground.yu.newPlans;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
@@ -53,8 +53,8 @@ public class PlansMutateTimeAllocation {
 		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(1800,
 				MatsimRandom.getLocalInstance());
 
-		for (Person person : population.getPersons().values())
-			for (Plan plan : person.getPlans())
+		for (PersonImpl person : population.getPersons().values())
+			for (PlanImpl plan : person.getPlans())
 				pmta.run(plan);
 
 		new PopulationWriter(population,

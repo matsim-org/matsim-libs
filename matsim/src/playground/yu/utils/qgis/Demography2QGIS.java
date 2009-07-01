@@ -28,14 +28,14 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -103,14 +103,14 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString() + ";");
-				Person person = this.plans.getPersons().get(person_id);
+				PersonImpl person = this.plans.getPersons().get(person_id);
 				out.write(person.getSex() + ";");
 				out.write(person.getAge() + ";");
 				out.write(person.getLicense() + ";");
 				out.write(person.getCarAvail() + ";");
 				out.write(person.isEmployed() + ";");
 
-				Plan sp = person.getSelectedPlan();
+				PlanImpl sp = person.getSelectedPlan();
 				ActivityImpl fa = sp.getFirstActivity();
 				if (fa.getType().substring(0, 1).equals("h")) {
 					Coord coord = fa.getCoord();

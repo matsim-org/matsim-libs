@@ -5,14 +5,14 @@ package playground.yu.analysis;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -35,7 +35,7 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 			notEmployedPtTime;
 	private double alwaysCarTime, alwaysPtTime, sometimesCarTime,
 			sometimesPtTime, neverCarTime, neverPtTime;
-	private Person person = null;
+	private PersonImpl person = null;
 
 	/**
 	 *
@@ -70,12 +70,12 @@ public class DailyEnRouteTimeModalSplit extends AbstractPersonAlgorithm
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		this.person = person;
 		run(person.getSelectedPlan());
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		int age = this.person.getAge();
 		String carAvail = this.person.getCarAvail();
 		for (PlanElement pe : plan.getPlanElements()) {

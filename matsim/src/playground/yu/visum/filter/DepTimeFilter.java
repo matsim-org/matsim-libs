@@ -2,9 +2,9 @@ package playground.yu.visum.filter;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class DepTimeFilter extends PersonFilterA {
@@ -16,8 +16,8 @@ public class DepTimeFilter extends PersonFilterA {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean judge(Person person) {
-		for (Plan plan : person.getPlans()) {
+	public boolean judge(PersonImpl person) {
+		for (PlanImpl plan : person.getPlans()) {
 			List actsLegs = plan.getPlanElements();
 			for (int i = 1; i < actsLegs.size(); i += 2) {
 				LegImpl leg = (LegImpl) actsLegs.get(i);

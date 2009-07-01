@@ -8,15 +8,15 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -46,8 +46,8 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(Person person) {
-		Plan plan = person.getSelectedPlan();
+	public void run(PersonImpl person) {
+		PlanImpl plan = person.getSelectedPlan();
 		if (toll == null) {
 			personCnt++;
 			run(plan);
@@ -57,7 +57,7 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				ActivityImpl previousAct = plan.getPreviousActivity((LegImpl) pe);

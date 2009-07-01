@@ -20,13 +20,13 @@
 
 package playground.yu.newPlans;
 
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -50,8 +50,8 @@ public class SelectedPlans extends NewPopulation {
 	}
 
 	@Override
-	public void run(Person person) {
-		Plan selectedPlan = person.getSelectedPlan();
+	public void run(PersonImpl person) {
+		PlanImpl selectedPlan = person.getSelectedPlan();
 		person.getPlans().clear();
 		person.addPlan(selectedPlan);
 		pw.writePerson(person);

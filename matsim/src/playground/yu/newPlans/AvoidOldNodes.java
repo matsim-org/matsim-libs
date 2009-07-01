@@ -24,18 +24,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -62,8 +62,8 @@ public class AvoidOldNodes extends NewPopulation {
 	}
 
 	@Override
-	public void run(final Person person) {
-		for (Plan p : person.getPlans()) {
+	public void run(final PersonImpl person) {
+		for (PlanImpl p : person.getPlans()) {
 			for (PlanElement pe : p.getPlanElements()) {
 				if (pe instanceof BasicLeg) {
 					BasicLeg bl = (BasicLeg) pe;

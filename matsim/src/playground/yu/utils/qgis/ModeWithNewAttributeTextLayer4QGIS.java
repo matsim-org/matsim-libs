@@ -5,13 +5,13 @@ package playground.yu.utils.qgis;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -37,7 +37,7 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 	}
 
 	@Override
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		count++;
 		ActivityImpl act = plan.getFirstActivity();
 		Coord homeLoc = act.getCoord();

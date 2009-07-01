@@ -3,7 +3,7 @@
  */
 package playground.yu.scoring;
 
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 

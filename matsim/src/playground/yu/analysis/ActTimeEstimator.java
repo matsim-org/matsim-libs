@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -67,7 +67,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl a = (ActivityImpl) pe;

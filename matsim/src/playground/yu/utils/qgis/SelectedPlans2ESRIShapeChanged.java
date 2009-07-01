@@ -37,15 +37,15 @@ import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -78,7 +78,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	// private double actBlurFactor = 0;
 	private double legBlurFactor = 0;
 	protected String outputDir;
-	private ArrayList<Plan> outputSamplePlans;
+	private ArrayList<PlanImpl> outputSamplePlans;
 	private FeatureType featureTypeAct;
 	private FeatureType featureTypeLeg;
 	protected GeometryFactory geofac;
@@ -126,7 +126,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	protected void writeLegs() throws IOException {
 		String outputFile = this.getOutputDir() + "/legs.shp";
 		ArrayList<Feature> fts = new ArrayList<Feature>();
-		for (Plan plan : this.getOutputSamplePlans()) {
+		for (PlanImpl plan : this.getOutputSamplePlans()) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
@@ -306,11 +306,11 @@ public class SelectedPlans2ESRIShapeChanged extends
 		return this.outputDir;
 	}
 
-	public void setOutputSamplePlans(final ArrayList<Plan> outputSamplePlans) {
+	public void setOutputSamplePlans(final ArrayList<PlanImpl> outputSamplePlans) {
 		this.outputSamplePlans = outputSamplePlans;
 	}
 
-	public ArrayList<Plan> getOutputSamplePlans() {
+	public ArrayList<PlanImpl> getOutputSamplePlans() {
 		return this.outputSamplePlans;
 	}
 

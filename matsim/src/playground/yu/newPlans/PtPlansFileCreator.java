@@ -7,18 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -139,9 +139,9 @@ public class PtPlansFileCreator {
 	private void createPtPerson(final String startLinkId, final String endTime,
 			final String endLinkId, final List<Node> srcRoute) {
 
-		Person p = new PersonImpl(new IdImpl("245-" + this.personCount));
+		PersonImpl p = new PersonImpl(new IdImpl("245-" + this.personCount));
 		try {
-			Plan pl = new org.matsim.core.population.PlanImpl(p);
+			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
 			Link startLink = this.network.getLink(new IdImpl(startLinkId));
 			ActivityImpl a = pl.createActivity("h", startLink);

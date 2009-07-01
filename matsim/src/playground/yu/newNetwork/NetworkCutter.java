@@ -30,12 +30,10 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -43,6 +41,8 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -106,8 +106,8 @@ public class NetworkCutter {
 	}
 
 	public void run(NetworkLayer net, Population pop) {
-		for (Person person : pop.getPersons().values())
-			for (Plan plan : person.getPlans())
+		for (PersonImpl person : pop.getPersons().values())
+			for (PlanImpl plan : person.getPlans())
 				for (PlanElement pe : plan.getPlanElements())
 					if (pe instanceof ActivityImpl)
 						resetBoundary(((ActivityImpl) pe).getCoord());
