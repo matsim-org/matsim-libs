@@ -30,17 +30,17 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -135,7 +135,7 @@ public class MyCommercialDemandGenerator3 {
 			int populationLimit = 1;
 			int agentId  = firstIndex;
 			for(int i = 0; i < populationSize; i++ ){
-				Plan plan = new PlanImpl(null);
+				PlanImpl plan = new PlanImpl(null);
 
 				// Sample start time
 				int startTimeBin = (int) cdfStartTime.sampleFromCDF();
@@ -194,12 +194,12 @@ public class MyCommercialDemandGenerator3 {
 				plan.getPlanElements().add(majorActivityEnd);
 
 				PlanWrapper pw = new PlanWrapper(86400, 0);
-				ArrayList<Plan> planList = pw.wrapPlan(plan);
+				ArrayList<PlanImpl> planList = pw.wrapPlan(plan);
 
-				for (Plan pp : planList) {
+				for (PlanImpl pp : planList) {
 					// Create a truck agent
 					Id id = sc.createId(Long.toString(agentId));
-					Person truck = pb.createPerson(id);
+					PersonImpl truck = pb.createPerson(id);
 					truck.addPlan(pp);
 					pp.setPerson(truck);
 //					pp.setSelected(true);

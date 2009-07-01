@@ -23,9 +23,9 @@ package playground.jjoubert.CommercialDemand;
 import java.util.ArrayList;
 
 import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -68,8 +68,8 @@ public class PlanWrapper {
 	 * @param plan of type {@code BasicPlan}
 	 * @return an {@code ArrayList} of {@code BasicPlan}s
 	 */
-	public ArrayList<Plan> wrapPlan(Plan plan) {
-		ArrayList<Plan> result = new ArrayList<Plan>();
+	public ArrayList<PlanImpl> wrapPlan(PlanImpl plan) {
+		ArrayList<PlanImpl> result = new ArrayList<PlanImpl>();
 		
 		Object firstActivity = plan.getPlanElements().get(0);
 		// Checks that the first plan element is an activity
@@ -98,7 +98,7 @@ public class PlanWrapper {
 				/*
 				 * Wrap the plan
 				 */
-				Plan dummyPlan = new PlanImpl(null);					
+				PlanImpl dummyPlan = new PlanImpl(null);					
 				
 				int index = 0;
 				while(index < plan.getPlanElements().size()){
@@ -161,8 +161,8 @@ public class PlanWrapper {
 							 * STEP 3: Check the new dummy plan. 
 							 */
 							PlanWrapper pw = new PlanWrapper(this.tw,squeezeThreshold);
-							ArrayList<Plan> recursivePlans = pw.wrapPlan(dummyPlan);
-							for (Plan bp : recursivePlans) {
+							ArrayList<PlanImpl> recursivePlans = pw.wrapPlan(dummyPlan);
+							for (PlanImpl bp : recursivePlans) {
 								result.add(bp);
 							}
 						}
