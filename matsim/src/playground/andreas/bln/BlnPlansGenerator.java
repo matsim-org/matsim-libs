@@ -9,12 +9,12 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -285,7 +285,7 @@ public class BlnPlansGenerator {
 
 			ArrayList<String[]> curTripList = tripData.get(personId);
 			PersonImpl curPerson = personList.get(personId);
-			Plan curPlan;
+			PlanImpl curPlan;
 
 			if(curPerson.getSelectedPlan() == null){
 				curPlan = curPerson.createPlan(true);

@@ -2,16 +2,16 @@ package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -45,7 +45,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 
 	
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		
 		this.personshandled++;
 		
@@ -53,7 +53,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 			System.err.println("Person got more than one plan");
 		} else {
 			
-			Plan plan = person.getPlans().get(0);
+			PlanImpl plan = person.getPlans().get(0);
 			boolean keepPlan = false;
 
 			for (PlanElement planElement : plan.getPlanElements()) {

@@ -24,11 +24,9 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -39,6 +37,8 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -118,10 +118,10 @@ public class MyControler1 extends Controler {
 		Link link9 = this.network.getLink("9");
 		Link link15 = this.network.getLink("15");
 		for (int i=0; i<100; i++) {
-			Person p = new PersonImpl(new IdImpl(i+1));
+			PersonImpl p = new PersonImpl(new IdImpl(i+1));
 
 			try {
-				Plan plan1 = new org.matsim.core.population.PlanImpl(p);
+				PlanImpl plan1 = new org.matsim.core.population.PlanImpl(p);
 				ActivityImpl act1a = plan1.createActivity("h", new CoordImpl(100., 100.));
 				act1a.setLink(link9);
 				act1a.setEndTime(0*60*60.);
@@ -134,7 +134,7 @@ public class MyControler1 extends Controler {
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
-				Plan plan2 = new org.matsim.core.population.PlanImpl(p);
+				PlanImpl plan2 = new org.matsim.core.population.PlanImpl(p);
 				ActivityImpl act2a = plan1.createActivity("h", new CoordImpl(100., 100.));
 				act2a.setLink(link9);
 				act2a.setEndTime(0*60*60.);
@@ -324,8 +324,8 @@ public class MyControler1 extends Controler {
 	}
 
 	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Population population){
-		Person p = new PersonImpl(new IdImpl(ii));
-		Plan plan = new org.matsim.core.population.PlanImpl(p);
+		PersonImpl p = new PersonImpl(new IdImpl(ii));
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			ActivityImpl act1 = plan.createActivity("h", new CoordImpl(100., 100.));
 			act1.setLink(sourceLink);

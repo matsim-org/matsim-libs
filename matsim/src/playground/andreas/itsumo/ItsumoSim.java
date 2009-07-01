@@ -25,17 +25,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ItsumoSim extends ExternalMobsim {
@@ -94,7 +94,7 @@ public class ItsumoSim extends ExternalMobsim {
 
 			out.write(" <drivers>"); out.newLine();
 
-			for (Person person : this.population.getPersons().values()) {
+			for (PersonImpl person : this.population.getPersons().values()) {
 
 				out.write("  <driver>"); out.newLine();
 
@@ -109,7 +109,7 @@ public class ItsumoSim extends ExternalMobsim {
 				out.write("   </options>"); out.newLine();
 
 
-				Plan plan = person.getSelectedPlan();
+				PlanImpl plan = person.getSelectedPlan();
 				if ( plan==null ) {
 					continue ;
 				}

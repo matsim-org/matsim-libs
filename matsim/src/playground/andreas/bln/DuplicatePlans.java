@@ -2,13 +2,13 @@ package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -28,7 +28,7 @@ public class DuplicatePlans extends NewPopulation {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		// Keep old person untouched
 		this.popWriter.writePerson(person);
 		Id personId = person.getId();		
