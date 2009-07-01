@@ -27,8 +27,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		
-		TestSuite suite = new TestSuite("All tests for " + AllTests.class.getPackage().getName());
+		TestSuite suite = new TestSuite("All tests for playground.jjoubert");
 		
 		suite.addTest(playground.jjoubert.Utilities.AllTests.suite());
 		

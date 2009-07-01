@@ -49,6 +49,7 @@ import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 import playground.jjoubert.CommercialTraffic.ActivityLocations;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
+import playground.jjoubert.Utilities.MyXmlConverter;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -57,14 +58,14 @@ public class MyCommercialDemandGenerator3 {
 	// String value that must be set
 	final static String PROVINCE = "Gauteng";
 	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "/home/jjoubert/";
 	
 	private static final int populationSize = 5000;
 	private static final int firstIndex = 100000;
 	private static double WITHIN_THRESHOLD = 0.90;
-	private static final int numberOfSamples = 10;
+	private static final int numberOfSamples = 2;
 
 	private final static int dimensionStart = 24; 		// vales 00h00m00 - 23h59m59
 	private final static int dimensionActivities = 21; 	// index '0' should never be used
@@ -78,8 +79,18 @@ public class MyCommercialDemandGenerator3 {
 		System.out.println("*****************************************************************************************");
 		System.out.println();
 
-		// Analyze vehicle chains
-		ArrayList<ArrayList<ArrayList<Integer>>> matrix = extractChainProperties();
+		// Analyze vehicle chains, but only if the matrix does NOT exist
+		String matrixFileName = ROOT + "Commercial/Input/matrixFile.txt";
+		File matrixFile = new File(matrixFileName);
+		MyXmlConverter xmlConverter = new MyXmlConverter();
+		ArrayList<ArrayList<ArrayList<Integer>>> matrix = null;
+		if(matrixFile.exists()){
+			Object obj = xmlConverter.readObjectFromFile(matrixFileName);
+			matrix = (ArrayList<ArrayList<ArrayList<Integer>>>) obj;
+		} else{
+			matrix = extractChainProperties();
+			xmlConverter.writeObjectToFile(matrix, matrixFileName);
+		}
 		// Build CDF for chain start times		
 		CumulativeDistribution cdfStartTime = convertMatrixToStartTimeCDF(matrix);
 		// Build empty CDF for number of activities
@@ -434,5 +445,6 @@ public class MyCommercialDemandGenerator3 {
 		System.out.printf("   ... Done (%d files)\n", filesProcessed);
 		return matrix;
 	}
+
 
 }

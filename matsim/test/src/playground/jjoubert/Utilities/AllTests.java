@@ -25,18 +25,12 @@ import junit.framework.TestSuite;
 
 
 public class AllTests {
-	
-	/**
-	 * Test all utilities.
-	 * @return
-	 */
-	
+		
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
 		
 		suite.addTestSuite(MyXmlConverterTest.class);
 		
 		return suite;
 	}
-	
 }
