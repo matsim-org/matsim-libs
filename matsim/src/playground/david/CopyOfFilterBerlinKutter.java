@@ -24,15 +24,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -47,9 +47,9 @@ class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 		super();
 	}
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
 			if (jj % 2 == 0) {
 			} else {

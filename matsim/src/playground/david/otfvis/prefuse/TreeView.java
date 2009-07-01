@@ -36,9 +36,9 @@ import javax.swing.SwingConstants;
 import javax.swing.event.TableModelEvent;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
@@ -215,7 +215,7 @@ public static class MTree extends Tree {
 		if(level == 0) {
 			parent.setInt("level", 0); // is expanded
 			for (int i = start; i<end; i++) {
-				Person p = m_pop.getPerson(i);
+				PersonImpl p = m_pop.getPerson(i);
 				if(p != null) {
 					Node child = this.addNode();
 					//Node child = this.addChild(parent);

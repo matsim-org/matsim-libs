@@ -26,13 +26,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -65,7 +65,7 @@ public class PopProviderServer implements PopulationProvider {
 	}
 
 	public static class QueryPerson  extends QueryImpl {
-		private Person person;
+		private PersonImpl person;
 		int id;
 		
 		public QueryPerson(int id){
@@ -154,7 +154,7 @@ public class PopProviderServer implements PopulationProvider {
 		return qid.idSet;
 	}
 
-	public Person getPerson(int id) {
+	public PersonImpl getPerson(int id) {
 		QueryPerson qid = (QueryPerson) clientQ.doQuery(new QueryPerson(id));
 		return qid.person;
 	}

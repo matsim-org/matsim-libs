@@ -23,11 +23,11 @@ package playground.david.otfvis.prefuse;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 public interface PopulationProvider {
 	public SortedSet<Integer> getIdSet();
-	public Person getPerson(int id);
+	public PersonImpl getPerson(int id);
 	
 }
 

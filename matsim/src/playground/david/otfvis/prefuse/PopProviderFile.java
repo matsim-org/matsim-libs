@@ -32,10 +32,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
@@ -83,8 +83,8 @@ public class PopProviderFile implements PopulationProvider {
 		return idSet;
 	}
 
-	public Person getPerson(int id) {
-		Person p = population.getPersons().get(new IdImpl(id));
+	public PersonImpl getPerson(int id) {
+		PersonImpl p = population.getPersons().get(new IdImpl(id));
 		return p;
 	}
 
