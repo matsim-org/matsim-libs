@@ -25,12 +25,10 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
@@ -39,6 +37,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.scoring.EventsToScore;
@@ -162,7 +162,7 @@ import org.matsim.core.utils.misc.Time;
 		return population;
 	}
 	
-	private static void addPersonToPopulation(final Person person, final Population population) {
+	private static void addPersonToPopulation(final PersonImpl person, final Population population) {
 		population.getPersons().put(person.getId(), person);
 	}
 
@@ -178,9 +178,9 @@ import org.matsim.core.utils.misc.Time;
 		return population;
 	}
 
-	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final List<Node> routeNodes, final Link workLink) {
-		Person person = new PersonImpl(new IdImpl(personId));
-		Plan plan = new org.matsim.core.population.PlanImpl(person);
+	private static PersonImpl createPerson1(final int personId, final String startTime, final Link homeLink, final List<Node> routeNodes, final Link workLink) {
+		PersonImpl person = new PersonImpl(new IdImpl(personId));
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createActivity("h", homeLink).setEndTime(Time.parseTime(startTime));
 		LegImpl leg = plan.createLeg(TransportMode.car);//"car", startTime, "00:01", null);
@@ -191,9 +191,9 @@ import org.matsim.core.utils.misc.Time;
 		return person;
 	}
 
-	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
-		Person person = new PersonImpl(new IdImpl(personId));
-		Plan plan = new org.matsim.core.population.PlanImpl(person);
+	private static PersonImpl createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
+		PersonImpl person = new PersonImpl(new IdImpl(personId));
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		ActivityImpl act = plan.createActivity("h", homeLink);
 		act.setCoord(homeLink.getCoord());

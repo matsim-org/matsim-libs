@@ -3,9 +3,9 @@ package org.matsim.locationchoice.constrained;
 
 import java.util.List;
 
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.locationchoice.Initializer;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -44,7 +44,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	
 	public void testHandlePlan() {
 		this.initialize();
-		Plan plan = this.initializer.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();		
+		PlanImpl plan = this.initializer.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();		
 		this.locationmutator.handlePlan(plan);
 		assertEquals(plan.getFirstActivity().getCoord().getX(), -25000.0, EPSILON);
 		assertEquals(plan.getNextLeg(plan.getFirstActivity()).getRoute(), null);
@@ -52,7 +52,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	
 	public void testCalcActChains() {
 		this.initialize();
-		Plan plan = this.initializer.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();		
+		PlanImpl plan = this.initializer.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();		
 		List<SubChain> list = this.locationmutator.calcActChains(plan);
 		assertEquals(list.size(), 1);
 	}

@@ -28,12 +28,12 @@ import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -57,9 +57,9 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
+		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
 		// only plan of that person
-		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		Planomat testee = new Planomat(null, null);
 
@@ -128,9 +128,9 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
+		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
 		// only plan of that person
-		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		Planomat testee = new Planomat(null, null);
 

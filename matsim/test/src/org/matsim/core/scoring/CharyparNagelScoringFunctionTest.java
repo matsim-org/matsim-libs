@@ -24,8 +24,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -34,6 +32,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -52,8 +52,8 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 
 	protected Config config = null;
 	private NetworkLayer network = null;
-	private Person person = null;
-	private Plan plan = null;
+	private PersonImpl person = null;
+	private PlanImpl plan = null;
 
 	@Override
 	public void setUp() throws Exception {

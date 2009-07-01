@@ -23,10 +23,8 @@ package org.matsim.run;
 import java.io.File;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -37,6 +35,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.testcases.MatsimTestCase;
@@ -63,9 +63,9 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// create one person with missing link in act
 		Population population = new PopulationImpl();
-		Person person = new PersonImpl(new IdImpl("1"));
+		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		population.getPersons().put(person.getId(), person);
-		Plan plan = person.createPlan(true);
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", network.getLink(new IdImpl("1")));
 		a1.setEndTime(3600);
 		plan.createLeg(TransportMode.car);
@@ -92,10 +92,10 @@ public class InitRoutesTest extends MatsimTestCase {
 		Population population2 = new PopulationImpl();
 		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
-		Person person2 = population2.getPersons().get(new IdImpl("1"));
+		PersonImpl person2 = population2.getPersons().get(new IdImpl("1"));
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
-		Plan plan2 = person2.getPlans().get(0);
+		PlanImpl plan2 = person2.getPlans().get(0);
 		LegImpl leg2 = (LegImpl) plan2.getPlanElements().get(1);
 		NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
 		assertNotNull("no route assigned.", route2);

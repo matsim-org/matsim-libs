@@ -20,15 +20,15 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -55,9 +55,9 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		Person person1 = new PersonImpl(new IdImpl(1)); // person 1 travels link1 + link2
-		Person person2 = new PersonImpl(new IdImpl(2)); // person 2 travels link1 + link2
-		Person person3 = new PersonImpl(new IdImpl(3)); // person 3 travels link1 + link3
+		PersonImpl person1 = new PersonImpl(new IdImpl(1)); // person 1 travels link1 + link2
+		PersonImpl person2 = new PersonImpl(new IdImpl(2)); // person 2 travels link1 + link2
+		PersonImpl person3 = new PersonImpl(new IdImpl(3)); // person 3 travels link1 + link3
 		
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = Time.parseTime("07:00:10");

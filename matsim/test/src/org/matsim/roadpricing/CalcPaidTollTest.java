@@ -27,14 +27,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
@@ -61,8 +61,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id4 = new IdImpl("4");
 		Id id5 = new IdImpl("5");
 		
-		Map<Id, Person> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
-		Map<Id, Person> population = runTollSimulation(tollFile, "distance", config.charyparNagelScoring()).getPersons();
+		Map<Id, PersonImpl> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
+		Map<Id, PersonImpl> population = runTollSimulation(tollFile, "distance", config.charyparNagelScoring()).getPersons();
 
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
@@ -99,8 +99,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id8 = new IdImpl("8");
 		Id id10 = new IdImpl("10");
 
-		Map<Id, Person> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
-		Map<Id, Person> population = runTollSimulation(tollFile, "area", config.charyparNagelScoring()).getPersons();
+		Map<Id, PersonImpl> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
+		Map<Id, PersonImpl> population = runTollSimulation(tollFile, "area", config.charyparNagelScoring()).getPersons();
 
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
@@ -148,8 +148,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id7 = new IdImpl("7");
 		Id id8 = new IdImpl("8");
 
-		Map<Id, Person> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
-		Map<Id, Person> population = runTollSimulation(tollFile, "cordon", config.charyparNagelScoring()).getPersons();
+		Map<Id, PersonImpl> referencePopulation = Fixture.createReferencePopulation1(config.charyparNagelScoring()).getPersons();
+		Map<Id, PersonImpl> population = runTollSimulation(tollFile, "cordon", config.charyparNagelScoring()).getPersons();
 
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),

@@ -25,18 +25,18 @@ import java.util.Collection;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.CompressedNetworkRoute;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -71,8 +71,8 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		controler.run();
 
 		Population population = controler.getPopulation();
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
+		for (PersonImpl person : population.getPersons().values()) {
+			for (PlanImpl plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof BasicLeg) {
 						BasicLeg leg = (BasicLeg) pe;
@@ -97,9 +97,9 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		controler2.run();
 
 		Population population2 = controler2.getPopulation();
-		for (Person person : population2.getPersons().values()) {
+		for (PersonImpl person : population2.getPersons().values()) {
 			int planCounter = 0;
-			for (Plan plan : person.getPlans()) {
+			for (PlanImpl plan : person.getPlans()) {
 				planCounter++;
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof BasicLeg) {

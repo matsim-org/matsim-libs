@@ -21,14 +21,14 @@
 package org.matsim.roadpricing;
 
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -64,7 +64,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		Person person1 = population.getPersons().get(new IdImpl("1"));
+		PersonImpl person1 = population.getPersons().get(new IdImpl("1"));
 		LegImpl leg = ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
@@ -113,7 +113,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
-		Person person1 = population.getPersons().get(new IdImpl("1"));
+		PersonImpl person1 = population.getPersons().get(new IdImpl("1"));
 		LegImpl leg = ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
@@ -152,8 +152,8 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	 * @param population
 	 */
 	private void clearRoutes(final Population population) {
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
+		for (PersonImpl person : population.getPersons().values()) {
+			for (PlanImpl plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof LegImpl) {
 						((LegImpl) pe).setRoute(null);

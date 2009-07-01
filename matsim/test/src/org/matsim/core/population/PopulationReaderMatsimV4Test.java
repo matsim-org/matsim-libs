@@ -24,12 +24,10 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -54,8 +52,8 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		new PopulationReaderMatsimV4(scenario).parse(getInputDirectory() + "plans2.xml");
 
 		assertEquals("population size.", 2, population.getPersons().size());
-		Person person1 = population.getPersons().get(new IdImpl("1"));
-		Plan plan1 = person1.getPlans().get(0);
+		PersonImpl person1 = population.getPersons().get(new IdImpl("1"));
+		PlanImpl plan1 = person1.getPlans().get(0);
 		LegImpl leg1a = (LegImpl) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
 		assertEquals("different startLink for first leg.", network.getLink(new IdImpl("1")), route1a.getStartLink());
@@ -69,8 +67,8 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route1c.getStartLink());
 		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route1c.getEndLink());
 
-		Person person2 = population.getPersons().get(new IdImpl("2"));
-		Plan plan2 = person2.getPlans().get(0);
+		PersonImpl person2 = population.getPersons().get(new IdImpl("2"));
+		PlanImpl plan2 = person2.getPlans().get(0);
 		LegImpl leg2a = (LegImpl) plan2.getPlanElements().get(1);
 		Route route2a = leg2a.getRoute();
 		assertEquals("different startLink for first leg.", network.getLink(new IdImpl("2")), route2a.getStartLink());

@@ -22,9 +22,9 @@ package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -35,7 +35,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testRandomChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		Plan plan = new org.matsim.core.population.PlanImpl(null);
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createActivity("home", new CoordImpl(0, 0));
 		LegImpl leg = plan.createLeg(TransportMode.car);
 		plan.createActivity("work", new CoordImpl(0, 0));
@@ -64,14 +64,14 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testHandleEmptyPlan() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		Plan plan = new org.matsim.core.population.PlanImpl(null);
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
 	public void testHandlePlanWithoutLeg() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		Plan plan = new org.matsim.core.population.PlanImpl(null);
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createActivity("home", new CoordImpl(0, 0));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
@@ -82,7 +82,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 */
 	public void testMultipleLegs() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
-		Plan plan = new org.matsim.core.population.PlanImpl(null);
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createActivity("home", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
 		plan.createActivity("work", new CoordImpl(0, 0));

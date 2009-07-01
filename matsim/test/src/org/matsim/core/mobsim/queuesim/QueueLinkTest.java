@@ -21,19 +21,19 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicle;
@@ -71,7 +71,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		QueueVehicleImpl v = new QueueVehicleImpl(f.basicVehicle);
 
-		Person p = new PersonImpl(new IdImpl("1"));
+		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		v.setDriver(new PersonAgent(p, null));
 		Exception e = null;
 		//as QueueLink has static access to the rest of the simulation
@@ -103,7 +103,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		QueueSimulation qsim = new QueueSimulation(f.scenario, new Events());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
-		Person p = new PersonImpl(new IdImpl(23));
+		PersonImpl p = new PersonImpl(new IdImpl(23));
 		veh.setDriver(new PersonAgent(p, qsim));
 
 		// start test, check initial conditions
@@ -149,7 +149,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		QueueSimulation qsim = new QueueSimulation(f.scenario, new Events());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
-		Person p = new PersonImpl(new IdImpl(42));
+		PersonImpl p = new PersonImpl(new IdImpl(42));
 		veh.setDriver(new PersonAgent(p, qsim));
 
 		// start test, check initial conditions
@@ -184,7 +184,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		QueueSimulation qsim = new QueueSimulation(f.scenario, new Events());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
-		Person p = new PersonImpl(new IdImpl(80));
+		PersonImpl p = new PersonImpl(new IdImpl(80));
 		veh.setDriver(new PersonAgent(p, qsim));
 
 		// start test, check initial conditions
@@ -235,8 +235,8 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		QueueSimulation qsim = new QueueSimulation(network, null, new Events());
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
-		Person p = new PersonImpl(new IdImpl("1"));
-		Plan plan = p.createPlan(true);
+		PersonImpl p = new PersonImpl(new IdImpl("1"));
+		PlanImpl plan = p.createPlan(true);
 		try {
 			plan.createActivity("h", link1);
 			LegImpl leg = plan.createLeg(TransportMode.car);
@@ -298,7 +298,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
-		Person p = new PersonImpl(new IdImpl(5));
+		PersonImpl p = new PersonImpl(new IdImpl(5));
 		QueueSimulation qsim = new QueueSimulation(new ScenarioImpl(), new Events());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));

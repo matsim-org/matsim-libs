@@ -26,7 +26,6 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -43,7 +42,7 @@ public class PlanImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testCreateLeg() {
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		try {
 			plan.createLeg(TransportMode.car);
 			fail("expected IllegalStateException when creating a leg in an empty plan.");
@@ -67,7 +66,7 @@ public class PlanImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testCreateAct() {
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createActivity("h", new CoordImpl(0, 0));
 		// don't allow a second act directly after the first
 		try {
@@ -85,7 +84,7 @@ public class PlanImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_Between() {
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		ActivityImpl homeAct = plan.createActivity("h", new CoordImpl(0, 0));
 		LegImpl leg1 = plan.createLeg(TransportMode.car);
 		ActivityImpl workAct = plan.createActivity("w", new CoordImpl(100, 200));
@@ -111,7 +110,7 @@ public class PlanImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_AtEnd() {
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		ActivityImpl homeAct = plan.createActivity("h", new CoordImpl(0, 0));
 		LegImpl leg1 = plan.createLeg(TransportMode.car);
 		ActivityImpl workAct = plan.createActivity("w", new CoordImpl(100, 200));
@@ -137,7 +136,7 @@ public class PlanImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_AtWrongPosition() {
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createActivity("h", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
 		plan.createActivity("w", new CoordImpl(100, 200));
@@ -160,7 +159,7 @@ public class PlanImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_AtStart() {
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createActivity("h", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
 		plan.createActivity("w", new CoordImpl(100, 200));
@@ -184,7 +183,7 @@ public class PlanImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_BehindEnd() {
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createActivity("h", new CoordImpl(0, 0));
 		plan.createLeg(TransportMode.car);
 		plan.createActivity("w", new CoordImpl(100, 200));
@@ -219,7 +218,7 @@ public class PlanImplTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 		Link link2 = network.createLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 		
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createActivity("h", new CoordImpl(0, 0));
 		LegImpl leg = plan.createLeg(TransportMode.car);
 		plan.createActivity("w", new CoordImpl(100, 200));
@@ -228,7 +227,7 @@ public class PlanImplTest extends MatsimTestCase {
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 		
-		Plan plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
+		PlanImpl plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
 		plan2.copyPlan(plan);
 		
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
@@ -247,7 +246,7 @@ public class PlanImplTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 		Link link2 = network.createLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 		
-		Plan plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createActivity("h", new CoordImpl(0, 0));
 		LegImpl leg = plan.createLeg(TransportMode.car);
 		plan.createActivity("w", new CoordImpl(100, 200));
@@ -256,7 +255,7 @@ public class PlanImplTest extends MatsimTestCase {
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 		
-		Plan plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
+		PlanImpl plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
 		plan2.copyPlan(plan);
 		
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());

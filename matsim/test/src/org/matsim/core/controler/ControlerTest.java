@@ -24,12 +24,10 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -39,6 +37,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -63,10 +63,10 @@ public class ControlerTest extends MatsimTestCase {
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
 		Population population = new PopulationImpl();
-		Person person1 = null;
+		PersonImpl person1 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
-		Plan plan1 = person1.createPlan(true);
+		PlanImpl plan1 = person1.createPlan(true);
 		ActivityImpl a1 = plan1.createActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
 		LegImpl leg1 = plan1.createLeg(TransportMode.car);
@@ -79,8 +79,8 @@ public class ControlerTest extends MatsimTestCase {
 		plan1.createActivity("h", f.link3);
 		population.getPersons().put(person1.getId(), person1);
 
-		Person person2 = new PersonImpl(new IdImpl(2));
-		Plan plan2 = person2.createPlan(true);
+		PersonImpl person2 = new PersonImpl(new IdImpl(2));
+		PlanImpl plan2 = person2.createPlan(true);
 		ActivityImpl a2 = plan2.createActivity("h", f.link1);
 		a2.setEndTime(7.0*3600);
 		LegImpl leg2 = plan2.createLeg(TransportMode.car);
@@ -171,20 +171,20 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new PopulationImpl();
-		Person person1 = null;
+		PersonImpl person1 = null;
 		LegImpl leg1 = null;
 		LegImpl leg2 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
-		Plan plan1 = person1.createPlan(true);
+		PlanImpl plan1 = person1.createPlan(true);
 		ActivityImpl a1 = plan1.createActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a1.setEndTime(7.0*3600);
 		leg1 = plan1.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		plan1.createActivity("h", f.link3);
 		// --- plan 2 ---
-		Plan plan2 = person1.createPlan(true);
+		PlanImpl plan2 = person1.createPlan(true);
 		ActivityImpl a2 = plan2.createActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a2.setEndTime(7.0*3600);
 
@@ -228,7 +228,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new PopulationImpl();
-		Person person1 = null;
+		PersonImpl person1 = null;
 		ActivityImpl act1a = null;
 		ActivityImpl act1b = null;
 		ActivityImpl act2a = null;
@@ -238,14 +238,14 @@ public class ControlerTest extends MatsimTestCase {
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
-		Plan plan1 = person1.createPlan(true);
+		PlanImpl plan1 = person1.createPlan(true);
 		act1a = plan1.createActivity("h", new CoordImpl(-50.0, 10.0));
 		act1a.setEndTime(7.0*3600);
 		leg1 = plan1.createLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		act1b = plan1.createActivity("h", new CoordImpl(1075.0, -10.0));
 		// --- plan 2 ---
-		Plan plan2 = person1.createPlan(true);
+		PlanImpl plan2 = person1.createPlan(true);
 		act2a = plan2.createActivity("h", new CoordImpl(-50.0, -10.0));
 		act2a.setEndTime(7.9*3600);
 		leg2 = plan2.createLeg(TransportMode.car);
@@ -405,7 +405,7 @@ public class ControlerTest extends MatsimTestCase {
 	/** A helper class for testSetScoringFunctionFactory() */
 	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
 
-		public ScoringFunction getNewScoringFunction(final Plan plan) {
+		public ScoringFunction getNewScoringFunction(final PlanImpl plan) {
 			return new ScoringFunctionAccumulator();
 		}
 	}

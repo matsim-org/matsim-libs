@@ -20,10 +20,10 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -48,9 +48,9 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 *  @author mrieser
 	 */
 	public void testUndefinedScore() {
-		Person person;
+		PersonImpl person;
 		PlanSelector selector = getPlanSelector();
-		Plan plan;
+		PlanImpl plan;
 		
 		// test 1: exactly one plan, with undefined score
 		person = new PersonImpl(new IdImpl(1));
@@ -84,12 +84,12 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * Test how a plan selector reacts when a person has no plans at all. The correct behavior would be
 	 * to just return null, as stated in
-	 * {@link PlanSelector#selectPlan(org.matsim.core.api.population.Person) PlanSelector.selectPlan(Person)}
+	 * {@link PlanSelector#selectPlan(org.matsim.core.population.PersonImpl) PlanSelector.selectPlan(Person)}
 	 *
 	 * @author mrieser
 	 */
 	public void testNoPlans() {
-		Person person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		assertNull(getPlanSelector().selectPlan(person));
 	}
 
@@ -101,9 +101,9 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testNegativeScore() {
 		PlanSelector selector = getPlanSelector();
-		Plan plan;
+		PlanImpl plan;
 		// test with only one plan...
-		Person person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		plan = person.createPlan(false);
 		plan.setScore(-10.0);
 		assertNotNull(selector.selectPlan(person));
@@ -139,8 +139,8 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testZeroScore() {
 		PlanSelector selector = getPlanSelector();
-		Plan plan;
-		Person person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan;
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		plan = person.createPlan(false);
 		plan.setScore(0.0);
 		assertNotNull(selector.selectPlan(person));

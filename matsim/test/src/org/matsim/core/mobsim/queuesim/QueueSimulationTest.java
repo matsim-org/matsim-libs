@@ -31,12 +31,10 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -54,6 +52,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -75,8 +75,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		Person person = new PersonImpl(new IdImpl(0));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createLeg(TransportMode.car);
@@ -112,8 +112,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
-			Person person = new PersonImpl(new IdImpl(i));
-			Plan plan = person.createPlan(true);
+			PersonImpl person = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = person.createPlan(true);
 			ActivityImpl a1 = plan.createActivity("h", f.link1);
 			a1.setEndTime((6+i)*3600);
 			LegImpl leg = plan.createLeg(TransportMode.car);
@@ -150,8 +150,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		Person person = new PersonImpl(new IdImpl(0));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createLeg(TransportMode.other);
@@ -192,8 +192,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		Person person = new PersonImpl(new IdImpl(0));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createLeg(TransportMode.car);
@@ -254,8 +254,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 	public void testAgentWithoutLeg() {
 		Fixture f = new Fixture();
 
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan = person.createPlan(true);
 		plan.createActivity("home", f.link1);
 		f.plans.getPersons().put(person.getId(), person);
 		
@@ -278,8 +278,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 	public void testAgentWithoutLegWithEndtime() {
 		Fixture f = new Fixture();
 		
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl act = plan.createActivity("home", f.link1);
 		act.setEndTime(6.0 * 3600);
 		f.plans.getPersons().put(person.getId(), person);
@@ -303,8 +303,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 	public void testAgentWithLastActWithEndtime() {
 		Fixture f = new Fixture();
 		
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl act = plan.createActivity("home", f.link1);
 		act.setEndTime(6.0 * 3600);
 		LegImpl leg = plan.createLeg(TransportMode.walk);
@@ -336,8 +336,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-		Person person = new PersonImpl(new IdImpl(0));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createLeg(TransportMode.car);
@@ -403,8 +403,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-		Person person = new PersonImpl(new IdImpl(0));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createLeg(TransportMode.car);
@@ -459,8 +459,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-		Person person = new PersonImpl(new IdImpl(0));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createLeg(TransportMode.car);
@@ -519,8 +519,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 	public void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture();
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createLeg(TransportMode.other);
@@ -563,8 +563,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 	
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture();
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createLeg(TransportMode.other);
@@ -705,8 +705,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link6 = f.network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
-		Person person = new PersonImpl(new IdImpl(0));
-		Plan plan = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createLeg(TransportMode.car);

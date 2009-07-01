@@ -31,16 +31,16 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsBuilderImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -82,7 +82,7 @@ public class PlanomatTest extends MatsimTestCase {
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
 		//store the only existing person
-		Person p = scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		PersonImpl p = scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		//read the events once to create a complete test population
 		Events events = new Events(new EventsBuilderImpl(this.scenario));
 		events.addHandler(new ScenarioCreatePersonEventHandler(this.scenario));
@@ -114,13 +114,13 @@ public class PlanomatTest extends MatsimTestCase {
 	}
 
 	public void testCarAvailabilityAlways() {
-		Person p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		p.setCarAvail("always");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
 	
 	public void testCarAvailabilityNever() {
-		Person p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		p.setCarAvail("never");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
@@ -169,9 +169,9 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
-		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		// actual test
 		testee.run(testPlan);
@@ -199,9 +199,9 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
-		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		Planomat testee = new Planomat(null, null);
 
@@ -231,7 +231,7 @@ public class PlanomatTest extends MatsimTestCase {
 	public void testStepThroughPlan_WriteBack() throws InvalidConfigurationException {
 
 		// writeChromosome2Plan() has 3 arguments:
-		Plan testPlan = null;
+		PlanImpl testPlan = null;
 		IChromosome testChromosome = null;
 		LegTravelTimeEstimator ltte = null;
 
@@ -239,7 +239,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 

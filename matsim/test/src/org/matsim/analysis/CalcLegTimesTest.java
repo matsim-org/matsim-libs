@@ -22,11 +22,9 @@ package org.matsim.analysis;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -35,6 +33,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -55,9 +55,9 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		super.loadConfig(null);
 		
 		this.population = new PopulationImpl();
-		Person person = new PersonImpl(DEFAULT_PERSON_ID);
+		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
 		this.population.getPersons().put(person.getId(), person);
-		Plan plan = person.createPlan(true);
+		PlanImpl plan = person.createPlan(true);
 		plan.createActivity("act1", new CoordImpl(100.0, 100.0));
 		plan.createLeg(TransportMode.undefined);
 		plan.createActivity("act2", new CoordImpl(200.0, 200.0));
@@ -99,7 +99,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		Events events = new Events();
 		events.addHandler(testee);
 
-		Person defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
+		PersonImpl defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
 		Link defaultLink = this.network.getLinks().get(DEFAULT_LINK_ID);
 
 		LegImpl leg = new LegImpl(TransportMode.car);

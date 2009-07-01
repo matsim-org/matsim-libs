@@ -20,10 +20,10 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 
@@ -39,16 +39,16 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testRemoveWorstPlans_nullType() {
 		PlanSelector selector = getPlanSelector();
-		Person person = new PersonImpl(new IdImpl("1"));
+		PersonImpl person = new PersonImpl(new IdImpl("1"));
 
-		Plan plan1 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
 		plan1.setScore(15.0);
-		Plan plan2 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan2 = new org.matsim.core.population.PlanImpl(person);
 		plan2.setScore(22.0);
-		Plan plan3 = new org.matsim.core.population.PlanImpl(person);
-		Plan plan4 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan3 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan4 = new org.matsim.core.population.PlanImpl(person);
 		plan4.setScore(1.0);
-		Plan plan5 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan5 = new org.matsim.core.population.PlanImpl(person);
 		plan5.setScore(18.0);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
@@ -87,26 +87,26 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		 * plan4: b,  1.0
 		 * plan3: a, null
 		 */
-		Person person = new PersonImpl(new IdImpl("1"));
+		PersonImpl person = new PersonImpl(new IdImpl("1"));
 
-		Plan plan1 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
 		plan1.setScore(15.0);
-		Plan plan2 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan2 = new org.matsim.core.population.PlanImpl(person);
 		plan2.setScore(22.0);
-		Plan plan3 = new org.matsim.core.population.PlanImpl(person);
-		Plan plan4 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan3 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan4 = new org.matsim.core.population.PlanImpl(person);
 		plan4.setScore(1.0);
-		Plan plan5 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan5 = new org.matsim.core.population.PlanImpl(person);
 		plan5.setScore(18.0);
-		Plan plan6 = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan6 = new org.matsim.core.population.PlanImpl(person);
 		plan6.setScore(21.0);
 
-		plan1.setType(Plan.Type.CAR);
-		plan2.setType(Plan.Type.PT);
-		plan3.setType(Plan.Type.CAR);
-		plan4.setType(Plan.Type.PT);
-		plan5.setType(Plan.Type.CAR);
-		plan6.setType(Plan.Type.PT);
+		plan1.setType(PlanImpl.Type.CAR);
+		plan2.setType(PlanImpl.Type.PT);
+		plan3.setType(PlanImpl.Type.CAR);
+		plan4.setType(PlanImpl.Type.PT);
+		plan5.setType(PlanImpl.Type.CAR);
+		plan6.setType(PlanImpl.Type.PT);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
 		person.addPlan(plan3);

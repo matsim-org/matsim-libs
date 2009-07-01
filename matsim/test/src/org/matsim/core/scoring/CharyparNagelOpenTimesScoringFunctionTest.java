@@ -24,8 +24,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
@@ -33,6 +31,8 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -41,8 +41,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
-	private Person person = null;
-	private Plan plan = null;
+	private PersonImpl person = null;
+	private PlanImpl plan = null;
 
 	private static final String UNUSED_OPENTIME_ACTIVITY_TYPE = "no wed and wkday open time activity";
 	private static final String ONE_WKDAY_ACTIVITY_TYPE = "one opening interval on wkday activity";

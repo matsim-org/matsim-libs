@@ -20,11 +20,11 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -44,7 +44,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		Population population = new PopulationImpl();
 		for (int i = 0; i < 1000; i++) {
-			Person p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.getPersons().put(p.getId(), p);
 		}
 
@@ -124,7 +124,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		Population population = new PopulationImpl();
 		for (int i = 0; i < 100; i++) {
-			Person p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.getPersons().put(p.getId(), p);
 		}
 
@@ -180,8 +180,8 @@ public class StrategyManagerTest extends MatsimTestCase {
 	public void testOptimisticBehavior() {
 
 		Population population = new PopulationImpl();
-		Person person = null;
-		Plan[] plans = new Plan[10];
+		PersonImpl person = null;
+		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
 		person = new PersonImpl(new IdImpl(1));
 		plans[0] = person.createPlan(false);
@@ -209,7 +209,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		// in each "iteration", an unscored plans should be selected
 		for (int i = 0; i < 4; i++) {
 			manager.run(population, i);
-			Plan plan = person.getSelectedPlan();
+			PlanImpl plan = person.getSelectedPlan();
 			assertNull("plan has not undefined score in iteration " + i, plan.getScore());
 			plan.setScore(Double.valueOf(i));
 		}
@@ -232,8 +232,8 @@ public class StrategyManagerTest extends MatsimTestCase {
 		manager.addStrategy(new PlanStrategy(new RandomPlanSelector()), 1.0);
 		
 		// init Population
-		Person p = new PersonImpl(new IdImpl(1));
-		Plan[] plans = new Plan[7];
+		PersonImpl p = new PersonImpl(new IdImpl(1));
+		PlanImpl[] plans = new PlanImpl[7];
 		for (int i = 0; i < plans.length; i++) {
 			plans[i] = p.createPlan(false);
 			plans[i].setScore(Double.valueOf(i*10));
@@ -278,7 +278,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void run(final Person person) {
+		public void run(final PersonImpl person) {
 			this.counter++;
 			super.run(person);
 		}
@@ -302,7 +302,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		public TestPlanSelector() {
 		}
-		public Plan selectPlan(final Person person) {
+		public PlanImpl selectPlan(final PersonImpl person) {
 			throw new UnsupportedOperationException();
 		}
 

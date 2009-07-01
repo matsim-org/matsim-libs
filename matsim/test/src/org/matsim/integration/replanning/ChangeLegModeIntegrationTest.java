@@ -21,11 +21,9 @@
 package org.matsim.integration.replanning;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -34,6 +32,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -63,9 +63,9 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup population with one person
 		Population population = new PopulationImpl();
-		Person person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		population.getPersons().put(person.getId(), person);
-		Plan plan = person.createPlan(true);
+		PlanImpl plan = person.createPlan(true);
 		ActivityImpl act = plan.createActivity("home", new CoordImpl(0, 0));
 		act.setLink(link);
 		act.setEndTime(8.0 * 3600);
@@ -83,7 +83,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// test that everything worked as expected
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
-		Plan newPlan = person.getSelectedPlan();
+		PlanImpl newPlan = person.getSelectedPlan();
 		LegImpl newLeg = (LegImpl) newPlan.getPlanElements().get(1);
 		assertEquals(TransportMode.walk, newLeg.getMode());
 		assertNotNull("the leg should now have a route.", newLeg.getRoute());

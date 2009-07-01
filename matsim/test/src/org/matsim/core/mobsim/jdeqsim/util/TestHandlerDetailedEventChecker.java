@@ -7,14 +7,12 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
@@ -29,6 +27,8 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements BasicPersonEventHandler {
@@ -65,9 +65,9 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 		// compare plan and events for each agent
 		// compare: type of events, linkId
 		for (LinkedList<BasicPersonEvent> list : events.values()) {
-			Person p = population.getPersons().get(list.get(0).getPersonId());
+			PersonImpl p = population.getPersons().get(list.get(0).getPersonId());
 			// printEvents(list.get(0).agentId);
-			Plan plan = p.getSelectedPlan();
+			PlanImpl plan = p.getSelectedPlan();
 			int index = 0;
 
 			ActivityImpl act = null;

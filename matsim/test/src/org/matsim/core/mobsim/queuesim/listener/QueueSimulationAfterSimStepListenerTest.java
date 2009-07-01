@@ -23,8 +23,8 @@ package org.matsim.core.mobsim.queuesim.listener;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;

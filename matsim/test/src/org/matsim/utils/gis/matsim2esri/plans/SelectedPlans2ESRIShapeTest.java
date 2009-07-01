@@ -22,7 +22,7 @@ package org.matsim.utils.gis.matsim2esri.plans;
 
 import java.io.IOException;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;

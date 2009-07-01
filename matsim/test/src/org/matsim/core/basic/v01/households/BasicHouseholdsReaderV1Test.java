@@ -27,10 +27,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsReaderV10;
@@ -58,7 +58,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
   private final Id id43 = new IdImpl("43");
   private final Id id44 = new IdImpl("44");
   private final Id id45 = new IdImpl("45");
-  private Person p23, p42, p43, p44, p45;
+  private PersonImpl p23, p42, p43, p44, p45;
   
 	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
 		BasicHouseholds<BasicHousehold> households = new BasicHouseholdsImpl();

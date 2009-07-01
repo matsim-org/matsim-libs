@@ -20,8 +20,8 @@
 
 package org.matsim.core.events;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicle;
@@ -35,7 +35,7 @@ import org.matsim.vehicles.BasicVehicleTypeImpl;
 public class PersonLeavesVehicleEventTest extends MatsimTestCase {
 	
 	public void testWriteReadXml() {
-		Person person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(80), vehicleType);
 		PersonLeavesVehicleEvent event = new PersonLeavesVehicleEvent(5.0 * 3600 + 11.0 * 60, person, vehicle);

@@ -20,10 +20,10 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
@@ -45,8 +45,8 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testBestPlan() {
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan;
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan;
 		person.createPlan(false);
 		plan = person.createPlan(false);
 		plan.setScore(10.0);

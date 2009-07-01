@@ -20,10 +20,10 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
@@ -45,11 +45,11 @@ public class KeepSelectedTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testSelected() {
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan1 = person.createPlan(false);
-		Plan plan2 = person.createPlan(true);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan1 = person.createPlan(false);
+		PlanImpl plan2 = person.createPlan(true);
 		plan2.setScore(10.0);
-		Plan plan3 = person.createPlan(false);
+		PlanImpl plan3 = person.createPlan(false);
 		plan3.setScore(-50.0);
 		KeepSelected selector = new KeepSelected();
 

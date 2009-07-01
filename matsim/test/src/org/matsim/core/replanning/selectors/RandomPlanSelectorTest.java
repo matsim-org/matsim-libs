@@ -21,10 +21,10 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
@@ -46,13 +46,13 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * Test that each of a person's plans is randomly selected.
 	 */
 	public void testRandom() {
-		Person person = new PersonImpl(new IdImpl(1));
-		Plan plan1 = person.createPlan(false);
-		Plan plan2 = person.createPlan(false);
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan1 = person.createPlan(false);
+		PlanImpl plan2 = person.createPlan(false);
 		plan2.setScore(10.0);
-		Plan plan3 = person.createPlan(false);
+		PlanImpl plan3 = person.createPlan(false);
 		plan3.setScore(-50.0);
-		Plan plan4 = person.createPlan(false);
+		PlanImpl plan4 = person.createPlan(false);
 		plan4.setScore(0.0);
 
 		RandomPlanSelector selector = new RandomPlanSelector();
@@ -62,7 +62,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 		int cnt4 = 0;
 
 		for (int i = 0; i < 4000; i++) {
-			Plan plan = selector.selectPlan(person);
+			PlanImpl plan = selector.selectPlan(person);
 			if (plan == plan1) cnt1++;
 			if (plan == plan2) cnt2++;
 			if (plan == plan3) cnt3++;

@@ -1,6 +1,6 @@
 package org.matsim.locationchoice;
 
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 

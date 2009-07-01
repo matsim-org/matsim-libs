@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -64,7 +64,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 		loadConfig(null);
 		Population population = new PopulationImpl();
 		for (int i = 0; i < 100; i++) {
-			Person person = new PersonImpl(new IdImpl(i));
+			PersonImpl person = new PersonImpl(new IdImpl(i));
 			population.getPersons().put(person.getId(), person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
@@ -113,10 +113,10 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 			// make constructor public
 		}
 		@Override
-		public void run(final Person person) {
+		public void run(final PersonImpl person) {
 			handlePerson(person);
 		}
-		private synchronized void handlePerson(final Person person) {
+		private synchronized void handlePerson(final PersonImpl person) {
 			this.personIds.add(person.getId());
 		}
 	}

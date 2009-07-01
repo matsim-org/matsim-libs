@@ -20,15 +20,15 @@
 
 package org.matsim.core.scoring;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -42,7 +42,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	 */
 	public void testAddMoney() {
 		Population population = new PopulationImpl();
-		Person person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		population.getPersons().put(person.getId(), person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsToScore e2s = new EventsToScore(population, sfFactory, 1.0);
@@ -72,7 +72,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
-		public ScoringFunction getNewScoringFunction(final Plan plan) {
+		public ScoringFunction getNewScoringFunction(final PlanImpl plan) {
 			this.counter++;
 			return this.sf;
 		}

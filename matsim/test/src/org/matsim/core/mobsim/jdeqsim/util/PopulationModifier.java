@@ -1,6 +1,6 @@
 package org.matsim.core.mobsim.jdeqsim.util;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 
 /**
  * This allows to modify the population at the beginning of the simulation.

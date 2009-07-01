@@ -23,11 +23,11 @@ package org.matsim.population.filters;
 import java.util.TreeMap;
 
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -51,13 +51,13 @@ public class ActLinkFilterTest extends MatsimTestCase {
 		network.createLink(new IdImpl("1"), node1, node2, 1000.0, 20, 200, 2);
 		network.createLink(new IdImpl("2"), node2, node3, 1000.0, 20, 200, 2);
 
-		TreeMap<String, Person> persons = new TreeMap<String, Person>();
+		TreeMap<String, PersonImpl> persons = new TreeMap<String, PersonImpl>();
 
 		String linkId = null;
 		String actType = null;
 		for (String personId : new String[]{"1", "2"}) {
-			Person person = new PersonImpl(new IdImpl(personId));
-			Plan plan = person.createPlan(true);
+			PersonImpl person = new PersonImpl(new IdImpl(personId));
+			PlanImpl plan = person.createPlan(true);
 			if (personId.equals("1")) {
 				linkId = "1";
 				actType = GENERAL_HOME_ACT_TYPE;

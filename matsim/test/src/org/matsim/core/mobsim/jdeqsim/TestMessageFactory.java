@@ -1,6 +1,5 @@
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
 import org.matsim.core.mobsim.jdeqsim.EndLegMessage;
@@ -12,6 +11,7 @@ import org.matsim.core.mobsim.jdeqsim.Scheduler;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.StartingLegMessage;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -86,7 +86,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.GC_ALL_MESSAGES();
 		SimulationParameters.setGC_MESSAGES(true);
 		Scheduler scheduler=new Scheduler();
-		Person person= new PersonImpl(new IdImpl("abc"));
+		PersonImpl person= new PersonImpl(new IdImpl("abc"));
 		Vehicle vehicle=new Vehicle(scheduler, person );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);
@@ -109,7 +109,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.GC_ALL_MESSAGES();
 		SimulationParameters.setGC_MESSAGES(false);
 		Scheduler scheduler=new Scheduler();
-		Person person= new PersonImpl(new IdImpl("abc"));
+		PersonImpl person= new PersonImpl(new IdImpl("abc"));
 		Vehicle vehicle=new Vehicle(scheduler, person );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);

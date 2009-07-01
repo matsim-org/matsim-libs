@@ -22,8 +22,8 @@ package org.matsim.population.filters;
 
 import java.util.TreeMap;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -36,7 +36,7 @@ public class PersonIdFilterTest extends MatsimTestCase {
 	public void testPersonIdFilter() throws Exception {
 
 		// create fixture: 4 persons with special ids
-		TreeMap<String, Person> persons = new TreeMap<String, Person>();
+		TreeMap<String, PersonImpl> persons = new TreeMap<String, PersonImpl>();
 		for (String personId : new String[]{"1", "2102002002", "30", "3030"}) {
 			persons.put(personId, new PersonImpl(new IdImpl(personId)));
 		}

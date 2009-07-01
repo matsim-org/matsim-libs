@@ -29,8 +29,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
@@ -42,6 +40,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicleImpl;
@@ -63,7 +63,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 	private NetworkRoute route1 = null;
 	private NetworkRoute route2 = null;
 	private NetworkRoute agentRoute = null;
-	private Plan plan = null;
+	private PlanImpl plan = null;
 	private LegImpl leg = null;
 	private QueueSimulation simulation = null;
 
@@ -139,7 +139,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 	}
 
 	private WithindayAgent createAgent(final Link homeLink, final Link workLink) {
-		Person p = new PersonImpl(new IdImpl("1"));
+		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		this.plan = new PlanImpl(p);
 		p.addPlan(this.plan);
 		this.leg = null;

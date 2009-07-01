@@ -26,8 +26,6 @@ import java.util.Map.Entry;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -37,6 +35,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -76,7 +76,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
 
-		Person person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 
 		// test different types of activity plans
 		HashMap<String, String> expectedSubtourIndexations = new HashMap<String, String>();
@@ -169,7 +169,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		for (Entry<String, String> entry: expectedSubtourIndexations.entrySet()) {
 			String facString  = entry.getKey();
 
-			Plan plan = new org.matsim.core.population.PlanImpl(person);
+			PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 
 			String[] locationIdSequence = facString.split(" ");
 			for (int aa=0; aa < locationIdSequence.length; aa++) {

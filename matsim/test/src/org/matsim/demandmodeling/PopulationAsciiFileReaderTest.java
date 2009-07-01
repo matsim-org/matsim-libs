@@ -21,11 +21,11 @@ package org.matsim.demandmodeling;
 
 import java.io.IOException;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
@@ -48,16 +48,16 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 		Population plans = p.readFile(f);
 		assertNotNull(plans);
 		assertEquals(2, plans.getPersons().size());
-		Person p1 = plans.getPersons().get(new IdImpl("1"));
-		Person p2 = plans.getPersons().get(new IdImpl("2"));
+		PersonImpl p1 = plans.getPersons().get(new IdImpl("1"));
+		PersonImpl p2 = plans.getPersons().get(new IdImpl("2"));
 		assertNotNull(p1);
 		assertNotNull(p2);
 		assertEquals(1, p1.getAge());
 		assertEquals(99, p2.getAge());
 		assertEquals("m", p1.getSex());
 		assertEquals("f", p2.getSex());
-		Plan plan1 = p1.getSelectedPlan();
-		Plan plan2 = p2.getSelectedPlan();
+		PlanImpl plan1 = p1.getSelectedPlan();
+		PlanImpl plan2 = p2.getSelectedPlan();
 		assertNotNull(plan1);
 		assertNotNull(plan2);
 		ActivityImpl a11 = plan1.getFirstActivity();

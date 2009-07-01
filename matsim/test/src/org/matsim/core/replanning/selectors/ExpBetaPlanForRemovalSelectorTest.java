@@ -21,11 +21,11 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Tests for {@link ExpBetaPlanForRemovalSelector}.
@@ -53,18 +53,18 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	 */
 	public void testExpBeta2() {
 		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
-		Person person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// TODO [AH] Update to newest formula
 		// weight = Math.exp(this.beta * 5 * (plan.getScore() / maxScore));
-		Plan plan1 = person.createPlan(false); // weight: 14764.781
+		PlanImpl plan1 = person.createPlan(false); // weight: 14764.781
 		plan1.setScore(96.0);
-		Plan plan2 = person.createPlan(false); // weight: 16317.607
+		PlanImpl plan2 = person.createPlan(false); // weight: 16317.607
 		plan2.setScore(97.0);
-		Plan plan3 = person.createPlan(false); // weight: 18033.744
+		PlanImpl plan3 = person.createPlan(false); // weight: 18033.744
 		plan3.setScore(98.0);
-		Plan plan4 = person.createPlan(false); // weight: 19930.370
+		PlanImpl plan4 = person.createPlan(false); // weight: 19930.370
 		plan4.setScore(99.0);
-		Plan plan5 = person.createPlan(false);// weight: 22026.465
+		PlanImpl plan5 = person.createPlan(false);// weight: 22026.465
 		plan5.setScore(100.0);
 		
 		PlanSelector selector = new ExpBetaPlanForRemovalSelector();
@@ -75,7 +75,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		int cnt5 = 0;
 
 		for (int i = 0; i < 10000; i++) {
-			Plan plan = selector.selectPlan(person);
+			PlanImpl plan = selector.selectPlan(person);
 			if (plan == plan1) cnt1++;
 			if (plan == plan2) cnt2++;
 			if (plan == plan3) cnt3++;
@@ -106,23 +106,23 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	 */
 	public void testExpBeta1() {
 		this.config.charyparNagelScoring().setBrainExpBeta(1.0);
-		Person person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// TODO [AH] update to newest formula
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 121.5104175
-		Plan plan1 = person.createPlan(false); 
+		PlanImpl plan1 = person.createPlan(false); 
 		plan1.setScore(96.0);
 		// weight: 127.74038984602878
-		Plan plan2 = person.createPlan(false); 
+		PlanImpl plan2 = person.createPlan(false); 
 		plan2.setScore(97.0);
 		// weight: 134.289779684935
-		Plan plan3 = person.createPlan(false); 
+		PlanImpl plan3 = person.createPlan(false); 
 		plan3.setScore(98.0);
 		// weight: 141.1749639214768
-		Plan plan4 = person.createPlan(false); 
+		PlanImpl plan4 = person.createPlan(false); 
 		plan4.setScore(99.0);
 		// weight: 148.41315910257657
-		Plan plan5 = person.createPlan(false);
+		PlanImpl plan5 = person.createPlan(false);
 		plan5.setScore(100.0);
 		
 		PlanSelector selector = new ExpBetaPlanForRemovalSelector();
@@ -133,7 +133,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		int cnt5 = 0;
 
 		for (int i = 0; i < 10000; i++) {
-			Plan plan = selector.selectPlan(person);
+			PlanImpl plan = selector.selectPlan(person);
 			if (plan == plan1) cnt1++;
 			if (plan == plan2) cnt2++;
 			if (plan == plan3) cnt3++;

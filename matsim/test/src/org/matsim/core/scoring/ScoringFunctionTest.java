@@ -21,11 +21,9 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -33,6 +31,8 @@ import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -43,7 +43,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public abstract class ScoringFunctionTest extends MatsimTestCase {
 
-	protected abstract ScoringFunction getScoringFunctionInstance(final Plan plan);
+	protected abstract ScoringFunction getScoringFunctionInstance(final PlanImpl plan);
 
 	/**
 	 * Sets up the configuration to be useful for scoring plans. This implementation
@@ -86,8 +86,8 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		setupScoringConfig(scenario.getConfig());
 
 		// score the same plan twice
-		Person person1 = new PersonImpl(new IdImpl(1));
-		Plan plan1 = person1.createPlan(true);
+		PersonImpl person1 = new PersonImpl(new IdImpl(1));
+		PlanImpl plan1 = person1.createPlan(true);
 		ActivityImpl act1a = plan1.createActivity("home", (Link)null);//, 0, 7.0*3600, 7*3600, false);
 		LegImpl leg1 = plan1.createLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
 		ActivityImpl act1b = plan1.createActivity("work", (Link)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);

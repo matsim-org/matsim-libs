@@ -29,12 +29,10 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -47,6 +45,8 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -76,8 +76,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 		// create a population
 		Population plans = new PopulationImpl();
-		Person person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
-		Person person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
+		PersonImpl person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
+		PersonImpl person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
 		plans.getPersons().put(person1.getId(), person1);
 		plans.getPersons().put(person2.getId(), person2);
 
@@ -127,17 +127,17 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		 * Create two waves of persons, each counting 10.
 		 */
 		Population plans = new PopulationImpl();
-		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
-		for(Person p : persons1) {
+		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, personsPerWave);
+		for(PersonImpl p : persons1) {
 			plans.getPersons().put(p.getId(), p);
 		}
-		Person person1 = persons1.get(personsPerWave - 1);
+		PersonImpl person1 = persons1.get(personsPerWave - 1);
 
-		List<Person> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
-		for(Person p : persons2) {
+		List<PersonImpl> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
+		for(PersonImpl p : persons2) {
 			plans.getPersons().put(p.getId(), p);
 		}
-		Person person2 = persons2.get(personsPerWave - 1);
+		PersonImpl person2 = persons2.get(personsPerWave - 1);
 		/*
 		 * Run the simulation with the time-variant network and the two waves of
 		 * persons. Observe the last person of each wave.
@@ -195,13 +195,13 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
-	private List<Person> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkLayer network,
+	private List<PersonImpl> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkLayer network,
 			final int count) {
 		double departureTime = depTime;
-		List<Person> persons = new ArrayList<Person>(count);
+		List<PersonImpl> persons = new ArrayList<PersonImpl>(count);
 		for(int i = 0; i < count; i++) {
-			Person person = new PersonImpl(new IdImpl(i + (int)departureTime));
-			Plan plan1 = person.createPlan(true);
+			PersonImpl person = new PersonImpl(new IdImpl(i + (int)departureTime));
+			PlanImpl plan1 = person.createPlan(true);
 			ActivityImpl a1 = plan1.createActivity("h", depLink);
 			a1.setEndTime(departureTime);
 			LegImpl leg1 = plan1.createLeg(TransportMode.car);
@@ -225,15 +225,15 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 */
 	private static class TestTravelTimeCalculator implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
 
-		private final Person person1;
-		private final Person person2;
+		private final PersonImpl person1;
+		private final PersonImpl person2;
 		private final Id linkId;
 		protected double person1enterTime = Time.UNDEFINED_TIME;
 		protected double person1leaveTime = Time.UNDEFINED_TIME;
 		protected double person2enterTime = Time.UNDEFINED_TIME;
 		protected double person2leaveTime = Time.UNDEFINED_TIME;
 
-		protected TestTravelTimeCalculator(final Person person1, final Person person2, final Id linkId) {
+		protected TestTravelTimeCalculator(final PersonImpl person1, final PersonImpl person2, final Id linkId) {
 			this.person1 = person1;
 			this.person2 = person2;
 			this.linkId = linkId;

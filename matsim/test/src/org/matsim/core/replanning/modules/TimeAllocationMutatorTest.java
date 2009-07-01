@@ -23,13 +23,13 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -113,13 +113,13 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		network.createLink(new IdImpl("2"), node3, node4, 100, 5, 100, 1);
 
 		// setup person
-		Plan plan;
+		PlanImpl plan;
 		ActivityImpl act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			Person person = new PersonImpl(new IdImpl("1"));
+			PersonImpl person = new PersonImpl(new IdImpl("1"));
 			plan = person.createPlan(true);
 			act1 = plan.createActivity("h", link1);
 			act1.setEndTime(4*3600);
