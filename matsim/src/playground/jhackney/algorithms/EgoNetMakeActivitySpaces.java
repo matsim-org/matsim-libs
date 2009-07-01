@@ -20,14 +20,14 @@
 
 package playground.jhackney.algorithms;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -122,7 +122,7 @@ public class EgoNetMakeActivitySpaces {
 //		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 //		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 //		new PersonsRandomizeId(plans);
-		Person ego=plans.getPersons().get(new IdImpl("21924270"));
+		PersonImpl ego=plans.getPersons().get(new IdImpl("21924270"));
 
 		PopulationImpl socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
 //		// make the set of plans to use as EgoNet

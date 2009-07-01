@@ -23,8 +23,8 @@ package playground.jhackney.socialnetworks.socialnet;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
 
 /*
  * The purpose of the EgoNet class is to avoid extending the Person class.
@@ -56,7 +56,7 @@ public class EgoNet {
 	egoLinks.remove(link);
     }
 
-    public SocialNetEdge getEgoLink(Person p2) {
+    public SocialNetEdge getEgoLink(PersonImpl p2) {
 	SocialNetEdge myEdge = null;
 	Iterator<SocialNetEdge> linkIter = egoLinks.iterator();
 	while (linkIter.hasNext()) {
@@ -72,7 +72,7 @@ public class EgoNet {
      * @param person
      * @return <code>true</code> if person is already part of our social context
      */
-    public boolean knows( Person person ) {
+    public boolean knows( PersonImpl person ) {
 	for( SocialNetEdge edge : egoLinks ){
 	    if( edge.getPersonFrom().equals(person) )
 		return true;
@@ -100,7 +100,7 @@ public class EgoNet {
 //	    return edge.getPersonTo();
 //	return edge.getPersonFrom();
 //    }
-    public Person getRandomPerson() {
+    public PersonImpl getRandomPerson() {
 
 	int size = egoLinks.size();
 	if( size == 0 )
@@ -117,10 +117,10 @@ public class EgoNet {
 	return id;
     }
 
-    public ArrayList<Person> getAlters() {
-	ArrayList<Person> alterList= new ArrayList<Person>();
+    public ArrayList<PersonImpl> getAlters() {
+	ArrayList<PersonImpl> alterList= new ArrayList<PersonImpl>();
 	for (SocialNetEdge myEdge : egoLinks) {
-	    Person me = myEdge.getPersonTo();
+	    PersonImpl me = myEdge.getPersonTo();
 	    alterList.add(me);// TODO JH check if we want Ego on the Alters list ?!
 	}
 	return alterList;

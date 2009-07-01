@@ -4,9 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
@@ -64,8 +65,8 @@ public class MakeSocialNetworkFromFile {
 
 					if(iterToLoad == iter){
 						//fill the social network
-						Person person1 = plans.getPersons().get(new IdImpl(egoId));
-						Person person2 = plans.getPersons().get(new IdImpl(alterId));
+						PersonImpl person1 = plans.getPersons().get(new IdImpl(egoId));
+						PersonImpl person2 = plans.getPersons().get(new IdImpl(alterId));
 						snet.makeSocialContact(person1, person2, 0, purpose);
 						SocialNetEdge thisEdge = ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
 						thisEdge.setNumberOfTimesMet(timesmet);

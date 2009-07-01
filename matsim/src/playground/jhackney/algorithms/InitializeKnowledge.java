@@ -3,11 +3,11 @@ package playground.jhackney.algorithms;
 import java.io.File;
 import java.util.Iterator;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 
@@ -42,16 +42,16 @@ public class InitializeKnowledge {
 
 		System.out.println(" ... done");
 
-		Iterator<Person> p_it = plans.getPersons().values().iterator();
+		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
-			Person person=p_it.next();
+			PersonImpl person=p_it.next();
 
 			Knowledge k = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
 				k = knowledges.getBuilder().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
-				Plan plan = person.getPlans().get(ii);
+				PlanImpl plan = person.getPlans().get(ii);
 
 				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
 				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }

@@ -10,8 +10,9 @@ package playground.jhackney.socialnetworks.algorithms;
  */
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
@@ -29,12 +30,12 @@ public class PersonForgetKnowledge extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		// TODO Auto-generated method stub
 //		Remember a number of activities equal to at least the number of
 //		acts per plan times the number of plans in memory
 
-		Plan p = person.getSelectedPlan();
+		PlanImpl p = person.getSelectedPlan();
 		if(multiple>0){
 		int max_memory = (int) (p.getPlanElements().size()/2*person.getPlans().size()*multiple);
 		((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).manageMemory(max_memory, person.getPlans());

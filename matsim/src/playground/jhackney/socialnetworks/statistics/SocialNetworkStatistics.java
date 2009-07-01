@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Location;
@@ -210,8 +210,8 @@ public class SocialNetworkStatistics {
 			// Average distance separating acquaintances
 			smDD.accumulate(dyadDist);
 			// Need persons to get Id's
-			Person pFrom = myEdge.getPersonFrom();
-			Person pTo = myEdge.getPersonTo();
+			PersonImpl pFrom = myEdge.getPersonFrom();
+			PersonImpl pTo = myEdge.getPersonTo();
 			// Average duration of a social link
 			double x1 = myEdge.getTimeLastUsed();
 			double x2 = myEdge.getTimesMet();
@@ -256,9 +256,9 @@ public class SocialNetworkStatistics {
 			// Average distance separating acquaintances
 			smDD.accumulate(dyadDist);
 			// Need persons to get Id's
-			Vector<Person> dyad = getEdgePersons(myEdge, plans);
-			Person pFrom = dyad.elementAt(0);
-			Person pTo = dyad.elementAt(1);
+			Vector<PersonImpl> dyad = getEdgePersons(myEdge, plans);
+			PersonImpl pFrom = dyad.elementAt(0);
+			PersonImpl pTo = dyad.elementAt(1);
 			// Average duration of a social link
 			double x1 = (iter - Integer.parseInt(myEdge.getUserDatum("timeLastUsed")
 					.toString()));
@@ -289,12 +289,12 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	private Vector<Person> getEdgePersons(Edge e, Population plans) {
-		Vector<Person> persons = new Vector<Person>(2);
+	private Vector<PersonImpl> getEdgePersons(Edge e, Population plans) {
+		Vector<PersonImpl> persons = new Vector<PersonImpl>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
-		Person p1 = plans.getPersons().get((Id) v1.getUserDatum("personId"));
+		PersonImpl p1 = plans.getPersons().get((Id) v1.getUserDatum("personId"));
 		Vertex v2 = (Vertex) e.getEndpoints().getSecond();
-		Person p2 = plans.getPersons().get((Id) v2.getUserDatum("personId"));
+		PersonImpl p2 = plans.getPersons().get((Id) v2.getUserDatum("personId"));
 		persons.add(p1);
 		persons.add(p2);
 		return persons;
@@ -302,10 +302,10 @@ public class SocialNetworkStatistics {
 
 	private double getDyadDistance(SocialNetEdge myEdge) {
 		double dist = 0.;
-		Person pFrom = myEdge.getPersonFrom();
+		PersonImpl pFrom = myEdge.getPersonFrom();
 		Coord fromCoord = ((ActivityImpl) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
-		Person pTo = myEdge.getPersonTo();
+		PersonImpl pTo = myEdge.getPersonTo();
 		Coord toCoord = ((ActivityImpl) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);
@@ -314,11 +314,11 @@ public class SocialNetworkStatistics {
 	private double getDyadDistance(Edge myEdge, Population plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
-		Person pFrom = plans.getPersons().get((Id) vFrom.getUserDatum("personId"));
+		PersonImpl pFrom = plans.getPersons().get((Id) vFrom.getUserDatum("personId"));
 		Coord fromCoord = ((ActivityImpl) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
-		Person pTo = plans.getPersons().get((Id) vTo.getUserDatum("personId"));
+		PersonImpl pTo = plans.getPersons().get((Id) vTo.getUserDatum("personId"));
 		Coord toCoord = ((ActivityImpl) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);
@@ -365,7 +365,7 @@ public class SocialNetworkStatistics {
 		while (ivert.hasNext()) {
 
 			Vertex myVert = ivert.next();
-			Person myPerson = plans.getPersons().get((Id) myVert.getUserDatum("personId"));
+			PersonImpl myPerson = plans.getPersons().get((Id) myVert.getUserDatum("personId"));
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
 			ActivityImpl myAct = (ActivityImpl) myPerson.getSelectedPlan().getPlanElements().get(0);
@@ -402,9 +402,9 @@ public class SocialNetworkStatistics {
 			double pop=(Integer) myVertex.getUserDatum("population");
 
 			// Agent's Plan Type
-			Plan thisPlan = myPerson.getSelectedPlan();
-			Plan.Type planType = thisPlan.getType();
-			if ((planType == null) || (planType == Plan.Type.UNDEFINED)) {
+			PlanImpl thisPlan = myPerson.getSelectedPlan();
+			PlanImpl.Type planType = thisPlan.getType();
+			if ((planType == null) || (planType == PlanImpl.Type.UNDEFINED)) {
 				planTypeString = new StringBuilder();
 				for (PlanElement pe : thisPlan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
@@ -498,7 +498,7 @@ public class SocialNetworkStatistics {
 	void fillGraph(Graph g, SocialNetwork snet, Population plans) {
 		Vertex v;
 		Edge e;
-		for (Person p : plans.getPersons().values()) {
+		for (PersonImpl p : plans.getPersons().values()) {
 			if (snet.isUNDIRECTED()) {
 				v = new UndirectedSparseVertex();
 			}

@@ -52,13 +52,13 @@ import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -280,7 +280,7 @@ public class EgoNetPlansMakeKML {
 	}
 
 
-	public static void loadData(Person myPerson){
+	public static void loadData(PersonImpl myPerson){
 
 		if(config.getModule(KML21_MODULE)==null) return;
 
@@ -291,22 +291,22 @@ public class EgoNetPlansMakeKML {
 		loadData(myPerson, 0, 1);
 
 		// Proceed to the EgoNet of myPerson
-		ArrayList<Person> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
-		Iterator<Person> altersIt= persons.iterator();
+		ArrayList<PersonImpl> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
+		Iterator<PersonImpl> altersIt= persons.iterator();
 
 		while(altersIt.hasNext()){
-			Person p = altersIt.next();
+			PersonImpl p = altersIt.next();
 			i++;
 			loadData(p,i,persons.size());
 		}
 
 		System.out.println(" ... done.");
 	}
-	public static void loadData(Person myPerson, int i, int nColors) {
+	public static void loadData(PersonImpl myPerson, int i, int nColors) {
 
 		System.out.println("    loading Plan data. Processing person ...");
 
-		Plan myPlan = myPerson.getSelectedPlan();
+		PlanImpl myPlan = myPerson.getSelectedPlan();
 
 		byte[] color = setColor(i, nColors+1);
 //		setFacStyles(color);
@@ -471,7 +471,7 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static void makeActKML(Person myPerson, ActivityImpl act, FolderType agentFolder, StyleType agentLinkStyle) {
+	private static void makeActKML(PersonImpl myPerson, ActivityImpl act, FolderType agentFolder, StyleType agentLinkStyle) {
 		// TODO Auto-generated method stub
 
 		String styleUrl = null;

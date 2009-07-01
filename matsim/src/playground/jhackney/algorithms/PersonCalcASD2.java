@@ -1,6 +1,6 @@
 package playground.jhackney.algorithms;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 import playground.jhackney.socialnetworks.algorithms.PersonCalculateActivitySpaces;
@@ -21,7 +21,7 @@ public class PersonCalcASD2  extends AbstractPersonAlgorithm{
 	}
 	
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		// TODO Auto-generated method stub
 		double aSd2 = pcasd1.getPersonASD2(person.getSelectedPlan());
 		System.out.println("#Result "+aSd2);

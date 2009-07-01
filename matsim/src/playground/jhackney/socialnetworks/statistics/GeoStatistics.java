@@ -3,9 +3,9 @@ package playground.jhackney.socialnetworks.statistics;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.world.Location;
 
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
@@ -46,10 +46,10 @@ public class GeoStatistics {
 	public Graph makeJungGraph() {
 		// TODO fix
 		Graph g = new UndirectedSparseGraph();
-		Iterator<Person> iperson = this.plans.getPersons().values().iterator();
+		Iterator<PersonImpl> iperson = this.plans.getPersons().values().iterator();
 		while (iperson.hasNext()) {
 			Vertex v;
-			Person aPerson = iperson.next();
+			PersonImpl aPerson = iperson.next();
 //			Choose the first location in the plan and assume it's where the person lives
 
 			ActivityFacility aHome = aPerson.getSelectedPlan().getFirstActivity().getFacility();
@@ -78,8 +78,8 @@ public class GeoStatistics {
 		while (ilinks.hasNext()) {
 			SocialNetEdge link = ilinks.next();
 
-			Person personA = link.getPersonFrom();
-			Person personB = link.getPersonTo();
+			PersonImpl personA = link.getPersonFrom();
+			PersonImpl personB = link.getPersonTo();
 
 			ActivityFacility aHome=personA.getSelectedPlan().getFirstActivity().getFacility();
 			ActivityFacility bHome=personB.getSelectedPlan().getFirstActivity().getFacility();

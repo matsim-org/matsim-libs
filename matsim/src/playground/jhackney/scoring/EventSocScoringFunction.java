@@ -26,11 +26,11 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 
@@ -44,7 +44,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 
 	static final private Logger log = Logger.getLogger(EventSocScoringFunction.class);
 //	private final playground.jhackney.scoring.CharyparNagelScoringFunctiosuperon;
-	private final Plan plan;
+	private final PlanImpl plan;
 //	private final TrackEventsOverlap teo;
 	private final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats;
 	private final String factype;
@@ -63,7 +63,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	LinkedHashMap<ActivityImpl,Double> dusoc=new LinkedHashMap<ActivityImpl,Double>();
 
 //	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
-	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final PlanImpl plan, String factype, final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		super(plan);
 		this.plan = plan;

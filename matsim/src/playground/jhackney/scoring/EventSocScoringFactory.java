@@ -3,8 +3,8 @@ package playground.jhackney.scoring;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 
@@ -22,7 +22,7 @@ public class EventSocScoringFactory implements ScoringFunctionFactory {
 
 	}
 
-	public EventSocScoringFunction getNewScoringFunction(final Plan plan) {
+	public EventSocScoringFunction getNewScoringFunction(final PlanImpl plan) {
 //		return new SNScoringMaxFriendFoeRatio(plan, this.factype, this.scorer);
 		return new EventSocScoringFunction(plan, factype, actStats);
 	}

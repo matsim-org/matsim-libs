@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
@@ -147,10 +148,10 @@ public class SpatialInteractorEvents {
 			Object[] visits= timeWindowMap.get(fac).toArray();
 			// Go through the list of Persons and for each one pick one friend randomly
 			for(int ii=0;ii<visits.length;ii++){
-				Person p1 = ((TimeWindow) visits[ii]).person;
+				PersonImpl p1 = ((TimeWindow) visits[ii]).person;
 				String actType1=((TimeWindow) visits[ii]).act.getType();
 				for(int iii=ii;iii<visits.length;iii++){
-					Person p2 = ((TimeWindow) visits[iii]).person;
+					PersonImpl p2 = ((TimeWindow) visits[iii]).person;
 					String actType2=((TimeWindow) visits[iii]).act.getType();
 					if(actType1.equals(actType2)){
 						if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actType2)){
@@ -206,11 +207,11 @@ public class SpatialInteractorEvents {
 			Object[] visits= timeWindowMap.get(fac).toArray();
 			// Go through the list of Persons and for each one pick one friend randomly
 			for(int ii=0;ii<visits.length;ii++){
-				Person p1 = ((TimeWindow) visits[ii]).person;
+				PersonImpl p1 = ((TimeWindow) visits[ii]).person;
 				String actType1=((TimeWindow) visits[ii]).act.getType();
 
 				TimeWindow tw2 = (TimeWindow) visits[MatsimRandom.getRandom().nextInt(visits.length)];
-				Person p2 = tw2.person;
+				PersonImpl p2 = tw2.person;
 				String actType2=tw2.act.getType();
 				if(actType1.equals(actType2)){
 					if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actType2)){
@@ -252,12 +253,12 @@ public class SpatialInteractorEvents {
 		for (ActivityFacility fac : timeWindowMap.keySet()) {
 			Object[] visits= timeWindowMap.get(fac).toArray();
 			for(int ii=0;ii<visits.length;ii++){
-				LinkedHashMap<String,ArrayList<Person>> othersMap = new LinkedHashMap<String,ArrayList<Person>>();
+				LinkedHashMap<String,ArrayList<PersonImpl>> othersMap = new LinkedHashMap<String,ArrayList<PersonImpl>>();
 				TimeWindow tw1 = (TimeWindow) visits[ii];
-				Person p1 = tw1.person;
+				PersonImpl p1 = tw1.person;
 				for (int iii=ii;iii<visits.length;iii++){
 					TimeWindow tw2 = (TimeWindow) visits[iii];
-					Person p2 = tw2.person;
+					PersonImpl p2 = tw2.person;
 					String actType2=tw2.act.getType();
 					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2)){
 						//agents encounter and may befriend
@@ -265,12 +266,12 @@ public class SpatialInteractorEvents {
 						//no problems here, but if we are counting duration
 						//of time overlap, we need to account for that
 						if(othersMap.containsKey(actType2)){
-							ArrayList<Person> list=othersMap.get(actType2);
+							ArrayList<PersonImpl> list=othersMap.get(actType2);
 							list.add(p2);
 							othersMap.remove(actType2);
 							othersMap.put(actType2,list);
 						}else{
-							ArrayList<Person> list=new ArrayList<Person>();
+							ArrayList<PersonImpl> list=new ArrayList<PersonImpl>();
 							list.add(p2);
 							othersMap.put(actType2, list);
 						}
@@ -279,10 +280,10 @@ public class SpatialInteractorEvents {
 //				Enumerate the keys of others
 				Object[] actTypes=othersMap.keySet().toArray();
 				for (int j=0;j<actTypes.length;j++){
-					ArrayList<Person> others = othersMap.get(actTypes[j]);
+					ArrayList<PersonImpl> others = othersMap.get(actTypes[j]);
 
 					if(others.size()>0){
-						Person p2=others.get(MatsimRandom.getRandom().nextInt(others.size()));
+						PersonImpl p2=others.get(MatsimRandom.getRandom().nextInt(others.size()));
 						if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(actTypes[j])){
 
 							// If they know each other, probability is 1.0 that the relationship is reinforced
@@ -329,10 +330,10 @@ public class SpatialInteractorEvents {
 			// Go through the list of Persons and for each one pick one friend randomly
 			for(int ii=0;ii<visits.length;ii++){
 				TimeWindow tw1 = (TimeWindow) visits[ii];
-				Person p1 = tw1.person;
+				PersonImpl p1 = tw1.person;
 				for(int iii=ii;iii<visits.length;iii++){
 					TimeWindow tw2=(TimeWindow) visits[iii];
-					Person p2 = tw2.person;
+					PersonImpl p2 = tw2.person;
 					String actType2=tw2.act.getType();
 					if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2)&& !p1.equals(p2)){
 						//agents encoutner and may befriend

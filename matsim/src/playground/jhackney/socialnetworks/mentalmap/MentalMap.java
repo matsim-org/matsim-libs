@@ -36,11 +36,11 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.world.Location;
 
@@ -89,7 +89,7 @@ public class MentalMap {
 		this.knowledge=knowledge;
 	}
 
-	public void initializeActActivityMapRandom (Plan myPlan){
+	public void initializeActActivityMapRandom (PlanImpl myPlan){
 
 //		Associate each act in the plan with a random facility on the link
 
@@ -130,7 +130,7 @@ public class MentalMap {
 		}
 	}
 
-	public void initializeActActivityMapFromFile(Plan myPlan, ActivityFacilities facilities, ActivityActReader aar){
+	public void initializeActActivityMapFromFile(PlanImpl myPlan, ActivityFacilities facilities, ActivityActReader aar){
 
 
 		if(aar==null) return;
@@ -154,7 +154,7 @@ public class MentalMap {
 		}
 	}
 
-	public void prepareActs(Plan myPlan){
+	public void prepareActs(PlanImpl myPlan){
 
 //		Tidy the acts up so they correspond to the expectations of the social net module.
 //		First, change the types to be the same as the facility types.
@@ -202,7 +202,7 @@ public class MentalMap {
 	 * @param max
 	 * @param myPlans
 	 */
-	public void manageMemory(int max, List<Plan> myPlans){
+	public void manageMemory(int max, List<PlanImpl> myPlans){
 
 		if(myPlans.get(0).getPlanElements().size()*myPlans.size()/2 >max){
 			this.log.info("No activities removed from memory");
@@ -214,7 +214,7 @@ public class MentalMap {
 			// so that they won't be deleted
 
 			ArrayList<Id> currentActivities = new ArrayList<Id>();
-			for (Plan myPlan : myPlans) {
+			for (PlanImpl myPlan : myPlans) {
 				for (PlanElement pe : myPlan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
 						ActivityImpl act = (ActivityImpl) pe;
@@ -287,9 +287,9 @@ public class MentalMap {
 			}
 	}
 
-	public ActivityImpl getActFromActivity (Person person, ActivityOption myActivity){
+	public ActivityImpl getActFromActivity (PersonImpl person, ActivityOption myActivity){
 		ActivityImpl myAct=null;
-		for (Plan myPlan : person.getPlans()) {
+		for (PlanImpl myPlan : person.getPlans()) {
 			for (PlanElement pe : myPlan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;

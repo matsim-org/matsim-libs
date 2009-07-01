@@ -25,11 +25,11 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -42,7 +42,7 @@ public class PlanSocScoringFunction implements ScoringFunction{
 
 	static final private Logger log = Logger.getLogger(PlanSocScoringFunction.class);
 	private final ScoringFunction scoringFunction;
-	private final Plan plan;
+	private final PlanImpl plan;
 	private final TrackActsOverlap spatialScorer;
 	private final String factype;
 
@@ -57,7 +57,7 @@ public class PlanSocScoringFunction implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public PlanSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, TrackActsOverlap spatialScorer) {
+	public PlanSocScoringFunction(final PlanImpl plan, final ScoringFunction scoringFunction, String factype, TrackActsOverlap spatialScorer) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;

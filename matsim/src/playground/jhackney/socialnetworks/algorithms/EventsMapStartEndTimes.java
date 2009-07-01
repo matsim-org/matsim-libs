@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.population.PersonImpl;
 
 public class EventsMapStartEndTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	public LinkedHashMap<Person, ArrayList<ActivityStartEvent>> startMap = new LinkedHashMap<Person,ArrayList<ActivityStartEvent>>();
-	public LinkedHashMap<Person, ArrayList<ActivityEndEvent>> endMap = new LinkedHashMap<Person,ArrayList<ActivityEndEvent>>();
+	public LinkedHashMap<PersonImpl, ArrayList<ActivityStartEvent>> startMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityStartEvent>>();
+	public LinkedHashMap<PersonImpl, ArrayList<ActivityEndEvent>> endMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityEndEvent>>();
 	public double maxtime=0;
 	private Population plans;
 	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);
@@ -27,7 +28,7 @@ public class EventsMapStartEndTimes implements ActivityStartEventHandler, Activi
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
-		Person person = plans.getPersons().get(event.getPersonId());
+		PersonImpl person = plans.getPersons().get(event.getPersonId());
 		ArrayList<ActivityStartEvent> startList;
 		if((startMap.get(person)==null)){
 			startList=new ArrayList<ActivityStartEvent>();
@@ -47,7 +48,7 @@ public class EventsMapStartEndTimes implements ActivityStartEventHandler, Activi
 	}
 
 	public void handleEvent(ActivityEndEvent event) {
-		Person person = plans.getPersons().get(event.getPersonId());
+		PersonImpl person = plans.getPersons().get(event.getPersonId());
 		ArrayList<ActivityEndEvent> endList;
 		if((endMap.get(person)== null)){
 			endList=new ArrayList<ActivityEndEvent>();

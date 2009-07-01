@@ -1,7 +1,8 @@
 package playground.jhackney.controler;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.ScenarioImpl;
+
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;

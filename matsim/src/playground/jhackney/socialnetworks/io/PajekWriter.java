@@ -32,11 +32,11 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -107,10 +107,10 @@ public class PajekWriter {
 //			System.out.print(" *Vertices " + numPersons + " \n");
 			pjnet.write("*Vertices " + numPersons+"\r\n");
 
-			Iterator<Person> itPerson = plans.getPersons().values().iterator();
+			Iterator<PersonImpl> itPerson = plans.getPersons().values().iterator();
 			int iperson = 1;
 			while (itPerson.hasNext()) {
-				Person p = itPerson.next();
+				PersonImpl p = itPerson.next();
 				final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(p.getId());
 				if (know == null) {
 					Gbl.errorMsg("Knowledge is not defined!");
@@ -132,8 +132,8 @@ public class PajekWriter {
 			while (itLink.hasNext()) {
 				SocialNetEdge printLink = itLink.next();
 				int age = iter-printLink.getTimeLastUsed();
-				Person printPerson1 = printLink.getPersonFrom();
-				Person printPerson2 = printLink.getPersonTo();
+				PersonImpl printPerson1 = printLink.getPersonFrom();
+				PersonImpl printPerson2 = printLink.getPersonTo();
 
 				Coord xy1 = ((ActivityImpl) printPerson1.getSelectedPlan().getPlanElements().get(0)).getCoord();
 				Coord xy2 = ((ActivityImpl) printPerson2.getSelectedPlan().getPlanElements().get(0)).getCoord();

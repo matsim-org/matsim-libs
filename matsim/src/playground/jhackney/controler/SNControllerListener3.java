@@ -27,11 +27,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.ScenarioImpl;
+
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -43,6 +42,8 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -230,10 +231,10 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 //			forget knowledge
 			//TODO  Should be an algorithm
 			this.log.info("Forgetting knowledge");
-			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
-			Iterator<Person> iperson = personList.iterator();
+			Collection<PersonImpl> personList = this.controler.getPopulation().getPersons().values();
+			Iterator<PersonImpl> iperson = personList.iterator();
 			while (iperson.hasNext()) {
-				Person p = iperson.next();
+				PersonImpl p = iperson.next();
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getPlanElements().size()/2*p.getPlans().size()*1.5);
@@ -349,16 +350,16 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		aar.openFile(fileName);
 		System.out.println(" ... done");
 
-		Iterator<Person> p_it = plans.getPersons().values().iterator();
+		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
-			Person person=p_it.next();
+			PersonImpl person=p_it.next();
 
 			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
 				k = this.knowledges.getBuilder().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
-				Plan plan = person.getPlans().get(ii);
+				PlanImpl plan = person.getPlans().get(ii);
 
 				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
 				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }

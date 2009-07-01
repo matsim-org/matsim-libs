@@ -23,10 +23,10 @@ package playground.jhackney.socialnetworks.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -38,15 +38,15 @@ public class PersonCalculateActivitySpaces {
 	 * @param ego
 	 * @return the average distance to all alters (a radius of a disk-shaped activity space)
 	 */
-	public double getPersonASD1(Population plans, Person ego) {
+	public double getPersonASD1(Population plans, PersonImpl ego) {
 
 		double aSd = 0.;
 
 		ActivityImpl myAct = (ActivityImpl) ego.getSelectedPlan().getPlanElements().get(0);
 		Coord egoHomeCoord = myAct.getCoord();
 		EgoNet personNet = (EgoNet)ego.getCustomAttributes().get(EgoNet.NAME);
-		ArrayList<Person> alters = personNet.getAlters();
-		for (Person myAlter : alters) {
+		ArrayList<PersonImpl> alters = personNet.getAlters();
+		for (PersonImpl myAlter : alters) {
 			//Coord myAlterCoord = (Coord) pfc.personGetCoords(myAlter,"home").get(0);
 			myAct = (ActivityImpl) myAlter.getSelectedPlan().getPlanElements().get(0);
 			Coord myAlterCoord = myAct.getCoord();
@@ -61,7 +61,7 @@ public class PersonCalculateActivitySpaces {
 	 * @return the average straight-line distance from agent's home to all of its activities
 	 * (the radius of a disk-shaped activity space).
 	 */
-	public double getPersonASD2(Plan plan) {
+	public double getPersonASD2(PlanImpl plan) {
 
 		double aSd = 0.;
 		int numAct = 0;

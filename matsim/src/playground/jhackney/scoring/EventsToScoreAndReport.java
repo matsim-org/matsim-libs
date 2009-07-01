@@ -32,8 +32,7 @@ import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -42,6 +41,7 @@ import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -114,7 +114,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			sf.finish();
 
 			double score = sf.getScore();
-			Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
+			PlanImpl plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 			Double oldScore = plan.getScore();
 			if (oldScore == null) {
 				plan.setScore(score);
@@ -149,7 +149,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			for (Map.Entry<String, playground.jhackney.scoring.EventSocScoringFunction> entry : this.agentScorers.entrySet()) {
 				String agentId = entry.getKey();
 				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
-				Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
+				PlanImpl plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 				Iterator actLegIter = plan.getPlanElements().iterator();
 				ActivityImpl act = (ActivityImpl) actLegIter.next(); // assume first plan element is always an Activity
 
@@ -236,7 +236,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	 * @return the average score of the plans before mixing with the old scores (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
-		if (this.scoreSum == 0) return Plan.UNDEF_SCORE;
+		if (this.scoreSum == 0) return PlanImpl.UNDEF_SCORE;
 		return (this.scoreSum / this.scoreCount);
 	}
 
@@ -250,7 +250,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	 */
 	public double getAgentScore(final Id agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId.toString());
-		if (sf == null) return Plan.UNDEF_SCORE;
+		if (sf == null) return PlanImpl.UNDEF_SCORE;
 		return sf.getScore();
 	}
 

@@ -44,13 +44,13 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -84,12 +84,12 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 		this.knowledges = knowledges;
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		// TODO Auto-generated method stub
 		replaceRandomFacility(plan);
 	}
 
-	private void replaceRandomFacility(Plan plan) {
+	private void replaceRandomFacility(PlanImpl plan) {
 
 		// Draw a random number to figure out which of the facility types will be changed for this plan
 		// If the plan contains this facility type, replace it with a facility from knowledge,
@@ -100,10 +100,10 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 		//
 
 		String factype=null;// facility type to switch out
-		Person person = plan.getPerson();
+		PersonImpl person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		Plan newPlan = person.copySelectedPlan();
+		PlanImpl newPlan = person.copySelectedPlan();
 		
 		// Note that it is not changed, yet
 		boolean changed = false;

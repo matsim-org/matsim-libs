@@ -25,12 +25,12 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 
@@ -68,7 +68,7 @@ public class TrackEventsOverlapII implements ActivityStartEventHandler, Activity
 		}
 		// Make a TimeWindow and add to TimeWindowMap
 		if(eventStartTime>=0){// TODO probably wrong
-			Person agent = event.getPerson();
+			PersonImpl agent = event.getPerson();
 
 			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){
@@ -99,7 +99,7 @@ public class TrackEventsOverlapII implements ActivityStartEventHandler, Activity
 			eventEndTime=3600.*30;
 		}
 		if(eventEndTime>=0){// if a valid end time is found, make a timeWindow and add to Map
-			Person agent = event.getPerson();
+			PersonImpl agent = event.getPerson();
 
 			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){

@@ -27,12 +27,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
@@ -64,7 +64,7 @@ public class SocialNetwork {
 	double remove_p= Double.parseDouble(socnetConfig.getSocNetLinkRemovalP());
 	double remove_age= Double.parseDouble(socnetConfig.getSocNetLinkRemovalAge());
 	private double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
-	private Collection<Person> persons;
+	private Collection<PersonImpl> persons;
 
 	// a Collection of all the Links in the network
 	//public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
@@ -141,7 +141,7 @@ public class SocialNetwork {
 
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED distance-dependent Erdos/Renyi random graph.");
-		Person[] personList = new Person[1];
+		PersonImpl[] personList = new PersonImpl[1];
 		personList = plans.getPersons().values().toArray( personList );
 
 		int numLinks = (int) ((kbar * personList.length) / 2.);
@@ -154,8 +154,8 @@ public class SocialNetwork {
 		int i=0;
 		while(i<numLinks){
 //			for (int i = 0; i < numLinks; i++) {
-			Person person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
-			Person person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
+			PersonImpl person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
+			PersonImpl person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			Coord home1=((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			Coord home2=((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
@@ -206,20 +206,20 @@ public class SocialNetwork {
 		double A = 2.*(gamma-2);
 		int E; // number of edges in network each time m links are added
 
-		Person[] personList = new Person[1];
+		PersonImpl[] personList = new PersonImpl[1];
 		personList = plans.getPersons().values().toArray( personList );
 
 		int maxE = (int) ((double)kbar/2.)*personList.length;
 
 		log.info("Links the Persons together in UNDIRECTED Barabasi/Albert random graph of Gamma="+gamma+", core="+m0+", Emax="+maxE);
 
-		ArrayList<Person> population = new ArrayList<Person>();
+		ArrayList<PersonImpl> population = new ArrayList<PersonImpl>();
 		for (int i=0;i<personList.length;i++){
 			population.add(personList[i]);
 		}
 
 		//Define the core network of m0 nodes, chosen from personList
-		ArrayList<Person> core = new ArrayList<Person>();
+		ArrayList<PersonImpl> core = new ArrayList<PersonImpl>();
 		for (int ii=0;ii<m0;ii++){
 			int pick=MatsimRandom.getRandom().nextInt(population.size());
 			core.add(population.get(pick));
@@ -230,13 +230,13 @@ public class SocialNetwork {
 		E=this.getLinks().size();
 		int coreSize = core.size();
 		while(population.size()>0 && E< maxE){
-			Person pI=population.get(MatsimRandom.getRandom().nextInt(population.size()));
+			PersonImpl pI=population.get(MatsimRandom.getRandom().nextInt(population.size()));
 			// Attachment probabilities are based on last iteration
 			boolean met=false;
 			int j=0;
 			while (j<Math.min(m,coreSize)){ // the new member links to this many old members. m < m0
 				int pick=MatsimRandom.getRandom().nextInt(coreSize);//start at a random core member
-				Person pJ = core.get(pick);
+				PersonImpl pJ = core.get(pick);
 				double pIJ= (((EgoNet)pJ.getCustomAttributes().get(EgoNet.NAME)).getOutDegree()+A)/(2*E + coreSize*A);
 				if(coreSize==0){
 					pIJ = 1.;
@@ -272,7 +272,7 @@ public class SocialNetwork {
 
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED Erdos/Renyi random graph. Dorogovtsev and Mendes 2003.");
-		Person[] personList = new Person[1];
+		PersonImpl[] personList = new PersonImpl[1];
 		personList = plans.getPersons().values().toArray( personList );
 
 		int numLinks = (int) ((kbar * personList.length) / 2.);
@@ -280,8 +280,8 @@ public class SocialNetwork {
 		int i=0;
 		while(i<numLinks){
 //		for (int i = 0; i < numLinks; i++) {
-			Person person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
-			Person person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
+			PersonImpl person1 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
+			PersonImpl person2 = personList[MatsimRandom.getRandom().nextInt(personList.length)];
 			Coord home1=((ActivityImpl)person1.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			Coord home2=((ActivityImpl)person2.getSelectedPlan().getPlanElements().get(0)).getFacility().getCoord();
 			double distance = CoordUtils.calcDistance(home1, home2);
@@ -358,7 +358,7 @@ public class SocialNetwork {
 	 * @author jhackney
 	 */
 
-	public void makeSocialContact(Person person1, Person person2, int iteration) {
+	public void makeSocialContact(PersonImpl person1, PersonImpl person2, int iteration) {
 
 		SocialNetEdge newLink;
 		SocialNetEdge newOpposingLink;
@@ -416,7 +416,7 @@ public class SocialNetwork {
 	 *                
 	 * @author jhackney
 	 */
-	public void makeSocialContact(Person person1, Person person2, int iteration, String linkType) {
+	public void makeSocialContact(PersonImpl person1, PersonImpl person2, int iteration, String linkType) {
 
 		SocialNetEdge newLink;
 		SocialNetEdge newOpposingLink;
@@ -481,7 +481,7 @@ public class SocialNetwork {
 	 *              
 	 * @author jhackney
 	 */
-	public int makeSocialContactNotify(Person person1, Person person2, int iteration, String linkType) {
+	public int makeSocialContactNotify(PersonImpl person1, PersonImpl person2, int iteration, String linkType) {
 
 		int status=0;
 		SocialNetEdge newLink;
@@ -663,7 +663,7 @@ public class SocialNetwork {
 		Object myPersons[]= this.getNodes().toArray();
 
 		for(int i=0;i<myPersons.length;i++){
-			Person myPerson = (Person) myPersons[i];
+			PersonImpl myPerson = (PersonImpl) myPersons[i];
 			int deg= ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getOutDegree();
 			if(maxDegree<deg){
 				maxDegree=deg;
@@ -701,7 +701,7 @@ public class SocialNetwork {
 		return linksList;
 	}
 
-	public Collection<Person> getNodes(){
+	public Collection<PersonImpl> getNodes(){
 		return this.persons;
 	}
 

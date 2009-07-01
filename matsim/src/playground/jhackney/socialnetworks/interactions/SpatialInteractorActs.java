@@ -26,13 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -49,7 +49,7 @@ public class SpatialInteractorActs {
 
 	String interaction_type = Gbl.getConfig().socnetmodule().getSocNetInteractor2();
 
-	LinkedHashMap<ActivityOption,ArrayList<Person>> activityMap;
+	LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> activityMap;
 //	LinkedHashMap<Activity,ArrayList<Person>> actMap=new LinkedHashMap<Activity,ArrayList<Person>>();
 
 	public SpatialInteractorActs(SocialNetwork snet) {
@@ -82,7 +82,7 @@ public class SpatialInteractorActs {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
-			activityMap = new LinkedHashMap<ActivityOption,ArrayList<Person>>(); 
+			activityMap = new LinkedHashMap<ActivityOption,ArrayList<PersonImpl>>(); 
 			activityMap= makeActivityMap(plans);
 
 		// Activity-(facility)-based interactions
@@ -120,22 +120,22 @@ public class SpatialInteractorActs {
 	 * @param plans
 	 * @return
 	 */
-	private LinkedHashMap<ActivityOption,ArrayList<Person>> makeActivityMap(Population plans){
+	private LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> makeActivityMap(Population plans){
 		System.out.println("Making a new activity map for spatial interactions");
-		LinkedHashMap<ActivityOption,ArrayList<Person>> activityMap=new LinkedHashMap<ActivityOption,ArrayList<Person>>();
-		for (Person p1 : plans.getPersons().values()) {
-			Plan plan1 = p1.getSelectedPlan();
+		LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> activityMap=new LinkedHashMap<ActivityOption,ArrayList<PersonImpl>>();
+		for (PersonImpl p1 : plans.getPersons().values()) {
+			PlanImpl plan1 = p1.getSelectedPlan();
 			for (PlanElement pe : plan1.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act1 = (ActivityImpl) pe;
 					ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
-					ArrayList<Person> actList=new ArrayList<Person>();
+					ArrayList<PersonImpl> actList=new ArrayList<PersonImpl>();
 					
 					if(!activityMap.keySet().contains(activity1)){
 						activityMap.put(activity1,actList);	
 					}
 					if(activityMap.keySet().contains(activity1)){
-						ArrayList<Person> myList=activityMap.get(activity1);
+						ArrayList<PersonImpl> myList=activityMap.get(activity1);
 						myList.add(p1);
 					}	
 				}
@@ -210,15 +210,15 @@ public class SpatialInteractorActs {
 			Iterator<ActivityOption> ait= myActivities.iterator();
 			while(ait.hasNext()) {
 				ActivityOption myActivity=(ActivityOption) ait.next();
-			ArrayList<Person> visitors=activityMap.get(myActivity);
+			ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
 			// Go through the list of Persons and for each one pick one friend randomly
 			// Must be double loop
-			Iterator<Person> vIt1=visitors.iterator();
+			Iterator<PersonImpl> vIt1=visitors.iterator();
 			while(vIt1.hasNext()){
-				Person p1= vIt1.next();
-				Iterator<Person> vIt2=visitors.iterator();
+				PersonImpl p1= vIt1.next();
+				Iterator<PersonImpl> vIt2=visitors.iterator();
 				while(vIt2.hasNext()){
-					Person p2= vIt2.next();
+					PersonImpl p2= vIt2.next();
 
 					if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
@@ -272,15 +272,15 @@ public class SpatialInteractorActs {
 			Iterator<ActivityOption> ait= myActivities.iterator();
 			while(ait.hasNext()) {
 				ActivityOption myActivity=(ActivityOption) ait.next();
-			ArrayList<Person> visitors=activityMap.get(myActivity);
+			ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
 			
 			// Go through the list of Persons and for each one pick one friend randomly
 			// Must be double loop
-			Iterator<Person> vIt1=visitors.iterator();
+			Iterator<PersonImpl> vIt1=visitors.iterator();
 			while(vIt1.hasNext()){
-				Person p1= vIt1.next();
+				PersonImpl p1= vIt1.next();
 
-				Person p2 = visitors.get(MatsimRandom.getRandom().nextInt(visitors.size()));
+				PersonImpl p2 = visitors.get(MatsimRandom.getRandom().nextInt(visitors.size()));
 				if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 					// If they know each other, probability is 1.0 that the relationship is reinforced
@@ -324,17 +324,17 @@ public class SpatialInteractorActs {
 		//			Activity myActivity=myActivities.nextElement();
 		Set<ActivityOption> myActivities=activityMap.keySet();
 		for (ActivityOption myActivity : myActivities) {
-			ArrayList<Person> visitors=activityMap.get(myActivity);
-			for (Person p1 : visitors) {
-				Plan plan1=p1.getSelectedPlan();
-				ArrayList<Person> others = new ArrayList<Person>();
+			ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
+			for (PersonImpl p1 : visitors) {
+				PlanImpl plan1=p1.getSelectedPlan();
+				ArrayList<PersonImpl> others = new ArrayList<PersonImpl>();
 				//				othersList.put(p1,others);
 				for (PlanElement pe1 : plan1.getPlanElements()) {
 					if (pe1 instanceof ActivityImpl) {
 						ActivityImpl act1 = (ActivityImpl) pe1;
 						//					personList.put(p1,act1);
-						for (Person p2 : visitors) {
-							Plan plan2=p2.getSelectedPlan();
+						for (PersonImpl p2 : visitors) {
+							PlanImpl plan2=p2.getSelectedPlan();
 							for (PlanElement pe2 : plan2.getPlanElements()) {
 								if (pe2 instanceof ActivityImpl)	{
 									ActivityImpl act2 = (ActivityImpl) pe2;
@@ -348,7 +348,7 @@ public class SpatialInteractorActs {
 					}
 				}
 				if(others.size()>0){
-					Person p2=others.get(MatsimRandom.getRandom().nextInt(others.size()));
+					PersonImpl p2=others.get(MatsimRandom.getRandom().nextInt(others.size()));
 					if(MatsimRandom.getRandom().nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
@@ -421,14 +421,14 @@ public class SpatialInteractorActs {
 		while(ait.hasNext()) {
 			ActivityOption myActivity=(ActivityOption) ait.next();
 //			Activity myActivity=myActivities.nextElement();
-			ArrayList<Person> visitors=activityMap.get(myActivity);
-			Iterator<Person> vIt1=visitors.iterator();
+			ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
+			Iterator<PersonImpl> vIt1=visitors.iterator();
 			while(vIt1.hasNext()){
-				Person p1= vIt1.next();
+				PersonImpl p1= vIt1.next();
 				for (PlanElement pe1 : p1.getSelectedPlan().getPlanElements()) {
 					if (pe1 instanceof ActivityImpl) {
 						ActivityImpl act1 = (ActivityImpl) pe1;
-						for (Person p2 : visitors) {
+						for (PersonImpl p2 : visitors) {
 							for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
 								if (pe2 instanceof ActivityImpl) {
 									ActivityImpl act2 = (ActivityImpl) pe2;

@@ -7,9 +7,9 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
@@ -25,15 +25,15 @@ public class SNAdjustTimes implements PlanAlgorithm {
 	public SNAdjustTimes(playground.jhackney.controler.SNController3 controler){
 		this.controler=controler;
 	}
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		adjustDepartureTimes(plan);
 	}
 
-	private void adjustDepartureTimes(Plan plan) {
-		Person person = plan.getPerson();
+	private void adjustDepartureTimes(PlanImpl plan) {
+		PersonImpl person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		Plan newPlan = person.copySelectedPlan();
+		PlanImpl newPlan = person.copySelectedPlan();
 
 		for (PlanElement pe : newPlan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -62,8 +62,8 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		double avgStartTime=0;
 		TimeWindow tw1 = null;
 		TimeWindow tw2 = null;
-		Person p1 = null;
-		Person p2 = null;
+		PersonImpl p1 = null;
+		PersonImpl p2 = null;
 
 		ActivityFacility actFacility=act.getFacility();
 

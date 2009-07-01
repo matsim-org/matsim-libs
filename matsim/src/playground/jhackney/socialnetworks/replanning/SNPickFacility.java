@@ -10,13 +10,13 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -81,16 +81,16 @@ public class SNPickFacility implements PlanAlgorithm {
 		this.knowledges = knowledges;
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		pickFacility(plan);
 	}
 
-	private void pickFacility(Plan plan) {
+	private void pickFacility(PlanImpl plan) {
 		String factype=null;// facility type to switch out
-		Person person = plan.getPerson();
+		PersonImpl person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		Plan newPlan = person.copySelectedPlan();
+		PlanImpl newPlan = person.copySelectedPlan();
 
 		// Note that it is not changed, yet
 		boolean changed = false;
@@ -151,10 +151,10 @@ public class SNPickFacility implements PlanAlgorithm {
 //			Pick a new facility for it from the knowledge of alters and ego (LOGIT)
 //For each alter append its facList to existing facList
 			EgoNet egoNet = (EgoNet)person.getCustomAttributes().get(EgoNet.NAME);
-			ArrayList<Person> alters=egoNet.getAlters();
-			Iterator<Person> aIt=alters.iterator();
+			ArrayList<PersonImpl> alters=egoNet.getAlters();
+			Iterator<PersonImpl> aIt=alters.iterator();
 			while(aIt.hasNext()){
-				Person alter = aIt.next();
+				PersonImpl alter = aIt.next();
 				facList.clear();
 				facList.addAll(this.knowledges.getKnowledgesByPersonId().get(alter.getId()).getActivities(factype));
 				fIt=null;

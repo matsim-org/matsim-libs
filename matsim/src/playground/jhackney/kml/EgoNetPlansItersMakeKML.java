@@ -52,12 +52,12 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -104,13 +104,13 @@ public class EgoNetPlansItersMakeKML {
 	private static final Logger log = Logger.getLogger(EgoNetPlansItersMakeKML.class);
 
 	private static TreeMap<String,FolderType> agentMap = new TreeMap<String,FolderType>();
-	private static Person ego;
+	private static PersonImpl ego;
 //	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
 	private static TreeMap<Id,Byte[]> colors = new TreeMap<Id,Byte[]>();
 	private static TimeStampType timeStamp;
 	private static TimeSpanType timeSpan;
 	private static int nColors=13;//36
-	private static Person ai;
+	private static PersonImpl ai;
 	private static Knowledges knowledges;
 
 	public static void setUp(Config config, NetworkLayer network) {
@@ -254,7 +254,7 @@ public class EgoNetPlansItersMakeKML {
 	}
 
 
-	public static void loadData(Person myPerson, int iter, Knowledges kn){
+	public static void loadData(PersonImpl myPerson, int iter, Knowledges kn){
 
 		ego=myPerson;
 		knowledges = kn;
@@ -265,17 +265,17 @@ public class EgoNetPlansItersMakeKML {
 
 		// load Data into KML folders for myPerson
 		int i=0;
-		ArrayList<Person> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
+		ArrayList<PersonImpl> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
 
 		// more colors than in current egonet to allow for adding agents to egonet without repeating colors
 //		nColors=persons.size()*2;
 
 		loadData(ego, 0, iter);
 
-		Iterator<Person> altersIt= persons.iterator();
+		Iterator<PersonImpl> altersIt= persons.iterator();
 
 		while(altersIt.hasNext()){
-			Person p = altersIt.next();
+			PersonImpl p = altersIt.next();
 			i++;
 			log.info("CALLING KML FOR EGONET PERSON "+p.getId());
 			loadData(p,i, iter);
@@ -289,13 +289,13 @@ public class EgoNetPlansItersMakeKML {
 	}
 
 
-	public static void loadData(Person alter, int i, int iter) {
+	public static void loadData(PersonImpl alter, int i, int iter) {
 
 		log.info("    loading Plan data. Processing person ...");
 //		TODO make one file per agent and put in the routes and acts each iteration
 //		TODO ensure that each agent has a unique color by using the P_ID (?how to quickly find min/max for scaling the colors?)
 
-		Plan myPlan = alter.getSelectedPlan();
+		PlanImpl myPlan = alter.getSelectedPlan();
 
 //		Color color = setColor(i, nColors+1);
 		Byte[] color = new Byte[]{(byte) 0, (byte) 0, (byte) 0, (byte) 0};
@@ -557,7 +557,7 @@ public class EgoNetPlansItersMakeKML {
 		}
 	}
 
-	private static void makeTangentialSocialLinkKML(Person myPerson, int i,	FolderType folder){
+	private static void makeTangentialSocialLinkKML(PersonImpl myPerson, int i,	FolderType folder){
 
 		StyleType tangentialLinkStyle = kmlObjectFactory.createStyleType();
 		tangentialLinkStyle.setId("tangentialLinkStyle"+myPerson.getId().toString());
@@ -588,7 +588,7 @@ public class EgoNetPlansItersMakeKML {
 		log.info("Feature added: grey social link from alter "+ai.getId()+" to alter "+myPerson.getId());
 	}
 
-	private static void makeCoreSocialLinkKML(Person myPerson, int i,
+	private static void makeCoreSocialLinkKML(PersonImpl myPerson, int i,
 			FolderType folder, StyleType agentLinkStyle){
 		// Add a line from the alter's home to the ego's home in the color of the alter
 		String id = myPerson.getId().toString();
@@ -615,7 +615,7 @@ public class EgoNetPlansItersMakeKML {
 		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
 	}
 
-	private static void makeActivitySpaceKML_Line(Person myPerson, int i,
+	private static void makeActivitySpaceKML_Line(PersonImpl myPerson, int i,
 			FolderType planFolder, StyleType agentLinkStyle) {
 
 		String id = myPerson.getId().toString();
@@ -783,7 +783,7 @@ public class EgoNetPlansItersMakeKML {
 //
 //	}
 
-	private static void makeActKML(Person myPerson, ActivityImpl act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
+	private static void makeActKML(PersonImpl myPerson, ActivityImpl act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
 
 		String styleUrl = null;
 		String fullActName = null;

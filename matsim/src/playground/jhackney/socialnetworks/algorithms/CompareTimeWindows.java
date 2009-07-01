@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -43,8 +43,8 @@ public class CompareTimeWindows {
 			double totalTimeWithFriends=0;
 			TimeWindow tw1 = null;
 			TimeWindow tw2 = null;
-			Person p1 = null;
-			Person p2 = null;
+			PersonImpl p1 = null;
+			PersonImpl p2 = null;
 
 			ActivityFacility myFacility=(ActivityFacility) fit.next();
 			ArrayList<TimeWindow> visits=timeWindowMap.get(myFacility);
