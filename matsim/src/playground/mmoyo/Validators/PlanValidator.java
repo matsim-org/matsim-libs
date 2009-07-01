@@ -1,8 +1,8 @@
 package playground.mmoyo.Validators;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 
 
 /**
@@ -14,7 +14,7 @@ public class PlanValidator {
 	public PlanValidator() {
 	}
 
-	public boolean hasAllLegs(final Plan plan){
+	public boolean hasAllLegs(final PlanImpl plan){
 		for (BasicPlanElement basicPlanElement: plan.getPlanElements()){
 			if (basicPlanElement instanceof LegImpl) {
 				//Leg leg = (Leg)basicPlanElement;

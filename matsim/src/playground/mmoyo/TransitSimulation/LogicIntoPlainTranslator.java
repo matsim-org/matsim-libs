@@ -8,15 +8,15 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
 /**
@@ -79,8 +79,8 @@ public class LogicIntoPlainTranslator {
 	
 	/**translates the plans of a whole population*/
 	public void convertToPlain(Population population){
-		for (Person person: population.getPersons().values()) {
-			Plan plan = person.getPlans().get(0);
+		for (PersonImpl person: population.getPersons().values()) {
+			PlanImpl plan = person.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {  
 				if (pe instanceof ActivityImpl) {  				
 					ActivityImpl act =  (ActivityImpl) pe;					

@@ -1,9 +1,9 @@
 package playground.mmoyo.TransitSimulation;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class SimplifyPtLegs {
 	/**
 	 * Identifies and marks ptActs
 	 */
-	public void run (Plan plan){
+	public void run (PlanImpl plan){
 		int i=0;
 		List<Integer> ptElements = new ArrayList<Integer>();
 		boolean marking =false;
@@ -43,7 +43,7 @@ public class SimplifyPtLegs {
 	/**
 	 * Deletes marked ptActs and their legs 
 	 */
-	private void deleteElements(Plan plan, List<Integer> ptElements){
+	private void deleteElements(PlanImpl plan, List<Integer> ptElements){
 		LegImpl firstLeg = (LegImpl)plan.getPlanElements().get(ptElements.get(0)-1);
 		LegImpl lastLeg = (LegImpl)plan.getPlanElements().get(ptElements.get(ptElements.size())+1);
 		firstLeg.setMode(TransportMode.pt);

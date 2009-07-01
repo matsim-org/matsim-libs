@@ -7,12 +7,10 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -20,6 +18,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -99,7 +99,7 @@ public class PTActWriter {
 		
 		SimplifyPtLegs SimplifyPtLegs = new SimplifyPtLegs();
 		
-		for (Person person: this.population.getPersons().values()) {
+		for (PersonImpl person: this.population.getPersons().values()) {
 			//if (true){ Person person = population.getPersons().get(new IdImpl("3937204"));
 			System.out.println(person.getId());
 			SimplifyPtLegs.run(person.getPlans().get(0));
@@ -116,10 +116,10 @@ public class PTActWriter {
 	public void printPTLegs(final TransitScheduleImpl transitSchedule){
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
 		
-		for (Person person: this.population.getPersons().values()) {
+		for (PersonImpl person: this.population.getPersons().values()) {
 			//Person person = population.getPersons().get(new IdImpl("2180188"));
 	
-			Plan plan = person.getPlans().get(0);
+			PlanImpl plan = person.getPlans().get(0);
 	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
 			ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
 			List<LegImpl> legList = transitRouteFinder.calculateRoute (act1, act2, person);
@@ -151,11 +151,11 @@ public class PTActWriter {
 		
 		List<Double> durations = new ArrayList<Double>();  
 		
-		for (Person person: this.population.getPersons().values()) {
+		for (PersonImpl person: this.population.getPersons().values()) {
 		//if ( true ) {
 			//Person person = population.getPersons().get(new IdImpl("3246022")); // 5636428  2949483 
  			System.out.println(numPlans + " id:" + person.getId());
-			Plan plan = person.getPlans().get(0);
+			PlanImpl plan = person.getPlans().get(0);
 
 			boolean first =true;
 			boolean addPerson= true;
@@ -165,7 +165,7 @@ public class PTActWriter {
 			double startTime=0;
 			double duration=0;
 			
-			Plan newPlan = new PlanImpl(person);
+			PlanImpl newPlan = new PlanImpl(person);
 			
 			//for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
 			for	(int elemIndex=0; elemIndex<3; elemIndex++){            //jun09  finds only
@@ -260,7 +260,7 @@ public class PTActWriter {
 	/**
 	 * Cuts up the found path into acts and legs according to the type of links contained in the path
 	 */
-	public void insertLegActs(final Path path, double depTime, final Plan newPlan){
+	public void insertLegActs(final Path path, double depTime, final PlanImpl newPlan){
 		List<Link> routeLinks = path.links;
 		List<Link> legRouteLinks = new ArrayList<Link>();
 		double accumulatedTime=depTime;
