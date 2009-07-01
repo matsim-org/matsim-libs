@@ -57,8 +57,8 @@ public class EventsToGAP {
 	// Derived string values
 	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
 	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
-	final static String INPUT = ROOT + "Commercial/PostProcess/Run01" + "100.eventsTruckMinor.txt";
-	final static String OUTPUT_PRE = ROOT + "Commercial/PostProcess/Run01" + "SimulatedCommercialMinorGAP_Normalized_";
+	final static String INPUT = ROOT + "Commercial/PostProcess/Run01/" + "100.eventsTruckMinor.txt";
+	final static String OUTPUT_PRE = ROOT + "Commercial/PostProcess/Run01/" + "SimulatedCommercialMinorGAP_Normalized_";
 	final static String OUTPUT_POST = ".txt";
 
 	public static final String DELIMITER = ",";
