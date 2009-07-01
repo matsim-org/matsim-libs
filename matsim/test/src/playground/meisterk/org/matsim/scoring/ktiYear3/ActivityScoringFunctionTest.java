@@ -27,15 +27,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
@@ -47,6 +45,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -70,7 +70,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	private final static Id TEST_PERSON_ID = new IdImpl("123");
 
 	private Population population;
-	private Plan plan;
+	private PlanImpl plan;
 	private Config config;
 	private ActivityFacilities facilities;
 	private NetworkLayer network;
@@ -98,7 +98,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate person
 		this.population = new PopulationImpl();
 //		Id personId = new IdImpl("123");
-		Person person = new PersonImpl(TEST_PERSON_ID);
+		PersonImpl person = new PersonImpl(TEST_PERSON_ID);
 		this.population.getPersons().put(person.getId(), person);
 
 		// generate facilities
@@ -217,9 +217,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 
-		Person testPerson = this.population.getPersons().get(TEST_PERSON_ID);
+		PersonImpl testPerson = this.population.getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
-		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				this.config.charyparNagelScoring(), facilityPenalties);

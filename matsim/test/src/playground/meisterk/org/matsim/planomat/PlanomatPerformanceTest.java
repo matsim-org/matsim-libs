@@ -23,9 +23,8 @@ package playground.meisterk.org.matsim.planomat;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -34,6 +33,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -102,9 +103,9 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		int personCounter = 0;
 		int nextCounter = 1;
 		Random rng = MatsimRandom.getLocalInstance();
-		for (Person person : population.getPersons().values()) {
+		for (PersonImpl person : population.getPersons().values()) {
 			if (rng.nextDouble() < 0.1) {
-				Plan plan = person.getRandomPlan();
+				PlanImpl plan = person.getRandomPlan();
 				testee.run(plan);
 				personCounter++;
 				if (personCounter % nextCounter == 0) {

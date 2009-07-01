@@ -30,8 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -41,6 +39,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -371,7 +371,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		EnumSet<TransportMode> possibleModes = EnumSet.of(TransportMode.walk, TransportMode.bike, TransportMode.pt, TransportMode.car);
 		testee.setModeSet(possibleModes);
 
-		Person person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
 		Location location = null;
 		ActivityImpl act = null;
@@ -380,7 +380,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
 
-			Plan plan = new org.matsim.core.population.PlanImpl(person);
+			PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 
 			String[] locationIdSequence = facString.split(" ");
 			for (int aa=0; aa < locationIdSequence.length; aa++) {
