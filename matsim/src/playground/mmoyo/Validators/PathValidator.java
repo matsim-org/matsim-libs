@@ -1,6 +1,6 @@
 package playground.mmoyo.Validators;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 /** Validates a given path with the next conditions:
@@ -25,8 +25,8 @@ public class PathValidator {
 	public boolean isValid(Path path) {
 		boolean valid = true;
 		if (path!=null){
-			Link lastLink = null;
-			for (Link link : path.links) {
+			LinkImpl lastLink = null;
+			for (LinkImpl link : path.links) {
 				if (lastLink!= null){
 					if (!canPassLink(lastLink, link)){
 						return false;
@@ -41,7 +41,7 @@ public class PathValidator {
 	}
 	
 	
-	public boolean canPassLink(final Link lastLink, final Link link){
+	public boolean canPassLink(final LinkImpl lastLink, final LinkImpl link){
 		boolean pass = false;
 		String type= link.getType();
 		

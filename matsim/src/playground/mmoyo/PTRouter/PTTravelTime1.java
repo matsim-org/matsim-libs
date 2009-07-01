@@ -1,6 +1,6 @@
 package playground.mmoyo.PTRouter;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -13,7 +13,7 @@ public class PTTravelTime1 implements TravelTime {
 
 	}
 	
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(LinkImpl link, double time) {
 		return 1;
 	}
 }

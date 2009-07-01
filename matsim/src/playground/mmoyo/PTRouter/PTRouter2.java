@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -52,14 +52,14 @@ public class PTRouter2{
 	
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
 		double walkRange= distToWalk; 
-		Node origin= createWalkingNode(new IdImpl("W1"), coord1);
-		Node destination= createWalkingNode(new IdImpl("W2"), coord2);
+		NodeImpl origin= createWalkingNode(new IdImpl("W1"), coord1);
+		NodeImpl destination= createWalkingNode(new IdImpl("W2"), coord2);
 		
-		Collection <Node> nearOriginStops = findnStations (coord1, walkRange);
-		Collection <Node> nearDestinationStops = findnStations (coord2, walkRange);
+		Collection <NodeImpl> nearOriginStops = findnStations (coord1, walkRange);
+		Collection <NodeImpl> nearDestinationStops = findnStations (coord2, walkRange);
 		
-		List <Link> walkLinksFromOrigin = createWalkingLinks(origin, nearOriginStops, true);
-		List <Link> walkLinksToDestination = createWalkingLinks(destination, nearDestinationStops, false);
+		List <LinkImpl> walkLinksFromOrigin = createWalkingLinks(origin, nearOriginStops, true);
+		List <LinkImpl> walkLinksToDestination = createWalkingLinks(destination, nearDestinationStops, false);
 			
 		Path path = myDijkstra.calcLeastCostPath(origin, destination, time); 
 			
@@ -75,8 +75,8 @@ public class PTRouter2{
 		return path;
 	}
 
-	private Collection <Node> findnStations(Coord coord, double walkRange){
-		Collection <Node> stations;
+	private Collection <NodeImpl> findnStations(Coord coord, double walkRange){
+		Collection <NodeImpl> stations;
 		do{
 			stations = logicNet.getNearestNodes(coord, walkRange);
 			walkRange= walkRange + 300;
@@ -88,22 +88,22 @@ public class PTRouter2{
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the quadtree
 	 */
-	public Node createWalkingNode(Id id, Coord coord) {
-		Node node = new PTNode(id, coord, "Walking");
+	public NodeImpl createWalkingNode(Id id, Coord coord) {
+		NodeImpl node = new PTNode(id, coord, "Walking");
 		logicNet.getNodes().put(id, node);
 		return node;
 	}
 	
-	public List <Link> createWalkingLinks(Node walkNode, Collection <Node> nearNodes, boolean to){
+	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
 		//->move to link factory
-		List<Link> newWalkLinks = new ArrayList<Link>();
+		List<LinkImpl> newWalkLinks = new ArrayList<LinkImpl>();
 		Id idLink;
-		Node fromNode;
-		Node toNode;
+		NodeImpl fromNode;
+		NodeImpl toNode;
 		int x=0;
 		
 		
-		for (Node node : nearNodes){
+		for (NodeImpl node : nearNodes){
 			if (to){
 				fromNode= walkNode;
 				toNode= node;
@@ -113,7 +113,7 @@ public class PTRouter2{
 				toNode=  walkNode;
 				idLink = new IdImpl("WLD" + x++);
 			}
-			Link link= logicNet.createLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", "Walking");
+			LinkImpl link= logicNet.createLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", "Walking");
 			//-->check if this temporary stuff improves the performance
 			//link.setFreespeed(link.getLength()* WALKING_SPEED);
 			newWalkLinks.add(link);
@@ -121,20 +121,20 @@ public class PTRouter2{
 		return newWalkLinks;
 	}
 
-	public void removeWalkLinks(Collection<Link> WalkingLinkList){
+	public void removeWalkLinks(Collection<LinkImpl> WalkingLinkList){
 		//->use link factory
-		for (Link link : WalkingLinkList){
+		for (LinkImpl link : WalkingLinkList){
 			logicNet.removeLink(link);
 		}
 	}
 	
 	public Path findRoute(Coord coord1, Coord coord2, double time){
-		Node node1= logicNet.getNearestNode(coord1);
-		Node node2= logicNet.getNearestNode(coord2);
+		NodeImpl node1= logicNet.getNearestNode(coord1);
+		NodeImpl node2= logicNet.getNearestNode(coord2);
 		return findRoute(node1, node2,time);
 	}
 	
-	public Path findRoute(Node ptNode1, Node ptNode2, double time){
+	public Path findRoute(NodeImpl ptNode1, NodeImpl ptNode2, double time){
 		return myDijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 	}
 	
@@ -146,7 +146,7 @@ public class PTRouter2{
 			//}
 		
 			Id idPTLine = new IdImpl("");
-			for (Node node : path.nodes){
+			for (NodeImpl node : path.nodes){
 				PTNode ptNode= (PTNode)node;
 				if(ptNode.getIdPTLine()==idPTLine){
 					System.out.print(ptNode.getId().toString() + " ");

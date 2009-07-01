@@ -8,11 +8,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.api.network.Link;
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 import java.util.TreeMap;
+
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -144,7 +145,7 @@ public class PTLineAggregator {
 				net.getNodes().put(newId2, ptNode2);
 
 				if (!first) {
-					Link link;
+					LinkImpl link;
 
 					/** create links between nodes */
 					double length = CoordUtils.calcDistance(lastPTNode1.getCoord(), ptNode1.getCoord());

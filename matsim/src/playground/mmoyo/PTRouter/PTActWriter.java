@@ -8,13 +8,13 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -41,10 +41,10 @@ public class PTActWriter {
 	private final Population population;
 	private String outputFile;
 	private String plansFile;
-	private Node originNode;
-	private Node destinationNode;
-	private Link walkLink1;
-	private Link walkLink2;
+	private NodeImpl originNode;
+	private NodeImpl destinationNode;
+	private LinkImpl walkLink1;
+	private LinkImpl walkLink2;
 	
 	private NetworkLayer logicNet;
 	private PTRouter2 ptRouter;
@@ -260,8 +260,8 @@ public class PTActWriter {
 	 * Cuts up the found path into acts and legs according to the type of links contained in the path
 	 */
 	public void insertLegActs(final Path path, double depTime, final PlanImpl newPlan){
-		List<Link> routeLinks = path.links;
-		List<Link> legRouteLinks = new ArrayList<Link>();
+		List<LinkImpl> routeLinks = path.links;
+		List<LinkImpl> legRouteLinks = new ArrayList<LinkImpl>();
 		double accumulatedTime=depTime;
 		double arrTime;
 		double legTravelTime=0;
@@ -270,9 +270,9 @@ public class PTActWriter {
 		double linkDistance=0;
 		int linkIndex=1;
 		boolean first=true;
-		Link lastLink = null;
+		LinkImpl lastLink = null;
 		
-		for(Link link: routeLinks){
+		for(LinkImpl link: routeLinks){
 			linkTravelTime=this.ptRouter.ptTravelTime.getLinkTravelTime(link,accumulatedTime);
 			linkDistance = link.getLength();
 			
@@ -346,14 +346,14 @@ public class PTActWriter {
 	}//insert
 
 	
-	private ActivityImpl newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
+	private ActivityImpl newPTAct(final String type, final Coord coord, final LinkImpl link, final double startTime, final double endTime){
 		ActivityImpl ptAct= new ActivityImpl(type, coord, link);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		return ptAct;
 	}
 
-	private LegImpl newPTLeg(TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private LegImpl newPTLeg(TransportMode mode, final List<LinkImpl> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 		
 		if (mode!=TransportMode.walk){
@@ -377,7 +377,7 @@ public class PTActWriter {
 		double walkTravelTime = walk.walkTravelTime(distance);
 		double depTime = act1.getEndTime();
 		double arrTime = depTime + walkTravelTime;
-		return newPTLeg(TransportMode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
+		return newPTLeg(TransportMode.walk, new ArrayList<LinkImpl>(), distance, depTime, walkTravelTime, arrTime);
 	}
 	
 	private void createWlinks(final Coord coord1, Path path, final Coord coord2){
@@ -393,13 +393,13 @@ public class PTActWriter {
 	/**
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the Quadtree*/
-	public Node createWalkingNode(Id id, Coord coord){
-		Node node = new PTNode(id, coord, "Walking");
+	public NodeImpl createWalkingNode(Id id, Coord coord){
+		NodeImpl node = new PTNode(id, coord, "Walking");
 		logicNet.getNodes().put(id, node);
 		return node;
 	}
 	
-	public Link createPTLink(String strIdLink, Node fromNode, Node toNode, String type){
+	public LinkImpl createPTLink(String strIdLink, NodeImpl fromNode, NodeImpl toNode, String type){
 		//->use link factory
 		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		return logicNet.createLink( new IdImpl(strIdLink), fromNode, toNode, length, 1, 1, 1, "0", type); 

@@ -5,9 +5,9 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 import playground.mmoyo.input.PTStation;
 import playground.mmoyo.PTRouter.PTTimeTable2;
@@ -16,7 +16,7 @@ import playground.mmoyo.Validators.StationValidator;
 
 public class PTNodeFactory {
 
-	private Network net;
+	private NetworkLayer net;
 	private PTStation ptStation;;
 	private StationValidator sValidator;
 
@@ -24,7 +24,7 @@ public class PTNodeFactory {
 		
 	}
 			
-	public PTNodeFactory(final Network net, final PTTimeTable2 ptTimeTable) {
+	public PTNodeFactory(final NetworkLayer net, final PTTimeTable2 ptTimeTable) {
 		this.net = net;
 		this.ptStation = new PTStation(ptTimeTable);
 		this.sValidator = new StationValidator(net);
@@ -34,8 +34,8 @@ public class PTNodeFactory {
 	/**
 	 * converts all nodes from the network into PTNodes 
 	 */
-	public Network transformToPTNodes(final Network netWithNodes, Network netWithPTNodes){
-		for (Node node: netWithNodes.getNodes().values()){
+	public NetworkLayer transformToPTNodes(final NetworkLayer netWithNodes, NetworkLayer netWithPTNodes){
+		for (NodeImpl node: netWithNodes.getNodes().values()){
 			PTNode ptNode = new PTNode(node.getId(),node.getCoord(),node.getType());
 			netWithPTNodes.getNodes().put(node.getId(),ptNode);
 		}

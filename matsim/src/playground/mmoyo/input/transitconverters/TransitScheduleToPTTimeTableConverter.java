@@ -9,7 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.SAXException;
 
@@ -32,7 +32,7 @@ public class TransitScheduleToPTTimeTableConverter {
 
 	}
 
-	public PTTimeTable2 getPTTimeTable(final String transitScheduleFile, final Network net) {
+	public PTTimeTable2 getPTTimeTable(final String transitScheduleFile, final NetworkLayer net) {
 		TransitSchedule transitSchedule = new TransitScheduleImpl();
 		try {
 			new TransitScheduleReaderV1(transitSchedule, net).readFile(transitScheduleFile);

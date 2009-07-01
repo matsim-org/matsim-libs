@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -41,14 +41,14 @@ public class TransitRouteFinder {
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
 
 		if (path!= null){
-			List <Link> linkList = new ArrayList<Link>();
+			List <LinkImpl> linkList = new ArrayList<LinkImpl>();
 			double depTime=fromAct.getEndTime();
 			double travTime= depTime;
 			
 			int i=1;
 			String linkType;
 			String lastLinkType= null;
-			for (Link link: path.links){
+			for (LinkImpl link: path.links){
 				linkType = link.getType();
 				
 				if (i>1){
@@ -57,7 +57,7 @@ public class TransitRouteFinder {
 						legList.add(newLeg);
 						
 						depTime=travTime;
-						linkList = new ArrayList<Link>();
+						linkList = new ArrayList<LinkImpl>();
 					}
 					if (i == path.links.size()){						
 						travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
@@ -85,11 +85,11 @@ public class TransitRouteFinder {
 		return mode;
 	}
 	
-	private LegImpl createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
+	private LegImpl createLeg(TransportMode mode, final List<LinkImpl> routeLinks, final double depTime, final double arrivTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null);  
 		double travTime= arrivTime - depTime;
 		double distance=0;
-		for(Link link : routeLinks) {
+		for(LinkImpl link : routeLinks) {
 			distance= distance + link.getLength();
 		} 
 		legRoute.setDistance(distance);

@@ -1,8 +1,8 @@
 package playground.mmoyo.Validators;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTTimeTable2;
@@ -12,18 +12,18 @@ import playground.mmoyo.PTRouter.PTTimeTable2;
  */
 public class NetValidator {
 	
-	private Network net;
+	private NetworkLayer net;
 	private PTTimeTable2 ptTimeTable;
 	
 	
-	public NetValidator (final Network net, final PTTimeTable2 ptTimeTable){
+	public NetValidator (final NetworkLayer net, final PTTimeTable2 ptTimeTable){
 		this.net = net;
 		this.ptTimeTable =ptTimeTable; 
 	}
 	
 	public void printNegativeStandardCosts(){
 		boolean found=false;
-		for(Link link: net.getLinks().values()){
+		for(LinkImpl link: net.getLinks().values()){
 			if(link.getType().equals("Standard")){ 
 				double cost= ptTimeTable.getTravelTime(link);
 				if (cost<0){
@@ -38,7 +38,7 @@ public class NetValidator {
 
 	public void printNegativeTransferCosts(double time){
 		int x=0;
-		for(Link link: net.getLinks().values()){
+		for(LinkImpl link: net.getLinks().values()){
 			if(link.getType().equals("Transfer")){ 
 				double cost= ptTimeTable.getTransferTime(link, time);
 				if (cost<0){
@@ -51,7 +51,7 @@ public class NetValidator {
 	}
 	
 	public boolean validLinkLengths(){
-		for (Link link : net.getLinks().values()){
+		for (LinkImpl link : net.getLinks().values()){
 			Coord from = link.getFromNode().getCoord();
 			Coord to = link.getToNode().getCoord();
 			double distance= CoordUtils.calcDistance(from, to);

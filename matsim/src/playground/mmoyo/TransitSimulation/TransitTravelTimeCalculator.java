@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.transitSchedule.TransitStopFacility;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
+
 
 import playground.marcel.pt.transitSchedule.api.Departure;
 import playground.marcel.pt.transitSchedule.api.TransitLine;
@@ -24,15 +25,15 @@ public class TransitTravelTimeCalculator {
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	public Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	
-	public TransitTravelTimeCalculator(final TransitSchedule logicTransitSchedule, final Network logicNetwork){
+	public TransitTravelTimeCalculator(final TransitSchedule logicTransitSchedule, final NetworkLayer logicNetwork){
 		calculateTravelTimes(logicTransitSchedule,logicNetwork);
 	}
 	
 	/**fills  a map of travelTime for links and  a map of departures for each node to create a TransitTimeTable*/
-	public void calculateTravelTimes(TransitSchedule logicTransitSchedule, Network logicNetwork){
+	public void calculateTravelTimes(TransitSchedule logicTransitSchedule, NetworkLayer logicNetwork){
 		for (TransitLine transitLine : logicTransitSchedule.getTransitLines().values()){
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
-				Node lastNode = null;
+				NodeImpl lastNode = null;
 				boolean first= true;
 				double departureDelay=0;
 				double lastDepartureDelay =0;
@@ -50,7 +51,7 @@ public class TransitTravelTimeCalculator {
 				/**iterates in each stop to calculate departures travel times*/
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
-					Node node = logicNetwork.getNode(transitStopFacility.getId());
+					NodeImpl node = logicNetwork.getNode(transitStopFacility.getId());
 					
 					/**Save node departures in the DeparturesMap*/
 					double[] nodeDeparturesArray =new double[numDepartures];
@@ -65,7 +66,7 @@ public class TransitTravelTimeCalculator {
 					
 					/**finds the link that joins both stations, calculate and save its travel time*/ 
 					if (!first){
-						for (Link lastLink : node.getInLinks().values()){
+						for (LinkImpl lastLink : node.getInLinks().values()){
 							if (lastLink.getFromNode().equals(lastNode)){
 								departureDelay= transitRouteStop.getDepartureDelay();
 								linkTravelTime= departureDelay- lastDepartureDelay;

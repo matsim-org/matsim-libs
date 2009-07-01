@@ -1,6 +1,6 @@
 package playground.mmoyo.PTRouter;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -16,7 +16,7 @@ public class PTTravelCost implements TravelCost {
 		this.ptTravelTime= new PTTravelTime(ptTimeTable);
 	}
 
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkTravelCost(LinkImpl link, double time) {
 		//return 1;
 		//return link.getLength();
 		return ptTravelTime.getLinkTravelTime(link, time);

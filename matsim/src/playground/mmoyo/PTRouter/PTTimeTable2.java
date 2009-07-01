@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import playground.mmoyo.input.PTLinesReader2;
 
@@ -20,7 +20,7 @@ public class PTTimeTable2{
 	private PTLinesReader2 ptLinesReader;
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
-	private Map <Id, Link> nextLinkMap = new TreeMap <Id, Link>();
+	private Map <Id, LinkImpl> nextLinkMap = new TreeMap <Id, LinkImpl>();
 	private static Time time;
 	
 	@Deprecated
@@ -46,7 +46,7 @@ public class PTTimeTable2{
 	 * [MMoyo]17th June It will be completely replaced by  TransitTravelTimeCalculator 
 	 */
 	@Deprecated
-	public void calculateTravelTimes(Network networklayer){
+	public void calculateTravelTimes(NetworkLayer networklayer){
 		// -> make its own class in input and the pttimetable gets this external data
 		Map<Id,Double> minuteMap = new TreeMap<Id,Double>();
 		
@@ -75,13 +75,13 @@ public class PTTimeTable2{
 		}
 	}
 	
-	public double getTravelTime(Link link){
+	public double getTravelTime(LinkImpl link){
 		return linkTravelTimeMap.get(link.getId())*60; // stored in minutes, returned in seconds
 	}
 
 	/**
 	 * Returns the waiting time in a transfer link head node after a given time //minutes */
-	public double getTransferTime(Link link, double time){
+	public double getTransferTime(LinkImpl link, double time){
 	 	double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
 		double transferTime= 0;
 		if (nextDeparture>=time){
@@ -116,7 +116,7 @@ public class PTTimeTable2{
 	}
 
 	@Deprecated
-	public void putNextDTLink(Id id, Link link) {
+	public void putNextDTLink(Id id, LinkImpl link) {
 		nextLinkMap.put(id, link);
 	}
 	

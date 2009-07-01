@@ -9,10 +9,10 @@ import org.apache.commons.collections.map.MultiKeyMap;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -25,41 +25,41 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 public class LogicIntoPlainTranslator {
 	private NetworkLayer plainNet;
 	private MultiKeyMap joiningLinkMap;
-	private Map<Node,Node> logicToPlainStopMap;
+	private Map<NodeImpl,NodeImpl> logicToPlainStopMap;
 	
 	/**the constructor creates the joiningLinkMap that stores the relation between logic and plain Nodes*/ 
-	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<Node,Node> logicToPlanStopMap) {
+	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<NodeImpl,NodeImpl> logicToPlanStopMap) {
 		this.plainNet= plainNetwork;
 		this.logicToPlainStopMap = logicToPlanStopMap;
 		
 		/**creates the JoiningLinkMa, it contains fromNode and toNode as keys, and the link between them as value */
 		int linkNum = plainNet.getLinks().size();
 		joiningLinkMap = MultiKeyMap.decorate(new LRUMap(linkNum));
-		for (Link plainLink : plainNet.getLinks().values()){
-			Node fromPlainNode= plainLink.getFromNode();
-			Node toPlainNode= plainLink.getToNode();
+		for (LinkImpl plainLink : plainNet.getLinks().values()){
+			NodeImpl fromPlainNode= plainLink.getFromNode();
+			NodeImpl toPlainNode= plainLink.getToNode();
 			joiningLinkMap.put(fromPlainNode, toPlainNode, plainLink);
 		}
 	}
 
-	private Node convertToPlain(Node logicNode){
+	private NodeImpl convertToPlain(NodeImpl logicNode){
 		return logicToPlainStopMap.get(logicNode);
 	}
 	
-	private Link convertToPlain(final Link logicLink){
-		Link logicAliasLink = logicLink;
+	private LinkImpl convertToPlain(final LinkImpl logicLink){
+		LinkImpl logicAliasLink = logicLink;
 		if (logicLink.getType().equals("Transfer") || logicLink.getType().equals("DetTransfer"))
 			logicAliasLink= findLastStandardLink(logicLink);
-		Node fromPlainNode = convertToPlain(logicAliasLink.getFromNode());
-		Node toPlainNode = convertToPlain(logicAliasLink.getToNode());
-		Link planLink = (Link)joiningLinkMap.get(fromPlainNode, toPlainNode); 
+		NodeImpl fromPlainNode = convertToPlain(logicAliasLink.getFromNode());
+		NodeImpl toPlainNode = convertToPlain(logicAliasLink.getToNode());
+		LinkImpl planLink = (LinkImpl)joiningLinkMap.get(fromPlainNode, toPlainNode); 
 		return planLink;
 	}
 	
 	/**in case of a transfer link of the logic Network, the last standard link is returned, because transfer links do not exist in the pain network*/
-	private Link findLastStandardLink (Link transferLink){
-		Link standardLink = null;
-		for (Link inLink: transferLink.getFromNode().getInLinks().values()){
+	private LinkImpl findLastStandardLink (LinkImpl transferLink){
+		LinkImpl standardLink = null;
+		for (LinkImpl inLink: transferLink.getFromNode().getInLinks().values()){
 			if (inLink.getType().equals("Standard"))
 				standardLink = inLink;
 		}
@@ -68,10 +68,10 @@ public class LogicIntoPlainTranslator {
 		return standardLink;
 	}
 
-	private List<Link> convertToPlain(List<Link> logicLinks){
-		List<Link> plainLinks  = new ArrayList<Link>();
-		for (Link logicLink: logicLinks){
-			Link plainLink= convertToPlain(logicLink);
+	private List<LinkImpl> convertToPlain(List<LinkImpl> logicLinks){
+		List<LinkImpl> plainLinks  = new ArrayList<LinkImpl>();
+		for (LinkImpl logicLink: logicLinks){
+			LinkImpl plainLink= convertToPlain(logicLink);
 			plainLinks.add(plainLink);
 		}
 		return plainLinks;
@@ -84,12 +84,12 @@ public class LogicIntoPlainTranslator {
 			for (PlanElement pe : plan.getPlanElements()) {  
 				if (pe instanceof ActivityImpl) {  				
 					ActivityImpl act =  (ActivityImpl) pe;					
-					Link plainLink= plainNet.getNearestLink(act.getCoord()); 
+					LinkImpl plainLink= plainNet.getNearestLink(act.getCoord()); 
 					act.setLink(plainLink);
 				}else{
 					LegImpl leg = (LegImpl)pe;
 					NetworkRoute logicRoute = (NetworkRoute)leg.getRoute();
-					List<Link> plainLinks = convertToPlain(logicRoute.getLinks());
+					List<LinkImpl> plainLinks = convertToPlain(logicRoute.getLinks());
 					logicRoute.setLinks(null, plainLinks, null); 
 				}
 			}
@@ -100,9 +100,9 @@ public class LogicIntoPlainTranslator {
 		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
 		for(LegImpl logicLeg : logicLegList){
 			NetworkRoute logicNetworkRoute= (NetworkRoute)logicLeg.getRoute();
-			List<Link> plainLinkList = new ArrayList<Link>();
+			List<LinkImpl> plainLinkList = new ArrayList<LinkImpl>();
 			
-			for (Link link: logicNetworkRoute.getLinks()){
+			for (LinkImpl link: logicNetworkRoute.getLinks()){
 				//if (link.getType().equals("Standard"))
 					plainLinkList.add(link);
 			}

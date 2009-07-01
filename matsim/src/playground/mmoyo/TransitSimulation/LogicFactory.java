@@ -12,8 +12,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.TransitStopFacility;
 
@@ -46,8 +48,8 @@ public class LogicFactory{
 	private TransitSchedule logicTransitSchedule = new TransitScheduleImpl(); 
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
 	
-	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /** <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
-	public Map<Node,Node> logicToPlanStopMap = new TreeMap<Node,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
+	private Map<Id,List<NodeImpl>> facilityNodeMap = new TreeMap<Id,List<NodeImpl>>(); /** <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
+	public Map<NodeImpl,NodeImpl> logicToPlanStopMap = new TreeMap<NodeImpl,NodeImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
 	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();
 	
 	long newLinkId=0;
@@ -70,8 +72,8 @@ public class LogicFactory{
 			
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				List<TransitRouteStop> logicTransitStops = new ArrayList<TransitRouteStop>();
-				Node lastLogicNode = null;
-				Node lastPlainNode=null;
+				NodeImpl lastLogicNode = null;
+				NodeImpl lastPlainNode=null;
 				boolean first= true;
 				
 				//iterates in each transit stop to create nodes and links */
@@ -82,13 +84,13 @@ public class LogicFactory{
 					Coord coord = transitStopFacility.getCoord();
 					Id idStopFacility = transitStopFacility.getId();  
 					Id logicalId= createLogicalId(idStopFacility, transitRoute.getId()); 
-					Node logicNode= logicNet.createNode(logicalId, coord);
-					Node plainNode= createPlainNode(transitStopFacility);
+					NodeImpl logicNode= logicNet.createNode(logicalId, coord);
+					NodeImpl plainNode= createPlainNode(transitStopFacility);
 					logicToPlanStopMap.put(logicNode, plainNode);
 					
 					//fill the facilityNodeMap to create transfer links later on
 					if (!facilityNodeMap.containsKey(idStopFacility)){
-						List<Node> nodeStationArray = new ArrayList<Node>();
+						List<NodeImpl> nodeStationArray = new ArrayList<NodeImpl>();
 						facilityNodeMap.put(idStopFacility, nodeStationArray);
 					}
 					facilityNodeMap.get(idStopFacility).add(logicNode);
@@ -132,9 +134,9 @@ public class LogicFactory{
 	}
 	
 	private void createTransferLinks(){
-		for (List<Node> chList : facilityNodeMap.values()) 
-			for (Node fromNode : chList) 
-				for (Node toNode : chList) 
+		for (List<NodeImpl> chList : facilityNodeMap.values()) 
+			for (NodeImpl fromNode : chList) 
+				for (NodeImpl toNode : chList) 
 					if (!fromNode.equals(toNode) && willJoin2StandardLinks(fromNode, toNode)){
 						Id idNewLink = new IdImpl("T" + ++newLinkId);
 						createLogicLink(idNewLink, fromNode, toNode, "Transfer");
@@ -143,10 +145,10 @@ public class LogicFactory{
 	}
 	
 	public void createDetachedTransferLinks (final double distance){
-		for (Node centerNode: logicNet.getNodes().values()){
-			Collection<Node> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), distance);
+		for (NodeImpl centerNode: logicNet.getNodes().values()){
+			Collection<NodeImpl> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), distance);
 			nearNodes.remove(centerNode);
-			for (Node nearNode : nearNodes){
+			for (NodeImpl nearNode : nearNodes){
 				boolean areConected = centerNode.getOutNodes().containsValue(nearNode); 
 				boolean belongToSameLine = nodeLineMap.get(centerNode.getId()) == nodeLineMap.get(nearNode.getId()); 
 				if (!belongToSameLine && !areConected && willJoin2StandardLinks(centerNode, nearNode)){  /**avoid joining nodes that are already joined by standard links AND joining nodes of the same Line*/
@@ -160,14 +162,14 @@ public class LogicFactory{
 	
 	/**Asks if the fromNode has at least one standard inLink and also if the toNode has at least a standard outLink
 	 * Otherwise it is senseless to create a transfer link between them */
-	private boolean willJoin2StandardLinks(Node fromNode, Node toNode){
+	private boolean willJoin2StandardLinks(NodeImpl fromNode, NodeImpl toNode){
 		int numInGoingStandards =0;
-		for (Link inLink : fromNode.getInLinks().values()){
+		for (LinkImpl inLink : fromNode.getInLinks().values()){
 			if (inLink.getType().equals(STANDARDLINK)) 	numInGoingStandards++;
 		}	
 		
 		int numOutgoingStandards =0;
-		for (Link outLink : toNode.getOutLinks().values()){
+		for (LinkImpl outLink : toNode.getOutLinks().values()){
 			if (outLink.getType().equals(STANDARDLINK)) numOutgoingStandards++;
 		}
 		
@@ -177,21 +179,21 @@ public class LogicFactory{
 	
 	
 	/**links for the logical network, one for transitRoute*/
-	private void createLogicLink(Id id, Node fromNode, Node toNode, String type){
+	private void createLogicLink(Id id, NodeImpl fromNode, NodeImpl toNode, String type){
 		double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		logicNet.createLink(id, fromNode, toNode, length , 1.0 , 1.0, 1.0, "0", type);	
 	}
 	
 	/**links for the plain network, only one between two stations*/
-	private void createPlainLink(Node fromNode, Node toNode){
+	private void createPlainLink(NodeImpl fromNode, NodeImpl toNode){
 		if (!fromNode.getOutNodes().containsValue(toNode)){
 			double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 			plainNet.createLink(new IdImpl(newPlainLinkId++), fromNode, toNode, length, 1.0, 1.0 , 1);
 		}
 	}
 	
-	private Node createPlainNode(TransitStopFacility transitStopFacility){
-		Node plainNode = null;
+	private NodeImpl createPlainNode(TransitStopFacility transitStopFacility){
+		NodeImpl plainNode = null;
 		Id id = transitStopFacility.getId();
 		if (this.plainNet.getNodes().containsKey(id)){
 			plainNode = plainNet.getNode(id);

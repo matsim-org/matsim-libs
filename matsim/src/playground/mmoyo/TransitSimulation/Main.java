@@ -3,11 +3,11 @@ package playground.mmoyo.TransitSimulation;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
@@ -64,11 +64,11 @@ public class Main {
 				
 				Coord coord1 = new CoordImpl(747420, 262794);
 				Coord coord2 = new CoordImpl(685862, 254136);
-				Node nodeA = plainNet.getNode("8506000");
-				Node nodeB = plainNet.getNode("8503309");
+				NodeImpl nodeA = plainNet.getNode("8506000");
+				NodeImpl nodeB = plainNet.getNode("8503309");
 				Path path = ptRouter.findPTPath (coord1, coord2, 24372, 300);
 				System.out.println(path.links.size());
-				for (Link l : path.links){
+				for (LinkImpl l : path.links){
 					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + l.getType() + l.getToNode().getId() );
 				}
 				break;

@@ -1,13 +1,13 @@
 package playground.mmoyo.PTRouter;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import playground.mmoyo.input.transitconverters.ToTransitScheduleConverter;
@@ -68,7 +68,7 @@ public class PTControler2 {
 			
 			case-4:
 	    		/** validates the id assignation for nodes of ZVV diva2Web database*/
-				Network netDiv= new NetworkLayer(new NetworkFactory());
+				NetworkLayer netDiv= new NetworkLayer(new NetworkFactory());
 	    		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(netDiv);
 	    		matsimNetworkReader.readFile(DIVNODES);
 	    		
@@ -120,12 +120,12 @@ public class PTControler2 {
 				/**searches and shows a PT path between two coordinates or nodes */
 				Coord coord1 = new CoordImpl(747420, 262794);   
 				Coord coord2 = new CoordImpl(685862, 254136);
-				Node nodeA = pt.getPtNetworkLayer().getNode("_8506000");
-				Node nodeB = pt.getPtNetworkLayer().getNode("_8503309");
+				NodeImpl nodeA = pt.getPtNetworkLayer().getNode("_8506000");
+				NodeImpl nodeB = pt.getPtNetworkLayer().getNode("_8503309");
 				//Path path2 = pt.getPtRouter2().findRoute(nodeA, nodeB, 45386);
 				Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
 				System.out.println(path2.links.size());
-				for (Link l : path2.links){
+				for (LinkImpl l : path2.links){
 					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + l.getType() + l.getToNode().getId() );
 				}
 				break;

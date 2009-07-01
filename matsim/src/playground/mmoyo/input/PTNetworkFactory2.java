@@ -60,13 +60,13 @@ public class PTNetworkFactory2 {
 		
 		//Create the PTNetwork with PTNodes
 		//List<PTNode> ptNodeList = new ArrayList<PTNode>();
-		for (Node node: tempNet.getNodes().values()){
+		for (NodeImpl node: tempNet.getNodes().values()){
 			PTNode ptNode = new PTNode(new IdImpl(node.getId().toString()),node.getCoord(),node.getType());
 			ptNetworkLayer.getNodes().put(node.getId(),ptNode);
 		}
 	
 		//Add Links
-		for (Link l: tempNet.getLinks().values()){
+		for (LinkImpl l: tempNet.getLinks().values()){
 			createPTLink(ptNetworkLayer, l.getId().toString(), l.getFromNode().getId(), l.getToNode().getId(), l.getType());
 		}
 
@@ -79,7 +79,7 @@ public class PTNetworkFactory2 {
 	/**
 	 * Reads the timetable File, validates that every node exists and loads the data in the ptTimeTable object
 	 */	
-	public void readTimeTable(final Network ptNetworkLayer, PTTimeTable2 ptTimeTable){
+	public void readTimeTable(final NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
 		PTNode ptLastNode = null;
 		for (PTLine ptLine :  ptTimeTable.getPtLineList()) {
 			//Test code
@@ -105,7 +105,7 @@ public class PTNetworkFactory2 {
 				
 				travelTime=min-lastTravelTime;
 				if (!first){
-					for (Link link : (ptNode.getInLinks().values())) {
+					for (LinkImpl link : (ptNode.getInLinks().values())) {
 						if (link.getFromNode().equals(ptLastNode)){
 							linkTravelTimeMap.put(link.getId(), travelTime);
 							//-->check if this temporary assignment improves the performance
@@ -189,15 +189,15 @@ public class PTNetworkFactory2 {
 
 	}
 
-	private void createPTLink(Network net, int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
+	private void createPTLink(NetworkLayer net, int intId, BasicNode fromBasicNode, BasicNode toBasicNode, String type){
 		//-> use this unique method and eliminate the last two
 		Id id =  new IdImpl(intId);
-		Link  link = net.getFactory().createLink(id, fromBasicNode.getId(), toBasicNode.getId() );
+		LinkImpl  link = net.getFactory().createLink(id, fromBasicNode.getId(), toBasicNode.getId() );
 		link.setLength(CoordUtils.calcDistance(fromBasicNode.getCoord(), toBasicNode.getCoord()));
 		link.setType(type);
 	}
 
-	public void writeNet(final Network net, final String fileName){
+	public void writeNet(final NetworkLayer net, final String fileName){
 		System.out.println("writing pt network...");
 		new NetworkWriter(net, fileName).write();
 		System.out.println("done.");
@@ -207,8 +207,8 @@ public class PTNetworkFactory2 {
 		//--> move this to class Linkfactory
 		int x=0;
 		String strId;
-		for (Node node: net.getNodes().values()){
-			for (Node nearNode : net.getNearestNodes(node.getCoord(), distance)){
+		for (NodeImpl node: net.getNodes().values()){
+			for (NodeImpl nearNode : net.getNearestNodes(node.getCoord(), distance)){
 				PTNode ptn1 = (PTNode) node;
 				PTNode ptn2 = (PTNode) nearNode;
 				//if(!ptn1.getIdStation().equals(ptn2.getIdStation())){   
@@ -231,12 +231,12 @@ public class PTNetworkFactory2 {
 	 */
 	@Deprecated
 	public void setDetNextLinks (NetworkLayer net, PTTimeTable2 ptTimeTable){
-		List <Link> eliminateList = new ArrayList<Link>();
-		for (Link link: net.getLinks().values()){
+		List <LinkImpl> eliminateList = new ArrayList<LinkImpl>();
+		for (LinkImpl link: net.getLinks().values()){
 			if (link.getType().equals("DetTransfer")){
-				Link nextLink= null;
+				LinkImpl nextLink= null;
 				int numStandards =0;
-				for (Link outLink : link.getToNode().getOutLinks().values()) {
+				for (LinkImpl outLink : link.getToNode().getOutLinks().values()) {
 					if (outLink.getType().equals("Standard")){
 						numStandards++;
 						nextLink=outLink;
@@ -255,7 +255,7 @@ public class PTNetworkFactory2 {
 		}
 
 		System.out.println("eliminate" + eliminateList.size());
-		for (Link link:eliminateList){
+		for (LinkImpl link:eliminateList){
 			net.removeLink(link);
 		}
 	}
@@ -265,7 +265,7 @@ public class PTNetworkFactory2 {
 	 */
 	public static void printLinks(NetworkLayer ptNetworkLayer) {
 		//-> unify with first version of ptNetFactory
-		for (Link l : ptNetworkLayer.getLinks().values()) {
+		for (LinkImpl l : ptNetworkLayer.getLinks().values()) {
 			System.out.print("\n(" );
 			System.out.print(l.getFromNode().getId().toString()); 
 			System.out.print( ")----" ); 

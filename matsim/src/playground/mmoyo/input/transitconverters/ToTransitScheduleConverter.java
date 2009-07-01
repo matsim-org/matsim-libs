@@ -9,6 +9,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
@@ -36,7 +37,7 @@ public class ToTransitScheduleConverter {
 	}
 	
 	/**reads a PTTimetable and writes a transitFile*/
-	public void createTransitSchedule(final PTTimeTable2 ptTimeTable, final Network ptNet, String outTransitFile) {
+	public void createTransitSchedule(final PTTimeTable2 ptTimeTable, final NetworkLayer ptNet, String outTransitFile) {
 		TransitLine transitLine;
 		/*
 		for (Node node:  ptNet.getNodes().values()){
@@ -92,7 +93,7 @@ public class ToTransitScheduleConverter {
 		System.out.println("done.");
 	}
 	
-	public void createFacilities(Network net){
+	public void createFacilities(NetworkLayer net){
 	
 	}
 	

@@ -1,6 +1,6 @@
 package playground.mmoyo.PTRouter;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 import playground.mmoyo.Validators.CostValidator;
 import playground.mmoyo.PTRouter.Walk;
@@ -25,10 +25,10 @@ public class PTTravelTime implements TravelTime {
 	 * Calculation of travel time for each link type:
 	 * Standard link: (toNode arrival- fromNode arrival)
 	 * Walking link : (distance* walk speed)
-	 * Transfer link: (2° veh departure - 1° veh arrival)
+	 * Transfer link: (2ï¿½ veh departure - 1ï¿½ veh arrival)
 	 * Detached transfer: (distance*walk speed) + (veh departure - walk arrival)  
 	 */
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final LinkImpl link, final double time) {
 		type = link.getType();
 		if (type.equals("Transfer")){
 			travelTime= transferTime(link,time); 
@@ -45,7 +45,7 @@ public class PTTravelTime implements TravelTime {
 		return travelTime;
 	}
 	
-	public double transferTime(final Link link, final double time){
+	public double transferTime(final LinkImpl link, final double time){
 		transTime= ptTimeTable.getTransferTime(link, time);
 		if (transTime<0) {
 			//costValidator.pushNegativeValue(link.getId(), time, transTime);

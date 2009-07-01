@@ -4,27 +4,28 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
+
 import playground.mmoyo.input.PTStation;
 
 /**
  * Validates that all nodes in an intersection have the same coordinate and correct id`s
  */
 public class StationValidator {
-	Network net;
+	NetworkLayer net;
 	
-	public StationValidator(final Network net){
+	public StationValidator(final NetworkLayer net){
 		this.net = net;
 	}
 	
 	public boolean hasValidCoordinates(final PTStation ptStation){
 		for (List<Id> list : ptStation.getIntersecionMap().values()) {
 			Id firstId= list.get(0);
-			Node firstNode=  net.getNode(firstId);
+			NodeImpl firstNode=  net.getNode(firstId);
 			Coord firstCoord = firstNode.getCoord();
 			for (Id id : list){
-				Node node=  net.getNode(id);
+				NodeImpl node=  net.getNode(id);
 				Coord coord = node.getCoord();
 				if(!firstCoord.equals(coord))
 					throw new java.lang.NullPointerException(id + "PTNode does not have the same coordinates as their sibling PTNodes ");
@@ -33,17 +34,17 @@ public class StationValidator {
 		return true;
 	}
 	
-	public void validateIds(final Network netDiv){
+	public void validateIds(final NetworkLayer netDiv){
 		int x=0;
 		int diferent = 0;
-		for (Node node: net.getNodes().values()){
+		for (NodeImpl node: net.getNodes().values()){
 			
 			String idStation = ((playground.mmoyo.PTRouter.PTNode)node).getStrIdStation();
 			int intId = Integer.valueOf(idStation);
 
 			if (intId< 106699 || intId > 106699){
 				diferent++;
-				for (Node divNode: netDiv.getNodes().values()){
+				for (NodeImpl divNode: netDiv.getNodes().values()){
 					if (node.getCoord().equals(divNode.getCoord())){
 						System.out.println("Corregible " + x++);
 					}

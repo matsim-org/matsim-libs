@@ -6,10 +6,10 @@ import playground.mmoyo.PTRouter.PTTravelTime1;
 import playground.mmoyo.PTRouter.MyDijkstra;
 import playground.mmoyo.PTRouter.PTLine;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.api.network.Node;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class PTLineValidator {
 	 * @param ptTimeTable
 	 * @param net
 	 */
-	public void getIsolatedPTLines(PTTimeTable2 ptTimeTable, Network net){
+	public void getIsolatedPTLines(PTTimeTable2 ptTimeTable, NetworkLayer net){
 		int isolated=0;
 		int comparisons=0;
 		PTTravelCost ptTravelCost = new PTTravelCost(ptTimeTable);
@@ -35,9 +35,9 @@ public class PTLineValidator {
 			Id firstNodeId = ptLine.getNodeRoute().get(0);
 			for (PTLine ptLine2 : ptTimeTable.getPtLineList()){
 				Id lastNodeId = ptLine2.getNodeRoute().get(ptLine2.getNodeRoute().size()-1);
-				Node node1 = net.getNode(firstNodeId);
+				NodeImpl node1 = net.getNode(firstNodeId);
 				if(!ptLine.equals(ptLine2)){
-					Node node2 = net.getNode(lastNodeId);
+					NodeImpl node2 = net.getNode(lastNodeId);
 					Path path = expressDijkstra.calcLeastCostPath(node1, node2, 600);
 					comparisons++;
 					if (path==null){

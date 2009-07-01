@@ -1,8 +1,8 @@
 package playground.mmoyo.input;
 
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -14,11 +14,11 @@ public class PTNetworkReader{
 	
 	}
 
-	public Network readNetFile(final String inFileName){
+	public NetworkLayer readNetFile(final String inFileName){
 		NetworkFactory networkFactory = new NetworkFactory();
 	
-		Network tempNet= new NetworkLayer(networkFactory);
-		Network ptNetworkLayer= new NetworkLayer();
+		NetworkLayer tempNet= new NetworkLayer(networkFactory);
+		NetworkLayer ptNetworkLayer= new NetworkLayer();
 		
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(tempNet);
 		matsimNetworkReader.readFile(inFileName);
