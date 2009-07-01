@@ -24,12 +24,12 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * Calculates average trip durations by mode.
@@ -60,7 +60,7 @@ public class CalcLegTimesKTI implements AgentDepartureEventHandler, AgentArrival
 
 	public void handleEvent(AgentArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
-		Person agent = this.population.getPersons().get(event.getPersonId());
+		PersonImpl agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
 

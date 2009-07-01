@@ -15,8 +15,7 @@ import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -26,6 +25,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
@@ -436,7 +436,7 @@ public class CompareScenarios {
 				if (analysis.intValue() == ROUTE_SWITCHERS_ANALYSIS_NAME) {
 					if (scenarioName.equals(this.scenarioNames[0])) {
 						this.routeSwitchersLines.add("person\thome_link\thome_x\thome_y");
-						for (Person person : plansSubPop.getPersons().values()) {
+						for (PersonImpl person : plansSubPop.getPersons().values()) {
 							for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 								if (pe instanceof ActivityImpl) {
 									homeActivity = (ActivityImpl) pe;

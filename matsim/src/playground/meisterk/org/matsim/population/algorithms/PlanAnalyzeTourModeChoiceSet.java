@@ -28,10 +28,10 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.Location;
 
@@ -73,7 +73,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		this.modeSet = modeSet;
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
 		Location currentLocation = null, requiredLocation = null, nextLocation = null;

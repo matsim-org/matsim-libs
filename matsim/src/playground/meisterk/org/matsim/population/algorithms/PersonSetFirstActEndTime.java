@@ -22,10 +22,10 @@ package playground.meisterk.org.matsim.population.algorithms;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -39,15 +39,15 @@ public class PersonSetFirstActEndTime extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(Person person) {
-		List<Plan> plans = person.getPlans();
+	public void run(PersonImpl person) {
+		List<PlanImpl> plans = person.getPlans();
 		for (int i=0; i<plans.size(); i++) {
-			Plan plan = plans.get(i);
+			PlanImpl plan = plans.get(i);
 			this.run(plan);
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 
 		ActivityImpl firstAct = plan.getFirstActivity();
 		firstAct.setEndTime(this.firstActEndTime);
