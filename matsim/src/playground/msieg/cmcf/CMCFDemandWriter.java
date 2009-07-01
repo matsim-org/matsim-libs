@@ -27,9 +27,8 @@ import java.io.Writer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -37,6 +36,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.xml.sax.SAXException;
@@ -188,7 +188,7 @@ public class CMCFDemandWriter{
 		//in advance, read input data and store all the demands accumulated:
 		Commodities<Node> com = new Commodities<Node>();
 
-		Plan plan;
+		PlanImpl plan;
 		ActivityImpl act1, act2;
 		LegImpl leg;
 		for (Id id : this.plans.getPersons().keySet()) {

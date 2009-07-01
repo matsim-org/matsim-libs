@@ -30,9 +30,10 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReader;

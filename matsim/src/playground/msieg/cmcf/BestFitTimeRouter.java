@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 
 import playground.msieg.structure.Commodity;
@@ -52,7 +52,7 @@ public class BestFitTimeRouter extends CMCFRouter {
 	
 	@Override
 	public void route() {
-		Set<Person> unroutedPersons = new HashSet<Person>(this.population.getPersons().values());
+		Set<PersonImpl> unroutedPersons = new HashSet<PersonImpl>(this.population.getPersons().values());
 		
 		Map<List<Link>, Double> flowValues = new HashMap<List<Link>, Double>();
 		for(Commodity<Node> c: this.pathFlow.getCommodities()){
@@ -81,9 +81,9 @@ public class BestFitTimeRouter extends CMCFRouter {
 				double flow = flowValues.get(path); 
 				while (flow > 0.99) //0.99 because of rounding errors
 				{	//look for unrouted person with the same start and target
-					Person person = null;
+					PersonImpl person = null;
 					LegImpl leg = null;
-					for(Person p: unroutedPersons){
+					for(PersonImpl p: unroutedPersons){
 						leg = p.getSelectedPlan().getNextLeg(p.getSelectedPlan().getFirstActivity());
 						Node 	from = leg.getRoute().getStartLink().getToNode(),
 								to = leg.getRoute().getEndLink().getFromNode();

@@ -24,11 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 
 import playground.msieg.structure.Commodity;
@@ -50,7 +50,7 @@ public class BestFitRouter extends CMCFRouter {
 				flowValues.put(path, this.pathFlow.getFlowValue(c, path));
 		}
 		int routedPersons = 0;
-		for(Person p: pop.getPersons().values()){
+		for(PersonImpl p: pop.getPersons().values()){
 			LegImpl leg = p.getSelectedPlan().getNextLeg(p.getSelectedPlan().getFirstActivity());
 			Node 	from = leg.getRoute().getStartLink().getToNode(),
 					to = leg.getRoute().getEndLink().getFromNode();
