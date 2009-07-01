@@ -9,12 +9,12 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -47,7 +47,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	 private final boolean checkLeafs (Plan plan,TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
+	 private final boolean checkLeafs (PlanImpl plan,TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
 		boolean last_leaf = false;
 		ArrayList<Integer> last_subtour = new ArrayList<Integer>();
 		last_subtour = subtours.get(subtour_idx);
@@ -64,7 +64,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 			return tour;
 	 }
 	
-	private final TreeMap<Integer, ArrayList<Integer>> registerSubTour (Plan plan, ArrayList<Integer> start_end, ArrayList<Integer> tour, int subtour_idx, TreeMap<Integer, ArrayList<Integer>> subtours){
+	private final TreeMap<Integer, ArrayList<Integer>> registerSubTour (PlanImpl plan, ArrayList<Integer> start_end, ArrayList<Integer> tour, int subtour_idx, TreeMap<Integer, ArrayList<Integer>> subtours){
 		ArrayList<Integer> subtour = new ArrayList<Integer>();
 		int start = start_end.get(0);
 		int end = start_end.get(1);
@@ -75,7 +75,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 		return subtours;
 	}
 	
-	private final ArrayList<Integer> extractSubTours(Plan plan, int start, int end, ArrayList<Integer> tour) {
+	private final ArrayList<Integer> extractSubTours(PlanImpl plan, int start, int end, ArrayList<Integer> tour) {
 		boolean is_leaf = false;
 		int i=0;
 		int leaf_start = start;
@@ -104,7 +104,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 		return start_end;
 	}
 		
-	private final void registerPlan (Plan plan, ArrayList<Integer> tour) {
+	private final void registerPlan (PlanImpl plan, ArrayList<Integer> tour) {
 		for (int i=0; i<=plan.getPlanElements().size()-1;i=i+2) {
 			tour.add(i);
 		}
@@ -115,9 +115,9 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 				
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		ArrayList<Integer> tour = new ArrayList<Integer>();
 		ArrayList<Integer> start_end = new ArrayList<Integer>();
 		boolean all_leafs = false;		
@@ -133,7 +133,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 		System.out.println("subtours end = " + subtours);
 	}
 	
-	public void run(Plan plan){
+	public void run(PlanImpl plan){
 	}
 	
 	//////////////////////////////////////////////////////////////////////

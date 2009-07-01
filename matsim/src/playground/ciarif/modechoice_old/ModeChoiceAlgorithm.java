@@ -25,11 +25,11 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -52,7 +52,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 	 * @see org.matsim.demandmodeling.plans.algorithms.PersonAlgorithm#run(org.matsim.demandmodeling.plans.Person)
 	 */
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 			UtilityComputer2[] mobilityUtilityComputers;
 
 			final int alternativeCount = 5;
@@ -103,7 +103,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			addMobilityInformation(person, index);
 		}
 
-		private void addMobilityInformation(Person person, int index) {
+		private void addMobilityInformation(PersonImpl person, int index) {
 			/* Index		Mode information
 			 * 0			Walk
 			 * 1			Bicycle
@@ -111,7 +111,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			 * 3			Public Trasnport
 			 * 4			Other means */
 
-			Plan plan = person.getSelectedPlan();
+			PlanImpl plan = person.getSelectedPlan();
 			List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 			if (index == 0) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
@@ -152,11 +152,11 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		return Math.exp(referenceUtility) / expSumOfAlternatives;
 	}
 
-	private double getAge2(Person p) {
+	private double getAge2(PersonImpl p) {
 		return getAge(p) * getAge(p);
 	}
 
-	protected double getAge(Person p) {
+	protected double getAge(PersonImpl p) {
 		return p.getAge();
 	}
 
@@ -169,14 +169,14 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 //		}
 //	}
 
-	private double getHasLicense(Person p) {
+	private double getHasLicense(PersonImpl p) {
 		if (p.getLicense().equals("yes")) {
 			return 1;
 		}
 		// else...
 		return 0;
 	}
-	private double getTravelcards(Person p) {
+	private double getTravelcards(PersonImpl p) {
 		if (p.getTravelcards().equals("yes")) {
 			return 1;
 		}
@@ -184,7 +184,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		return 0;
 	}
 
-	private double getCarAlternativeAvail(Person p) {
+	private double getCarAlternativeAvail(PersonImpl p) {
 		if (p.getCarAvail().equals("always")) {
 			return 1;
 		}
@@ -201,7 +201,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		return 0;
 	}
 
-	private double getCarAvailPerson(Person p) {
+	private double getCarAvailPerson(PersonImpl p) {
 		if (p.getCarAvail().equals("always")) {
 			return 1;
 		}
@@ -209,10 +209,10 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		return 0;
 	}
 
-	public double calcDist (Person person) {
+	public double calcDist (PersonImpl person) {
 
 		double dist=0;
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		if (plan == null) {
 			return 0;
 		}
@@ -226,10 +226,10 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		return dist / 1000;
 	}
 
-	public String detectTourMainActivity1 (Person person){
+	public String detectTourMainActivity1 (PersonImpl person){
 
 		String main_type = "o";
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
@@ -255,10 +255,10 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		return main_type;
 	}
 
-public int detectTourMainActivity2 (Person person){
+public int detectTourMainActivity2 (PersonImpl person){
 
 		int main_type = 2;
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
@@ -305,7 +305,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 
 			return B_Const_w* 1 + B_Dist_w * T_DIST;
@@ -323,7 +323,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double r2 = MatsimRandom.getRandom().nextDouble();
 
@@ -356,7 +356,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double DRIV_LIC = getHasLicense (p);
 			double CAR = getCarAlternativeAvail (p);
@@ -390,7 +390,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double SEASON_T = getTravelcards(p);
 			double T_DIST = calcDist(p);
 			double r4 = MatsimRandom.getRandom().nextDouble();
@@ -413,7 +413,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			return B_Const_ot * 1;
 		}
 	}
@@ -428,7 +428,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 
 			return B_Const_w * 1 + B_Dist_w * T_DIST;
@@ -444,7 +444,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double r3 = MatsimRandom.getRandom().nextDouble();
 
@@ -471,7 +471,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double DRIV_LIC = getHasLicense (p);
 			double CAR = getCarAlternativeAvail (p);
@@ -504,7 +504,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double SEASON_T = getTravelcards(p);
 			double AGE_SQ = getAge2 (p);
@@ -528,7 +528,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 
 			return B_Const_ot * 1;
 		}
@@ -544,7 +544,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 
 			return B_Const_w * 1 + B_Dist_w * T_DIST;
@@ -561,7 +561,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double r4 = MatsimRandom.getRandom().nextDouble();
 
@@ -590,7 +590,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double DRIV_LIC = getHasLicense (p);
 			double CAR = getCarAlternativeAvail (p);
@@ -624,7 +624,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 			double T_DIST = calcDist(p);
 			double SEASON_T = getTravelcards(p);
 			double AGE_SQ = getAge2 (p);
@@ -656,7 +656,7 @@ public int detectTourMainActivity2 (Person person){
 		 * @param p
 		 * @return
 		 */
-		public double computeUtility(Person p) {
+		public double computeUtility(PersonImpl p) {
 
 			return B_Const_ot * 1 ;
 		}

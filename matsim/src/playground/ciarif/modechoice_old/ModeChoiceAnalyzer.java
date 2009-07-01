@@ -30,8 +30,8 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 
@@ -56,8 +56,8 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	 * @see org.matsim.demandmodeling.plans.algorithms.PersonAlgorithm#run(org.matsim.demandmodeling.plans.Person)
 	 */
 	@Override
-	public void run(Person person) {
-		Plan plan = person.getSelectedPlan();
+	public void run(PersonImpl person) {
+		PlanImpl plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof BasicLeg) {
 				BasicLeg leg = (BasicLeg) pe;

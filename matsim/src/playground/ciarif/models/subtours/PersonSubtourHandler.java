@@ -5,9 +5,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PersonSubtourHandler {
@@ -41,7 +41,7 @@ public class PersonSubtourHandler {
 	// Private Methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void handleSubTours(final Plan plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
+	private final void handleSubTours(final PlanImpl plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
 		
 		// setting subtour parameters
 		
@@ -141,7 +141,7 @@ public class PersonSubtourHandler {
 	// Run Methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run (final Plan plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
+	public void run (final PlanImpl plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
 		handleSubTours(plan,subtours,subtour_idx);
 	}
 

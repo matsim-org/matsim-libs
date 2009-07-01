@@ -27,11 +27,11 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -51,10 +51,10 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 
   
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		
 		double rd = MatsimRandom.getRandom().nextDouble();
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
@@ -65,10 +65,10 @@ public class ModeAlgo extends AbstractPersonAlgorithm{
 		}
 	}
 	
-	public double calcDist (Person person) {
+	public double calcDist (PersonImpl person) {
 		
 		double dist=0;
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 		
 		for (int i=2; i<acts_legs.size(); i=i+2) {

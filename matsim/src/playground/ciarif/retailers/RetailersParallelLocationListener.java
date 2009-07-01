@@ -38,8 +38,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -49,6 +47,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -156,10 +156,10 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			int iter = controler.getIteration();
 			this.rs.write(this.retailers);
 			
-			for (Person p : controler.getPopulation().getPersons().values()) {
+			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
 				pst.run(p,iter);
 				//for (Plan plan : p.getPlans()) {
-				Plan plan = p.getSelectedPlan();
+				PlanImpl plan = p.getSelectedPlan();
 					// fc: is it not possible anymore to use only the selected plan? 
 					// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
 					boolean routeIt = false;
@@ -191,7 +191,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		}
 	}	
 	
-	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
+	private final QuadTree<PersonImpl> createPersonQuadTree(Controler controler) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -206,8 +206,8 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 
 		log.info("minx = " + minx + "; miny = " + miny + "; maxx = " + maxx + "; maxy =" + maxy );
-		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
-		for (Person p : controler.getPopulation().getPersons().values()) {
+		QuadTree<PersonImpl> personQuadTree = new QuadTree<PersonImpl>(minx, miny, maxx, maxy);
+		for (PersonImpl p : controler.getPopulation().getPersons().values()) {
 			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
 			personQuadTree.put(c.getX(),c.getY(),p);
 		}

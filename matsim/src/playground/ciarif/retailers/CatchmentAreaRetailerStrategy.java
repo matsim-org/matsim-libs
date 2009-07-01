@@ -7,10 +7,10 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
@@ -33,9 +33,9 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 			for (ActivityFacility f : facilities.values()) {
 				
 				// example of the use of a bad code style, but works anyway....
-				QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();
+				QuadTree<PersonImpl> personQuadTree = Utils.getPersonQuadTree();
 				if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
-				Collection<Person> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),100);
+				Collection<PersonImpl> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),100);
 				System.out.println(" Persons living around the facility " + f.getId() + " are: " + persons.toArray().length);
 				
 				

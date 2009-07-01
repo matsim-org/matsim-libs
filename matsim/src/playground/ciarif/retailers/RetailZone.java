@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class RetailZone {
@@ -16,12 +16,12 @@ public class RetailZone {
 	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	
 	private Id id;
-	private QuadTree<Person> personsQuadTree; // TODO Check if it does make more sense private, or if static does make sense at all  
+	private QuadTree<PersonImpl> personsQuadTree; // TODO Check if it does make more sense private, or if static does make sense at all  
 	private QuadTree<ActivityFacility> shopsQuadTree;
 	
 	public RetailZone(Id id,final Double minx,final Double miny,final Double maxx,final Double maxy) { 
 		this.id = id;
-		this.personsQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
+		this.personsQuadTree = new QuadTree<PersonImpl>(minx, miny, maxx, maxy);
 		this.shopsQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 	}
 
@@ -30,8 +30,8 @@ public class RetailZone {
 		return id;
 	}
 
-	public void addPersons(Collection<Person> persons) {
-		for (Person p : persons ) {
+	public void addPersons(Collection<PersonImpl> persons) {
+		for (PersonImpl p : persons ) {
 			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
 			double x1 = this.personsQuadTree.getMaxEasting();
 			double x2 = this.personsQuadTree.getMinEasting();
@@ -57,7 +57,7 @@ public class RetailZone {
 		}	
 	}
 	
-	public QuadTree<Person> getPersonsQuadTree (){
+	public QuadTree<PersonImpl> getPersonsQuadTree (){
 		return this.personsQuadTree;
 	}
 	

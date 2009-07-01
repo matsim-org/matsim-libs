@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -46,6 +45,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -129,7 +129,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				Gbl.errorMsg(e);
 			}
 		}
-		Collection<Person> persons = controler.getPopulation().getPersons().values();
+		Collection<PersonImpl> persons = controler.getPopulation().getPersons().values();
 		int n =3; // TODO: get this from the config file  
 		System.out.println("Number of retail zones = "+  n*n);
 		double minx = Double.POSITIVE_INFINITY;
@@ -144,7 +144,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			}
 			else {System.out.println ("Activity options are: " + f.getActivityOptions().values().toString());}
 		}
-		for (Person p : persons) {
+		for (PersonImpl p : persons) {
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() < miny) { miny = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() > maxx) { maxx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
@@ -202,11 +202,11 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 					zone_count++;
 					double counter = 0;
 					double prob = 0;
-					Collection<Person> persons = new ArrayList<Person> ();
+					Collection<PersonImpl> persons = new ArrayList<PersonImpl> ();
 					rz.getPersonsQuadTree().get(rz.getPersonsQuadTree().getMinEasting(),rz.getPersonsQuadTree().getMinNorthing(), rz.getPersonsQuadTree().getMaxEasting(), rz.getPersonsQuadTree().getMaxNorthing(), persons );
 					log.info("In the retail zone " + rz.getId() + " " + persons.size() + " persons are living");
 					//log.info("minx_x = " + rz.getPersonsQuadTree().getMinEasting() + ", min_y = " + rz.getPersonsQuadTree().getMinNorthing() + ", max_x = " + rz.getPersonsQuadTree().getMaxEasting() + ", max_y" + rz.getPersonsQuadTree().getMaxNorthing());
-					for (Person p:persons) {
+					for (PersonImpl p:persons) {
 						
 						if (first_shop) {
 							Consumer consumer = new Consumer (consumer_count, p, rz.getId());
