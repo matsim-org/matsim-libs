@@ -40,11 +40,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class GetAllLinks {
 	
@@ -58,44 +58,44 @@ public class GetAllLinks {
 		getLinks(n, links);
 	}
 	
-	public ArrayList<Link> getAllLinks(Person p)
+	public ArrayList<Link> getAllLinks(PersonImpl p)
 	{
 		return getLinks(p);
 	}
 	
-	public void getAllLinks(Person p, ArrayList<Link> links)
+	public void getAllLinks(PersonImpl p, ArrayList<Link> links)
 	{
 		getLinks(p, links);
 	}
 	
-	public ArrayList<Link> getAllLinks(Plan p)
+	public ArrayList<Link> getAllLinks(PlanImpl p)
 	{
 		return getLinks(p);
 	}
 	
-	public void getAllLinks(Plan p,  ArrayList<Link> links)
+	public void getAllLinks(PlanImpl p,  ArrayList<Link> links)
 	{
 		getLinks(p, links);
 	}
 	
 	
-	protected void getLinks(Person person, ArrayList<Link> links)
+	protected void getLinks(PersonImpl person, ArrayList<Link> links)
 	{
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		getLinks(plan, links);
 	}
 	
 	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der uebergebenen Person sind.
-	protected ArrayList<Link> getLinks(Person person)
+	protected ArrayList<Link> getLinks(PersonImpl person)
 	{
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 
 		return getLinks(plan);
 	} //getLinks(Person)
 	
 	
 	// Liefert eine ArrayList aller Links, die Teil uebergebenen Plans sind.
-	protected ArrayList<Link> getLinks(Plan plan)
+	protected ArrayList<Link> getLinks(PlanImpl plan)
 	{	
 		ArrayList<Link> links = new ArrayList<Link>();
 		getLinks(plan, links);
@@ -103,7 +103,7 @@ public class GetAllLinks {
 		return links;
 	}
 	
-	protected void getLinks(Plan plan, ArrayList<Link> links)
+	protected void getLinks(PlanImpl plan, ArrayList<Link> links)
 	{
 		// koennte kombiniert werden in eine for-schleife statt zwei
 

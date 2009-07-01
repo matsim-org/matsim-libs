@@ -37,12 +37,10 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -50,6 +48,8 @@ import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class BasicSimulation {
 	
@@ -77,11 +77,11 @@ public class BasicSimulation {
 	}
 
 	
-	protected void simulatePerson(Person person)
+	protected void simulatePerson(PersonImpl person)
 	{
 		log.info("Simulating Person " + person.getId());
 		
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 	
 		// Zufallsgenerator eindeutig mit der Id der Person initialisieren -> reproduzierbare Ergebnisse!
 		Random random = new Random( Long.valueOf(person.getId().toString()) ); // better use MatsimRandom
@@ -158,12 +158,12 @@ public class BasicSimulation {
 	
 	public final void run() 
 	{
-		Collection<Person> persons = plans.getPersons().values();
+		Collection<PersonImpl> persons = plans.getPersons().values();
 		Iterator personIterator = persons.iterator();
 		
 		while(personIterator.hasNext())
 		{
-			this.simulatePerson((Person)personIterator.next());
+			this.simulatePerson((PersonImpl)personIterator.next());
 		}
 
 		cleanupSim();

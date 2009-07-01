@@ -10,7 +10,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -19,6 +18,7 @@ import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
@@ -73,7 +73,7 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	{
 		// Act End Replanning Objects
 		ArrayList<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
-		ArrayList<Person> personsToReplanActEnd = new ArrayList<Person>();
+		ArrayList<PersonImpl> personsToReplanActEnd = new ArrayList<PersonImpl>();
 		ArrayList<ActivityImpl> fromActActEnd = new ArrayList<ActivityImpl>();
 		/*
 		 * Checking only Links that leed to active Nodes is not allowed here!
@@ -89,7 +89,7 @@ public class MyQueueSimEngine extends QueueSimEngine{
 		{
 			if (driverAgent.getDepartureTime() <= time) 
 			{
-				Person person = driverAgent.getPerson();
+				PersonImpl person = driverAgent.getPerson();
 				personsToReplanActEnd.add(person);
 				
 				PersonAgent pa = (PersonAgent) driverAgent;

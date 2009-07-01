@@ -22,15 +22,15 @@ package playground.christoph.mobsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.population.PersonImpl;
 
 public class MyPersonAgent extends PersonAgent{
 
 	private static final Logger log = Logger.getLogger(MyPersonAgent.class);
 
-	public MyPersonAgent(final Person p, final QueueSimulation simulation)
+	public MyPersonAgent(final PersonImpl p, final QueueSimulation simulation)
 	{
 		super(p, simulation);
 	}

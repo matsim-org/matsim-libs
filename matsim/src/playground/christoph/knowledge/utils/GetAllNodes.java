@@ -40,9 +40,9 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class GetAllNodes {
 
@@ -56,22 +56,22 @@ public class GetAllNodes {
 		getNodes(n, nodesMap);
 	}
 	
-	public Map<Id, Node> getAllNodes(Person p)
+	public Map<Id, Node> getAllNodes(PersonImpl p)
 	{
 		return getNodes(new GetAllLinks().getAllLinks(p));
 	}
 	
-	public void getAllNodes(Person p, Map<Id, Node> nodesMap)
+	public void getAllNodes(PersonImpl p, Map<Id, Node> nodesMap)
 	{
 		getNodes(new GetAllLinks().getAllLinks(p), nodesMap);
 	}
 	
-	public Map<Id, Node> getAllNodes(Plan p)
+	public Map<Id, Node> getAllNodes(PlanImpl p)
 	{
 		return getNodes(new GetAllLinks().getAllLinks(p));
 	}
 	
-	public void getAllNodes(Plan p, Map<Id, Node> nodesMap)
+	public void getAllNodes(PlanImpl p, Map<Id, Node> nodesMap)
 	{
 		getNodes(new GetAllLinks().getAllLinks(p), nodesMap);
 	}

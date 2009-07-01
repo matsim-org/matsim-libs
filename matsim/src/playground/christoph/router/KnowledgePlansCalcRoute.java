@@ -22,9 +22,9 @@ package playground.christoph.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -37,7 +37,7 @@ import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
 public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable{
 	
-	protected Person person;
+	protected PersonImpl person;
 	protected MyQueueNetwork myQueueNetwork;
 	protected double time;
 	protected PlansCalcRouteConfigGroup configGroup;
@@ -74,7 +74,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	/*
 	 * We have to hand over the person to the Cost- and TimeCalculators of the Router.
 	 */
-	public void setPerson(Person person)
+	public void setPerson(PersonImpl person)
 	{
 		this.person = person;
 		
@@ -89,7 +89,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		}
 	}
 	
-	public Person getPerson()
+	public PersonImpl getPerson()
 	{
 		return this.person;
 	}

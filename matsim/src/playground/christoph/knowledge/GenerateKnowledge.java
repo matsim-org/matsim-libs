@@ -27,11 +27,11 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.utils.GetAllLinks;
 
@@ -55,10 +55,10 @@ public class GenerateKnowledge {
 	// der Personen des aktuellen Objekts zu beschraenken.
 	protected void getPersons()
 	{
-		Iterator<Person> PersonIterator = population.getPersons().values().iterator();
+		Iterator<PersonImpl> PersonIterator = population.getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{
-			Person person = PersonIterator.next();
+			PersonImpl person = PersonIterator.next();
 			
 			ArrayList<Link> links = new GetAllLinks().getAllLinks(person);
 			
@@ -97,7 +97,7 @@ public class GenerateKnowledge {
 	
 	
 	// Beschraenkt die Kenntnis der Umgebung der uebergebenen Person.
-	protected void setKnowledge(Person person, ArrayList<Link> links)
+	protected void setKnowledge(PersonImpl person, ArrayList<Link> links)
 	{		
 		
 		ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getCustomAttributes().get("IncludedLinkIDs");

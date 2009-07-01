@@ -23,10 +23,11 @@ package playground.christoph.analysis;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;

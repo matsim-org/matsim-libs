@@ -21,28 +21,28 @@
 package playground.christoph.router.util;
 
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelCost;
 
 import playground.christoph.mobsim.MyQueueNetwork;
 
 public abstract class KnowledgeTravelCost implements TravelCost, Cloneable {
 
-	protected Person person;
+	protected PersonImpl person;
 	protected MyQueueNetwork myQueueNetwork;
 	
-	public double getLinkTravelCost(Link link, double time, Person person)
+	public double getLinkTravelCost(Link link, double time, PersonImpl person)
 	{
 		this.person = person;
 		return getLinkTravelCost(link, time);
 	}
 	
-	public void setPerson(Person person)
+	public void setPerson(PersonImpl person)
 	{
 		this.person = person;
 	}
 	
-	public Person getPerson()
+	public PersonImpl getPerson()
 	{
 		return this.person;
 	}

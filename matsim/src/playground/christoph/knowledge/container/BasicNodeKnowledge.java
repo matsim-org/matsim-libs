@@ -1,21 +1,21 @@
 package playground.christoph.knowledge.container;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 public abstract class BasicNodeKnowledge implements NodeKnowledge{
 
-	protected Person person;
+	protected PersonImpl person;
 	protected Network network;
 	
 	
-	public Person getPerson()
+	public PersonImpl getPerson()
 	{
 		return person;
 	}
 
 	
-	public void setPerson(Person person)
+	public void setPerson(PersonImpl person)
 	{
 		this.person = person;
 	}

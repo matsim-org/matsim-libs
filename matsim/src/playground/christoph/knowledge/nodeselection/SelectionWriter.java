@@ -26,10 +26,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
 import org.matsim.knowledges.Knowledge;
@@ -105,7 +105,7 @@ public class SelectionWriter extends Writer {
 		}
 	}
 
-	public final void writePerson(final Person p) 
+	public final void writePerson(final PersonImpl p) 
 	{
 		try 
 		{
@@ -154,11 +154,11 @@ public class SelectionWriter extends Writer {
 
 	public final void writePersons()
 	{
-		Iterator<Person> p_it = this.population.getPersons().values().iterator();
+		Iterator<PersonImpl> p_it = this.population.getPersons().values().iterator();
 		
 		while (p_it.hasNext()) 
 		{
-			Person p = p_it.next();
+			PersonImpl p = p_it.next();
 			writePerson(p);
 		}
 	}
@@ -232,7 +232,7 @@ public class SelectionWriter extends Writer {
 		// set how many places you want to the left of the decimal.
 		nf.setMinimumIntegerDigits(this.numDigits);
 */				
-		Iterator<Person> p_it = this.population.getPersons().values().iterator();
+		Iterator<PersonImpl> p_it = this.population.getPersons().values().iterator();
 		
 		while (p_it.hasNext()) 
 		{
@@ -243,7 +243,7 @@ public class SelectionWriter extends Writer {
 				log.info(this.outfile);
 				this.writeStartSelection(description);
 			}
-			Person p = p_it.next();
+			PersonImpl p = p_it.next();
 			writePerson(p);
 			
 			if ( ((i + 1) % n == 0) || !p_it.hasNext())

@@ -27,11 +27,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -101,7 +101,7 @@ public class ParallelCreateKnownNodesMap {
 		
 		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
 		int i = 0;
-		for (Person person : population.getPersons().values()) 
+		for (PersonImpl person : population.getPersons().values()) 
 		{
 			selectorThreads[i % numOfThreads].handlePerson(person);
 			i++;
@@ -146,7 +146,7 @@ public class ParallelCreateKnownNodesMap {
 		private final Network network;
 		private final ArrayList<SelectNodes> nodeSelectors;
 		private final SelectNodes[][] nodeSelectorArray;
-		private final List<Person> persons = new LinkedList<Person>();
+		private final List<PersonImpl> persons = new LinkedList<PersonImpl>();
 		
 		public SelectNodesThread(final int i, Network network, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
 		{
@@ -156,7 +156,7 @@ public class ParallelCreateKnownNodesMap {
 			this.nodeSelectors = nodeSelectors;
 		}
 
-		public void handlePerson(final Person person)
+		public void handlePerson(final PersonImpl person)
 		{
 			this.persons.add(person);
 		}
@@ -165,7 +165,7 @@ public class ParallelCreateKnownNodesMap {
 		{
 			int numRuns = 0;
 			
-			for (Person person : this.persons)
+			for (PersonImpl person : this.persons)
 			{	
 				/* 
 				 * If person has no Knowledge create at least the knowledge structure to

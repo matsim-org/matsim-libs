@@ -25,9 +25,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -46,7 +47,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	 * @param population
 	 * @param time
 	 */	
-	public static void run(ArrayList<Person> persons, double time)
+	public static void run(ArrayList<PersonImpl> persons, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -64,7 +65,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		
 		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
 		int i = 0;
-		for (Person person : persons)
+		for (PersonImpl person : persons)
 		{
 			replannerThreads[i % numOfThreads].handlePerson(person);
 			i++;
@@ -92,9 +93,9 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	
 	public static void run(Population population, double time)
 	{
-		ArrayList<Person> persons = new ArrayList<Person>();
+		ArrayList<PersonImpl> persons = new ArrayList<PersonImpl>();
 		
-		for(Person person : population.getPersons().values())
+		for(PersonImpl person : population.getPersons().values())
 		{
 			persons.add(person);
 		}
@@ -118,7 +119,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		private double time = 0.0;
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
-		private final List<Person> persons = new LinkedList<Person>();
+		private final List<PersonImpl> persons = new LinkedList<PersonImpl>();
 
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
 		{
@@ -133,7 +134,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 			removeKnowledge = value;
 		}
 		
-		public void handlePerson(final Person person)
+		public void handlePerson(final PersonImpl person)
 		{
 			this.persons.add(person);
 		}
@@ -142,7 +143,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		{
 			int numRuns = 0;
 			
-			for (Person person : this.persons)
+			for (PersonImpl person : this.persons)
 			{	
 				// replanner of the person
 				PlanAlgorithm replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");

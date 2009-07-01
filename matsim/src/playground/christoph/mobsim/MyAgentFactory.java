@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.christoph.mobsim;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.population.PersonImpl;
 
 public class MyAgentFactory extends AgentFactory {
 
@@ -31,7 +31,7 @@ public class MyAgentFactory extends AgentFactory {
 	}
 
 	@Override
-	public PersonAgent createPersonAgent(final Person p)
+	public PersonAgent createPersonAgent(final PersonImpl p)
 	{
 		MyPersonAgent agent = new MyPersonAgent(p, this.simulation);
 		return agent;

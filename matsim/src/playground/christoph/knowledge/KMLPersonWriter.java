@@ -41,12 +41,12 @@ import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.vis.kml.KMZWriter;
@@ -61,7 +61,7 @@ public class KMLPersonWriter {
 	protected String netFileName;
 	protected String kmzFileName;
 	protected String outputDirectory;
-	protected Person person;
+	protected PersonImpl person;
 	protected ArrayList<Link> activityLinks;
 	protected ArrayList<Node> routeNodes;
 	protected NetworkLayer network;
@@ -80,7 +80,7 @@ public class KMLPersonWriter {
 	private StyleType networkNodeStyle;
 	private CoordinateTransformation coordinateTransform = new IdentityTransformation();
 	
-	public KMLPersonWriter(NetworkLayer network, Person person)
+	public KMLPersonWriter(NetworkLayer network, PersonImpl person)
 	{
 //		kmzFileName = "D:/Master_Thesis_HLI/Workspace/TestNetz/test.kmz";
 		setNetwork(network);
@@ -290,7 +290,7 @@ public class KMLPersonWriter {
 		
 		if (this.person != null)
 		{
-			Plan selectedPlan = this.person.getSelectedPlan();
+			PlanImpl selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null)
 			{
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
@@ -323,7 +323,7 @@ public class KMLPersonWriter {
 		
 		if (this.person != null)
 		{
-			Plan selectedPlan = this.person.getSelectedPlan();
+			PlanImpl selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null)
 			{
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
@@ -425,7 +425,7 @@ public class KMLPersonWriter {
 		return this.outputDirectory;
 	}
 	
-	public void setPerson(Person person)
+	public void setPerson(PersonImpl person)
 	{
 		this.person = person;
 		
@@ -441,7 +441,7 @@ public class KMLPersonWriter {
 		}
 	}
 	
-	public Person getPerson()
+	public PersonImpl getPerson()
 	{
 		return this.person;
 	}

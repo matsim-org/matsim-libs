@@ -27,12 +27,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -46,13 +46,13 @@ public class CreateKnownNodesMap {
 	
 	public static void collectAllSelectedNodes(Population population, Network network)
 	{
-		for (Person person : population.getPersons().values()) 
+		for (PersonImpl person : population.getPersons().values()) 
 		{
 			collectAllSelectedNodes(person, network);
 		}
 	}
 	
-	private static void collectAllSelectedNodes(Person person, Network network)
+	private static void collectAllSelectedNodes(PersonImpl person, Network network)
 	{					
 		ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)person.getCustomAttributes().get("NodeSelectors");
 		
@@ -69,9 +69,9 @@ public class CreateKnownNodesMap {
 	 * The handling of the nodeSelectors should probably be outsourced...
 	 * Implementing them direct in the nodeSelectors could be a good solution...
 	 */
-	public static void collectSelectedNodes(Person p, Network network, SelectNodes nodeSelector)
+	public static void collectSelectedNodes(PersonImpl p, Network network, SelectNodes nodeSelector)
 	{		
-		Plan plan = p.getSelectedPlan();
+		PlanImpl plan = p.getSelectedPlan();
 		
 		// get Nodes from the Person's Knowledge
 		Map<Id, Node> nodesMap = null;

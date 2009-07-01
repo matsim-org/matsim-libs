@@ -23,13 +23,13 @@ package playground.christoph.events.algorithms;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -48,7 +48,7 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
 public class ActEndReplanner implements ActivityEndEventHandler {
 	
 	protected PlanAlgorithm replanner;
-	protected Person person;
+	protected PersonImpl person;
 	protected ActivityImpl fromAct;
 	protected LegImpl betweenLeg;
 	protected ActivityImpl toAct;
@@ -64,7 +64,7 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 		this.time = time;
 		this.replanner = replanner;
 
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		this.betweenLeg = plan.getNextLeg(fromAct);
 	
 		if(betweenLeg != null)
@@ -85,14 +85,14 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 	}
 	
 	// used when starting the Replanner "by hand"
-	public ActEndReplanner(ActivityImpl fromAct, Person person, double time, PlanAlgorithm replanner)
+	public ActEndReplanner(ActivityImpl fromAct, PersonImpl person, double time, PlanAlgorithm replanner)
 	{
 		this.fromAct = fromAct;
 		this.person = person;
 		this.time = time;
 		this.replanner = replanner;
 
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		this.betweenLeg = plan.getNextLeg(fromAct);
 	
 		if(betweenLeg != null)
@@ -129,7 +129,7 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 			this.person = event.getPerson();
 			this.fromAct = event.getAct();
 			
-			Plan plan = person.getSelectedPlan();
+			PlanImpl plan = person.getSelectedPlan();
 			this.betweenLeg = plan.getNextLeg(fromAct);
 			
 			if(betweenLeg != null)
@@ -184,12 +184,12 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 //		fromAct.setEndTime(time);
 		
 		// save currently selected plan
-		Plan currentPlan = person.getSelectedPlan();
+		PlanImpl currentPlan = person.getSelectedPlan();
 		
 		// Create new Plan and select it.
 		// This Plan contains only the just ended and the next Activity.
 		// -> That's the only Part of the Route that we want to replan.
-		Plan newPlan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl newPlan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(newPlan);
 		person.setSelectedPlan(newPlan);
 		

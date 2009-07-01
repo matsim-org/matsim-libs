@@ -31,12 +31,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.Knowledge;
@@ -67,7 +67,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	
 	protected Population population;
 	protected NetworkLayer network;
-	protected Person person;
+	protected PersonImpl person;
 	protected Knowledge currentKnowledge;
 	protected Map<Id, Node> currentNodes;
 	protected Map<Id, Link> currentLinks;

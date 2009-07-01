@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /*
  * Removes Dead Ends from the Activity Maps in the Knowledge of a Person.
@@ -41,7 +41,7 @@ public class DeadEndRemover {
 
 	private final static Logger log = Logger.getLogger(DeadEndRemover.class);
 	
-	public static void removeDeadEnds(Person person)
+	public static void removeDeadEnds(PersonImpl person)
 	{
 		Map<Id, Node> knownNodesMap;
 		
@@ -138,11 +138,11 @@ public class DeadEndRemover {
 	 * Returns a Map with the Start- and Endnodes of the Activities of the selected Plan of a Person.
 	 */
 	//public static ArrayList<Node> getActivityNodes(Person person)
-	public static Map<Id, Node> getActivityNodesMap(Person person)
+	public static Map<Id, Node> getActivityNodesMap(PersonImpl person)
 	{
 		Map<Id, Node> activityNodesMap = new HashMap<Id, Node>();
 		
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {

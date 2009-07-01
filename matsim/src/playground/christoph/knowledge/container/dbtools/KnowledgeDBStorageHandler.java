@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.container.DBStorage;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -17,7 +17,7 @@ import playground.christoph.router.util.KnowledgeTools;
  */
 public class KnowledgeDBStorageHandler extends Thread implements BasicActivityStartEventHandler{
 
-	LinkedList<Person> personsToProcess = new LinkedList<Person>();
+	LinkedList<PersonImpl> personsToProcess = new LinkedList<PersonImpl>();
 
 	private boolean stopHandler = false;
 	private boolean running = false;
@@ -47,7 +47,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		}
 	}
 	
-	public void addPerson(Person person)
+	public void addPerson(PersonImpl person)
 	{
 		personsToProcess.add(person);
 		
@@ -60,7 +60,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		
 		while ((personsToProcess.peek() != null) && !stopHandler)
 		{
-			Person person = personsToProcess.poll();
+			PersonImpl person = personsToProcess.poll();
 			
 			NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
 			
@@ -92,7 +92,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 	
 	public void handleEvent(BasicActivityStartEvent event)
 	{
-		Person person = population.getPersons().get(event.getPersonId());
+		PersonImpl person = population.getPersons().get(event.getPersonId());
 		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
 		
 		if (nodeKnowledge instanceof DBStorage)

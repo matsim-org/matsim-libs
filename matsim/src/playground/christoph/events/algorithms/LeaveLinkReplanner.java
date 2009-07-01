@@ -27,14 +27,14 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -68,9 +68,9 @@ public class LeaveLinkReplanner {
 	protected LegImpl leg;
 	protected double time;
 	protected PersonAgent personAgent;
-	protected Person person;
+	protected PersonImpl person;
 	protected Node node;
-	protected Plan plan;
+	protected PlanImpl plan;
 	protected QueueNode queueNode;
 	protected QueueVehicle vehicle;
 	
@@ -109,7 +109,7 @@ public class LeaveLinkReplanner {
 
 	protected void init()
 	{
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 
 		leg = personAgent.getCurrentLeg();
 
@@ -190,10 +190,10 @@ public class LeaveLinkReplanner {
 		newLeg.setRoute(subRoute);
 		
 		// currently selected Plan
-		Plan currentPlan = person.getSelectedPlan();
+		PlanImpl currentPlan = person.getSelectedPlan();
 		
 		// create new plan and select it
-		Plan newPlan = new PlanImpl(person);
+		PlanImpl newPlan = new PlanImpl(person);
 		person.addPlan(newPlan);
 		person.setSelectedPlan(newPlan);
 			

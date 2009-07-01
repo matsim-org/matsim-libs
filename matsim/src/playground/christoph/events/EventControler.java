@@ -26,14 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Person;
+
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -358,7 +359,7 @@ public class EventControler extends Controler{
 		actEndReplanningCounter = 0;
 		leaveLinkReplanningCounter = 0;
 		
-		for(Person person : this.getPopulation().getPersons().values())
+		for(PersonImpl person : this.getPopulation().getPersons().values())
 		{
 			// get Person's Custom Attributes
 			Map<String,Object> customAttributes = person.getCustomAttributes();
@@ -469,10 +470,10 @@ public class EventControler extends Controler{
 	 */
 	protected void setReplanners()
 	{
-		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
+		Iterator<PersonImpl> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{
-			Person p = PersonIterator.next();
+			PersonImpl p = PersonIterator.next();
 		
 			Map<String,Object> customAttributes = p.getCustomAttributes();
 //			customAttributes.put("Replanner", replanners.get(1));	// Random
@@ -499,10 +500,10 @@ public class EventControler extends Controler{
 	protected void setNodeSelectors()
 	{		
 		// Create NodeSelectorContainer
-		Iterator<Person> PersonIterator = this.getPopulation().getPersons().values().iterator();
+		Iterator<PersonImpl> PersonIterator = this.getPopulation().getPersons().values().iterator();
 		while (PersonIterator.hasNext())
 		{	
-			Person p = PersonIterator.next();
+			PersonImpl p = PersonIterator.next();
 		
 			Map<String,Object> customAttributes = p.getCustomAttributes();
 			
@@ -517,7 +518,7 @@ public class EventControler extends Controler{
 		while (PersonIterator.hasNext())
 		{	
 			counter++;
-			Person p = PersonIterator.next();
+			PersonImpl p = PersonIterator.next();
 			
 			Map<String,Object> customAttributes = p.getCustomAttributes();
 			
@@ -586,7 +587,7 @@ public class EventControler extends Controler{
 		
 	protected void setKnowledgeStorageHandler()
 	{
-		for(Person person : this.getPopulation().getPersons().values())
+		for(PersonImpl person : this.getPopulation().getPersons().values())
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 /*			
@@ -618,9 +619,9 @@ public class EventControler extends Controler{
 	
 	protected void doInitialReplanning()
 	{
-		ArrayList<Person> personsToReplan = new ArrayList<Person>();
+		ArrayList<PersonImpl> personsToReplan = new ArrayList<PersonImpl>();
 		
-		for (Person person : this.getPopulation().getPersons().values())
+		for (PersonImpl person : this.getPopulation().getPersons().values())
 		{
 			boolean replanning = (Boolean)person.getCustomAttributes().get("initialReplanning");
 			
@@ -661,13 +662,13 @@ public class EventControler extends Controler{
 	// removes all plans, that are currently not selectedS
 	protected void clearPlans()
 	{
-		for (Person person : this.getPopulation().getPersons().values())
+		for (PersonImpl person : this.getPopulation().getPersons().values())
 		{
 			person.removeUnselectedPlans();
 		}
 	}
 	
-	protected void writePersonKML(Person person)
+	protected void writePersonKML(PersonImpl person)
 	{
 		KMLPersonWriter test = new KMLPersonWriter(network, person);
 		

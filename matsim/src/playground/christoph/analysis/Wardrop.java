@@ -32,19 +32,19 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.basic.v01.BasicRouteImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -167,9 +167,9 @@ public class Wardrop {
 	
 	public void fillMatrixFromPlans()
 	{		
-		for (Person person : population.getPersons().values()) 
+		for (PersonImpl person : population.getPersons().values()) 
 		{
-			Plan plan = person.getSelectedPlan();
+			PlanImpl plan = person.getSelectedPlan();
 			
 			ArrayList<BasicActivity> acts = new ArrayList<BasicActivity>();
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -312,7 +312,7 @@ public class Wardrop {
 		
 		if (actTimesCollector != null)
 		{
-			for(Person person:this.population.getPersons().values())
+			for(PersonImpl person:this.population.getPersons().values())
 			{
 				Id id = person.getId();
 				ArrayList<Double> startTimes = (ArrayList<Double>) actTimesCollector.getStartTimes(id);
@@ -595,9 +595,9 @@ public class Wardrop {
 		int legCounter = 0;
 		int PersonCounter = 0;
 		
-		for (Person person : population.getPersons().values()) 
+		for (PersonImpl person : population.getPersons().values()) 
 		{
-			Plan plan = person.getSelectedPlan();
+			PlanImpl plan = person.getSelectedPlan();
 						
 			ArrayList<BasicLegImpl> legs = new ArrayList<BasicLegImpl>();
 

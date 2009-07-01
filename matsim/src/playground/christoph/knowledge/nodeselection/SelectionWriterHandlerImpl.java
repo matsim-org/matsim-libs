@@ -29,8 +29,8 @@ import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.ActivitySpaceBean;
@@ -63,7 +63,7 @@ public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPerson(final Person person, final BufferedWriter out) throws IOException 
+	public void startPerson(final PersonImpl person, final BufferedWriter out) throws IOException 
 	{
 		out.write("\t<person");
 		out.write(" id=\"" + person.getId() + "\"");

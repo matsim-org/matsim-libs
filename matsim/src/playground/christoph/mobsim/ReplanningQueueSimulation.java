@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;

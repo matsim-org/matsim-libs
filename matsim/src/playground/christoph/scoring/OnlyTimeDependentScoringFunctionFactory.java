@@ -20,7 +20,7 @@
 
 package playground.christoph.scoring;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -30,7 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class OnlyTimeDependentScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	public ScoringFunction getNewScoringFunction(Plan plan) 
+	public ScoringFunction getNewScoringFunction(PlanImpl plan) 
 	{
 		return new OnlyTimeDependentScoringFunction(plan);
 	}

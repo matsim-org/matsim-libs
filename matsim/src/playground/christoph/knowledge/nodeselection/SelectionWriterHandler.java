@@ -27,7 +27,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.WriterHandler;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -45,7 +45,7 @@ public interface SelectionWriterHandler extends WriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPerson(final Person person, final BufferedWriter out) throws IOException;
+	public void startPerson(final PersonImpl person, final BufferedWriter out) throws IOException;
 
 	public void endPerson(final BufferedWriter out) throws IOException;
 	

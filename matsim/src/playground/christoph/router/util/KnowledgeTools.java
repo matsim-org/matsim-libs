@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 
@@ -42,7 +42,7 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static Map<Id, Node> getKnownNodes(Person person)
+	public static Map<Id, Node> getKnownNodes(PersonImpl person)
 	{
 		Map<Id, Node> knownNodesMap = null;
 		
@@ -73,7 +73,7 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static NodeKnowledge getNodeKnowledge(Person person)
+	public static NodeKnowledge getNodeKnowledge(PersonImpl person)
 	{
 		NodeKnowledge nodeKnowledge = null;
 		
@@ -152,7 +152,7 @@ public class KnowledgeTools {
 	 * doing their routing. An Example would be a Random Router that does only an
 	 * initial planning before starting the mobsim.
 	 */ 
-	public static void removeKnowledge(Person person)
+	public static void removeKnowledge(PersonImpl person)
 	{
 		Map<Id, Node> knownNodesMap = null;
 		
