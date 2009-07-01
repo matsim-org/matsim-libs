@@ -20,8 +20,8 @@
 
 package tutorial.example2;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;

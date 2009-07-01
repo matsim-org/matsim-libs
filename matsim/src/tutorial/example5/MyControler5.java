@@ -20,8 +20,8 @@
 
 package tutorial.example5;
 
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioLoader;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
