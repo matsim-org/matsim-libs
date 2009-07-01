@@ -33,6 +33,11 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
+/**
+ * Writes a transit schedule to a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
+ * 
+ * @author mrieser
+ */
 public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 
 	private static final String TRANSIT_STOPS = "transitStops";

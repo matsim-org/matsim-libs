@@ -31,6 +31,11 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.transitSchedule.TransitStopFacility;
 
+/**
+ * Describes a route of a transit line, including its stops and the departures along this route.
+ * 
+ * @author mrieser
+ */
 public class TransitRoute {
 
 	private final Id routeId;

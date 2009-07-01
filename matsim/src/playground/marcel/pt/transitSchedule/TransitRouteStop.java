@@ -22,6 +22,12 @@ package playground.marcel.pt.transitSchedule;
 
 import org.matsim.transitSchedule.TransitStopFacility;
 
+/**
+ * Describes the stop within a route of a transit line. Specifies also at
+ * what time a headway is expected at the stop as offset from the route start.
+ * 
+ * @author mrieser
+ */
 public class TransitRouteStop {
 
 	private final TransitStopFacility stop;

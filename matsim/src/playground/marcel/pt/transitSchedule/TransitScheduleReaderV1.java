@@ -42,6 +42,11 @@ import org.matsim.transitSchedule.TransitStopFacility;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+/**
+ * Reads a transit schedule from a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
+ * 
+ * @author mrieser
+ */
 public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private static final String STOP_FACILITY = "stopFacility";

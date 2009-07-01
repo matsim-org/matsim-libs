@@ -26,7 +26,7 @@ import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.network.Link;
 
 /**
- * A facility describing a public transport stop.
+ * A facility (infrastructure) describing a public transport stop.
  *
  * @author mrieser
  */

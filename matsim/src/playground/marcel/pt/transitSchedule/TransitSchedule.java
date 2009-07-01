@@ -27,6 +27,11 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.transitSchedule.TransitStopFacility;
 
+/**
+ * 
+ * 
+ * @author mrieser
+ */
 public class TransitSchedule {
 
 	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();

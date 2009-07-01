@@ -50,6 +50,12 @@ import org.xml.sax.SAXException;
 
 import playground.marcel.SoldnerBerlinToWGS84;
 
+/**
+ * Reads transit schedule information from BERTA XML files once used 
+ * by the Berlin Transport Company.
+ * 
+ * @author mrieser
+ */
 public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(TransitScheduleReaderBerta.class);

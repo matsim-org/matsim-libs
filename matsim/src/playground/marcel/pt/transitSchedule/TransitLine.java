@@ -26,6 +26,11 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 
+/**
+ * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
+ * 
+ * @author mrieser
+ */
 public class TransitLine {
 
 	private final Id lineId;
