@@ -6,8 +6,8 @@ package playground.yu.analysis;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 
 /**

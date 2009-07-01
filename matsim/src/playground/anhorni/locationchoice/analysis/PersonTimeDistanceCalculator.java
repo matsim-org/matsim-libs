@@ -1,7 +1,7 @@
 package playground.anhorni.locationchoice.analysis;
 
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 
 /*

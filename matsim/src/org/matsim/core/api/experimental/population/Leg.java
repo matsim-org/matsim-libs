@@ -21,7 +21,6 @@
 package org.matsim.core.api.experimental.population;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.api.population.Route;
 
 public interface Leg extends BasicLeg, PlanElement {

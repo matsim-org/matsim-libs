@@ -19,9 +19,9 @@
 
 package playground.ciarif.retailers;
 
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;

@@ -20,8 +20,8 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 

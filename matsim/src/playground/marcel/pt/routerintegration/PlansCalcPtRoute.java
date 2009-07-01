@@ -25,9 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;

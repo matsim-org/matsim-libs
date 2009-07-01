@@ -21,9 +21,9 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;

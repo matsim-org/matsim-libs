@@ -21,8 +21,8 @@
 
 package org.matsim.analysis;
 
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 
 public class PlanLegsTravelDistanceCalculator {
