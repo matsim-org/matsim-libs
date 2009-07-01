@@ -26,14 +26,12 @@ import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
 
 public class MockAgent implements DriverAgent, PassengerAgent {
 
@@ -85,7 +83,7 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 		return stop == exitStop;
 	}
 
-	public boolean ptLineAvailable(final TransitLineImpl line) {
+	public boolean ptLineAvailable(final TransitLine line) {
 		return true;
 	}
 

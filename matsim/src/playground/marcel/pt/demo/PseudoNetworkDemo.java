@@ -47,6 +47,7 @@ import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
 import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.marcel.pt.tryout.CreatePseudoNetwork;
 
 public class PseudoNetworkDemo {
@@ -83,7 +84,7 @@ public class PseudoNetworkDemo {
 			}
 		}
 		
-		TransitScheduleImpl schedule = new TransitScheduleImpl();
+		TransitSchedule schedule = new TransitScheduleImpl();
 		try {
 			new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 		} catch (SAXException e1) {

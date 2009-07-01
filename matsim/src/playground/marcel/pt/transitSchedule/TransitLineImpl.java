@@ -26,15 +26,18 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+
 /**
  * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
  * 
  * @author mrieser
  */
-public class TransitLineImpl {
+public class TransitLineImpl implements TransitLine {
 
 	private final Id lineId;
-	private final Map<Id, TransitRouteImpl> transitRoutes = new LinkedHashMap<Id, TransitRouteImpl>();
+	private final Map<Id, TransitRoute> transitRoutes = new LinkedHashMap<Id, TransitRoute>();
 
 	public TransitLineImpl(final Id id) {
 		this.lineId = id;
@@ -44,7 +47,7 @@ public class TransitLineImpl {
 		return this.lineId;
 	}
 
-	public void addRoute(final TransitRouteImpl transitRoute) {
+	public void addRoute(final TransitRoute transitRoute) {
 		final Id id = transitRoute.getId();
 		if (this.transitRoutes.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit route with id " + id.toString());
@@ -52,11 +55,11 @@ public class TransitLineImpl {
 		this.transitRoutes.put(id, transitRoute);
 	}
 
-	public Map<Id, TransitRouteImpl> getRoutes() {
+	public Map<Id, TransitRoute> getRoutes() {
 		return Collections.unmodifiableMap(this.transitRoutes);
 	}
 
-	public void removeRoute(final TransitRouteImpl route) {
+	public void removeRoute(final TransitRoute route) {
 		this.transitRoutes.remove(route.getId());
 	}
 

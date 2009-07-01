@@ -31,21 +31,25 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.transitSchedule.TransitStopFacility;
 
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+
 /**
  * Describes a route of a transit line, including its stops and the departures along this route.
  * 
  * @author mrieser
  */
-public class TransitRouteImpl {
+public class TransitRouteImpl implements TransitRoute {
 
 	private final Id routeId;
 	private NetworkRoute route;
-	private final List<TransitRouteStopImpl> stops = new ArrayList<TransitRouteStopImpl>();
+	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 	private String description = null;
-	private final Map<Id, DepartureImpl> departures = new HashMap<Id, DepartureImpl>();
+	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
 	private TransportMode transportMode;
 
-	public TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStopImpl> stops, final TransportMode mode) {
+	public TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
 		this.routeId = id;
 		this.route = route;
 		this.stops.addAll(stops);
@@ -78,7 +82,7 @@ public class TransitRouteImpl {
 		return this.transportMode;
 	}
 
-	public void addDeparture(final DepartureImpl departure) {
+	public void addDeparture(final Departure departure) {
 		final Id id = departure.getId();
 		if (this.departures.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a departure with id " + id.toString());
@@ -86,7 +90,7 @@ public class TransitRouteImpl {
 		this.departures.put(id, departure);
 	}
 
-	public Map<Id, DepartureImpl> getDepartures() {
+	public Map<Id, Departure> getDepartures() {
 		return Collections.unmodifiableMap(this.departures);
 	}
 
@@ -98,15 +102,15 @@ public class TransitRouteImpl {
 		this.route = route;
 	}
 
-	public List<TransitRouteStopImpl> getStops() {
+	public List<TransitRouteStop> getStops() {
 		if (this.stops == null) {
-			return Collections.unmodifiableList(new ArrayList<TransitRouteStopImpl>(0));
+			return Collections.unmodifiableList(new ArrayList<TransitRouteStop>(0));
 		}
 		return Collections.unmodifiableList(this.stops);
 	}
 
-	public TransitRouteStopImpl getStop(final TransitStopFacility stop) {
-		for (TransitRouteStopImpl trStop : this.stops) {
+	public TransitRouteStop getStop(final TransitStopFacility stop) {
+		for (TransitRouteStop trStop : this.stops) {
 			if (stop == trStop.getStopFacility()) {
 				return trStop;
 			}

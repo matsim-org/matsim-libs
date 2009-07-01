@@ -1,27 +1,25 @@
 package playground.mohit;
 
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
- 
 
 import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 public class Visum2TransitSchedule {
 	
 	private final VisumNetwork visum;
-	private final TransitScheduleImpl schedule;
+	private final TransitSchedule schedule;
 	
-	public Visum2TransitSchedule(VisumNetwork visum, TransitScheduleImpl schedule) {
+	public Visum2TransitSchedule(VisumNetwork visum, TransitSchedule schedule) {
 		this.visum = visum;
 		this.schedule = schedule;
 	}
@@ -56,20 +54,20 @@ public class Visum2TransitSchedule {
 		}
 		// 2nd step: convert lines
 		for (VisumNetwork.TransitLine line : this.visum.lines.values()){
-			playground.marcel.pt.transitSchedule.TransitLineImpl tLine = new playground.marcel.pt.transitSchedule.TransitLineImpl(line.id);
+			playground.marcel.pt.transitSchedule.api.TransitLine tLine = new playground.marcel.pt.transitSchedule.TransitLineImpl(line.id);
 			
 			for (VisumNetwork.TimeProfile timeProfile : this.visum.timeProfiles.values()){
 				// convert line routes
 			   if (timeProfile.lineName.compareTo(line.id) == 0 ){
-				  List<TransitRouteStopImpl> stops = new ArrayList<TransitRouteStopImpl>();
+				  List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 				  //  convert route profile
 				  for (VisumNetwork.TimeProfileItem tpi : this.visum.timeProfileItems.values()){
 					 if (tpi.lineName.compareTo(line.id.toString()) == 0 && tpi.lineRouteName.compareTo(timeProfile.lineRouteName.toString()) == 0 && tpi.timeProfileName.compareTo(timeProfile.index.toString())==0){
-				       TransitRouteStopImpl s = new TransitRouteStopImpl(stopFacilities.get(visum.lineRouteItems.get(line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.DCode).stopPointNo),this.toDouble(tpi.arr),this.toDouble(tpi.dep));
+				       TransitRouteStop s = new TransitRouteStopImpl(stopFacilities.get(visum.lineRouteItems.get(line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.DCode).stopPointNo),this.toDouble(tpi.arr),this.toDouble(tpi.dep));
 				       stops.add(s);
 				     }
 				  }
-				  playground.marcel.pt.transitSchedule.TransitRouteImpl tRoute = new playground.marcel.pt.transitSchedule.TransitRouteImpl(new IdImpl(timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+timeProfile.DCode.toString()),null,stops,this.visum.transportModes.get(line.tCode));
+				  playground.marcel.pt.transitSchedule.api.TransitRoute tRoute = new playground.marcel.pt.transitSchedule.TransitRouteImpl(new IdImpl(timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+timeProfile.DCode.toString()),null,stops,this.visum.transportModes.get(line.tCode));
 				  //  convert departures
 				  for (VisumNetwork.Departure d : this.visum.departures.values()){
 					if (d.lineName.compareTo(line.id.toString())== 0 && d.lineRouteName.compareTo(timeProfile.lineRouteName.toString())== 0 && d.TRI.compareTo(timeProfile.index.toString())==0){

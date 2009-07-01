@@ -42,6 +42,12 @@ import org.matsim.transitSchedule.TransitStopFacility;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+
 /**
  * Reads a transit schedule from a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
  * 
@@ -66,14 +72,14 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private static final String ARRIVAL_OFFSET = "arrivalOffset";
 	private static final String DEPARTURE_OFFSET = "departureOffset";
 
-	private final TransitScheduleImpl schedule;
+	private final TransitSchedule schedule;
 	private final Network network;
 
-	private TransitLineImpl currentTransitLine = null;
+	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
-	public TransitScheduleReaderV1(final TransitScheduleImpl schedule, final Network network) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
 		this.schedule = schedule;
 		this.network = network;
 	}
@@ -104,7 +110,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			this.currentTransitRoute = new TempTransitRoute(id);
 		} else if (DEPARTURE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(ID));
-			DepartureImpl departure = new DepartureImpl(id, Time.parseTime(atts.getValue("departureTime")));
+			Departure departure = new DepartureImpl(id, Time.parseTime(atts.getValue("departureTime")));
 			this.currentTransitRoute.departures.put(id, departure);
 		} else if (ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRoute();
@@ -140,7 +146,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (TRANSPORT_MODE.equals(name)) {
 			this.currentTransitRoute.mode = TransportMode.valueOf(content);
 		} else if (TRANSIT_ROUTE.equals(name)) {
-			List<TransitRouteStopImpl> stops = new ArrayList<TransitRouteStopImpl>(this.currentTransitRoute.stops.size());
+			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentTransitRoute.stops.size());
 			for (TempStop tStop : this.currentTransitRoute.stops) {
 				stops.add(new TransitRouteStopImpl(tStop.stop, tStop.arrival, tStop.departure));
 			}
@@ -149,9 +155,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 				route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
 				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
 			}
-			TransitRouteImpl transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
+			TransitRoute transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
 			transitRoute.setDescription(this.currentTransitRoute.description);
-			for (DepartureImpl departure : this.currentTransitRoute.departures.values()) {
+			for (Departure departure : this.currentTransitRoute.departures.values()) {
 				transitRoute.addDeparture(departure);
 			}
 			this.currentTransitLine.addRoute(transitRoute);
@@ -161,7 +167,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private static class TempTransitRoute {
 		protected final Id id;
 		protected String description = null;
-		protected Map<Id, DepartureImpl> departures = new LinkedHashMap<Id, DepartureImpl>();
+		protected Map<Id, Departure> departures = new LinkedHashMap<Id, Departure>();
 		/*package*/ List<TempStop> stops = new ArrayList<TempStop>();
 		/*package*/ TransportMode mode = null;
 

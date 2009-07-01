@@ -25,31 +25,31 @@ import java.util.Collection;
 
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 public class CreateTimetableForStop {
 
-	private final TransitLineImpl line;
+	private final TransitLine line;
 
-	public CreateTimetableForStop(final TransitLineImpl line) {
+	public CreateTimetableForStop(final TransitLine line) {
 		this.line = line;
 	}
 
 	public double[] getDeparturesAtStop(final TransitStopFacility stop) {
 		int numOfDepartures = 0;
-		Collection<TransitRouteImpl> routes = this.line.getRoutes().values();
-		for (TransitRouteImpl route : routes) {
+		Collection<TransitRoute> routes = this.line.getRoutes().values();
+		for (TransitRoute route : routes) {
 			numOfDepartures += route.getDepartures().size();
 		}
 		double[] departures = new double[numOfDepartures];
 		int index = 0;
-		for (TransitRouteImpl route : routes) {
-			TransitRouteStopImpl trStop = route.getStop(stop);
+		for (TransitRoute route : routes) {
+			TransitRouteStop trStop = route.getStop(stop);
 			double delay = trStop.getDepartureDelay();
-			for (DepartureImpl dep : route.getDepartures().values()) {
+			for (Departure dep : route.getDepartures().values()) {
 				departures[index] = dep.getDepartureTime() + delay;
 				index++;
 			}

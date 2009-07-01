@@ -14,6 +14,7 @@ import org.matsim.api.basic.v01.Id;
 //import playground.marcel.visum.VisumNetwork.Stop;
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mohit.VisumNetwork.LineRouteItem;
 import playground.mohit.VisumNetwork.Stop;
@@ -76,7 +77,7 @@ public class MyMain {
 			
 		}
 		
-		TransitScheduleImpl schedule = new TransitScheduleImpl();
+		TransitSchedule schedule = new TransitScheduleImpl();
 		new Visum2TransitSchedule(vNetwork, schedule).convert();
 		
 		try {

@@ -22,13 +22,15 @@ package playground.marcel.pt.transitSchedule;
 
 import org.matsim.transitSchedule.TransitStopFacility;
 
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+
 /**
  * Describes the stop within a route of a transit line. Specifies also at
  * what time a headway is expected at the stop as offset from the route start.
  * 
  * @author mrieser
  */
-public class TransitRouteStopImpl {
+public class TransitRouteStopImpl implements TransitRouteStop {
 
 	private final TransitStopFacility stop;
 	private final double departureDelay;

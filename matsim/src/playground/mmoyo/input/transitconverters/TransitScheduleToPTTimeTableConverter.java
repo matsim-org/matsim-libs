@@ -4,21 +4,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.PTRouter.PTLine;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 
 /**
  * Reads a transitschedule to feed a PTTimetable
@@ -30,7 +33,7 @@ public class TransitScheduleToPTTimeTableConverter {
 	}
 
 	public PTTimeTable2 getPTTimeTable(final String transitScheduleFile, final Network net) {
-		TransitScheduleImpl transitSchedule = new TransitScheduleImpl();
+		TransitSchedule transitSchedule = new TransitScheduleImpl();
 		try {
 			new TransitScheduleReaderV1(transitSchedule, net).readFile(transitScheduleFile);
 		} catch (SAXException e) {
@@ -44,13 +47,13 @@ public class TransitScheduleToPTTimeTableConverter {
 	}
 	
 	
-	public PTTimeTable2 getPTTimeTable(final TransitScheduleImpl transitSchedule) {
+	public PTTimeTable2 getPTTimeTable(final TransitSchedule transitSchedule) {
 		PTTimeTable2 ptTimeTable = new PTTimeTable2();
 		List<PTLine> ptLineList = new ArrayList<PTLine>();
 		
 		/**Convert every transitRoute into PTLine    */
-		for (TransitLineImpl transitLine : transitSchedule.getTransitLines().values()){
-			for (TransitRouteImpl transitRoute : transitLine.getRoutes().values()){
+		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
+			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				Id id = transitRoute.getId();
 				System.out.println("TransitRoute: " + id);
 				TransportMode transportMode =  transitRoute.getTransportMode();
@@ -59,7 +62,7 @@ public class TransitScheduleToPTTimeTableConverter {
 				
 				List<Double> minutesList = new ArrayList<Double>();
 				List<Id> idNodeRouteList = new ArrayList<Id>();
-				for (TransitRouteStopImpl transitRouteStop: transitRoute.getStops()) {
+				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) {
 					minutesList.add(transitRouteStop.getArrivalDelay());
 					idNodeRouteList.add(transitRouteStop.getStopFacility().getId());
 				}
@@ -81,9 +84,9 @@ public class TransitScheduleToPTTimeTableConverter {
 	 * @param departuresCollection Departure objects whose time will be converted in text as PTTimeTable uses it
 	 * @return
 	 */
-	private List<String> getStrDepartureList (Collection<DepartureImpl> departuresCollection){
+	private List<String> getStrDepartureList (Collection<Departure> departuresCollection){
 		List<String> strDepartureList = new ArrayList<String>(); 
-		for (DepartureImpl departure : departuresCollection){
+		for (Departure departure : departuresCollection){
 			String strDeparture= time.writeTime(departure.getDepartureTime(), time.TIMEFORMAT_HHMM);
 			strDepartureList.add(strDeparture);
 		}

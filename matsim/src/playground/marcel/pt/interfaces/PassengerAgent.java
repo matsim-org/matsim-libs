@@ -22,7 +22,7 @@ package playground.marcel.pt.interfaces;
 
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
 
 /**
  * @author mrieser
@@ -39,7 +39,7 @@ public interface PassengerAgent {
 	 *
 	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
 	 */
-	public boolean ptLineAvailable(final TransitLineImpl line);
+	public boolean ptLineAvailable(final TransitLine line);
 
 	/**
 	 * Informs a passenger in a transit vehicle that the vehicle has

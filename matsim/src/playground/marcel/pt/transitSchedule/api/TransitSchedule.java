@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * TransitSchedule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.transitSchedule.api;
+
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
+/**
+ * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time data
+ * and the infrastructure in form of stop facilities.
+ * 
+ * @author mrieser
+ */
+public interface TransitSchedule {
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
+	public abstract void addTransitLine(final TransitLine line);
 
-	private final TransitStopFacility exitStop;
+	public abstract void addStopFacility(final TransitStopFacility stop);
 
-	public BusPassenger(final Id id, final TransitStopFacility exitStop) {
-		super(id);
-		this.exitStop = exitStop;
-	}
+	public abstract Map<Id, TransitLine> getTransitLines();
 
-	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return this.exitStop == stop;
-	}
-
-	public boolean ptLineAvailable(final TransitLine line) {
-		// TODO [MR] Auto-generated method stub
-		return true;
-	}
+	public abstract Map<Id, TransitStopFacility> getFacilities();
 
 }

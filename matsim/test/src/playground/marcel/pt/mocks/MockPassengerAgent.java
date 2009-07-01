@@ -24,7 +24,7 @@ import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
 
 public class MockPassengerAgent implements PassengerAgent {
 
@@ -38,7 +38,7 @@ public class MockPassengerAgent implements PassengerAgent {
 		return stop == exitStop;
 	}
 
-	public boolean ptLineAvailable(final TransitLineImpl line) {
+	public boolean ptLineAvailable(final TransitLine line) {
 		return true;
 	}
 

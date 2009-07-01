@@ -49,6 +49,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import playground.marcel.SoldnerBerlinToWGS84;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * Reads transit schedule information from BERTA XML files once used 
@@ -97,8 +101,8 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	private static final String VEROEFFENTLICHT = "veröffentlicht";
 
 
-	private final TransitScheduleImpl schedule;
-	private TransitLineImpl currentTransitLine = null;
+	private final TransitSchedule schedule;
+	private TransitLine currentTransitLine = null;
 	private BLinie tmpLinie = null;
 	private BHaltepunkt tmpHaltepunkt = null;
 	private BRoute tmpRoute = null;
@@ -113,7 +117,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	private final SoldnerBerlinToWGS84 soldnerToWgs84 = new SoldnerBerlinToWGS84();
 	private final CoordinateTransformation wgs84ToRBS;
 	
-	public TransitScheduleReaderBerta(final TransitScheduleImpl schedule, final CoordinateTransformation coordTransformation) {
+	public TransitScheduleReaderBerta(final TransitSchedule schedule, final CoordinateTransformation coordTransformation) {
 		this.schedule = schedule;
 		this.wgs84ToRBS = coordTransformation;
 	}
@@ -230,10 +234,10 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	}
 
 	private void convertRoute(final BRoute route) {
-		Map<Id, TransitRouteImpl> transitRoutes = new HashMap<Id, TransitRouteImpl>();
+		Map<Id, TransitRoute> transitRoutes = new HashMap<Id, TransitRoute>();
 
 		for (BFahrt fahrt : route.fahrten) {
-			TransitRouteImpl tRoute = transitRoutes.get(getTransitRouteId(route, fahrt.fahrzeitprofil));
+			TransitRoute tRoute = transitRoutes.get(getTransitRouteId(route, fahrt.fahrzeitprofil));
 			if (tRoute == null) {
 				tRoute = convertFahrzeitprofil(route, fahrt.fahrzeitprofil);
 				transitRoutes.put(tRoute.getId(), tRoute);
@@ -243,8 +247,8 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		}
 	}
 
-	private TransitRouteImpl convertFahrzeitprofil(final BRoute route, final BFahrzeitprofil fahrzeitprofil) {
-		List<TransitRouteStopImpl> stops = new ArrayList<TransitRouteStopImpl>();
+	private TransitRoute convertFahrzeitprofil(final BRoute route, final BFahrzeitprofil fahrzeitprofil) {
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 
 		double timeOffset = 0;
 		for (BFahrzeitprofilpunkt profilpunkt : fahrzeitprofil.profilpunkte) {
@@ -255,7 +259,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 			timeOffset += profilpunkt.wartezeit;
 		}
 		Id routeId = getTransitRouteId(route, fahrzeitprofil);
-		TransitRouteImpl transitRoute = new TransitRouteImpl(routeId, null, stops, TransportMode.bus); // TODO find correct transport mode
+		TransitRoute transitRoute = new TransitRouteImpl(routeId, null, stops, TransportMode.bus); // TODO find correct transport mode
 		transitRoute.setDescription("Linie " + this.tmpLinie.publicId);
 		return transitRoute;
 	}
@@ -320,7 +324,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		// TODO [MR] remove after testing
-		TransitScheduleImpl schedule = new TransitScheduleImpl();
+		TransitSchedule schedule = new TransitScheduleImpl();
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 		TransitScheduleReaderBerta reader = new TransitScheduleReaderBerta(schedule, transformation);
 		reader.setLocalDtdDirectory("../thesis-data/examples/berta/");

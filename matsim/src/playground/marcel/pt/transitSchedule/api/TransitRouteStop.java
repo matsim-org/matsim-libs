@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * TransitRouteStop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.transitSchedule.api;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
+/**
+ * Describes the stop within a route of a transit line. Specifies also at
+ * what time a headway is expected at the stop as offset from the route start.
+ * 
+ * @author mrieser
+ */
+public interface TransitRouteStop {
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
+	public abstract TransitStopFacility getStopFacility();
 
-	private final TransitStopFacility exitStop;
+	public abstract double getDepartureDelay();
 
-	public BusPassenger(final Id id, final TransitStopFacility exitStop) {
-		super(id);
-		this.exitStop = exitStop;
-	}
-
-	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return this.exitStop == stop;
-	}
-
-	public boolean ptLineAvailable(final TransitLine line) {
-		// TODO [MR] Auto-generated method stub
-		return true;
-	}
+	public abstract double getArrivalDelay();
 
 }

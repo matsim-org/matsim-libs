@@ -32,10 +32,11 @@ import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 public class PtControler extends Controler {
 
-	private final TransitScheduleImpl schedule;
+	private final TransitSchedule schedule;
 	
 	public PtControler(String configFileName) {
 		super(configFileName);

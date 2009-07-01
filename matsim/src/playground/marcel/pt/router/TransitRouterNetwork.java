@@ -27,9 +27,9 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 
 /*package*/ class TransitRouterNetwork {
@@ -43,12 +43,12 @@ import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
 	}
 	
 	/*package*/ static class TransitRouterNetworkNode {
-		final TransitRouteStopImpl stop;
-		final TransitRouteImpl route;
-		final TransitLineImpl line;
+		final TransitRouteStop stop;
+		final TransitRoute route;
+		final TransitLine line;
 		final List<TransitRouterNetworkLink> outgoingLinks = new ArrayList<TransitRouterNetworkLink>();
 		
-		public TransitRouterNetworkNode(final TransitRouteStopImpl stop, final TransitRouteImpl route, final TransitLineImpl line) {
+		public TransitRouterNetworkNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 			this.stop = stop;
 			this.route = route;
 			this.line = line;
@@ -62,9 +62,9 @@ import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
 	/*package*/ static class TransitRouterNetworkLink {
 		final TransitRouterNetworkNode fromNode;
 		final TransitRouterNetworkNode toNode;
-		final TransitRouteImpl route;
-		final TransitLineImpl line;
-		public TransitRouterNetworkLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRouteImpl route, final TransitLineImpl line) {
+		final TransitRoute route;
+		final TransitLine line;
+		public TransitRouterNetworkLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
 			this.fromNode = fromNode;
 			this.toNode = toNode;
 			this.route = route;
@@ -72,13 +72,13 @@ import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
 		}
 	}
 
-	public TransitRouterNetworkNode createNode(final TransitRouteStopImpl stop, final TransitRouteImpl route, final TransitLineImpl line) {
+	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(stop, route, line);
 		this.nodes.add(node);
 		return node;
 	}
 	
-	public TransitRouterNetworkLink createLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRouteImpl route, final TransitLineImpl line) {
+	public TransitRouterNetworkLink createLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
 		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(fromNode, toNode, route, line);
 		this.links.add(link);
 		fromNode.addOutgoingLink(link);

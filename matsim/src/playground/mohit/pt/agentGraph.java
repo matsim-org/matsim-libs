@@ -1,6 +1,12 @@
 package playground.mohit.pt;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -13,8 +19,8 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.demo.AccessEgressDemo;
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 public class agentGraph extends Frame implements ActionListener{
 	AccessEgressDemo a;
 	TransitRouteAccessEgressAnalysis b;
@@ -31,7 +37,7 @@ public class agentGraph extends Frame implements ActionListener{
 		p1 = new Panel(); 
 		p1.setLayout(new GridLayout());
 		int u=0;
-		for (DepartureImpl departure : b.headings.values()){
+		for (Departure departure : b.headings.values()){
 			
 			buttons[u]=new Button(Time.writeTime(departure.getDepartureTime()));
 			p1.add(buttons[u]);
@@ -104,11 +110,11 @@ public class agentGraph extends Frame implements ActionListener{
     }
 	public void graph(){
 		List<Id> stopFacilityIds = new ArrayList<Id>(b.transitRoute.getStops().size());
-		for (TransitRouteStopImpl stop : b.transitRoute.getStops()) {
+		for (TransitRouteStop stop : b.transitRoute.getStops()) {
 			stopFacilityIds.add(stop.getStopFacility().getId());
 		}
 
-		for (DepartureImpl departure : b.headings.values()){
+		for (Departure departure : b.headings.values()){
 			if (Time.writeTime(departure.getDepartureTime()).equals(s)){
 					Map<Id, Integer> accessCounter = b.getAccessCounter(departure);
 					Map<Id, Integer> egressCounter = b.getEgressCounter(departure);

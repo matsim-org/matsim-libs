@@ -37,10 +37,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 public class CreatePseudoNetwork {
 
@@ -51,11 +51,11 @@ public class CreatePseudoNetwork {
 	private Map<Tuple<TransitStopFacility, TransitStopFacility>, Link> links = null;
 	private Map<TransitStopFacility, Node> nodes = null;
 	private final NetworkLayer network;
-	private final TransitScheduleImpl schedule;
+	private final TransitSchedule schedule;
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
 	
-	public CreatePseudoNetwork(final TransitScheduleImpl schedule, final NetworkLayer network) {
+	public CreatePseudoNetwork(final TransitSchedule schedule, final NetworkLayer network) {
 		this.network = network;
 		this.schedule = schedule;
 	}
@@ -76,13 +76,13 @@ public class CreatePseudoNetwork {
 		this.links = new HashMap<Tuple<TransitStopFacility, TransitStopFacility>, Link>();
 		this.nodes = new HashMap<TransitStopFacility, Node>();
 		
-		List<Tuple<TransitLineImpl, TransitRouteImpl>> toBeRemoved = new LinkedList<Tuple<TransitLineImpl, TransitRouteImpl>>();
+		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
 		
-		for (TransitLineImpl tLine : schedule.getTransitLines().values()) {
-			for (TransitRouteImpl tRoute : tLine.getRoutes().values()) {
+		for (TransitLine tLine : schedule.getTransitLines().values()) {
+			for (TransitRoute tRoute : tLine.getRoutes().values()) {
 				ArrayList<Link> routeLinks = new ArrayList<Link>();
 				TransitStopFacility prevFacility = null;
-				for (TransitRouteStopImpl stop : tRoute.getStops()) {
+				for (TransitRouteStop stop : tRoute.getStops()) {
 					TransitStopFacility facility = stop.getStopFacility();
 					if (prevFacility != null) {
 						Link link = getNetworkLink(prevFacility, facility);
@@ -101,12 +101,12 @@ public class CreatePseudoNetwork {
 					tRoute.setRoute(route);
 				} else {
 					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
-					toBeRemoved.add(new Tuple<TransitLineImpl, TransitRouteImpl>(tLine, tRoute));
+					toBeRemoved.add(new Tuple<TransitLine, TransitRoute>(tLine, tRoute));
 				}
 			}
 		}
 		
-		for (Tuple<TransitLineImpl, TransitRouteImpl> remove : toBeRemoved) {
+		for (Tuple<TransitLine, TransitRoute> remove : toBeRemoved) {
 			remove.getFirst().removeRoute(remove.getSecond());
 		}
 		

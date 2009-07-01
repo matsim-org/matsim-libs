@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * Departure.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.transitSchedule.api;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.vehicles.BasicVehicle;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
+/**
+ * Describes a single departure along a route in a transit line.
+ * 
+ * @author mrieser
+ */
+public interface Departure extends Identifiable {
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
+	public abstract double getDepartureTime();
 
-	private final TransitStopFacility exitStop;
+	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
+	public abstract void setVehicle(final BasicVehicle vehicle);
 
-	public BusPassenger(final Id id, final TransitStopFacility exitStop) {
-		super(id);
-		this.exitStop = exitStop;
-	}
-
-	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return this.exitStop == stop;
-	}
-
-	public boolean ptLineAvailable(final TransitLine line) {
-		// TODO [MR] Auto-generated method stub
-		return true;
-	}
+	public abstract BasicVehicle getVehicle();
 
 }

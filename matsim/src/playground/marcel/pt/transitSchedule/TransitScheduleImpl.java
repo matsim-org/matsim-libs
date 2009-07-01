@@ -27,20 +27,25 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.transitSchedule.TransitStopFacility;
 
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+
 /**
+ * Default implementation of {@link TransitSchedule}.
  * 
+ * {@inheritDoc}
  * 
  * @author mrieser
  */
-public class TransitScheduleImpl {
+public class TransitScheduleImpl implements TransitSchedule {
 
-	private final Map<Id, TransitLineImpl> transitLines = new TreeMap<Id, TransitLineImpl>();
+	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
 	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
 
 	public TransitScheduleImpl() {
 	}
 
-	public void addTransitLine(final TransitLineImpl line) {
+	public void addTransitLine(final TransitLine line) {
 		final Id id = line.getId();
 		if (this.transitLines.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
@@ -56,7 +61,7 @@ public class TransitScheduleImpl {
 		this.stopFacilities.put(id, stop);
 	}
 
-	public Map<Id, TransitLineImpl> getTransitLines() {
+	public Map<Id, TransitLine> getTransitLines() {
 		return Collections.unmodifiableMap(this.transitLines);
 	}
 	

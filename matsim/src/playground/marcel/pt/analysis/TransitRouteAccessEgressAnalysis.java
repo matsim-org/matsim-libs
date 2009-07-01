@@ -33,19 +33,19 @@ import org.matsim.core.basic.v01.events.handlers.BasicPersonEntersVehicleEventHa
 import org.matsim.core.basic.v01.events.handlers.BasicPersonLeavesVehicleEventHandler;
 import org.matsim.core.utils.misc.Time;
 
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicleEventHandler, BasicPersonLeavesVehicleEventHandler {
 
-	public final TransitRouteImpl transitRoute;
-	public Map<Id, DepartureImpl> headings = null;
-	private Map<DepartureImpl, Map<Id, Integer>> accessCounters = new LinkedHashMap<DepartureImpl, Map<Id, Integer>>();
-	private Map<DepartureImpl, Map<Id, Integer>> egressCounters = new LinkedHashMap<DepartureImpl, Map<Id, Integer>>();
+	public final TransitRoute transitRoute;
+	public Map<Id, Departure> headings = null;
+	private Map<Departure, Map<Id, Integer>> accessCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
+	private Map<Departure, Map<Id, Integer>> egressCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
 	private final VehicleTracker vehTracker;
 
-	public TransitRouteAccessEgressAnalysis(final TransitRouteImpl transitRoute, final VehicleTracker vehicleTracker) {
+	public TransitRouteAccessEgressAnalysis(final TransitRoute transitRoute, final VehicleTracker vehicleTracker) {
 		this.transitRoute = transitRoute;
 		this.vehTracker = vehicleTracker;
 	}
@@ -54,7 +54,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		if (this.headings == null) {
 			collectHeadingsInfo();
 		}
-		DepartureImpl dep = this.headings.get(event.getVehicleId());
+		Departure dep = this.headings.get(event.getVehicleId());
 		if (dep != null) {
 			Id fId = this.vehTracker.getFacilityIdForVehicle(event.getVehicleId());
 			Map<Id, Integer> counter = getAccessCounter(dep);
@@ -71,7 +71,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		if (this.headings == null) {
 			collectHeadingsInfo();
 		}
-		DepartureImpl dep = this.headings.get(event.getVehicleId());
+		Departure dep = this.headings.get(event.getVehicleId());
 		if (dep != null) {
 			Id fId = this.vehTracker.getFacilityIdForVehicle(event.getVehicleId());
 			Map<Id, Integer> counter = getEgressCounter(dep);
@@ -92,7 +92,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 	
 	public void printStats() {
 		List<Id> stopFacilityIds = new ArrayList<Id>(this.transitRoute.getStops().size());
-		for (TransitRouteStopImpl stop : this.transitRoute.getStops()) {
+		for (TransitRouteStop stop : this.transitRoute.getStops()) {
 			stopFacilityIds.add(stop.getStopFacility().getId());
 		}
 		
@@ -101,7 +101,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 			System.out.print("\t" + id);
 		}
 		System.out.println();
-		for (DepartureImpl departure : this.headings.values()) {
+		for (Departure departure : this.headings.values()) {
 			System.out.print(Time.writeTime(departure.getDepartureTime()));
 			Map<Id, Integer> accessCounter = getAccessCounter(departure);
 			for (Id id : stopFacilityIds) {
@@ -128,7 +128,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		}
 	}
 	
-	public Map<Id, Integer> getAccessCounter(final DepartureImpl departure) {
+	public Map<Id, Integer> getAccessCounter(final Departure departure) {
 		Map<Id, Integer> counter = this.accessCounters.get(departure);
 		if (counter == null) {
 			counter = new HashMap<Id, Integer>();
@@ -137,7 +137,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		return counter;
 	}
 	
-	public Map<Id, Integer> getEgressCounter(final DepartureImpl departure) {
+	public Map<Id, Integer> getEgressCounter(final Departure departure) {
 		Map<Id, Integer> counter = this.egressCounters.get(departure);
 		if (counter == null) {
 			counter = new HashMap<Id, Integer>();
@@ -150,9 +150,9 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 	 * Lazy initialization, as the vehicle info may not be available from the beginning.
 	 */
 	private void collectHeadingsInfo() {
-		Map<Id, DepartureImpl> map = new HashMap<Id, DepartureImpl>(this.transitRoute.getDepartures().size()*2);
+		Map<Id, Departure> map = new HashMap<Id, Departure>(this.transitRoute.getDepartures().size()*2);
 		
-		for (DepartureImpl departure : this.transitRoute.getDepartures().values()) {
+		for (Departure departure : this.transitRoute.getDepartures().values()) {
 			if (departure.getVehicle() != null) {
 				map.put(departure.getVehicle().getId(), departure);
 			}

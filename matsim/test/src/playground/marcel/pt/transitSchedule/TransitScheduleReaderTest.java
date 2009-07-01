@@ -34,6 +34,12 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+
 public class TransitScheduleReaderTest extends MatsimTestCase {
 
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
@@ -45,23 +51,23 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitScheduleImpl schedule = new TransitScheduleImpl();
+		TransitSchedule schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
 		assertEquals("wrong line id.", new IdImpl("T1"), schedule.getTransitLines().keySet().iterator().next());
 
-		TransitLineImpl lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
+		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 		assertNotNull("could not find line with id T1.", lineT1);
 
-		TransitRouteImpl route1 = lineT1.getRoutes().get(new IdImpl("1"));
+		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
 		assertNotNull("could not find route 1 in line T1.", route1);
 
-		Map<Id, DepartureImpl> departures = route1.getDepartures();
+		Map<Id, Departure> departures = route1.getDepartures();
 		assertNotNull("could not get departures of route 1 in line T1.", departures);
 		assertEquals("wrong number of departures.", 3, departures.size());
 
-		List<TransitRouteStopImpl> stops = route1.getStops();
+		List<TransitRouteStop> stops = route1.getStops();
 		assertNotNull("could not get transit route stops.", stops);
 		assertEquals("wrong number of stops.", 6, stops.size());
 

@@ -37,7 +37,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
@@ -54,7 +54,7 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 
 	public PlansCalcPtRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final TravelCost costCalculator, final TravelTime timeCalculator,
-			final LeastCostPathCalculatorFactory factory, final TransitScheduleImpl schedule) {
+			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule) {
 		super(config, network, costCalculator, timeCalculator, factory);
 		this.planSimplifier = new SimplifyPtLegs();
 

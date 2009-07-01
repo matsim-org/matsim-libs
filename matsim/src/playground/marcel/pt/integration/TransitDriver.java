@@ -35,17 +35,16 @@ import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.TransitVehicle;
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 public class TransitDriver implements TransitDriverAgent {
 
@@ -61,12 +60,12 @@ public class TransitDriver implements TransitDriverAgent {
 		private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 		private final PersonImpl dummyPerson;
 
-		private final Iterator<TransitRouteStopImpl> stopIterator;
-		private TransitRouteStopImpl nextStop;
+		private final Iterator<TransitRouteStop> stopIterator;
+		private TransitRouteStop nextStop;
 
-		private final TransitLineImpl transitLine;
+		private final TransitLine transitLine;
 
-		public TransitDriver(final TransitLineImpl line, final TransitRouteImpl route, final DepartureImpl departure, final TransitQueueSimulation sim) {
+		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
 			this.transitLine = line;
 			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 			this.stopIterator = route.getStops().iterator();

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * TransitLine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.transitSchedule.api;
+
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.api.basic.v01.Identifiable;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
+/**
+ * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
+ * 
+ * @author mrieser
+ */
+public interface TransitLine extends Identifiable {
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
+	public abstract void addRoute(final TransitRoute transitRoute);
 
-	private final TransitStopFacility exitStop;
+	public abstract Map<Id, TransitRoute> getRoutes();
 
-	public BusPassenger(final Id id, final TransitStopFacility exitStop) {
-		super(id);
-		this.exitStop = exitStop;
-	}
-
-	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return this.exitStop == stop;
-	}
-
-	public boolean ptLineAvailable(final TransitLine line) {
-		// TODO [MR] Auto-generated method stub
-		return true;
-	}
+	public abstract void removeRoute(final TransitRoute route);
 
 }

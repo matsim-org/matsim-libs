@@ -38,6 +38,7 @@ import playground.marcel.OTFDemo;
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderBerta;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 
 public class TestIntegration {
@@ -70,7 +71,7 @@ public class TestIntegration {
 
 		sl.loadScenario();	
 
-		final TransitScheduleImpl schedule = new TransitScheduleImpl();
+		final TransitSchedule schedule = new TransitScheduleImpl();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
@@ -118,7 +119,7 @@ public class TestIntegration {
 		
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 
-		final TransitScheduleImpl schedule = new TransitScheduleImpl();
+		final TransitSchedule schedule = new TransitScheduleImpl();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);

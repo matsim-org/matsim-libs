@@ -31,10 +31,11 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 public class CreateTimetableForStopTest extends MatsimTestCase {
 
@@ -47,10 +48,10 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitScheduleImpl schedule = new TransitScheduleImpl();
+		TransitSchedule schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		TransitLineImpl line = schedule.getTransitLines().get(new IdImpl("T1"));
+		TransitLine line = schedule.getTransitLines().get(new IdImpl("T1"));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(line);
 		assertNotNull("could not get transit line.", line);
 

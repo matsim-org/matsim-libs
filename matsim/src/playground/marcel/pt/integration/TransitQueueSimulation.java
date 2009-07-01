@@ -44,16 +44,16 @@ import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.marcel.pt.otfvis.FacilityDrawer;
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.api.Departure;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 public class TransitQueueSimulation extends QueueSimulation {
 	
 	private OnTheFlyServer otfServer = null;
 
-	private TransitScheduleImpl schedule = null;
+	private TransitSchedule schedule = null;
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
 
@@ -89,7 +89,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		}
 	}
 
-	public void setTransitSchedule(final TransitScheduleImpl schedule) {
+	public void setTransitSchedule(final TransitSchedule schedule) {
 		this.schedule = schedule;
 		if (this.otfServer != null) {
 			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
@@ -112,9 +112,9 @@ public class TransitQueueSimulation extends QueueSimulation {
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 			
-			for (TransitLineImpl line : this.schedule.getTransitLines().values()) {
-				for (TransitRouteImpl route : line.getRoutes().values()) {
-					for (DepartureImpl departure : route.getDepartures().values()) {
+			for (TransitLine line : this.schedule.getTransitLines().values()) {
+				for (TransitRoute route : line.getRoutes().values()) {
+					for (Departure departure : route.getDepartures().values()) {
 						TransitDriver driver = new TransitDriver(line, route, departure, this);
 
 						TransitQueueVehicle veh = new TransitQueueVehicle(new BasicVehicleImpl(driver.getPerson().getId(), vehicleType), 5);

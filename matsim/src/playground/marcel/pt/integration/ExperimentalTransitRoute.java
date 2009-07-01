@@ -27,7 +27,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
 
 public class ExperimentalTransitRoute extends GenericRouteImpl {
 
@@ -40,7 +40,7 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 		super(startLink, endLink);
 	}
 	
-	public ExperimentalTransitRoute(TransitStopFacility accessFacility, TransitLineImpl line, TransitStopFacility egressFacility) {
+	public ExperimentalTransitRoute(TransitStopFacility accessFacility, TransitLine line, TransitStopFacility egressFacility) {
 		this(accessFacility.getLink(), egressFacility.getLink());
 		this.accessStopId = accessFacility.getId();
 		this.lineId = line.getId();

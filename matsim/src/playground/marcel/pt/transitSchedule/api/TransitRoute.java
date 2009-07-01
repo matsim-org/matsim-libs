@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * TransitRoute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.transitSchedule.api;
+
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
+/**
+ * Describes a route of a transit line, including its stops and the departures along this route.
+ * 
+ * @author mrieser
+ */
+public interface TransitRoute extends Identifiable {
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
+	public abstract void setDescription(final String description);
 
-	private final TransitStopFacility exitStop;
+	public abstract String getDescription();
 
-	public BusPassenger(final Id id, final TransitStopFacility exitStop) {
-		super(id);
-		this.exitStop = exitStop;
-	}
+	/**
+	 * Sets the transport mode with which this transit route is handled, e.g.
+	 * {@link TransportMode#bus} or {@link TransportMode#train}.
+	 *
+	 * @param mode
+	 */
+	public abstract void setTransportMode(final TransportMode mode);
 
-	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return this.exitStop == stop;
-	}
+	public abstract TransportMode getTransportMode();
 
-	public boolean ptLineAvailable(final TransitLine line) {
-		// TODO [MR] Auto-generated method stub
-		return true;
-	}
+	public abstract void addDeparture(final Departure departure);
+
+	public abstract Map<Id, Departure> getDepartures();
+
+	public abstract NetworkRoute getRoute();
+
+	public abstract void setRoute(final NetworkRoute route);
+
+	public abstract List<TransitRouteStop> getStops();
+
+	public abstract TransitRouteStop getStop(final TransitStopFacility stop);
 
 }

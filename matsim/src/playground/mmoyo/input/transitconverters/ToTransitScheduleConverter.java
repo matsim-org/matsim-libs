@@ -6,21 +6,30 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.*;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.marcel.pt.transitSchedule.DepartureImpl;
+import playground.marcel.pt.transitSchedule.TransitLineImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteImpl;
+import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.PTRouter.PTLine;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 
 /**
  * From PTtimeTable to transitShcedule converter 
  */
 public class ToTransitScheduleConverter {
-	final TransitScheduleImpl transitSchedule = new TransitScheduleImpl();
+	final TransitSchedule transitSchedule = new TransitScheduleImpl();
 	
 	public ToTransitScheduleConverter (){
 				
@@ -28,7 +37,7 @@ public class ToTransitScheduleConverter {
 	
 	/**reads a PTTimetable and writes a transitFile*/
 	public void createTransitSchedule(final PTTimeTable2 ptTimeTable, final Network ptNet, String outTransitFile) {
-		TransitLineImpl transitLine;
+		TransitLine transitLine;
 		/*
 		for (Node node:  ptNet.getNodes().values()){
 			this.transitSchedule.addStopFacility(new TransitStopFacility(node.getId(), node.getCoord()));
@@ -44,7 +53,7 @@ public class ToTransitScheduleConverter {
 			}
 			
 			int x=0;
-			List<TransitRouteStopImpl> transitRouteStops = new ArrayList<TransitRouteStopImpl>();
+			List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
 			for (Id idNode : ptLine.getNodeRoute()){				
 				if (!transitSchedule.getFacilities().containsKey(idNode)){
 					TransitStopFacility transitStopFacility =  new 	TransitStopFacility(idNode, ptNet.getNode(idNode).getCoord());
@@ -58,7 +67,7 @@ public class ToTransitScheduleConverter {
 			
 			Id idTransitRoute = new IdImpl(ptLineId + "-" +  ptLine.getDirection());
 			NetworkRoute networkRoute= null; //new NodeNetworkRoute(null, null);
-			TransitRouteImpl transitRoute = new  TransitRouteImpl(idTransitRoute, networkRoute, transitRouteStops, TransportMode.pt);
+			TransitRoute transitRoute = new  TransitRouteImpl(idTransitRoute, networkRoute, transitRouteStops, TransportMode.pt);
 			transitRoute.setTransportMode(ptLine.getTransportMode());
 			x=0;
 			for (String strDeparture : ptLine.getDepartures()){

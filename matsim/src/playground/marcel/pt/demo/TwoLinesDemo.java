@@ -49,11 +49,15 @@ import playground.marcel.pt.transitSchedule.TransitLineImpl;
 import playground.marcel.pt.transitSchedule.TransitRouteImpl;
 import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.api.TransitLine;
+import playground.marcel.pt.transitSchedule.api.TransitRoute;
+import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 public class TwoLinesDemo {
 	
 	private final Scenario scenario = new ScenarioImpl();
-	private final TransitScheduleImpl schedule = new TransitScheduleImpl();
+	private final TransitSchedule schedule = new TransitScheduleImpl();
 	private final Id[] ids = new Id[15];
 
 	private void createIds() {
@@ -156,7 +160,7 @@ public class TwoLinesDemo {
 		this.schedule.addStopFacility(stop6);
 
 
-		TransitLineImpl tLine1 = new TransitLineImpl(this.ids[1]);
+		TransitLine tLine1 = new TransitLineImpl(this.ids[1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
 		ArrayList<Link> linkList = new ArrayList<Link>(6);
 		linkList.add(link3);
@@ -166,12 +170,12 @@ public class TwoLinesDemo {
 		linkList.add(link9);
 		linkList.add(link11);
 		networkRoute.setLinks(link1, linkList, link13);
-		ArrayList<TransitRouteStopImpl> stopList = new ArrayList<TransitRouteStopImpl>(4);
+		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(4);
 		stopList.add(new TransitRouteStopImpl(stop1, 0, 0));
 		stopList.add(new TransitRouteStopImpl(stop3, 90, 100));
 		stopList.add(new TransitRouteStopImpl(stop4, 290, 300));
 		stopList.add(new TransitRouteStopImpl(stop5, 390, Time.UNDEFINED_TIME));
-		TransitRouteImpl tRoute1 = new TransitRouteImpl(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute1 = new TransitRouteImpl(this.ids[1], networkRoute, stopList, TransportMode.bus);
 		tLine1.addRoute(tRoute1);
 		
 		tRoute1.addDeparture(new DepartureImpl(this.ids[1], Time.parseTime("07:00:00")));
@@ -183,7 +187,7 @@ public class TwoLinesDemo {
 		
 		this.schedule.addTransitLine(tLine1);
 
-		TransitLineImpl tLine2 = new TransitLineImpl(this.ids[2]);
+		TransitLine tLine2 = new TransitLineImpl(this.ids[2]);
 		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
 		linkList = new ArrayList<Link>(6);
 		linkList.add(link4);
@@ -193,12 +197,12 @@ public class TwoLinesDemo {
 		linkList.add(link9);
 		linkList.add(link10);
 		networkRoute.setLinks(link2, linkList, link12);
-		stopList = new ArrayList<TransitRouteStopImpl>(4);
+		stopList = new ArrayList<TransitRouteStop>(4);
 		stopList.add(new TransitRouteStopImpl(stop2, 0, 0));
 		stopList.add(new TransitRouteStopImpl(stop3, 90, 100));
 		stopList.add(new TransitRouteStopImpl(stop4, 290, 300));
 		stopList.add(new TransitRouteStopImpl(stop6, 390, Time.UNDEFINED_TIME));
-		TransitRouteImpl tRoute2 = new TransitRouteImpl(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute2 = new TransitRouteImpl(this.ids[1], networkRoute, stopList, TransportMode.bus);
 		tLine2.addRoute(tRoute2);
 
 		tRoute2.addDeparture(new DepartureImpl(this.ids[1], Time.parseTime("07:02:00")));
@@ -212,8 +216,8 @@ public class TwoLinesDemo {
 		Population population = this.scenario.getPopulation();
 		PopulationBuilder pb = population.getPopulationBuilder();
 		
-		TransitLineImpl tLine1 = this.schedule.getTransitLines().get(this.ids[1]);
-		TransitLineImpl tLine2 = this.schedule.getTransitLines().get(this.ids[2]);
+		TransitLine tLine1 = this.schedule.getTransitLines().get(this.ids[1]);
+		TransitLine tLine2 = this.schedule.getTransitLines().get(this.ids[2]);
 		
 		TransitStopFacility stop1 = this.schedule.getFacilities().get(this.ids[1]);
 		TransitStopFacility stop2 = this.schedule.getFacilities().get(this.ids[2]);

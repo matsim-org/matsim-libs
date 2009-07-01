@@ -23,12 +23,14 @@ package playground.marcel.pt.transitSchedule;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.vehicles.BasicVehicle;
 
+import playground.marcel.pt.transitSchedule.api.Departure;
+
 /**
  * Describes a single departure along a route in a transit line.
  * 
  * @author mrieser
  */
-public class DepartureImpl {
+public class DepartureImpl implements Departure {
 
 	private final Id id;
 	private final double departureTime;

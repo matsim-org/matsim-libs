@@ -45,6 +45,7 @@ import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.PTRouter.PTOb;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
@@ -83,7 +84,7 @@ public class RouterTest extends MatsimTestCase {
 		// setup very simple scenario
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/input/playground/marcel/pt/transitSchedule/network.xml");
-		TransitScheduleImpl schedule = new TransitScheduleImpl();
+		TransitSchedule schedule = new TransitScheduleImpl();
 		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile("test/input/playground/marcel/pt/plans.xml");
