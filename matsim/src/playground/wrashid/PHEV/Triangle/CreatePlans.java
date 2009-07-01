@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -17,6 +15,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledge;
@@ -69,7 +69,7 @@ public class CreatePlans {
 
 		// create 100 persons
 		for (int i=0;i<5000;i++){
-			Person person = new PersonImpl(new IdImpl(i));
+			PersonImpl person = new PersonImpl(new IdImpl(i));
 			plans.addPerson(person);
 
 
@@ -77,7 +77,7 @@ public class CreatePlans {
 			k.addActivity(home, false);
 			k.addActivity(work, false);
 
-			Plan plan = person.createPlan(true);
+			PlanImpl plan = person.createPlan(true);
 			ActivityFacility home_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
 			ActivityFacility work_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("work").get(0).getFacility();
 			ArrayList<ActivityOption> acts = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
