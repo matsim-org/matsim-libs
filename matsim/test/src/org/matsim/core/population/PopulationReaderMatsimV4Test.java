@@ -27,10 +27,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -45,7 +45,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 	 */
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final Scenario scenario = new ScenarioImpl();
-		final Network network = scenario.getNetwork();
+		final NetworkLayer network = scenario.getNetwork();
 		final Population population = scenario.getPopulation();
 		
 		new MatsimNetworkReader(scenario.getNetwork()).parse("test/scenarios/equil/network.xml");

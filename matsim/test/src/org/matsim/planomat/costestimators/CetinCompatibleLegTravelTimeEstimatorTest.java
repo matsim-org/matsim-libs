@@ -23,13 +23,13 @@ package org.matsim.planomat.costestimators;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.misc.Time;
 
@@ -59,7 +59,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		events.printEventHandlers();
 
 		NetworkRoute route = (NetworkRoute) testLeg.getRoute();
-		List<Link> links = route.getLinks();
+		List<LinkImpl> links = route.getLinks();
 
 		// let's test a route without events first
 		// should result in free speed travel time, without departure delay
@@ -72,7 +72,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 				testLeg);
 
 		double expectedLegEndTime = departureTime;
-		for (Link link : links) {
+		for (LinkImpl link : links) {
 			expectedLegEndTime += link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
 		}
 		expectedLegEndTime += destinationAct.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
@@ -100,7 +100,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 
 		expectedLegEndTime = departureTime;
 		expectedLegEndTime += depDelay;
-		for (Link link : links) {
+		for (LinkImpl link : links) {
 			expectedLegEndTime += link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
 		}
 		expectedLegEndTime += destinationAct.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);

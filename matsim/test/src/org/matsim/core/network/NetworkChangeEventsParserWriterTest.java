@@ -25,7 +25,6 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -46,9 +45,9 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 		NetworkFactory nf = new NetworkFactory();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
-		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 1000));
-		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(1000, 2000));
+		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 1000));
+		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(1000, 2000));
 		network.createLink(new IdImpl("1"), node1, node2, 1000, 1.667, 3600, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 1500, 1.667, 3600, 1);
 

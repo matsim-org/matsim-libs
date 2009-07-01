@@ -24,10 +24,10 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -39,8 +39,8 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		super.loadConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
-		Link link1 = network.getLinks().get(new IdImpl(1));
-		Link link2 = network.getLinks().get(new IdImpl(2));
+		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
+		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
 		Gbl.createWorld().setNetworkLayer(network);
 		
 		Population pop = new PopulationImpl();

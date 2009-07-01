@@ -21,13 +21,13 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -50,8 +50,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		double fromY = 100.0;
 		double toX = 100.0;
 		double toY = 200.0;
-		Node fromNode = network.createNode(new IdImpl("1"), new CoordImpl(fromX, fromY));
-		Node toNode = network.createNode(new IdImpl("2"), new CoordImpl(toX, toY));
+		NodeImpl fromNode = network.createNode(new IdImpl("1"), new CoordImpl(fromX, fromY));
+		NodeImpl toNode = network.createNode(new IdImpl("2"), new CoordImpl(toX, toY));
 		network.createLink(LINK_ID, fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
 	}
 

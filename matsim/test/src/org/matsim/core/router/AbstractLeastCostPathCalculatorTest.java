@@ -26,12 +26,12 @@ import java.util.EnumSet;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase {
 	
-	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final Network network);
+	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final NetworkLayer network);
 
 	private static final String MODE_RESTRICTION_NOT_SUPPORTED = "Router algo does not support mode restrictions. ";
 	
@@ -51,8 +51,8 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		Node node12 = network.getNode(new IdImpl("12"));
-		Node node15 = network.getNode(new IdImpl("15"));
+		NodeImpl node12 = network.getNode(new IdImpl("12"));
+		NodeImpl node15 = network.getNode(new IdImpl("15"));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600);
@@ -72,7 +72,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		loadConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		Node node12 = network.getNode(new IdImpl("12"));
+		NodeImpl node12 = network.getNode(new IdImpl("12"));
 		
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600);
@@ -306,8 +306,8 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	 */
 	private static class MultiModeFixture {
 		/*package*/ final NetworkLayer network = new NetworkLayer();
-		/*package*/ final Node[] nodes = new Node[8];
-		/*package*/ final Link[] links = new Link[12];
+		/*package*/ final NodeImpl[] nodes = new NodeImpl[8];
+		/*package*/ final LinkImpl[] links = new LinkImpl[12];
 
 		public MultiModeFixture() {
 			this.network.setCapacityPeriod(3600.0);

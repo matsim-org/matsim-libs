@@ -26,13 +26,13 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
@@ -91,14 +91,14 @@ public class VDSSignTest extends TestCase {
 		this.controlInput.setNashTime(0);
 
 		this.route1 = new NodeNetworkRoute();
-		ArrayList<Node> list = new ArrayList<Node>();
+		ArrayList<NodeImpl> list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setNodes(list);
 		this.controlInput.setMainRoute(this.route1);
 		this.route2 = new NodeNetworkRoute();
-		list = new ArrayList<Node>();
+		list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
@@ -172,7 +172,7 @@ public class VDSSignTest extends TestCase {
 		NetworkRoute r2 = sign.requestRoute();
 //		System.out.println("Route2 is: " + LogRouteUtils.getNodeRoute(r2));
 		assertNotSame("routes should not be equal to those of ControlInput", this.route2, r2);
-		List<Node> rl1, rl2;
+		List<NodeImpl> rl1, rl2;
 		rl1 = r1.getNodes();
 		rl2 = r2.getNodes();
 		assertEquals("nodes should be equal", sign.getSignLink().getToNode(), rl1.get(0));

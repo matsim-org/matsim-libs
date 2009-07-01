@@ -25,15 +25,15 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -72,7 +72,7 @@ public class ControlerTest extends MatsimTestCase {
 		LegImpl leg1 = plan1.createLeg(TransportMode.car);
 		NetworkRoute route1 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg1.setRoute(route1);
-		ArrayList<Node> nodes = new ArrayList<Node>();
+		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
 		nodes.add(f.node2);
 		nodes.add(f.node3);
 		route1.setNodes(f.link1, nodes, f.link3);
@@ -142,8 +142,8 @@ public class ControlerTest extends MatsimTestCase {
 
 		// create a very simple network with one link only and an empty population
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
+		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
 		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
 		Population population = new PopulationImpl();
 
@@ -415,13 +415,13 @@ public class ControlerTest extends MatsimTestCase {
 	 */
 	private static class Fixture {
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = null;
-		Node node2 = null;
-		Node node3 = null;
-		Node node4 = null;
-		Link link1 = null;
-		Link link2 = null;
-		Link link3 = null;
+		NodeImpl node1 = null;
+		NodeImpl node2 = null;
+		NodeImpl node3 = null;
+		NodeImpl node4 = null;
+		LinkImpl link1 = null;
+		LinkImpl link2 = null;
+		LinkImpl link3 = null;
 		
 		protected Fixture() {
 			/* Create a simple network with 4 nodes and 3 links:

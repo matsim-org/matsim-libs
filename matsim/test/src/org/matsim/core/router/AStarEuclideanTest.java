@@ -20,7 +20,7 @@
 
 package org.matsim.core.router;
 
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessEuclidean;
@@ -28,7 +28,7 @@ import org.matsim.core.router.util.PreProcessEuclidean;
 public class AStarEuclideanTest extends AbstractLeastCostPathCalculatorTest {
 
 	@Override
-	protected LeastCostPathCalculator getLeastCostPathCalculator(Network network) {
+	protected LeastCostPathCalculator getLeastCostPathCalculator(NetworkLayer network) {
 		FreespeedTravelTimeCost travelTimeCostCalculator = new FreespeedTravelTimeCost();
 		PreProcessEuclidean preProcessData = new PreProcessEuclidean(travelTimeCostCalculator);
 		preProcessData.run(network);

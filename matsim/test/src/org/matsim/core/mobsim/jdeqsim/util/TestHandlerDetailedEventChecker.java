@@ -11,7 +11,6 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
@@ -24,6 +23,7 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -115,7 +115,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 								((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
 						index++;
 						
-						for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+						for (LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 							// enter link and leave each link on route
 							assertTrue(list.get(index) instanceof LinkEnterEvent);
 							assertTrue(link.getId().toString().equalsIgnoreCase(

@@ -27,13 +27,13 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
@@ -94,14 +94,14 @@ public class CoopersRouteProviderTest extends TestCase {
 		controlInput.setNashTime(0);
 
 		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-		ArrayList<Node> list = new ArrayList<Node>();
+		ArrayList<NodeImpl> list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setNodes(null, list, null);
 		controlInput.setMainRoute(this.route1);
 		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-		list = new ArrayList<Node>();
+		list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
@@ -124,12 +124,12 @@ public class CoopersRouteProviderTest extends TestCase {
 
 
 	/**
-	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#providesRoute(org.matsim.core.api.network.Link, org.matsim.core.api.population.NetworkRoute)}.
+	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.api.population.NetworkRoute)}.
 	 */
 	public void testProvidesRoute() {
 	  //create route which is driven by the person in the real simulated world
 		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-	  ArrayList<Node> nodes = new ArrayList<Node>();
+	  ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
 	  nodes.add(this.network.getNode("3"));
 	  nodes.add(this.network.getNode("32"));
 	  nodes.add(this.network.getNode("4"));
@@ -148,7 +148,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	  //second: now a route should be provided
 	  nodes.add(0, this.network.getNode("2"));
 	  agentRoute.setNodes(null, nodes, null);
-	  Link linkNo1 = this.network.getLink("1");
+	  LinkImpl linkNo1 = this.network.getLink("1");
 	  assertTrue(provider.providesRoute(linkNo1, agentRoute));
 	  //add another node to the route
 	  nodes.add(this.network.getNode("6"));
@@ -163,12 +163,12 @@ public class CoopersRouteProviderTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#requestRoute(org.matsim.core.api.network.Link, org.matsim.core.api.network.Link, double)}.
+	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#requestRoute(org.matsim.core.network.LinkImpl, org.matsim.core.network.LinkImpl, double)}.
 	 */
 	public void testRequestRouteLinkLinkDouble() {
 	  //create route which is driven by the person in the real simulated world
 		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-	  ArrayList<Node> agentRouteNodes = new ArrayList<Node>();
+	  ArrayList<NodeImpl> agentRouteNodes = new ArrayList<NodeImpl>();
 	  agentRouteNodes.add(this.network.getNode("2"));
 	  agentRouteNodes.add(this.network.getNode("3"));
 	  agentRouteNodes.add(this.network.getNode("32"));
@@ -176,7 +176,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	  agentRoute.setNodes(null, agentRouteNodes, null);
 	  //create the route which should be returned by the provider
 	  NetworkRoute providerRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-	  ArrayList<Node> providerRouteNodes = new ArrayList<Node>();
+	  ArrayList<NodeImpl> providerRouteNodes = new ArrayList<NodeImpl>();
 	  providerRouteNodes.add(this.network.getNode("2"));
 	  providerRouteNodes.add(this.network.getNode("3"));
 	  providerRouteNodes.add(this.network.getNode("31"));
@@ -184,7 +184,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	  providerRoute.setNodes(null, providerRouteNodes, null);
 	  //finish the setup for this test
 	  CoopersRouteProvider provider = this.createRouteProvider();
-	  Link linkNo1 = this.network.getLink("1");
+	  LinkImpl linkNo1 = this.network.getLink("1");
 	  //has to be called first
 	  provider.providesRoute(linkNo1, agentRoute);
 	  //check routing

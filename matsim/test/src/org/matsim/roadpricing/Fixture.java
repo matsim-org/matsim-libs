@@ -26,14 +26,14 @@ import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -69,12 +69,12 @@ import org.matsim.core.utils.misc.Time;
 		 * to travel along one link.		 */
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
-		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(200, 0));
-		Node node4 = network.createNode(new IdImpl(4), new CoordImpl(300, 0));
-		Node node5 = network.createNode(new IdImpl(5), new CoordImpl(400, 0));
-		Node node6 = network.createNode(new IdImpl(6), new CoordImpl(500, 0));
+		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
+		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(200, 0));
+		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(300, 0));
+		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(400, 0));
+		NodeImpl node6 = network.createNode(new IdImpl(6), new CoordImpl(500, 0));
 		// freespeed 18km/h = 5m/s --> 20s for 100m
 		network.createLink(new IdImpl(0), node1, node2, 100, 5, 100, 1);
 		network.createLink(new IdImpl(1), node2, node3, 100, 5, 100, 1);
@@ -108,18 +108,18 @@ import org.matsim.core.utils.misc.Time;
 		 */
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node0 = network.createNode(new IdImpl( "0"), new CoordImpl(  0,   10));
-		Node node1 = network.createNode(new IdImpl( "1"), new CoordImpl(  0,  100));
-		Node node2 = network.createNode(new IdImpl( "2"), new CoordImpl(100,  100));
-		Node node3 = network.createNode(new IdImpl( "3"), new CoordImpl(150,  150));
-		Node node4 = network.createNode(new IdImpl( "4"), new CoordImpl(200,  100));
-		Node node5 = network.createNode(new IdImpl( "5"), new CoordImpl(300,  100));
-		Node node6 = network.createNode(new IdImpl( "6"), new CoordImpl(300, -100));
-		Node node7 = network.createNode(new IdImpl( "7"), new CoordImpl(200, -100));
-		Node node8 = network.createNode(new IdImpl( "8"), new CoordImpl(150, -150));
-		Node node9 = network.createNode(new IdImpl( "9"), new CoordImpl(100, -100));
-		Node node10 =network.createNode(new IdImpl("10"), new CoordImpl(  0, -100));
-		Node node11 =network.createNode(new IdImpl("11"), new CoordImpl(  0,  -10));
+		NodeImpl node0 = network.createNode(new IdImpl( "0"), new CoordImpl(  0,   10));
+		NodeImpl node1 = network.createNode(new IdImpl( "1"), new CoordImpl(  0,  100));
+		NodeImpl node2 = network.createNode(new IdImpl( "2"), new CoordImpl(100,  100));
+		NodeImpl node3 = network.createNode(new IdImpl( "3"), new CoordImpl(150,  150));
+		NodeImpl node4 = network.createNode(new IdImpl( "4"), new CoordImpl(200,  100));
+		NodeImpl node5 = network.createNode(new IdImpl( "5"), new CoordImpl(300,  100));
+		NodeImpl node6 = network.createNode(new IdImpl( "6"), new CoordImpl(300, -100));
+		NodeImpl node7 = network.createNode(new IdImpl( "7"), new CoordImpl(200, -100));
+		NodeImpl node8 = network.createNode(new IdImpl( "8"), new CoordImpl(150, -150));
+		NodeImpl node9 = network.createNode(new IdImpl( "9"), new CoordImpl(100, -100));
+		NodeImpl node10 =network.createNode(new IdImpl("10"), new CoordImpl(  0, -100));
+		NodeImpl node11 =network.createNode(new IdImpl("11"), new CoordImpl(  0,  -10));
 		network.createLink(new IdImpl( "1"),  node0,  node1, 100, 5, 100, 1);
 		network.createLink(new IdImpl( "2"),  node1,  node2, 100, 5, 100, 1);
 		network.createLink(new IdImpl( "3"),  node2,  node3, 100, 5, 100, 1);
@@ -143,11 +143,11 @@ import org.matsim.core.utils.misc.Time;
 	protected static Population createPopulation1(final NetworkLayer network) {
 		Population population = new PopulationImpl();
 
-		Link link0 = network.getLink(new IdImpl(0));
-		Link link1 = network.getLink(new IdImpl(1));
-		Link link2 = network.getLink(new IdImpl(2));
-		Link link3 = network.getLink(new IdImpl(3));
-		Link link4 = network.getLink(new IdImpl(4));
+		LinkImpl link0 = network.getLink(new IdImpl(0));
+		LinkImpl link1 = network.getLink(new IdImpl(1));
+		LinkImpl link2 = network.getLink(new IdImpl(2));
+		LinkImpl link3 = network.getLink(new IdImpl(3));
+		LinkImpl link4 = network.getLink(new IdImpl(4));
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 1st time slot
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 2nd time slot
 		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0, NetworkUtils.getNodes(network, "2 3 4 5"), link4), population); // toll in 3rd time slot
@@ -178,7 +178,7 @@ import org.matsim.core.utils.misc.Time;
 		return population;
 	}
 
-	private static PersonImpl createPerson1(final int personId, final String startTime, final Link homeLink, final List<Node> routeNodes, final Link workLink) {
+	private static PersonImpl createPerson1(final int personId, final String startTime, final LinkImpl homeLink, final List<NodeImpl> routeNodes, final LinkImpl workLink) {
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
@@ -191,7 +191,7 @@ import org.matsim.core.utils.misc.Time;
 		return person;
 	}
 
-	private static PersonImpl createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
+	private static PersonImpl createPerson2(final int personId, final String startTime, final LinkImpl homeLink, final LinkImpl workLink, final LinkImpl finishLink) {
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
@@ -224,7 +224,7 @@ import org.matsim.core.utils.misc.Time;
 
 	protected static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
 		StringBuilder strBuilder = new StringBuilder();
-		for (Node node : realRoute.getNodes()) {
+		for (NodeImpl node : realRoute.getNodes()) {
 			strBuilder.append(node.getId().toString());
 			strBuilder.append(' ');
 		}

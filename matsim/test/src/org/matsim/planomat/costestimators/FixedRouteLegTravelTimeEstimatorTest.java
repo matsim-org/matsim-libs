@@ -27,7 +27,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -36,6 +35,7 @@ import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -208,7 +208,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		// generate some travel times
 		BasicEventImpl event = null;
 
-		List<Link> links = route.getLinks();
+		List<LinkImpl> links = route.getLinks();
 		System.out.println(links.size());
 
 		String[][] eventTimes = new String[][]{

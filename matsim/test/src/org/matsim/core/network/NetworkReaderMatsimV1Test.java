@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -36,7 +35,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testAllowedModes_singleMode() {
-		Link link = prepareTestAllowedModes("car");
+		LinkImpl link = prepareTestAllowedModes("car");
 		Set<TransportMode> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 1, modes.size());
 		assertTrue("wrong mode.", modes.contains(TransportMode.car));
@@ -52,7 +51,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testAllowedModes_emptyMode() {
-		Link link = prepareTestAllowedModes("");
+		LinkImpl link = prepareTestAllowedModes("");
 		Set<TransportMode> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 0, modes.size());
 	}
@@ -61,7 +60,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testAllowedModes_multipleModes() {
-		Link link = prepareTestAllowedModes("car,bus");
+		LinkImpl link = prepareTestAllowedModes("car,bus");
 		Set<TransportMode> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 2, modes.size());
 		assertTrue("wrong mode.", modes.contains(TransportMode.car));
@@ -92,7 +91,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 * 
 	 * @author mrieser
 	 */
-	private Link prepareTestAllowedModes(final String modes) {
+	private LinkImpl prepareTestAllowedModes(final String modes) {
 		NetworkLayer network = new NetworkLayer();
 		network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		network.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
@@ -114,7 +113,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 
 		// start test
 		assertEquals("expected one link.", 1, network.getLinks().size());
-		Link link = network.getLink(new IdImpl("1"));
+		LinkImpl link = network.getLink(new IdImpl("1"));
 		assertNotNull("expected link with id=1.", link);
 		
 		return link;

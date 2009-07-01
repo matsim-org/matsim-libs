@@ -25,12 +25,12 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -62,8 +62,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 
-		Link link1 = network.getLink(new IdImpl(1));
-		Link link20 = network.getLink(new IdImpl(20));
+		LinkImpl link1 = network.getLink(new IdImpl(1));
+		LinkImpl link20 = network.getLink(new IdImpl(20));
 
 		Population population = new PopulationImpl();
 
@@ -117,8 +117,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 	}
 
-	private List<Node> getNodesFromString(final NetworkLayer network, final String nodes) {
-		List<Node> nodesList = new ArrayList<Node>();
+	private List<NodeImpl> getNodesFromString(final NetworkLayer network, final String nodes) {
+		List<NodeImpl> nodesList = new ArrayList<NodeImpl>();
 		for (String node : StringUtils.explode(nodes, ' ')) {
 			nodesList.add(network.getNode(node));
 		}

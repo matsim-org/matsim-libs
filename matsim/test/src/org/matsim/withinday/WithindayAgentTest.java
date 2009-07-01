@@ -26,8 +26,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -36,8 +34,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
@@ -91,22 +91,22 @@ public class WithindayAgentTest extends MatsimTestCase {
 	}
 
 	private void createRoutes() {
-		Link startLink = this.network.getLink(new IdImpl("2"));
-		Link endLink = this.network.getLink(new IdImpl("7"));
+		LinkImpl startLink = this.network.getLink(new IdImpl("2"));
+		LinkImpl endLink = this.network.getLink(new IdImpl("7"));
 		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
 		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
 		this.agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<Node> list = new ArrayList<Node>();
+		ArrayList<NodeImpl> list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setNodes(startLink, list, endLink);
-		list = new ArrayList<Node>();
+		list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
 		this.route2.setNodes(startLink, list, endLink);
-		list = new ArrayList<Node>();
+		list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
@@ -138,7 +138,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		return sign;
 	}
 
-	private WithindayAgent createAgent(final Link homeLink, final Link workLink) {
+	private WithindayAgent createAgent(final LinkImpl homeLink, final LinkImpl workLink) {
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		this.plan = new PlanImpl(p);
 		p.addPlan(this.plan);
@@ -178,7 +178,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		v.setDriver(pa);
 		pa.initialize();
 		pa.activityEnds(7.0*3600);
-		Link link2 = this.network.getLink("2");
+		LinkImpl link2 = this.network.getLink("2");
 		v.setCurrentLink(link2);
 		pa.teleportToLink(link2);
 
@@ -190,28 +190,28 @@ public class WithindayAgentTest extends MatsimTestCase {
 	 * {@link org.matsim.withinday.WithindayAgent#replan()}.
 	 */
 	public void testReplan() {
-		Link link1 = this.network.getLink("1");
-		Link link2 = this.network.getLink("2");
-		Link link7 = this.network.getLink("7");
+		LinkImpl link1 = this.network.getLink("1");
+		LinkImpl link2 = this.network.getLink("2");
+		LinkImpl link7 = this.network.getLink("7");
 		WithindayAgent agent = createAgent(link2, link7);
 		agent.replan();
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
 	  // first testing the plan of the person
 		LegImpl newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
-		List<Node> newPlansRoute = ((NetworkRoute) newPlansLeg.getRoute()).getNodes();
+		List<NodeImpl> newPlansRoute = ((NetworkRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newPlansRoute.get(newPlansRoute.size()-1));
 		//second testing the vehicle
 		assertNotSame("The current leg should be exchanged by a new one", this.leg, agent.getCurrentLeg());
-		List<Node> newLegsRoute = ((NetworkRoute) agent.getCurrentLeg().getRoute()).getNodes();
+		List<NodeImpl> newLegsRoute = ((NetworkRoute) agent.getCurrentLeg().getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newLegsRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newLegsRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newLegsRoute.get(newLegsRoute.size()-1));
 
 		//enlarge scenario
-		List<Node> list = new ArrayList<Node>();
+		List<NodeImpl> list = new ArrayList<NodeImpl>();
 		list.add(this.network.getNode("2"));
 		list.addAll(this.agentRoute.getNodes());
 		this.agentRoute.setNodes(link1, list, link7);
@@ -233,8 +233,8 @@ public class WithindayAgentTest extends MatsimTestCase {
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newLegsRoute.get(newLegsRoute.size()-1));
 
 		//again enlarge scenario
-		Link link8 = this.network.getLink("8");
-		list = new ArrayList<Node>();
+		LinkImpl link8 = this.network.getLink("8");
+		list = new ArrayList<NodeImpl>();
 		list.addAll(this.agentRoute.getNodes());
 		list.add(this.network.getNode("5"));
 		this.agentRoute.setNodes(link1, list, link8);

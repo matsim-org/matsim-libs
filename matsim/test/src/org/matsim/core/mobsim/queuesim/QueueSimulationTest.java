@@ -32,8 +32,6 @@ import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
@@ -48,7 +46,9 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -198,7 +198,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link1);
-		route.setNodes(f.link1, new ArrayList<Node>(0), f.link1);
+		route.setNodes(f.link1, new ArrayList<NodeImpl>(0), f.link1);
 		leg.setRoute(route);
 		plan.createActivity("w", f.link1);
 		f.plans.getPersons().put(person.getId(), person);
@@ -697,12 +697,12 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		/* enhance network */
-		Node node5 = f.network.createNode(new IdImpl("5"), new CoordImpl(3100, 0));
-		Node node6 = f.network.createNode(new IdImpl("6"), new CoordImpl(3200, 0));
-		Node node7 = f.network.createNode(new IdImpl("7"), new CoordImpl(3300, 0));
+		NodeImpl node5 = f.network.createNode(new IdImpl("5"), new CoordImpl(3100, 0));
+		NodeImpl node6 = f.network.createNode(new IdImpl("6"), new CoordImpl(3200, 0));
+		NodeImpl node7 = f.network.createNode(new IdImpl("7"), new CoordImpl(3300, 0));
 		f.network.createLink(new IdImpl("4"), f.node4, node5, 1000, 10, 6000, 2);
-		Link link5 = f.network.createLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
-		Link link6 = f.network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
+		LinkImpl link5 = f.network.createLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
+		LinkImpl link6 = f.network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		PersonImpl person = new PersonImpl(new IdImpl(0));
@@ -795,16 +795,16 @@ public class QueueSimulationTest extends MatsimTestCase {
 	private static final class Fixture {
 		final Config config;
 		final NetworkLayer network;
-		final Node node1;
-		final Node node2;
-		final Node node3;
-		final Node node4;
-		final Link link1;
-		final Link link2;
-		final Link link3;
+		final NodeImpl node1;
+		final NodeImpl node2;
+		final NodeImpl node3;
+		final NodeImpl node4;
+		final LinkImpl link1;
+		final LinkImpl link2;
+		final LinkImpl link3;
 		final Population plans;
-		final ArrayList<Node> nodes3;
-		final ArrayList<Node> nodes23;
+		final ArrayList<NodeImpl> nodes3;
+		final ArrayList<NodeImpl> nodes23;
 
 		public Fixture() {
 			this.config = Gbl.createConfig(null);
@@ -825,10 +825,10 @@ public class QueueSimulationTest extends MatsimTestCase {
 			/* build plans */
 			this.plans = new PopulationImpl();
 			
-			this.nodes3 = new ArrayList<Node>();
+			this.nodes3 = new ArrayList<NodeImpl>();
 			this.nodes3.add(this.node3);
 
-			this.nodes23 = new ArrayList<Node>();
+			this.nodes23 = new ArrayList<NodeImpl>();
 			this.nodes23.add(this.node2);
 			this.nodes23.add(this.node3);
 		}

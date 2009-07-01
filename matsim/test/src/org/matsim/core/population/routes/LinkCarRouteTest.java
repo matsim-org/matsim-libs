@@ -23,12 +23,12 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
 /**
@@ -37,15 +37,15 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 public class LinkCarRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, Network network) {
+	public NetworkRoute getCarRouteInstance(final LinkImpl fromLink, final LinkImpl toLink, NetworkLayer network) {
 		return new LinkNetworkRoute(fromLink, toLink);
 	}
 
 	public void testGetNodes_subsequentLinks_setLinks() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link2 = network.getLink(new IdImpl("2"));
-		Node node2 = network.getNode(new IdImpl("2"));
+		LinkImpl link1 = network.getLink(new IdImpl("1"));
+		LinkImpl link2 = network.getLink(new IdImpl("2"));
+		NodeImpl node2 = network.getNode(new IdImpl("2"));
 
 		NetworkRoute route = new LinkNetworkRoute(link1, link2);
 		route.setLinks(link1, null, link2);
@@ -56,10 +56,10 @@ public class LinkCarRouteTest extends AbstractNetworkRouteTest {
 
 	public void testGetNodes_subsequentLinks_setNodes() {
 		NetworkLayer network = createTestNetwork();
-		Link link1 = network.getLink(new IdImpl("1"));
-		Link link2 = network.getLink(new IdImpl("2"));
-		Node node2 = network.getNode(new IdImpl("2"));
-		List<Node> nodes = new ArrayList<Node>();
+		LinkImpl link1 = network.getLink(new IdImpl("1"));
+		LinkImpl link2 = network.getLink(new IdImpl("2"));
+		NodeImpl node2 = network.getNode(new IdImpl("2"));
+		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
 		nodes.add(node2);
 
 		NetworkRoute route = new LinkNetworkRoute(link1, link2);

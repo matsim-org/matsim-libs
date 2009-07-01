@@ -8,15 +8,15 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
@@ -24,9 +24,9 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 	private ArrayList<Vehicle> agents;
 	private final boolean setup = false;
 	private ScenarioImpl sc;
-	private Network network;
+	private NetworkLayer network;
 	private Id l0;
-	private Link link0;
+	private LinkImpl link0;
 	
 	
 	public void testSocialCostCalculatorSingleLinkZeroCost() {
@@ -159,8 +159,8 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		Id n1 = this.sc.createId("1");
 
 		
-		Node node0 = ((NetworkLayer)this.network).createNode(n0, this.sc.createCoord(0,0));
-		Node node1 = ((NetworkLayer)this.network).createNode(n1, this.sc.createCoord(10,0));
+		NodeImpl node0 = ((NetworkLayer)this.network).createNode(n0, this.sc.createCoord(0,0));
+		NodeImpl node1 = ((NetworkLayer)this.network).createNode(n1, this.sc.createCoord(10,0));
 		
 		
 		

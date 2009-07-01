@@ -23,13 +23,13 @@ package org.matsim.analysis;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -68,8 +68,8 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		plan.createLeg(TransportMode.undefined);
 		plan.createActivity("act5", new CoordImpl(200.0, 200.0));
 		this.network = new NetworkLayer();
-		Node fromNode = this.network.createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
-		Node toNode = this.network.createNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
+		NodeImpl fromNode = this.network.createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
+		NodeImpl toNode = this.network.createNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
 		this.network.createLink(DEFAULT_LINK_ID, fromNode, toNode, Math.sqrt(20000.0), 13.333, 2000, 1);
 	}
 
@@ -100,7 +100,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		events.addHandler(testee);
 
 		PersonImpl defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
-		Link defaultLink = this.network.getLinks().get(DEFAULT_LINK_ID);
+		LinkImpl defaultLink = this.network.getLinks().get(DEFAULT_LINK_ID);
 
 		LegImpl leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));

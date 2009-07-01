@@ -21,7 +21,6 @@
 package org.matsim.core.network;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.population.routes.AbstractRoute;
@@ -67,26 +66,26 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 	
 	/*package*/ static class CarRouteMock extends AbstractRoute {
-		CarRouteMock(Link startLink, Link endLink){
+		CarRouteMock(LinkImpl startLink, LinkImpl endLink){
 			super(startLink, endLink);
 		}
 	}
 
 	/*package*/ static class PtRouteMock extends AbstractRoute {
-		PtRouteMock(Link startLink, Link endLink){
+		PtRouteMock(LinkImpl startLink, LinkImpl endLink){
 			super(startLink, endLink);
 		}
 	}
 	
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
-		public Route createRoute(Link startLink, Link endLink) {
+		public Route createRoute(LinkImpl startLink, LinkImpl endLink) {
 			return new CarRouteMock(startLink, endLink);
 		}
 
 	}
 
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
-		public Route createRoute(Link startLink, Link endLink) {
+		public Route createRoute(LinkImpl startLink, LinkImpl endLink) {
 			return new PtRouteMock(startLink, endLink);
 		}
 

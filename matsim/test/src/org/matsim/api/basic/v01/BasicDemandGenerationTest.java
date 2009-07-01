@@ -35,11 +35,11 @@ import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -84,7 +84,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
 		
-		this.createFakeNetwork(sc, (Network)sc.getNetwork());
+		this.createFakeNetwork(sc, (NetworkLayer)sc.getNetwork());
 		
 		BasicPopulation pop = sc.getPopulation();
 		BasicPopulationBuilder builder = pop.getPopulationBuilder();
@@ -175,13 +175,13 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		checkContent(population);
 	}
 	
-	private void createFakeNetwork(BasicScenario scenario, Network network){
-		Node n1 = network.getFactory().createNode(ids.get(0), scenario.createCoord(0.0, 0.0), null);
+	private void createFakeNetwork(BasicScenario scenario, NetworkLayer network){
+		NodeImpl n1 = network.getFactory().createNode(ids.get(0), scenario.createCoord(0.0, 0.0), null);
 		network.getNodes().put(n1.getId(), n1);
-		Node n2 = network.getFactory().createNode(ids.get(1), scenario.createCoord(0.0, 0.0), null);
+		NodeImpl n2 = network.getFactory().createNode(ids.get(1), scenario.createCoord(0.0, 0.0), null);
 		network.getNodes().put(n2.getId(), n2);
 		for (Id id : ids){
-			Link l = network.getFactory().createLink(id, n1, n2, network, 23.0, 23.0, 23.0, 1.0);
+			LinkImpl l = network.getFactory().createLink(id, n1, n2, network, 23.0, 23.0, 23.0, 1.0);
 			network.getLinks().put(l.getId(), l);
 		}
 	}

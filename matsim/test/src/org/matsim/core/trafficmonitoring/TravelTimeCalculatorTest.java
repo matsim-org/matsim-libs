@@ -33,9 +33,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -43,8 +40,11 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -98,7 +98,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
 		String eventsFile = getClassInputDirectory() + "link10_events.txt";
 
-		Network network = scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
 		Events events = new Events();
@@ -134,7 +134,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// prepare comparison
-		Link link10 = network.getLinks().get(new IdImpl("10"));
+		LinkImpl link10 = network.getLinks().get(new IdImpl("10"));
 
 		if (generateNewData) {
 			BufferedWriter outfile = null;
@@ -170,9 +170,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		LinkImpl link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
@@ -220,7 +220,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		
 		Config config = super.loadConfig(null);
 		
-		Network network = new NetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse(networkFile);
 		
 		Events events = new Events(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
@@ -230,7 +230,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		
 		new MatsimEventsReader(events).readFile(eventsFilename);
 		
-		Link link10 = network.getLinks().get(new IdImpl("10"));
+		LinkImpl link10 = network.getLinks().get(new IdImpl("10"));
 		
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTime(link10, 6.0 * 3600), EPSILON);
 		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTime(link10, 6.25 * 3600), EPSILON);
