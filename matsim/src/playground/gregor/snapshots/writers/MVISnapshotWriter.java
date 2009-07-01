@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.Scenario;
+import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.utils.gis.ShapeFileReader;

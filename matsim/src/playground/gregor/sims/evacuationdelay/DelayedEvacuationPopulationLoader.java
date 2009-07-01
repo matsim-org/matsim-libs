@@ -2,7 +2,7 @@ package playground.gregor.sims.evacuationdelay;
 
 import java.util.List;
 
-import org.matsim.core.api.Scenario;
+import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.config.groups.EvacuationConfigGroup.EvacuationScenario;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;

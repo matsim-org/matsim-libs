@@ -10,8 +10,6 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -19,6 +17,8 @@ import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -68,8 +68,8 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 
 	private void scorePlans(Events events) {
 		for (AgentArrivalEvent e : this.arrivedPersons) {
-			Person pers = e.getPerson();
-			Plan plan = pers.getSelectedPlan();
+			PersonImpl pers = e.getPerson();
+			PlanImpl plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			for (Id id : links) {
 				LinkInfo li = this.linkInfos.get(id);
@@ -113,8 +113,8 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 	
 	private void updateAvgTT() {
 		for (AgentArrivalEvent e : this.arrivedPersons) {
-			Person pers = e.getPerson();
-			Plan plan = pers.getSelectedPlan();
+			PersonImpl pers = e.getPerson();
+			PlanImpl plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			Collections.reverse(links);
 			traceAgent(links,pers.getId(),e.getTime());

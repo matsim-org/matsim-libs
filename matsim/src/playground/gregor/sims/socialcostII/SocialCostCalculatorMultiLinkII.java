@@ -7,11 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEvent;
@@ -23,6 +21,8 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 import org.matsim.evacuation.socialcost.SocialCostCalculator;
@@ -86,11 +86,11 @@ public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, Qu
 
 	private void recalculateSocialCosts() {
 		calcLinkTimeCosts();
-		for (Person pers : this.population.getPersons().values()) {
+		for (PersonImpl pers : this.population.getPersons().values()) {
 			if ( this.stuckedAgents.contains(pers.getId())) {
 				continue;
 			}
-			Plan plan = pers.getSelectedPlan();
+			PlanImpl plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			traceAgentsRoute(links,pers.getId());
 			

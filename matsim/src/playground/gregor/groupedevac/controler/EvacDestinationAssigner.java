@@ -27,18 +27,18 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -49,7 +49,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 	private Population population;
 
-	private HashMap<Link,ArrayList<Plan>> linkPlanMapping;
+	private HashMap<Link,ArrayList<PlanImpl>> linkPlanMapping;
 	private HashMap<Link,Id> linkColor;
 
 	ArrayList<LinksScoreGroup> linksScoreGroups;
@@ -76,7 +76,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		}
 		Controler controler = event.getControler();
 		this.population = controler.getPopulation();
-		this.linkPlanMapping = new HashMap<Link,ArrayList<Plan>>();
+		this.linkPlanMapping = new HashMap<Link,ArrayList<PlanImpl>>();
 		this.linkColor = new HashMap<Link, Id>();
 		this.linksScoreGroups = new ArrayList<LinksScoreGroup>();
 		iteratePlans();
@@ -88,7 +88,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 	private void iterateLinksScoreGroups() {
 		for (LinksScoreGroup group : this.linksScoreGroups) {
 			Link link = group.getBestLink();
-			Plan plan = getBestLinkPlan(link);
+			PlanImpl plan = getBestLinkPlan(link);
 			ArrayList<Node> evacRoute = new ArrayList<Node>(((NetworkRoute) ((LegImpl) plan.getPlanElements().get(1)).getRoute()).getNodes());
 			if (isOutLink(link, group.getNode())){
 				evacRoute.add(0, group.getNode());
@@ -103,7 +103,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			ArrayList<Link> links = group.getLinks();
 			for (Link l : links) {
 
-				ArrayList<Plan> plans = this.linkPlanMapping.get(l);
+				ArrayList<PlanImpl> plans = this.linkPlanMapping.get(l);
 				if (plans == null) {
 					continue;
 				}
@@ -141,9 +141,9 @@ public class EvacDestinationAssigner implements ScoringListener {
 	}
 
 
-	private void modifyPlans(final Link dest, final ArrayList<Node> evacRoute, final Link origin, final ArrayList<Plan> plans) {
+	private void modifyPlans(final Link dest, final ArrayList<Node> evacRoute, final Link origin, final ArrayList<PlanImpl> plans) {
 		
-		for (Plan plan : plans) {
+		for (PlanImpl plan : plans) {
 			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			NetworkRoute route = new NodeNetworkRoute();
 			route.setNodes(evacRoute);
@@ -156,11 +156,11 @@ public class EvacDestinationAssigner implements ScoringListener {
 				return;
 			}
 
-			Person pers = plan.getPerson();
+			PersonImpl pers = plan.getPerson();
 			// keep best plan only
-			Plan bestPlan = null;
+			PlanImpl bestPlan = null;
 			double bestScore = Double.NEGATIVE_INFINITY;
-			for (Plan plan2 : pers.getPlans()) {
+			for (PlanImpl plan2 : pers.getPlans()) {
 				if (plan2.getScore().doubleValue() > bestScore) {
 					bestScore = plan2.getScore().doubleValue();
 					bestPlan = plan2;
@@ -191,10 +191,10 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 
 
-	private Plan getBestLinkPlan(final Link link) {
-		Plan bestPlan = null;
+	private PlanImpl getBestLinkPlan(final Link link) {
+		PlanImpl bestPlan = null;
 		double bestScore = Double.NEGATIVE_INFINITY;
-		for (Plan plan : this.linkPlanMapping.get(link)) {
+		for (PlanImpl plan : this.linkPlanMapping.get(link)) {
 			if (plan.getScore().doubleValue() > bestScore) {
 				bestScore = plan.getScore().doubleValue();
 				bestPlan = plan;
@@ -267,14 +267,14 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 
 	private double calcScore(final Link link) {
-		ArrayList<Plan> plans = this.linkPlanMapping.get(link);
+		ArrayList<PlanImpl> plans = this.linkPlanMapping.get(link);
 		if (plans == null) {
 			return Double.NEGATIVE_INFINITY;
 		}
 		
 		
 		double scoreSum = 0;
-		for (Plan plan : plans) {
+		for (PlanImpl plan : plans) {
 			scoreSum += plan.getScore().doubleValue();
 		}
 		
@@ -283,13 +283,13 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 
 	private void iteratePlans() {
-		Collection<Person> pers = this.population.getPersons().values();
-		for (Person p : pers) {
-			Plan plan = p.getSelectedPlan();
+		Collection<PersonImpl> pers = this.population.getPersons().values();
+		for (PersonImpl p : pers) {
+			PlanImpl plan = p.getSelectedPlan();
 			Link link = plan.getFirstActivity().getLink();
-			ArrayList<Plan> coPlans = this.linkPlanMapping.get(link);
+			ArrayList<PlanImpl> coPlans = this.linkPlanMapping.get(link);
 			if (coPlans == null) {
-				coPlans = new ArrayList<Plan>();
+				coPlans = new ArrayList<PlanImpl>();
 				this.linkPlanMapping.put(link, coPlans);
 			}
 			coPlans.add(plan);

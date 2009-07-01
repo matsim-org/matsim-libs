@@ -4,15 +4,13 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -23,6 +21,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -98,8 +98,8 @@ public class NetworkCalibrator {
 		Population pop = sc.getPopulation();
 		PopulationBuilder pb = pop.getPopulationBuilder();
 		for (int i = 0; i < PERSONS; i++) {
-			Person p = pb.createPerson(new IdImpl(i));
-			Plan plan = pb.createPlan(p);
+			PersonImpl p = pb.createPerson(new IdImpl(i));
+			PlanImpl plan = pb.createPlan(p);
 			p.addPlan(plan);
 			ActivityImpl a0 = pb.createActivityFromLinkId("h", l0.getId());
 			a0.setEndTime(0);

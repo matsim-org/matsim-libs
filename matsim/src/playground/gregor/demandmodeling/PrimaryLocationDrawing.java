@@ -32,10 +32,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -44,6 +42,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -114,9 +114,9 @@ public class PrimaryLocationDrawing {
 	}
 
 
-	private ArrayList<Person> getPersons(final Feature zone) {
+	private ArrayList<PersonImpl> getPersons(final Feature zone) {
 
-		ArrayList<Person> ret = new ArrayList<Person>();
+		ArrayList<PersonImpl> ret = new ArrayList<PersonImpl>();
 
 		final Polygon p = (Polygon) zone.getDefaultGeometry().getGeometryN(0);
 		final Envelope e = zone.getBounds();
@@ -169,8 +169,8 @@ public class PrimaryLocationDrawing {
 			final int li = (int) Math.round(inhabitants * fraction);
 			all += li;
 			for (int i = 0; i < li ; i++) {
-				final Person pers = new PersonImpl(new IdImpl(this.id++));
-				final Plan plan = new org.matsim.core.population.PlanImpl(pers);
+				final PersonImpl pers = new PersonImpl(new IdImpl(this.id++));
+				final PlanImpl plan = new org.matsim.core.population.PlanImpl(pers);
 				final ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",link.getCoord(),link);
 				act.setEndTime(6*3600);
 				plan.addActivity(act);
@@ -204,9 +204,9 @@ public class PrimaryLocationDrawing {
 		for (Entry<String, Feature> e : ftDist.entrySet()) {
 			Feature ft = e.getValue();
 			Long inhabitants = (Long) ft.getAttribute(6);
-			ArrayList<Person> persons = getPersons(ft);
+			ArrayList<PersonImpl> persons = getPersons(ft);
 
-			for (Person pers : persons) {
+			for (PersonImpl pers : persons) {
 
 				Zone primActZone = null;
 				while(true) {

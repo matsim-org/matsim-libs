@@ -12,15 +12,15 @@ import org.jgap.Population;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -71,7 +71,7 @@ public class AsciiToPlan {
 		Scenario sc = new ScenarioImpl();
 		Network net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(NET_FILE);
-		org.matsim.core.api.population.Population pop = sc.getPopulation();
+		org.matsim.core.api.experimental.population.Population pop = sc.getPopulation();
 		PopulationBuilder pb = pop.getPopulationBuilder();
 		
 		//Starte die Verarbeitung
@@ -79,8 +79,8 @@ public class AsciiToPlan {
 			int j=0;
 			zaehler++;
 			Id id =new IdImpl(zaehler); 
-			Person person = pb.createPerson(id);
-			Plan plan = pb.createPlan(person);
+			PersonImpl person = pb.createPerson(id);
+			PlanImpl plan = pb.createPlan(person);
 			person.addPlan(plan);
 			//Lese wichtige Daten ein
 //			spalten_v = StringUtils.explode(zeile, TRENNER);

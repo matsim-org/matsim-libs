@@ -29,13 +29,13 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -73,7 +73,7 @@ public class PlanExcluder {
 
 		Population plans = new PopulationImpl();
 
-		for (Person person : this.plans.getPersons().values()) {
+		for (PersonImpl person : this.plans.getPersons().values()) {
 
 			Coord c = person.getSelectedPlan().getFirstActivity().getCoord();
 			Point p  = MGC.coord2Point(c);

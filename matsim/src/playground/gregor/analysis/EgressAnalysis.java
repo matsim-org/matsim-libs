@@ -40,17 +40,17 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
@@ -75,7 +75,7 @@ public class EgressAnalysis {
 
 	private final Population population;
 	private final Envelope envelope = null;
-	private QuadTree<Person> personTree;
+	private QuadTree<PersonImpl> personTree;
 	private final NetworkLayer network;
 	private final PlansCalcRoute router;
 	private FeatureType ftDistrictShape;
@@ -175,12 +175,12 @@ public class EgressAnalysis {
 
 	private void handlePlans() {
 			log.info("handle plans");
-			for (Person person : this.population.getPersons().values()) {
+			for (PersonImpl person : this.population.getPersons().values()) {
 				LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 				List<Node> route = ((NetworkRoute) leg.getRoute()).getNodes();
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
-				Plan plan = new org.matsim.core.population.PlanImpl(person);
+				PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 				plan.addActivity(person.getSelectedPlan().getFirstActivity());
 				LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 				l.setDepartureTime(0.0);

@@ -32,8 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,6 +45,8 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -84,17 +84,17 @@ public class CutNetwork {
 		max_x = 652088.;
 		max_y = 9894785.;
 		
-		ConcurrentLinkedQueue<Plan> q = new ConcurrentLinkedQueue<Plan>();
-		for (Person pers : pop.getPersons().values()) {
-			Plan p = pers.getSelectedPlan();
+		ConcurrentLinkedQueue<PlanImpl> q = new ConcurrentLinkedQueue<PlanImpl>();
+		for (PersonImpl pers : pop.getPersons().values()) {
+			PlanImpl p = pers.getSelectedPlan();
 			CoordImpl c = (CoordImpl) p.getFirstActivity().getCoord();
 			if (!isWithin(c)) {
 				q.add(p);
 			}
 		}
 		while (q.size() > 0) {
-			Plan p = q.poll();
-			Person pers = p.getPerson();
+			PlanImpl p = q.poll();
+			PersonImpl pers = p.getPerson();
 			pop.getPersons().remove(pers.getId());
 		}
 		System.out.println(pop.getPersons().size());
@@ -133,9 +133,9 @@ public class CutNetwork {
 		}
 		new NetworkCleaner().run(net);
 		
-		Iterator<Person> it = pop.getPersons().values().iterator();
+		Iterator<PersonImpl> it = pop.getPersons().values().iterator();
 		while (it.hasNext()) {
-			Person pers = it.next();
+			PersonImpl pers = it.next();
 
 			Id id = ((ActivityImpl)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
 
