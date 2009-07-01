@@ -22,8 +22,8 @@ package org.matsim.core.replanning.selectors;
 
 import java.util.HashMap;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Selects the worst plan of a person (most likely for removal), but respects
@@ -34,11 +34,11 @@ import org.matsim.core.api.population.Plan;
  */
 public class WorstPlanForRemovalSelector implements PlanSelector {
 
-	public Plan selectPlan(Person person) {
+	public PlanImpl selectPlan(PersonImpl person) {
 		
-		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
+		HashMap<PlanImpl.Type, Integer> typeCounts = new HashMap<PlanImpl.Type, Integer>();
 		// initialize list of types
-		for (Plan plan : person.getPlans()) {
+		for (PlanImpl plan : person.getPlans()) {
 			Integer cnt = typeCounts.get(plan.getType());
 			if (cnt == null) {
 				typeCounts.put(plan.getType(), Integer.valueOf(1));
@@ -46,9 +46,9 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 				typeCounts.put(plan.getType(), Integer.valueOf(cnt.intValue() + 1));
 			}
 		}
-			Plan worst = null;
+			PlanImpl worst = null;
 			double worstScore = Double.POSITIVE_INFINITY;
-			for (Plan plan : person.getPlans()) {
+			for (PlanImpl plan : person.getPlans()) {
 				if (typeCounts.get(plan.getType()).intValue() > 1) {
 					if (plan.getScore() == null) {
 						worst = plan;
@@ -64,7 +64,7 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 		if (worst == null) {
 			// there is exactly one plan, or we have of each plan-type exactly one.
 			// select the one with worst score globally
-			for (Plan plan : person.getPlans()) {
+			for (PlanImpl plan : person.getPlans()) {
 				if (plan.getScore() == null) {
 					return plan;
 				}

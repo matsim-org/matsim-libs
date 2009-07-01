@@ -22,10 +22,10 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PersonSimplify extends AbstractPersonAlgorithm {
 
@@ -48,10 +48,10 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		List plans = person.getPlans();
 		for (int i=0; i<plans.size(); i++) {
-			Plan plan = (Plan)plans.get(i);
+			PlanImpl plan = (PlanImpl)plans.get(i);
 
 			// set the first and last activty to home
 			List acts_legs = plan.getPlanElements();

@@ -24,13 +24,13 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -102,11 +102,11 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			this.isFirstLine = false;
 		}
 		else {
-			Person p = new PersonImpl(new IdImpl(row[0]));
+			PersonImpl p = new PersonImpl(new IdImpl(row[0]));
 			p.setAge(Integer.parseInt(row[2]));
 			p.setSex(row[3]);
 			log.warn("Income is not supported by the current version of MATSim. Column 5 will be ignored");
-			Plan plan = p.createPlan(true);
+			PlanImpl plan = p.createPlan(true);
 			Zone homeZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[1]));
 			Coord homeCoord = WorldUtils.getRandomCoordInZone(homeZone, this.zoneLayer);
 			Zone primaryZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[6]));

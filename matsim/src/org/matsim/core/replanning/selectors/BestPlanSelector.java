@@ -20,8 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Selects the plan with the best score from the existing plans of the person.
@@ -33,12 +33,12 @@ public class BestPlanSelector implements PlanSelector {
 	/**
 	 * selects the plan with the highest score from the person
 	 */
-	public Plan selectPlan(final Person person) {
+	public PlanImpl selectPlan(final PersonImpl person) {
 
 		double maxScore = Double.NEGATIVE_INFINITY;
-		Plan bestPlan = null;
+		PlanImpl bestPlan = null;
 
-		for (Plan plan : person.getPlans()) {
+		for (PlanImpl plan : person.getPlans()) {
 			Double score = plan.getScore();
 			if ((score != null) && (score.doubleValue() > maxScore)) {
 				maxScore = plan.getScore().doubleValue();

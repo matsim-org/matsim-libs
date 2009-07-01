@@ -22,8 +22,8 @@ package org.matsim.population.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -35,17 +35,17 @@ public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlg
 	}
 	
 	@Override
-	public void run(Person person) {
-		Iterator<Plan> iter = person.getPlans().iterator();
+	public void run(PersonImpl person) {
+		Iterator<PlanImpl> iter = person.getPlans().iterator();
 		while (iter.hasNext()) {
-			Plan plan = iter.next();
+			PlanImpl plan = iter.next();
 			if (plan.isSelected()) {
 				run(plan);
 			}
 		}
 	}
 	
-	public final void run(Plan plan) {
+	public final void run(PlanImpl plan) {
 		Double score = plan.getScore();
 
 		if ((score != null) && (!score.isInfinite()) && (!score.isNaN())) {

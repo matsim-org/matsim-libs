@@ -25,10 +25,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;
@@ -213,7 +213,7 @@ public class PlanScore implements AgentContentment {
 	}
 
 	private void calcReferenceVals() {
-		Plan plan = this.agent.getPerson().getSelectedPlan();
+		PlanImpl plan = this.agent.getPerson().getSelectedPlan();
 		int planEntries = plan.getPlanElements().size();
 		this.referenceScore = new double[planEntries + 1];
 		this.zeroUtilDuration = new double[planEntries + 1];

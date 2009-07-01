@@ -16,11 +16,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api;
+package org.matsim.core.api.experimental;
 import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Population;
 import org.matsim.households.Households;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
@@ -36,7 +36,7 @@ import org.matsim.vehicles.BasicVehicles;
  * has to provide consistent implementations
  * for the different return types, e.g. Network, 
  * Facilities or Population.
- * @see org.matsim.core.api.ScenarioLoader
+ * @see org.matsim.core.api.experimental.ScenarioLoader
  * @author dgrether
  *
  */

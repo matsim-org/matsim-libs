@@ -21,9 +21,9 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
@@ -36,7 +36,7 @@ import org.matsim.core.scoring.interfaces.LegScoring;
  */
 public class LegScoringFunction implements LegScoring, BasicScoring {
 
-	protected final Plan plan;
+	protected final PlanImpl plan;
 
 	protected double score;
 	private double lastTime;
@@ -49,7 +49,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 
-	public LegScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public LegScoringFunction(final PlanImpl plan, final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
 

@@ -23,9 +23,9 @@ package org.matsim.population.algorithms;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Counter;
 
 /**
@@ -88,7 +88,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 		
 		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
 		int i = 0;
-		for (Person person : population.getPersons().values()) {
+		for (PersonImpl person : population.getPersons().values()) {
 			algoThreads[i % numOfThreads].handlePerson(person);
 			i++;
 		}
@@ -116,7 +116,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 
 		public final int threadId;
 		private final AbstractPersonAlgorithm personAlgo;
-		private final List<Person> persons = new LinkedList<Person>();
+		private final List<PersonImpl> persons = new LinkedList<PersonImpl>();
 		private final Counter counter;
 
 		public PersonAlgoThread(final int i, final AbstractPersonAlgorithm algo, final Counter counter) {
@@ -125,12 +125,12 @@ public abstract class ParallelPersonAlgorithmRunner {
 			this.counter = counter;
 		}
 
-		public void handlePerson(final Person person) {
+		public void handlePerson(final PersonImpl person) {
 			this.persons.add(person);
 		}
 
 		public void run() {
-			for (Person person : this.persons) {
+			for (PersonImpl person : this.persons) {
 				this.personAlgo.run(person);
 				counter.incCounter();
 			}

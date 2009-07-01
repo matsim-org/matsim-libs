@@ -22,28 +22,28 @@ package org.matsim.population.algorithms;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * @author dgrether
  */
 public class PlanCollectFromAlgorithm implements PlanAlgorithm {
 
-	private Set<Plan> plans;
+	private Set<PlanImpl> plans;
 
 	public PlanCollectFromAlgorithm() {
-		this.plans = new HashSet<Plan>();
+		this.plans = new HashSet<PlanImpl>();
 	}
 
 	/**
 	 * Just collects all plans in a set.
-	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.core.api.population.Plan)
+	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.core.population.PlanImpl)
 	 */
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		this.plans.add(plan);
 	}
 
-	public Set<Plan> getPlans() {
+	public Set<PlanImpl> getPlans() {
 		return this.plans;
 	}
 

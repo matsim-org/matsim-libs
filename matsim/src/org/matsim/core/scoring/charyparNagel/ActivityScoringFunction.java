@@ -21,9 +21,9 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -39,8 +39,8 @@ import org.matsim.core.utils.misc.Time;
 public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 
-	protected final Person person;
-	protected final Plan plan;
+	protected final PersonImpl person;
+	protected final PlanImpl plan;
 
 	protected double score;
 	private double lastTime;
@@ -60,7 +60,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	
 	private static final Logger log = Logger.getLogger(ActivityScoringFunction.class);
 
-	public ActivityScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public ActivityScoringFunction(final PlanImpl plan, final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
 

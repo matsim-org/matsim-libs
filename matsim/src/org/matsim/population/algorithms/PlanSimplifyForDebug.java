@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -85,9 +85,9 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	// ////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
-		for (Iterator<Plan> iter = person.getPlans().iterator(); iter.hasNext();) {
-			Plan plan = iter.next();
+	public void run(final PersonImpl person) {
+		for (Iterator<PlanImpl> iter = person.getPlans().iterator(); iter.hasNext();) {
+			PlanImpl plan = iter.next();
 			run(plan);
 			if (plan.getPlanElements().size() != 5) {
 				iter.remove();
@@ -95,7 +95,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		}
 	}
 
-	private void run(final Plan plan) {
+	private void run(final PlanImpl plan) {
 		removeUnwantedActs(plan);
 		shortenPlan(plan);
 		setTimes(plan);
@@ -110,7 +110,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	 * 
 	 * @param plan
 	 */
-	private void removeUnwantedActs(final Plan plan) {
+	private void removeUnwantedActs(final PlanImpl plan) {
 		List<?> actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i += 2) {
 			ActivityImpl act = (ActivityImpl) actsLegs.get(i);
@@ -134,14 +134,14 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	 * 
 	 * @param plan
 	 */
-	private void shortenPlan(final Plan plan) {
+	private void shortenPlan(final PlanImpl plan) {
 		List<?> actsLegs = plan.getPlanElements();
 		while (actsLegs.size() > 5) {
 			plan.removeActivity(4);
 		}
 	}
 
-	private void setTimes(final Plan plan) {
+	private void setTimes(final PlanImpl plan) {
 		// we assume we get simple h-X-h-Plans at this stage
 		if (plan.getPlanElements().size() != 5)
 			return;
@@ -176,7 +176,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		act.setDuration(16 * 3600 - time);
 	}
 
-	private void restoreRoutes(final Plan plan) {
+	private void restoreRoutes(final PlanImpl plan) {
 		boolean needsRouter = false;
 		List<?> actsLegs = plan.getPlanElements();
 		for (int i = 1, max = actsLegs.size(); i < max; i += 2) {

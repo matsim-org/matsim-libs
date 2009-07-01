@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api;
+package org.matsim.core.api.experimental;
 
 import java.io.IOException;
 
@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
  * of the scenario assuming that required parts are already 
  * loaded or created by the user.
  * 
- * @see org.matsim.core.api.Scenario
+ * @see org.matsim.core.api.experimental.Scenario
  * 
  * @author dgrether
  */

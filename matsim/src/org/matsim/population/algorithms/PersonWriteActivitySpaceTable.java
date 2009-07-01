@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.ActivitySpaceBean;
 import org.matsim.knowledges.ActivitySpaceCassini;
@@ -129,7 +129,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			Gbl.errorMsg("Knowledge is not defined!");

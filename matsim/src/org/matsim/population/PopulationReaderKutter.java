@@ -24,14 +24,14 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -165,8 +165,8 @@ public class PopulationReaderKutter implements PopulationReader {
 				6*3600, 3*3600, 2*3600, 2*3600, 5*3600 /* 13-17 */
 		};
 		private final TransportMode[] legModes = {TransportMode.undefined, TransportMode.walk, TransportMode.bike, TransportMode.car, TransportMode.ride, TransportMode.pt, TransportMode.pt};
-		private Person currPerson = null;
-		private Plan currPlan = null;
+		private PersonImpl currPerson = null;
+		private PlanImpl currPlan = null;
 		private Coord currHome = null;
 		private int currTime = 0;
 
@@ -191,12 +191,12 @@ public class PopulationReaderKutter implements PopulationReader {
 			this.cnt = 0;
 		}
 
-		private Person parsePerson() {
+		private PersonImpl parsePerson() {
 			String id = Long.toString(this.idCnt);
 			this.idCnt++;
 			this.cnt++;
 			int age = this.pgMinAge[this.pg_] + (int)Math.round(MatsimRandom.getRandom().nextDouble()*(this.pgMaxAge[this.pg_]+1 - this.pgMinAge[this.pg_]));
-			Person p = new PersonImpl(new IdImpl(id));
+			PersonImpl p = new PersonImpl(new IdImpl(id));
 			p.setSex(this.pgSex[this.pg_]);
 			p.setAge(age);
 			p.setLicence(this.pgLicense[this.pg_]);

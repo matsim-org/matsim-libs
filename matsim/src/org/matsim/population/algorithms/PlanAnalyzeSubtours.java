@@ -25,11 +25,11 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Analyses plans for subtours. See documentation <a href="http://matsim.org/node/266">here</a>.
@@ -53,7 +53,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		super();
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 
 		this.locationIds = new ArrayList<Id>();
 
@@ -105,7 +105,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	/**
 	 * Use this method to get information which leg belongs to which subtour. See documentation <a href="http://matsim.org/node/264">here</a>.
 	 * 
-	 * @return an array with subtour indices [int] of each leg of the {@link Plan} that was analyzed most recently
+	 * @return an array with subtour indices [int] of each leg of the {@link PlanImpl} that was analyzed most recently
 	 */
 	public int[] getSubtourIndexation() {
 		return this.subtourIndexation;
@@ -114,7 +114,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	/**
 	 * Use this method to retrieve the number of subtours of an activity plan. See documentation <a href="http://matsim.org/node/264">here</a>.
 	 * 
-	 * @return the number of subtours in the {@link Plan} that was analyzed most recently
+	 * @return the number of subtours in the {@link PlanImpl} that was analyzed most recently
 	 */
 	public int getNumSubtours() {
 		return this.numSubtours;

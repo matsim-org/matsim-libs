@@ -22,8 +22,8 @@ package org.matsim.population.filters;
 
 import java.util.regex.Pattern;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * Filters persons whose id matches a certain pattern (regular expression).
@@ -41,7 +41,7 @@ public class PersonIdFilter extends AbstractPersonFilter {
 	}
 
 	@Override
-	public boolean judge(Person person) {
+	public boolean judge(PersonImpl person) {
 
 		String personId = person.getId().toString();
 		

@@ -20,8 +20,10 @@
 
 package org.matsim.core.api.population;
 
+import org.matsim.core.population.PersonImpl;
+
 
 
 public interface PersonAlgorithm {
-	public void run(Person person);
+	public void run(PersonImpl person);
 }

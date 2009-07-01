@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.households.basic.BasicHouseholdImpl;
 import org.matsim.vehicles.BasicVehicle;
 
@@ -35,13 +35,13 @@ import org.matsim.vehicles.BasicVehicle;
  */
 public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 
-	private final Map<Id, Person> members;
+	private final Map<Id, PersonImpl> members;
 
 	private final Map<Id, BasicVehicle> vehicles;
 
 	public HouseholdImpl(final Id id) {
 		super(id);
-		this.members = new LinkedHashMap<Id, Person>();
+		this.members = new LinkedHashMap<Id, PersonImpl>();
 		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
 	}
 
@@ -59,7 +59,7 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 				"Use method addMember(Person p) instead!");
 	}
 
-	public Map<Id, Person> getMembers() {
+	public Map<Id, PersonImpl> getMembers() {
 		return this.members;
 	}
 

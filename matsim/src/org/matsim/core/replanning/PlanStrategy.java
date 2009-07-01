@@ -24,9 +24,9 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
@@ -40,7 +40,7 @@ public class PlanStrategy {
 	private PlanSelector planSelector = null;
 	private Object firstModule = null;
 	private final ArrayList<Object> modules = new ArrayList<Object>();
-	private final ArrayList<Plan> plans = new ArrayList<Plan>();
+	private final ArrayList<PlanImpl> plans = new ArrayList<PlanImpl>();
 	private long counter = 0;
 	private final static Logger log = Logger.getLogger(PlanStrategy.class);
 
@@ -98,9 +98,9 @@ public class PlanStrategy {
 	 * @param person
 	 * @see #finish()
 	 */
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		this.counter++;
-		Plan plan = person.getRandomUnscoredPlan();
+		PlanImpl plan = person.getRandomUnscoredPlan();
 		if (plan == null) {
 			plan = this.planSelector.selectPlan(person);
 		}
@@ -135,7 +135,7 @@ public class PlanStrategy {
 	 * Indicates that no additional persons will be handed to this module and
 	 * waits until this strategy has finished handling all persons.
 	 *
-	 * @see #run(Person)
+	 * @see #run(PersonImpl)
 	 */
 	public void finish() {
 		if (this.firstModule != null) {
@@ -150,14 +150,14 @@ public class PlanStrategy {
 				if (o instanceof PlanStrategyModule) {
 					PlanStrategyModule module = (PlanStrategyModule) o;
 					module.prepareReplanning();
-					for (Plan plan : this.plans) {
+					for (PlanImpl plan : this.plans) {
 						module.handlePlan(plan);
 					}
 					module.finishReplanning();
 				} else if (o instanceof BasicPlanStrategyModule) {
 					BasicPlanStrategyModule module = (BasicPlanStrategyModule) o;
 					module.prepareReplanning();
-					for (Plan plan : this.plans) {
+					for (PlanImpl plan : this.plans) {
 						module.handlePlan(plan);
 					}
 					module.finishReplanning();					

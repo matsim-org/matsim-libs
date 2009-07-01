@@ -22,8 +22,8 @@
 package org.matsim.analysis;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PlanLegsTravelDistanceCalculator {
 	
@@ -31,7 +31,7 @@ public class PlanLegsTravelDistanceCalculator {
 	// later: distinguish between modes
 	private double nbrOfLegs;
 	
-	public void handle(final Plan plan){
+	public void handle(final PlanImpl plan){
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				final LegImpl leg = (LegImpl) pe;

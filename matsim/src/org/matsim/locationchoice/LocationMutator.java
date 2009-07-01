@@ -26,14 +26,14 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -105,20 +105,20 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
 	
-	public abstract void handlePlan(final Plan plan);
+	public abstract void handlePlan(final PlanImpl plan);
 
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		final int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
-			final Plan plan = person.getPlans().get(planId);
+			final PlanImpl plan = person.getPlans().get(planId);
 			handlePlan(plan);
 		}
 	}
 
-	public void run(final Plan plan) {	
+	public void run(final PlanImpl plan) {	
 		handlePlan(plan);
 	}
 	
@@ -130,11 +130,11 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.controler = controler;
 	}
 		
-	protected List<ActivityImpl>  defineMovablePrimaryActivities(final Plan plan) {				
+	protected List<ActivityImpl>  defineMovablePrimaryActivities(final PlanImpl plan) {				
 		return this.defineFlexibleActivities.getMovablePrimaryActivities(plan);
 	}
 	
-	protected void resetRoutes(final Plan plan) {
+	protected void resetRoutes(final PlanImpl plan) {
 		// loop over all <leg>s, remove route-information
 		// routing is done after location choice
 		final List<?> actslegs = plan.getPlanElements();

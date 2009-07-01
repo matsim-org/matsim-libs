@@ -28,12 +28,12 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
@@ -65,7 +65,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	
 	@Override
-	public void handlePlan(final Plan plan){
+	public void handlePlan(final PlanImpl plan){
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
 		super.resetRoutes(plan);	
@@ -79,7 +79,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		this.unsuccessfullLC = 0;
 	}
 
-	public void handleSubChains(final Plan plan, List<SubChain> subChains) {		
+	public void handleSubChains(final PlanImpl plan, List<SubChain> subChains) {		
 		Iterator<SubChain> sc_it = subChains.iterator();
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
@@ -186,7 +186,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return leg.getTravelTime();
 	}
 	
-	private List<SubChain> calcActChainsDefinedFixedTypes(final Plan plan) {
+	private List<SubChain> calcActChainsDefinedFixedTypes(final PlanImpl plan) {
 		ManageSubchains manager = new ManageSubchains();
 		
 		final List<?> actslegs = plan.getPlanElements();
@@ -208,7 +208,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return manager.getSubChains();	
 	}
 	
-	private List<SubChain> calcActChainsBasedOnKnowledge(final Plan plan) {
+	private List<SubChain> calcActChainsBasedOnKnowledge(final PlanImpl plan) {
 		ManageSubchains manager = new ManageSubchains();	
 		List<ActivityImpl> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		
@@ -235,7 +235,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return manager.getSubChains();
 	}
  		
-	public List<SubChain> calcActChains(final Plan plan) {
+	public List<SubChain> calcActChains(final PlanImpl plan) {
 		if (super.locationChoiceBasedOnKnowledge) {
 			return this.calcActChainsBasedOnKnowledge(plan);
 		}

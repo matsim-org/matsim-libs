@@ -21,10 +21,10 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Changes to another plan if that plan is better.  Probability to change depends on score difference.
@@ -45,10 +45,10 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	 * Changes to another plan with a probability proportional to exp( Delta scores ).
 	 * Need to think through if this goes to Nash Equilibrium or to SUE !!!
 	 */
-	public Plan selectPlan(final Person person) {
+	public PlanImpl selectPlan(final PersonImpl person) {
 		// current plan and random plan:
-		Plan currentPlan = person.getSelectedPlan();
-		Plan otherPlan = person.getRandomPlan();
+		PlanImpl currentPlan = person.getSelectedPlan();
+		PlanImpl otherPlan = person.getRandomPlan();
 
 		if (currentPlan == null) {
 			// this case should only happen when the agent has no plans at all

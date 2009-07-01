@@ -27,12 +27,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.Scenario;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Counter;
@@ -50,7 +49,7 @@ public class PopulationImpl implements Population {
 	private long nextMsg = 1;
 	private boolean isStreaming = false;
 	
-	private Map<Id, Person> persons = new TreeMap<Id, Person>();
+	private Map<Id, PersonImpl> persons = new TreeMap<Id, PersonImpl>();
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
@@ -77,7 +76,7 @@ public class PopulationImpl implements Population {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void addPerson(final Person p) {
+	public final void addPerson(final PersonImpl p) {
 		// validation
 		if (this.getPersons().containsKey(p.getId())) {
 			throw new IllegalArgumentException("Person with id = " + p.getId() + " already exists.");
@@ -121,7 +120,7 @@ public class PopulationImpl implements Population {
 				PersonAlgorithm algo = this.personAlgos.get(i);
 				log.info("running algorithm " + algo.getClass().getName());
 				Counter cntr = new Counter(" person # ");
-				for (Person person : this.getPersons().values()) {
+				for (PersonImpl person : this.getPersons().values()) {
 					cntr.incCounter();
 					algo.run(person);
 				}
@@ -159,7 +158,7 @@ public class PopulationImpl implements Population {
 	//////////////////////////////////////////////////////////////////////
 
 
-	public final Map<Id, Person> getPersons() {
+	public final Map<Id, PersonImpl> getPersons() {
 		return persons ;
 	}
 

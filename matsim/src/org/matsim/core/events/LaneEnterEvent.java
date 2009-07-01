@@ -21,7 +21,7 @@ package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 
 /**
@@ -32,7 +32,7 @@ public class LaneEnterEvent extends LaneEvent {
 	
 	public static final String EVENT_TYPE = "entered lane";
 
-	public LaneEnterEvent(double time, Person agent, Link link, Id laneId) {
+	public LaneEnterEvent(double time, PersonImpl agent, Link link, Id laneId) {
 		super(time, agent, link, laneId);
 	}
 

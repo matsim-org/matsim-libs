@@ -19,11 +19,11 @@
 
 package org.matsim.withinday;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * Factory for withinday replanning agents
@@ -45,7 +45,7 @@ public class WithindayAgentFactory extends AgentFactory {
 	}
 
 	@Override
-	public PersonAgent createPersonAgent(final Person p) {
+	public PersonAgent createPersonAgent(final PersonImpl p) {
 		WithindayAgent agent = new WithindayAgent(p, this.simulation, this.withindayConfigGroup.getAgentVisibilityRange(), this.agentLogicFactory);
 		//set the agent's replanning interval
 		agent.setReplanningInterval(this.withindayConfigGroup.getReplanningInterval());

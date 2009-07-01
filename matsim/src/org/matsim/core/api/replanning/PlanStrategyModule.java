@@ -20,7 +20,7 @@
 
 package org.matsim.core.api.replanning;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 
 /**
@@ -48,7 +48,7 @@ public interface PlanStrategyModule {
 	 * @param plan
 	 * @see #finishReplanning()
 	 */
-	public void handlePlan(Plan plan);
+	public void handlePlan(PlanImpl plan);
 	
 	/**
 	 * Indicates that no additional plans will be handed to this module and waits
@@ -56,7 +56,7 @@ public interface PlanStrategyModule {
 	 * routines can call those here, or multi-threaded modules can wait here until
 	 * all threads are finished with their work.
 	 * 
-	 * @see #handlePlan(Plan)
+	 * @see #handlePlan(PlanImpl)
 	 */
 	public void finishReplanning();
 }

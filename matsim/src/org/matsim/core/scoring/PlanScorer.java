@@ -21,9 +21,9 @@
 package org.matsim.core.scoring;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * @author dgrether
@@ -36,7 +36,7 @@ public class PlanScorer {
 		this.factory = factory;
 	}
 
-	public double getScore(final Plan plan) {
+	public double getScore(final PlanImpl plan) {
 		ScoringFunction function = this.factory.getNewScoringFunction(plan);
 		boolean firstActivityDone = false;
 

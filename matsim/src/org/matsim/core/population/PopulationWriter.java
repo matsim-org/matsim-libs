@@ -30,10 +30,9 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
@@ -197,8 +196,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		}
 		try {
 			this.handler.startPerson(person,this.out);
-			if (person instanceof Person) {
-				Person p = (Person)person;
+			if (person instanceof PersonImpl) {
+				PersonImpl p = (PersonImpl)person;
 				// travelcards
 				if (p.getTravelcards() != null) {
 					Iterator<String> t_it = p.getTravelcards().iterator();
@@ -312,7 +311,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	}
 
 	public final void writePersons() {
-		Iterator<Person> p_it = this.population.getPersons().values().iterator();
+		Iterator<PersonImpl> p_it = this.population.getPersons().values().iterator();
 		while (p_it.hasNext()) {
 			BasicPerson p = p_it.next();
 			writePerson(p);
@@ -357,7 +356,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		writePerson(person);
 	}
 }

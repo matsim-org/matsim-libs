@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * @author david
@@ -40,7 +40,7 @@ public class BasicPlanImpl implements BasicPlan {
 	private Double score = null;
 	private BasicPerson person = null;
 
-	private Plan.Type type = null;
+	private PlanImpl.Type type = null;
 
 	private boolean isSelected;
 
@@ -73,12 +73,12 @@ public class BasicPlanImpl implements BasicPlan {
 	}
 
 
-	public Plan.Type getType() {
+	public PlanImpl.Type getType() {
 		return this.type;
 	}
 
 
-	public void setType(Plan.Type type) {
+	public void setType(PlanImpl.Type type) {
 		this.type = type;
 	}
 

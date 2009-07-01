@@ -30,8 +30,8 @@ import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -62,8 +62,8 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		this.count = new int[4];
 	}
 
-	public void run(final Plan plan) {
-		Plan beeline = getBeeline(plan);
+	public void run(final PlanImpl plan) {
+		PlanImpl beeline = getBeeline(plan);
 
 		Iterator<PlanElement> itPlan = plan.getPlanElements().iterator();
 		Iterator<PlanElement> itBeeline = beeline.getPlanElements().iterator();
@@ -96,8 +96,8 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		return 0;
 	}
 
-	private Plan getBeeline(final Plan plan) {
-		Plan beeline = new PlanImpl(plan.getPerson());
+	private PlanImpl getBeeline(final PlanImpl plan) {
+		PlanImpl beeline = new PlanImpl(plan.getPerson());
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);

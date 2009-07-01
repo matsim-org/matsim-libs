@@ -28,13 +28,12 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -43,13 +42,27 @@ import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl implements Plan {
 
+	/**
+	 * @deprecated use Leg.Mode instead
+	 */
+	@Deprecated
+	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
+	
+	/**
+	 * Constant describing the score of an unscored plan. <b>Do not use this constant in
+	 * comparisons</b>, but use <code>getScore() == null</code>
+	 * instead to test if a plan has an undefined score.
+	 */
+	@Deprecated
+	public static final double UNDEF_SCORE = Double.NaN;
+
 	private final BasicPlanImpl delegate;
 	
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
 
-	public PlanImpl(final Person person) {
+	public PlanImpl(final PersonImpl person) {
 		this.delegate = new BasicPlanImpl(person);
 	}
 
@@ -178,11 +191,11 @@ public class PlanImpl implements Plan {
 		return (List<PlanElement>) this.delegate.getPlanElements();
 	}
 
-	public final Person getPerson() {
-		return (Person) this.delegate.getPerson();
+	public final PersonImpl getPerson() {
+		return (PersonImpl) this.delegate.getPerson();
 	}
 
-	public void setPerson(final Person person) {
+	public void setPerson(final PersonImpl person) {
 		this.delegate.setPerson(person);
 	}
 
@@ -205,7 +218,7 @@ public class PlanImpl implements Plan {
 	/** loads a copy of an existing plan, but keeps the person reference
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
-	public void copyPlan(final Plan in) {
+	public void copyPlan(final PlanImpl in) {
 		// TODO should be re-implemented making use of Cloneable
 		setScore(in.getScore());
 		this.setType(in.getType());

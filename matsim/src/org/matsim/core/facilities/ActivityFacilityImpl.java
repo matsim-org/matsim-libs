@@ -26,13 +26,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
 import org.matsim.world.Location;
@@ -92,7 +92,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 	 * and down-layer: {@link NetworkLayer}) will be updated, too (if the neighbors exist).
 	 * 
 	 * <p><b>Note:</b> Other data structures than the {@link World} and the {@link NetworkLayer} of MATSim
-	 * will not be updated (i.e. the references to links and facilities in a {@link Plan}
+	 * will not be updated (i.e. the references to links and facilities in a {@link PlanImpl}
 	 * of an agent of the {@link Population}).</p>
 	 * 
 	 * <p><b>Mapping rule (zone-facility):</b> The facility gets one zones assigned, in which 

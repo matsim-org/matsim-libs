@@ -28,8 +28,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.events.AgentReplanEvent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
@@ -38,6 +36,8 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -76,7 +76,7 @@ public class WithindayAgent extends PersonAgent {
 
 	private final List<AgentPercepts> percepts;
 
-	public WithindayAgent(final Person person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
+	public WithindayAgent(final PersonImpl person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
 		super(person, simulation);
 //		this.person = person;
 //		this.vehicle = v;
@@ -149,7 +149,7 @@ public class WithindayAgent extends PersonAgent {
 		ActivityImpl nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
 		Link destinationLink = nextAct.getLink();
 		NetworkRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
-		Plan oldPlan = this.getPerson().getSelectedPlan();
+		PlanImpl oldPlan = this.getPerson().getSelectedPlan();
 		LegImpl currentLeg = this.getCurrentLeg();
 		Route oldRoute = currentLeg.getRoute();
 
@@ -165,7 +165,7 @@ public class WithindayAgent extends PersonAgent {
 			passedNodesList.addAll(oldRouteNodes.subList(0, lastPassedNodeIndex+1));
 		}
 		//create new plan
-		Plan newPlan = new PlanImpl(this.getPerson());
+		PlanImpl newPlan = new PlanImpl(this.getPerson());
 		newPlan.copyPlan(oldPlan);
 		//put new route into the new plan
 		//first determine index of current leg in the plan

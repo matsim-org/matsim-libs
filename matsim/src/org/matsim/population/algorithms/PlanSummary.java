@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -53,7 +53,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	private final double[] actTypeDurations;
 	private final TransportMode [] legModes;
 	private final int[] legModeCnt;
-	private HashMap<Plan.Type, Integer> planTypes = new HashMap<Plan.Type, Integer>();
+	private HashMap<PlanImpl.Type, Integer> planTypes = new HashMap<PlanImpl.Type, Integer>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -110,14 +110,14 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		for (int i=0; i<person.getPlans().size(); i++) {
-			Plan plan = person.getPlans().get(i);
+			PlanImpl plan = person.getPlans().get(i);
 			run(plan);
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
 			this.actCnt++;
@@ -210,7 +210,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		}
 		// plan types summary
 		System.out.println("\nplan types:");
-		for (Plan.Type type : this.planTypes.keySet()) {
+		for (PlanImpl.Type type : this.planTypes.keySet()) {
 			System.out.println(type + " : " + this.planTypes.get(type));
 		}
 		System.out.println("----------------------------------------");

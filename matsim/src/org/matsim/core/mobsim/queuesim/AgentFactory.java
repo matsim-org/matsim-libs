@@ -19,7 +19,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * @author dgrether
@@ -32,7 +32,7 @@ public class AgentFactory {
 		this.simulation = simulation;
 	}
 
-	public PersonAgent createPersonAgent(final Person p) {
+	public PersonAgent createPersonAgent(final PersonImpl p) {
 		PersonAgent agent = new PersonAgent(p, this.simulation);
 		return agent;
 	}

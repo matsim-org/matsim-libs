@@ -20,13 +20,13 @@
 
 package org.matsim.population.algorithms;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 
 public class PlansCreateFromNetwork {
@@ -114,7 +114,7 @@ public class PlansCreateFromNetwork {
 					else if (rd2 < 0.4) { car_avail = "always"; }
 				}
 			}
-			Person p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(new IdImpl(i));
 			p.setSex(sex);
 			p.setAge(age);
 			p.setLicence(license);

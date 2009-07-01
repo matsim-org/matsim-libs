@@ -23,9 +23,11 @@ package org.matsim.core.api.facilities;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.population.*;
 import org.matsim.core.basic.v01.facilities.BasicActivityFacility;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.world.*;
 
 public interface ActivityFacility extends BasicActivityFacility, Location, Facility {
@@ -44,7 +46,7 @@ public interface ActivityFacility extends BasicActivityFacility, Location, Facil
 	 * and down-layer: {@link NetworkLayer}) will be updated, too (if the neighbors exist).
 	 * 
 	 * <p><b>Note:</b> Other data structures than the {@link World} and the {@link NetworkLayer} of MATSim
-	 * will not be updated (i.e. the references to links and facilities in a {@link Plan}
+	 * will not be updated (i.e. the references to links and facilities in a {@link PlanImpl}
 	 * of an agent of the {@link Population}).</p>
 	 * 
 	 * <p><b>Mapping rule (zone-facility):</b> The facility gets one zones assigned, in which 

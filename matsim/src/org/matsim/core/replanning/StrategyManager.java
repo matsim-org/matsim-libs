@@ -25,11 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -125,7 +125,7 @@ public class StrategyManager {
 			strategy.init();
 		}
 		// then go through the population and assign each person to a strategy
-		for (Person person : population.getPersons().values()) {
+		for (PersonImpl person : population.getPersons().values()) {
 			if ((this.maxPlansPerAgent > 0) && (person.getPlans().size() > this.maxPlansPerAgent)) {
 				removePlans(person, this.maxPlansPerAgent);
 			}
@@ -142,9 +142,9 @@ public class StrategyManager {
 		}
 	}
 	
-	private void removePlans(final Person person, final int maxNumberOfPlans) {
+	private void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
-			Plan plan = this.removalPlanSelector.selectPlan(person);
+			PlanImpl plan = this.removalPlanSelector.selectPlan(person);
 			person.getPlans().remove(plan);
 			if (plan == person.getSelectedPlan()) {
 				person.setSelectedPlan(person.getRandomPlan());

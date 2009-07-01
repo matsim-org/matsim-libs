@@ -20,8 +20,8 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.core.api.population.Person;
 import org.matsim.core.api.population.PersonAlgorithm;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * Interface for filtering persons.
@@ -35,13 +35,13 @@ public interface PersonFilter extends Filter, PersonAlgorithm {
 	 * @param person person being judged
 	 * @return true if the Person meets the criterion of the filter
 	 */
-	boolean judge(Person person);
+	boolean judge(PersonImpl person);
 
 	/**
 	 * sends the person to the next PersonAlgorithm, which could be another filter.
 	 *
 	 * @param person person to be handled
 	 */
-	void run(Person person);
+	void run(PersonImpl person);
 
 }

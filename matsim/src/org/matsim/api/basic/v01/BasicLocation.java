@@ -29,6 +29,6 @@ public interface BasicLocation extends Serializable {
 
 	public Coord getCoord();
 	
-	public void setCoord( Coord coord ) ;
+//	public void setCoord( Coord coord ) ;
 	
 }

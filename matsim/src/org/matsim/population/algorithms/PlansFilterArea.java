@@ -25,10 +25,10 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Filters out plans from persons where none of the act's locations are within
@@ -59,7 +59,7 @@ public class PlansFilterArea {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			Person person = plans.getPersons().get(personId);
+			PersonImpl person = plans.getPersons().get(personId);
 
 			run(person);	// handle the person; in this step plans may get removed from a person
 			if (person.getPlans().isEmpty()) {
@@ -79,11 +79,11 @@ public class PlansFilterArea {
 		System.out.println("Number of persons removed: " + pid_set.size());
 	}
 
-	private void run(final Person person) {
+	private void run(final PersonImpl person) {
 		for (int i=person.getPlans().size()-1; i>=0; i--) {
 			int cntActs = 0;
 			int cntOutside = 0;
-			Plan plan = person.getPlans().get(i);
+			PlanImpl plan = person.getPlans().get(i);
 
 			for (int j=0; j<plan.getPlanElements().size(); j+=2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);

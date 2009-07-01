@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -54,11 +54,11 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
+			PlanImpl plan = person.getPlans().get(planId);
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
@@ -67,7 +67,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
@@ -79,7 +79,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 	// helper methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void handlePlan(final Plan plan) throws Exception {
+	public void handlePlan(final PlanImpl plan) throws Exception {
 		List<?> actslegs = plan.getPlanElements();
 		ActivityImpl fromAct = (ActivityImpl)actslegs.get(0);
 

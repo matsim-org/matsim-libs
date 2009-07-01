@@ -27,13 +27,13 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -150,16 +150,16 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
+			PlanImpl plan = person.getPlans().get(planId);
 			handlePlan(plan);
 		}
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		handlePlan(plan);
 	}
 
@@ -167,7 +167,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	// helper methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected void handlePlan(final Plan plan) {
+	protected void handlePlan(final PlanImpl plan) {
 		double now = 0;
 
 		// loop over all <act>s

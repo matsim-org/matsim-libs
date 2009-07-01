@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicLinkEvent;
 import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 
 public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 
@@ -34,7 +34,7 @@ public abstract class LinkEvent extends PersonEvent implements BasicLinkEvent {
 	private final Id linkId;
 	private transient Link link;
 
-	LinkEvent(final double time, final Person agent, final Link link) {
+	LinkEvent(final double time, final PersonImpl agent, final Link link) {
 		super(time, agent);
 		this.link = link;
 		this.linkId = link.getId();

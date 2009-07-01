@@ -23,10 +23,10 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PersonActChainSummary extends AbstractPersonAlgorithm {
 
@@ -79,14 +79,14 @@ public class PersonActChainSummary extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		if (person.getPlans().size() != 1) {
 			Gbl.errorMsg("[person_id=" + person.getId() + " does not have exactly one plan. not allowed.]");
 		}
 
 		// fill up chain_freq TreeMap
 		String chain = "";
-		Plan plan = person.getPlans().get(0);
+		PlanImpl plan = person.getPlans().get(0);
 		for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			chain = chain.concat(act.getType());

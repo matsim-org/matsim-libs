@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.Scenario;
+import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
@@ -38,8 +38,6 @@ import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -85,14 +83,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final ActivityFacilities facilities;
 	private Knowledges knowledges;
 		
-	private Person currperson = null;
+	private PersonImpl currperson = null;
 	private Desires currdesires = null;
 	private Knowledge currknowledge = null;
 	private ActivitySpace curractspace = null;
 	private String curracttype = null;
 	private ActivityFacility currfacility = null;
 	private ActivityOption curractivity = null;
-	private Plan currplan = null;
+	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
 	private LegImpl currleg = null;
 	private Route currRoute = null;
@@ -328,29 +326,29 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 		String type = atts.getValue("type");
 		if (type == null) {
-			this.currplan.setType(Plan.Type.UNDEFINED);
+			this.currplan.setType(PlanImpl.Type.UNDEFINED);
 		}
 		else if ("car".equalsIgnoreCase(type)) {
-				this.currplan.setType(Plan.Type.CAR);
+				this.currplan.setType(PlanImpl.Type.CAR);
 		}
 		else if ("pt".equalsIgnoreCase(type)) {
-			this.currplan.setType(Plan.Type.PT);
+			this.currplan.setType(PlanImpl.Type.PT);
 		}
 		else if ("ride".equalsIgnoreCase(type)) {
-			this.currplan.setType(Plan.Type.RIDE);
+			this.currplan.setType(PlanImpl.Type.RIDE);
 		}
 		else if ("bike".equalsIgnoreCase(type)) {
-			this.currplan.setType(Plan.Type.BIKE);
+			this.currplan.setType(PlanImpl.Type.BIKE);
 		}
 		else if ("walk".equalsIgnoreCase(type)) {
-			this.currplan.setType(Plan.Type.WALK);
+			this.currplan.setType(PlanImpl.Type.WALK);
 		}
 		else {
 			if (this.warnPlanTypeCount < 10 ) {
 				log.warn("Type " + type + " of plan not known! Setting plan to type undefined!");
 				this.warnPlanTypeCount++;
 			}
-			this.currplan.setType(Plan.Type.UNDEFINED);
+			this.currplan.setType(PlanImpl.Type.UNDEFINED);
 		}
 	}
 

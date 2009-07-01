@@ -27,9 +27,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -38,6 +36,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -112,14 +112,14 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		int nofLegTravelDistanceAvg = 0;
 		int nofLegTravelDistanceExecuted = 0;
 
-		for (Person person : this.population.getPersons().values()) {
-			Plan worstPlan = null;
-			Plan bestPlan = null;
+		for (PersonImpl person : this.population.getPersons().values()) {
+			PlanImpl worstPlan = null;
+			PlanImpl bestPlan = null;
 			double worstScore = Double.POSITIVE_INFINITY;
 			double bestScore = Double.NEGATIVE_INFINITY;
 			double sumAvgLegTravelDistance = 0.0;
 			double cntAvgLegTravelDistance = 0;
-			for (Plan plan : person.getPlans()) {
+			for (PlanImpl plan : person.getPlans()) {
 				
 				if (plan.getScore() == null) {
 					continue;
@@ -230,7 +230,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		return this.history.clone();
 	}
 
-	private double getAvgLegTravelDistance(final Plan plan){
+	private double getAvgLegTravelDistance(final PlanImpl plan){
 
 		double planTravelDistance=0.0;
 		int numberOfLegs=0;

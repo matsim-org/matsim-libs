@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledges;
 
 public class DefineFlexibleActivities {
@@ -23,7 +23,7 @@ public class DefineFlexibleActivities {
 		this.initFlexibleTypes();
 	}
 	
-	public List<ActivityImpl> getFlexibleActivities(final Plan plan) {		
+	public List<ActivityImpl> getFlexibleActivities(final PlanImpl plan) {		
 		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
 		if (flexibleTypes.size() > 0) {
 			this.getFlexibleActs(plan, flexibleActivities);
@@ -34,7 +34,7 @@ public class DefineFlexibleActivities {
 		return flexibleActivities;
 	}
 	
-	private void getFlexibleActs(Plan plan, List<ActivityImpl> flexibleActivities) {				
+	private void getFlexibleActs(PlanImpl plan, List<ActivityImpl> flexibleActivities) {				
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (this.flexibleTypes.contains(act.getType())) {
@@ -46,7 +46,7 @@ public class DefineFlexibleActivities {
 	/*
 	 * Get all activities which are allowed to be relocated (incl. "primaries")
 	 */
-	private void getFlexibleActsBasedOnKnowledge(Plan plan, List<ActivityImpl> flexibleActivities) {				
+	private void getFlexibleActsBasedOnKnowledge(PlanImpl plan, List<ActivityImpl> flexibleActivities) {				
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
@@ -60,7 +60,7 @@ public class DefineFlexibleActivities {
 	/*
 	 * Get only "primary" activities which are allowed to be relocated
 	 */	
-	public List<ActivityImpl> getMovablePrimaryActivities(final Plan plan) {
+	public List<ActivityImpl> getMovablePrimaryActivities(final PlanImpl plan) {
 		
 		List<ActivityImpl> primaryActivities = new Vector<ActivityImpl>();
 		

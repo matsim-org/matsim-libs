@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.households.Household;
@@ -37,37 +37,37 @@ import org.matsim.population.Desires;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**
- * Default implementation of {@link Person} interface.
+ * Default implementation of {@link PersonImpl} interface.
  * 
- * @see org.matsim.core.api.population.Person
+ * @see org.matsim.core.population.PersonImpl
  */
 public class PersonImpl implements Person {
 
-	private final static Logger log = Logger.getLogger(Person.class);
+	private final static Logger log = Logger.getLogger(PersonImpl.class);
 
-	private final BasicPersonImpl<Plan> delegate;
+	private final BasicPersonImpl<PlanImpl> delegate;
 
 	private Customizable customizableDelegate;
 
 	private Household household;
 
-	protected Plan selectedPlan = null;
+	protected PlanImpl selectedPlan = null;
 
 	public PersonImpl(final Id id) {
-		this.delegate = new BasicPersonImpl<Plan>(id);
+		this.delegate = new BasicPersonImpl<PlanImpl>(id);
 	}
 
-	public void addPlan(final Plan plan) {
+	public void addPlan(final PlanImpl plan) {
 		this.delegate.addPlan(plan);
 		// Make sure there is a selected plan if there is at least one plan
 		if (this.selectedPlan == null) this.selectedPlan = plan;
 	}
 
-	public Plan getSelectedPlan() {
+	public PlanImpl getSelectedPlan() {
 		return this.selectedPlan;
 	}
 
-	public void setSelectedPlan(final Plan selectedPlan) {
+	public void setSelectedPlan(final PlanImpl selectedPlan) {
 		if (this.delegate.getPlans().contains(selectedPlan)) {
 			this.selectedPlan = selectedPlan;
 		} else if (selectedPlan != null) {
@@ -75,8 +75,8 @@ public class PersonImpl implements Person {
 		}
 	}
 
-	public Plan createPlan(final boolean selected) {
-		Plan p = new PlanImpl(this);
+	public PlanImpl createPlan(final boolean selected) {
+		PlanImpl p = new PlanImpl(this);
 		this.delegate.getPlans().add(p);
 		if (selected) {
 			setSelectedPlan(p);
@@ -88,15 +88,15 @@ public class PersonImpl implements Person {
 	}
 
 	public void removeUnselectedPlans() {
-		for (Iterator<Plan> iter = this.delegate.getPlans().iterator(); iter.hasNext(); ) {
-			Plan plan = iter.next();
+		for (Iterator<PlanImpl> iter = this.delegate.getPlans().iterator(); iter.hasNext(); ) {
+			PlanImpl plan = iter.next();
 			if (!plan.isSelected()) {
 				iter.remove();
 			}
 		}
 	}
 
-	public Plan getRandomPlan() {
+	public PlanImpl getRandomPlan() {
 		if (this.delegate.getPlans().size() == 0) {
 			return null;
 		}
@@ -104,9 +104,9 @@ public class PersonImpl implements Person {
 		return this.getPlans().get(index);
 	}
 
-	public Plan getRandomUnscoredPlan() {
+	public PlanImpl getRandomUnscoredPlan() {
 		int cntUnscored = 0;
-		for (Plan plan : this.getPlans()) {
+		for (PlanImpl plan : this.getPlans()) {
 			if (plan.getScore() == null) {
 				cntUnscored++;
 			}
@@ -115,7 +115,7 @@ public class PersonImpl implements Person {
 			// select one of the unscored plans
 			int idxUnscored = MatsimRandom.getRandom().nextInt(cntUnscored);
 			cntUnscored = 0;
-			for (Plan plan : this.getPlans()) {
+			for (PlanImpl plan : this.getPlans()) {
 				if (plan.getScore() == null) {
 					if (cntUnscored == idxUnscored) {
 						return plan;
@@ -127,9 +127,9 @@ public class PersonImpl implements Person {
 		return null;
 	}
 
-	public void exchangeSelectedPlan(final Plan newPlan, final boolean appendPlan) {
+	public void exchangeSelectedPlan(final PlanImpl newPlan, final boolean appendPlan) {
 		newPlan.setPerson(this);
-		Plan oldSelectedPlan = getSelectedPlan();
+		PlanImpl oldSelectedPlan = getSelectedPlan();
 		if (appendPlan || (oldSelectedPlan == null)) {
 			this.delegate.getPlans().add(newPlan);
 		} else {
@@ -139,12 +139,12 @@ public class PersonImpl implements Person {
 		setSelectedPlan(newPlan);
 	}
 
-	public Plan copySelectedPlan() {
-		Plan oldPlan = this.getSelectedPlan();
+	public PlanImpl copySelectedPlan() {
+		PlanImpl oldPlan = this.getSelectedPlan();
 		if (oldPlan == null) {
 			return null;
 		}
-		Plan newPlan = new PlanImpl(oldPlan.getPerson());
+		PlanImpl newPlan = new PlanImpl(oldPlan.getPerson());
 		newPlan.copyPlan(oldPlan);
 		this.delegate.getPlans().add(newPlan);
 		this.setSelectedPlan(newPlan);
@@ -167,7 +167,7 @@ public class PersonImpl implements Person {
 	  return b.toString();
 	}
 
-	public boolean removePlan(final Plan plan) {
+	public boolean removePlan(final PlanImpl plan) {
 		boolean result = this.delegate.getPlans().remove(plan);
 		if ((this.getSelectedPlan() == plan) && result) {
 			this.setSelectedPlan(this.getRandomPlan());
@@ -253,7 +253,7 @@ public class PersonImpl implements Person {
 		return this.delegate.getLicense();
 	}
 
-	public List<Plan> getPlans() {
+	public List<PlanImpl> getPlans() {
 		return this.delegate.getPlans();
 	}
 

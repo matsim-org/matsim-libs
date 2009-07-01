@@ -61,17 +61,17 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -128,7 +128,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	}
 	
 	@Override
-	public void run(Person guy){
+	public void run(PersonImpl guy){
 
 		// Modify the plans of the agents accordingly to the Primloc model 
 		// that was run in setup()
@@ -295,7 +295,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		
 		core.P = new double[ core.numZ ];
 		// Determine how many employed persons live in each zone
-		for (Person guy : population.getPersons().values()) 
+		for (PersonImpl guy : population.getPersons().values()) 
 			if( agentHasPrimaryActivityInPlan( guy ) ){
 				ActivityFacility homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
 				ArrayList<Location> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
@@ -307,8 +307,8 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			}
 	}
 	
-	private boolean agentHasPrimaryActivityInPlan( Person guy ){
-		for( Plan plan : guy.getPlans() ) {
+	private boolean agentHasPrimaryActivityInPlan( PersonImpl guy ){
+		for( PlanImpl plan : guy.getPlans() ) {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					if (((ActivityImpl) pe).getType().equals(primaryActivityName)) {

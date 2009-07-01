@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.households.basic.BasicHousehold;
 import org.matsim.vehicles.BasicVehicle;
 
@@ -42,7 +42,7 @@ public interface Household extends BasicHousehold {
 	 */
 	public List<Id> getMemberIds();
 	
-	public Map<Id, Person> getMembers();
+	public Map<Id, PersonImpl> getMembers();
 	
 	public Map<Id, BasicVehicle> getVehicles();
 	

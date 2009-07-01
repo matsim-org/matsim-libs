@@ -22,8 +22,8 @@ package org.matsim.households;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.population.Person;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.households.basic.BasicHousehold;
 import org.matsim.households.basic.BasicHouseholds;
 import org.matsim.households.basic.BasicHouseholdsReaderV10;
@@ -54,7 +54,7 @@ public class HouseholdsReaderV10 extends BasicHouseholdsReaderV10 {
 		Household hh = this.households.getHouseholdBuilder().createHousehold(currentHhId);
 		if (memberIds != null) {
 			for (Id i : memberIds) {
-				Person p = scenario.getPopulation().getPersons().get(i);
+				PersonImpl p = scenario.getPopulation().getPersons().get(i);
 				if (p == null) {
 					throw new IllegalStateException("Person referenced in households file with id " + i.toString()
 							+ " is not existing in population. A consistent MATSim scenario could not be loaded. "

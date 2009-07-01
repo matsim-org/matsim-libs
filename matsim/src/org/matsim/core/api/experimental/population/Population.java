@@ -18,26 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.population;
+package org.matsim.core.api.experimental.population;
 
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * Root class of the population description (previously also called "plans file")
  */
-public interface Population extends BasicPopulation<Person> {
-	/**
-	 * @deprecated use getPersons().put(...) instead
-	 */
-	@Deprecated
-	public void addPerson(final Person p);
+public interface Population extends BasicPopulation<PersonImpl> {
+
+	public void addPerson(final PersonImpl p); 
+	// yyyy resurrected.  move to BasicPopulation once certain that this is a good idea  
 
 	public PopulationBuilder getPopulationBuilder();
 
-	public Map<Id, Person> getPersons();
+	public Map<Id, PersonImpl> getPersons();
 	
 
 }

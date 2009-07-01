@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Selects one of the existing plans of the person based on the
@@ -37,7 +37,7 @@ import org.matsim.core.api.population.Plan;
  */
 public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector {
 	
-	protected double calcPlanWeight(final Plan plan, final double maxScore) {
+	protected double calcPlanWeight(final PlanImpl plan, final double maxScore) {
 		
 		if (plan.getScore() == null) {
 			return Double.NaN;

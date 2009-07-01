@@ -20,7 +20,7 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class SelectedPlanFilter extends AbstractPersonFilter {
@@ -32,12 +32,12 @@ public class SelectedPlanFilter extends AbstractPersonFilter {
 	}
 
 	@Override
-	public boolean judge(final Person person) {
+	public boolean judge(final PersonImpl person) {
 		return true;
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		count();
 		this.nextAlgo.run(person.getSelectedPlan());
 	}

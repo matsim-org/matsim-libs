@@ -20,8 +20,8 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Removes all non-selected plans from a person. If a person has no
@@ -36,11 +36,11 @@ public class PersonFilterSelectedPlan extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
+			PlanImpl plan = person.getPlans().get(planId);
 			if (!plan.isSelected()) {
 				person.getPlans().remove(planId);
 				planId--;

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RouteLinkFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,45 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package org.matsim.core.api.experimental.population;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.api.population.Route;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class RouteLinkFilter extends AbstractPlanFilter {
+/**
+ * @author dgrether
+ */
+public interface PopulationBuilder extends BasicPopulationBuilder {
 
-	private final Set<Id> linkIds;
+	PersonImpl createPerson(Id id);
 
-	public RouteLinkFilter(final PlanAlgorithm nextAlgo) {
-		this.nextAlgorithm = nextAlgo;
-		this.linkIds = new HashSet<Id>();
-	}
+	PlanImpl createPlan(BasicPerson person);
 
-	public void addLink(final Id linkId) {
-		this.linkIds.add(linkId);
-	}
+	ActivityImpl createActivityFromCoord(String actType, Coord coord);
+	
+	ActivityImpl createActivityFromFacilityId(String actType, Id facilityId);
 
-	@Override
-	public boolean judge(final PlanImpl plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
-				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
-					if (this.linkIds.contains(link.getId())) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
+	ActivityImpl createActivityFromLinkId(String actType, Id linkId);
+	
+	LegImpl createLeg(TransportMode legMode);
+
+	/**
+	 * Creates a new Route object
+	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
+	 * @return a BasicRoute Object with the links set accordingly
+	 * @deprecated needs to be verified // TODO [MR] verify
+	 */
+	Route createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
 
 }

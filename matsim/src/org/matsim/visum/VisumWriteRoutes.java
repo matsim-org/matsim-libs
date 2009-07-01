@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.Location;
@@ -59,15 +59,15 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 	}
 
 	@Override
-	public void run(Person person) {
-		for(Plan plan : person.getPlans()) {
+	public void run(PersonImpl person) {
+		for(PlanImpl plan : person.getPlans()) {
 			if (plan.isSelected()) {
 				run(plan);
 			}
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			StringBuilder visum = new StringBuilder();

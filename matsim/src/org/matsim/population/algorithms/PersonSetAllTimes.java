@@ -20,11 +20,11 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class PersonSetAllTimes extends AbstractPersonAlgorithm {
@@ -42,9 +42,9 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		for (int i=0; i<person.getPlans().size(); i++) {
-			Plan plan = person.getPlans().get(i);
+			PlanImpl plan = person.getPlans().get(i);
 
 			int w_cnt = 0;
 			int e_cnt = 0;

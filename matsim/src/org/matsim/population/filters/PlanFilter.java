@@ -20,7 +20,7 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public interface PlanFilter extends PlanAlgorithm, Filter {
@@ -31,13 +31,13 @@ public interface PlanFilter extends PlanAlgorithm, Filter {
 	 * @param plan
 	 * @return true if the plan meets the criterion of the filter.
 	 */
-	boolean judge(Plan plan);
+	boolean judge(PlanImpl plan);
 
 	/**
 	 * Sends the person to the next algorithm
 	 *
 	 * @param plan
 	 */
-	void run(Plan plan);
+	void run(PlanImpl plan);
 
 }

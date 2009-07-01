@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.api.network.Node;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -124,9 +124,9 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	}
 
 	/**
-	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.core.api.population.Plan)
+	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.core.population.PlanImpl)
 	 */
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		List actslegs = plan.getPlanElements();
 		ActivityImpl fromAct = (ActivityImpl) actslegs.get(0);
 		Node fromNode = fromAct.getLink().getToNode();
@@ -162,8 +162,8 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	}
 
 	@Override
-	public void run(Person person) {
-		for (Plan plan : person.getPlans()) {
+	public void run(PersonImpl person) {
+		for (PlanImpl plan : person.getPlans()) {
 			run(plan);
 		}
 	}

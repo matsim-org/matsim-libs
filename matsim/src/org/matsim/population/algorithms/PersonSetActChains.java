@@ -24,9 +24,9 @@ import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PersonSetActChains extends AbstractPersonAlgorithm {
@@ -183,7 +183,7 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 
 		String group = null;
 		if ((person.getAge() >= 0) && (person.getAge() < 6)) {
@@ -223,7 +223,7 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 		}
 
 		person.getPlans().clear();
-		Plan p = person.createPlan(true);
+		PlanImpl p = person.createPlan(true);
 
 		String [] acttypes = chain.split("");
 		// note: by splitting, the string[0] is always = ""!

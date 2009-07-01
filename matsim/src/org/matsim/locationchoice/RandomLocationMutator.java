@@ -25,11 +25,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
@@ -56,7 +56,7 @@ public class RandomLocationMutator extends LocationMutator {
 	 * plan == selected plan
 	 */
 	@Override
-	public void handlePlan(final Plan plan){	
+	public void handlePlan(final PlanImpl plan){	
 		if (super.locationChoiceBasedOnKnowledge) {
 			//log.info("LC based on knowledge");
 			this.handlePlanBasedOnKnowldge(plan);	
@@ -69,7 +69,7 @@ public class RandomLocationMutator extends LocationMutator {
 		super.resetRoutes(plan);		
 	}
 		
-	private void handlePlanBasedOnKnowldge(final Plan plan) {
+	private void handlePlanBasedOnKnowldge(final PlanImpl plan) {
 		
 		List<ActivityImpl> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		
@@ -91,7 +91,7 @@ public class RandomLocationMutator extends LocationMutator {
 		}
 	}
 	
-	private void handlePlanForPreDefinedFlexibleTypes(final Plan plan) {
+	private void handlePlanForPreDefinedFlexibleTypes(final PlanImpl plan) {
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final ActivityImpl act = (ActivityImpl)actslegs.get(j);

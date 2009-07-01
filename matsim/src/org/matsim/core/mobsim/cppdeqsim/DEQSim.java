@@ -32,11 +32,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -46,6 +44,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -142,7 +142,7 @@ public class DEQSim extends ExternalMobsim {
 			// # persons, int, 32bit
 			out.writeInt(this.population.getPersons().size());
 			// for each person...
-			for (Person person : this.population.getPersons().values()) {
+			for (PersonImpl person : this.population.getPersons().values()) {
 				writePerson(out, person);
 			}
 			out.close();
@@ -155,11 +155,11 @@ public class DEQSim extends ExternalMobsim {
 		System.out.println("done writing plans for deqsim. " + (new Date()));
 	}
 
-	public static void writePerson(final DataOutputStream out, final Person person) throws IOException {
+	public static void writePerson(final DataOutputStream out, final PersonImpl person) throws IOException {
 		// person id, int, 32bit
 		out.writeInt(Integer.parseInt(person.getId().toString()));
 
-		Plan plan = person.getSelectedPlan();
+		PlanImpl plan = person.getSelectedPlan();
 		// # legs, int, 32bit
 		out.writeInt((plan.getPlanElements().size()-1) / 2);
 

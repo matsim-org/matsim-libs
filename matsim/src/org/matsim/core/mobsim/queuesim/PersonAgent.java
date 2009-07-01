@@ -28,11 +28,11 @@ import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -42,7 +42,7 @@ public class PersonAgent implements DriverAgent {
 
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
 
-	private final Person person;
+	private final PersonImpl person;
 	private QueueVehicle vehicle;
 	protected Link cachedNextLink = null;
 
@@ -67,12 +67,12 @@ public class PersonAgent implements DriverAgent {
 
 	private int currentNodeIndex;
 
-	public PersonAgent(final Person p, final QueueSimulation simulation) {
+	public PersonAgent(final PersonImpl p, final QueueSimulation simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
 
-	public Person getPerson() {
+	public PersonImpl getPerson() {
 		return this.person;
 	}
 

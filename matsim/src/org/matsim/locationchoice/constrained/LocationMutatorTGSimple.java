@@ -29,12 +29,12 @@ import java.util.Vector;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
@@ -54,7 +54,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	}
 		
 	@Override
-	public void handlePlan(final Plan plan){
+	public void handlePlan(final PlanImpl plan){
 
 		List<ActivityImpl> flexibleActivities = this.getFlexibleActivities(plan);
 		
@@ -102,7 +102,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		super.resetRoutes(plan);
 	}
 	
-	private List<ActivityImpl> getFlexibleActivities(final Plan plan) {
+	private List<ActivityImpl> getFlexibleActivities(final PlanImpl plan) {
 		List<ActivityImpl> flexibleActivities = new Vector<ActivityImpl>();
 		if (!super.locationChoiceBasedOnKnowledge) {
 			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);

@@ -20,18 +20,18 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.core.api.population.Person;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.population.PersonAlgorithm;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.population.PersonImpl;
 
 public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFilter {
 
 	protected PersonAlgorithm nextAlgorithm = null;
 	private int count = 0;
 	
-	abstract public boolean judge(Person person);
+	abstract public boolean judge(PersonImpl person);
 
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		if (judge(person)) {
 			count();
 			this.nextAlgorithm.run(person);
@@ -47,7 +47,7 @@ public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFil
 	}
 
 	public void run(Population population) {
-		for (Person person : population.getPersons().values()) {
+		for (PersonImpl person : population.getPersons().values()) {
 			run(person);
 		}
 	}

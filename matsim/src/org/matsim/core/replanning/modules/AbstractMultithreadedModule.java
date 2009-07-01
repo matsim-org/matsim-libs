@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -77,7 +77,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		}
 	}
 
-	public void handlePlan(final Plan plan) {
+	public void handlePlan(final PlanImpl plan) {
 		if (this.directAlgo == null) {
 			this.algothreads[this.counter % this.numOfThreads].handlePlan(plan);
 			this.counter++;
@@ -148,19 +148,19 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 		public final int threadId;
 		private final PlanAlgorithm planAlgo;
-		private final List<Plan> plans = new LinkedList<Plan>();
+		private final List<PlanImpl> plans = new LinkedList<PlanImpl>();
 
 		public PlanAlgoThread(final int i, final PlanAlgorithm algo) {
 			this.threadId = i;
 			this.planAlgo = algo;
 		}
 
-		public void handlePlan(final Plan plan) {
+		public void handlePlan(final PlanImpl plan) {
 			this.plans.add(plan);
 		}
 
 		public void run() {
-			for (Plan plan : this.plans) {
+			for (PlanImpl plan : this.plans) {
 				this.planAlgo.run(plan);
 				incCounter();
 			}

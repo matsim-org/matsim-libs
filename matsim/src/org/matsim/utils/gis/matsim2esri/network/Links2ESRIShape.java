@@ -26,8 +26,9 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
+
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;

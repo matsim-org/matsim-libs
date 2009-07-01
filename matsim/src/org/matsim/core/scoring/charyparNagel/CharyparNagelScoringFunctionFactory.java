@@ -20,8 +20,8 @@
 
 package org.matsim.core.scoring.charyparNagel;
 
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -53,7 +53,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	 * @param plan
 	 * @return new ScoringFunction
 	 */
-	public ScoringFunction getNewScoringFunction(Plan plan) {
+	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));

@@ -21,21 +21,21 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	@Override
-	public void run(final Person person) {
-		for (Plan plan : person.getPlans()) {
+	public void run(final PersonImpl person) {
+		for (PlanImpl plan : person.getPlans()) {
 			run(plan);
 		}
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				((ActivityImpl) pe).setLink(null);

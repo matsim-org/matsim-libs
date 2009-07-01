@@ -34,9 +34,9 @@ import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 public class PlanomatJGAPConfiguration extends Configuration {
@@ -47,7 +47,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 	private static final long serialVersionUID = 1L;
 
 	public PlanomatJGAPConfiguration(
-			Plan plan, 
+			PlanImpl plan, 
 			PlanAnalyzeSubtours planAnalyzeSubtours, 
 			long seed,
 			int numTimeIntervals,
@@ -58,7 +58,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 	private PlanomatJGAPConfiguration(
 			String a_id, 
 			String a_name, 
-			Plan plan, 
+			PlanImpl plan, 
 			PlanAnalyzeSubtours planAnalyzeSubtours, 
 			long seed,
 			int numTimeIntervals,

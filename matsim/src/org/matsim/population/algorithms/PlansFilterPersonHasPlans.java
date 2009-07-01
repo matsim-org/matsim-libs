@@ -24,8 +24,8 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * This algorithm filters out all persons without plans, leaving only persons in the
@@ -47,7 +47,7 @@ public class PlansFilterPersonHasPlans {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			Person person = plans.getPersons().get(personId);
+			PersonImpl person = plans.getPersons().get(personId);
 
 			if (person.getPlans().isEmpty()) {
 				// the person has no plans left. remove the person afterwards (so we do not disrupt the Iterator)

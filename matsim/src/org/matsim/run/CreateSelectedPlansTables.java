@@ -25,13 +25,13 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -167,7 +167,7 @@ public class CreateSelectedPlansTables {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString()+"\t");
-				final Person person=this.plans0.getPersons().get(person_id);
+				final PersonImpl person=this.plans0.getPersons().get(person_id);
 				out.write(person.getSex()+"\t");
 				out.write(person.getAge()+"\t");
 				out.write(person.getLicense()+"\t");
@@ -201,7 +201,7 @@ public class CreateSelectedPlansTables {
 				// plan1 ----------------------------------------------
 				if (this.twoPlans) {
 
-					final Person person_comp=this.plans1.getPersons().get(person_id);
+					final PersonImpl person_comp=this.plans1.getPersons().get(person_id);
 					out.write(person_comp.getSelectedPlan().getScore()+"\t");
 					out.write(this.getTravelTime(person_comp)+"\t");
 					this.sumPlanTraveltime[1]+=this.getTravelTime(person_comp);
@@ -227,7 +227,7 @@ public class CreateSelectedPlansTables {
 	/*  TODO [AH] Combine the following three methods and make one method.
 	 *  See playground.anhorni.locationchoice.analysis.PersonTimeDistanceCalculator */
 
-	private double getTravelTime(final Person person) {
+	private double getTravelTime(final PersonImpl person) {
 		double travelTime=0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof LegImpl) {
@@ -237,7 +237,7 @@ public class CreateSelectedPlansTables {
 		return travelTime;
 	}
 
-	private double getTravelDist(final Person person) {
+	private double getTravelDist(final PersonImpl person) {
 		double travelDist=0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof LegImpl) {
@@ -247,7 +247,7 @@ public class CreateSelectedPlansTables {
 		return travelDist;
 	}
 
-	private int getNumberOfTrips(final Person person) {
+	private int getNumberOfTrips(final PersonImpl person) {
 		int numberOfLegs=0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof LegImpl) {

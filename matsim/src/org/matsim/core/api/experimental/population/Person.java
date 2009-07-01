@@ -17,41 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.population;
+package org.matsim.core.api.experimental.population;
 
-import java.util.List;
-
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.utils.customize.Customizable;
 
 /**
  * @author dgrether
  */
-public interface PopulationBuilder extends BasicPopulationBuilder {
-
-	Person createPerson(Id id);
-
-	Plan createPlan(BasicPerson person);
-
-	ActivityImpl createActivityFromCoord(String actType, Coord coord);
+public interface Person extends BasicPerson<PlanImpl>, Customizable{
 	
-	ActivityImpl createActivityFromFacilityId(String actType, Id facilityId);
-
-	ActivityImpl createActivityFromLinkId(String actType, Id linkId);
 	
-	LegImpl createLeg(TransportMode legMode);
-
-	/**
-	 * Creates a new Route object
-	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
-	 * @return a BasicRoute Object with the links set accordingly
-	 * @deprecated needs to be verified // TODO [MR] verify
-	 */
-	Route createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
-
 }

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.PlanImpl;
 
 public class QuerySpinneNOW extends QuerySpinne {
 
@@ -16,8 +16,8 @@ public class QuerySpinneNOW extends QuerySpinne {
 	 * @see org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne#getPersons(org.matsim.population.Plans)
 	 */
 	@Override
-	protected List<Plan> getPersons(Population plans, QueueNetwork net) {
-		List<Plan> actPersons = new ArrayList<Plan>();
+	protected List<PlanImpl> getPersons(Population plans, QueueNetwork net) {
+		List<PlanImpl> actPersons = new ArrayList<PlanImpl>();
 		QueueLink link = net.getLinks().get(linkId);
 		Collection<QueueVehicle> vehs = link.getAllVehicles();
 		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());

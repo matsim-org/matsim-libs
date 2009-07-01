@@ -32,13 +32,13 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Calculates continuously the score of the selected plans of a given population
@@ -105,7 +105,7 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, AgentDepart
 			ScoringFunction sf = entry.getValue();
 			sf.finish();
 			double score = sf.getScore();
-			Plan plan = this.population.getPersons().get(agentId).getSelectedPlan();
+			PlanImpl plan = this.population.getPersons().get(agentId).getSelectedPlan();
 			Double oldScore = plan.getScore();
 			if (oldScore == null) {
 				plan.setScore(score);

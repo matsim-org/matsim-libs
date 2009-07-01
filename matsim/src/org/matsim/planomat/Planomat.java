@@ -31,13 +31,13 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -83,7 +83,7 @@ public class Planomat implements PlanAlgorithm {
 		this.seedGenerator = MatsimRandom.getLocalInstance();
 	}
 
-	public void run(final Plan plan) {
+	public void run(final PlanImpl plan) {
 
 		if (this.doLogging) {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
@@ -151,7 +151,7 @@ public class Planomat implements PlanAlgorithm {
 	 * @param plan
 	 * @return
 	 */
-	protected TransportMode[] getPossibleModes(final Plan plan) {
+	protected TransportMode[] getPossibleModes(final PlanImpl plan) {
 		
 		// remove car option for agents that have no car available
 		EnumSet<TransportMode> possibleModesEnumSet = this.config.getPossibleModes().clone();
@@ -187,7 +187,7 @@ public class Planomat implements PlanAlgorithm {
 	protected double stepThroughPlan(
 			final StepThroughPlanAction action, 
 			final IChromosome individual, 
-			final Plan plan, 
+			final PlanImpl plan, 
 			final PlanAnalyzeSubtours planAnalyzeSubtours,
 			final TransportMode[] possibleModes) {
 

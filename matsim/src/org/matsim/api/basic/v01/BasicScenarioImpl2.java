@@ -20,10 +20,10 @@
 
 package org.matsim.api.basic.v01;
 
-import org.matsim.core.api.Scenario;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -38,7 +38,7 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.vehicles.BasicVehicles;
 
 /** @deprecated this is a proposal; do not use */
-public class BasicScenarioImpl2 implements Scenario {
+/* package */ class BasicScenarioImpl2 implements Scenario {
 
 	private final Config config;
 	private final Network network;

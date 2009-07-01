@@ -23,8 +23,8 @@ package org.matsim.population.algorithms;
 import java.util.HashSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PersonIdRecorder extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -35,11 +35,11 @@ public class PersonIdRecorder extends AbstractPersonAlgorithm implements PlanAlg
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(PersonImpl person) {
 		ids.add(person.getId());	
 }
 
-	public void run(Plan plan) {
+	public void run(PlanImpl plan) {
 		this.run(plan.getPerson());
 	}
 

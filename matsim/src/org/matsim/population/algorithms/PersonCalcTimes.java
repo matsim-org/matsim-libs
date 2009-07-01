@@ -22,10 +22,10 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -57,10 +57,10 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
   @Override
-	public void run(Person person) {
-		List<Plan> plans = person.getPlans();
+	public void run(PersonImpl person) {
+		List<PlanImpl> plans = person.getPlans();
 		for (int i=0; i<plans.size(); i++) {
-			Plan plan = plans.get(i);
+			PlanImpl plan = plans.get(i);
 
 			List acts_legs = plan.getPlanElements();
 			ActivityImpl act = null;

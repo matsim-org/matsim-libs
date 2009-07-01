@@ -22,11 +22,11 @@ package org.matsim.population.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -54,9 +54,9 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		// first make sure we have a selected plan
-		Plan selectedPlan = person.getSelectedPlan();
+		PlanImpl selectedPlan = person.getSelectedPlan();
 		if (selectedPlan == null) {
 			// the only way no plan can be selected should be when the person has no plans at all
 			log.warn("Person " + person.getId() + " has no plans!");
@@ -64,7 +64,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		}
 		
 		// make sure all the plans have valid act-locations and valid routes
-		for (Plan plan : person.getPlans()) {
+		for (PlanImpl plan : person.getPlans()) {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
 			for (BasicPlanElement pe : plan.getPlanElements()) {

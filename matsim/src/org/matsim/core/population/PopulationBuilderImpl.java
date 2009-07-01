@@ -27,15 +27,13 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.core.api.Scenario;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
-import org.matsim.core.api.population.PopulationBuilder;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
@@ -67,16 +65,16 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		this.facilities = null; // TODO [MR]
 	}
 
-	public Person createPerson(final Id id) {
-		Person p = new PersonImpl(id);
+	public PersonImpl createPerson(final Id id) {
+		PersonImpl p = new PersonImpl(id);
 		return p;
 	}
 	
-	public Plan createPlan(BasicPerson person) {
-		if (!(person instanceof Person)) {
+	public PlanImpl createPlan(BasicPerson person) {
+		if (!(person instanceof PersonImpl)) {
 			throw new IllegalArgumentException("person must be of type Person.");
 		}
-		return new PlanImpl((Person) person);
+		return new PlanImpl((PersonImpl) person);
 	}
 
 	public ActivityImpl createActivityFromCoord(String actType, Coord coord) {

@@ -32,8 +32,6 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.network.Link;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -62,9 +60,9 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private final BasicPopulation plans;
 	private final Network network;
 
-	private Person currperson = null;
+	private PersonImpl currperson = null;
 
-	private Plan currplan = null;
+	private PlanImpl currplan = null;
 
 	private LegImpl currleg = null;
 

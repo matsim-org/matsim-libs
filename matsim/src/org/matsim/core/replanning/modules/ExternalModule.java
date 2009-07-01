@@ -26,11 +26,9 @@ import java.util.TreeMap;
 
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -40,6 +38,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -74,7 +74,7 @@ public class ExternalModule implements PlanStrategyModule {
 	protected static final String ExternalConfigFileName = "config.xml";
 
 	/** holds a personId and the reference to the person for reloading the plans later */
-	private final TreeMap<Id, Person> persons = new TreeMap<Id, Person>();
+	private final TreeMap<Id, PersonImpl> persons = new TreeMap<Id, PersonImpl>();
 	protected PopulationWriter plansWriter = null;
 	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
@@ -107,8 +107,8 @@ public class ExternalModule implements PlanStrategyModule {
 		return new PopulationWriter(pop, filename, version);
 	}
 
-	public void handlePlan(final Plan plan) {
-		Person person = plan.getPerson();
+	public void handlePlan(final PlanImpl plan) {
+		PersonImpl person = plan.getPerson();
 		this.persons.put(person.getId(), person);
 
 		try {
@@ -223,18 +223,18 @@ public class ExternalModule implements PlanStrategyModule {
 
 	private static class UpdatePlansAlgo extends AbstractPersonAlgorithm {
 
-		private final TreeMap<Id, Person> persons;
+		private final TreeMap<Id, PersonImpl> persons;
 
-		protected UpdatePlansAlgo(final TreeMap<Id, Person> persons) {
+		protected UpdatePlansAlgo(final TreeMap<Id, PersonImpl> persons) {
 			this.persons = persons;
 		}
 
 		@Override
-		public void run(final Person dummyperson) {
-			Plan newplan = dummyperson.getPlans().get(0);
+		public void run(final PersonImpl dummyperson) {
+			PlanImpl newplan = dummyperson.getPlans().get(0);
 			// Find the original person
 			Id Id = dummyperson.getId();
-			Person person = this.persons.get(Id);
+			PersonImpl person = this.persons.get(Id);
 
 			// replace / append the new plan
 			person.exchangeSelectedPlan(newplan, false);

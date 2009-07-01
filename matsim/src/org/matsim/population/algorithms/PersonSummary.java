@@ -20,8 +20,8 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
 public class PersonSummary extends AbstractPersonAlgorithm {
 
@@ -64,7 +64,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		if (person.getAge() > 99) {
 //			Gbl.warningMsg(this.getClass(),"run(...)","[person_id=" + person.getId() + ", older than 99 years. Excluded from summary]");
 			return;
@@ -118,7 +118,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {
-			Plan plan = person.getPlans().get(i);
+			PlanImpl plan = person.getPlans().get(i);
 
 			int acts = plan.getPlanElements().size() / 2 + 1;
 			this.act_cnt += acts;

@@ -29,10 +29,10 @@ import java.util.TreeSet;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.population.Person;
 import org.matsim.core.basic.v01.BasicKnowledge;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 
 public class Knowledge implements BasicKnowledge<ActivityOption> {
 
@@ -44,7 +44,7 @@ public class Knowledge implements BasicKnowledge<ActivityOption> {
 	private static final int INIT_ACTIVITY_CAPACITY = 5;
 
 	/**
-	 * Contains all known {@link ActivityOption Activities} of a {@link Person}. Each activity can at most occur
+	 * Contains all known {@link ActivityOption Activities} of a {@link PersonImpl}. Each activity can at most occur
 	 * one time, independent of its {@code isPrimary} flag.
 	 */
 	private Set<KActivity> activities = null;
@@ -120,13 +120,13 @@ public class Knowledge implements BasicKnowledge<ActivityOption> {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * <p>Adds an {@link ActivityOption} to a {@link Person Persons} {@link Knowledge}.
+	 * <p>Adds an {@link ActivityOption} to a {@link PersonImpl Persons} {@link Knowledge}.
 	 * It leaves the list of activities unchanged, if the given {@link ActivityOption} is already present,
 	 * independent of the {@code isPrimary} flag.</p>
 	 * 
 	 * <p> Use {@link #setPrimaryFlag(ActivityOption, boolean)} to change the {@code isPrimary} flag of an already present {@link ActivityOption}.</p>
 	 * 
-	 * @param activity The {@link ActivityOption} to add to the {@link Person}s {@link Knowledge}.
+	 * @param activity The {@link ActivityOption} to add to the {@link PersonImpl}s {@link Knowledge}.
 	 * @param isPrimary To define if the {@code activity} is a primary activity
 	 * @return <code>true</code> if the {@code activity} is not already present in the list (independent of the {@code isPrimary} flag)
 	 */

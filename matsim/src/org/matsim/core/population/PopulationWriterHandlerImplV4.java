@@ -34,8 +34,6 @@ import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -78,8 +76,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	public void startPerson(final BasicPerson p, final BufferedWriter out) throws IOException {
 		out.write("\t<person");
 		out.write(" id=\"" + p.getId() + "\"");
-		if (p instanceof Person){
-			Person person = (Person)p;
+		if (p instanceof PersonImpl){
+			PersonImpl person = (PersonImpl)p;
 			if (person.getSex() != null)
 				out.write(" sex=\"" + person.getSex() + "\"");
 			if (person.getAge() != Integer.MIN_VALUE)
@@ -289,9 +287,9 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 			out.write(" selected=\"" + "yes" + "\"");
 		else
 			out.write(" selected=\"" + "no" + "\"");
-		if (plan instanceof Plan){
-			Plan p = (Plan)plan;
-			if ((p.getType() != null) && (p.getType() != Plan.Type.UNDEFINED))
+		if (plan instanceof PlanImpl){
+			PlanImpl p = (PlanImpl)plan;
+			if ((p.getType() != null) && (p.getType() != PlanImpl.Type.UNDEFINED))
 				out.write(" type=\"" + p.getType() + "\"");
 		}
 		out.write(">\n");
