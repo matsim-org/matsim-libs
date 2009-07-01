@@ -29,12 +29,12 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -388,7 +388,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
 					act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacility) location);
 				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
-					act = plan.createActivity("actOnLink" + locationIdSequence[aa], (Link) location);
+					act = plan.createActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
 				}
 				act.setEndTime(10*3600);
 				if (aa != (locationIdSequence.length - 1)) {

@@ -27,9 +27,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
@@ -109,7 +109,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		bus.addPassenger(agent5);
 
 		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
-		Link link = driver.getCurrentLeg().getRoute().getStartLink();
+		LinkImpl link = driver.getCurrentLeg().getRoute().getStartLink();
 		// handle first link
 		if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
 			driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
@@ -122,7 +122,7 @@ public class TransitDriverTest extends MatsimTestCase {
 				driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
 				continue;
 			}
-			Link nextLink = driver.chooseNextLink();
+			LinkImpl nextLink = driver.chooseNextLink();
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
 			}
@@ -186,7 +186,7 @@ public class TransitDriverTest extends MatsimTestCase {
 
 		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
 
-		Link link = driver.getCurrentLeg().getRoute().getStartLink();
+		LinkImpl link = driver.getCurrentLeg().getRoute().getStartLink();
 		// handle first link
 		if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
 			driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
@@ -199,7 +199,7 @@ public class TransitDriverTest extends MatsimTestCase {
 				driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
 				continue;
 			}
-			Link nextLink = driver.chooseNextLink();
+			LinkImpl nextLink = driver.chooseNextLink();
 			if (nextLink != null) {
 				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
 			}

@@ -29,8 +29,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.Leg;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -68,7 +68,7 @@ public class RouterTest extends MatsimTestCase {
 		Coord coord2 = new CoordImpl(685862, 254136);
 		Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
 		System.out.println(path2.links.size());
-		for (Link link : path2.links){
+		for (LinkImpl link : path2.links){
 			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + link.getType() + link.getToNode().getId() );
 		}
 

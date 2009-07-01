@@ -27,11 +27,11 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -50,15 +50,15 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 	public void testWrite() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		NetworkLayer network = new NetworkLayer();
-		Node n1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node n2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 0));
-		Node n3 = network.createNode(new IdImpl("3"), new CoordImpl(0, 0));
-		Node n4 = network.createNode(new IdImpl("4"), new CoordImpl(0, 0));
-		Node n5 = network.createNode(new IdImpl("5"), new CoordImpl(0, 0));
-		Link l1 = network.createLink(new IdImpl("1"), n1, n2, 1000, 10, 3600, 1.0);
-		Link l2 = network.createLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
-		Link l3 = network.createLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
-		Link l4 = network.createLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
+		NodeImpl n1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		NodeImpl n2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 0));
+		NodeImpl n3 = network.createNode(new IdImpl("3"), new CoordImpl(0, 0));
+		NodeImpl n4 = network.createNode(new IdImpl("4"), new CoordImpl(0, 0));
+		NodeImpl n5 = network.createNode(new IdImpl("5"), new CoordImpl(0, 0));
+		LinkImpl l1 = network.createLink(new IdImpl("1"), n1, n2, 1000, 10, 3600, 1.0);
+		LinkImpl l2 = network.createLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
+		LinkImpl l3 = network.createLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
+		LinkImpl l4 = network.createLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
 
 		TransitStopFacility stop1 = new TransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
 		TransitStopFacility stop2 = new TransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
@@ -100,7 +100,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 
 		// now add route info to the schedule
 		NetworkRoute route = new LinkNetworkRoute(l1, l4);
-		List<Link> links = new ArrayList<Link>(2);
+		List<LinkImpl> links = new ArrayList<LinkImpl>(2);
 		links.add(l2);
 		links.add(l3);
 		route.setLinks(l1, links, l4);
@@ -156,8 +156,8 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 					assertNotNull("bad network route, must not be null.", netRouteA);
 					assertEquals("wrong start link.", netRouteE.getStartLink(), netRouteA.getStartLink());
 					assertEquals("wrong end link.", netRouteE.getEndLink(), netRouteA.getEndLink());
-					List<Link> linksE = netRouteE.getLinks();
-					List<Link> linksA = netRouteA.getLinks();
+					List<LinkImpl> linksE = netRouteE.getLinks();
+					List<LinkImpl> linksA = netRouteA.getLinks();
 					for (int i = 0, n = linksE.size(); i < n; i++) {
 						assertEquals("wrong link in network route", linksE.get(i), linksA.get(i));
 					}

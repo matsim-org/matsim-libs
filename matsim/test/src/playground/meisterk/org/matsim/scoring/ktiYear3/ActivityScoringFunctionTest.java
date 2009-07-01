@@ -31,8 +31,6 @@ import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
@@ -41,7 +39,9 @@ import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -115,11 +115,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate network
 		this.network = new NetworkLayer();
 		
-		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
-		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
-		Node node3 = network.createNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
-		Node node4 = network.createNode(new IdImpl(4), new CoordImpl( 6000.0, 0.0));
-		Node node5 = network.createNode(new IdImpl(5), new CoordImpl(11000.0, 0.0));
+		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
+		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
+		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
+		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl( 6000.0, 0.0));
+		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(11000.0, 0.0));
 		network.createLink(new IdImpl(1020), node1, node2, 500, 25, 3600, 1);
 		network.createLink(new IdImpl(2010), node2, node1, 500, 25, 3600, 1);
 		network.createLink(new IdImpl(2030), node2, node3, 500, 25, 3600, 1);
@@ -140,7 +140,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		plan = person.createPlan(true);
 
 		ActivityImpl act = plan.createActivity("home", facilityHome);
-		Link link = this.network.getLink("2030");
+		LinkImpl link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		LegImpl leg = this.plan.createLeg(TransportMode.car);
