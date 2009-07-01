@@ -36,12 +36,12 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.Scenario;
-import org.matsim.core.api.ScenarioImpl;
-import org.matsim.core.api.ScenarioLoader;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
-import org.matsim.core.api.population.Population;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -114,7 +114,7 @@ public class BKickHouseholdsCreatorZurich {
 			//create the households
 	    HouseholdBuilder b = households.getHouseholdBuilder();
 	    Household hh = b.createHousehold(p.getId());
-	    hh.getMembers().put(p.getId(), (Person)(BasicPerson)p);
+	    hh.getMembers().put(p.getId(), (PersonImpl)(BasicPerson)p);
 	    households.getHouseholds().put(p.getId(), hh);
 
 	    //calculate the income
@@ -212,10 +212,10 @@ public class BKickHouseholdsCreatorZurich {
 	
 	
 	private void checkGemeindenForPop(Population population, FeatureSource fsource) throws IOException {
-		Plan plan;
+		PlanImpl plan;
 		int personsWithGemeinde = 0;
 		
-		for (Person p : population.getPersons().values()) {
+		for (PersonImpl p : population.getPersons().values()) {
 			plan = p.getPlans().get(0);
 			if (plan == null) {
 				throw new IllegalStateException("Person " + p.getId() + " has no plans");

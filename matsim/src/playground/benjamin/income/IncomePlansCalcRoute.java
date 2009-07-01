@@ -20,9 +20,9 @@
 package playground.benjamin.income;
 
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -49,14 +49,14 @@ public class IncomePlansCalcRoute extends PlansCalcRoute{
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final PersonImpl person) {
 		this.incomeCostCalculator.setIncome(person.getHousehold().getIncome());
 		super.run(person);
 	}
 	
 
 	@Override
-	public void run(Plan plan){
+	public void run(PlanImpl plan){
 		this.incomeCostCalculator.setIncome(plan.getPerson().getHousehold().getIncome());
 		super.run(plan);
 	}

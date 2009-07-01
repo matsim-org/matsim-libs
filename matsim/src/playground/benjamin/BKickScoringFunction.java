@@ -22,14 +22,14 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Plan;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -41,8 +41,8 @@ import org.matsim.core.utils.misc.Time;
  */
 public class BKickScoringFunction implements ScoringFunction {
 
-	protected final Person person;
-	protected final Plan plan;
+	protected final PersonImpl person;
+	protected final PlanImpl plan;
 
 	protected double score;
 	private double lastTime;
@@ -79,7 +79,7 @@ public class BKickScoringFunction implements ScoringFunction {
 
 	
 	
-	public BKickScoringFunction(final Plan plan, CharyparNagelScoringConfigGroup config) {
+	public BKickScoringFunction(final PlanImpl plan, CharyparNagelScoringConfigGroup config) {
 		configGroup = config;
 		init();
 		this.reset();

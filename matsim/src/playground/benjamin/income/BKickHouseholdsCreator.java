@@ -23,12 +23,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.network.Network;
-import org.matsim.core.api.population.Person;
-import org.matsim.core.api.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.basic.BasicIncome;
@@ -87,7 +87,7 @@ public class BKickHouseholdsCreator {
 
     IncomeCalculatorKantonZurich incomeCalculator = new IncomeCalculatorKantonZurich();
     
-    for (Person p : pop.getPersons().values()){
+    for (PersonImpl p : pop.getPersons().values()){
       Household hh = b.createHousehold(p.getId());
       hh.setIncome(b.createIncome(incomeCalculator.calculateIncome(46300), BasicIncome.IncomePeriod.year));
       hh.getMembers().put(p.getId(), p);
