@@ -25,12 +25,16 @@ import java.io.ObjectInputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 
 public class BasicNodeImpl implements BasicNode {
+	private final static Logger log = Logger.getLogger(BasicNodeImpl.class);
+
 	protected transient  Map<Id, BasicLink> inlinks  = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
 	protected transient  Map<Id, BasicLink> outlinks = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
 
@@ -38,23 +42,38 @@ public class BasicNodeImpl implements BasicNode {
 	protected final Id id;
 
 
-	public BasicNodeImpl(Id id){
+	protected BasicNodeImpl(Id id){
 		this.id = id;
 	}
 	
 	public BasicNodeImpl(Id id, Coord coord) {
+		// yyyyyy should be protected and then go through builder
 		this(id);
 		this.coord = coord;
 	}
 
-	public boolean addInLink(BasicLink link) {
-		this.inlinks.put(link.getId(), link);
-		return true;
+	public final boolean addInLink(BasicLink inlink) {
+		Id linkid = inlink.getId();
+		if (this.inlinks.containsKey(linkid)) {
+			throw new IllegalArgumentException(this + "[inlink_id=" + inlink.getId() + " already exists]");
+		}
+		if (this.outlinks.containsKey(linkid)) {
+			log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
+		}
+		this.inlinks.put(linkid, inlink);
+		return true; // yy should return true only if collection changed as result of call
 	}
 
-	public boolean addOutLink(BasicLink link) {
-		this.outlinks.put(link.getId(), link);
-		return true;
+	public final boolean addOutLink(BasicLink outlink) {
+		Id linkid = outlink.getId();
+		if (this.outlinks.containsKey(linkid)) {
+			throw new IllegalArgumentException(this + "[inlink_id=" + outlink.getId() + " already exists]");
+		}
+		if (this.inlinks.containsKey(linkid)) {
+			log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
+		}
+		this.outlinks.put(linkid, outlink);
+		return true ; // yy should return true only if collection changed as result of call
 	}
 
 	public Map<Id, ? extends BasicLink> getInLinks() {
