@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -239,8 +240,10 @@ public class ModdedConverterE {
 				}
 			}
 		}else{
+
 			PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
 			PlanImpl tmpPl = p.getSelectedPlan();
+
 
 			LegImpl leg = tmpPl.createLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
@@ -281,14 +284,14 @@ public class ModdedConverterE {
 	}
 
 	public static void main(final String[] args) {
-		String oldPlansFilename = "C:\\workspace\\matsim\\input\\ConvertPlan\\InputForMATSim.txt";
-		String newPlansFilename = "C:\\workspace\\matsim\\output\\ConvertPlan\\plansE.xml.gz";
-		String zoneFilename = "C:\\workspace\\matsim\\input\\ConvertPlan\\centroids.txt";
+		String oldPlansFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\fout_modechoices_recleaned.txt";
+		String newPlansFilename = "C:\\Thesis_HJY\\matsim\\output\\ConvertPlan\\plansE.xml.gz";
+		String zoneFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\centroids.txt";
 		
 		ModdedConverterE c = new ModdedConverterE();
 
 		Gbl.createConfig(null);
-		c.setZones((ZoneLayer) Gbl.createWorld().createLayer(new IdImpl("zones"),
+		c.setZones((ZoneLayer) Gbl.getWorld().createLayer(new IdImpl("zones"),
 				"toronto_test"));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
