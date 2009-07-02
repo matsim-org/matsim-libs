@@ -1,0 +1,110 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Network.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.core.api.experimental.network;
+
+import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
+
+// FIXME [MR] still imports NetworkFactory from outside interface
+public interface Network extends BasicNetwork<NodeImpl, LinkImpl> {
+
+//	
+//	public String getName();
+//	
+//	/**
+//	 * @param capPeriod the capacity-period in seconds
+//	 */
+//	public void setCapacityPeriod(final double capPeriod);
+//
+//	public void setEffectiveCellSize(final double effectiveCellSize);
+//
+//	public void setEffectiveLaneWidth(final double effectiveLaneWidth);
+//
+//	public double getCapacityPeriod();
+//
+//	public double getEffectiveCellSize();
+//
+//	public double getEffectiveLaneWidth();
+//
+//	public NodeImpl getNode(final Id id);
+//
+//	public LinkImpl getLink(final Id linkId);
+//
+//	/**
+//	 * Finds the node nearest to <code>coord</code>
+//	 *
+//	 * @param coord the coordinate to which the closest node should be found
+//	 * @return the closest node found, null if none
+//	 */
+//	public NodeImpl getNearestNode(final Coord coord);
+//
+//	/**
+//	 * finds the nodes within distance to <code>coord</code>
+//	 *
+//	 * @param coord the coordinate around which nodes should be located
+//	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
+//	 * @return all nodes within distance to <code>coord</code>
+//	 */
+//	public Collection<NodeImpl> getNearestNodes(final Coord coord, final double distance);
+//
+//	public NetworkFactory getFactory();
+//
+//	public NetworkBuilder getBuilder();
+//
+//	
+//	/**
+//	 * removes a link from the network.<p>
+//	 *
+//	 * In case <tt>link</tt> exists, it first unlinks it from the two
+//	 * incident nodes and then removes it from the link set of the network.
+//	 *
+//	 * @param link Link to be removed.
+//	 * @return <tt>true</tt> if the specified link is part of the network and
+//	 * is successfully removed.
+//	 */
+//	public boolean removeLink(final LinkImpl link);
+//
+//	/**
+//	 * removes a node from the network.<p>
+//	 *
+//	 * In case <tt>node</tt> exists, it first removed all incident links of
+//	 * <tt>node</tt> and then removes <tt>node</tt> from the link set
+//	 * and from the <tt>nodeQuadTree</tt>---if instantiated---of the network.<p>
+//	 *
+//	 * NOTE: if one of the incident links of <tt>node</tt> cannot be removed
+//	 * properly, the process crashes.
+//	 *
+//	 * @param node Node to be removed.
+//	 * @return <tt>true</tt> if the specified node is part of the network and
+//	 * is successfully removed AND all incident links are removed successfully
+//	 */
+//	public boolean removeNode(final NodeImpl node);
+//
+//  /**
+//   * Connects this network in the following sense: After a call to this
+//   * function, all contained nodes and links must know about all of their
+//   * adjacent network elements.
+//   */
+//  public void connect();
+
+	
+}
