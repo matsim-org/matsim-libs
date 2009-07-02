@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentArrivalEvent;
@@ -19,6 +18,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
 
