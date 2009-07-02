@@ -26,12 +26,12 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.OpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.misc.Time;
 
