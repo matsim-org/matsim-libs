@@ -28,12 +28,12 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 public class RoutesForGianluca {
 
@@ -76,18 +76,18 @@ public class RoutesForGianluca {
 				// example: 2768  17816   15313        10392     7580      7562
 				// index:   0         1   2            3         4         5
 				Integer id = new Integer(entries[0].trim());
-				Node o_node = this.network.getNode(entries[1].trim());
-				Node d_node = this.network.getNode(entries[2].trim());
+				NodeImpl o_node = this.network.getNode(entries[1].trim());
+				NodeImpl d_node = this.network.getNode(entries[2].trim());
 
-				LinkedList<Link> links = new LinkedList<Link>();
+				LinkedList<LinkImpl> links = new LinkedList<LinkImpl>();
 				int idx = 3;
-				Node curr_node = o_node;
+				NodeImpl curr_node = o_node;
 				while (entries[idx].length() > 0) {
 					String orig_id = entries[idx].trim();
 					boolean link_found = false;
-					Iterator<? extends Link> outlink_it = curr_node.getOutLinks().values().iterator();
+					Iterator<? extends LinkImpl> outlink_it = curr_node.getOutLinks().values().iterator();
 					while (outlink_it.hasNext()) {
-						Link outlink = outlink_it.next();
+						LinkImpl outlink = outlink_it.next();
 						if (outlink.getOrigId().equals(orig_id)) {
 							link_found = true;
 							links.add(outlink);
@@ -112,7 +112,7 @@ public class RoutesForGianluca {
 					}
 //					System.out.println(curr_line);
 					System.out.print(id + "\t" + o_node.getId() + "\t" + d_node.getId());
-					Iterator<Link> l_it = links.iterator();
+					Iterator<LinkImpl> l_it = links.iterator();
 					while (l_it.hasNext()) {
 						System.out.print("\t" + l_it.next().getId());
 					}

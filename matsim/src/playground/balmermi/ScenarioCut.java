@@ -33,11 +33,11 @@ import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -63,7 +63,7 @@ public class ScenarioCut {
 
 		min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		for (Node n : scenario.getNetwork().getNodes().values()) {
+		for (NodeImpl n : scenario.getNetwork().getNodes().values()) {
 			if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
 			if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
 			if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
@@ -85,7 +85,7 @@ public class ScenarioCut {
 							if (a.getCoord().getY() > max.getY()) { max.setY(a.getCoord().getY()); }
 						}
 						if (a.getLinkId() != null) {
-							Node n = a.getLink().getFromNode();
+							NodeImpl n = a.getLink().getFromNode();
 							if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
 							if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
 							if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
@@ -121,7 +121,7 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 	
-	private static void reduceFacilities(ActivityFacilities facilities, Network network) {
+	private static void reduceFacilities(ActivityFacilities facilities, NetworkLayer network) {
 		System.out.println("removing facilities that refer to removed links of the network... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
 		for (ActivityFacility f : facilities.getFacilities().values()) {
@@ -167,10 +167,10 @@ public class ScenarioCut {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceNetwork(Network network, Coord center, double radius) {
+	private static void reduceNetwork(NetworkLayer network, Coord center, double radius) {
 		System.out.println("removing links outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 			CoordImpl fc = (CoordImpl)l.getFromNode().getCoord();
 			CoordImpl tc = (CoordImpl)l.getToNode().getCoord();
 			if (fc.calcDistance(center) > radius) { toRemove.add(l.getId()); }
@@ -188,10 +188,10 @@ public class ScenarioCut {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceNetwork(Network network, Coord min, Coord max) {
+	private static void reduceNetwork(NetworkLayer network, Coord min, Coord max) {
 		System.out.println("removing links outside of rectangle ("+min.toString()+";"+max.toString()+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 			Coord fc = l.getFromNode().getCoord();
 			if (fc.getX() < min.getX()) { toRemove.add(l.getId()); continue; }
 			if (fc.getX() > max.getX()) { toRemove.add(l.getId()); continue; }

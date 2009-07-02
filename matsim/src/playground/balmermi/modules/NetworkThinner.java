@@ -28,9 +28,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -39,25 +39,25 @@ public class NetworkThinner {
 	
 	private static final Logger log = Logger.getLogger(NetworkThinner.class);
 	
-	private final void merge(List<Link> list, NetworkLayer network, Counts counts) {
-		Link first = list.get(0);
-		Node fromNode = first.getFromNode();
-		Node toNode = list.get(list.size()-1).getToNode();
+	private final void merge(List<LinkImpl> list, NetworkLayer network, Counts counts) {
+		LinkImpl first = list.get(0);
+		NodeImpl fromNode = first.getFromNode();
+		NodeImpl toNode = list.get(list.size()-1).getToNode();
 		// remove the links
-		for (Link l : list) { network.removeLink(l); }
+		for (LinkImpl l : list) { network.removeLink(l); }
 		// add a new link
-		double length = 0.0; for (Link l : list) { length += l.getLength(); }
-		Link newLink = network.createLink(first.getId(),fromNode,toNode,length,first.getFreespeed(Time.UNDEFINED_TIME),first.getCapacity(Time.UNDEFINED_TIME),first.getNumberOfLanes(Time.UNDEFINED_TIME));
+		double length = 0.0; for (LinkImpl l : list) { length += l.getLength(); }
+		LinkImpl newLink = network.createLink(first.getId(),fromNode,toNode,length,first.getFreespeed(Time.UNDEFINED_TIME),first.getCapacity(Time.UNDEFINED_TIME),first.getNumberOfLanes(Time.UNDEFINED_TIME));
 		newLink.setType(first.getType());
 		// always assign the origId of the first link (for convenience)
 		newLink.setOrigId(first.getOrigId());
 		
 		// mapping info
-		for (Link l : list) { log.info("    mapping: "+l.getId()+" => "+newLink.getId()); }
+		for (LinkImpl l : list) { log.info("    mapping: "+l.getId()+" => "+newLink.getId()); }
 		
 		// get the counts to remap
 		List<Count> countsToRemap = new ArrayList<Count>();
-		for (Link l : list) {
+		for (LinkImpl l : list) {
 			if (counts.getCount(l.getId()) != null) { countsToRemap.add(counts.getCount(l.getId())); }
 		}
 		for (Count c : countsToRemap) {
@@ -80,14 +80,14 @@ public class NetworkThinner {
 		log.info("  init number of nodes: "+network.getNodes().size());
 		// get the start links of "one way" or "two way" passes
 		Set<Id> lids = new HashSet<Id>();
-		for (Link l : network.getLinks().values()) {
-			Link currLink = l;
-			Node fromNode = currLink.getFromNode();
+		for (LinkImpl l : network.getLinks().values()) {
+			LinkImpl currLink = l;
+			NodeImpl fromNode = currLink.getFromNode();
 			while ((fromNode.getIncidentNodes().size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
-				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
-				Link prevLink = linkIt.next();
+				Iterator<? extends LinkImpl> linkIt = fromNode.getInLinks().values().iterator();
+				LinkImpl prevLink = linkIt.next();
 				if (prevLink.getFromNode().getId().equals(currLink.getToNode().getId())) { prevLink = linkIt.next(); }
 				currLink = prevLink;
 				fromNode = currLink.getFromNode();
@@ -97,17 +97,17 @@ public class NetworkThinner {
 		log.info("  number of start links: "+lids.size());
 
 		// calc the merge groups
-		List<List<Link>> mergeGroups = new ArrayList<List<Link>>();
+		List<List<LinkImpl>> mergeGroups = new ArrayList<List<LinkImpl>>();
 		for (Id lid : lids) {
-			List<Link> linksToMerge = new ArrayList<Link>();
-			Link currLink = network.getLink(lid);
+			List<LinkImpl> linksToMerge = new ArrayList<LinkImpl>();
+			LinkImpl currLink = network.getLink(lid);
 			linksToMerge.add(currLink);
-			Node toNode = currLink.getToNode();
+			NodeImpl toNode = currLink.getToNode();
 			while ((toNode.getIncidentNodes().size() == 2) &&
 					(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 					((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
-				Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
-				Link nextLink = linkIt.next();
+				Iterator<? extends LinkImpl> linkIt = toNode.getOutLinks().values().iterator();
+				LinkImpl nextLink = linkIt.next();
 				if (nextLink.getToNode().getId().equals(currLink.getFromNode().getId())) { nextLink = linkIt.next(); }
 
 				if ((currLink.getCapacity(Time.UNDEFINED_TIME) != nextLink.getCapacity(Time.UNDEFINED_TIME)) ||
@@ -117,7 +117,7 @@ public class NetworkThinner {
 						!currLink.getType().equals(nextLink.getType()) ||
 						!currLink.getAllowedModes().equals(nextLink.getAllowedModes())) {
 					mergeGroups.add(linksToMerge);
-					linksToMerge = new ArrayList<Link>();
+					linksToMerge = new ArrayList<LinkImpl>();
 				}
 				currLink = nextLink;
 				linksToMerge.add(currLink);
@@ -127,19 +127,19 @@ public class NetworkThinner {
 		}
 		log.info("  number of merge groups: "+mergeGroups.size());
 		int cnt = 0;
-		for (List<Link> list : mergeGroups) { cnt += list.size(); }
+		for (List<LinkImpl> list : mergeGroups) { cnt += list.size(); }
 		log.info("  number of links of all merge groups: "+cnt);
 		
 		int cntKeepLast = 0;
 		int cntMerge = 0;
-		for (List<Link> list : mergeGroups) {
-			Link first = list.get(0);
-			Node fromNode = first.getFromNode();
-			Node toNode = list.get(list.size()-1).getToNode();
+		for (List<LinkImpl> list : mergeGroups) {
+			LinkImpl first = list.get(0);
+			NodeImpl fromNode = first.getFromNode();
+			NodeImpl toNode = list.get(list.size()-1).getToNode();
 
 			boolean keepLast = false;
 			// check if a merge will produce "double links"
-			for (Link l : fromNode.getOutLinks().values()) {
+			for (LinkImpl l : fromNode.getOutLinks().values()) {
 				if (!l.equals(first)) {
 					if (l.getToNode().equals(toNode)) { keepLast = true; }
 				}

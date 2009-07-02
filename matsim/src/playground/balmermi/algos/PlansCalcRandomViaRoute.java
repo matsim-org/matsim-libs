@@ -23,11 +23,11 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -166,13 +166,13 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 
 	private double handleCarLeg(LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime) {
 		double travTime = 0;
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
+		LinkImpl fromLink = fromAct.getLink();
+		LinkImpl toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
-		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-		Node endNode = toLink.getFromNode(); // the target is the start of the link
+		NodeImpl startNode = fromLink.getToNode();	// start at the end of the "current" link
+		NodeImpl endNode = toLink.getFromNode(); // the target is the start of the link
 		
 		// getting a random via node
 		double x = 0.5*(startNode.getCoord().getX() + endNode.getCoord().getX());
@@ -182,7 +182,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		x = x + (MatsimRandom.getRandom().nextDouble()-0.5)*dist;
 		y = y + (MatsimRandom.getRandom().nextDouble()-0.5)*dist;
 		CoordImpl coord = new CoordImpl(x,y);
-		Node viaNode = this.network.getNearestNode(coord);
+		NodeImpl viaNode = this.network.getNearestNode(coord);
 		while ((viaNode == startNode) || (viaNode == endNode)) {
 			dist = dist + 1000.0;
 			x = x + (MatsimRandom.getRandom().nextDouble()-0.5)*dist;
@@ -208,7 +208,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 		
 		
-		List<Node> nodes = (path1 != null ? path1.nodes : new ArrayList<Node>());
+		List<NodeImpl> nodes = (path1 != null ? path1.nodes : new ArrayList<NodeImpl>());
 		if (!nodes.isEmpty()) { nodes.remove(nodes.size()-1); } // remove the via node
 		if (path2 != null) {
 			nodes.addAll(path2.nodes);

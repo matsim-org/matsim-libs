@@ -23,11 +23,11 @@ package playground.balmermi.modules;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 
@@ -53,10 +53,10 @@ public class XY2SensefullLink {
 		new NetworkSummary().run(network);
 
 		System.out.println("    removing links with type < 30 (Highways and zoll) and >= 90 (trains and ships)...");
-		ArrayList<Link> useless_links = new ArrayList<Link>();
-		Iterator<? extends Link> l_it = network.getLinks().values().iterator();
+		ArrayList<LinkImpl> useless_links = new ArrayList<LinkImpl>();
+		Iterator<? extends LinkImpl> l_it = network.getLinks().values().iterator();
 		while (l_it.hasNext()) {
-			Link l = l_it.next();
+			LinkImpl l = l_it.next();
 			int type = Integer.parseInt(l.getType());
 			if ((type < 30) || (type >= 90)) { useless_links.add(l); }
 		}
@@ -70,10 +70,10 @@ public class XY2SensefullLink {
 		new NetworkSummary().run(network);
 		
 		System.out.println("    removing nodes with no incident links...");
-		ArrayList<Node> useless_nodes = new ArrayList<Node>();
-		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
+		ArrayList<NodeImpl> useless_nodes = new ArrayList<NodeImpl>();
+		Iterator<? extends NodeImpl> n_it = network.getNodes().values().iterator();
 		while (n_it.hasNext()) {
-			Node n = n_it.next();
+			NodeImpl n = n_it.next();
 			if (n.getIncidentLinks().isEmpty()) { useless_nodes.add(n); }
 		}
 		System.out.println("    "+useless_nodes.size()+" nodes to remove.");

@@ -22,8 +22,8 @@ package playground.balmermi.algos;
 
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.World;
 
@@ -37,7 +37,7 @@ public class FacilitiesCreateFromNetwork {
 
 	public void run(ActivityFacilities facilities) {
 		if (!facilities.getFacilities().isEmpty()) { Gbl.errorMsg("Facilities not empty"); }
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 			ActivityFacility f = facilities.createFacility(l.getId(),l.getCoord());
 			f.createActivityOption("h");
 			f.createActivityOption("w");

@@ -22,19 +22,19 @@ package playground.balmermi.algos;
 
 import java.util.ArrayList;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 public class NetworkAdaptCHNavtec {
 
-	public void run(Network network) {
+	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		ArrayList<Link> link90 = new ArrayList<Link>();
+		ArrayList<LinkImpl> link90 = new ArrayList<LinkImpl>();
 
 		System.out.println("      adapt lanes and caps...");
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 			int type = Integer.parseInt(l.getType());
 			if ((type == 13) || (type == 16)) {
 				System.out.println("        link id=" + l.getId() + "; type=" + l.getType() + "; lanes=" + l.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + " ==> lanes=3");
@@ -62,7 +62,7 @@ public class NetworkAdaptCHNavtec {
 
 		System.out.println("      remove links with type = 90...");
 		for (int i=0; i<link90.size(); i++) {
-			Link l = link90.get(i);
+			LinkImpl l = link90.get(i);
 			boolean removed = network.removeLink(l);
 			if (!removed) {
 				System.out.println("        link id=" + l.getId() + "; type=" + l.getType() + " could not be removed!!!");

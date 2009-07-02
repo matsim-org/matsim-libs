@@ -31,9 +31,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
@@ -260,7 +260,7 @@ public class NetworkCreateLSA {
 					Intersection intersec = this.intersections.get(knotennr);
 					Lane l = intersec.lanes.get(lnr);
 					if (l == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": lane_nr=" + lnr + " does not exist!"); }
-					Link link = this.network.getLink(linkid);
+					LinkImpl link = this.network.getLink(linkid);
 					if (link == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": link_nr=" + linkid.toString() + " does not exist!"); }
 					l.addLink(link);
 
@@ -372,7 +372,7 @@ public class NetworkCreateLSA {
 			Iterator<Id> id_it = this.lsalinklist.keySet().iterator();
 			while (id_it.hasNext()) {
 				Id id = id_it.next();
-				Link link = this.network.getLink(id);
+				LinkImpl link = this.network.getLink(id);
 				HashSet<LSA> lsas = this.lsalinklist.get(id);
 				if (links_to_ignore.contains(id)){
 					System.out.println("Link id=" + id + " will be ignored. (no LSA for that link)!");

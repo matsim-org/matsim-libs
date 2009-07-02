@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.Random;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 public class NetworkWriteVolumesAsTable {
 
@@ -78,7 +78,7 @@ public class NetworkWriteVolumesAsTable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Network network) {
+	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		double capperiod = network.getCapacityPeriod();
@@ -86,7 +86,7 @@ public class NetworkWriteVolumesAsTable {
 		System.out.println("      capperiod = " + capperiod);
 
 		try {
-			for (Link l : network.getLinks().values()) {
+			for (LinkImpl l : network.getLinks().values()) {
 				Id l_id = l.getId();
 
 				Random r = new Random();

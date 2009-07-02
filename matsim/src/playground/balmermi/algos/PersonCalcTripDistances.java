@@ -20,8 +20,8 @@
 
 package playground.balmermi.algos;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -71,7 +71,7 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 				if (((NetworkRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(CoordUtils.calcDistance(next.getCoord(), prev.getCoord())); }
 				else {
 					double dist = prev.getLink().getLength();
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					for (LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						dist += link.getLength();
 					}
 					leg.getRoute().setDistance(dist);

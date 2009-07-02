@@ -26,10 +26,10 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -55,14 +55,14 @@ public class NetworkDoubleLinks {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void handleDoubleLink(Link l, NetworkLayer network) {
-		Node fn = l.getFromNode();
-		Node tn = l.getToNode();
+	private final void handleDoubleLink(LinkImpl l, NetworkLayer network) {
+		NodeImpl fn = l.getFromNode();
+		NodeImpl tn = l.getToNode();
 		Coord nc = new CoordImpl(0.5*(fn.getCoord().getX()+tn.getCoord().getX()),0.5*(fn.getCoord().getY()+tn.getCoord().getY()));
-		Node n = network.createNode(new IdImpl(l.getId()+suffix),nc,fn.getType());
+		NodeImpl n = network.createNode(new IdImpl(l.getId()+suffix),nc,fn.getType());
 		network.removeLink(l);
-		Link l1new = network.createLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());
-		Link l2new = network.createLink(new IdImpl(l.getId()+suffix),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());
+		LinkImpl l1new = network.createLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());
+		LinkImpl l2new = network.createLink(new IdImpl(l.getId()+suffix),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());
 		log.info("    lid="+l.getId()+" split into lids="+l1new.getId()+","+l2new.getId()+" with additional nid="+n.getId());
 	}
 
@@ -75,12 +75,12 @@ public class NetworkDoubleLinks {
 		log.info("  init number of links: "+network.getLinks().size());
 		log.info("  init number of nodes: "+network.getNodes().size());
 		Set<Id> linkIds = new TreeSet<Id>();
-		for (Node n : network.getNodes().values()) {
+		for (NodeImpl n : network.getNodes().values()) {
 			Object [] outLinks = n.getOutLinks().values().toArray();
 			for (int i=0; i<outLinks.length; i++) {
-				Link refLink = (Link)outLinks[i];
+				LinkImpl refLink = (LinkImpl)outLinks[i];
 				for (int j=i+1; j<outLinks.length; j++) {
-					Link candidateLink = (Link)outLinks[j];
+					LinkImpl candidateLink = (LinkImpl)outLinks[j];
 					if (refLink.getToNode().equals(candidateLink.getToNode())) {
 						linkIds.add(candidateLink.getId());
 					}

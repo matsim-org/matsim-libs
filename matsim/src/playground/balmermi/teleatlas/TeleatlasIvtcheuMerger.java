@@ -28,12 +28,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.utils.misc.Time;
 
@@ -68,7 +68,7 @@ public class TeleatlasIvtcheuMerger {
 				// ivtchLID
 				// 0
 				Id lid = new IdImpl(entries[0].trim());
-				Link l = networkIvtcheu.getLink(lid);
+				LinkImpl l = networkIvtcheu.getLink(lid);
 				if (l == null) { throw new RuntimeException(lineCnt+": link with id="+lid+" not found."); }
 				if (!networkIvtcheu.removeLink(l)) { throw new RuntimeException(lineCnt+": could not remove link with id="+lid+"."); }
 				lineCnt++;
@@ -113,7 +113,7 @@ public class TeleatlasIvtcheuMerger {
 		}
 		
 		int nodeMapCnt = 0;
-		for (Node n : networkIvtcheu.getNodes().values()) {
+		for (NodeImpl n : networkIvtcheu.getNodes().values()) {
 			if (!nodeMapping.containsKey(n.getId())) {
 				networkTeleatlas.createNode(n.getId(),n.getCoord(),n.getType());
 			}
@@ -121,7 +121,7 @@ public class TeleatlasIvtcheuMerger {
 		}
 		if (nodeMapCnt != nodeMapping.size()) { throw new RuntimeException("Something is wrong!"); }
 		
-		for (Link l : networkIvtcheu.getLinks().values()) {
+		for (LinkImpl l : networkIvtcheu.getLinks().values()) {
 			Id fromNodeId = l.getFromNode().getId();
 			Id toNodeId = l.getToNode().getId();
 			if (nodeMapping.keySet().contains(fromNodeId) && nodeMapping.keySet().contains(toNodeId)) {

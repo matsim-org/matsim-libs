@@ -25,11 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -61,13 +61,13 @@ public class PersonFilter {
 
 		double radius = 30000.0;
 		final CoordImpl center = new CoordImpl(683518.0,246836.0);
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
 		System.out.println("  => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		System.out.println("  extracting links of the aoi... " + (new Date()));
-		for (Link link : network.getLinks().values()) {
-			final Node from = link.getFromNode();
-			final Node to = link.getToNode();
+		for (LinkImpl link : network.getLinks().values()) {
+			final NodeImpl from = link.getFromNode();
+			final NodeImpl to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
 				areaOfInterest.put(link.getId(),link);

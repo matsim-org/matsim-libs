@@ -24,10 +24,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -108,7 +108,7 @@ public class NetworkWriteETwithCounts {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final double getMaxCount(Link l) {
+	private final double getMaxCount(LinkImpl l) {
 		Count count = this.counts.getCounts().get(l.getId());
 		if (count != null) {
 			Volume v = count.getMaxVolume();
@@ -121,7 +121,7 @@ public class NetworkWriteETwithCounts {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Network network) {
+	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		double capperiod = network.getCapacityPeriod();
@@ -129,14 +129,14 @@ public class NetworkWriteETwithCounts {
 		System.out.println("      capperiod = " + capperiod);
 
 		try {
-			for (Node n : network.getNodes().values()) {
+			for (NodeImpl n : network.getNodes().values()) {
 				this.out_n.write(n.getId() + "\t" + n.getCoord().getX() + "\t" + n.getCoord().getY() + "\n");
 				this.out_n.flush();
 			}
-			for (Link l : network.getLinks().values()) {
+			for (LinkImpl l : network.getLinks().values()) {
 				double maxvol = this.getMaxCount(l);
-				Node f = l.getFromNode();
-				Node t = l.getToNode();
+				NodeImpl f = l.getFromNode();
+				NodeImpl t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
 				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(Time.UNDEFINED_TIME) + "\t1\n");

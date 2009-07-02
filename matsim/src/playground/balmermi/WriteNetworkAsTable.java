@@ -21,8 +21,8 @@
 package playground.balmermi;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkSummary;
 
 import playground.balmermi.algos.NetworkWriteVolumesAsTable;
@@ -39,7 +39,7 @@ public class WriteNetworkAsTable {
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
-		Network network = sl.getScenario().getNetwork();
+		NetworkLayer network = sl.getScenario().getNetwork();
 
 		System.out.println("  running Network Validation and cleaning algorithms... ");
 		new NetworkSummary().run(network);

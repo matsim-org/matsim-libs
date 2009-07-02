@@ -20,16 +20,16 @@
 
 package playground.balmermi.algos;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 public class NetworkSetDefaultCapacities {
 
-	public void run(Network network) {
+	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 			int lanes = l.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			if (lanes == 1) { l.setCapacity(2000.0); }
 			else if (lanes == 2) { l.setCapacity(4000.0); }

@@ -22,9 +22,9 @@ package playground.balmermi.modules.ivtch;
 
 import java.util.ArrayList;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkSimplifyAttributes {
@@ -51,12 +51,12 @@ public class NetworkSimplifyAttributes {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Network network) {
+	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		ArrayList<Link> link90 = new ArrayList<Link>();
+		ArrayList<LinkImpl> link90 = new ArrayList<LinkImpl>();
 
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 			double speed = l.getFreespeed(Time.UNDEFINED_TIME)*3.6;
 			if (speed <= 0.0) { Gbl.errorMsg("speed = " + speed + " not allowed!"); }
 			else if (speed <= 21.0) { l.setFreespeed(10.0/3.6); }

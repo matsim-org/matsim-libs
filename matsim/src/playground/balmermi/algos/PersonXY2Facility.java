@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -165,7 +165,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 				ActivityFacility f = qt.get(coord.getX(),coord.getY());
 				if (f == null) { throw new RuntimeException("Coordinates == null; something is wrong!"); }
 				
-				Link l = f.getLink();
+				LinkImpl l = f.getLink();
 				if (l == null) { throw new RuntimeException("Link == null; something is wrong!"); }
 				
 				act.setFacility(f);

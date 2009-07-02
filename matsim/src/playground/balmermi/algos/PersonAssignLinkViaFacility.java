@@ -24,8 +24,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -138,7 +138,7 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 					else { throw new RuntimeException("Something is wrong!"); }
 					if (f == null) { throw new RuntimeException("Something is wrong!"); }
 					
-					Link link = f.getLink();
+					LinkImpl link = f.getLink();
 					if (link == null) { throw new RuntimeException("Something is wrong!"); }
 					
 					a.setLink(link);

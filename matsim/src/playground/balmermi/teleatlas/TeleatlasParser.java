@@ -33,12 +33,12 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -364,8 +364,8 @@ public class TeleatlasParser {
 			double speed = Double.parseDouble(f.getAttribute(this.linkSpeedName).toString());
 			double lanes = Double.parseDouble(f.getAttribute(this.linkLanesName).toString());
 			// ignore link where from node or to node is missing
-			Node fNode = network.getNode(fromJunctionId);
-			Node tNode = network.getNode(toJunctionId);
+			NodeImpl fNode = network.getNode(fromJunctionId);
+			NodeImpl tNode = network.getNode(toJunctionId);
 			if ((fNode == null) || (tNode == null)) { log.warn("  linkId="+id.toString()+": at least one of the two junctions do not exist. Ignoring and proceeding anyway..."); ignore = true; }
 			// ignore link that is not a 'Road Element' (4110) or a 'Ferry Connection Element' (4130)
 			// typically there are 'Address Area Boundary Element' (4165) links that will be ignored
@@ -451,8 +451,8 @@ public class TeleatlasParser {
 				String id = entries[srIdNameIndex].toString();
 				if (valdir == 1) {
 					// Valid in Both Directions
-					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
-					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					LinkImpl ftLink = network.getLinks().get(new IdImpl(id+"FT"));
+					LinkImpl tfLink = network.getLinks().get(new IdImpl(id+"TF"));
 					if ((ftLink == null) || (tfLink == null)) { log.debug("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -463,7 +463,7 @@ public class TeleatlasParser {
 				}
 				else if (valdir == 2) {
 					// Valid Only in Positive Direction
-					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
+					LinkImpl ftLink = network.getLinks().get(new IdImpl(id+"FT"));
 					if (ftLink == null) { log.debug("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -473,7 +473,7 @@ public class TeleatlasParser {
 				}
 				else if (valdir == 3) {
 					// Valid Only in Negative Direction
-					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					LinkImpl tfLink = network.getLinks().get(new IdImpl(id+"TF"));
 					if (tfLink == null) { log.debug("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -567,7 +567,7 @@ public class TeleatlasParser {
 			if (network.getNode(nodeId) == null) { log.debug("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
 			else {
 				// node found
-				Node n = network.getNode(nodeId);
+				NodeImpl n = network.getNode(nodeId);
 				// init maneuver matrix
 				// TreeMap<fromLinkId,TreeMap<toLinkId,turnAllowed>>
 				TreeMap<Id,TreeMap<Id,Boolean>> mmatrix = new TreeMap<Id, TreeMap<Id,Boolean>>();
@@ -586,9 +586,9 @@ public class TeleatlasParser {
 					while (snr_it.hasNext()) {
 						Integer snr2 = snr_it.next();
 						// get the start link and the target link of the maneuver
-						Link inLink = n.getInLinks().get(new IdImpl(mSequence.get(snr)+"FT"));
+						LinkImpl inLink = n.getInLinks().get(new IdImpl(mSequence.get(snr)+"FT"));
 						if (inLink == null) { inLink = n.getInLinks().get(new IdImpl(mSequence.get(snr)+"TF")); }
-						Link outLink = n.getOutLinks().get(new IdImpl(mSequence.get(snr2)+"FT"));
+						LinkImpl outLink = n.getOutLinks().get(new IdImpl(mSequence.get(snr2)+"FT"));
 						if (outLink == null) { outLink = n.getOutLinks().get(new IdImpl(mSequence.get(snr2)+"TF")); }
 						if ((inLink != null) && (outLink != null)) {
 							// start and target link found and they are incident to the given node
@@ -657,7 +657,7 @@ public class TeleatlasParser {
 					}
 				}
 				// expand the node
-				Tuple<ArrayList<Node>,ArrayList<Link>> t = expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
+				Tuple<ArrayList<NodeImpl>,ArrayList<LinkImpl>> t = expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
 				virtualNodesCnt += t.getFirst().size();
 				virtualLinksCnt += t.getSecond().size();
 				nodesAssignedCnt++;
@@ -676,11 +676,11 @@ public class TeleatlasParser {
 	// expand method
 	//////////////////////////////////////////////////////////////////////
 
-	private final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
+	private final Tuple<ArrayList<NodeImpl>,ArrayList<LinkImpl>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
 		double d = Math.sqrt(r*r-e*e);
 		// check the input
 		if (network == null) { throw new IllegalArgumentException("network not defined."); }
-		Node node = network.getNode(nodeId);
+		NodeImpl node = network.getNode(nodeId);
 		if (node == null) { throw new IllegalArgumentException("nodeid="+nodeId+": not found in the network."); }
 		for (int i=0; i<turns.size(); i++) {
 			Id first = turns.get(i).getFirst();
@@ -692,34 +692,34 @@ public class TeleatlasParser {
 		}
 		
 		// remove the node
-		Map<Id,Link> inlinks = new TreeMap<Id, Link>(node.getInLinks());
-		Map<Id,Link> outlinks = new TreeMap<Id, Link>(node.getOutLinks());
+		Map<Id,LinkImpl> inlinks = new TreeMap<Id, LinkImpl>(node.getInLinks());
+		Map<Id,LinkImpl> outlinks = new TreeMap<Id, LinkImpl>(node.getOutLinks());
 		if (!network.removeNode(node)) { throw new RuntimeException("nodeid="+nodeId+": Failed to remove node from the network."); }
 
-		ArrayList<Node> newNodes = new ArrayList<Node>(inlinks.size()+outlinks.size());
-		ArrayList<Link> newLinks = new ArrayList<Link>(turns.size());
+		ArrayList<NodeImpl> newNodes = new ArrayList<NodeImpl>(inlinks.size()+outlinks.size());
+		ArrayList<LinkImpl> newLinks = new ArrayList<LinkImpl>(turns.size());
 		// add new nodes and connect them with the in and out links
 		int nodeIdCnt = 0;
-		for (Link inlink : inlinks.values()) {
+		for (LinkImpl inlink : inlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = inlink.getFromNode().getCoord();
 			Coord pc = new CoordImpl(c.getX()-p.getX(),c.getY()-p.getY());
 			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
 			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
 			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
-			Node n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			NodeImpl n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),inlink.getOrigId(),inlink.getType());
 		}
-		for (Link outlink : outlinks.values()) {
+		for (LinkImpl outlink : outlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = outlink.getToNode().getCoord();
 			Coord cp = new CoordImpl(p.getX()-c.getX(),p.getY()-c.getY());
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			double x = c.getX()+d/lcp*cp.getX()+e/lcp*cp.getY();
 			double y = c.getY()+d/lcp*cp.getY()-e/lcp*cp.getX();
-			Node n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			NodeImpl n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),outlink.getOrigId(),outlink.getType());
@@ -728,12 +728,12 @@ public class TeleatlasParser {
 		// add virtual links for the turn restrictions
 		for (int i=0; i<turns.size(); i++) {
 			Tuple<Id,Id> turn = turns.get(i);
-			Link fromLink = network.getLink(turn.getFirst());
-			Link toLink = network.getLink(turn.getSecond());
-			Link l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME));
+			LinkImpl fromLink = network.getLink(turn.getFirst());
+			LinkImpl toLink = network.getLink(turn.getSecond());
+			LinkImpl l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME));
 			newLinks.add(l);
 		}
-		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);
+		return new Tuple<ArrayList<NodeImpl>, ArrayList<LinkImpl>>(newNodes,newLinks);
 	}
 	
 	//////////////////////////////////////////////////////////////////////

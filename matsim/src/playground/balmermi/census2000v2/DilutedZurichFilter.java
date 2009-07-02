@@ -27,16 +27,16 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -109,13 +109,13 @@ public class DilutedZurichFilter {
 		log.info("  calculate area of interest... ");
 		double radius = 30000.0;
 		final CoordImpl center = new CoordImpl(683518.0,246836.0);
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		log.info("    extracting links of the aoi... " + (new Date()));
-		for (Link link : network.getLinks().values()) {
-			final Node from = link.getFromNode();
-			final Node to = link.getToNode();
+		for (LinkImpl link : network.getLinks().values()) {
+			final NodeImpl from = link.getFromNode();
+			final NodeImpl to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				areaOfInterest.put(link.getId(),link);
 			}

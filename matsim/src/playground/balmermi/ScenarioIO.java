@@ -26,10 +26,10 @@ import java.util.TreeSet;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.Facility;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -87,7 +87,7 @@ public class ScenarioIO {
 		System.out.println("done. (loading network)");
 
 		Config config = sl.getScenario().getConfig();
-		Network network = sl.getScenario().getNetwork();
+		NetworkLayer network = sl.getScenario().getNetwork();
 		ActivityFacilities af = sl.getScenario().getActivityFacilities();
 
 		System.out.println("complete world...");

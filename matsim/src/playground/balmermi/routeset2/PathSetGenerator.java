@@ -31,12 +31,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -64,8 +64,8 @@ public class PathSetGenerator {
 	private final FreespeedTravelTimeCost frespeedCost;
 	private final LeastCostPathCalculator router;
 
-	private Node origin = null;
-	private Node destination = null;
+	private NodeImpl origin = null;
+	private NodeImpl destination = null;
 	private int nofPaths = 20; // default
 	private double variationFactor = 1.0; // default
 	private double depTime = Time.UNDEFINED_TIME; // not sure yet if there needs a depTime defined => setting default
@@ -96,7 +96,7 @@ public class PathSetGenerator {
 		// calc network densities
 		double linkDensity = 0.0;
 		double nodeDensity = 0.0;
-		for (Node n : network.getNodes().values()) {
+		for (NodeImpl n : network.getNodes().values()) {
 			linkDensity += n.getIncidentLinks().size();
 			nodeDensity += n.getIncidentNodes().size();
 		}
@@ -141,7 +141,7 @@ public class PathSetGenerator {
 		else { this.timeout = timeout; }
 	}
 
-	public final boolean setODPair(Node fromNode, Node toNode) {
+	public final boolean setODPair(NodeImpl fromNode, NodeImpl toNode) {
 		if (fromNode == null) { log.warn("Origin node must exist."); return false; }
 		if (network.getNode(fromNode.getId()) == null) { log.warn("Origin node does not exist in the network."); return false; }
 
@@ -191,16 +191,16 @@ public class PathSetGenerator {
 	
 	private final void initStreetSegments() {
 		log.info("init street segments...");
-		for (Link l : network.getLinks().values()) {
+		for (LinkImpl l : network.getLinks().values()) {
 
 			// find the beginning of the "oneway path" or "twoway path"
-			Link currLink = l;
-			Node fromNode = currLink.getFromNode();
+			LinkImpl currLink = l;
+			NodeImpl fromNode = currLink.getFromNode();
 			while ((fromNode.getIncidentNodes().size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
-				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
-				Link prevLink = linkIt.next();
+				Iterator<? extends LinkImpl> linkIt = fromNode.getInLinks().values().iterator();
+				LinkImpl prevLink = linkIt.next();
 				if (prevLink.getFromNode().getId().equals(currLink.getToNode().getId())) { prevLink = linkIt.next(); }
 				currLink = prevLink;
 				fromNode = currLink.getFromNode();
@@ -212,12 +212,12 @@ public class PathSetGenerator {
 				s = new StreetSegment(new IdImpl("s"+currLink.getId()),currLink.getFromNode(),currLink.getToNode(),network,1,1,1,1);
 				s.links.add(currLink);
 				l2sMapping.put(currLink.getId(),s);
-				Node toNode = currLink.getToNode();
+				NodeImpl toNode = currLink.getToNode();
 				while ((toNode.getIncidentNodes().size() == 2) &&
 						(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 						((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
-					Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
-					Link nextLink = linkIt.next();
+					Iterator<? extends LinkImpl> linkIt = toNode.getOutLinks().values().iterator();
+					LinkImpl nextLink = linkIt.next();
 					if (nextLink.getToNode().getId().equals(currLink.getFromNode().getId())) { nextLink = linkIt.next(); }
 					currLink = nextLink;
 					toNode = currLink.getToNode();
@@ -238,12 +238,12 @@ public class PathSetGenerator {
 		log.info("done.");
 	}
 	
-	private void addLinkToNetwork(Link link) {
+	private void addLinkToNetwork(LinkImpl link) {
 		link.getFromNode().addOutLink(link);
 		link.getToNode().addInLink(link);
 	}
 
-	private void removeLinkFromNetwork(Link link) {
+	private void removeLinkFromNetwork(LinkImpl link) {
 		link.getFromNode().removeOutLink(link);
 		link.getToNode().removeInLink(link);
 	}
@@ -278,14 +278,14 @@ public class PathSetGenerator {
 			
 			// remove the links from the network, calculate the least cost path and put the links back where they were
 			for (StreetSegment segment : streetSegmentSet) {
-				for (Link l : segment.links) {
+				for (LinkImpl l : segment.links) {
 					removeLinkFromNetwork(l);
 				}
 			}
 			Path path = router.calcLeastCostPath(origin,destination,depTime);
 			routeCnt++;
 			for (StreetSegment segment : streetSegmentSet) {
-				for (Link l : segment.links) {
+				for (LinkImpl l : segment.links) {
 					addLinkToNetwork(l);
 				}
 			}
@@ -325,7 +325,7 @@ public class PathSetGenerator {
 				// no matter if the path already exists in the path list, that element of the recursion tree needs to be expanded.
 				// Therefore, add new excluding link set for the NEXT tree level
 				// TODO balmermi: set the right street segments
-				for (Link l : path.links) {
+				for (LinkImpl l : path.links) {
 					Set<StreetSegment> newExcludingStreetSegmentSet = new HashSet<StreetSegment>(streetSegmentSet.size()+1);
 					newExcludingStreetSegmentSet.addAll(streetSegmentSet);
 					StreetSegment s = l2sMapping.get(l.getId());
@@ -362,18 +362,18 @@ public class PathSetGenerator {
 		}
 	}
 	
-	private final void printSummary(Node o, Node d, long ctime, int pathCnt, int routeCnt, int level, String type, Path leastCostPath) {
+	private final void printSummary(NodeImpl o, NodeImpl d, long ctime, int pathCnt, int routeCnt, int level, String type, Path leastCostPath) {
 		double eDist = Math.sqrt(
 				(d.getCoord().getX()-o.getCoord().getX())*(d.getCoord().getX()-o.getCoord().getX())+
 				(d.getCoord().getY()-o.getCoord().getY())*(d.getCoord().getY()-o.getCoord().getY()));
 		double distLCP = 0.0;
-		for (Link l : leastCostPath.links) { distLCP += l.getLength(); }
+		for (LinkImpl l : leastCostPath.links) { distLCP += l.getLength(); }
 		int nofNonePassNodesLCP = 0;
 		double avLinkDensityPerNodeLCP = 0.0;
 		double avIncidentNodeDensityPerNodeLCP = 0.0;
 		double avLinkDensityPerNonePassNodeLCP = 0.0;
 		double avIncidentNodeDensityPerNonePassNodeLCP = 0.0;
-		for (Node n : leastCostPath.nodes) {
+		for (NodeImpl n : leastCostPath.nodes) {
 			if ((n.getIncidentNodes().size() == 2) &&
 			    (((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) ||
 			     ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)))) {
