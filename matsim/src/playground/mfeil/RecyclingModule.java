@@ -32,12 +32,12 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.knowledges.Knowledges;

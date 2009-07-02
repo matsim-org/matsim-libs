@@ -21,10 +21,10 @@ package playground.mfeil;
 
 
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRoute;

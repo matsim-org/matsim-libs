@@ -29,9 +29,9 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.controler.Controler;
