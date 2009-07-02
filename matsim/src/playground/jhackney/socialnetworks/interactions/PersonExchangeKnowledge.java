@@ -22,7 +22,7 @@ package playground.jhackney.socialnetworks.interactions;
 
 import java.util.List;
 
-import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.Knowledge;

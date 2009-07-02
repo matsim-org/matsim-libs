@@ -21,8 +21,8 @@
 package playground.jhackney.socialnetworks.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class FacilitiesFindScenarioMinMaxCoords {

@@ -20,7 +20,7 @@
 
 package playground.jhackney.socialnetworks.replanning;
 
-import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
