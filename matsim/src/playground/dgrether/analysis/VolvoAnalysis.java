@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.LinkEnterEvent;
@@ -35,6 +34,7 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -100,7 +100,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		Link link = event.getLink();
+		LinkImpl link = event.getLink();
 		int hour = getTimestep(event.getTime());
 		if (link == null) {
 			link = this.network.getLink(event.getLinkId().toString());
@@ -126,7 +126,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		if (depTime.doubleValue() == -1.0)
 			return;
 
-		Link link = event.getLink();
+		LinkImpl link = event.getLink();
 		if (link == null) {
 			link = this.network.getLink(event.getLinkId().toString());
 		}
@@ -149,7 +149,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		if (depTime.doubleValue() == -1.0)
 			return;
 
-		Link link = this.network.getLinks().get(event.getLinkId());
+		LinkImpl link = this.network.getLinks().get(event.getLinkId());
 		if (this.hundekopfLinkIds.contains(link.getId())) {
 			this.timeHundekopf[hour] += (event.getTime() - depTime.doubleValue());
 		}
@@ -163,7 +163,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 
 	public void handleEvent(AgentDepartureEvent event) {
 		int hour = getTimestep(event.getTime());
-		Link link = this.network.getLinks().get(event.getLinkId());
+		LinkImpl link = this.network.getLinks().get(event.getLinkId());
 		if (this.hundekopfLinkIds.contains(link.getId())) {
 			this.tripsHundekopf[hour]++;
 		}

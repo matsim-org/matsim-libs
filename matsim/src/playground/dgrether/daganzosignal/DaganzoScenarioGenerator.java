@@ -28,13 +28,13 @@ import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -187,12 +187,12 @@ public class DaganzoScenarioGenerator {
 
 
 	private void createPlans(Scenario scenario) {
-		Network network = scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
-		Link l1 = network.getLink(scenario.createId("1"));
-		Link l7 = network.getLink(scenario.createId("7"));
+		LinkImpl l1 = network.getLink(scenario.createId("1"));
+		LinkImpl l7 = network.getLink(scenario.createId("7"));
 		PopulationBuilder builder = population.getPopulationBuilder();
 
 		for (int i = 1; i <= 3600; i++) {

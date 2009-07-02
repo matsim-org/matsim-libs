@@ -20,7 +20,6 @@ package playground.dgrether.cmcf;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -30,6 +29,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.run.OTFVis;
 
@@ -110,10 +110,10 @@ public class CMCFRunnerNoReroute {
 			
 			controler.run();
 			NetworkLayer net = controler.getNetwork();
-			Link link2 = net.getLink(new IdImpl("2"));
-			Link link3 = net.getLink(new IdImpl("3"));
-			Link link4 = net.getLink(new IdImpl("4"));
-			Link link5 = net.getLink(new IdImpl("5"));
+			LinkImpl link2 = net.getLink(new IdImpl("2"));
+			LinkImpl link3 = net.getLink(new IdImpl("3"));
+			LinkImpl link4 = net.getLink(new IdImpl("4"));
+			LinkImpl link5 = net.getLink(new IdImpl("5"));
 
 			
 //			double tt2 = controler.getTravelTimeCalculator().getLinkTravelTime(link2, 7.0 * 3600.0);

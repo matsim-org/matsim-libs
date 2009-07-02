@@ -22,8 +22,8 @@ package playground.dgrether;
 
 import java.util.ArrayList;
 
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.NodeImpl;
 
 
 /**
@@ -34,16 +34,16 @@ public class LogRouteUtils {
 
 	public static String getNodeRoute(final NetworkRoute r) {
 		StringBuffer buffer = new StringBuffer();
-		for (Node n : r.getNodes()) {
+		for (NodeImpl n : r.getNodes()) {
 			buffer.append(n.getId().toString());
 			buffer.append(" ");
 		}
 		return buffer.toString();
 	}
 	
-	public static String getNodeRoute(final ArrayList<Node> l) {
+	public static String getNodeRoute(final ArrayList<NodeImpl> l) {
 		StringBuffer buffer = new StringBuffer();
-		for (Node n : l) {
+		for (NodeImpl n : l) {
 			buffer.append(n.getId().toString());
 			buffer.append(" ");
 		}

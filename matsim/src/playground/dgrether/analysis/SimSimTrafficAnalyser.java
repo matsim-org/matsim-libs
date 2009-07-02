@@ -25,8 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
@@ -91,7 +91,7 @@ public class SimSimTrafficAnalyser {
 		
 		this.countSimComp = new ArrayList<CountSimComparison>(this.network.getLinks().size());
 		
-		for (Link l : this.network.getLinks().values()) {
+		for (LinkImpl l : this.network.getLinks().values()) {
 			double[] volumes = this.linkStats.getAvgLinkVolumes(l.getId());
 			double[] volumes2 = this.linkStats2.getAvgLinkVolumes(l.getId());
 			

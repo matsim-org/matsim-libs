@@ -22,11 +22,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
+
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -87,9 +88,9 @@ public class CountsCreator {
 		routes.add(r3);
 		routes.add(r4);
 
-		Set<Link> links = new HashSet<Link>(r2.getNodes().size() + r1.getNodes().size());
+		Set<LinkImpl> links = new HashSet<LinkImpl>(r2.getNodes().size() + r1.getNodes().size());
 		for (NetworkRoute r : routes) {
-			for (Link l : r.getLinks()) {
+			for (LinkImpl l : r.getLinks()) {
 				if (!links.contains(l))
 					links.add(l);
 			}
@@ -97,7 +98,7 @@ public class CountsCreator {
 		createCounts(links);
 	}
 
-	public void createCounts(Set<Link> links) {
+	public void createCounts(Set<LinkImpl> links) {
 		Counts counts = new Counts();
 		Count c;
 		counts.setLayer("superLayer");
@@ -105,13 +106,19 @@ public class CountsCreator {
 		counts.setName("noname china counts");
 		counts.setYear(2005);
 		QueueLink ql;
-		for (Link l : links) {
-			ql = (QueueLink) l;
-			c = counts.createCount(l.getId(), l.getId().toString());
-			for (int i = 1; i < 25; i++) {
-				c.createVolume(i, ql.getSimulatedFlowCapacity()*3600);
-			}
-		}
+//		for (LinkImpl l : links) {
+//			ql = (QueueLink) l;
+//			c = counts.createCount(l.getId(), l.getId().toString());
+//			for (int i = 1; i < 25; i++) {
+//				c.createVolume(i, ql.getSimulatedFlowCapacity()*3600);
+//			}
+//		}
+		
+		log.fatal("I don't understand how this can have worked beforeso I can't fix it.  Maybe at some point in time" +
+				" QueueLink had something to do with Link but now it does not. Kai") ;
+		System.exit(-1) ;
+
+	
 		CountsWriter cw = new CountsWriter(counts, "./output/counts.xml");
 		cw.write();
 		log.info("counts written successfully to: ./output/counts.xml");
