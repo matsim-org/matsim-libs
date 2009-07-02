@@ -49,12 +49,12 @@ import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -156,7 +156,7 @@ public class EgoNetPlansMakeKML {
 
 		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			networkFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(generateLinkPlacemark(link, linkStyle, trafo)));
 		}
 
@@ -337,7 +337,7 @@ public class EgoNetPlansMakeKML {
 			if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl) o;
 	
-				for (Link routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (LinkImpl routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
 	
 					boolean linkExists = false;
@@ -524,7 +524,7 @@ public class EgoNetPlansMakeKML {
 		agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(pl));
 
 //		if (!fullActName.equals("evening home")) {
-		Link actLink = act.getLink();
+		LinkImpl actLink = act.getLink();
 
 		PlacemarkType agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
 
@@ -631,19 +631,19 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static PlacemarkType generateLinkPlacemark(Link link, StyleType style, CoordinateTransformation trafo) {
+	private static PlacemarkType generateLinkPlacemark(LinkImpl link, StyleType style, CoordinateTransformation trafo) {
 
 		PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
 		linkPlacemark.setName("link" + link.getId());
 
 		LineStringType lst = kmlObjectFactory.createLineStringType();
 
-		Node fromNode = link.getFromNode();
+		NodeImpl fromNode = link.getFromNode();
 		Coord fromNodeWorldCoord = fromNode.getCoord();
 		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(fromNodeGeometryCoord.getX()) + "," + Double.toString(fromNodeGeometryCoord.getY()) + ",0.0");
 
-		Node toNode = link.getToNode();
+		NodeImpl toNode = link.getToNode();
 		Coord toNodeWorldCoord = toNode.getCoord();
 		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(toNodeGeometryCoord.getX()) + "," + Double.toString(toNodeGeometryCoord.getY()) + ",0.0");

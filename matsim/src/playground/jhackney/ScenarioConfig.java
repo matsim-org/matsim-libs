@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.Events;
@@ -32,6 +31,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -222,7 +222,7 @@ public abstract class ScenarioConfig {
 //		System.out.println("  done.");
 //		return plans;
 //	}
-	public static final Population readPlans(final Network network, final int i) {
+	public static final Population readPlans(final NetworkLayer network, final int i) {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
@@ -236,7 +236,7 @@ public abstract class ScenarioConfig {
 		return plans;
 	}
 	
-	public static final Population readPlansAndKnowledges(final Network network, Knowledges kn) {
+	public static final Population readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 		String filename=input_directory +popFileName;

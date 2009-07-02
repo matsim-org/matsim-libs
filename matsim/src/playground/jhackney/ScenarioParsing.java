@@ -21,8 +21,8 @@
 package playground.jhackney;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.jhackney.algorithms.PersonsRandomizeId;
 
@@ -39,7 +39,7 @@ public class ScenarioParsing {
 		Scenario.setUpScenarioConfig();
 
 		Scenario.readWorld();
-		Network network = Scenario.readNetwork();
+		NetworkLayer network = Scenario.readNetwork();
 		Population plans = Scenario.readPlans(network);
 		
 //		System.out.println("  reading world xml file... ");

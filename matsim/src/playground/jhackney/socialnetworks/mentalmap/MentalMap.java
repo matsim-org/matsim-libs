@@ -35,9 +35,9 @@ import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -108,7 +108,7 @@ public class MentalMap {
 					}
 					
 					// Else the activity is null and we choose an activity to assign to the act
-					Link myLink = myAct.getLink();
+					LinkImpl myLink = myAct.getLink();
 					// These Locations are facilities by the new convention
 					Collection<Location> locations = myLink.getUpMapping().values();
 					// These Objects are facilities by convention

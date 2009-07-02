@@ -22,7 +22,6 @@ package playground.jhackney;
 
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.Events;
@@ -31,6 +30,7 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -194,7 +194,7 @@ public abstract class Scenario {
 //		return Matrices.getSingleton();
 //	}
 
-	public static final Population readPlans(final Network network) {
+	public static final Population readPlans(final NetworkLayer network) {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 		System.out.println(config.plans().getInputFile());
@@ -205,7 +205,7 @@ public abstract class Scenario {
 
 
 	
-	public static final Population readPlans(final Network network, final int i) {
+	public static final Population readPlans(final NetworkLayer network, final int i) {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
@@ -217,7 +217,7 @@ public abstract class Scenario {
 		return plans;
 	}
 
-	public static final Population readPlansAndKnowledges(final Network network, Knowledges kn) {
+	public static final Population readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new PopulationImpl();
 		System.out.println(config.plans().getInputFile());

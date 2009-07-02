@@ -49,11 +49,11 @@ import net.opengis.kml._2.TimeStampType;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -171,7 +171,7 @@ public class EgoNetPlansItersMakeKML {
 		networkFolder.setVisibility(false);
 		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			networkFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(generateLinkPlacemark(link, linkStyle, trafo)));
 		}
 
@@ -410,7 +410,7 @@ public class EgoNetPlansItersMakeKML {
 			if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl) o;
 
-				for (Link routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (LinkImpl routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
 					
 					featureExists = false;
@@ -846,7 +846,7 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 //		if (!fullActName.equals("evening home")) {
-		Link actLink = act.getLink();
+		LinkImpl actLink = act.getLink();
 		PlacemarkType agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
 		
 		featureExists = false;
@@ -945,19 +945,19 @@ public class EgoNetPlansItersMakeKML {
 
 	}
 
-	private static PlacemarkType generateLinkPlacemark(Link link, StyleType style, CoordinateTransformation trafo) {
+	private static PlacemarkType generateLinkPlacemark(LinkImpl link, StyleType style, CoordinateTransformation trafo) {
 
 		PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
 		linkPlacemark.setName("link" + link.getId());
 
 		LineStringType lst = kmlObjectFactory.createLineStringType();
 
-		Node fromNode = link.getFromNode();
+		NodeImpl fromNode = link.getFromNode();
 		Coord fromNodeWorldCoord = fromNode.getCoord();
 		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(fromNodeGeometryCoord.getX()) + "," + Double.toString(fromNodeGeometryCoord.getY()) + ",0.0");
 
-		Node toNode = link.getToNode();
+		NodeImpl toNode = link.getToNode();
 		Coord toNodeWorldCoord = toNode.getCoord();
 		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(toNodeGeometryCoord.getX()) + "," + Double.toString(toNodeGeometryCoord.getY()) + ",0.0");
@@ -968,7 +968,7 @@ public class EgoNetPlansItersMakeKML {
 		return linkPlacemark;
 	}
 	
-	private static PlacemarkType generateLinkPlacemark(Link link, StyleType style, CoordinateTransformation trafo, int iter) {
+	private static PlacemarkType generateLinkPlacemark(LinkImpl link, StyleType style, CoordinateTransformation trafo, int iter) {
 
 		PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
 		linkPlacemark.setId("link" + link.getId());
@@ -977,10 +977,10 @@ public class EgoNetPlansItersMakeKML {
 		
 		LineStringType lineString = kmlObjectFactory.createLineStringType();
 		
-		Node fromNode = link.getFromNode();
+		NodeImpl fromNode = link.getFromNode();
 		Coord fromNodeWorldCoord = fromNode.getCoord();
 		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
-		Node toNode = link.getToNode();
+		NodeImpl toNode = link.getToNode();
 		Coord toNodeWorldCoord = toNode.getCoord();
 		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 
