@@ -25,13 +25,13 @@ package playground.yu.analysis;
 
 import java.util.TreeMap;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -78,7 +78,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 			this.enterTimes
 					.put(enter.getPersonId().toString(), enter.getTime());
 		else {
-			Link link = enter.getLink();
+			LinkImpl link = enter.getLink();
 			if (link == null)
 				link = network.getLink(enter.getLinkId().toString());
 			if (link != null)
@@ -98,7 +98,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		Double enterTime = this.enterTimes.remove(leave.getPersonId()
 				.toString());
 		if (enterTime != null) {
-			Link l = leave.getLink();
+			LinkImpl l = leave.getLink();
 			if (l == null) {
 				l = this.network.getLink(leave.getLinkId().toString());
 			}

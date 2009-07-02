@@ -29,10 +29,10 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.core.api.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -54,15 +54,15 @@ public class NetworkCleaner {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);
-		Set<Node> nodesToRemove = new TreeSet<Node>();
-		for (Node n : network.getNodes().values())
+		Set<NodeImpl> nodesToRemove = new TreeSet<NodeImpl>();
+		for (NodeImpl n : network.getNodes().values())
 			if (n.getIncidentLinks().isEmpty())
 				nodesToRemove.add(n);
 		int count = 0;
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(logFilename);
 			writer.write("Id of nodes removed from Toronto network\n");
-			for (Node n : nodesToRemove) {
+			for (NodeImpl n : nodesToRemove) {
 				network.removeNode(n);
 				writer.write(count++ + n.toString() + "\n");
 			}

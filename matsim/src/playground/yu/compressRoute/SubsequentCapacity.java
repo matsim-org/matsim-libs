@@ -30,9 +30,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 /**
@@ -44,14 +44,14 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  */
 public class SubsequentCapacity extends MatsimXmlWriter {
 
-	private final Map<Id, ? extends Link> links;
+	private final Map<Id, ? extends LinkImpl> links;
 
 	/**
 	 * (arg0) - ssLinkId (arg1) - linkId
 	 */
 	private final TreeMap<String, String> ssLinks = new TreeMap<String, String>();
 
-	Map<String, Link> outLinksMap = new TreeMap<String, Link>();
+	Map<String, LinkImpl> outLinksMap = new TreeMap<String, LinkImpl>();
 
 	public SubsequentCapacity(final NetworkLayer network) {
 		links = network.getLinks();
@@ -71,15 +71,15 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 		Map<String, Double> caps = new TreeMap<String, Double>();
 		List<String> toCompareAngles = new ArrayList<String>();
 
-		for (Link l : links.values()) {
+		for (LinkImpl l : links.values()) {
 			caps.clear();
 			toCompareAngles.clear();
 			outLinksMap.clear();
 
-			Node to = l.getToNode();
-			Collection<? extends Link> outLinks = to.getOutLinks().values();
+			NodeImpl to = l.getToNode();
+			Collection<? extends LinkImpl> outLinks = to.getOutLinks().values();
 
-			for (Link outLink : outLinks) {
+			for (LinkImpl outLink : outLinks) {
 				String outLinkId = outLink.getId().toString();
 				caps
 						.put(
@@ -135,12 +135,12 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 	 *            a list of outLinks with the same Capacity, size <= 2
 	 * @return the "default next" LinkId
 	 */
-	public String compareAngles(final Link l, final List<String> nextLinksIds) {
+	public String compareAngles(final LinkImpl l, final List<String> nextLinksIds) {
 		Map<String, Double> thetas = new TreeMap<String, Double>();
 		List<String> minThetas = new ArrayList<String>();
 		String resultLinkId = "";
-		Node to = l.getToNode();
-		Node from = l.getFromNode();
+		NodeImpl to = l.getToNode();
+		NodeImpl from = l.getFromNode();
 
 		Coord cFrom = from.getCoord();
 		Coord cTo = to.getCoord();

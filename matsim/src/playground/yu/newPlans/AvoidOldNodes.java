@@ -27,12 +27,12 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -56,7 +56,7 @@ public class AvoidOldNodes extends NewPopulation {
 	}
 
 	public void addLink(final String linkId) {
-		Link l = this.net.getLink(linkId);
+		LinkImpl l = this.net.getLink(linkId);
 		this.nodeIds.add(l.getFromNode().getId().toString());
 		this.nodeIds.add(l.getToNode().getId().toString());
 	}
@@ -69,7 +69,7 @@ public class AvoidOldNodes extends NewPopulation {
 					BasicLeg bl = (BasicLeg) pe;
 					NetworkRoute br = (NetworkRoute) bl.getRoute();
 					if (br != null) {
-						tag: for (final Node n : br.getNodes()) {
+						tag: for (final NodeImpl n : br.getNodes()) {
 							final String nId = n.getId().toString();
 							for (String nodeId : this.nodeIds) {
 								if (nId.equals(nodeId)) {

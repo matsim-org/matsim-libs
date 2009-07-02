@@ -6,7 +6,7 @@ package playground.yu.utils.counts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
@@ -62,7 +62,7 @@ public class CountsConverter {
 		counts.setLayer("0");
 		counts
 				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att");
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			String origLinkId = link.getOrigId();
 			for (int i = 0; i < NO_TONODENOs.size(); i++) {
 				Tuple<String, String> tuple = NO_TONODENOs.get(i);

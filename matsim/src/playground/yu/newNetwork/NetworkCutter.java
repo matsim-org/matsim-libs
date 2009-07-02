@@ -31,13 +31,13 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -116,24 +116,24 @@ public class NetworkCutter {
 						if (route != null && (route instanceof NetworkRoute))
 							resetBoundary((NetworkRoute) route, net);
 					}
-		Set<Link> links = new HashSet<Link>();
+		Set<LinkImpl> links = new HashSet<LinkImpl>();
 		links.addAll(net.getLinks().values());
-		for (Link link : links)
+		for (LinkImpl link : links)
 			if (!inside(link))
 				net.removeLink(link);
-		Set<Node> nodes = new HashSet<Node>();
+		Set<NodeImpl> nodes = new HashSet<NodeImpl>();
 		nodes.addAll(net.getNodes().values());
-		for (Node node : nodes)
+		for (NodeImpl node : nodes)
 			if (!inside(node))
 				net.removeNode(node);
 	}
 
 	// not perfect, but it's enough to test
-	private boolean inside(Link link) {
+	private boolean inside(LinkImpl link) {
 		return inside(link.getFromNode()) || inside(link.getToNode());
 	}
 
-	private boolean inside(Node node) {
+	private boolean inside(NodeImpl node) {
 		Coord crd = node.getCoord();
 		double x = crd.getX();
 		double y = crd.getY();
@@ -149,7 +149,7 @@ public class NetworkCutter {
 		resetBoundary(route.getEndLink());
 	}
 
-	private void resetBoundary(Link link) {
+	private void resetBoundary(LinkImpl link) {
 		resetBoundary(link.getFromNode().getCoord());
 		resetBoundary(link.getToNode().getCoord());
 	}

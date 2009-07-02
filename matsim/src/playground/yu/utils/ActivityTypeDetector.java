@@ -31,8 +31,8 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -153,7 +153,7 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 	public static void main(String[] args) {
 		Scenario s = new ScenarioImpl();
 
-		Network net = s.getNetwork();
+		NetworkLayer net = s.getNetwork();
 		new MatsimNetworkReader(net)
 				.readFile("D:/fromNB04/wm/Toronto/toronto/networks/changedNetworkWithManeuvers/network.xml");
 

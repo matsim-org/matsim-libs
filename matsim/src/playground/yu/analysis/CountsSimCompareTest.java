@@ -14,9 +14,9 @@ import java.util.Map.Entry;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
@@ -32,7 +32,7 @@ import org.matsim.counts.MatsimCountsReader;
  */
 public class CountsSimCompareTest {
 	private static boolean isInRange(final Id linkid, final NetworkLayer net) {
-		Link l = net.getLink(linkid);
+		LinkImpl l = net.getLink(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
 					+ linkid.toString());
@@ -79,7 +79,7 @@ public class CountsSimCompareTest {
 				for (Id linkId : counts.getCounts().keySet()) {
 					if (isInRange(linkId, network)) {
 						Count count = counts.getCount(linkId);
-						Link link = network.getLink(linkId);
+						LinkImpl link = network.getLink(linkId);
 						if (link != null) {
 							// Coord toCoord = link.getToNode().getCoord();
 							// Coord fromCoord = link.getFromNode().getCoord();

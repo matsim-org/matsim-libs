@@ -4,7 +4,7 @@
 package playground.yu.analysis.MZComparison;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -22,7 +22,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
  */
 public class MZComparisonData extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
-	public static boolean isInRange(Link loc, RoadPricingScheme toll) {
+	public static boolean isInRange(LinkImpl loc, RoadPricingScheme toll) {
 		return toll.getLinks().contains(loc);
 	}
 

@@ -12,8 +12,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
@@ -48,7 +48,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 			for (Id linkId : linkIds) {
-				Link link = network.getLink(linkId);
+				LinkImpl link = network.getLink(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);

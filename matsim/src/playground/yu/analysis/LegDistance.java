@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentEvent;
 import org.matsim.core.events.AgentStuckEvent;
@@ -40,6 +39,7 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -121,7 +121,7 @@ public class LegDistance implements LinkEnterEventHandler,
 
 	public void handleEvent(LinkEnterEvent event) {
 		String linkId = event.getLinkId().toString();
-		Link l = this.network.getLink(linkId);
+		LinkImpl l = this.network.getLink(linkId);
 		String agentId = event.getPersonId().toString();
 		Double distance = this.distances.get(agentId);
 		if (distance == null) {

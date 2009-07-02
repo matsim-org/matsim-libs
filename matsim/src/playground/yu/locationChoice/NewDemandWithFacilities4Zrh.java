@@ -34,10 +34,10 @@ import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -132,7 +132,7 @@ public class NewDemandWithFacilities4Zrh {
 
 		Scenario scenario = new ScenarioImpl();
 
-		Network net = scenario.getNetwork();
+		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFilename);
 
 		Population pop = scenario.getPopulation();

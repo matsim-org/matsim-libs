@@ -27,9 +27,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -58,9 +58,9 @@ public class NetworkLinkIdsInCircle {
 		CoordImpl center = new CoordImpl(x, y);
 		System.out.println("--> extracting area of interest... at "
 				+ (new Date()));
-		for (Link link : this.network.getLinks().values()) {
-			final Node from = link.getFromNode();
-			final Node to = link.getToNode();
+		for (LinkImpl link : this.network.getLinks().values()) {
+			final NodeImpl from = link.getFromNode();
+			final NodeImpl to = link.getToNode();
 			String linkId;
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius)
 					|| (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {

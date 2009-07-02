@@ -10,9 +10,9 @@ import java.io.IOException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
@@ -60,7 +60,7 @@ public class CountsSimCompareDayTest {
 							+ "X\tY\tcountValue\tsimValue\tdeviation((sim-count)/count)\n");
 			for (Id linkId : counts.getCounts().keySet()) {
 				Count count = counts.getCount(linkId);
-				Link link = network.getLink(linkId);
+				LinkImpl link = network.getLink(linkId);
 				if (link != null) {
 					Coord toCoord = link.getToNode().getCoord();
 					Coord fromCoord = link.getFromNode().getCoord();

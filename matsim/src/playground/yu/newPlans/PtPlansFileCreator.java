@@ -8,12 +8,12 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -110,8 +110,8 @@ public class PtPlansFileCreator {
 		createSouthBus245Person("00:18");
 	}
 
-	public List<Node> getSrcRoute(final int[] nodes) {
-		List<Node> srcRoute = new ArrayList<Node>();
+	public List<NodeImpl> getSrcRoute(final int[] nodes) {
+		List<NodeImpl> srcRoute = new ArrayList<NodeImpl>();
 		for (int i = 0; i < nodes.length; i++)
 			srcRoute.add(this.network.getNode(new IdImpl(nodes[i])));
 		return srcRoute;
@@ -137,20 +137,20 @@ public class PtPlansFileCreator {
 
 	@SuppressWarnings("deprecation")
 	private void createPtPerson(final String startLinkId, final String endTime,
-			final String endLinkId, final List<Node> srcRoute) {
+			final String endLinkId, final List<NodeImpl> srcRoute) {
 
 		PersonImpl p = new PersonImpl(new IdImpl("245-" + this.personCount));
 		try {
 			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(pl);
-			Link startLink = this.network.getLink(new IdImpl(startLinkId));
+			LinkImpl startLink = this.network.getLink(new IdImpl(startLinkId));
 			ActivityImpl a = pl.createActivity("h", startLink);
 			a.setEndTime(Time.parseTime(endTime));
 			LegImpl leg = pl.createLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
 			NetworkRoute route = new NodeNetworkRoute();
 			leg.setRoute(route);
-			Link endLink = this.network.getLink(new IdImpl(endLinkId));
+			LinkImpl endLink = this.network.getLink(new IdImpl(endLinkId));
 			pl.createActivity("w", endLink);
 			route.setNodes(startLink, srcRoute, endLink);
 			this.pop.addPerson(p);

@@ -34,11 +34,11 @@ import net.opengis.kml._2.ScreenOverlayType;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -1260,7 +1260,7 @@ public class TollSchemeGenerator {
 	private RoadPricingScheme createRoadPricingScheme(
 			final NetworkLayer tollNetwork) {
 		RoadPricingScheme scheme = new RoadPricingScheme(network);
-		for (Link l : tollNetwork.getLinks().values())
+		for (LinkImpl l : tollNetwork.getLinks().values())
 			scheme.addLink(l.getId().toString());
 		scheme.addCost(usedStart, usedStop, usedAmount);
 		return scheme;
@@ -1380,7 +1380,7 @@ public class TollSchemeGenerator {
 		LinearRing shell = new LinearRing(coordsequence, geofac);
 		Polygon ppp = new Polygon(shell, new LinearRing[] {}, geofac);
 
-		for (Link l : net.getLinks().values()) {
+		for (LinkImpl l : net.getLinks().values()) {
 			Coordinate fromCord = MGC.coord2Coordinate(l.getFromNode()
 					.getCoord());
 			Coordinate toCord = MGC.coord2Coordinate(l.getToNode().getCoord());

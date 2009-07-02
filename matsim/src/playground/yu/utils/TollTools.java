@@ -5,7 +5,7 @@ package playground.yu.utils;
 
 import java.util.Collection;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
@@ -20,7 +20,7 @@ public class TollTools {
 	 * @return a boolean value, whether a <code>Link</code> belongs to toll
 	 *         area.
 	 */
-	public static boolean isInRange(Link loc, RoadPricingScheme toll) {
+	public static boolean isInRange(LinkImpl loc, RoadPricingScheme toll) {
 		return toll.getLinks().contains(loc);
 	}
 
@@ -33,7 +33,7 @@ public class TollTools {
 	 *         containing all the <code>Link</code>s in the difference area
 	 *         between biggerToll and surroundedToll
 	 */
-	public static Collection<Link> getDifferenceToll(
+	public static Collection<LinkImpl> getDifferenceToll(
 			RoadPricingScheme biggerToll, RoadPricingScheme surroundedToll) {
 		biggerToll.getLinks().removeAll(surroundedToll.getLinks());
 		return biggerToll.getLinks();

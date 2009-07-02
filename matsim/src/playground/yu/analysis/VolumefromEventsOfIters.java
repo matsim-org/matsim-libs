@@ -26,9 +26,9 @@ import java.util.Set;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -58,7 +58,7 @@ public class VolumefromEventsOfIters {
 		final Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);
 
-		Set<Link> linksInCircle = new NetworkLinksInCircle(network).getLinks(
+		Set<LinkImpl> linksInCircle = new NetworkLinksInCircle(network).getLinks(
 				682845.0, 247388.0, 2000.0);
 
 		List<VolumesAnalyzer> vols = new ArrayList<VolumesAnalyzer>();

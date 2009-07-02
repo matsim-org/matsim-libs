@@ -43,8 +43,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -90,7 +90,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 			for (Id linkId : linkIds) {
-				Link link = network.getLink(linkId);
+				LinkImpl link = network.getLink(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, this.geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p },
@@ -111,12 +111,12 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	}
 
 	public static List<Map<Id, Double>> createSpeedLevels(
-			Collection<Link> links, CalcLinksAvgSpeed clas) {
+			Collection<LinkImpl> links, CalcLinksAvgSpeed clas) {
 		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
 		for (int i = 0; i < 24; i++)
 			speeds.add(i, null);
 
-		for (Link link : links) {
+		for (LinkImpl link : links) {
 			Id linkId = link.getId();
 
 			for (int i = 0; i < 24; i++) {
@@ -171,7 +171,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<Link> links = (rps != null) ? rps.getLinks() : net
+		Collection<LinkImpl> links = (rps != null) ? rps.getLinks() : net
 				.getLinks().values();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas);
 

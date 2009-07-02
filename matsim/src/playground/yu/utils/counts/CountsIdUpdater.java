@@ -24,10 +24,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -63,7 +63,7 @@ public class CountsIdUpdater {
 		newCounts
 				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att, countIds also were changed according to the new OSM-network https://svn.vsp.tu-berlin.de/repos/shared-svn/studies/countries/de/berlin/network/bb_5_v_notscaled_simple.xml.gz");
 		for (Id oldCountId : oldCounts.getCounts().keySet()) {
-			Link oldLink = oldNet.getLink(oldCountId);
+			LinkImpl oldLink = oldNet.getLink(oldCountId);
 			System.out.println("oldCountId :\t" + oldCountId);
 			Id newLinkId = searchLinkPerNodeIdPair(oldLink.getFromNode()
 					.getId(), oldLink.getToNode().getId(), newNet);
@@ -98,13 +98,13 @@ public class CountsIdUpdater {
 
 	private static Id searchLinkPerNodeIdPair(final Id fromNodeId,
 			final Id toNodeId, final NetworkLayer net) {
-		Node fromNode = net.getNode(fromNodeId);
+		NodeImpl fromNode = net.getNode(fromNodeId);
 		if (fromNode == null) {
 			System.err.println("Node with Id " + fromNodeId.toString()
 					+ " doesn't exist in the new network!");
 			return null;
 		}
-		for (Link link : fromNode.getOutLinks().values())
+		for (LinkImpl link : fromNode.getOutLinks().values())
 			if (Integer.parseInt(link.getToNode().getId().toString()) == Integer
 					.parseInt(toNodeId.toString())) {
 				System.out.println("Link with fromNodeId "

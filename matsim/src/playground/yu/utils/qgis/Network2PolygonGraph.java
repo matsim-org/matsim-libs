@@ -35,7 +35,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -121,7 +121,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 		for (int i = 0; i < attrTypes.size(); i++)
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-		for (Link link : this.network.getLinks().values()) {
+		for (LinkImpl link : this.network.getLinks().values()) {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);

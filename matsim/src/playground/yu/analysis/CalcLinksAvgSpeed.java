@@ -33,13 +33,13 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -61,7 +61,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 *            - a SpeedCounter object
 	 */
 	private final HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
-	private Set<Link> interestLinks = null;
+	private Set<LinkImpl> interestLinks = null;
 	private final int binSize, nofBins;
 	private final double[] speeds;
 	private final int[] speedsCount;
@@ -121,7 +121,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		this(network);
 		this.toll = toll;
 		if (toll != null)
-			interestLinks = new HashSet<Link>(toll.getLinks());
+			interestLinks = new HashSet<LinkImpl>(toll.getLinks());
 	}
 
 	public static class SpeedCounter {
@@ -217,7 +217,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId()
 					.toString());
 			if (enterTime != null) {
-				Link l = leave.getLink();
+				LinkImpl l = leave.getLink();
 				if (l == null)
 					l = network.getLink(linkId);
 				if (l != null) {
@@ -256,7 +256,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			out.write(head.toString());
 			out.flush();
 
-			for (Link l : interestLinks == null ? network.getLinks().values()
+			for (LinkImpl l : interestLinks == null ? network.getLinks().values()
 					: interestLinks) {
 				Id linkId = l.getId();
 				StringBuffer line = new StringBuffer(linkId.toString());
@@ -302,7 +302,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	public Set<Id> getInterestLinkIds() {
 		Set<Id> interestLinkIds = new HashSet<Id>();
-		for (Link link : interestLinks == null ? network.getLinks().values()
+		for (LinkImpl link : interestLinks == null ? network.getLinks().values()
 				: interestLinks) {
 			interestLinkIds.add(link.getId());
 		}

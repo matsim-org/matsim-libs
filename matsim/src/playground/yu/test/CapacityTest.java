@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
@@ -43,7 +43,7 @@ public class CapacityTest {
 
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
-			for (Link link : network.getLinks().values()) {
+			for (LinkImpl link : network.getLinks().values()) {
 				out
 						.write(link.getId()
 								+ "\t"

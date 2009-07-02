@@ -30,8 +30,8 @@ import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -50,7 +50,7 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 			saturationLevels.add(i, null);
 		}
 		double capPeriod = net.getCapacityPeriod() / 3600.0;
-		for (Link link : (net.getLinks()).values()) {
+		for (LinkImpl link : (net.getLinks()).values()) {
 			Id linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
@@ -73,7 +73,7 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 			saturationLevels.add(i, null);
 		}
 		double capPeriod = net.getCapacityPeriod() / 3600.0;
-		for (Link link : rps.getLinks()) {
+		for (LinkImpl link : rps.getLinks()) {
 			Id linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {

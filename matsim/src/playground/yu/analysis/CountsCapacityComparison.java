@@ -7,8 +7,8 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -22,7 +22,7 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class CountsCapacityComparison {
-	public static boolean isInRange(final Link link,
+	public static boolean isInRange(final LinkImpl link,
 			Coord distanceFilterCenter, double filterRadius) {
 		return CoordUtils.calcDistance(link.getCoord(), distanceFilterCenter) < filterRadius;
 	}
@@ -56,7 +56,7 @@ public class CountsCapacityComparison {
 
 		for (Id linkId : counts.getCounts().keySet()) {
 
-			Link link = network.getLink(linkId);
+			LinkImpl link = network.getLink(linkId);
 			if (link != null) {
 				if (isInRange(link, center, 30000.0)) {
 					n_countStations++;
@@ -70,19 +70,19 @@ public class CountsCapacityComparison {
 								+ "\t" + maxCountsValue);
 						// TODO what about the upward and downward links??
 						// upward
-						Link upLink = link;
+						LinkImpl upLink = link;
 						int smallUpwardLinks = 1;
 						while (smallUpwardLinks == 1) {
 							// sw.writeln("upward");
 							double capSum = 0.0;
 							smallUpwardLinks = 0;
-							for (Link inLink : upLink.getFromNode()
+							for (LinkImpl inLink : upLink.getFromNode()
 									.getInLinks().values()) {
 								capSum += inLink.getCapacity(0) / capPeriod;
 								smallUpwardLinks++;
 							}
 							if (capSum <= maxCountsValue) {
-								for (Link inLink : upLink.getFromNode()
+								for (LinkImpl inLink : upLink.getFromNode()
 										.getInLinks().values()) {
 									sw
 											.writeln(inLink.getId().toString()
@@ -99,7 +99,7 @@ public class CountsCapacityComparison {
 									.iterator().next();
 						}
 						// downward
-						Link downLink = link;
+						LinkImpl downLink = link;
 						int smallDownwardLinks = 1;
 						while (smallDownwardLinks == 1) {
 							// sw.writeln("downward");
@@ -107,13 +107,13 @@ public class CountsCapacityComparison {
 							// + downLink.getId().toString());
 							double capSum = 0.0;
 							smallDownwardLinks = 0;
-							for (Link outLink : downLink.getToNode()
+							for (LinkImpl outLink : downLink.getToNode()
 									.getOutLinks().values()) {
 								capSum += outLink.getCapacity(0) / capPeriod;
 								smallDownwardLinks++;
 							}
 							if (capSum <= maxCountsValue) {
-								for (Link outLink : downLink.getToNode()
+								for (LinkImpl outLink : downLink.getToNode()
 										.getOutLinks().values()) {
 									sw.writeln(outLink.getId().toString()
 											+ "\t" + outLink.getCoord().getX()

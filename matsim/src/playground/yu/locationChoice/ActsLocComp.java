@@ -35,9 +35,9 @@ import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -124,7 +124,7 @@ public class ActsLocComp {
 		// senario A
 		Scenario scenarioA = new ScenarioImpl();
 
-		Network net = scenarioA.getNetwork();
+		NetworkLayer net = scenarioA.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFile);
 
 		ActivityFacilities af = scenarioA.getActivityFacilities();
