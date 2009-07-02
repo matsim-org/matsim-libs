@@ -22,8 +22,8 @@ package playground.dgrether;
 
 import java.util.ArrayList;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 
 
 /**
