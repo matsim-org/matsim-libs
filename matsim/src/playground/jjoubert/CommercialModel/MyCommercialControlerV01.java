@@ -28,8 +28,8 @@ public class MyCommercialControlerV01 {
 		MyCommercialActivityDensityListener cadl = new MyCommercialActivityDensityListener();
 		c.addControlerListener(cadl);
 		
-		MyCommercialLegHistogramListener clhl = new MyCommercialLegHistogramListener();
-		c.addControlerListener(clhl);
+//		MyCommercialLegHistogramListener clhl = new MyCommercialLegHistogramListener();
+//		c.addControlerListener(clhl);
 				
 		c.run();
 		long time = (System.currentTimeMillis() - t) / 1000;
