@@ -8,11 +8,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
@@ -64,13 +64,13 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				cnt++ ;
 				Coord coord = fromZone.getCoord() ;
 				assert( coord != null ) ;
-				Node fromNode = network.getNearestNode( coord ) ;
+				NodeImpl fromNode = network.getNearestNode( coord ) ;
 				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
-					Node toNode = network.getNearestNode( toCoord ) ;
+					NodeImpl toNode = network.getNearestNode( toCoord ) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();
 					double ttime = arrTime - dpTime ;
 					writer.write ( fromZone.getId().toString()

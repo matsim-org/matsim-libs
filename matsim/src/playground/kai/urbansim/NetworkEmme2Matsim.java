@@ -9,10 +9,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -67,14 +67,14 @@ public class NetworkEmme2Matsim {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
 						String yyStr = parts[3] ;
-						Node node = network.createNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
+						NodeImpl node = network.createNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
 						if ( NW_NAME==PSRC ) {
 							node.setOrigId(parts[7]);		
 						}
 //						checkMax( xxStr, yyStr ) ;
 					} else {
-						Node fromNode = network.getNode(parts[1]) ;
-						Node   toNode = network.getNode(parts[2]);
+						NodeImpl fromNode = network.getNode(parts[1]) ;
+						NodeImpl   toNode = network.getNode(parts[2]);
 						if ( fromNode==null || toNode==null ) {
 //							log.info("fromNode or toNode ==null; probably connector link; skipping it ...") ;
 							continue ;
