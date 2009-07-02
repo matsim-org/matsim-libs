@@ -1,17 +1,25 @@
 package playground.mmoyo.input;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.api.network.*;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.*;
-import org.matsim.core.utils.geometry.CoordUtils;
-import playground.mmoyo.PTRouter.*;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+
+import playground.mmoyo.PTRouter.PTLine;
+import playground.mmoyo.PTRouter.PTNode;
+import playground.mmoyo.PTRouter.PTTimeTable2;
 /** 
  * Second version of network factory for the PTCase2 (with no relationship to street network) 
  * Represent a network layer with independent route with transfer links at intersections 
