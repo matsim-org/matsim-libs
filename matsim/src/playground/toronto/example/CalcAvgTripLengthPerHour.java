@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -72,7 +72,7 @@ public class CalcAvgTripLengthPerHour implements BasicAgentDepartureEventHandler
 
 	public void handleEvent(final BasicLinkEnterEvent event) {
 		Double distance = this.travelDistancePerAgent.get(event.getPersonId());
-		Link link = this.network.getLinks().get(event.getLinkId());
+		LinkImpl link = this.network.getLinks().get(event.getLinkId());
 		distance = distance + link.getLength();
 		this.travelDistancePerAgent.put(event.getPersonId(), distance);
 	}

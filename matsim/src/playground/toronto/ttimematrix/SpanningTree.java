@@ -27,12 +27,12 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -47,7 +47,7 @@ public class SpanningTree {
 
 	private final static Logger log = Logger.getLogger(SpanningTree.class);
 	
-	private Node origin = null;
+	private NodeImpl origin = null;
 	private double dTime = Time.UNDEFINED_TIME;
 	
 	private final TravelTime ttFunction;
@@ -70,38 +70,38 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 
 	public static class NodeData {
-		private Node prev = null;
+		private NodeImpl prev = null;
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
 		public void reset() { this.prev = null; this.cost = Double.MAX_VALUE; this.time = 0; }
-		public void visit(final Node comingFrom, final double cost, final double time) {
+		public void visit(final NodeImpl comingFrom, final double cost, final double time) {
 			this.prev = comingFrom;
 			this.cost = cost;
 			this.time = time;
 		}
 		public double getCost() { return this.cost; }
 		public double getTime() { return this.time; }
-		public Node getPrevNode() { return this.prev; }
+		public NodeImpl getPrevNode() { return this.prev; }
 	}
 
-	static class ComparatorCost implements Comparator<Node> {
+	static class ComparatorCost implements Comparator<NodeImpl> {
 		protected Map<Id, ? extends NodeData> nodeData;
 		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
-		public int compare(final Node n1, final Node n2) {
+		public int compare(final NodeImpl n1, final NodeImpl n2) {
 			double c1 = getCost(n1);
 			double c2 = getCost(n2);
 			if (c1 < c2) return -1;
 			if (c1 > c2) return +1;
 			return n1.compareTo(n2);
 		}
-		protected double getCost(final Node node) { return this.nodeData.get(node.getId()).getCost(); }
+		protected double getCost(final NodeImpl node) { return this.nodeData.get(node.getId()).getCost(); }
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void setOrigin(Node origin) {
+	public final void setOrigin(NodeImpl origin) {
 		this.origin = origin;
 	}
 
@@ -125,7 +125,7 @@ public class SpanningTree {
 		return this.tcFunction;
 	}
 	
-	public final Node getOrigin() {
+	public final NodeImpl getOrigin() {
 		return this.origin;
 	}
 	
@@ -137,12 +137,12 @@ public class SpanningTree {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private void relaxNode(final Node n, PriorityQueue<Node> pendingNodes) {
+	private void relaxNode(final NodeImpl n, PriorityQueue<NodeImpl> pendingNodes) {
 		NodeData nData = nodeData.get(n.getId());
 		double currTime = nData.getTime();
 		double currCost = nData.getCost();
-		for (Link l : n.getOutLinks().values()) {
-			Node nn = l.getToNode();
+		for (LinkImpl l : n.getOutLinks().values()) {
+			NodeImpl nn = l.getToNode();
 			NodeData nnData = nodeData.get(nn.getId());
 			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn.getId(),nnData); }
 			double visitCost = currCost+tcFunction.getLinkTravelCost(l,currTime);
@@ -169,10 +169,10 @@ public class SpanningTree {
 		nodeData.put(origin.getId(),d);
 		
 		ComparatorCost comparator = new ComparatorCost(nodeData);
-		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500,comparator);
+		PriorityQueue<NodeImpl> pendingNodes = new PriorityQueue<NodeImpl>(500,comparator);
 		relaxNode(this.origin,pendingNodes);
 		while (!pendingNodes.isEmpty()) {
-			Node n = pendingNodes.poll();
+			NodeImpl n = pendingNodes.poll();
 			relaxNode(n,pendingNodes);
 		}
 		
@@ -190,7 +190,7 @@ public class SpanningTree {
 		if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, Gbl.getConfig().travelTimeCalculator());
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
-		Node origin = network.getNode(new IdImpl(1));
+		NodeImpl origin = network.getNode(new IdImpl(1));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);
 		st.run(network);
