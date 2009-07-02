@@ -55,16 +55,10 @@ public class PersonImpl implements Person {
 		this.delegate = new BasicPersonImpl<PlanImpl>(id);
 	}
 
-//	public void addPlan(final PlanImpl plan) {
-//		this.delegate.addPlan(plan);
-//		// Make sure there is a selected plan if there is at least one plan
-//		if (this.selectedPlan == null) this.selectedPlan = plan;
-//	}
-
 	public final PlanImpl getSelectedPlan() {
 		return this.delegate.getSelectedPlan();
 	}
-//
+
 	public final void setSelectedPlan(final PlanImpl selectedPlan) {
 		this.delegate.setSelectedPlan(selectedPlan);
 	}
@@ -226,7 +220,7 @@ public class PersonImpl implements Person {
 	public Desires getDesires() {
 		return this.delegate.getDesires();
 	}
-
+	
 	/**
 	 * @return "yes" if the person has a job
 	 * @deprecated use {@link #isEmployed()}
