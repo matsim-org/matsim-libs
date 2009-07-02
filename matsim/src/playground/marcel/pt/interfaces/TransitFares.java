@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.interfaces;
 
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacility;
 
 public interface TransitFares {
 

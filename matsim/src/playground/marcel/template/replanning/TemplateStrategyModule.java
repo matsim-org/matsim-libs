@@ -21,8 +21,8 @@
 package playground.marcel.template.replanning;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.PlanStrategyModule;
 
 public class TemplateStrategyModule implements PlanStrategyModule {
 

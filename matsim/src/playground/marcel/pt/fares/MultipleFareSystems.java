@@ -23,7 +23,7 @@ package playground.marcel.pt.fares;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacility;
 
 import playground.marcel.pt.interfaces.TransitFares;
 
