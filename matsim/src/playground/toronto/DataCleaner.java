@@ -14,6 +14,8 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.Math;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -38,7 +40,7 @@ public class DataCleaner {
 	private String tmpPurp = "H";
 	private String start = "H";
 	private String[] tmpTabs = {"","","1"};
-	
+	public static Map<String,String> storage = new HashMap<String,String>();
 	
 	
 	public void readLine(final String line) {
@@ -47,6 +49,12 @@ public class DataCleaner {
 			String tripId = tabs[0] + "," + tabs[1] + "," + tabs[2];
 			
 			if(!this.tmpTripId.equals(tripId)){ //ignore duplicates
+				String temp = ","+tabs[3];
+				for (int i = 4; i<tabs.length;i=i+1){
+					temp = temp+","+tabs[i];
+				}
+				//System.out.println(temp);
+		        storage.put(tripId, temp);
 				String personId = tabs[0] + "," + tabs[1];
 				int mode = Integer.parseInt(tabs[16]); 
 		
@@ -137,17 +145,17 @@ public class DataCleaner {
 					d.readLine(line);
 					if(i==1){
 						for (int i = chainS; i < chainE+1; i = i + 1){
-							writerG.write(output+","+i);
+							writerG.write(output+","+i+storage.get(output+","+i));
 							writerG.newLine();
 						}
 					}else if (i==2){
 						for (int i = chainS; i < chainE+1; i = i + 1){
-							writerO.write(output+","+i);
+							writerO.write(output+","+i+storage.get(output+","+i));
 							writerO.newLine();
 						}
 					}else if (i==3){
 						for (int i = chainS; i < chainE+1; i = i + 1){
-							writerB.write(output+","+i);
+							writerB.write(output+","+i+storage.get(output+","+i));
 							writerB.newLine();
 						}
 					}
@@ -157,17 +165,17 @@ public class DataCleaner {
 			d.readLine(line);
 			if(i==1){
 				for (int i = chainS; i < chainE+1; i = i + 1){
-					writerG.write(output+","+i);
+					writerG.write(output+","+i+storage.get(output+","+i));
 					writerG.newLine();
 				}
 			}else if (i==2){
 				for (int i = chainS; i < chainE+1; i = i + 1){
-					writerO.write(output+","+i);
+					writerO.write(output+","+i+storage.get(output+","+i));
 					writerO.newLine();
 				}
 			}else if (i==3){
 				for (int i = chainS; i < chainE+1; i = i + 1){
-					writerB.write(output+","+i);
+					writerB.write(output+","+i+storage.get(output+","+i));
 					writerB.newLine();
 				}
 			}
