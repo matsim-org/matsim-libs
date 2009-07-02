@@ -29,7 +29,6 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.network.LinkImpl;
@@ -37,6 +36,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
@@ -232,7 +232,7 @@ public class PlanImpl implements Plan { //zzzz would be better with inheritance 
 				l2.setDepartureTime(l.getDepartureTime());
 				l2.setTravelTime(l.getTravelTime());
 				l2.setArrivalTime(l.getArrivalTime());
-				Route route = l.getRoute();
+				RouteWRefs route = l.getRoute();
 				if (route != null) {
 					if (route instanceof NetworkRoute) {
 						NetworkLayer net = (NetworkLayer) route.getStartLink().getLayer();

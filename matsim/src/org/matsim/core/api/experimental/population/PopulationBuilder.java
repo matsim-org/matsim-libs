@@ -26,11 +26,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 
 /**
  * @author dgrether
@@ -55,6 +55,6 @@ public interface PopulationBuilder extends BasicPopulationBuilder {
 	 * @return a BasicRoute Object with the links set accordingly
 	 * @deprecated needs to be verified // TODO [MR] verify
 	 */
-	Route createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
+	RouteWRefs createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
 
 }

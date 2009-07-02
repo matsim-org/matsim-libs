@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Route.java
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.population;
+package org.matsim.core.api.experimental.population;
 
 import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.core.network.LinkImpl;
 
 /**
- * Defines the minimum amount of information a route in MATSim must provide.
+ * @author nagel
  *
- * @author mrieser
  */
 public interface Route extends BasicRoute {
 
-	public LinkImpl getStartLink();
-	public void setStartLink(final LinkImpl link);
-
-	public LinkImpl getEndLink();
-	public void setEndLink(final LinkImpl link);
-	
 }

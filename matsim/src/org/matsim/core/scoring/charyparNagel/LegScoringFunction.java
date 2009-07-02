@@ -21,9 +21,9 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
@@ -93,7 +93,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
-				Route route = leg.getRoute();
+				RouteWRefs route = leg.getRoute();
 				dist = route.getDistance();
 				/*
 				 * TODO the route-distance does not contain the length of the

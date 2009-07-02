@@ -43,7 +43,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -57,6 +56,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -174,7 +174,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 				
 				if ( pe instanceof LegImpl ) {
 					LegImpl leg = (LegImpl) pe ;
-					Route route = leg.getRoute();
+					RouteWRefs route = leg.getRoute();
 					if ( route instanceof NetworkRoute ) { // added in jun09, see below in "collectLinks". kai, jun09
 						List<LinkImpl> links = new ArrayList<LinkImpl>();
 						for (LinkImpl link : ((NetworkRoute) route).getLinks() ) {
@@ -212,7 +212,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					 * So I included the instanceof check (see below).  Should be done in ALL the queries.  kai, jun09
 					 */
 
-					Route route = leg.getRoute() ;
+					RouteWRefs route = leg.getRoute() ;
 					if ( route instanceof NetworkRoute ) {
 						NetworkRoute nr = (NetworkRoute) route ;
 						for (LinkImpl link : nr.getLinks() ) {

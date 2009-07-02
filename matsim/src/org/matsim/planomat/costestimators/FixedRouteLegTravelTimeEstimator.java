@@ -25,11 +25,11 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 
@@ -46,7 +46,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute plansCalcRoute;
 
-	private HashMap<Route, List<LinkImpl>> linkRoutesCache = new HashMap<Route, List<LinkImpl>>();
+	private HashMap<RouteWRefs, List<LinkImpl>> linkRoutesCache = new HashMap<RouteWRefs, List<LinkImpl>>();
 	private HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
 
 	public FixedRouteLegTravelTimeEstimator(

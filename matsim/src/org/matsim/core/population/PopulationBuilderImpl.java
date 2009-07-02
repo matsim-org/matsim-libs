@@ -30,13 +30,13 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 
 /**
  * @author dgrether
@@ -96,7 +96,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		return new LegImpl(legMode);
 	}
 
-	public Route createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
+	public RouteWRefs createRoute(final Id startLinkId, final Id endLinkId, final List<Id> currentRouteLinkIds) {
 		LinkImpl start = this.network.getLink(startLinkId);
 		LinkImpl end = this.network.getLink(endLinkId);
 		if (start == null) {

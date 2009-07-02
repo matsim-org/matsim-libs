@@ -22,11 +22,11 @@ package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Leg;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 public class LegImpl extends BasicLegImpl implements Leg {
@@ -70,8 +70,8 @@ public class LegImpl extends BasicLegImpl implements Leg {
 
 
 	@Override
-	public Route getRoute() {
-		return (Route) this.route;
+	public RouteWRefs getRoute() {
+		return (RouteWRefs) this.route;
 	}
 
 	@Override

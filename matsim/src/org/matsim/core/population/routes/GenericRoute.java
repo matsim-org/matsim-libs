@@ -20,7 +20,6 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.api.population.Route;
 import org.matsim.core.network.LinkImpl;
 
 /**
@@ -28,7 +27,7 @@ import org.matsim.core.network.LinkImpl;
  *
  * @author mrieser
  */
-public interface GenericRoute extends Route {
+public interface GenericRoute extends RouteWRefs {
 
 	public void setRouteDescription(final LinkImpl startLink, final String routeDescription, final LinkImpl endLink);
 	

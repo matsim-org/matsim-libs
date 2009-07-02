@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitRouteFactory.java
+ * Route.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,12 +20,20 @@
 
 package org.matsim.core.population.routes;
 
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.network.LinkImpl;
 
-public class GenericRouteFactory implements RouteFactory {
+/**
+ * Defines the minimum amount of information a route in MATSim must provide.
+ *
+ * @author mrieser
+ */
+public interface RouteWRefs extends BasicRoute {
 
-	public RouteWRefs createRoute(final LinkImpl startLink, final LinkImpl endLink) {
-		return new GenericRouteImpl(startLink, endLink);
-	}
+	public LinkImpl getStartLink();
+	public void setStartLink(final LinkImpl link);
 
+	public LinkImpl getEndLink();
+	public void setEndLink(final LinkImpl link);
+	
 }

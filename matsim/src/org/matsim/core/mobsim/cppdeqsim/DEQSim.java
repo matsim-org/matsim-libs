@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -46,6 +45,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -192,7 +192,7 @@ public class DEQSim extends ExternalMobsim {
 			// departuretime, double, 64bit
 			out.writeDouble(time);
 
-			Route route = leg.getRoute();
+			RouteWRefs route = leg.getRoute();
 			List<LinkImpl> linkRoute = null;
 			if (route instanceof NetworkRoute) {
 				// in the binary format, we write the link-ids instead of the node-ids

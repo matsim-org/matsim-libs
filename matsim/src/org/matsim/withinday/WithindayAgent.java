@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.events.AgentReplanEvent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -39,6 +38,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
@@ -151,7 +151,7 @@ public class WithindayAgent extends PersonAgent {
 		NetworkRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		PlanImpl oldPlan = this.getPerson().getSelectedPlan();
 		LegImpl currentLeg = this.getCurrentLeg();
-		Route oldRoute = currentLeg.getRoute();
+		RouteWRefs oldRoute = currentLeg.getRoute();
 
 		//create Route of already passed Nodes
 		//TODO dg use Route.getSubroute method

@@ -21,16 +21,15 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicRouteImpl;
 import org.matsim.core.network.LinkImpl;
 
 /**
- * Default, abstract implementation of the {@link Route}-interface.
+ * Default, abstract implementation of the {@link RouteWRefs}-interface.
  *
  * @author mrieser
  */
-public abstract class AbstractRoute extends BasicRouteImpl implements Route {
+public abstract class AbstractRoute extends BasicRouteImpl implements RouteWRefs {
 
 	private LinkImpl startLink = null;
 	private LinkImpl endLink = null;
