@@ -23,9 +23,9 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
 
 public class FacilitiesRenameAndRemoveNOGAActTypes {
 

@@ -23,8 +23,8 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.world.Location;

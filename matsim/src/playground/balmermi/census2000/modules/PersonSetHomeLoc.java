@@ -21,8 +21,8 @@
 package playground.balmermi.census2000.modules;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;

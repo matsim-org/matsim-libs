@@ -28,10 +28,10 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implements PersonAlgorithm {

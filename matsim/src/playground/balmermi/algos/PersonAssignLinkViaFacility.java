@@ -22,8 +22,8 @@ package playground.balmermi.algos;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;

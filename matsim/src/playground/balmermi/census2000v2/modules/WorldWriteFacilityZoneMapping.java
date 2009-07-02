@@ -26,9 +26,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Location;
 import org.matsim.world.World;

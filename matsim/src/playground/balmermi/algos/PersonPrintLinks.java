@@ -21,11 +21,11 @@
 package playground.balmermi.algos;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonPrintLinks extends AbstractPersonAlgorithm {

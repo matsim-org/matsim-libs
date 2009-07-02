@@ -22,9 +22,9 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 
 /**
  * <p>

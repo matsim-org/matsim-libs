@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;

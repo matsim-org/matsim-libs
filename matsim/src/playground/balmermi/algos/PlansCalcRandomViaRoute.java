@@ -23,7 +23,6 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -32,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;

@@ -24,10 +24,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.Facility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;

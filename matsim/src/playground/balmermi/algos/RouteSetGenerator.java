@@ -24,13 +24,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
