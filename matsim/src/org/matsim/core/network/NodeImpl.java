@@ -27,10 +27,8 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.BasicNodeImpl;
-import org.matsim.core.gbl.Gbl;
 
 public class NodeImpl extends BasicNodeImpl implements Node {
 
@@ -80,32 +78,6 @@ public class NodeImpl extends BasicNodeImpl implements Node {
 	//////////////////////////////////////////////////////////////////////
 	// add / set methods
 	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public boolean addInLink(final BasicLink inlink) {
-		Id linkid = inlink.getId();
-		if (this.inlinks.containsKey(linkid)) {
-			Gbl.errorMsg(this + "[inlink_id=" + inlink.getId() + " already exists]");
-		}
-		if (this.outlinks.containsKey(linkid)) {
-			log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
-		}
-		this.inlinks.put(linkid, inlink);
-		return true;
-	}
-
-	@Override
-	public boolean addOutLink(final BasicLink outlink) {
-		Id linkid = outlink.getId();
-		if (this.outlinks.containsKey(linkid)) {
-			Gbl.errorMsg(this + "[inlink_id=" + outlink.getId() + " already exists]");
-		}
-		if (this.inlinks.containsKey(linkid)) {
-			log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
-		}
-		this.outlinks.put(linkid, outlink);
-		return true;
-	}
 
 	public final void setOrigId(final String id) {
 		this.origid = id;
