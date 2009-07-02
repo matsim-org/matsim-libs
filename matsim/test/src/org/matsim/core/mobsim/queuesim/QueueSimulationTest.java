@@ -32,7 +32,6 @@ import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
@@ -56,6 +55,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -155,7 +155,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		ActivityImpl a1 = plan.createActivity("h", f.link1);
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createLeg(TransportMode.other);
-		Route route = f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3); // TODO [MR] use different factory/mode here
+		RouteWRefs route = f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3); // TODO [MR] use different factory/mode here
 		leg.setRoute(route);
 		leg.setTravelTime(15.0);
 		plan.createActivity("w", f.link3);

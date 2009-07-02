@@ -24,13 +24,13 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
@@ -49,7 +49,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		PlanImpl plan = pb.createPlan(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));
 		LegImpl leg = pb.createLeg(TransportMode.undefined);
-		Route route = new GenericRouteImpl(link1, link2);
+		RouteWRefs route = new GenericRouteImpl(link1, link2);
 		route.setTravelTime(123);
 		route.setDistance(9876.54);
 		leg.setRoute(route);
@@ -65,7 +65,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		new MatsimPopulationReader(pop2, network).readFile(filename);
 		PersonImpl person2 = pop2.getPersons().get(new IdImpl(1));
 		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);
-		Route route2 = leg2.getRoute();
+		RouteWRefs route2 = leg2.getRoute();
 		assertEquals(123, route2.getTravelTime(), EPSILON); // if this succeeds, we know that writing/reading the data works
 		assertEquals(9876.54, route2.getDistance(), EPSILON);
 	}
