@@ -29,13 +29,13 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -87,7 +87,7 @@ public class BlockingStopDemo {
 	private void createNetwork() {
 		NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node[] nodes = new Node[nOfLinks * 2 + 2];
+		NodeImpl[] nodes = new NodeImpl[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
 			nodes[i           ] = network.createNode(this.ids[i           ], this.scenario.createCoord(i * 500, 0));
 			nodes[i+nOfLinks+1] = network.createNode(this.ids[i+nOfLinks+1], this.scenario.createCoord(i * 500, 500));
@@ -110,10 +110,10 @@ public class BlockingStopDemo {
 			stopList.add(new TransitRouteStopImpl(stops[i], 100 + i*70, 120 + i*70));
 		}
 
-		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
-		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
+		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
+		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<Link> linkList = new ArrayList<Link>(nOfLinks);
+		ArrayList<LinkImpl> linkList = new ArrayList<LinkImpl>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
@@ -138,7 +138,7 @@ public class BlockingStopDemo {
 		startLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks]);
 		endLink = this.scenario.getNetwork().getLinks().get(this.ids[2*nOfLinks-1]);
 		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		linkList = new ArrayList<Link>(nOfLinks);
+		linkList = new ArrayList<LinkImpl>(nOfLinks);
 		for (int i = nOfLinks+1; i < (2*nOfLinks - 1); i++) {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
@@ -202,11 +202,11 @@ public class BlockingStopDemo {
 		}
 
 		// car-drivers
-		Network network = this.scenario.getNetwork();
+		NetworkLayer network = this.scenario.getNetwork();
 		NetworkRoute carRoute1 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[0]), network.getLinks().get(this.ids[nOfLinks-1]));
 		NetworkRoute carRoute2 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[nOfLinks]), network.getLinks().get(this.ids[2*nOfLinks-1]));
-		List<Link> links1 = new ArrayList<Link>(nOfLinks-2);
-		List<Link> links2 = new ArrayList<Link>(nOfLinks-2);
+		List<LinkImpl> links1 = new ArrayList<LinkImpl>(nOfLinks-2);
+		List<LinkImpl> links2 = new ArrayList<LinkImpl>(nOfLinks-2);
 		for (int i = 1; i<nOfLinks-1; i++) {
 			links1.add(network.getLinks().get(this.ids[i]));
 			links2.add(network.getLinks().get(this.ids[i+nOfLinks]));

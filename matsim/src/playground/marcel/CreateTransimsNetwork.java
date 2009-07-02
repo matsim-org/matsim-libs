@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriterHandlerImplTLinks;
 import org.matsim.core.network.NetworkWriterHandlerImplTNodes;
 
@@ -70,7 +70,7 @@ public class CreateTransimsNetwork {
 		config.global().setLocalDtdBase("dtd/");
 
 		System.out.println("reading network from " + this.networkFileName);
-		Network network = scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(this.networkFileName);
 
 		if (network.getNode(new IdImpl("0")) != null) {

@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.PersonAlgorithm;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,9 +38,9 @@ import org.matsim.population.filters.AbstractPersonFilter;
  */
 public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 
-	private final Map<Id, Link> areaOfInterest;
+	private final Map<Id, LinkImpl> areaOfInterest;
 
-	public PersonLeavesAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> areaOfInterest) {
+	public PersonLeavesAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, LinkImpl> areaOfInterest) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.areaOfInterest = areaOfInterest;
 	}
@@ -54,11 +54,11 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 				if (leg.getRoute() == null) {
 					return false;
 				}
-				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}
 				// test departure link
-				Link link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
+				LinkImpl link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
 				if (link != null) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}

@@ -26,12 +26,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -48,8 +48,8 @@ public class CreatePseudoNetwork {
 //	public static final String OUTPUT_SCHEDULE = "../thesis-data/examples/berta/pseudoSchedule.xml";
 //	public static final String OUTPUT_NETWORK = "../thesis-data/examples/berta/pseudoNetwork.xml";
 	
-	private Map<Tuple<TransitStopFacility, TransitStopFacility>, Link> links = null;
-	private Map<TransitStopFacility, Node> nodes = null;
+	private Map<Tuple<TransitStopFacility, TransitStopFacility>, LinkImpl> links = null;
+	private Map<TransitStopFacility, NodeImpl> nodes = null;
 	private final NetworkLayer network;
 	private final TransitSchedule schedule;
 	private long linkIdCounter = 0;
@@ -60,7 +60,7 @@ public class CreatePseudoNetwork {
 		this.schedule = schedule;
 	}
 	
-	public Network run() {
+	public NetworkLayer run() {
 		this.linkIdCounter = 0;
 		this.nodeIdCounter = 0;
 //		try {
@@ -73,19 +73,19 @@ public class CreatePseudoNetwork {
 //			e.printStackTrace();
 //		}
 		
-		this.links = new HashMap<Tuple<TransitStopFacility, TransitStopFacility>, Link>();
-		this.nodes = new HashMap<TransitStopFacility, Node>();
+		this.links = new HashMap<Tuple<TransitStopFacility, TransitStopFacility>, LinkImpl>();
+		this.nodes = new HashMap<TransitStopFacility, NodeImpl>();
 		
 		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
 		
 		for (TransitLine tLine : schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
-				ArrayList<Link> routeLinks = new ArrayList<Link>();
+				ArrayList<LinkImpl> routeLinks = new ArrayList<LinkImpl>();
 				TransitStopFacility prevFacility = null;
 				for (TransitRouteStop stop : tRoute.getStops()) {
 					TransitStopFacility facility = stop.getStopFacility();
 					if (prevFacility != null) {
-						Link link = getNetworkLink(prevFacility, facility);
+						LinkImpl link = getNetworkLink(prevFacility, facility);
 						// add link to route
 						routeLinks.add(link);
 					}
@@ -93,9 +93,9 @@ public class CreatePseudoNetwork {
 				}
 
 				if (routeLinks.size() > 0) {
-					Link startLink = routeLinks.get(0);
-					List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
-					Link endLink = routeLinks.get(routeLinks.size() - 1);
+					LinkImpl startLink = routeLinks.get(0);
+					List<LinkImpl> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<LinkImpl>(0);
+					LinkImpl endLink = routeLinks.get(routeLinks.size() - 1);
 					NetworkRoute route = new LinkNetworkRoute(startLink, endLink);
 					route.setLinks(startLink, linksBetween, endLink);
 					tRoute.setRoute(route);
@@ -119,16 +119,16 @@ public class CreatePseudoNetwork {
 		return network;
 	}
 	
-	private Link getNetworkLink(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
+	private LinkImpl getNetworkLink(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
 		Tuple<TransitStopFacility, TransitStopFacility> connection = new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop);
-		Link link = links.get(connection);
+		LinkImpl link = links.get(connection);
 		if (link == null) {
-			Node fromNode = nodes.get(fromStop);
+			NodeImpl fromNode = nodes.get(fromStop);
 			if (fromNode == null) {
 				fromNode = network.createNode(new IdImpl(nodeIdCounter++), fromStop.getCoord());
 				nodes.put(fromStop, fromNode);
 			}
-			Node toNode = nodes.get(toStop);
+			NodeImpl toNode = nodes.get(toStop);
 			if (toNode == null) {
 				toNode = network.createNode(new IdImpl(nodeIdCounter++), toStop.getCoord());
 				nodes.put(toStop, toNode);

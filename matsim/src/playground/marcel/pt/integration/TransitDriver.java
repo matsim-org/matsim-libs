@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
@@ -34,6 +33,7 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
@@ -48,7 +48,7 @@ import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 public class TransitDriver implements TransitDriverAgent {
 
-		private final List<Link> linkRoute;
+		private final List<LinkImpl> linkRoute;
 		private final NetworkRoute carRoute;
 		private final double departureTime;
 
@@ -82,7 +82,7 @@ public class TransitDriver implements TransitDriverAgent {
 			this.vehicle = vehicle;
 		}
 
-		public Link chooseNextLink() {
+		public LinkImpl chooseNextLink() {
 			if (this.nextLinkIndex < this.linkRoute.size()) {
 				return this.linkRoute.get(this.nextLinkIndex);
 			}
@@ -178,7 +178,7 @@ public class TransitDriver implements TransitDriverAgent {
 			return this.currentLeg;
 		}
 
-		public Link getDestinationLink() {
+		public LinkImpl getDestinationLink() {
 			return this.currentLeg.getRoute().getEndLink();
 		}
 
@@ -190,6 +190,6 @@ public class TransitDriver implements TransitDriverAgent {
 			Simulation.decLiving();
 		}
 
-		public void teleportToLink(final Link link) {
+		public void teleportToLink(final LinkImpl link) {
 		}
 }

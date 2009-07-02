@@ -28,12 +28,12 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -70,7 +70,7 @@ public class PseudoNetworkDemo {
 		
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		
-		Network network = scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
 			try {
@@ -101,7 +101,7 @@ public class PseudoNetworkDemo {
 		new CreatePseudoNetwork(schedule, (NetworkLayer) network).run();
 		
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-		Link link1 = network.getLink(scenario.createId("1"));
+		LinkImpl link1 = network.getLink(scenario.createId("1"));
 
 		Population population = scenario.getPopulation();
 		PersonImpl person = population.getPopulationBuilder().createPerson(new IdImpl(1));

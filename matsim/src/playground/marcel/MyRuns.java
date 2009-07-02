@@ -47,17 +47,17 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCalcLanes;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
 import org.matsim.core.population.LegImpl;
@@ -124,16 +124,16 @@ public class MyRuns {
 		System.out.println("RUN: filterPlansWithRouteInArea");
 
 		final CoordImpl center = new CoordImpl(x, y);
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
-		Network network = sl.getScenario().getNetwork();
+		NetworkLayer network = sl.getScenario().getNetwork();
 		
 		System.out.println("  extracting aoi... at " + (new Date()));
-		for (Link link : network.getLinks().values()) {
-			final Node from = link.getFromNode();
-			final Node to = link.getToNode();
+		for (LinkImpl link : network.getLinks().values()) {
+			final NodeImpl from = link.getFromNode();
+			final NodeImpl to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
 				areaOfInterest.put(link.getId(),link);
@@ -276,7 +276,7 @@ public class MyRuns {
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
 		
-		Network network = sl.getScenario().getNetwork();
+		NetworkLayer network = sl.getScenario().getNetwork();
 
 		System.out.println("  calculating number of lanes... ");
 		new NetworkCalcLanes().run(network);
@@ -298,12 +298,12 @@ public class MyRuns {
 		System.out.println("RUN: subNetwork");
 
 		final CoordImpl center = new CoordImpl(x, y);
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
 
-		Network network = sl.getScenario().getNetwork();
+		NetworkLayer network = sl.getScenario().getNetwork();
 
 //		System.out.println("  reading population... " + (new Date()));
 //		final Plans population = new Plans(Plans.NO_STREAMING);
@@ -311,9 +311,9 @@ public class MyRuns {
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		for (double radius = minRadius; radius <= maxRadius; radius += radiusStep) {
-			for (Link link : network.getLinks().values()) {
-				final Node from = link.getFromNode();
-				final Node to = link.getToNode();
+			for (LinkImpl link : network.getLinks().values()) {
+				final NodeImpl from = link.getFromNode();
+				final NodeImpl to = link.getToNode();
 				if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 					areaOfInterest.put(link.getId(),link);
 				}
@@ -344,7 +344,7 @@ public class MyRuns {
 		sl.loadNetwork();
 		Scenario scenario = sl.getScenario();
 		
-		Network network = scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 
 		System.out.println("  falsifying the network...");
 		(new NetworkFalsifier(50)).run(network);
@@ -377,17 +377,17 @@ public class MyRuns {
 	// buildKML2
 	//////////////////////////////////////////////////////////////////////
 
-	private static MultiGeometryType getNetworkAsKml(final Network network, final CoordinateTransformation coordTransform) {
+	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final CoordinateTransformation coordTransform) {
 		return getNetworkAsKml(network, new TreeMap<Id, Integer>(), coordTransform);
 	}
 
-	private static MultiGeometryType getNetworkAsKml(final Network network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
+	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 
 		final MultiGeometryType networkGeom = kmlObjectFactory.createMultiGeometryType();
 
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			Integer volume = linkVolumes.get(link.getId());
 			if (volume == null) volume = 0;
 			final Coord fromCoord = coordTransform.transform(link.getFromNode().getCoord());
@@ -410,7 +410,7 @@ public class MyRuns {
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
 		Config config = sl.getScenario().getConfig();
-		Network network = sl.getScenario().getNetwork();
+		NetworkLayer network = sl.getScenario().getNetwork();
 
 		if (useVolumes) {
 			System.out.println("  reading plans...");
@@ -444,7 +444,7 @@ public class MyRuns {
 							final int hour = (int)time / 3600;
 							if ((hour > 30) || (hour < 0)) return;
 
-							for (final Link link : route.getLinks()) {
+							for (final LinkImpl link : route.getLinks()) {
 								final Id id = link.getId();
 								TreeMap<Id, Integer> hourValues = linkValues.get(hour);
 								if (hourValues == null) {

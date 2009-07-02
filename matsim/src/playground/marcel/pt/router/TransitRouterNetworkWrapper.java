@@ -33,17 +33,17 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.NetworkBuilder;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.api.experimental.network.NetworkBuilder;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
-public class TransitRouterNetworkWrapper implements Network {
+public class TransitRouterNetworkWrapper implements NetworkLayer {
 
 	/*package*/static final Set<TransportMode> allowedModes = EnumSet.of(TransportMode.pt);
 
@@ -52,8 +52,8 @@ public class TransitRouterNetworkWrapper implements Network {
 		new HashMap<TransitRouterNetwork.TransitRouterNetworkNode, NodeWrapper>();
 	private final Map<TransitRouterNetwork.TransitRouterNetworkLink, LinkWrapper> linksLookup =
 		new HashMap<TransitRouterNetwork.TransitRouterNetworkLink, LinkWrapper>();
-	private final Map<Id, Node> nodes = new LinkedHashMap<Id, Node>();
-	private final Map<Id, Link> links = new LinkedHashMap<Id, Link>();
+	private final Map<Id, NodeImpl> nodes = new LinkedHashMap<Id, NodeImpl>();
+	private final Map<Id, LinkImpl> links = new LinkedHashMap<Id, LinkImpl>();
 
 	private long nextNodeId = 0;
 	private long nextLinkId = 0;
@@ -72,27 +72,27 @@ public class TransitRouterNetworkWrapper implements Network {
 		}
 	}
 
-	public Link getLink(final Id linkId) {
+	public LinkImpl getLink(final Id linkId) {
 		return this.links.get(linkId);
 	}
 
-	public Node getNode(final Id id) {
+	public NodeImpl getNode(final Id id) {
 		return this.nodes.get(id);
 	}
 
-	public Node getNearestNode(final Coord coord) {
+	public NodeImpl getNearestNode(final Coord coord) {
 		throw new UnsupportedOperationException();
 	}
 
-	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
+	public Collection<NodeImpl> getNearestNodes(final Coord coord, final double distance) {
 		throw new UnsupportedOperationException();
 	}
 
-	public Map<Id, Link> getLinks() {
+	public Map<Id, LinkImpl> getLinks() {
 		return this.links;
 	}
 
-	public Map<Id, Node> getNodes() {
+	public Map<Id, NodeImpl> getNodes() {
 		return this.nodes;
 	}
 
@@ -128,11 +128,11 @@ public class TransitRouterNetworkWrapper implements Network {
 		return "TransitRouterNetworkWrapper";
 	}
 
-	public boolean removeLink(final Link link) {
+	public boolean removeLink(final LinkImpl link) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean removeNode(final Node node) {
+	public boolean removeNode(final NodeImpl node) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -153,7 +153,7 @@ public class TransitRouterNetworkWrapper implements Network {
 	}
 
 
-	/*package*/ class NodeWrapper implements Node {
+	/*package*/ class NodeWrapper implements NodeImpl {
 		final TransitRouterNetwork.TransitRouterNetworkNode node;
 		final Id id;
 
@@ -162,19 +162,19 @@ public class TransitRouterNetworkWrapper implements Network {
 			this.id = id;
 		}
 
-		public Map<Id, ? extends Link> getInLinks() {
+		public Map<Id, ? extends LinkImpl> getInLinks() {
 			throw new UnsupportedOperationException();
 		}
 
-		public Map<Id, ? extends Node> getInNodes() {
+		public Map<Id, ? extends NodeImpl> getInNodes() {
 			throw new UnsupportedOperationException();
 		}
 
-		public Map<Id, ? extends Link> getIncidentLinks() {
+		public Map<Id, ? extends LinkImpl> getIncidentLinks() {
 			throw new UnsupportedOperationException();
 		}
 
-		public Map<Id, ? extends Node> getIncidentNodes() {
+		public Map<Id, ? extends NodeImpl> getIncidentNodes() {
 			throw new UnsupportedOperationException();
 		}
 
@@ -182,8 +182,8 @@ public class TransitRouterNetworkWrapper implements Network {
 			return null;
 		}
 
-		public Map<Id, ? extends Link> getOutLinks() {
-			Map<Id, Link> links = new LinkedHashMap<Id, Link>(this.node.outgoingLinks.size());
+		public Map<Id, ? extends LinkImpl> getOutLinks() {
+			Map<Id, LinkImpl> links = new LinkedHashMap<Id, LinkImpl>(this.node.outgoingLinks.size());
 			for (TransitRouterNetwork.TransitRouterNetworkLink link : this.node.outgoingLinks) {
 				LinkWrapper wrapped = getWrappedLink(link);
 				links.put(wrapped.id, wrapped);
@@ -191,7 +191,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			return links;
 		}
 
-		public Map<Id, ? extends Node> getOutNodes() {
+		public Map<Id, ? extends NodeImpl> getOutNodes() {
 			throw new UnsupportedOperationException();
 		}
 
@@ -203,11 +203,11 @@ public class TransitRouterNetworkWrapper implements Network {
 			return null;
 		}
 
-		public void removeInLink(final Link inlink) {
+		public void removeInLink(final LinkImpl inlink) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void removeOutLink(final Link outlink) {
+		public void removeOutLink(final LinkImpl outlink) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -243,12 +243,12 @@ public class TransitRouterNetworkWrapper implements Network {
 			return this.id;
 		}
 
-		public int compareTo(final Node o) {
+		public int compareTo(final NodeImpl o) {
 			return this.id.compareTo(o.getId());
 		}
 	}
 
-	/*package*/ class LinkWrapper implements Link {
+	/*package*/ class LinkWrapper implements LinkImpl {
 
 		final TransitRouterNetwork.TransitRouterNetworkLink link;
 		final Id id;
@@ -274,7 +274,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			throw new UnsupportedOperationException();
 		}
 
-		public Node getFromNode() {
+		public NodeImpl getFromNode() {
 			return getWrappedNode(this.link.fromNode);
 		}
 
@@ -282,7 +282,7 @@ public class TransitRouterNetworkWrapper implements Network {
 			return null;
 		}
 
-		public Node getToNode() {
+		public NodeImpl getToNode() {
 			return getWrappedNode(this.link.toNode);
 		}
 

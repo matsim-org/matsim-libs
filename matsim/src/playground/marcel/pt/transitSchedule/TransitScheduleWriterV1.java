@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -169,7 +169,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 			attributes.add(this.createTuple(REF_ID, route.getStartLink().getId().toString()));
 			this.writeStartTag(LINK, attributes, true);
 
-			for (Link link : route.getLinks()) {
+			for (LinkImpl link : route.getLinks()) {
 				attributes.clear();
 				attributes.add(this.createTuple(REF_ID, link.getId().toString()));
 				this.writeStartTag(LINK, attributes, true);

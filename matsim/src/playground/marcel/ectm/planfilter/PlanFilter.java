@@ -28,12 +28,12 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -57,7 +57,7 @@ public class PlanFilter {
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		Scenario sc = sl.loadScenario();
-		final Network network = sc.getNetwork();
+		final NetworkLayer network = sc.getNetwork();
 		final Population population = sc.getPopulation();
 
 		System.out.println("  finding sub-networks... " + (new Date()));
@@ -65,21 +65,21 @@ public class PlanFilter {
 		for (double smallRadius : smallRadiuses) {
 			for (double bigRadius : bigRadiuses) {
 
-				final Map<Id, Link> smallAOI = new HashMap<Id, Link>();
-				final Map<Id, Link> bigAOI = new HashMap<Id, Link>();
+				final Map<Id, LinkImpl> smallAOI = new HashMap<Id, LinkImpl>();
+				final Map<Id, LinkImpl> bigAOI = new HashMap<Id, LinkImpl>();
 
-				for (Link link : network.getLinks().values()) {
-					final Node from = link.getFromNode();
-					final Node to = link.getToNode();
+				for (LinkImpl link : network.getLinks().values()) {
+					final NodeImpl from = link.getFromNode();
+					final NodeImpl to = link.getToNode();
 					if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {
 						smallAOI.put(link.getId(),link);
 					}
 				}
 //				System.out.println("  aoi with radius=" + smallRadius + " contains " + smallAOI.size() + " links.");
 
-				for (Link link : network.getLinks().values()) {
-					final Node from = link.getFromNode();
-					final Node to = link.getToNode();
+				for (LinkImpl link : network.getLinks().values()) {
+					final NodeImpl from = link.getFromNode();
+					final NodeImpl to = link.getToNode();
 					if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {
 						bigAOI.put(link.getId(),link);
 					}
@@ -116,17 +116,17 @@ public class PlanFilter {
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		Scenario sc = sl.loadScenario();
 		final Config config = sc.getConfig();
-		final Network network = sc.getNetwork();
+		final NetworkLayer network = sc.getNetwork();
 		final Population population = sc.getPopulation();
 
 		System.out.println("  finding AOI links");
 
-		final Map<Id, Link> smallAOI = new HashMap<Id, Link>();
-		final Map<Id, Link> bigAOI = new HashMap<Id, Link>();
+		final Map<Id, LinkImpl> smallAOI = new HashMap<Id, LinkImpl>();
+		final Map<Id, LinkImpl> bigAOI = new HashMap<Id, LinkImpl>();
 
-		for (Link link : network.getLinks().values()) {
-			final Node from = link.getFromNode();
-			final Node to = link.getToNode();
+		for (LinkImpl link : network.getLinks().values()) {
+			final NodeImpl from = link.getFromNode();
+			final NodeImpl to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {
 				smallAOI.put(link.getId(),link);
 			}
@@ -136,16 +136,16 @@ public class PlanFilter {
 		NetworkLayer subnet = new NetworkLayer();
 		subnet.setName("based on " + config.network().getInputFile());
 		subnet.setCapacityPeriod(network.getCapacityPeriod());
-		for (Link link : network.getLinks().values()) {
-			final Node from = link.getFromNode();
-			final Node to = link.getToNode();
+		for (LinkImpl link : network.getLinks().values()) {
+			final NodeImpl from = link.getFromNode();
+			final NodeImpl to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {
 				bigAOI.put(link.getId(),link);
-				Node fromNode = link.getFromNode();
+				NodeImpl fromNode = link.getFromNode();
 				if (!subnet.getNodes().containsKey(fromNode.getId())) {
 					subnet.createNode(fromNode.getId(), fromNode.getCoord());
 				}
-				Node toNode = link.getToNode();
+				NodeImpl toNode = link.getToNode();
 				if (!subnet.getNodes().containsKey(toNode.getId())) {
 					subnet.createNode(toNode.getId(), toNode.getCoord());
 				}

@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.charts.XYScatterChart;
 
 /**
@@ -75,7 +75,7 @@ public class QVDiagramm implements BasicLinkEnterEventHandler, BasicLinkLeaveEve
 	/** The sum of all speeds of vehicles in this time bin. Used to calculate the average speed in this time bin. */
 	private double speedSum = 0;
 
-	public QVDiagramm(final Link link) {
+	public QVDiagramm(final LinkImpl link) {
 		this.linkId = link.getId();
 		this.linkLength = link.getLength();
 	}

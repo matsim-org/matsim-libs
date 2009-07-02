@@ -28,12 +28,12 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -93,20 +93,20 @@ public class TwoLinesDemo {
 		 */
 		NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createNode(this.ids[1], this.scenario.createCoord(-2000, 0));
-		Node node2 = network.createNode(this.ids[2], this.scenario.createCoord(-2000, 1000));
-		Node node3 = network.createNode(this.ids[3], this.scenario.createCoord(-1000, 0));
-		Node node4 = network.createNode(this.ids[4], this.scenario.createCoord(-1000, 1000));
-		Node node5 = network.createNode(this.ids[5], this.scenario.createCoord(0, 0));
-		Node node6 = network.createNode(this.ids[6], this.scenario.createCoord(0, 1000));
-		Node node7 = network.createNode(this.ids[7], this.scenario.createCoord(500, 500));
-		Node node8 = network.createNode(this.ids[8], this.scenario.createCoord(1500, 500));
-		Node node9 = network.createNode(this.ids[9], this.scenario.createCoord(2500, 500));
-		Node node10 = network.createNode(this.ids[10], this.scenario.createCoord(3500, 500));
-		Node node11 = network.createNode(this.ids[11], this.scenario.createCoord(4000, 1000));
-		Node node12 = network.createNode(this.ids[12], this.scenario.createCoord(4000, 0));
-		Node node13 = network.createNode(this.ids[13], this.scenario.createCoord(5000, 1000));
-		Node node14 = network.createNode(this.ids[14], this.scenario.createCoord(5000, 0));
+		NodeImpl node1 = network.createNode(this.ids[1], this.scenario.createCoord(-2000, 0));
+		NodeImpl node2 = network.createNode(this.ids[2], this.scenario.createCoord(-2000, 1000));
+		NodeImpl node3 = network.createNode(this.ids[3], this.scenario.createCoord(-1000, 0));
+		NodeImpl node4 = network.createNode(this.ids[4], this.scenario.createCoord(-1000, 1000));
+		NodeImpl node5 = network.createNode(this.ids[5], this.scenario.createCoord(0, 0));
+		NodeImpl node6 = network.createNode(this.ids[6], this.scenario.createCoord(0, 1000));
+		NodeImpl node7 = network.createNode(this.ids[7], this.scenario.createCoord(500, 500));
+		NodeImpl node8 = network.createNode(this.ids[8], this.scenario.createCoord(1500, 500));
+		NodeImpl node9 = network.createNode(this.ids[9], this.scenario.createCoord(2500, 500));
+		NodeImpl node10 = network.createNode(this.ids[10], this.scenario.createCoord(3500, 500));
+		NodeImpl node11 = network.createNode(this.ids[11], this.scenario.createCoord(4000, 1000));
+		NodeImpl node12 = network.createNode(this.ids[12], this.scenario.createCoord(4000, 0));
+		NodeImpl node13 = network.createNode(this.ids[13], this.scenario.createCoord(5000, 1000));
+		NodeImpl node14 = network.createNode(this.ids[14], this.scenario.createCoord(5000, 0));
 		
 		network.createLink(this.ids[1], node1, node3, 1000.0, 10.0, 3600.0, 1);
 		network.createLink(this.ids[2], node2, node4, 1000.0, 10.0, 3600.0, 1);
@@ -131,19 +131,19 @@ public class TwoLinesDemo {
 		TransitStopFacility stop5 = new TransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50));
 		TransitStopFacility stop6 = new TransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850));
 		
-		Link link1 = this.scenario.getNetwork().getLinks().get(this.ids[1]);
-		Link link2 = this.scenario.getNetwork().getLinks().get(this.ids[2]);
-		Link link3 = this.scenario.getNetwork().getLinks().get(this.ids[3]);
-		Link link4 = this.scenario.getNetwork().getLinks().get(this.ids[4]);
-		Link link5 = this.scenario.getNetwork().getLinks().get(this.ids[5]);
-		Link link6 = this.scenario.getNetwork().getLinks().get(this.ids[6]);
-		Link link7 = this.scenario.getNetwork().getLinks().get(this.ids[7]);
-		Link link8 = this.scenario.getNetwork().getLinks().get(this.ids[8]);
-		Link link9 = this.scenario.getNetwork().getLinks().get(this.ids[9]);
-		Link link10 = this.scenario.getNetwork().getLinks().get(this.ids[10]);
-		Link link11 = this.scenario.getNetwork().getLinks().get(this.ids[11]);
-		Link link12 = this.scenario.getNetwork().getLinks().get(this.ids[12]);
-		Link link13 = this.scenario.getNetwork().getLinks().get(this.ids[13]);
+		LinkImpl link1 = this.scenario.getNetwork().getLinks().get(this.ids[1]);
+		LinkImpl link2 = this.scenario.getNetwork().getLinks().get(this.ids[2]);
+		LinkImpl link3 = this.scenario.getNetwork().getLinks().get(this.ids[3]);
+		LinkImpl link4 = this.scenario.getNetwork().getLinks().get(this.ids[4]);
+		LinkImpl link5 = this.scenario.getNetwork().getLinks().get(this.ids[5]);
+		LinkImpl link6 = this.scenario.getNetwork().getLinks().get(this.ids[6]);
+		LinkImpl link7 = this.scenario.getNetwork().getLinks().get(this.ids[7]);
+		LinkImpl link8 = this.scenario.getNetwork().getLinks().get(this.ids[8]);
+		LinkImpl link9 = this.scenario.getNetwork().getLinks().get(this.ids[9]);
+		LinkImpl link10 = this.scenario.getNetwork().getLinks().get(this.ids[10]);
+		LinkImpl link11 = this.scenario.getNetwork().getLinks().get(this.ids[11]);
+		LinkImpl link12 = this.scenario.getNetwork().getLinks().get(this.ids[12]);
+		LinkImpl link13 = this.scenario.getNetwork().getLinks().get(this.ids[13]);
 
 		stop1.setLink(link3);
 		stop2.setLink(link4);
@@ -162,7 +162,7 @@ public class TwoLinesDemo {
 
 		TransitLine tLine1 = new TransitLineImpl(this.ids[1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
-		ArrayList<Link> linkList = new ArrayList<Link>(6);
+		ArrayList<LinkImpl> linkList = new ArrayList<LinkImpl>(6);
 		linkList.add(link3);
 		linkList.add(link5);
 		linkList.add(link7);
@@ -189,7 +189,7 @@ public class TwoLinesDemo {
 
 		TransitLine tLine2 = new TransitLineImpl(this.ids[2]);
 		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
-		linkList = new ArrayList<Link>(6);
+		linkList = new ArrayList<LinkImpl>(6);
 		linkList.add(link4);
 		linkList.add(link6);
 		linkList.add(link7);

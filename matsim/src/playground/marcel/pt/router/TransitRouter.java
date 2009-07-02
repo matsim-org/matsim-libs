@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -68,7 +68,7 @@ public class TransitRouter {
 		Dijkstra d = new Dijkstra(this.wrappedNetwork, c, c);
 		Path p = d.calcLeastCostPath(fromNodeWrapped, toNodeWrapped, departureTime);
 		ArrayList<Id> linkIds = new ArrayList<Id>(p.links.size());
-		for (Link l : p.links) {
+		for (LinkImpl l : p.links) {
 			linkIds.add(l.getId());
 			System.out.println(l.getId().toString());
 		}

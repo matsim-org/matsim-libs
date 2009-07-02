@@ -26,9 +26,9 @@ import java.io.IOException;
 
 import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.world.World;
@@ -52,14 +52,14 @@ public class FacilityNetworkMatching {
 		}
 	}
 
-	public static void loadMapping(final ActivityFacilities facilities, final Network network, final World world, final String filename) {
+	public static void loadMapping(final ActivityFacilities facilities, final NetworkLayer network, final World world, final String filename) {
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(filename);
 			String line;
 			while ((line = reader.readLine()) != null) {
 				String[] parts = StringUtils.explode(line, '\t');
 				ActivityFacility f = facilities.getFacilities().get(new IdImpl(parts[0]));
-				Link l = network.getLinks().get(new IdImpl(parts[1]));
+				LinkImpl l = network.getLinks().get(new IdImpl(parts[1]));
 				if (f == null || l == null) {
 					System.err.println("Could not load facility of link: " + line);
 				} else {
@@ -71,8 +71,8 @@ public class FacilityNetworkMatching {
 		}
 	}
 	
-	public static void facilitySetLink(final ActivityFacility f, final Link l, final World world) {
-		Link oldL = f.getLink();
+	public static void facilitySetLink(final ActivityFacility f, final LinkImpl l, final World world) {
+		LinkImpl oldL = f.getLink();
 		if (oldL != null) {
 			world.removeMapping(f, oldL);
 		}

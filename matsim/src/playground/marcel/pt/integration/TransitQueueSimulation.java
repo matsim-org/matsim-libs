@@ -25,14 +25,14 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
@@ -57,7 +57,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
 
-	public TransitQueueSimulation(final Network network, final Population population, final Events events) {
+	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events) {
 		super(network, population, events);
 	
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
@@ -132,7 +132,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		}
 	}
 	
-	public void agentDeparts(final DriverAgent agent, final Link link) {
+	public void agentDeparts(final DriverAgent agent, final LinkImpl link) {
 		LegImpl leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();

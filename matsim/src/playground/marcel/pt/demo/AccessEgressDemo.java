@@ -28,12 +28,12 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -89,7 +89,7 @@ public class AccessEgressDemo {
 	private void createNetwork() {
 		NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node[] nodes = new Node[nOfLinks + 1];
+		NodeImpl[] nodes = new NodeImpl[nOfLinks + 1];
 		for (int i = 0; i <= nOfLinks; i++) {
 			nodes[i] = network.createNode(this.ids[i], this.scenario.createCoord(i * 500, 0));
 		}
@@ -116,10 +116,10 @@ public class AccessEgressDemo {
 			TransitRouteStop stop = new TransitRouteStopImpl(stops[i], i * 50, i * 50 + 10);
 			stopList.add(stop);
 		}
-		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
-		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
+		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
+		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<Link> linkList = new ArrayList<Link>(nOfLinks - 2);
+		ArrayList<LinkImpl> linkList = new ArrayList<LinkImpl>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
