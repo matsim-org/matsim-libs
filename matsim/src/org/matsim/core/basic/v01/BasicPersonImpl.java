@@ -46,14 +46,30 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 	private TreeSet<String> travelcards = null;
 	protected BasicKnowledge knowledge = null;
 	private Desires desires = null;
+	
+	private T selectedPlan = null;
 
 
 	public BasicPersonImpl(final Id id) {
 		this.id = id;
 	}
 
-	public void addPlan(final T plan) {
-		this.plans.add(plan);
+	public boolean addPlan(final T plan) {
+		// Make sure there is a selected plan if there is at least one plan
+		if (this.selectedPlan == null) this.selectedPlan = plan;
+		return this.plans.add(plan);
+	}
+	
+	public final T getSelectedPlan(){
+		return this.selectedPlan;
+	}
+	
+	public final void setSelectedPlan(final T selectedPlan) {
+		if (this.getPlans().contains(selectedPlan)) {
+			this.selectedPlan = selectedPlan;
+		} else if (selectedPlan != null) {
+			throw new IllegalStateException("The plan to be set as selected is not stored in the person's plans");
+		}
 	}
 
 	public List<T> getPlans() {

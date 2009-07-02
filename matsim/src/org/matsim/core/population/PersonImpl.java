@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.basic.v01.BasicPersonImpl;
@@ -51,39 +50,38 @@ public class PersonImpl implements Person {
 
 	private Household household;
 
-	protected PlanImpl selectedPlan = null;
 
 	public PersonImpl(final Id id) {
 		this.delegate = new BasicPersonImpl<PlanImpl>(id);
 	}
 
-	public void addPlan(final PlanImpl plan) {
-		this.delegate.addPlan(plan);
-		// Make sure there is a selected plan if there is at least one plan
-		if (this.selectedPlan == null) this.selectedPlan = plan;
-	}
+//	public void addPlan(final PlanImpl plan) {
+//		this.delegate.addPlan(plan);
+//		// Make sure there is a selected plan if there is at least one plan
+//		if (this.selectedPlan == null) this.selectedPlan = plan;
+//	}
 
-	public PlanImpl getSelectedPlan() {
-		return this.selectedPlan;
+	public final PlanImpl getSelectedPlan() {
+		return this.delegate.getSelectedPlan();
 	}
-
-	public void setSelectedPlan(final PlanImpl selectedPlan) {
-		if (this.delegate.getPlans().contains(selectedPlan)) {
-			this.selectedPlan = selectedPlan;
-		} else if (selectedPlan != null) {
-			throw new IllegalStateException("The plan to be set as selected is not stored in the person's plans");
-		}
+//
+	public final void setSelectedPlan(final PlanImpl selectedPlan) {
+		this.delegate.setSelectedPlan(selectedPlan);
+	}
+	
+	public final boolean addPlan(PlanImpl p){
+		return this.delegate.addPlan(p);
 	}
 
 	public PlanImpl createPlan(final boolean selected) {
 		PlanImpl p = new PlanImpl(this);
 		this.delegate.getPlans().add(p);
 		if (selected) {
-			setSelectedPlan(p);
+			this.delegate.setSelectedPlan(p);
 		}
 		// Make sure there is a selected plan if there is at least one plan
 		if (this.getSelectedPlan() == null)
-			this.setSelectedPlan(p);
+			this.delegate.setSelectedPlan(p);
 		return p;
 	}
 
