@@ -32,8 +32,6 @@ import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
@@ -42,6 +40,7 @@ import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.mfeil.config.TimeModeChoicerConfigGroup;
@@ -109,11 +108,9 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		
-		this.estimator = controler.getConfig().planomat().getLegTravelTimeEstimator(
-				controler.getTravelTimeCalculator(), 
-				tDepDelayCalc, 
-				this.router);
-
+		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
+		this.estimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(controler.getConfig().planomat().getLegTravelTimeEstimatorName(), this.router);
+		
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
 		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());

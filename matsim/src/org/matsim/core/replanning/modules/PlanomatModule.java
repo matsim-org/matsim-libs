@@ -30,7 +30,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -48,6 +48,7 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Controler controler;
 	private final PlanomatConfigGroup config;
+	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	
 	private DepartureDelayAverageCalculator tDepDelayCalc = null;
 
@@ -72,6 +73,8 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 				this.network,
 				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.events.addHandler(tDepDelayCalc);
+
+		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(this.travelTime, this.tDepDelayCalc);
 	}
 
 	@Override
@@ -88,18 +91,13 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 		
 		PlansCalcRoute routingAlgorithm = (PlansCalcRoute) this.controler.getRoutingAlgorithm(this.travelCost, this.travelTime);
 		
-		
-		
-		
-		LegTravelTimeEstimator legTravelTimeEstimator = this.config.getLegTravelTimeEstimator(
-				this.travelTime, 
-				this.tDepDelayCalc, 
-				routingAlgorithm);
-
-		PlanAlgorithm planomatInstance =  new Planomat(legTravelTimeEstimator, this.scoringFunctionFactory, this.config);
+		PlanAlgorithm planomatInstance =  new Planomat(
+				this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(this.config.getLegTravelTimeEstimatorName(), routingAlgorithm), 
+				this.scoringFunctionFactory, 
+				this.config);
 
 		return planomatInstance;
 
 	}
-
+	
 }
