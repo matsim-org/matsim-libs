@@ -12,7 +12,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="/home/jjoubert/Commercial/Input/plansAll_06.0xml" />
+		<param name="inputPlansFile" value="/home/jjoubert/Commercial/Input/plansAll_06.xml" />
 	</module>
 
 	<module name="controler">
