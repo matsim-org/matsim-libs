@@ -27,6 +27,7 @@ import playground.andreas.bln.NewPopulation;
 /*
  * removes non miv plans from input file...
  *  (facilities needed for some plans files...)
+ *   => probably can just remove things related to faclities and it should work (or look at earlier revision)
  */
 
 public class KeepOnlyMIVPlans extends NewPopulation {
