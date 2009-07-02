@@ -21,9 +21,9 @@ package playground.benjamin.income;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.households.basic.BasicIncome;
@@ -59,7 +59,7 @@ public class BKickLegScoring extends LegScoringFunction {
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			Route route = leg.getRoute();
+			RouteWRefs route = leg.getRoute();
 			dist = route.getDistance();
 			if (Double.isNaN(dist)){
 				throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());

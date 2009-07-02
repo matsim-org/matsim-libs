@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
@@ -30,6 +29,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
@@ -297,7 +297,7 @@ public class BKickScoringFunction implements ScoringFunction {
 				 * because route.getDist() may calculate the distance if not yet
 				 * available, which is quite an expensive operation
 				 */
-				Route route = leg.getRoute();
+				RouteWRefs route = leg.getRoute();
 				dist = route.getDistance();
 				/* TODO the route-distance does not contain the length of the first or
 				 * last link of the route, because the route doesn't know those. Should
@@ -312,7 +312,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		} 
 		else if (TransportMode.pt.equals(leg.getMode())) {
 			if (marginalUtilityOfPtFare != 0.0) {
-				Route route = leg.getRoute();
+				RouteWRefs route = leg.getRoute();
 				dist = route.getDistance();
 			}
 			tmpScore = tmpScore + travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfPtFare * 0.28d/1000.0d * dist;

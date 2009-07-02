@@ -31,7 +31,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -44,6 +43,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
@@ -112,7 +112,7 @@ public class NetworkCutter {
 					if (pe instanceof ActivityImpl)
 						resetBoundary(((ActivityImpl) pe).getCoord());
 					else {
-						Route route = ((LegImpl) pe).getRoute();
+						RouteWRefs route = ((LegImpl) pe).getRoute();
 						if (route != null && (route instanceof NetworkRoute))
 							resetBoundary((NetworkRoute) route, net);
 					}

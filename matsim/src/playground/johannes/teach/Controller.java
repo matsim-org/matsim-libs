@@ -38,7 +38,6 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -64,6 +63,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -143,7 +143,7 @@ public class Controller extends Controler {
 				for(PlanImpl plan : p.getPlans()) {
 					double tt = 0;
 					LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
-					Route route = leg.getRoute();
+					RouteWRefs route = leg.getRoute();
 					for(Id id : ((NetworkRoute) route).getLinkIds()) {
 						if(id.toString().equals("4")) {
 							
