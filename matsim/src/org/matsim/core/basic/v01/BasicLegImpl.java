@@ -31,7 +31,6 @@ public class BasicLegImpl implements BasicLeg {
 
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
-	private double arrTime = Time.UNDEFINED_TIME;
 	private TransportMode mode;
 
 	
@@ -71,11 +70,4 @@ public class BasicLegImpl implements BasicLeg {
 		this.travTime = travTime;
 	}
 
-	public final double getArrivalTime() {
-		return this.arrTime;
-	}
-
-	public final void setArrivalTime(final double arrTime) {
-		this.arrTime = arrTime;
-	}
 }

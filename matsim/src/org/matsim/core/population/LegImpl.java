@@ -31,6 +31,9 @@ import org.matsim.core.utils.misc.Time;
 
 public class LegImpl extends BasicLegImpl implements Leg {
 
+	private double arrTime = Time.UNDEFINED_TIME;
+
+	
 	public LegImpl(final TransportMode mode) {
 		super(mode);
 	}
@@ -56,6 +59,15 @@ public class LegImpl extends BasicLegImpl implements Leg {
 			this.route = new GenericRouteImpl(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
 		}
 	}
+	
+	public final double getArrivalTime() {
+		return this.arrTime;
+	}
+
+	public final void setArrivalTime(final double arrTime) {
+		this.arrTime = arrTime;
+	}
+
 
 	@Override
 	public Route getRoute() {
