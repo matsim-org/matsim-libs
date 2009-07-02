@@ -1,0 +1,76 @@
+package playground.wrashid.tryouts.plan;
+
+import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.BasicScenarioImpl;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.PopulationWriter;
+
+import playground.andreas.bln.DuplicatePlans;
+import playground.andreas.bln.NewPopulation;
+
+public class KeepOnlyMIVPlans extends NewPopulation {
+	public static void main(String[] args) {
+
+		BasicScenarioImpl sc = new BasicScenarioImpl();
+		Gbl.setConfig(sc.getConfig());
+
+		String inputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans.xml.gz";
+		String outputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans1.xml.gz";
+		String networkFile = "/data/matsim/switzerland/ivt/studies/switzerland/networks/teleatlas/network.xml.gz";
+
+		Population inPop = new PopulationImpl();
+
+		NetworkLayer net = new NetworkLayer();
+		new MatsimNetworkReader(net).readFile(networkFile);
+
+		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
+		popReader.readFile(inputPlansFile);
+
+		KeepOnlyMIVPlans dp = new KeepOnlyMIVPlans(inPop, outputPlansFile);
+		dp.run(inPop);
+		dp.writeEndPlans();
+	}
+
+	public KeepOnlyMIVPlans(Population plans, String filename) {
+		super(plans, filename);
+	}
+
+	public void run(PersonImpl person) {
+		
+		if(person.getPlans().size() != 1){
+			System.err.println("Person got more than one plan");
+		} else {
+			
+			PlanImpl plan = person.getPlans().get(0);
+			boolean keepPlan = true;
+			
+			// only keep person if every leg is a car leg
+			for (PlanElement planElement : plan.getPlanElements()) {
+				if(planElement instanceof LegImpl){
+					if(((LegImpl)planElement).getMode() != TransportMode.car){
+						keepPlan = false;
+					}
+				}
+			}
+			
+			if(keepPlan){
+				this.popWriter.writePerson(person);
+			}
+			
+		}
+	
+	}
+}
