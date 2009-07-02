@@ -36,12 +36,12 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -69,7 +69,7 @@ public class Getagentcoords {
 
 		Scenario scenario = new ScenarioImpl();
 
-		Network network = scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		Population population = scenario.getPopulation();
@@ -77,8 +77,8 @@ public class Getagentcoords {
 
 
 		// get evac links
-		Node evac1node = network.getNodes().get(new IdImpl("en1"));
-		Map<Id,? extends Link> evaclinks = null;		
+		NodeImpl evac1node = network.getNodes().get(new IdImpl("en1"));
+		Map<Id,? extends LinkImpl> evaclinks = null;		
 		if (evac1node != null) {
 			evaclinks = evac1node.getInLinks();
 			/*for (Link link : evaclinks.values()) {
@@ -91,7 +91,7 @@ public class Getagentcoords {
 		Color noexit = Color.BLACK;
 
 		if (evaclinks != null) {
-			for (Link link : evaclinks.values()) {
+			for (LinkImpl link : evaclinks.values()) {
 				colours.put(link.getId().toString(), Color.getHSBColor((float) ((colours.size()*7) % evaclinks.size() )/ (float) evaclinks.size(),1.0f,1.0f));
 				//colours.put(link.getId(), Color.getHSBColor(0.3f,1.0f,1.0f));
 				//System.out.println(colours.get(link.getId().toString()));
@@ -117,7 +117,7 @@ public class Getagentcoords {
 				if (plan == null) continue;
 
 				 Id i = plan.getFirstActivity().getLinkId();
-				 Link l = network.getLink(i);
+				 LinkImpl l = network.getLink(i);
 				 Coord c = l.getFromNode().getCoord();
 				//Coord c = plan.getFirstActivity().getCoord();
 				//if (c == null) continue; // why would this happen? but happens ...
@@ -136,7 +136,7 @@ public class Getagentcoords {
 			System.out.println("miny "+ miny + " maxy " + maxy);
 
 			// print exits ...
-			for (Link link : evaclinks.values()) {
+			for (LinkImpl link : evaclinks.values()) {
 				Coord c = link.getFromNode().getCoord();
 				Double x = c.getX() * scalex + offsetx;
 				Double y = c.getY() * scaley + offsety;
@@ -154,7 +154,7 @@ public class Getagentcoords {
 				if (plan == null) {notfoundpeople++; continue;}
 
 				 Id i = plan.getFirstActivity().getLinkId();
-				 Link l = network.getLink(i);
+				 LinkImpl l = network.getLink(i);
 				 Coord c = l.getFromNode().getCoord();
 
 				//if (c == null) continue; // why would this happen? but happens ...

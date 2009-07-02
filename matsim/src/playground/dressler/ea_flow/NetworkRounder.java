@@ -21,7 +21,6 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.network.*;
 
 /**
@@ -53,7 +52,7 @@ public class NetworkRounder {
 		if(_debug){
 			System.out.println(divisor);
 		}
-		for (Link link : network.getLinks().values()){
+		for (LinkImpl link : network.getLinks().values()){
 			
 			link.setLength(link.getLength()*lengthFactor);
 			//link.setLength(link.getEuklideanDistance()*lengthFactor);

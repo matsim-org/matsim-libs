@@ -21,8 +21,8 @@
 package playground.dressler.ea_flow;
 
 //matsim imports
-import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 //other imports
 import java.util.Hashtable;
@@ -33,20 +33,20 @@ public class Distances {
 	/**----------- Fields -------------*/
 	final NetworkLayer network;
 	
-	private Hashtable<Node, Integer> distLables = new Hashtable<Node, Integer>();
+	private Hashtable<NodeImpl, Integer> distLables = new Hashtable<NodeImpl, Integer>();
 	
 	/**----------- Constructor -------------*/
 	
 	public Distances(final NetworkLayer network){
 		this.network = network;
-		for(Node node : network.getNodes().values()){
+		for(NodeImpl node : network.getNodes().values()){
 			distLables.put(node, Integer.MAX_VALUE);
 		}
 	}
 
-	public Distances(final NetworkLayer network, Node specialNode){
+	public Distances(final NetworkLayer network, NodeImpl specialNode){
 		this.network = network;
-		for(Node node : network.getNodes().values()){
+		for(NodeImpl node : network.getNodes().values()){
 			if(node == specialNode){
 				distLables.put(node, 0);
 			}
@@ -59,7 +59,7 @@ public class Distances {
 	/**----------- Getter and Setter -------------*/
 	
 	// returns false if time > currend distLabel for the node
-	public boolean setDistance(Node node, int time){
+	public boolean setDistance(NodeImpl node, int time){
 		if(time > distLables.get(node)){
 			System.out.println("Distances konnten oder sollten nicht gesetzt werden.");
 			return false;
@@ -69,18 +69,18 @@ public class Distances {
 	}
 	
 	
-	public Integer getDistance(Node node){
+	public Integer getDistance(NodeImpl node){
 		return this.getMinTime(node);
 	}
 	
 	
 	/**----------- Other Methods -------------*/
 	
-	public Integer getMinTime(Node node){
+	public Integer getMinTime(NodeImpl node){
 		return distLables.get(node);
 	}
 
-	public boolean isReachable(Node node, int time){
+	public boolean isReachable(NodeImpl node, int time){
 		if (distLables.get(node) <= time){
 			return true;
 		}
@@ -91,13 +91,13 @@ public class Distances {
 	/**----------- Print -------------*/
 	
 	public void printAll(){
-		for (Node n : network.getNodes().values()){
+		for (NodeImpl n : network.getNodes().values()){
 			print(n);
 		}
 		System.out.println();
 	}
 	
-	public void print(Node node){
+	public void print(NodeImpl node){
 		System.out.print("Node " + node.getId() + " ist ");
 		if (distLables.get(node).equals(Integer.MAX_VALUE)){
 			System.out.println("nicht erreichbar.");
@@ -109,7 +109,7 @@ public class Distances {
 	
 	public void print(int time){
 		System.out.println("Folgende Knoten sint zum Zeitpunkt " + time + " erreichbar:");
-		for (Node node : network.getNodes().values()){
+		for (NodeImpl node : network.getNodes().values()){
 			if(distLables.get(node) == time){
 				System.out.println(node.getId());
 			}

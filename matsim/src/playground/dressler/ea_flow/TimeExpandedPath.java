@@ -27,8 +27,8 @@ import java.util.ListIterator;
 // other imports
 
 // matsim imports
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 
@@ -77,7 +77,7 @@ public class TimeExpandedPath {
 		/**
 		 * Edge in a path
 		 */
-		private final Link edge;
+		private final LinkImpl edge;
 		
 		/**
 		 * time upon which the flow enters the edge
@@ -95,7 +95,7 @@ public class TimeExpandedPath {
 		 * @param time starting time
 		 * @param forward flag if edge is forward or backward
 		 */
-		PathEdge(Link edge,int time, boolean forward){
+		PathEdge(LinkImpl edge,int time, boolean forward){
 			this.time = time;
 			this.edge = edge;
 			this.forward = forward;
@@ -115,7 +115,7 @@ public class TimeExpandedPath {
 		 * Getter for the Link used
 		 * @return the edge
 		 */
-		public Link getEdge() {
+		public LinkImpl getEdge() {
 			return edge;
 		}
 
@@ -151,7 +151,7 @@ public class TimeExpandedPath {
 	 * @param forward flag if edge is forward or backward
 	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te last edge in the path
 	 */
-	public void append(Link edge, int time, boolean forward){
+	public void append(LinkImpl edge, int time, boolean forward){
 		//adding first PathEdge
 		if(this._edges.isEmpty()){
 			PathEdge temp =new PathEdge(edge, time, forward);
@@ -174,7 +174,7 @@ public class TimeExpandedPath {
 	 * @param forward flag if edge is forward or backward
 	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te first edge in the path
 	 */
-	public void push(Link edge, int time, boolean forward){
+	public void push(LinkImpl edge, int time, boolean forward){
 		if(this._edges.isEmpty()){
 			PathEdge temp =new PathEdge(edge, time, forward);
 			this._edges.addFirst(temp);
@@ -197,7 +197,7 @@ public class TimeExpandedPath {
 	 * @return true iff a path could go over first and over second immediatly after
 	 */
 	private static boolean checkPair(PathEdge first, PathEdge second){
-		Node node;
+		NodeImpl node;
 		if(first.forward){
 			node = first.edge.getToNode();
 		}else{
@@ -246,9 +246,9 @@ public class TimeExpandedPath {
 	 * Method to find the First node in a path
 	 * @return first Node 
 	 */
-	public Node getSource(){
+	public NodeImpl getSource(){
 		PathEdge firstedge = this._edges.getFirst();
-		Node result;
+		NodeImpl result;
 		if(firstedge.isForward()){
 			result = firstedge.getEdge().getFromNode();
 		}else{
@@ -453,7 +453,7 @@ public class TimeExpandedPath {
 	 * print the path
 	 */
 	public void print(){
-		Link edge;
+		LinkImpl edge;
 		System.out.println("Path waits at source " + this._wait);
 		for(int i = 0; i < this._edges.size(); i++){
 			edge = this._edges.get(i).getEdge();

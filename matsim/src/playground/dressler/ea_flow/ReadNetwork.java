@@ -23,8 +23,6 @@ package playground.dressler.ea_flow;
 
 //import java.util.Map;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.network.*;
 
 public class ReadNetwork {
@@ -46,11 +44,11 @@ public class ReadNetwork {
 		 //for (Node node : nodes.values()) {
 		 
 		 
-		 for (Node node : network.getNodes().values()) {
+		 for (NodeImpl node : network.getNodes().values()) {
 		   System.out.println(node.toString() + "\n");
 		 }
 		 
-		 for (Link link : network.getLinks().values()) {
+		 for (LinkImpl link : network.getLinks().values()) {
 		    System.out.println(link.toString() + "\n");
   
 		 }

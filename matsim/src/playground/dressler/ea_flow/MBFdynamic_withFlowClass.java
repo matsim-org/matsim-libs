@@ -31,9 +31,9 @@ import playground.dressler.Intervall.src.Intervalls.*;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 
 // matsim imports
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -76,7 +76,7 @@ import org.matsim.core.router.util.TravelTime;
 	 * The distance calculator. Provides the time, where we can at first reach the nodes from the
 	 * sources.
 	 */
-	private HashMap<Node, Distances> first = new HashMap<Node, Distances>();
+	private HashMap<NodeImpl, Distances> first = new HashMap<NodeImpl, Distances>();
 
 	/**
 	 * The arrival time calculator. Provides the time at which we reach the sink
@@ -86,13 +86,13 @@ import org.matsim.core.router.util.TravelTime;
 	/**
 	 * The source calculator. Provides the source from which we reach the sink at first.
 	 */
-	private Node source;
+	private NodeImpl source;
 
 	/**
 	 * The path calculator. Provides a shortest path, as list of links, in the
 	 * network.
 	 */
-	private LinkedList<Link> pathToRoute;
+	private LinkedList<LinkImpl> pathToRoute;
 
 	/**
 	 * The latest moment, we want reach the sink.
@@ -104,7 +104,7 @@ import org.matsim.core.router.util.TravelTime;
 	 * The successor calculator. Provides the successor-link of each node of a
 	 * path in the network.
 	 */
-	private HashMap<Node, LinkedList<TimeNode>> succ = new HashMap<Node, LinkedList<TimeNode>>();
+	private HashMap<NodeImpl, LinkedList<TimeNode>> succ = new HashMap<NodeImpl, LinkedList<TimeNode>>();
 
 	/**
 	 * The waiting time calculator. Provides the waiting time in each node of a
@@ -115,7 +115,7 @@ import org.matsim.core.router.util.TravelTime;
 	/**
 	 * The path calculator. Provides a shortest path, in each step of MooreBellmanFord-Algorithm.
 	 */
-	private LinkedList<Link> path = new LinkedList<Link>();
+	private LinkedList<LinkImpl> path = new LinkedList<LinkImpl>();
 	
 	/**
 	 * Default constructor.
@@ -171,14 +171,14 @@ import org.matsim.core.router.util.TravelTime;
 	private void construct(Flow flow) {
 		// initialize other variables
 		this.flow = flow;
-		pathToRoute = new LinkedList<Link>();
+		pathToRoute = new LinkedList<LinkImpl>();
 		waited = 0;
 		// TODO length with getter of Flow
 	}
 
 	
-	public Path calcLeastCostPath(Node source, Node sink, double startTime) {
-		LinkedList<Node> sources = new LinkedList<Node>();
+	public Path calcLeastCostPath(NodeImpl source, NodeImpl sink, double startTime) {
+		LinkedList<NodeImpl> sources = new LinkedList<NodeImpl>();
 		sources.add(source);
 		return calcLeastCostPath(sources, sink, startTime);
 	}
@@ -194,10 +194,10 @@ import org.matsim.core.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
-	 *      org.matsim.core.api.network.Node, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
+	 *      org.matsim.core.network.NodeImpl, double)
 	 */
-	 public Path calcLeastCostPath(LinkedList<Node> sources, Node sink, final double startTime) {
+	 public Path calcLeastCostPath(LinkedList<NodeImpl> sources, NodeImpl sink, final double startTime) {
 		boolean found = false;
 		
 		// find shortest path with Moore-Bellman-Ford-Algorithm
@@ -214,9 +214,9 @@ import org.matsim.core.router.util.TravelTime;
 		}
 		
 		// if there were no problem, reconstruct the route
-		List<Node> routeNodes = new LinkedList<Node>();
-		List<Link> routeLinks = new LinkedList<Link>();
-		Node tmpNode = source;
+		List<NodeImpl> routeNodes = new LinkedList<NodeImpl>();
+		List<LinkImpl> routeLinks = new LinkedList<LinkImpl>();
+		NodeImpl tmpNode = source;
 		LinkedList<PathEdge> edges = flow.getPaths().getLast().getPathEdges();
 		for(int i = 0; i < edges.size(); i++){
 			if(edges.get(i).getEdge().getFromNode().equals(tmpNode)){
@@ -253,10 +253,10 @@ import org.matsim.core.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
-	 *      org.matsim.core.api.network.Node, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
+	 *      org.matsim.core.network.NodeImpl, double)
 	 */
-	public Path calcLeastCostPath(LinkedList<Node> sources, Node sink, final double startTime, Flow flow) {
+	public Path calcLeastCostPath(LinkedList<NodeImpl> sources, NodeImpl sink, final double startTime, Flow flow) {
 
 		this.flow = flow;
 		return calcLeastCostPath(sources, sink, startTime);
@@ -273,10 +273,10 @@ import org.matsim.core.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
-	 *      org.matsim.core.api.network.Node, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
+	 *      org.matsim.core.network.NodeImpl, double)
 	 */
-	 public ArrayList<Link> calcLeastCostLinkRoute(LinkedList<Node> sources, Node sink, final double startTime) {
+	 public ArrayList<LinkImpl> calcLeastCostLinkRoute(LinkedList<NodeImpl> sources, NodeImpl sink, final double startTime) {
 		boolean found = false;
 		
 		// run the algorithm
@@ -292,7 +292,7 @@ import org.matsim.core.router.util.TravelTime;
 		}
 
 		// now reconstruct the route
-		ArrayList<Link> routeLinks = new ArrayList<Link>();
+		ArrayList<LinkImpl> routeLinks = new ArrayList<LinkImpl>();
 		if (pathToRoute.peek().getFromNode().equals(source) || pathToRoute.peek().getToNode().equals(source)) {
 			for (int i = 0; i < pathToRoute.size(); i++) {
 				routeLinks.add(pathToRoute.get(i));
@@ -321,10 +321,10 @@ import org.matsim.core.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
-	 *      org.matsim.core.api.network.Node, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
+	 *      org.matsim.core.network.NodeImpl, double)
 	 */
-	public ArrayList<Link> calcLeastCostLinkRoute(LinkedList<Node> sources, Node sink, final double startTime, Flow flow) {
+	public ArrayList<LinkImpl> calcLeastCostLinkRoute(LinkedList<NodeImpl> sources, NodeImpl sink, final double startTime, Flow flow) {
 		this.flow = flow;
 		return calcLeastCostLinkRoute(sources, sink, startTime);
 	}
@@ -340,13 +340,13 @@ import org.matsim.core.router.util.TravelTime;
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
-	 *      org.matsim.core.api.network.Node, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
+	 *      org.matsim.core.network.NodeImpl, double)
 	 */
-	public Flow calcLeastCostFlow(LinkedList<Node> sources, final Node sink, final double startTime) {
+	public Flow calcLeastCostFlow(LinkedList<NodeImpl> sources, final NodeImpl sink, final double startTime) {
 		boolean addNewPath = false;
 		boolean activeSource = false;
-		for(Node node : network.getNodes().values()){
+		for(NodeImpl node : network.getNodes().values()){
 			if(flow.isActiveSource(node)){
 				activeSource = true;
 				break;
@@ -359,7 +359,7 @@ import org.matsim.core.router.util.TravelTime;
 		addNewPath = doCalculation(sources, sink, startTime);
 		while(addNewPath){
 			activeSource = false;
-			for(Node node : network.getNodes().values()){
+			for(NodeImpl node : network.getNodes().values()){
 				if(flow.isActiveSource(node)){
 					activeSource = true;
 					break;
@@ -387,12 +387,12 @@ import org.matsim.core.router.util.TravelTime;
 	 *            ignored
 	 * @param flow
 	 *            Determines the flow on links.
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.api.network.Node,
-	 *      org.matsim.core.api.network.Node, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
+	 *      org.matsim.core.network.NodeImpl, double)
 	 */
 	public Flow calcLeastCostFlow(final double startTime, Flow flow) {
 		this.flow = flow;
-		LinkedList<Node> sources = new LinkedList<Node>();
+		LinkedList<NodeImpl> sources = new LinkedList<NodeImpl>();
 		sources.addAll(flow.getDemands().keySet());
 		return calcLeastCostFlow(sources , flow.getSink(), startTime);
 	}
@@ -401,7 +401,7 @@ import org.matsim.core.router.util.TravelTime;
 	 * this is the Moore-Bellman-Ford Algorithm on the residual network with  flow
 	 * 
 	 */
-	private boolean doCalculation(LinkedList<Node> sources, final Node sink, final double startTime) {
+	private boolean doCalculation(LinkedList<NodeImpl> sources, final NodeImpl sink, final double startTime) {
 		// run the algorithm
 		/* boolean we want to return and which returns
 		 * true, if we had found a path and
@@ -433,9 +433,9 @@ import org.matsim.core.router.util.TravelTime;
 		
 		// reconstruct path
 		//initializations for the while-loop
-		Node tmpNode = source;
-		Node node = tmpNode;
-		Link tmpLink;
+		NodeImpl tmpNode = source;
+		NodeImpl node = tmpNode;
+		LinkImpl tmpLink;
 		int time = waited;
 		Flow newFlow = flow;
 		int gamma = Integer.MAX_VALUE;
@@ -495,21 +495,21 @@ import org.matsim.core.router.util.TravelTime;
 	 * this calculates the arrivalTime at the sink and the source from which we reach the sink at this time
 	 * 
 	 */
-	private boolean calculateArrivalTime(LinkedList<Node> sources, final Node sink, final double startTime) {
+	private boolean calculateArrivalTime(LinkedList<NodeImpl> sources, final NodeImpl sink, final double startTime) {
 		//initialize all variables, we need
 		init(sources);
 		
 		// queue to save nodes we have to scan
-		Queue<Node> queue = new LinkedList<Node>();
+		Queue<NodeImpl> queue = new LinkedList<NodeImpl>();
 		// add sources to the queue
-		for(Node source : sources){
+		for(NodeImpl source : sources){
 			queue.add(source);
 		}
 
 		// v is first vertex in the queue
 		// w is the vertex we probably want to insert to the queue or to
 		// decrease the distance
-		Node v, w;
+		NodeImpl v, w;
 		// dist is the distance from the source to w over v
 		int dist;
 		
@@ -520,7 +520,7 @@ import org.matsim.core.router.util.TravelTime;
 			// check v == sink
 			if(v.equals(sink)){
 				boolean step = false;
-				for(Node source : sources){
+				for(NodeImpl source : sources){
 					if(first.get(source).getDistance(sink) < Integer.MAX_VALUE){
 						if(flow.isActiveSource(source)){
 							// set source and arrivalTime
@@ -539,11 +539,11 @@ import org.matsim.core.router.util.TravelTime;
 			
 			// visit neighbors
 			// link is outgoing link of v => forward edge
-			for (Link link : v.getOutLinks().values()) {
+			for (LinkImpl link : v.getOutLinks().values()) {
 				// w is the other node of the link
 				w = link.getToNode();
 				//TODO tausche for-schleife + ifs f�r bessere Laufzeit nach oben?
-				for(Node source : sources){
+				for(NodeImpl source : sources){
 					if(flow.isActiveSource(source)){
 						// compute new distance to neighbor
 						if (!first.get(source).getDistance(v).equals(Integer.MAX_VALUE)) {
@@ -589,10 +589,10 @@ import org.matsim.core.router.util.TravelTime;
 				}
 			}
 			// link is incoming edge of v => backward edge
-			for (Link link : v.getInLinks().values()) {
+			for (LinkImpl link : v.getInLinks().values()) {
 				// w is the other node of the link
 				w = link.getFromNode();
-				for(Node source : sources){
+				for(NodeImpl source : sources){
 					if(flow.isActiveSource(source)){
 						if (!first.get(source).getDistance(v).equals(Integer.MAX_VALUE)) {
 							// compute distance
@@ -683,13 +683,13 @@ import org.matsim.core.router.util.TravelTime;
 	 * @param fromNode
 	 *            The starting node
 	 */
-	private void init(LinkedList<Node> sources) {
+	private void init(LinkedList<NodeImpl> sources) {
 		// initialize the variables for the path
 		arrivalTime = Integer.MAX_VALUE;
 		if(!sources.isEmpty()){
 			source = sources.getFirst();
 		}
-		for (Node node : network.getNodes().values()) {
+		for (NodeImpl node : network.getNodes().values()) {
 			succ.put(node, new LinkedList<TimeNode>());
 			if((sources.contains(node)) && (flow.getDemands().get(node) > 0)){
 				first.put(node, new Distances(network, node));
@@ -712,7 +712,7 @@ import org.matsim.core.router.util.TravelTime;
 	 *            The time at which we could arrive at the finish node
 	 */
 	//TODO hier koennte noch mehr reinkommen
-	private int visitNode(final Node toNode,int oldTime, int newTime) {
+	private int visitNode(final NodeImpl toNode,int oldTime, int newTime) {
 		if (newTime < oldTime) {
 			return newTime;
 		}
@@ -728,14 +728,14 @@ import org.matsim.core.router.util.TravelTime;
 	 * @param toNode
 	 *            The finish node
 	 */
-	private boolean calculatePreds(final Node fromNode, final Node toNode){
+	private boolean calculatePreds(final NodeImpl fromNode, final NodeImpl toNode){
 		// calculate the predecessors with BFS over the time
 		// initializations
 		int time = arrivalTime;
 		int newTime = time;
 		TimeNode tmpNode = new TimeNode(toNode, time, null);
-		HashMap<Node, LinkedList<Integer>> times = new HashMap<Node, LinkedList<Integer>>();
-		for(Node node : network.getNodes().values()){
+		HashMap<NodeImpl, LinkedList<Integer>> times = new HashMap<NodeImpl, LinkedList<Integer>>();
+		for(NodeImpl node : network.getNodes().values()){
 			times.put(node, new LinkedList<Integer>());
 		}
 		
@@ -759,7 +759,7 @@ import org.matsim.core.router.util.TravelTime;
 			time = tmpNode.getTime();
 			
 			// tmpNode is ToNode => forward link in original network
-			for(Link link : tmpNode.getNode().getInLinks().values()){
+			for(LinkImpl link : tmpNode.getNode().getInLinks().values()){
 				TimeNode otherNode = new TimeNode();
 				// calculate the time when we reach 'otherNode' from the sink over tmpNode
 				newTime = time - (int)(link.getFreespeedTravelTime(1.));
@@ -784,7 +784,7 @@ import org.matsim.core.router.util.TravelTime;
 			
 			// tmpNode is fromNode => backward link in original network
 			if(!step){
-				for(Link link : tmpNode.getNode().getOutLinks().values()){
+				for(LinkImpl link : tmpNode.getNode().getOutLinks().values()){
 					TimeNode otherNode = new TimeNode();
 					// calculate the time when we reach 'otherNode' from the sink over tmpNode
 					newTime = time + (int)(link.getFreespeedTravelTime(1.));
@@ -809,8 +809,8 @@ import org.matsim.core.router.util.TravelTime;
 			}
 		}
 		//put the predecessor values (forward)
-		Node node = fromNode;
-		Link tmpLink;
+		NodeImpl node = fromNode;
+		LinkImpl tmpLink;
 		time = newTime;
 		waited = time;
 		step = false;
@@ -853,14 +853,14 @@ import org.matsim.core.router.util.TravelTime;
 	 * @param toNode
 	 *            The finish node
 	 */
-	private LinkedList<Link> findPath(final Node fromNode, final Node toNode) {
+	private LinkedList<LinkImpl> findPath(final NodeImpl fromNode, final NodeImpl toNode) {
 		// construct LinkedList pathToRoute
 		// initializations
 		path.clear();
-		Node tmpNode = fromNode;
-		Node node = tmpNode;
+		NodeImpl tmpNode = fromNode;
+		NodeImpl node = tmpNode;
 		int time = waited;
-		Link tmpLink;
+		LinkImpl tmpLink;
 		boolean step;
 		while (!tmpNode.equals(toNode)) {
 			step = false;

@@ -38,11 +38,11 @@ import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -74,21 +74,21 @@ public class CMCFPopulationConverter {
 			 String demand = commodity.getChildText("demand");
 			 //build  new Plans in the Population
 			 int dem = (int) Math.round(Double.parseDouble(demand));
-			 Node tonode = network.getNode(to);
-			 Node fromnode = network.getNode(from);
+			 NodeImpl tonode = network.getNode(to);
+			 NodeImpl fromnode = network.getNode(from);
 			 Coord coordfrom = fromnode.getCoord();
 			 Coord coordto = tonode.getCoord();
-			 Link fromlink = null;
-			 Link tolink = null;
+			 LinkImpl fromlink = null;
+			 LinkImpl tolink = null;
 			 //find edges
 			 if (!coordinates){
-				LinkedList<Link> tolinks = new LinkedList<Link>();
+				LinkedList<LinkImpl> tolinks = new LinkedList<LinkImpl>();
 				tolinks.addAll( tonode.getInLinks().values());
 				if(tolinks.isEmpty()){
 					throw new IllegalArgumentException(tonode.getOrigId()+ " has no ingoing edges!!!");
 				}
 				tolink = tolinks.getFirst();
-				LinkedList<Link> fromlinks = new LinkedList<Link>();
+				LinkedList<LinkImpl> fromlinks = new LinkedList<LinkImpl>();
 				fromlinks.addAll( fromnode.getOutLinks().values());
 				if(tolinks.isEmpty()){
 					throw new IllegalArgumentException(tonode.getOrigId()+ " has no outgoing edges!!!");

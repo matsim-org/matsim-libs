@@ -20,7 +20,7 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -34,15 +34,15 @@ public class FakeTravelTimeCost implements TravelMinCost, TravelTime {
 				
 	}
 	
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkTravelCost(LinkImpl link, double time) {
 		return Math.round((link.getLength() / link.getFreespeed(0)));
 	}
 
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(LinkImpl link, double time) {
 		return 0; 
 	}
 
-	public double getLinkMinimumTravelCost(Link link) {
+	public double getLinkMinimumTravelCost(LinkImpl link) {
 		return Math.round((link.getLength() / link.getFreespeed(0)));
 	}
 

@@ -21,8 +21,8 @@
 package playground.dressler.ea_flow;
 
 //matsim imports
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 /**
  * Class representing a Node in the time-expandet network with his own successor
@@ -33,7 +33,7 @@ public class TimeNode {
 	/**
 	 * the node
 	 */
-	private Node node;
+	private NodeImpl node;
 	
 	/**
 	 * the time, where we look at the node
@@ -43,7 +43,7 @@ public class TimeNode {
 	/**
 	 * successor of the node at the time
 	 */
-	private Link succ;
+	private LinkImpl succ;
 	
 	/**
 	 * default Constructor setting the Arguments
@@ -51,7 +51,7 @@ public class TimeNode {
 	 * @param time time
 	 * @param succ successor of node in a path
 	 */
-	TimeNode(Node node, int time, Link succ){
+	TimeNode(NodeImpl node, int time, LinkImpl succ){
 		this.node = node;
 		this.time = time;
 		this.succ = succ;
@@ -69,7 +69,7 @@ public class TimeNode {
 	/**
 	 * Getter for the node
 	 */
-	public Node getNode(){
+	public NodeImpl getNode(){
 		return node;
 	}
 	
@@ -77,7 +77,7 @@ public class TimeNode {
 	 * Setter for the node
 	 * @param node Node used
 	 */
-	public void setNode(Node node){
+	public void setNode(NodeImpl node){
 		this.node = node;
 	}
 	
@@ -99,7 +99,7 @@ public class TimeNode {
 	/**
 	 * Getter for the successor link
 	 */
-	public Link getSuccessorLink(){
+	public LinkImpl getSuccessorLink(){
 		return succ;
 	}
 	
@@ -107,14 +107,14 @@ public class TimeNode {
 	 * Setter for the successor link
 	 * @param succ successor link of the node
 	 */
-	public void setSuccessorLink(Link succ){
+	public void setSuccessorLink(LinkImpl succ){
 		this.succ = succ;
 	}
 	
 	/**
 	 * Getter for the successor-node
 	 */
-	public Node getSuccessorNode(){
+	public NodeImpl getSuccessorNode(){
 		if(succ.getToNode().equals(node)){
 			return succ.getFromNode();
 		}

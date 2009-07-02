@@ -29,8 +29,6 @@ import java.util.LinkedList;
 
 // matsim imports
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.network.*;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -51,10 +49,10 @@ public class MoreMultiSourceEAF {
 		 NetworkLayer network = new NetworkLayer();
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
 		 
-		 HashMap<Link, EdgeIntervalls> flow;
+		 HashMap<LinkImpl, EdgeIntervalls> flow;
 		 int timeHorizon = 6;
-		 ArrayList<Link> routeLinks = new ArrayList<Link>();
-		 LinkedList<ArrayList<Link>> routeLinksList = new LinkedList<ArrayList<Link>>();
+		 ArrayList<LinkImpl> routeLinks = new ArrayList<LinkImpl>();
+		 LinkedList<ArrayList<LinkImpl>> routeLinksList = new LinkedList<ArrayList<LinkImpl>>();
 
 		 //TODO choose the one you need
 		 //networkReader.readFile("/homes/combi/olthoff/.eclipse/Matsim/examples/equil/network.xml");
@@ -66,21 +64,21 @@ public class MoreMultiSourceEAF {
 		 networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");		 
 		 
 		// CODE
-		flow = new HashMap<Link, EdgeIntervalls>();
-		for(Link link : network.getLinks().values()){
+		flow = new HashMap<LinkImpl, EdgeIntervalls>();
+		for(LinkImpl link : network.getLinks().values()){
 			flow.put(link, new EdgeIntervalls((int)link.getFreespeed(1.)));
 			//TODO achtung cast von double auf int
 		}
 		
 		// find source and sink
-		Node source = network.getNode("0_erste_source");
+		NodeImpl source = network.getNode("0_erste_source");
 		/*Id maxId = source.getId();
 		for(Node node : network.getNodes().values()){
 			if(Integer.parseInt(node.getId().toString()) > Integer.parseInt(maxId.toString())){
 				maxId = node.getId();
 			}
 		}*/
-		Node sink = network.getNode("5_zweite_sink");
+		NodeImpl sink = network.getNode("5_zweite_sink");
 		
 		if (source == null || sink == null) {
 			System.out.println("nicht da");
