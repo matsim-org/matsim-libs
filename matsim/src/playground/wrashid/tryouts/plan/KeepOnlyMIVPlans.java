@@ -21,6 +21,10 @@ import org.matsim.core.population.PopulationWriter;
 import playground.andreas.bln.DuplicatePlans;
 import playground.andreas.bln.NewPopulation;
 
+/*
+ * removes non miv plans from input file...
+ */
+
 public class KeepOnlyMIVPlans extends NewPopulation {
 	public static void main(String[] args) {
 
