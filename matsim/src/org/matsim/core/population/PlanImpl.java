@@ -23,7 +23,6 @@ package org.matsim.core.population;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
@@ -40,8 +39,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.Time;
 
-public class PlanImpl implements Plan {
-
+public class PlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
 	/**
 	 * @deprecated use Leg.Mode instead
 	 */
@@ -200,12 +198,13 @@ public class PlanImpl implements Plan {
 	}
 
 	public final boolean isSelected() {
-		return getPerson().getSelectedPlan() == this;
+		return this.getPerson().getSelectedPlan() == this;
 	}
+	
 
 	public void setSelected(final boolean selected) {
-		this.getPerson().setSelectedPlan(this);
-		this.delegate.setSelected(selected);
+		this.getPerson().setSelectedPlan(this); 
+//		this.delegate.setSelected(selected);
 	}
 
 	@Override
