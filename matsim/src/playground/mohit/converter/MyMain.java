@@ -2,22 +2,10 @@ package playground.mohit.converter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
-
-//import playground.marcel.pt.transitSchedule.TransitRoute;
-//import playground.marcel.visum.VisumNetwork;
-//import playground.marcel.visum.VisumNetworkReader;
-//import playground.marcel.visum.VisumNetwork.Stop;
-import playground.marcel.pt.transitSchedule.TransitSchedule;
+import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
-
-
-import playground.mohit.converter.VisumNetwork;
-import playground.mohit.converter.VisumNetworkReader;
+import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mohit.converter.VisumNetwork.Departure;
 import playground.mohit.converter.VisumNetwork.LineRouteItem;
 import playground.mohit.converter.VisumNetwork.Stop;
@@ -76,7 +64,7 @@ public class MyMain {
 			
 		}
 		
-		TransitSchedule schedule = new TransitSchedule();
+		TransitSchedule schedule = new TransitScheduleImpl();
 		new Visum2TransitSchedule(vNetwork, schedule).convert();
 		
 		try {

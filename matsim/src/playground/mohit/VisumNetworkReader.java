@@ -30,6 +30,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
+import playground.mohit.converter.VisumNetwork;
+
 public class VisumNetworkReader {
 
 	private final VisumNetwork network;
@@ -295,8 +297,9 @@ public class VisumNetworkReader {
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 		
-			VisumNetwork.Departure d = new VisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxTRI],parts[idxDep]);
-			this.network.addDeparture(d);
+//			VisumNetwork.Departure d = new VisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxTRI],parts[idxDep]);
+			// FIXIT [mohit] above lines is missing one parameter
+//			this.network.addDeparture(d);
 			// proceed to next line
 			line = reader.readLine();
 		}
