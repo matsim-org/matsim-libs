@@ -27,10 +27,10 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
@@ -78,7 +78,7 @@ public class PopProviderServer implements PopulationProvider {
 	}
 
 	public static class QueryNet  extends QueryImpl {
-		private Network net;
+		private NetworkLayer net;
 		public void query(QueueNetwork net, Population population, Events events,
 				OTFServerQuad quad) {
 			this.net = net.getNetworkLayer();
@@ -111,7 +111,7 @@ public class PopProviderServer implements PopulationProvider {
 	}
 
 	OTFClientQuad clientQ;
-	Network netti = null;
+	NetworkLayer netti = null;
 	
 	
 	public PopProviderServer(final OTFClientQuad clientQ) {

@@ -28,13 +28,13 @@ import java.util.Set;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -62,14 +62,14 @@ class EventHH implements BasicLinkEnterEventHandler {
 
 class FilterPersons2 extends AbstractPersonAlgorithm{
 
-	public static Set<Node> relevantFromNodes = new HashSet<Node>();
-	public static Set<Node> relevantToNodes = new HashSet<Node>();
+	public static Set<NodeImpl> relevantFromNodes = new HashSet<NodeImpl>();
+	public static Set<NodeImpl> relevantToNodes = new HashSet<NodeImpl>();
 
 	int modulo = 1;
 	int count = 0;
 	public static int ptCount = 0;
 	
-	public Set<Link> usedlinkList = new HashSet<Link>();
+	public Set<LinkImpl> usedlinkList = new HashSet<LinkImpl>();
 
 	
 	public FilterPersons2() {
@@ -88,8 +88,8 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					LegImpl l = (LegImpl) actl.get(i);
 					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
 						
-						List<Link> ll = ((NetworkRoute) l.getRoute()).getLinks();
-						for(Link link : ll) {
+						List<LinkImpl> ll = ((NetworkRoute) l.getRoute()).getLinks();
+						for(LinkImpl link : ll) {
 							usedlinkList.add(link);
 						}
 					}
@@ -214,10 +214,10 @@ public class ReducePopulationExe {
 		plansWriter50.writeEndPlans();
 		plansWriter100.writeEndPlans();
 
-		List<Link> nolinkList = new LinkedList<Link>();
-		for(Link link : network.getLinks().values()) if(!filter.usedlinkList.contains(link)) nolinkList.add(link);
+		List<LinkImpl> nolinkList = new LinkedList<LinkImpl>();
+		for(LinkImpl link : network.getLinks().values()) if(!filter.usedlinkList.contains(link)) nolinkList.add(link);
 
-		for(Link link : nolinkList)network.removeLink(link);
+		for(LinkImpl link : nolinkList)network.removeLink(link);
 		
 		new NetworkWriter(network, outnetFileName).write();
 		

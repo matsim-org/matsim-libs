@@ -25,10 +25,10 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -39,8 +39,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 
-	public static Set<Node> relevantFromNodes = new HashSet<Node>();
-	public static Set<Node> relevantToNodes = new HashSet<Node>();
+	public static Set<NodeImpl> relevantFromNodes = new HashSet<NodeImpl>();
+	public static Set<NodeImpl> relevantToNodes = new HashSet<NodeImpl>();
 	public int count = 0;
 
 	public FilterPersonsNonCarMode() {

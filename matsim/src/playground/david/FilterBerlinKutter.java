@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -42,13 +42,13 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 class FilterPersons extends AbstractPersonAlgorithm{
 
-	public static Set<Node> relevantFromNodes = new HashSet<Node>();
-	public static Set<Node> relevantToNodes = new HashSet<Node>();
+	public static Set<NodeImpl> relevantFromNodes = new HashSet<NodeImpl>();
+	public static Set<NodeImpl> relevantToNodes = new HashSet<NodeImpl>();
 
 	public FilterPersons() {
 		super();
 		//Find relevant nodes to look for
-		Link link1 = FilterBerlinKutter.network.getLinks().get(new IdImpl(1655));
+		LinkImpl link1 = FilterBerlinKutter.network.getLinks().get(new IdImpl(1655));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
 		link1 = FilterBerlinKutter.network.getLinks().get(new IdImpl(1659));
@@ -72,9 +72,9 @@ class FilterPersons extends AbstractPersonAlgorithm{
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(jj);
 				// route
 				if (leg.getRoute() != null) {
-					List<Node> nodes = ((NetworkRoute) leg.getRoute()).getNodes();
+					List<NodeImpl> nodes = ((NetworkRoute) leg.getRoute()).getNodes();
 					int count = 0;
-					for (Node node : nodes) {
+					for (NodeImpl node : nodes) {
 						if (relevantFromNodes.contains(node)) count++;
 						else if (relevantToNodes.contains(node)) count++;
 					}
