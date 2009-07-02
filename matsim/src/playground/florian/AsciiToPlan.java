@@ -12,9 +12,9 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -66,7 +66,7 @@ public class AsciiToPlan {
 		
 		//�ffnen des Szenarios
 		Scenario sc = new ScenarioImpl();
-		Network net = sc.getNetwork();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(NET_FILE);
 		org.matsim.core.api.experimental.population.Population pop = sc.getPopulation();
 		PopulationBuilder pb = pop.getPopulationBuilder();
