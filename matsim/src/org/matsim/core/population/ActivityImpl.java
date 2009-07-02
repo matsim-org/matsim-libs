@@ -75,6 +75,10 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
+	
+	public void setCoord( final Coord coord ) {
+		super.setCoord ( coord ) ;
+	}
 
 	public void setFacility(final ActivityFacility facility) {
 		this.facility = facility;

@@ -62,7 +62,7 @@ public class BasicActivityImpl implements BasicActivity {
 		return this.coord;
 	}
 
-	public void setCoord(final Coord coord) {
+	/* deliberately */ protected void setCoord(final Coord coord) {
 		this.coord = coord;
 	}
 

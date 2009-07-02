@@ -32,11 +32,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -94,7 +95,7 @@ public class IVT2006ToGraphML {
 			 * Create a BasicPerson
 			 */
 			BasicPerson<BasicPlan<BasicPlanElement>> person = createPerson(
-					tokens[0], tokens[1], tokens[2]);
+					tokens[0], tokens[1], tokens[2], population);
 			population.getPersons().put(person.getId(), person);
 			/*
 			 * Create an Ego
@@ -117,7 +118,7 @@ public class IVT2006ToGraphML {
 			if (ego == null) {
 				logger.fatal(String.format("Ego with id %1$s not found!", tokens[0]));
 			} else {
-				BasicPerson<BasicPlan<BasicPlanElement>> person = createPerson(String.valueOf(++maxId), tokens[1], tokens[2]);
+				BasicPerson<BasicPlan<BasicPlanElement>> person = createPerson(String.valueOf(++maxId), tokens[1], tokens[2],population);
 				population.getPersons().put(person.getId(), person);
 
 				Ego<BasicPerson<BasicPlan<BasicPlanElement>>> alter = socialnet
@@ -145,14 +146,19 @@ public class IVT2006ToGraphML {
 	}
 
 	private static BasicPerson<BasicPlan<BasicPlanElement>> createPerson(
-			String id, String x, String y) {
+			String id, String x, String y, BasicPopulation population) {
 		BasicPerson<BasicPlan<BasicPlanElement>> person = new BasicPersonImpl<BasicPlan<BasicPlanElement>>(
 				new IdImpl(id));
 		BasicPlan<BasicPlanElement> plan = new BasicPlanImpl(person);
 		person.getPlans().add(plan);
-		BasicActivityImpl act = new BasicActivityImpl(HOME_ACT_TYPE);
-		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),
-				Double.parseDouble(y))));
+//		BasicActivityImpl act = new BasicActivityImpl(HOME_ACT_TYPE);
+//		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),
+//				Double.parseDouble(y))));
+		
+		BasicPopulationBuilder pb = population.getPopulationBuilder() ;
+		BasicActivity act = pb.createActivityFromCoord(HOME_ACT_TYPE,new CoordImpl(Double.parseDouble(x),
+				Double.parseDouble(y))) ;
+		
 		plan.addActivity(act);
 
 		return person;

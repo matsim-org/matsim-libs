@@ -38,11 +38,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.basic.v01.BasicActivityImpl;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -165,7 +165,7 @@ public class IVT2009ToGraphML {
 					/*
 					 * create a person and an ego
 					 */
-					BasicPerson<?> egoPerson = createPerson(id, coord, age);
+					BasicPerson<?> egoPerson = createPerson(id, coord, age, population);
 					population.getPersons().put(egoPerson.getId(), egoPerson);
 					Ego<BasicPerson<?>> ego = socialnet.addEgo(egoPerson);
 					numEgos++;
@@ -174,7 +174,7 @@ public class IVT2009ToGraphML {
 					 * create the alters
 					 */
 					for (int i = NUM_ALTERS_1; i > 0; i--) {
-						BasicPerson<BasicPlan<BasicPlanElement>> alterPerson = createAlter(ALTER_1_KEY, i, egoData, id);
+						BasicPerson<BasicPlan<BasicPlanElement>> alterPerson = createAlter(ALTER_1_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.getPersons().put(alterPerson.getId(), alterPerson);
 							Ego<BasicPerson<?>> alter = socialnet.addEgo(alterPerson);
@@ -186,7 +186,7 @@ public class IVT2009ToGraphML {
 					}
 
 					for (int i = NUM_ALTERS_2; i > 0; i--) {
-						BasicPerson<BasicPlan<BasicPlanElement>> alterPerson = createAlter(ALTER_2_KEY, i, egoData, id);
+						BasicPerson<BasicPlan<BasicPlanElement>> alterPerson = createAlter(ALTER_2_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.getPersons().put(alterPerson.getId(), alterPerson);
 							Ego<BasicPerson<?>> alter = socialnet.addEgo(alterPerson);
@@ -308,22 +308,24 @@ public class IVT2009ToGraphML {
 		return str;
 	}
 	
-	private static BasicPerson<BasicPlan<BasicPlanElement>> createPerson(String id, Coord coord, String age) {
+	private static BasicPerson<BasicPlan<BasicPlanElement>> createPerson(String id, Coord coord, String age, BasicPopulation population) {
 		BasicPersonImpl<BasicPlan<BasicPlanElement>> person = new BasicPersonImpl<BasicPlan<BasicPlanElement>>(new IdImpl(id));
 		if(age != null)
 				person.setAge(Integer.parseInt(age));
 		BasicPlan<BasicPlanElement> plan = new BasicPlanImpl(person);
-		BasicActivityImpl act = new BasicActivityImpl("home");
 		if(coord == null)
 			throw new NullPointerException("Null coordinates are not allowed.");
-		act.setCoord(coord);
+//		BasicActivityImpl act = new BasicActivityImpl("home");
+//		act.setCoord(coord);
+		BasicActivity act = population.getPopulationBuilder().createActivityFromCoord("home", coord);
+		
 		plan.addActivity(act);
 		person.getPlans().add(plan);
 		
 		return person;
 	}
 	
-	private static BasicPerson<BasicPlan<BasicPlanElement>> createAlter(String alterKey, int counter, Map<String, String> egoData, String egoId) {
+	private static BasicPerson<BasicPlan<BasicPlanElement>> createAlter(String alterKey, int counter, Map<String, String> egoData, String egoId, BasicPopulation population) {
 		String alterAge = getValue(egoData, makeKey(alterKey, ALTER_AGE_KEY, counter));
 //		if(alterAge == null)
 //			logger.warn(String.format("Missing age for alter %1$s of userId %2$s. Ignoring.", counter, egoId));
@@ -340,7 +342,7 @@ public class IVT2009ToGraphML {
 				logger.warn(String.format("Cannot decode location string. userId = %1$s, alter = %2$s", egoId, counter));
 				return null;
 			} else
-				return createPerson(String.format("%1$s.%2$s", egoId, counter), coord, alterAge);
+				return createPerson(String.format("%1$s.%2$s", egoId, counter), coord, alterAge, population);
 		}
 		
 	}
