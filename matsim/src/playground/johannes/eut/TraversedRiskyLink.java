@@ -36,7 +36,6 @@ import org.apache.commons.collections.functors.OrPredicate;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -45,6 +44,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -68,7 +68,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private Collection<PersonImpl> persons = null;
 	
-	public TraversedRiskyLink(Population population, List<Link> riskyLinks, SummaryWriter summaryWriter) {
+	public TraversedRiskyLink(Population population, List<LinkImpl> riskyLinks, SummaryWriter summaryWriter) {
 		this.summaryWriter = summaryWriter;
 		this.population = population;
 		
@@ -139,7 +139,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
-					for(Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					for(LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						if(link.equals(predicateLink))
 							return true;
 					}

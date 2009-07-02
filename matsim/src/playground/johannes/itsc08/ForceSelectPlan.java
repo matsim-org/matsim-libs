@@ -23,8 +23,8 @@
  */
 package playground.johannes.itsc08;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -36,9 +36,9 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 public class ForceSelectPlan implements PlanSelector {
 
-	private Link link;
+	private LinkImpl link;
 	
-	public ForceSelectPlan(Link link) {
+	public ForceSelectPlan(LinkImpl link) {
 		this.link = link;
 	}
 	/* (non-Javadoc)

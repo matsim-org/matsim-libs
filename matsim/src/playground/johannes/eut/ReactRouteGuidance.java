@@ -23,8 +23,8 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -54,14 +54,14 @@ public class ReactRouteGuidance implements RouteProvider {
 		return 10;
 	}
 
-	public boolean providesRoute(Link currentLink, NetworkRoute subRoute) {
+	public boolean providesRoute(LinkImpl currentLink, NetworkRoute subRoute) {
 		if(currentLink.getId().toString().equals("1"))
 			return true;
 		else
 			return false;
 	}
 
-	public synchronized NetworkRoute requestRoute(Link departureLink, Link destinationLink,
+	public synchronized NetworkRoute requestRoute(LinkImpl departureLink, LinkImpl destinationLink,
 			double time) {
 		if(linkcost.traveltimes instanceof EventBasedTTProvider) {
 			((EventBasedTTProvider)linkcost.traveltimes).requestLinkCost();
@@ -95,11 +95,11 @@ public class ReactRouteGuidance implements RouteProvider {
 
 		private TravelTime traveltimes;
 
-		public double getLinkTravelTime(Link link, double time) {
+		public double getLinkTravelTime(LinkImpl link, double time) {
 			return this.traveltimes.getLinkTravelTime(link, time);
 		}
 
-		public double getLinkTravelCost(Link link, double time) {
+		public double getLinkTravelCost(LinkImpl link, double time) {
 			return this.traveltimes.getLinkTravelTime(link, time);
 		}
 

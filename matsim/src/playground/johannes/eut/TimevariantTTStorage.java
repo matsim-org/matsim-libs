@@ -24,7 +24,8 @@
 package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
+
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -48,7 +49,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		/*
 		 * Initialize all bins with free flow travel time.
 		 */
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			double freeTT = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 			for (int i = 0; i < getBinCnt(); i++) {
 				setBinValue(link, i, freeTT);
@@ -56,7 +57,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		}
 	}
 
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(LinkImpl link, double time) {
 		try {
 			return getValue(link, (int) time);
 		} catch (IndexOutOfBoundsException e) {
@@ -67,7 +68,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		}
 	}
 
-	public void setLinkTravelTime(Link link, double time, double value) {
+	public void setLinkTravelTime(LinkImpl link, double time, double value) {
 		if(value <= 0)
 			throw new IllegalArgumentException("Travel time values must be greater than zero!");
 
@@ -80,7 +81,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		}
 	}
 
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkTravelCost(LinkImpl link, double time) {
 		return getLinkTravelTime(link, time);
 	}
 }

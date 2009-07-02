@@ -29,11 +29,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
@@ -55,7 +55,7 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 
 //	private final List<QueueLink> changedCaps = new LinkedList<QueueLink>();
 
-	private final List<Link> links = new LinkedList<Link>();
+	private final List<LinkImpl> links = new LinkedList<LinkImpl>();
 
 	private BufferedWriter writer;
 
@@ -70,7 +70,7 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 		}
 	}
 
-	public void addLink(Link link) {
+	public void addLink(LinkImpl link) {
 		this.links.add(link);
 	}
 
@@ -100,7 +100,7 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 			this.writer.write("\t");
 
 			List<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>(links.size() * 2);
-			for (Link link : this.links) {
+			for (LinkImpl link : this.links) {
 				MatsimRandom.getRandom().nextDouble();
 				if ((MatsimRandom.getRandom().nextDouble() < this.incidentProba)
 						&& (iteration >= this.startIteration)) {

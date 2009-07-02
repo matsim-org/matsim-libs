@@ -26,7 +26,7 @@ package playground.johannes.eut;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -82,7 +82,7 @@ public class TwoStateTTKnowledge extends TravelTimeMemory {
 			this.linkcosts = linkcosts;
 		}
 
-		public double getLinkTravelTime(Link link, double time) {
+		public double getLinkTravelTime(LinkImpl link, double time) {
 			double sum = 0;
 			for(int i = 0; i < this.linkcosts.size(); i++)
 				sum += this.linkcosts.get(i).getLinkTravelTime(link, time) * getWeigth(i);

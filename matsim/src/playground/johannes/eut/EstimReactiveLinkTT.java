@@ -38,9 +38,9 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -66,9 +66,9 @@ public class EstimReactiveLinkTT implements
 
 	private double lastTravelTime;
 	
-	private final Network network;
+	private final NetworkLayer network;
 
-	public EstimReactiveLinkTT(double scenarioScale, Network network) {
+	public EstimReactiveLinkTT(double scenarioScale, NetworkLayer network) {
 		capacityFactor = scenarioScale;
 		this.network = network;
 	}
@@ -107,7 +107,7 @@ public class EstimReactiveLinkTT implements
 		f.leaveLink(personId, time);
 	}
 
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(LinkImpl link, double time) {
 		int simtime = (int) SimulationTimer.getTime();
 		if ((simtime == this.lastQueryTime) && (link == this.lastQueriedLink))
 			return this.lastTravelTime;
@@ -130,7 +130,7 @@ public class EstimReactiveLinkTT implements
 
 	private class LinkTTCalculator {
 
-		private final Link link;
+		private final LinkImpl link;
 
 //		private final double freeFlowTravTime;
 
@@ -149,7 +149,7 @@ public class EstimReactiveLinkTT implements
 
 		private SortedSet<Sample> samples;
 
-		public LinkTTCalculator(Link link) {
+		public LinkTTCalculator(LinkImpl link) {
 //			this.qLink = queueNetwork.getQueueLink(link.getId());
 			this.link = link;
 			this.samples = new TreeSet<Sample>();

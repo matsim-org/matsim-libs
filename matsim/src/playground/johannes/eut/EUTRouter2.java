@@ -25,9 +25,9 @@ package playground.johannes.eut;
 
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
@@ -61,12 +61,12 @@ public class EUTRouter2 implements LeastCostPathCalculator {
 		this.analyzer = analyzer;
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime) {
+	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double starttime) {
 		return selectChoice(generateChoiceSet(fromNode, toNode, starttime),
 				starttime);
 	}
 
-	protected List<Path> generateChoiceSet(Node departure, Node destination,
+	protected List<Path> generateChoiceSet(NodeImpl departure, NodeImpl destination,
 			double time) {
 		return kspPenalty.getPaths(departure, destination, time, searchPaths,
 				ttKnowledge.getMeanTravelTimes());
@@ -115,7 +115,7 @@ public class EUTRouter2 implements LeastCostPathCalculator {
 	private double calcTravTime(TravelTime traveltimes, Path path,
 			double starttime) {
 		double totaltt = 0;
-		for (Link link : path.links) {
+		for (LinkImpl link : path.links) {
 			totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt);
 		}
 		return totaltt;

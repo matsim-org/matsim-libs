@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -35,6 +34,7 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -51,7 +51,7 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 	
 	private BufferedWriter estimTTWriter;
 	
-	private Link link;
+	private LinkImpl link;
 	
 	public LinkTTObserver(NetworkLayer network, EstimReactiveLinkTT linktt) {
 		link = network.getLink("2");

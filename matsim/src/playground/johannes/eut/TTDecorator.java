@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -56,7 +56,7 @@ public class TTDecorator implements TravelTime {
 		this.accidantLinks.remove(link);
 	}
 
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(LinkImpl link, double time) {
 		if(this.accidantLinks.contains(link)) {
 			return Double.MAX_VALUE;
 		} else

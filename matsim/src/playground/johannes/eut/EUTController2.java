@@ -26,11 +26,11 @@ package playground.johannes.eut;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
@@ -63,7 +63,7 @@ public class EUTController2 extends WithindayControler {
 	
 	private double capReduction;
 	
-	private List<Link> riskyLinks;
+	private List<LinkImpl> riskyLinks;
 
 	//==============================================================================
 	// 
@@ -108,9 +108,9 @@ public class EUTController2 extends WithindayControler {
 		 * Get the "risky" links...
 		 */
 		String linkIds = getConfig().findParam(CONFIG_MODULE_NAME, "links");
-		riskyLinks = new LinkedList<Link>();
+		riskyLinks = new LinkedList<LinkImpl>();
 		for(String id : linkIds.split(" ")) {
-			Link link = getNetwork().getLink(id);
+			LinkImpl link = getNetwork().getLink(id);
 			riskyLinks.add(link);
 			
 		}
@@ -152,7 +152,7 @@ public class EUTController2 extends WithindayControler {
 		 */
 		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
 		simulator.setCapReduction(capReduction);
-		for(Link link : riskyLinks)
+		for(LinkImpl link : riskyLinks)
 			simulator.addLink(link);
 		
 		addControlerListener(simulator);

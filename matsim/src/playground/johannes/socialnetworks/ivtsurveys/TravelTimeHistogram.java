@@ -39,9 +39,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.Dijkstra;
@@ -212,13 +212,13 @@ public class TravelTimeHistogram {
 		Distribution stats2 = new Distribution();
 		int egocount = 0;
 		for(Ego ego : egos.values()) {
-			Link homelink = network.getNearestLink(ego.homeloc);
+			LinkImpl homelink = network.getNearestLink(ego.homeloc);
 			TDoubleDoubleHashMap hist = egoHist.get(ego);
 			
 //			double pEgo = getPersons(ego.homeloc, 250, population);
 			for(Coord coord : ego.alters) {
 				Relation r = new Relation();
-				Link alterlink = network.getNearestLink(coord);
+				LinkImpl alterlink = network.getNearestLink(coord);
 				Path fastestRoute = fastestPathRouter.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
 				Path shortesRoute = shortestPathRouer.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
 				
@@ -348,7 +348,7 @@ public class TravelTimeHistogram {
 	}
 	private static double getPathLength(Path path) {
 		double sum = 0;
-		for(Link link : path.links)
+		for(LinkImpl link : path.links)
 			sum += link.getLength();
 		return sum;
 	}
@@ -379,11 +379,11 @@ public class TravelTimeHistogram {
 
 	private static class TravelDistanceCost implements TravelTime, TravelCost {
 
-		public double getLinkTravelTime(Link link, double time) {
+		public double getLinkTravelTime(LinkImpl link, double time) {
 			return link.getLength() / link.getFreespeed(time);
 		}
 
-		public double getLinkTravelCost(Link link, double time) {
+		public double getLinkTravelCost(LinkImpl link, double time) {
 			return link.getLength();
 		}
 		

@@ -24,9 +24,9 @@
 package playground.johannes.socialnetworks.ivtsurveys;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -59,12 +59,12 @@ public class TravelTimeMatrix {
 		new MatsimNetworkReader(network).readFile(networkfile);
 
 		
-		SpatialGrid<Node> grid = new SpatialGrid<Node>(xmin, ymin, xmax, ymax, resolution);
+		SpatialGrid<NodeImpl> grid = new SpatialGrid<NodeImpl>(xmin, ymin, xmax, ymax, resolution);
 		
 		for(int xcoord = (int)(xmin + resolution/2.0); xcoord <= xmax; xcoord += resolution) {
 			for(int ycoord = (int)(ymin + resolution/2.0); ycoord <= ymax; ycoord += resolution) {
 				Coord coord = new CoordImpl(xcoord, ycoord);
-				Node node = network.getNearestNode(coord);
+				NodeImpl node = network.getNearestNode(coord);
 				grid.setValue(node, coord);
 			}
 		}
@@ -76,11 +76,11 @@ public class TravelTimeMatrix {
 		int numCols = grid.getNumCols(0) - 1;
 		for(int row = 0; row < numRows; row++) {
 			for(int col = 0; col < numCols; col++) {
-				Node source = grid.getValue(row, col);
+				NodeImpl source = grid.getValue(row, col);
 				int souceCellIdx = row * col;
 				for(int row2 = 0; row2 < numRows; row2++) {
 					for(int col2 = 0; col2 < numCols; col2++) {
-						Node target = grid.getValue(row2, col2);
+						NodeImpl target = grid.getValue(row2, col2);
 						int targetCellIdx = row2 * col2;
 						Path path = router.calcLeastCostPath(source, target, 0);
 						ttmatrix.setValue(souceCellIdx, targetCellIdx, (int)path.travelTime);

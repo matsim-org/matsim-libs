@@ -39,7 +39,6 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
@@ -62,6 +61,7 @@ import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -337,7 +337,7 @@ public class Homework2 extends Controler {
 
 		private TIntObjectHashMap<List<NetworkChangeEvent>> changeEvents;
 		
-		public IncidentGenerator(String filename, Network network) {
+		public IncidentGenerator(String filename, NetworkLayer network) {
 			try {
 				changeEvents = new TIntObjectHashMap<List<NetworkChangeEvent>>();
 				
