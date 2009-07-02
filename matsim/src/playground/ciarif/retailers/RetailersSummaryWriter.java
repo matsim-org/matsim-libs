@@ -3,7 +3,8 @@ package playground.ciarif.retailers;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.matsim.core.api.facilities.ActivityFacility;
+
+import org.matsim.core.facilities.ActivityFacility;
 
 
 public class RetailersSummaryWriter {

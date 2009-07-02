@@ -3,8 +3,8 @@ package playground.ciarif.retailers;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.BasicLinkImpl;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.World;

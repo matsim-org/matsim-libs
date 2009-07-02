@@ -7,9 +7,9 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.Facility;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.Facility;
 import org.matsim.core.population.PersonImpl;
 
 import playground.gregor.demandmodeling.DistanceCalculator;
