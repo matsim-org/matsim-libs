@@ -6,10 +6,10 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -44,7 +44,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				
 				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 				double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
-				ArrayList<Link> newLinks = new ArrayList<Link>(); 
+				ArrayList<LinkImpl> newLinks = new ArrayList<LinkImpl>(); 
 				newLinks.add(f.getLink());
 				double currentlink_volume =0;
 				for (int j=0; j<currentlink_volumes.length;j=j+1) {
@@ -54,7 +54,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				// calc_utility method might be called at this point
 				for (int i=1; i<alternatives;i++) {
 					int rd = MatsimRandom.getRandom().nextInt(links.length);
-					newLinks.add((Link)links[rd]);
+					newLinks.add((LinkImpl)links[rd]);
 					double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(newLinks.get(i).getId());
 					
 					double newlink_volume =0;

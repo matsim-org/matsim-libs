@@ -37,7 +37,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -46,6 +45,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -220,7 +220,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-		for (Link l : controler.getNetwork().getLinks().values()) {
+		for (LinkImpl l : controler.getNetwork().getLinks().values()) {
 			if (l.getCoord().getX() < minx) { minx = l.getCoord().getX(); }
 			if (l.getCoord().getY() < miny) { miny = l.getCoord().getY(); }
 			if (l.getCoord().getX() > maxx) { maxx = l.getCoord().getX(); }

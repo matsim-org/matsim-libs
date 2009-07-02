@@ -1,10 +1,10 @@
 package playground.ciarif.retailers;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 public interface UtilityComputer {
 
-		public double computeUtility(Link link);
+		public double computeUtility(LinkImpl link);
 
 
 }
