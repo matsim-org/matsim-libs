@@ -41,7 +41,7 @@ public class CompareGAPV01 {
 //	final static String ROOT = "/home/jjoubert/";
 	// Derived string values
 	final static String IN_ACTUAL = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorGapStats_Normalized.txt";
-	final static String IN_SIMULATED = ROOT + "Commercial/PostProcess/SimulatedCommercialMinorGAP_Normalized.txt";
+	final static String IN_SIMULATED = ROOT + "Commercial/PostProcess/AverageSimulatedCommercialMinorGAP_Normalized.txt";
 	final static String OUTPUT_PRE = ROOT + "Commercial/PostProcess/CompareGAP_Normalized_";
 	final static String OUTPUT_POST_GIS = "_GIS.txt";
 	final static String OUTPUT_POST_SCATTER = "_Scatter.txt";
@@ -53,7 +53,7 @@ public class CompareGAPV01 {
 	 * The class reads two GAP density files:
 	 *   	<ul>
  	 *		<li>the normalized actual number of activities; and
-	 *   	<li>the normalized simulated number of activities.
+	 *   	<li>the normalized simulated number of activities. This may be averages of multiple runs.
 	 *   	</ul>
 	 * 
 	 * It then compares the activity densities of the two input files and produces three output files:
