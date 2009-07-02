@@ -22,7 +22,7 @@ package playground.gregor.evacuation.changeeventsmanipulation;
 
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -63,7 +63,7 @@ public class ManipulateChangeEvents {
 		ee.setFreespeedChange(v);
 		
 		for (int i = 0; i < links.length; i++) {
-			Link link = network.getLink(links[i]);
+			LinkImpl link = network.getLink(links[i]);
 			ee.addLink(link);
 			
 		}

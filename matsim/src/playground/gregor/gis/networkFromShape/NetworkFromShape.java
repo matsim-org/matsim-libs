@@ -10,10 +10,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -48,7 +48,7 @@ public class NetworkFromShape {
 			Coordinate c = geo.getGeometryN(0).getCentroid().getCoordinate();
 			Coord coord = MGC.coordinate2Coord(c);
 			Integer id = (Integer) f.getAttribute(1);
-			Node n = net.createNode(new IdImpl(id), coord);
+			NodeImpl n = net.createNode(new IdImpl(id), coord);
 			if (n == null) {
 				System.out.println("id:" + id);
 			}
@@ -73,8 +73,8 @@ public class NetworkFromShape {
 			double lanes = minWidth/laneWidth/2;
 			double flowCap = lanes * flowCapPerLane;
 			
-			Node nFrom = net.getNode(Integer.toString(from));
-			Node nTo = net.getNode(Integer.toString(to));
+			NodeImpl nFrom = net.getNode(Integer.toString(from));
+			NodeImpl nTo = net.getNode(Integer.toString(to));
 			if (nTo == null    || nFrom == null) {
 				int i = 0;
 				i++;

@@ -31,9 +31,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -103,14 +103,14 @@ public class CutNetwork {
 		//CHANGE EVENTS
 		ConcurrentLinkedQueue<NetworkChangeEvent> eq = new ConcurrentLinkedQueue<NetworkChangeEvent>();
 		for (NetworkChangeEvent e : events) {
-			ConcurrentLinkedQueue<Link> lq = new ConcurrentLinkedQueue<Link>();
-			for (Link l : e.getLinks()) {
+			ConcurrentLinkedQueue<LinkImpl> lq = new ConcurrentLinkedQueue<LinkImpl>();
+			for (LinkImpl l : e.getLinks()) {
 				if (!eal.containsKey(l.getId())) {
 					lq.add(l);
 				}
 			}
 			while (lq.size() > 0) {
-				Link l = lq.poll();
+				LinkImpl l = lq.poll();
 				e.removeLink(l);
 			}
 			if (e.getLinks().size() == 0) {
@@ -121,14 +121,14 @@ public class CutNetwork {
 			NetworkChangeEvent e = eq.poll();
 			events.remove(e);
 		}
-		ConcurrentLinkedQueue<Link> lq = new ConcurrentLinkedQueue<Link>();
-		for (Link l : net.getLinks().values()) {
+		ConcurrentLinkedQueue<LinkImpl> lq = new ConcurrentLinkedQueue<LinkImpl>();
+		for (LinkImpl l : net.getLinks().values()) {
 			if (!isWithin(l.getCoord())) {
 				lq.add(l);
 			}
 		}
 		while (lq.size() > 0) {
-			Link l = lq.poll();
+			LinkImpl l = lq.poll();
 			net.removeLink(l);
 		}
 		new NetworkCleaner().run(net);

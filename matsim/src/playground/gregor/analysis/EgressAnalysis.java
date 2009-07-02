@@ -41,12 +41,12 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -177,8 +177,8 @@ public class EgressAnalysis {
 			log.info("handle plans");
 			for (PersonImpl person : this.population.getPersons().values()) {
 				LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
-				List<Node> route = ((NetworkRoute) leg.getRoute()).getNodes();
-				Node node = route.get(route.size()-2);
+				List<NodeImpl> route = ((NetworkRoute) leg.getRoute()).getNodes();
+				NodeImpl node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 				plan.addActivity(person.getSelectedPlan().getFirstActivity());
@@ -190,8 +190,8 @@ public class EgressAnalysis {
 				plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
 				this.router.run(plan);
 				LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
-				List<Node> route2 = ((NetworkRoute) leg2.getRoute()).getNodes();
-				Node node2 = route2.get(route2.size()-2);
+				List<NodeImpl> route2 = ((NetworkRoute) leg2.getRoute()).getNodes();
+				NodeImpl node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;
 
 			}
@@ -207,7 +207,7 @@ public class EgressAnalysis {
 
 
 	private void initEgressNodes() {
-		for (Link link : this.network.getLinks().values()) {
+		for (LinkImpl link : this.network.getLinks().values()) {
 			if (link.getId().toString().contains("el")) {
 				Id id = link.getFromNode().getId();
 				EgressNode  e = new EgressNode();
@@ -274,7 +274,7 @@ public class EgressAnalysis {
 	}
 
 	private class EgressNode {
-		Node node;
+		NodeImpl node;
 		int num_shortest;
 		int num_current;
 

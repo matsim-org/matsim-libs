@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -39,6 +38,7 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.IntegerCache;
 import org.matsim.core.utils.misc.Time;
@@ -78,7 +78,7 @@ public class SocialCostCalculatorNetworkII implements SocialCostCalculator, Iter
 		this.network = network;
 	}
 	
-	public double getSocialCost(final Link link, final double time) {
+	public double getSocialCost(final LinkImpl link, final double time) {
 		SocialCostRole sc = this.socCosts.get(link.getId().toString());
 		if (sc == null) {
 			return 0;
@@ -292,7 +292,7 @@ public class SocialCostCalculatorNetworkII implements SocialCostCalculator, Iter
 		if (ret == null) {
 			ret = new LinkInfo();
 			ret.t_free = Math.ceil(this.network.getLink(id).getFreespeedTravelTime(Time.UNDEFINED_TIME)); //TODO make this dynamic, since we have time variant networks
-			Link link = this.network.getLink(id);
+			LinkImpl link = this.network.getLink(id);
 			ret.storageCap = calcCapacity(link);
 			ret.id = id;
 			this.linkInfos.put(id, ret);
@@ -311,7 +311,7 @@ public class SocialCostCalculatorNetworkII implements SocialCostCalculator, Iter
 	}
 	
 	
-	private int calcCapacity(final Link link) {
+	private int calcCapacity(final LinkImpl link) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 

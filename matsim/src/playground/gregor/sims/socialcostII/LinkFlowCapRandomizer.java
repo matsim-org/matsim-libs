@@ -3,10 +3,10 @@ package playground.gregor.sims.socialcostII;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkImpl;
@@ -36,7 +36,7 @@ public class LinkFlowCapRandomizer implements BeforeMobsimListener{
 
 
 		
-		for (Link link : this.network.getLinks().values()) {
+		for (LinkImpl link : this.network.getLinks().values()) {
 			TimeVariantLinkImpl ll;
 			double detFlow = link.getFlowCapacity(Time.UNDEFINED_TIME);
 			for (double time = startTime; time < endTime; time += 120) {

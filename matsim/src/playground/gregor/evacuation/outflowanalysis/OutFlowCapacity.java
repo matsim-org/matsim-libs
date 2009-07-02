@@ -25,17 +25,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 public class OutFlowCapacity {
 
 	private static Logger log = Logger.getLogger(OutFlowCapacity.class);
 	private final NetworkLayer network;
 	private double outFlowCapcity = 0;
-	private final Set<Link> outFlowLinks = new HashSet<Link>();
+	private final Set<LinkImpl> outFlowLinks = new HashSet<LinkImpl>();
 
 	public OutFlowCapacity(NetworkLayer network) {
 		this.network = network;
@@ -47,13 +47,13 @@ public class OutFlowCapacity {
 	}
 	
 	private void parseOutNodes() {
-		Node node = this.network.getNode("en1");
+		NodeImpl node = this.network.getNode("en1");
 		double cap = 0;
-		ArrayList<Node> outNode = new ArrayList<Node>();
-		for (Link l : node.getInLinks().values()) {
-			Node out = l.getFromNode();
+		ArrayList<NodeImpl> outNode = new ArrayList<NodeImpl>();
+		for (LinkImpl l : node.getInLinks().values()) {
+			NodeImpl out = l.getFromNode();
 			outNode.add(out);
-			for (Link ll : out.getInLinks().values()) {
+			for (LinkImpl ll : out.getInLinks().values()) {
 				cap += ll.getCapacity(0);
 			}
 		}
@@ -63,7 +63,7 @@ public class OutFlowCapacity {
 	
 	private void parseOutLinks() {
 		outFlowCapcity = 0;
-		for (Link link : this.network.getLinks().values()) {
+		for (LinkImpl link : this.network.getLinks().values()) {
 			if (this.outFlowLinks.contains(link)) {
 				continue;
 			}
@@ -71,7 +71,7 @@ public class OutFlowCapacity {
 				continue;
 			}
 			
-			for (Link l2 : link.getToNode().getOutLinks().values()) {
+			for (LinkImpl l2 : link.getToNode().getOutLinks().values()) {
 				if (l2.getId().toString().contains("el")) {
 					this.outFlowLinks.add(link);
 					this.outFlowCapcity += link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);

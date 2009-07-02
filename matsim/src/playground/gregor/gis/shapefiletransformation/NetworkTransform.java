@@ -12,12 +12,12 @@ import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
@@ -46,11 +46,11 @@ public class NetworkTransform {
 			
 		}
 		Scenario sc = new ScenarioImpl();
-		Network net = sc.getNetwork();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(this.net);
 		
 		NetworkLayer nl = new NetworkLayer();
-		for (Node node : net.getNodes().values()) {
+		for (NodeImpl node : net.getNodes().values()) {
 			Coord c = map.get(node.getId().toString());
 			if (node.getId().toString().contains("en")) {
 				c = node.getCoord();
@@ -61,7 +61,7 @@ public class NetworkTransform {
 			}
 			nl.createNode(node.getId(), c);
 		}
-		for (Link link : net.getLinks().values()) {
+		for (LinkImpl link : net.getLinks().values()) {
 			nl.createLink(link.getId(), nl.getNode(link.getFromNode().getId()), nl.getNode(link.getToNode().getId()), link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME), link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
 		}
 		nl.setEffectiveCellSize(net.getEffectiveCellSize());

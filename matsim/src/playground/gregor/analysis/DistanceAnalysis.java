@@ -42,10 +42,10 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
@@ -228,8 +228,8 @@ public class DistanceAnalysis {
 		for (PersonImpl person : persons) {
 			LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 			double l1 = leg.getRoute().getDistance();
-			List<Link> ls = ((NetworkRoute) leg.getRoute()).getLinks();
-			Link l = ls.get(ls.size()-1);
+			List<LinkImpl> ls = ((NetworkRoute) leg.getRoute()).getLinks();
+			LinkImpl l = ls.get(ls.size()-1);
 			String destS  = l.getId().toString().replace("el", "");
 			int dest = Integer.parseInt(destS);
 			dests[dest]++;

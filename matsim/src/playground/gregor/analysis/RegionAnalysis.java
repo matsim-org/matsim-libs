@@ -37,12 +37,12 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
@@ -192,7 +192,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 			
 			
 			String eId = "el" + ddc.getColor(key);
-			Link link = this.network.getLink(eId);
+			LinkImpl link = this.network.getLink(eId);
 			
 			if (link == null) {
 				continue;
@@ -249,7 +249,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 			return;
 		}
 		String lID = event.getLinkId().toString();
-		Link l = this.network.getLink(lID);
+		LinkImpl l = this.network.getLink(lID);
 		Point p = this.geofac.createPoint(MGC.coord2Coordinate(l.getCoord()));
 		if (this.tree.get(p.getX(), p.getY(), 1).size() <= 0) {
 			this.dests.put(id,p);

@@ -25,9 +25,9 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -44,7 +44,7 @@ public class NetworkGenerator {
 	private Collection<Feature> features;
 	private Envelope envelope;
 //	private QuadTree<LineString> tree;
-	private QuadTree<Node> nodes;
+	private QuadTree<NodeImpl> nodes;
 //	private HashSet<LineString> lineStrings;
 	private NetworkLayer network;
 	private int nodeId;
@@ -103,7 +103,7 @@ public class NetworkGenerator {
 
 		log.info("parsing features, building up NetworkLayer and running  NetworkCleaner as well ...");
 		this.network = new NetworkLayer();
-		this.nodes = new QuadTree<Node>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());		
+		this.nodes = new QuadTree<NodeImpl>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());		
 		this.nodeId = 0;
 		this.linkId = 0;
 		
@@ -127,20 +127,20 @@ public class NetworkGenerator {
 	
 	private void processLineString(LineString ls){
 		
-		Node from = this.network.getNode(getNode(ls.getStartPoint()));
-		Node to  = this.network.getNode(getNode(ls.getEndPoint()));
+		NodeImpl from = this.network.getNode(getNode(ls.getStartPoint()));
+		NodeImpl to  = this.network.getNode(getNode(ls.getEndPoint()));
 		this.network.createLink(new IdImpl(this.linkId++), from, to, ls.getLength(), 1.66, 1.33, 1);
 		this.network.createLink(new IdImpl(this.linkId++), to, from, ls.getLength(), 1.66, 1.33, 1);
 	}
 	
 	
 	private String getNode(Point p) {
-		Collection<Node> tmp = this.nodes.get(p.getX(), p.getY(), GISToMatsimConverter.CATCH_RADIUS);
+		Collection<NodeImpl> tmp = this.nodes.get(p.getX(), p.getY(), GISToMatsimConverter.CATCH_RADIUS);
 		if (tmp.size() > 1) {
 			throw new RuntimeException("two different nodes on the same location is not allowd!");
 		} 
 		if (tmp.size() == 0) {
-			Node n = network.createNode(new IdImpl(this.nodeId++), new CoordImpl(p.getX(), p.getY()));
+			NodeImpl n = network.createNode(new IdImpl(this.nodeId++), new CoordImpl(p.getX(), p.getY()));
 			addNode(n);
 			return n.getId().toString();
 		} else {
@@ -149,7 +149,7 @@ public class NetworkGenerator {
 	}
 
 
-	private void addNode(Node n){
+	private void addNode(NodeImpl n){
 		this.nodes.put(n.getCoord().getX(),n.getCoord().getY(),n);
 	}
 	

@@ -30,9 +30,9 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -55,7 +55,7 @@ public class StaticPopulationGenerator {
 	private static final Logger log = Logger.getLogger(StaticPopulationGenerator.class);
 	private final NetworkLayer network;
 	private final Collection<Feature> zones;
-	private final QuadTree<Link> linksTree;
+	private final QuadTree<LinkImpl> linksTree;
 	private final GeometryFactory geofac;
 
 	public StaticPopulationGenerator(final NetworkLayer network,
@@ -63,8 +63,8 @@ public class StaticPopulationGenerator {
 		this.network = network;
 		this.zones = zones;
 		this.geofac  = new GeometryFactory();
-		this.linksTree = new QuadTree<Link>(646000,9800000,674000,9999000);
-		for (final Link link : network.getLinks().values()) {
+		this.linksTree = new QuadTree<LinkImpl>(646000,9800000,674000,9999000);
+		for (final LinkImpl link : network.getLinks().values()) {
 			this.linksTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
 		}
 	}
@@ -79,10 +79,10 @@ public class StaticPopulationGenerator {
 			final Envelope e = zone.getBounds();
 			final long inhabitants = (Long)zone.getAttribute(7);
 			inhabitants_all += inhabitants;
-			Collection<Link> links = new ArrayList<Link>();
+			Collection<LinkImpl> links = new ArrayList<LinkImpl>();
 			this.linksTree.get(e.getMinX(), e.getMinY(),e.getMaxX(), e.getMaxY(),links);
-			final ArrayList<Link> tmp = new ArrayList<Link>();
-			for (final Link link : links) {
+			final ArrayList<LinkImpl> tmp = new ArrayList<LinkImpl>();
+			for (final LinkImpl link : links) {
 				final Point point = this.geofac.createPoint(new Coordinate(link.getCoord().getX(),link.getCoord().getY()));
 				if (p.contains(point)) {
 					tmp.add(link);
@@ -98,7 +98,7 @@ public class StaticPopulationGenerator {
 			links = tmp;
 			final double overalllength = getOALength(links);
 			int all = 0;
-			for (final Link link : links) {
+			for (final LinkImpl link : links) {
 				final double fraction = link.getLength() / overalllength;
 				final int li = (int) Math.round(inhabitants * fraction);
 				all += li;
@@ -128,9 +128,9 @@ public class StaticPopulationGenerator {
 
 	}
 
-	private double getOALength(final Collection<Link> links) {
+	private double getOALength(final Collection<LinkImpl> links) {
 		double l = 0;
-		for (final Link link : links) {
+		for (final LinkImpl link : links) {
 			l += link.getLength();
 		}
 		return l;

@@ -5,13 +5,13 @@ import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
 import org.matsim.signalsystems.control.SignalSystemControler;
@@ -23,13 +23,13 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 	private SortedMap<Id, SignalSystemControler> scs;
 	private final HashMap<Id,Counter> counts = new HashMap<Id, Counter>();
 	private final HashMap<Id, Building> shelterLinkMapping;
-	private final HashMap<Link,LinkInfo> linkInfos = new HashMap<Link, LinkInfo>();
+	private final HashMap<LinkImpl,LinkInfo> linkInfos = new HashMap<LinkImpl, LinkInfo>();
 	
 	public ShelterInputCounter(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping) {
 		
 		this.shelterLinkMapping = shelterLinkMapping;
 		
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			if (link.getId().toString().contains("sl") && link.getId().toString().contains("a")) {
 				this.counts.put(link.getId(), new Counter());
 			}
@@ -88,7 +88,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 		
 	}
 
-	public double getLinkPenalty(Link link, double time) {
+	public double getLinkPenalty(LinkImpl link, double time) {
 		LinkInfo li = this.linkInfos.get(link);
 		if (li == null) {
 			return 0.;

@@ -35,7 +35,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.api.network.Link;
+
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData.LinkInfo;
@@ -56,11 +57,11 @@ public class NodeCostShapeCreator {
 	private FeatureType ft;
 	private final CoordinateReferenceSystem targetCRS;
 	private Collection<Feature> features;
-	private final Map<Link, LinkInfo> links;
+	private final Map<LinkImpl, LinkInfo> links;
 	private FeatureType ftPoint;
 	private Collection<Feature> pointFeatures;
 
-	public NodeCostShapeCreator(final Map<Link, LinkInfo> lis,
+	public NodeCostShapeCreator(final Map<LinkImpl, LinkInfo> lis,
 			final CoordinateReferenceSystem crs) {
 		this.targetCRS = crs;
 		this.links = lis;
@@ -85,8 +86,8 @@ public class NodeCostShapeCreator {
 		GeometryFactory geofac = new GeometryFactory();
 		this.features = new ArrayList<Feature>();
 		this.pointFeatures = new ArrayList<Feature>();
-		for (Entry<Link, LinkInfo> e : this.links.entrySet()) {
-			Link l = e.getKey();
+		for (Entry<LinkImpl, LinkInfo> e : this.links.entrySet()) {
+			LinkImpl l = e.getKey();
 			Coordinate[] coords = {
 					MGC.coord2Coordinate(l.getFromNode().getCoord()),
 					MGC.coord2Coordinate(l.getToNode().getCoord()) };

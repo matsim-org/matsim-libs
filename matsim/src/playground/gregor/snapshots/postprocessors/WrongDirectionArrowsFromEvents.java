@@ -1,8 +1,8 @@
 package playground.gregor.snapshots.postprocessors;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.otf.SimpleBackgroundTextureDrawer;
@@ -14,7 +14,7 @@ public class WrongDirectionArrowsFromEvents extends ConfluenceArrowsFromEvents{
 	private final SimpleBackgroundTextureDrawer wrongDir;
 
 	public WrongDirectionArrowsFromEvents(SimpleBackgroundTextureDrawer arrows, SimpleBackgroundTextureDrawer wrongDir,
-			Network network) {
+			NetworkLayer network) {
 		super(arrows, network);
 		this.wrongDir = wrongDir;
 	}
@@ -23,7 +23,7 @@ public class WrongDirectionArrowsFromEvents extends ConfluenceArrowsFromEvents{
 	public void createArrows() {
 		for (NodeInfo ni : this.infos.values()) {
 			if (ni.outLinks.size() < ni.node.getOutLinks().size()) {
-				for (Link l : ni.node.getOutLinks().values()) {
+				for (LinkImpl l : ni.node.getOutLinks().values()) {
 					if (ni.outLinks.contains(l)) {
 						continue;
 					}

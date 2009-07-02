@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.otf.SimpleBackgroundTextureDrawer;
@@ -19,11 +19,11 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 
 	protected static final double PI_HALF = Math.PI/2;
 	protected static final double TWO_PI = 2 * Math.PI;
-	protected final Map<Node,NodeInfo> infos = new HashMap<Node,NodeInfo>();
+	protected final Map<NodeImpl,NodeInfo> infos = new HashMap<NodeImpl,NodeInfo>();
 	protected final SimpleBackgroundTextureDrawer sbg;
-	private final Network network;
+	private final NetworkLayer network;
 	
-	public ConfluenceArrowsFromEvents(SimpleBackgroundTextureDrawer sbg, Network network) {
+	public ConfluenceArrowsFromEvents(SimpleBackgroundTextureDrawer sbg, NetworkLayer network) {
 		this.sbg = sbg;
 		this.network = network;
 	}
@@ -31,7 +31,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	
 	
 	public void handleEvent(LinkEnterEvent event) {
-		Link l = event.getLink();
+		LinkImpl l = event.getLink();
 		if (l == null) {
 			l = this.network.getLink(event.getLinkId());
 		}
@@ -52,7 +52,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	public void createArrows() {
 		for (NodeInfo ni : this.infos.values()) {
 			if (ni.outLinks.size() == 1) {
-				Link l = ni.outLinks.iterator().next();
+				LinkImpl l = ni.outLinks.iterator().next();
 				double xDiff = l.getToNode().getCoord().getX() - l.getFromNode().getCoord().getX();
 				CoordImpl f = (CoordImpl) l.getFromNode().getCoord();
 				CoordImpl t = (CoordImpl) l.getToNode().getCoord();
@@ -97,7 +97,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	
 	
 	static class NodeInfo {
-		Set<Link> outLinks = new HashSet<Link>();
-		Node node;
+		Set<LinkImpl> outLinks = new HashSet<LinkImpl>();
+		NodeImpl node;
 	}
 }

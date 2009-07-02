@@ -34,7 +34,8 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
-import org.matsim.core.api.network.Link;
+
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -84,7 +85,7 @@ public class NetworkToGraph {
 				new AttributeType[] { geom, id, fromNode, toNode, length, minWidth, effectiveWidth }, "link");
 
 
-		for (Link link : this.network.getLinks().values()){
+		for (LinkImpl link : this.network.getLinks().values()){
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] {p},this.geofac);
@@ -96,7 +97,7 @@ public class NetworkToGraph {
 		return features;
 	}
 
-	private LinearRing getLinearRing(Link link) {
+	private LinearRing getLinearRing(LinkImpl link) {
 		double minWidth = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) / GISToMatsimConverter.CAPACITY_COEF;
 		minWidth = Math.min(minWidth,20);
 //		minWidth = 10;

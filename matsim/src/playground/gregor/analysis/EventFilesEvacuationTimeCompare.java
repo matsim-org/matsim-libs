@@ -35,7 +35,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentStuckEvent;
@@ -44,6 +43,7 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
@@ -246,7 +246,7 @@ public class EventFilesEvacuationTimeCompare {
 		public void handleEvent(final AgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
 			ai.time = 3*3600; //event.getTime();
-			Link link = EventFilesEvacuationTimeCompare.this.network.getLink(event.getLinkId().toString());
+			LinkImpl link = EventFilesEvacuationTimeCompare.this.network.getLink(event.getLinkId().toString());
 			ai.c = new Coordinate(link.getCoord().getX(),link.getCoord().getY());
 			this.ttimes.put(event.getPersonId().toString(), ai);
 			

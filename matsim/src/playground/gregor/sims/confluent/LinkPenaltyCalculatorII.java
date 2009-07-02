@@ -8,8 +8,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -18,7 +16,9 @@ import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -51,7 +51,7 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 		this.net = net;
 	}
 
-	public double getLinkCost(Link link) {
+	public double getLinkCost(LinkImpl link) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null){
 			return 0;
@@ -207,12 +207,12 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 		int switchRandToConf = 0;
 		int switchRandToNonConf = 0;
 		int penSwitch = 0;
-		for (Node node : this.net.getNodes().values()) {
+		for (NodeImpl node : this.net.getNodes().values()) {
 			NodeInfo ni = getNodeInfo(node.getId());
 			int denominator = 0;
 			double nominator = 0.;
 			List<LinkInfo> infos = new ArrayList<LinkInfo>();
-			for (Link link : node.getOutLinks().values()) {
+			for (LinkImpl link : node.getOutLinks().values()) {
 				LinkInfo li = this.linkInfos.get(link.getId());
 				if (li != null) {
 					infos.add(li);

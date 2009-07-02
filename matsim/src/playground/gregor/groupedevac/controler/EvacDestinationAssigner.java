@@ -28,13 +28,13 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -49,8 +49,8 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 	private Population population;
 
-	private HashMap<Link,ArrayList<PlanImpl>> linkPlanMapping;
-	private HashMap<Link,Id> linkColor;
+	private HashMap<LinkImpl,ArrayList<PlanImpl>> linkPlanMapping;
+	private HashMap<LinkImpl,Id> linkColor;
 
 	ArrayList<LinksScoreGroup> linksScoreGroups;
 	
@@ -76,8 +76,8 @@ public class EvacDestinationAssigner implements ScoringListener {
 		}
 		Controler controler = event.getControler();
 		this.population = controler.getPopulation();
-		this.linkPlanMapping = new HashMap<Link,ArrayList<PlanImpl>>();
-		this.linkColor = new HashMap<Link, Id>();
+		this.linkPlanMapping = new HashMap<LinkImpl,ArrayList<PlanImpl>>();
+		this.linkColor = new HashMap<LinkImpl, Id>();
 		this.linksScoreGroups = new ArrayList<LinksScoreGroup>();
 		iteratePlans();
 		iterateLinks();
@@ -87,28 +87,28 @@ public class EvacDestinationAssigner implements ScoringListener {
 	
 	private void iterateLinksScoreGroups() {
 		for (LinksScoreGroup group : this.linksScoreGroups) {
-			Link link = group.getBestLink();
+			LinkImpl link = group.getBestLink();
 			PlanImpl plan = getBestLinkPlan(link);
-			ArrayList<Node> evacRoute = new ArrayList<Node>(((NetworkRoute) ((LegImpl) plan.getPlanElements().get(1)).getRoute()).getNodes());
+			ArrayList<NodeImpl> evacRoute = new ArrayList<NodeImpl>(((NetworkRoute) ((LegImpl) plan.getPlanElements().get(1)).getRoute()).getNodes());
 			if (isOutLink(link, group.getNode())){
 				evacRoute.add(0, group.getNode());
 			}
 				
 			
-			Link dest = ((ActivityImpl)plan.getPlanElements().get(2)).getLink();
+			LinkImpl dest = ((ActivityImpl)plan.getPlanElements().get(2)).getLink();
 				
 			
 			
 			Id color = this.linkColor.get(link);
-			ArrayList<Link> links = group.getLinks();
-			for (Link l : links) {
+			ArrayList<LinkImpl> links = group.getLinks();
+			for (LinkImpl l : links) {
 
 				ArrayList<PlanImpl> plans = this.linkPlanMapping.get(l);
 				if (plans == null) {
 					continue;
 				}
 				if (this.linkColor.get(l) != color) {
-					ArrayList<Node> tmpEvacRoute = new ArrayList<Node>(evacRoute);
+					ArrayList<NodeImpl> tmpEvacRoute = new ArrayList<NodeImpl>(evacRoute);
 					if (isOutLink(l,group.getNode())) {
 						tmpEvacRoute.add(0, l.getToNode());	
 					}
@@ -131,8 +131,8 @@ public class EvacDestinationAssigner implements ScoringListener {
 	
 
 
-	private boolean isOutLink(final Link l, final Node node) {
-		for (Link tmp : node.getOutLinks().values()){
+	private boolean isOutLink(final LinkImpl l, final NodeImpl node) {
+		for (LinkImpl tmp : node.getOutLinks().values()){
 			if (tmp == l) {
 				return true;
 			}
@@ -141,7 +141,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 	}
 
 
-	private void modifyPlans(final Link dest, final ArrayList<Node> evacRoute, final Link origin, final ArrayList<PlanImpl> plans) {
+	private void modifyPlans(final LinkImpl dest, final ArrayList<NodeImpl> evacRoute, final LinkImpl origin, final ArrayList<PlanImpl> plans) {
 		
 		for (PlanImpl plan : plans) {
 			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
@@ -191,7 +191,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 
 
-	private PlanImpl getBestLinkPlan(final Link link) {
+	private PlanImpl getBestLinkPlan(final LinkImpl link) {
 		PlanImpl bestPlan = null;
 		double bestScore = Double.NEGATIVE_INFINITY;
 		for (PlanImpl plan : this.linkPlanMapping.get(link)) {
@@ -205,16 +205,16 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 
 	private void iterateLinks() {
-		for (Node node : this.network.getNodes().values()){
+		for (NodeImpl node : this.network.getNodes().values()){
 			boolean mixedColored = false;
 			Iterator it = node.getInLinks().values().iterator();
-			Link firstLink = (Link) it.next();
+			LinkImpl firstLink = (LinkImpl) it.next();
 			Id color = this.linkColor.get(firstLink);
 			if (color == null) {
 				continue;
 			}
 			while ( it.hasNext()) {
-				Link link = (Link) it.next();
+				LinkImpl link = (LinkImpl) it.next();
 				Id tmpColor = this.linkColor.get(link);
 				if (tmpColor == null) {
 					continue;
@@ -227,7 +227,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			
 			it = node.getOutLinks().values().iterator();
 			while (it.hasNext() && !mixedColored) {
-				Link link = (Link) it.next();
+				LinkImpl link = (LinkImpl) it.next();
 				Id tmpColor = this.linkColor.get(link);
 				if (tmpColor == null) {
 					continue;
@@ -246,18 +246,18 @@ public class EvacDestinationAssigner implements ScoringListener {
 	}
 
 
-	private void generateLinksScoreGroup(final Node node) {
+	private void generateLinksScoreGroup(final NodeImpl node) {
 		LinksScoreGroup mapping = new LinksScoreGroup(node);
 		Iterator it = node.getInLinks().values().iterator();
 		while (it.hasNext()) {
-			Link link = (Link) it.next();
+			LinkImpl link = (LinkImpl) it.next();
 			double score = calcScore(link);
 			mapping.addLinkScore(link, score);
 		}
 		
 		it = node.getOutLinks().values().iterator();
 		while (it.hasNext()) {
-			Link link = (Link) it.next();
+			LinkImpl link = (LinkImpl) it.next();
 			double score = calcScore(link);
 			mapping.addLinkScore(link, score);
 		}
@@ -266,7 +266,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 	}
 
 
-	private double calcScore(final Link link) {
+	private double calcScore(final LinkImpl link) {
 		ArrayList<PlanImpl> plans = this.linkPlanMapping.get(link);
 		if (plans == null) {
 			return Double.NEGATIVE_INFINITY;
@@ -286,7 +286,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		Collection<PersonImpl> pers = this.population.getPersons().values();
 		for (PersonImpl p : pers) {
 			PlanImpl plan = p.getSelectedPlan();
-			Link link = plan.getFirstActivity().getLink();
+			LinkImpl link = plan.getFirstActivity().getLink();
 			ArrayList<PlanImpl> coPlans = this.linkPlanMapping.get(link);
 			if (coPlans == null) {
 				coPlans = new ArrayList<PlanImpl>();
@@ -301,28 +301,28 @@ public class EvacDestinationAssigner implements ScoringListener {
 
 
 	private static class LinksScoreGroup{ 
-		private final ArrayList<Link> links;
+		private final ArrayList<LinkImpl> links;
 		private final ArrayList<Double> score;
-		private final Node node;
+		private final NodeImpl node;
 		
-		public LinksScoreGroup(final Node node) {
+		public LinksScoreGroup(final NodeImpl node) {
 			this.node = node;
-			this.links = new ArrayList<Link>();
+			this.links = new ArrayList<LinkImpl>();
 			this.score = new ArrayList<Double>();
 		}
 		
 		
-		public void addLinkScore(final Link link, final double score) {
+		public void addLinkScore(final LinkImpl link, final double score) {
 			this.links.add(link);
 			this.score.add(score);
 		}
 		
-		public ArrayList<Link> getLinks() {
+		public ArrayList<LinkImpl> getLinks() {
 			return this.links;
 		}
 		
-		public Link getBestLink() {
-			Link bestLink = null;
+		public LinkImpl getBestLink() {
+			LinkImpl bestLink = null;
 			double bestScore = Double.NEGATIVE_INFINITY;
 			double worstScore = Double.POSITIVE_INFINITY;
 			for (int i = 0; i < this.score.size(); i++) {
@@ -341,7 +341,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 			return bestLink;
 		}
 		
-		public Node getNode() {
+		public NodeImpl getNode() {
 			return this.node;
 		}
 	}

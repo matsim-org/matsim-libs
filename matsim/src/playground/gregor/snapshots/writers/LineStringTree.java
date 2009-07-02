@@ -25,9 +25,9 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.geotools.feature.Feature;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
@@ -73,8 +73,8 @@ public class LineStringTree {
 			} else {
 				throw new RuntimeException("Feature contains no LineString!");
 			}
-			final Link l1 = this.network.getLink(id1);
-			final Link l2 = this.network.getLink(id2);
+			final LinkImpl l1 = this.network.getLink(id1);
+			final LinkImpl l2 = this.network.getLink(id2);
 			if (l1 == null) {
 				continue;
 			}
@@ -89,7 +89,7 @@ public class LineStringTree {
 				lsMap.put(id2, getLsTree(ls,l2));
 			}
 		}
-		for (final Link link : this.network.getLinks().values()) {
+		for (final LinkImpl link : this.network.getLinks().values()) {
 			if (!lsMap.containsKey(link.getId().toString())) {
 				lsMap.put(link.getId().toString(), getDummyLsTree(link));
 			}
@@ -100,7 +100,7 @@ public class LineStringTree {
 		return lsMap;
 	}
 
-	private TreeMap<Double, LineSegment> getDummyLsTree(final Link link) {
+	private TreeMap<Double, LineSegment> getDummyLsTree(final LinkImpl link) {
 		final TreeMap<Double, LineSegment> dummy = new TreeMap<Double, LineSegment>();
 		final LineSegment ls = new LineSegment(MGC.coord2Coordinate(link.getFromNode().getCoord()),MGC.coord2Coordinate(link.getToNode().getCoord()));
 		dummy.put(0., ls);
@@ -108,8 +108,8 @@ public class LineStringTree {
 		return dummy;
 	}
 
-	private void handleFragmentedLink(final LineString ls, final Link l, final HashMap<String,TreeMap<Double,LineSegment>> lsMap) {
-		final Link lr = getLR(l);
+	private void handleFragmentedLink(final LineString ls, final LinkImpl l, final HashMap<String,TreeMap<Double,LineSegment>> lsMap) {
+		final LinkImpl lr = getLR(l);
 		final double dev = Math.abs((lr.getLength()+l.getLength())-ls.getLength()) / ls.getLength();
 		if (dev > TOLERANCE ) {
 			throw new RuntimeException("Could not find lr link!");
@@ -122,7 +122,7 @@ public class LineStringTree {
 		lsMap.put(lr.getId().toString(), getLsTree(ls2,lr));
 	}
 
-	private LineString getLs(final LineString ls, final Link l, final Coordinate cfrom) {
+	private LineString getLs(final LineString ls, final LinkImpl l, final Coordinate cfrom) {
 
 		final double length = l.getLength();
 	    final ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
@@ -168,9 +168,9 @@ public class LineStringTree {
 		return this.geofac.createLineString(ca);
 	}
 
-	private Link getLR(final Link l1) {
+	private LinkImpl getLR(final LinkImpl l1) {
 		
-		Node n = l1.getFromNode();
+		NodeImpl n = l1.getFromNode();
 		if (n.getOutLinks().size() != 1) {
 			n = l1.getToNode();
 		}
@@ -181,7 +181,7 @@ public class LineStringTree {
 		return n.getOutLinks().values().iterator().next();
 	}
 
-	private TreeMap<Double, LineSegment> getLsTree(final LineString ls, final Link l) {
+	private TreeMap<Double, LineSegment> getLsTree(final LineString ls, final LinkImpl l) {
 		final Coordinate cfrom = MGC.coord2Coordinate(l.getFromNode().getCoord());
 		final TreeMap<Double,LineSegment> lsTree = new TreeMap<Double,LineSegment>();
 		if (ls.getStartPoint().getCoordinate().distance(cfrom) > ls.getEndPoint().getCoordinate().distance(cfrom) ) {

@@ -37,12 +37,12 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -74,7 +74,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	private final String eventsFile;
 	private double oldTime = 3 * 3600;
 	
-	private final HashMap<String,Link> agentsOnLink = new HashMap<String, Link>();
+	private final HashMap<String,LinkImpl> agentsOnLink = new HashMap<String, LinkImpl>();
 	private final String shapeFilePrefix;
 	private final GeometryFactory geofac;
 	private final CoordinateReferenceSystem targetCRS;
@@ -128,7 +128,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 			doSnapshot();
 		}
 		String agentId = event.getPersonId().toString();
-		Link link = this.network.getLink(event.getLinkId().toString());
+		LinkImpl link = this.network.getLink(event.getLinkId().toString());
 		this.agentsOnLink.put(agentId, link);
 		
 	}
@@ -155,15 +155,15 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 
 	private MultiPoint getMultiPoint() {
-		HashSet<Link> links = new HashSet<Link>();
-		for (Link link : this.agentsOnLink.values()) {
+		HashSet<LinkImpl> links = new HashSet<LinkImpl>();
+		for (LinkImpl link : this.agentsOnLink.values()) {
 			if (isInBoundingBox(link.getCoord())) {
 				links.add(link);
 			}
 		}
 		Point [] points = new Point[links.size()];
 		int c = 0;
-		for (Link link : links) {
+		for (LinkImpl link : links) {
 			points[c++] = MGC.coord2Point(link.getCoord());
 		}
 

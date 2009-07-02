@@ -13,10 +13,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -27,12 +27,12 @@ import com.vividsolutions.jts.geom.Point;
 public class NodeCostShapeII {
 
 	private final String netcdf;
-	private final Network network;
+	private final NetworkLayer network;
 	private final String output;
 	private FeatureType ftPoint;
 	private CoordinateReferenceSystem targetCRS;
 
-	public NodeCostShapeII(String netcdf, String output, Network network) {
+	public NodeCostShapeII(String netcdf, String output, NetworkLayer network) {
 		this.netcdf = netcdf;
 		this.network = network;
 		this.output = output;
@@ -43,7 +43,7 @@ public class NodeCostShapeII {
 		this.targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
 		NodeRiskCostsFromNetcdf nc = new NodeRiskCostsFromNetcdf(this.netcdf);
 		Collection<Feature> fts = new ArrayList<Feature>();
-		for (Node n : this.network.getNodes().values()) {
+		for (NodeImpl n : this.network.getNodes().values()) {
 			double cost = nc.getNodeRiskCost(n);
 			if (cost == 0) {
 				continue;
@@ -86,7 +86,7 @@ public class NodeCostShapeII {
 		String netcdf = "../../inputs/flooding/flooding_old.sww";
 		String net = "../../inputs/networks/padang_net_evac_v20080618.xml";
 		String output = "./plans/nodeCosts.shp";
-		Network network = new NetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(net);
 		new NodeCostShapeII(netcdf, output, network).run();
 	}

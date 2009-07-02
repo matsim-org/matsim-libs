@@ -8,9 +8,6 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -18,7 +15,10 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -35,7 +35,7 @@ public class NetworkCalibrator {
 	private final static double CELLSIZE = 0.26;
 	private final static double PERSONS = 20000;
 	private final static double CRITERION = 36*60 +26;
-	private Link l1;
+	private LinkImpl l1;
 	
 	private void run() {
 		
@@ -43,7 +43,7 @@ public class NetworkCalibrator {
 		createScenario(sc,FREESPEED);
 		createConfig(sc);
 		
-		Network net = sc.getNetwork();
+		NetworkLayer net = sc.getNetwork();
 		
 		Optimizer op = new Optimizer(net,this.l1);
 		System.out.println("Num of its:" + op.getLastIt());
@@ -87,13 +87,13 @@ public class NetworkCalibrator {
 		net.setCapacityPeriod(1);
 		net.setEffectiveCellSize(CELLSIZE);
 		net.setEffectiveLaneWidth(0.71);
-		Node n0 = net.createNode(new IdImpl(0),new CoordImpl(0,0));
-		Node n1 = net.createNode(new IdImpl(1),new CoordImpl(50,0));
-		Node n2 = net.createNode(new IdImpl(2),new CoordImpl(150,0));
-		Node n3 = net.createNode(new IdImpl(3),new CoordImpl(200,0));
-		Link l0 = net.createLink(new IdImpl(0), n0, n1, 50, fs, 20000,PERSONS/(50/CELLSIZE));
+		NodeImpl n0 = net.createNode(new IdImpl(0),new CoordImpl(0,0));
+		NodeImpl n1 = net.createNode(new IdImpl(1),new CoordImpl(50,0));
+		NodeImpl n2 = net.createNode(new IdImpl(2),new CoordImpl(150,0));
+		NodeImpl n3 = net.createNode(new IdImpl(3),new CoordImpl(200,0));
+		LinkImpl l0 = net.createLink(new IdImpl(0), n0, n1, 50, fs, 20000,PERSONS/(50/CELLSIZE));
 		this.l1 = net.createLink(new IdImpl(1), n1, n2, 100, fs, CAP, WIDTH/PERS_WIDTH);
-		Link l2 = net.createLink(new IdImpl(3), n2, n3, 50, fs, 20000, PERSONS/(50/CELLSIZE));
+		LinkImpl l2 = net.createLink(new IdImpl(3), n2, n3, 50, fs, 20000, PERSONS/(50/CELLSIZE));
 		
 		Population pop = sc.getPopulation();
 		PopulationBuilder pb = pop.getPopulationBuilder();
@@ -119,9 +119,9 @@ public class NetworkCalibrator {
 		private ArrayList<Param> params;
 		int it = 0;
 		private final NetworkLayer net;
-		private Link link;
+		private LinkImpl link;
 		private int lastIt;
-		public Optimizer(Network net, Link link) {
+		public Optimizer(NetworkLayer net, LinkImpl link) {
 			this.net = (NetworkLayer) net;
 			this.link = link;
 			init();

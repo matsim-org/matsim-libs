@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -20,6 +19,7 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -50,7 +50,7 @@ public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, Qu
 		this.population = population;
 	}
 	
-	public double getSocialCost(Link link, double time) {
+	public double getSocialCost(LinkImpl link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
 			return 0.;
@@ -119,7 +119,7 @@ public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, Qu
 //	}
 
 	private void calcLinkTimeCosts() {
-		for (Link link : this.network.getLinks().values()) {
+		for (LinkImpl link : this.network.getLinks().values()) {
 			LinkInfo li = this.linkInfos.get(link.getId());
 			if (li == null) { //Link has never been used by anny agent
 				continue;

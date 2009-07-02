@@ -5,11 +5,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
 
@@ -31,7 +31,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler {
 
 		this.events = events;
 		this.shelterLinkMapping = shelterLinkMapping;
-		for (Link link : network.getLinks().values()) {
+		for (LinkImpl link : network.getLinks().values()) {
 			if (link.getId().toString().contains("sl") && link.getId().toString().contains("a")) {
 				Building b = this.shelterLinkMapping.get(link.getId());
 				this.linkInfos.put(link.getId(), new LinkInfo(b.getShelterSpace(),link.getId()));
@@ -40,7 +40,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler {
 	}
 
 	
-	public double getLinkTravelCost(Link link, double time) {
+	public double getLinkTravelCost(LinkImpl link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId()); 
 		if (li != null) {
 			if (time > li.blockingTime) {

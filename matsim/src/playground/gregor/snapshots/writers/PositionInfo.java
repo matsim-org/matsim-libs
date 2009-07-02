@@ -23,7 +23,7 @@ package playground.gregor.snapshots.writers;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
 
@@ -53,7 +53,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 	final private String visualizerData;
 	final private double speed;
 	final private VehicleState vehicleState;
-	final private Link link;
+	final private LinkImpl link;
 
 
 	private int type = 0;
@@ -61,7 +61,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 	
 	
 	
-	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed,
+	public PositionInfo(final Id agentId, final LinkImpl link, final double distanceOnLink, final int lane, final double speed,
 			final VehicleState vehicleState, final String visualizerData) {
 		super(agentId, 0, 0, 0, 0, 0, PositionInfo.VehicleState.Driving,	null);
 		this.agentId = agentId;
@@ -160,7 +160,7 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 
 
 	@Override
-	public Link getLink() {
+	public LinkImpl getLink() {
 		return this.link;
 	}
 
