@@ -9,7 +9,6 @@ import org.apache.commons.collections.map.MultiKeyMap;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -18,6 +17,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.api.basic.v01.Id;
 
 /**

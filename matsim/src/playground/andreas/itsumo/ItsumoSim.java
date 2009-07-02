@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -36,6 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ItsumoSim extends ExternalMobsim {
