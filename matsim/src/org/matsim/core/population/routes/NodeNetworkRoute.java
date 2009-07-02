@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;

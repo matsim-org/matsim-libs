@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;

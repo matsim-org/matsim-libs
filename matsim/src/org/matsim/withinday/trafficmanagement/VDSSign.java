@@ -26,11 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 

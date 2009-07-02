@@ -19,7 +19,7 @@
 package org.matsim.core.api.experimental;
 import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.households.Households;
 import org.matsim.knowledges.Knowledges;

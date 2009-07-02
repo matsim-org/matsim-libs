@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.MatsimRandom;
 
 public class FacilitiesMakeSample {

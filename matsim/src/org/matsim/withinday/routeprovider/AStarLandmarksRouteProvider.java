@@ -21,9 +21,9 @@
 package org.matsim.withinday.routeprovider;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;

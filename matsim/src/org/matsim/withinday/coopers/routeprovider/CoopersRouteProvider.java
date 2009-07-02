@@ -23,9 +23,9 @@ package org.matsim.withinday.coopers.routeprovider;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.routeprovider.AbstractRouteProvider;
 import org.matsim.withinday.routeprovider.HierarchicalRouteProvider;
@@ -56,7 +56,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 	/**
 	 *
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl,
-	 *      org.matsim.core.api.population.NetworkRoute)
+	 *      org.matsim.core.population.routes.NetworkRoute)
 	 */
 	public boolean providesRoute(final LinkImpl currentLink, final NetworkRoute subRoute) {
 		for (VDSSign s : this.signs) {

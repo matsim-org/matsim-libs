@@ -22,8 +22,8 @@ package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;

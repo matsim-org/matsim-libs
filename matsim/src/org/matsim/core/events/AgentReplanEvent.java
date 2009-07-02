@@ -20,7 +20,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author dgrether

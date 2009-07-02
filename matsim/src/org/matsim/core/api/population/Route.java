@@ -30,9 +30,6 @@ import org.matsim.core.network.LinkImpl;
  */
 public interface Route extends BasicRoute {
 
-	public double getTravelTime();
-	public void setTravelTime(final double travelTime);
-
 	public LinkImpl getStartLink();
 	public void setStartLink(final LinkImpl link);
 

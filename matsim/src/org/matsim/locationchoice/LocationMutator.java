@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
-import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;

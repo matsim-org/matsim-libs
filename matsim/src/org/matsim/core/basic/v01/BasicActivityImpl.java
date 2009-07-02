@@ -24,7 +24,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.utils.misc.Time;
 
 public class BasicActivityImpl implements BasicActivity {

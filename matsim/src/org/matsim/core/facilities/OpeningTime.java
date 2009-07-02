@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonAlgorithm.java
+ * Opentime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,12 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.population;
+package org.matsim.core.facilities;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 
+public interface OpeningTime extends BasicOpeningTime {
 
-
-public interface PersonAlgorithm {
-	public void run(PersonImpl person);
 }

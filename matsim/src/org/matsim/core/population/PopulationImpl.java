@@ -30,10 +30,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.population.PersonAlgorithm;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.misc.Counter;
 
 /**

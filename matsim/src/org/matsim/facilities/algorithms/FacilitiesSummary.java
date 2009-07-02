@@ -22,9 +22,9 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class FacilitiesSummary {

@@ -62,10 +62,10 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;

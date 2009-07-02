@@ -23,9 +23,6 @@ package org.matsim.core.facilities;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.utils.misc.Time;
 

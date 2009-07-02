@@ -27,8 +27,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.BasicLocation;
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;

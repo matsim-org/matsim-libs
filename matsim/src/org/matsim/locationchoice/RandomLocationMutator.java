@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;

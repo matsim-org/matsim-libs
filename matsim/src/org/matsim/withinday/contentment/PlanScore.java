@@ -23,12 +23,12 @@ package org.matsim.withinday.contentment;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;

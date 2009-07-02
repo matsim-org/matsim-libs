@@ -21,8 +21,8 @@
 package org.matsim.population.filters;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.PersonAlgorithm;
 
 public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFilter {
 

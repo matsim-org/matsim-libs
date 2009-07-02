@@ -25,13 +25,13 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.population.NetworkRoute;
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.world.WorldUtils;
 
 /**

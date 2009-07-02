@@ -23,8 +23,8 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;

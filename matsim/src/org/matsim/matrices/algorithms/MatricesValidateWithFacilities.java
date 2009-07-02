@@ -22,8 +22,8 @@ package org.matsim.matrices.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;

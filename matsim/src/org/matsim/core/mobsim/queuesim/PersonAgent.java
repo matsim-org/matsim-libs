@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.network.LinkImpl;
@@ -33,6 +32,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
 /**

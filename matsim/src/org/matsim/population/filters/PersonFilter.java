@@ -20,8 +20,8 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.PersonAlgorithm;
 
 /**
  * Interface for filtering persons.

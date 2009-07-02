@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.replanning;
+package org.matsim.core.replanning;
 
 import org.matsim.core.population.PlanImpl;
 

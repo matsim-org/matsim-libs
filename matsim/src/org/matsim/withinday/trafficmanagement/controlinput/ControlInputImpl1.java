@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
-import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Measures the travel time difference between route 1 and 2 and returns that as

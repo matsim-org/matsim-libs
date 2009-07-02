@@ -29,7 +29,6 @@ import java.io.PrintWriter;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -44,6 +43,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.ExeRunner;
 
 public class ExternalMobsim {

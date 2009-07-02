@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.facilities;
+package org.matsim.core.facilities;
 
 import java.util.Map;
 import java.util.SortedSet;

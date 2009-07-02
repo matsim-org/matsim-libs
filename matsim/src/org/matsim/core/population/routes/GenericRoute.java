@@ -18,8 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.population;
+package org.matsim.core.population.routes;
 
+import org.matsim.core.api.population.Route;
 import org.matsim.core.network.LinkImpl;
 
 /**

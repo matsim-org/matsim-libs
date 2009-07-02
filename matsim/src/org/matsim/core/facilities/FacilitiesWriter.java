@@ -25,9 +25,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;

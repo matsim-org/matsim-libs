@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;

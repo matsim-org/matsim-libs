@@ -22,8 +22,8 @@ package org.matsim.population.filters;
 
 import java.util.regex.Pattern;
 
-import org.matsim.core.api.population.PersonAlgorithm;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.PersonAlgorithm;
 
 /**
  * Filters persons whose id matches a certain pattern (regular expression).

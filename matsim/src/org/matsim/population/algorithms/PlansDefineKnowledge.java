@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.Knowledge;

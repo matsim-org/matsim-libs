@@ -18,11 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.population;
+package org.matsim.core.population.routes;
 
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.population.Route;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 
@@ -34,6 +35,8 @@ import org.matsim.core.network.NodeImpl;
  * @author mrieser
  */
 public interface NetworkRoute extends Route {
+	
+	public LinkImpl getStartLink();
 
 	public List<NodeImpl> getNodes();
 

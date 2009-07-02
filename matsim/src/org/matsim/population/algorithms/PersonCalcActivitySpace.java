@@ -25,7 +25,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.ActivitySpace;

@@ -29,14 +29,14 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.population.GenericRoute;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicPlanImpl;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only

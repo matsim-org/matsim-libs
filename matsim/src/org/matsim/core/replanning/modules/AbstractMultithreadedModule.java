@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.replanning.PlanStrategyModule;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**

@@ -1,4 +1,4 @@
-package org.matsim.core.api.facilities;
+package org.matsim.core.facilities;
 
 import org.matsim.core.basic.v01.facilities.BasicFacility;
 import org.matsim.core.network.LinkImpl;
