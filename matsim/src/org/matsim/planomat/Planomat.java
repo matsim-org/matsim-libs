@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -65,21 +64,27 @@ public class Planomat implements PlanAlgorithm {
 
 	protected static enum StepThroughPlanAction {EVALUATE, WRITE_BACK}
 
-	private final PlanomatConfigGroup config = Gbl.getConfig().planomat();
-	private final int numTimeIntervals = (int) Math.pow(2, config.getLevelOfTimeResolution());
-	protected final double timeIntervalSize = Planomat.SCENARIO_DURATION / numTimeIntervals;
+	private final PlanomatConfigGroup config;
+	private final int numTimeIntervals;
+	protected final double timeIntervalSize;
 
 	private final LegTravelTimeEstimator legTravelTimeEstimator;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Random seedGenerator;
 
 	private final static Logger logger = Logger.getLogger(Planomat.class);
-	private final boolean doLogging = this.config.isDoLogging();
+	private final boolean doLogging;
 
-	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
+	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory, final PlanomatConfigGroup config) {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.config = config;
+		
+		this.numTimeIntervals = (int) Math.pow(2, this.config.getLevelOfTimeResolution());
+		this.timeIntervalSize = Planomat.SCENARIO_DURATION / numTimeIntervals;
+		this.doLogging = this.config.isDoLogging();
+		
 		this.seedGenerator = MatsimRandom.getLocalInstance();
 	}
 

@@ -45,7 +45,6 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -224,7 +223,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				this.config.charyparNagelScoring(), facilityPenalties);
 		// init Planomat, which loads config!
-		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
+		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.config.planomat());
 
 		Random random = MatsimRandom.getLocalInstance();
 		

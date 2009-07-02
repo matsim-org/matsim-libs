@@ -150,8 +150,8 @@ public class PlanomatTest extends MatsimTestCase {
 			this.scenario.getConfig().planomat().setPossibleModes("car,pt");
 		}
 		
-		// init Planomat, which loads config!
-		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
+		// init Planomat
+		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.scenario.getConfig().planomat());
 		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
 
 		tTravelEstimator.reset(1);
@@ -203,7 +203,7 @@ public class PlanomatTest extends MatsimTestCase {
 		// only plan of that person
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
-		Planomat testee = new Planomat(null, null);
+		Planomat testee = new Planomat(null, null, this.scenario.getConfig().planomat());
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
 		
@@ -291,7 +291,7 @@ public class PlanomatTest extends MatsimTestCase {
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 
 		// run the method
-		Planomat testee = new Planomat(ltte, null);
+		Planomat testee = new Planomat(ltte, null, this.scenario.getConfig().planomat());
 
 		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, null);
 

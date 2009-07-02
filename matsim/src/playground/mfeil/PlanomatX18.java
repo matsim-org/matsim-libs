@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +31,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -111,7 +105,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			this.timer				= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		}
 		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
-			this.timer				= new Planomat (legTravelTimeEstimator, controler.getScoringFunctionFactory()); 
+			this.timer				= new Planomat (legTravelTimeEstimator, controler.getScoringFunctionFactory(), controler.getConfig().planomat()); 
 		}
 		else this.timer				= new TimeOptimizer(controler, this.legTravelTimeEstimator, this.scorer);
 		
@@ -119,7 +113,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			this.finalTimer			= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
 		}
 		else if (this.finalOpt.equals("Planomat")){
-			this.finalTimer			= new Planomat(legTravelTimeEstimator, controler.getScoringFunctionFactory()); 
+			this.finalTimer			= new Planomat(legTravelTimeEstimator, controler.getScoringFunctionFactory(), controler.getConfig().planomat()); 
 		}
 		else this.finalTimer		= new TimeOptimizerWIGIC(controler, legTravelTimeEstimator, this.scorer);		
 		

@@ -23,7 +23,6 @@ package playground.meisterk.org.matsim.planomat;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -96,7 +95,7 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 
-		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
+		Planomat testee = new Planomat(ltte, scoringFunctionFactory, config.planomat());
 		Gbl.printMemoryUsage();
 
 		log.info("Running evolution on 10% of the plans...");

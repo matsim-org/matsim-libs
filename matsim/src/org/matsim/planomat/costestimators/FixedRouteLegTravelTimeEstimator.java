@@ -63,23 +63,32 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
-		HashMap<TransportMode, Double> legInformation = null; 
-		if (this.travelTimeCache.containsKey(legIntermediate)) {
-			legInformation = this.travelTimeCache.get(legIntermediate);
-		} else {
-			legInformation = new HashMap<TransportMode, Double>();
-			this.travelTimeCache.put(legIntermediate, legInformation);
-		}
-		double cachedTravelTimeInformation;
-		if (legInformation.containsKey(legIntermediate.getMode())) {
-			cachedTravelTimeInformation = legInformation.get(legIntermediate.getMode()).doubleValue();
-		} else {
-			cachedTravelTimeInformation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
-			legInformation.put(legIntermediate.getMode(), cachedTravelTimeInformation);
-		}
+		double cachedTravelTimeInformation = 0.0;
+
+//		if (legIntermediate.getMode().equals(TransportMode.car)) {
+//
+//			
+//			
+//		} else {
+//
+			HashMap<TransportMode, Double> legInformation = null; 
+			if (this.travelTimeCache.containsKey(legIntermediate)) {
+				legInformation = this.travelTimeCache.get(legIntermediate);
+			} else {
+				legInformation = new HashMap<TransportMode, Double>();
+				this.travelTimeCache.put(legIntermediate, legInformation);
+			}
+			if (legInformation.containsKey(legIntermediate.getMode())) {
+				cachedTravelTimeInformation = legInformation.get(legIntermediate.getMode()).doubleValue();
+			} else {
+				cachedTravelTimeInformation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+				legInformation.put(legIntermediate.getMode(), cachedTravelTimeInformation);
+			}
+			
+//		}
 
 		return cachedTravelTimeInformation;
-		
+
 	}
 
 	protected double processDeparture(final LinkImpl link, final double start) {

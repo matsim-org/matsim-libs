@@ -30,7 +30,7 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 	public TimeOptimizerPerformanceT (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
 
 		//this.timeOptAlgorithm 		= new TimeOptimizer (controler, estimator, scorer);
-		this.timeOptAlgorithm 	= new Planomat (estimator, factory);
+		this.timeOptAlgorithm 	= new Planomat (estimator, factory, controler.getConfig().planomat());
 		this.scorer			  		= scorer;
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
