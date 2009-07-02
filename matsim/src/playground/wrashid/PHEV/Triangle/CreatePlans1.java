@@ -5,11 +5,11 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
-import org.matsim.core.api.facilities.ActivityOption;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
