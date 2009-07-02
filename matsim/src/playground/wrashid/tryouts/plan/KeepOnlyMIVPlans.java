@@ -5,7 +5,9 @@ import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -17,12 +19,14 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.world.World;
 
 import playground.andreas.bln.DuplicatePlans;
 import playground.andreas.bln.NewPopulation;
 
 /*
  * removes non miv plans from input file...
+ *  (facilities needed for some plans files...)
  */
 
 public class KeepOnlyMIVPlans extends NewPopulation {
@@ -30,11 +34,23 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 
 		BasicScenarioImpl sc = new BasicScenarioImpl();
 		Gbl.setConfig(sc.getConfig());
+		World world = Gbl.getWorld();
 
 		String inputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans.xml.gz";
 		String outputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans1.xml.gz";
 		String networkFile = "/data/matsim/switzerland/ivt/studies/switzerland/networks/teleatlas/network.xml.gz";
-
+		String facilitiesPath = "/data/matsim/switzerland/ivt/studies/switzerland/facilities/facilities.xml.gz";
+		
+		//String inputPlansFile = "./test/scenarios/chessboard/plans.xml";
+		//String outputPlansFile = "./plans1.xml";
+		//String networkFile = "./test/scenarios/chessboard/network.xml";
+		//String facilitiesPath = "./test/scenarios/chessboard/facilities.xml";
+		
+		
+		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(facilitiesPath);
+		world.complete();
+		
 		Population inPop = new PopulationImpl();
 
 		NetworkLayer net = new NetworkLayer();
