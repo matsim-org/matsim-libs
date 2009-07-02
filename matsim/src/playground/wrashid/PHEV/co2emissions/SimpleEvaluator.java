@@ -1,9 +1,9 @@
 package playground.wrashid.PHEV.co2emissions;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.network.NetworkLayer;
 
 public class SimpleEvaluator {
 
@@ -14,7 +14,7 @@ public class SimpleEvaluator {
 		
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
-		Network network = sl.getScenario().getNetwork();
+		NetworkLayer network = sl.getScenario().getNetwork();
 		
 		Events events = new Events();
 

@@ -1,7 +1,7 @@
 package playground.wrashid.PHEV.Triangle;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 public class PrintLinkCoordinates {
 
@@ -10,17 +10,17 @@ public class PrintLinkCoordinates {
 		sl.loadNetwork();
 		
 		System.out.println("linkId\tx\ty");
-		for (Link link : sl.getScenario().getNetwork().getLinks().values()){
+		for (LinkImpl link : sl.getScenario().getNetwork().getLinks().values()){
 			System.out.println(link.getId().toString() +"\t"+ getXCoordinate(link) +"\t"+  getYCoordinate(link));
 		}
 
 	}
 	
-	public static double getXCoordinate(Link link){
+	public static double getXCoordinate(LinkImpl link){
 		return (link.getFromNode().getCoord().getX()+ link.getToNode().getCoord().getX())/2;
 	}
 	
-	public static double getYCoordinate(Link link){
+	public static double getYCoordinate(LinkImpl link){
 		return (link.getFromNode().getCoord().getY()+ link.getToNode().getCoord().getY())/2;
 	}
 	

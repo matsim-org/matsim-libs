@@ -9,8 +9,8 @@ import java.util.Random;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.world.Layer;
@@ -67,11 +67,11 @@ public class Main {
 	
 	// key=linkId, value=NumberOfParkings
 	// for the city of Zurich, this contains the number of parkings per link
-	public static HashMap<Link, Integer> numberOfStreetParkingsPerLink=null; 
+	public static HashMap<LinkImpl, Integer> numberOfStreetParkingsPerLink=null; 
 	
 	// key= communityId, value=List of Links in the community
 	// for each community this contains the list of links, which belong to that community
-	public static HashMap<Integer,LinkedList<Link>> streetsInCommunities=new HashMap<Integer,LinkedList<Link>>();
+	public static HashMap<Integer,LinkedList<LinkImpl>> streetsInCommunities=new HashMap<Integer,LinkedList<LinkImpl>>();
 	public static int communityIdOfZurichCity=261;
 	
 	// key=communityId, Value=HashMap(LinkType,Percentage Road of this LinkType)
@@ -82,7 +82,7 @@ public class Main {
 	public static LinkedList<CityZone> zonesOfCityZurich = new LinkedList<CityZone>();
 	
 	// the links which belong to the community of the zurich city
-	public static LinkedList<Link> linksOfZurichCity=null;
+	public static LinkedList<LinkImpl> linksOfZurichCity=null;
 	public static Zone cityZurichZone=null; // from world file the zurich city community
 	
 	/**
@@ -117,11 +117,11 @@ public class Main {
 		// initialize streetsInCommunities
 		// this means for each community, we put the streets belonging to the community in there
 		Layer layer = world.getLayer("municipality");
-		for (Link link:network.getLinks().values()){
+		for (LinkImpl link:network.getLinks().values()){
 			for (Iterator iter=layer.getLocations().values().iterator();iter.hasNext();){
 				Zone zone=(Zone)iter.next();
 				if (zone.contains(link.getCoord())){
-					LinkedList<Link> list=streetsInCommunities.get((Integer.parseInt(zone.getId().toString())));
+					LinkedList<LinkImpl> list=streetsInCommunities.get((Integer.parseInt(zone.getId().toString())));
 					list.add(link);
 					break;
 				}
@@ -130,9 +130,9 @@ public class Main {
 		
 		
 		// calculate the number of parkings per link for the city of Zurich
-		numberOfStreetParkingsPerLink=new HashMap<Link, Integer>();
+		numberOfStreetParkingsPerLink=new HashMap<LinkImpl, Integer>();
 		for (int i=0;i<streetData.size();i++){
-			Link link = network.getNearestLink(streetData.get(i));
+			LinkImpl link = network.getNearestLink(streetData.get(i));
 			if (!numberOfStreetParkingsPerLink.containsKey(link)){
 				numberOfStreetParkingsPerLink.put(link,0);
 			}
@@ -148,7 +148,7 @@ public class Main {
 		Collection keys = new ArrayList(streetsInCommunities.keySet());
 		for (Iterator iter=keys.iterator();iter.hasNext();){
 			Integer communityId=(Integer)iter.next();
-			LinkedList<Link> list=streetsInCommunities.get(communityId);
+			LinkedList<LinkImpl> list=streetsInCommunities.get(communityId);
 			lengthPercentageOfEachLinkType.put(communityId,calculateLengthPercentageOfEachLinkType(list));
 		}
 		
@@ -168,11 +168,11 @@ public class Main {
 	}
 	
 	
-	public static HashMap<Integer,Double> calculateLengthPercentageOfEachLinkType(LinkedList<Link> list){
+	public static HashMap<Integer,Double> calculateLengthPercentageOfEachLinkType(LinkedList<LinkImpl> list){
 		HashMap<Integer,Double> hm = new HashMap<Integer,Double>();
 		double sumOfAllStreetLengths=0;
 		for (int i=0;i<list.size();i++){
-			Link link=list.get(i);
+			LinkImpl link=list.get(i);
 			sumOfAllStreetLengths+=link.getLength();
 			addValue(hm,Integer.parseInt(link.getType()),link.getLength());
 		}
@@ -216,7 +216,7 @@ public class Main {
 			}
 			
 			// performance insert: initialize streetsInCommunities
-			streetsInCommunities.put((Integer)key, new LinkedList<Link>()) ;
+			streetsInCommunities.put((Integer)key, new LinkedList<LinkImpl>()) ;
 		}
 		
 		// remove all zones, which do not belong to Kanton ZH
@@ -294,8 +294,8 @@ public class Main {
 		public double xMin,xMax,yMin,yMax=0;
 		
 		
-		public LinkedList<Link> allContainingLinks=new LinkedList<Link>();
-		public HashMap<Link,Integer> linksWithParking=new HashMap<Link,Integer>();
+		public LinkedList<LinkImpl> allContainingLinks=new LinkedList<LinkImpl>();
+		public HashMap<LinkImpl,Integer> linksWithParking=new HashMap<LinkImpl,Integer>();
 		public HashMap<Integer,Double> lengthPercentageOfEachLinkType = null;
 		
 		
@@ -317,7 +317,7 @@ public class Main {
 			}
 			
 			// the links, which contain parkings
-			for (Link link:numberOfStreetParkingsPerLink.keySet()){
+			for (LinkImpl link:numberOfStreetParkingsPerLink.keySet()){
 				if (xMin<link.getCoord().getX() && xMax>link.getCoord().getX() && yMin<link.getCoord().getY() && yMax<link.getCoord().getY()){
 					linksWithParking.put(link, numberOfStreetParkingsPerLink.get(link));
 				}

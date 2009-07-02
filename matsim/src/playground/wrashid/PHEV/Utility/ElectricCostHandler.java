@@ -16,9 +16,9 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.LinkImpl;
 
 //TODO: write tests for this class
 
@@ -108,7 +108,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 	public void handleEvent(BasicLinkLeaveEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
-		Link link = controler2.getNetwork().getLinks().get(event.getLinkId());
+		LinkImpl link = controler2.getNetwork().getLinks().get(event.getLinkId());
 //		if (controler == null) {
 //			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
 ////			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
@@ -144,7 +144,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 		recordSOCOfVehicle(event);
 	}
 
-	private double getEnergyConsumption(Link link) {
+	private double getEnergyConsumption(LinkImpl link) {
 		double freeSpeed = 0;
 		if (controler == null) {
 			freeSpeed = link.getFreespeed(controler2.getNetwork()
