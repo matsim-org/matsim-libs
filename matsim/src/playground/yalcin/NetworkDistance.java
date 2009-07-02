@@ -31,14 +31,14 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -150,8 +150,8 @@ public class NetworkDistance {
 				 */
 				Coord fromCoord = new CoordImpl(parts[4], parts[5]);
 				Coord toCoord = new CoordImpl(parts[8], parts[9]);
-				Node fromNode = network.getNearestNode(fromCoord);
-				Node toNode = network.getNearestNode(toCoord);
+				NodeImpl fromNode = network.getNearestNode(fromCoord);
+				NodeImpl toNode = network.getNearestNode(toCoord);
 
 				Path path = router.calcLeastCostPath(fromNode, toNode, 0);
 
@@ -161,7 +161,7 @@ public class NetworkDistance {
 
 				writer.write("\t" + fromNode.getId().toString());
 				writer.write("\t" + toNode.getId().toString());
-				for (Link link : path.links) {
+				for (LinkImpl link : path.links) {
 					writer.write("\t" + link.getId().toString());
 				}
 
@@ -182,7 +182,7 @@ public class NetworkDistance {
 
 	private static double getPathDistance(final Path path) {
 		double dist = 0;
-		for (Link link : path.links) {
+		for (LinkImpl link : path.links) {
 			dist += link.getLength();
 		}
 		return dist;
