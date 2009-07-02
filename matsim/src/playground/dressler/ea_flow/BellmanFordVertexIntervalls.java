@@ -21,8 +21,11 @@ package playground.dressler.ea_flow;
 
 // java imports
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import org.matsim.core.network.LinkImpl;
@@ -273,17 +276,18 @@ public class BellmanFordVertexIntervalls {
 		//set the startLabels and add active sources to to the queue
 		LinkedList<NodeImpl> activesources = this.refreshLabels();
 		if(_warmstart>0 && _warmstartlist!=null){
-			queue.addAll(_warmstartlist);
-			for( NodeImpl node : activesources){
+			queue.addAll(_warmstartlist);					
+			/* for( NodeImpl node : activesources){
 				if(!queue.contains(node)){
 					queue.add(node);
 				}
-			}
+				
+			}*/
+			queue.addAll(activesources);
 		}else{
 			queue.addAll(activesources);
 		}
-		
-		
+				
 
 		// v is first vertex in the queue
 		// w is the vertex we probably want to insert to the queue and 
@@ -298,9 +302,9 @@ public class BellmanFordVertexIntervalls {
 			v = queue.poll();
 			
 			// Clean Up before we do anything!
-			System.out.println("cleanupnode:"+v.getId().toString()+"\n old: \n"+_labels.get(v).toString());
+			//System.out.println("cleanupnode:"+v.getId().toString()+"\n old: \n"+_labels.get(v).toString());
 			gain += _labels.get(v).cleanup();
-			System.out.println("new: \n"+_labels.get(v).toString());
+			//System.out.println("new: \n"+_labels.get(v).toString());
 
 			// visit neighbors
 			
@@ -329,16 +333,16 @@ public class BellmanFordVertexIntervalls {
 		}
 		//System.out.println("finale labels: \n");
 		//printStatus();
-		_timeexpandedpath = null;
+		this._timeexpandedpath = null;
 		try{ 
-			_timeexpandedpath = constructRoute();
+			this._timeexpandedpath = constructRoute();
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());
 		}
 		if(_warmstart>0){
 			createwarmstartList();
 		}
-		return _timeexpandedpath;
+		return this._timeexpandedpath;
 		
 	}
 	
@@ -347,7 +351,62 @@ public class BellmanFordVertexIntervalls {
 	 */
 	private void createwarmstartList() {
 		// use cases of _warmstart to decide what to do
-		
+		if (_warmstart == 1) { // add the found path
+		  _warmstartlist = new LinkedList<NodeImpl>();
+		  if (_timeexpandedpath != null)
+		  for (TimeExpandedPath.PathEdge edge : _timeexpandedpath.getPathEdges()) {
+			  _warmstartlist.add(edge.getEdge().getFromNode());
+			  //System.out.println(edge.getEdge().getFromNode().getId());
+		  }
+		} else if (_warmstart == 2) { // rebuild shortest path tree from last interval
+		  _warmstartlist = new LinkedList<NodeImpl>();
+		 
+		  _warmstartlist.addAll(_labels.keySet());
+		  
+		  Collections.sort(_warmstartlist, new Comparator<NodeImpl>() {
+		          public int compare(NodeImpl n1, NodeImpl n2) {
+		        	   int v1 = _labels.get(n1).getLast().getLowBound();		        	   
+		        	   int v2 = _labels.get(n2).getLast().getLowBound();
+		        	   if (v1 > v2) {
+		        		  return 1;
+		        	   } else if (v1 == v2) {
+		        		   return 0;
+		        	   } else {
+		        		   return -1;
+		        	   }
+		        	   		               
+		          }
+		     });
+		  
+		  /*for (Node node : _warmstartlist) {
+			  System.out.println(node.getId().toString() + " " + _labels.get(node).getLast().getLowBound());
+		  }*/
+		  
+		} else if (_warmstart == 3) { // rebuild shortest path tree from firstPossibleTime
+			  _warmstartlist = new LinkedList<NodeImpl>();
+				 
+			  _warmstartlist.addAll(_labels.keySet());
+			  
+			  Collections.sort(_warmstartlist, new Comparator<NodeImpl>() {
+			          public int compare(NodeImpl n1, NodeImpl n2) {
+			        	   int v1 = _labels.get(n1).firstPossibleTime();		        	   
+			        	   int v2 = _labels.get(n2).firstPossibleTime();
+			        	   if (v1 > v2) {
+			        		  return 1;
+			        	   } else if (v1 == v2) {
+			        		   return 0;
+			        	   } else {
+			        		   return -1;
+			        	   }
+			        	   		               
+			          }
+			     });
+			  
+			  /*for (Node node : _warmstartlist) {
+				  System.out.println(node.getId().toString() + " " + _labels.get(node).getLast().getLowBound());
+			  }*/
+			  
+			}
 		
 	}
 
