@@ -6,11 +6,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
@@ -62,14 +62,14 @@ public class NetworkPrunerIterate {
 	}
 
 	private void removeShortLeaves(double length) {
-		Map<Id,? extends Link> netLinks = network.getLinks();
-		Iterator<? extends Link> linkIterator = netLinks.values().iterator();
+		Map<Id,? extends LinkImpl> netLinks = network.getLinks();
+		Iterator<? extends LinkImpl> linkIterator = netLinks.values().iterator();
 		int shortLeafRemovalCount = 0;
 		while(linkIterator.hasNext()){
-			Link currentLink = linkIterator.next();
+			LinkImpl currentLink = linkIterator.next();
 			if(currentLink.getLength() < length){
-				Node fromNode = currentLink.getFromNode();
-				Node toNode = currentLink.getToNode();
+				NodeImpl fromNode = currentLink.getFromNode();
+				NodeImpl toNode = currentLink.getToNode();
 //				check if it's a leaf
 //				scheme:
 //				fromNode		currentLink		toNode
@@ -79,7 +79,7 @@ public class NetworkPrunerIterate {
 //								partnerLink
 //				first, find its partner link
 				if(fromNode.getInLinks().size() == 1){
-					Link partnerLink = fromNode.getInLinks().values().iterator().next();
+					LinkImpl partnerLink = fromNode.getInLinks().values().iterator().next();
 					if (partnerLink.equals(currentLink)){ //mustn't be me
 						continue;
 					}
@@ -100,20 +100,20 @@ public class NetworkPrunerIterate {
 
 	private void joinOneWayLinks() {
 		// TODO Auto-generated method stub
-		Map<Id,Node> nodeMap =  network.getNodes();
-		Iterator<Node> nodeIterator = nodeMap.values().iterator();
+		Map<Id,NodeImpl> nodeMap =  network.getNodes();
+		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 		while(nodeIterator.hasNext()){
-			 Node currentNode =nodeIterator.next();
-			 Map<Id,? extends Link> inLinks = currentNode.getInLinks();
-			 Map<Id,? extends Link> outLinks = currentNode.getOutLinks();
+			 NodeImpl currentNode =nodeIterator.next();
+			 Map<Id,? extends LinkImpl> inLinks = currentNode.getInLinks();
+			 Map<Id,? extends LinkImpl> outLinks = currentNode.getOutLinks();
 			 if(inLinks.size()==1 && outLinks.size()==1){
 				 //check that it's not a dead-end, and has same parameters
 				 double period = 1;
-				 Link inLink = inLinks.values().iterator().next();
-				 Link outLink = outLinks.values().iterator().next();
-				 Node fromNode = inLink.getFromNode();
-				 Node toNode = outLink.getToNode();
+				 LinkImpl inLink = inLinks.values().iterator().next();
+				 LinkImpl outLink = outLinks.values().iterator().next();
+				 NodeImpl fromNode = inLink.getFromNode();
+				 NodeImpl toNode = outLink.getToNode();
 				 double inFlow = inLink.getFlowCapacity(period);
 				 double outFlow = outLink.getFlowCapacity(period);
 				 double inSpeed = inLink.getFreespeed(period);
@@ -143,22 +143,22 @@ public class NetworkPrunerIterate {
 	}
 	private void joinTwoWayLinks() {
 		// TODO Auto-generated method stub
-		Map<Id,Node> nodeMap =  network.getNodes();
-		Iterator<Node> nodeIterator = nodeMap.values().iterator();
+		Map<Id,NodeImpl> nodeMap =  network.getNodes();
+		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 //		ArrayList<Node> removeList = new ArrayList<Node>();
 		while(nodeIterator.hasNext()){
-			 Node currentNode =nodeIterator.next();
-			 Map<Id,? extends Link> inLinks = currentNode.getInLinks();
-			 Map<Id,? extends Link> outLinks = currentNode.getOutLinks();
+			 NodeImpl currentNode =nodeIterator.next();
+			 Map<Id,? extends LinkImpl> inLinks = currentNode.getInLinks();
+			 Map<Id,? extends LinkImpl> outLinks = currentNode.getOutLinks();
 			 if(inLinks.size()==2 && outLinks.size()==2){
 				 //check that it's not a dead-end, and has same parameters
 
 				 double period = 1;
-				 Iterator<? extends Link> inLinkIterator = inLinks.values().iterator();
-				 Iterator<? extends Link> outLinkIterator = outLinks.values().iterator();
-				 Link inLink1 = inLinkIterator.next();
-				 Link inLink2 = inLinkIterator.next();
+				 Iterator<? extends LinkImpl> inLinkIterator = inLinks.values().iterator();
+				 Iterator<? extends LinkImpl> outLinkIterator = outLinks.values().iterator();
+				 LinkImpl inLink1 = inLinkIterator.next();
+				 LinkImpl inLink2 = inLinkIterator.next();
 
 //				 operating from this scheme:
 //				 fromNode			inLink1			currentNode			outLink1			toNode
@@ -166,10 +166,10 @@ public class NetworkPrunerIterate {
 //				  <-------------------------------------- <---------------------------------------
 //				 		            outLink2							inLink2
 //				 so first need to establish which outLink is which
-				 Link outLinkX = outLinkIterator.next();
-				 Link outLinkY = outLinkIterator.next();
-				 Link outLink2 = null;
-				 Link outLink1 = null;
+				 LinkImpl outLinkX = outLinkIterator.next();
+				 LinkImpl outLinkY = outLinkIterator.next();
+				 LinkImpl outLink2 = null;
+				 LinkImpl outLink1 = null;
 				 if(outLinkX.getToNode().equals(inLink1.getFromNode())){
 					 outLink2 = outLinkX;
 					 outLink1 = outLinkY;
@@ -191,8 +191,8 @@ public class NetworkPrunerIterate {
 					 continue;
 				 }
 
-				 Node fromNode = inLink1.getFromNode();
-				 Node toNode = inLink2.getFromNode();
+				 NodeImpl fromNode = inLink1.getFromNode();
+				 NodeImpl toNode = inLink2.getFromNode();
 				 
 //				 final sanity check:
 				 if(
@@ -261,7 +261,7 @@ public class NetworkPrunerIterate {
 	}
 
 	private void findShortestLink(){
-		Iterator<? extends Link> linkIterator = this.network.getLinks().values().iterator();
+		Iterator<? extends LinkImpl> linkIterator = this.network.getLinks().values().iterator();
 		while (linkIterator.hasNext()){
 			double length = linkIterator.next().getLength();
 			if (length<this.shortestLink){

@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
@@ -50,20 +50,20 @@ public class NetworkPruner {
 
 	private void joinOneWayLinks() {
 		// TODO Auto-generated method stub
-		Map<Id,Node> nodeMap =  network.getNodes();
-		Iterator<Node> nodeIterator = nodeMap.values().iterator();
+		Map<Id,NodeImpl> nodeMap =  network.getNodes();
+		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 		while(nodeIterator.hasNext()){
-			 Node currentNode =nodeIterator.next();
-			 Map<Id,? extends Link> inLinks = currentNode.getInLinks();
-			 Map<Id,? extends Link> outLinks = currentNode.getOutLinks();
+			 NodeImpl currentNode =nodeIterator.next();
+			 Map<Id,? extends LinkImpl> inLinks = currentNode.getInLinks();
+			 Map<Id,? extends LinkImpl> outLinks = currentNode.getOutLinks();
 			 if(inLinks.size()==1 && outLinks.size()==1){
 				 //check that it's not a dead-end, and has same parameters
 				 double period = 1;
-				 Link inLink = inLinks.values().iterator().next();
-				 Link outLink = outLinks.values().iterator().next();
-				 Node fromNode = inLink.getFromNode();
-				 Node toNode = outLink.getToNode();
+				 LinkImpl inLink = inLinks.values().iterator().next();
+				 LinkImpl outLink = outLinks.values().iterator().next();
+				 NodeImpl fromNode = inLink.getFromNode();
+				 NodeImpl toNode = outLink.getToNode();
 				 double inFlow = inLink.getFlowCapacity(period);
 				 double outFlow = outLink.getFlowCapacity(period);
 				 double inSpeed = inLink.getFreespeed(period);

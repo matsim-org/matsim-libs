@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 public class LoopSeekerNode {
-	protected Node pointsToNode;
+	protected NodeImpl pointsToNode;
 	protected boolean isRoot;
 	protected boolean hasParent;
 	protected boolean hasKids;
@@ -17,28 +17,28 @@ public class LoopSeekerNode {
 	protected double distanceToParent;
 	protected LoopSeekerNode parentNode;
 	protected LoopSeekerRoot rootNode;
-	protected Link linkFromParent;
-	protected Link linkToParent;
-	protected ArrayList<Link> outLinks;
-	protected ArrayList<Link> inLinks;
-	protected ArrayList<Node> possibleOffSpring;
+	protected LinkImpl linkFromParent;
+	protected LinkImpl linkToParent;
+	protected ArrayList<LinkImpl> outLinks;
+	protected ArrayList<LinkImpl> inLinks;
+	protected ArrayList<NodeImpl> possibleOffSpring;
 	protected ArrayList<LoopSeekerNode> childNodes;
 //	protected Map<Id, PathTreeNode> descendantNodes;
 	
 //	constructors
 	public LoopSeekerNode(){
-		this.outLinks = new ArrayList<Link>();
-		this.inLinks = new ArrayList<Link>();
-		this.possibleOffSpring = new ArrayList<Node>();
+		this.outLinks = new ArrayList<LinkImpl>();
+		this.inLinks = new ArrayList<LinkImpl>();
+		this.possibleOffSpring = new ArrayList<NodeImpl>();
 		this.childNodes = new ArrayList<LoopSeekerNode>();
 	}
-	public LoopSeekerNode(Node childNode, LoopSeekerNode parentNode){
+	public LoopSeekerNode(NodeImpl childNode, LoopSeekerNode parentNode){
 		this.isRoot = false;
 		this.setPointsToNode(childNode);
 		this.parentNode = parentNode;
-		this.outLinks = new ArrayList<Link>();
-		this.inLinks = new ArrayList<Link>();
-		this.possibleOffSpring = new ArrayList<Node>();
+		this.outLinks = new ArrayList<LinkImpl>();
+		this.inLinks = new ArrayList<LinkImpl>();
+		this.possibleOffSpring = new ArrayList<NodeImpl>();
 		this.childNodes = new ArrayList<LoopSeekerNode>();
 		assignLinksToFields();
 		this.distanceToParent = linkFromParent.getLength();
@@ -77,17 +77,17 @@ public class LoopSeekerNode {
 			currentNode = currentNode.parentNode;
 		}
 	}
-	public void addChild(Node childNode){
+	public void addChild(NodeImpl childNode){
 		this.childNodes.add(new LoopSeekerNode(childNode,this));
 	}
 	
 	protected void assignLinksToFields() {
 		// assigns linkToParent, outLinks, inLinks
 		if(!this.isRoot){
-			Map<Id, ? extends Link> outMap = this.pointsToNode.getOutLinks();
-			Iterator<? extends Link> linkIterator = outMap.values().iterator();
+			Map<Id, ? extends LinkImpl> outMap = this.pointsToNode.getOutLinks();
+			Iterator<? extends LinkImpl> linkIterator = outMap.values().iterator();
 			while (linkIterator.hasNext()){
-				Link currentLink = linkIterator.next();
+				LinkImpl currentLink = linkIterator.next();
 				if (currentLink.getToNode().equals(this.parentNode.getPointsToNode())) 
 					this.linkToParent = currentLink;
 				else{
@@ -96,10 +96,10 @@ public class LoopSeekerNode {
 					}
 			}
 		}else{
-			Map<Id, ? extends Link> outMap = this.pointsToNode.getOutLinks();
-			Iterator<? extends Link> linkIterator = outMap.values().iterator();
+			Map<Id, ? extends LinkImpl> outMap = this.pointsToNode.getOutLinks();
+			Iterator<? extends LinkImpl> linkIterator = outMap.values().iterator();
 			while (linkIterator.hasNext()){
-				Link currentLink = linkIterator.next();
+				LinkImpl currentLink = linkIterator.next();
 
 					this.outLinks.add(currentLink);
 					this.possibleOffSpring.add(currentLink.getToNode());
@@ -108,10 +108,10 @@ public class LoopSeekerNode {
 		}
 		//inLinks
 		if(!this.isRoot){
-			Map<Id, ? extends Link> inMap = this.pointsToNode.getInLinks();
-			Iterator<? extends Link> linkIterator = inMap.values().iterator();
+			Map<Id, ? extends LinkImpl> inMap = this.pointsToNode.getInLinks();
+			Iterator<? extends LinkImpl> linkIterator = inMap.values().iterator();
 			while (linkIterator.hasNext()){
-				Link currentLink = linkIterator.next();
+				LinkImpl currentLink = linkIterator.next();
 				if (currentLink.getFromNode().equals(this.parentNode.getPointsToNode())) 
 					this.linkFromParent = currentLink;
 				else
@@ -119,10 +119,10 @@ public class LoopSeekerNode {
 
 			}
 		}else{
-			Map<Id, ? extends Link> inMap = this.pointsToNode.getInLinks();
-			Iterator<? extends Link> linkIterator = inMap.values().iterator();
+			Map<Id, ? extends LinkImpl> inMap = this.pointsToNode.getInLinks();
+			Iterator<? extends LinkImpl> linkIterator = inMap.values().iterator();
 			while (linkIterator.hasNext()){
-				Link currentLink = linkIterator.next();
+				LinkImpl currentLink = linkIterator.next();
 
 					this.inLinks.add(currentLink);
 
@@ -132,26 +132,26 @@ public class LoopSeekerNode {
 
 
 
-	public ArrayList<Link> getOutLinks() {
+	public ArrayList<LinkImpl> getOutLinks() {
 		return outLinks;
 	}
 
 	protected void makeOffspring() {
 		// TODO Auto-generated method stub
-		Iterator<Node> nodeIt = this.possibleOffSpring.iterator();
+		Iterator<NodeImpl> nodeIt = this.possibleOffSpring.iterator();
 		while (nodeIt.hasNext()){
-			Node currentNode = nodeIt.next();
+			NodeImpl currentNode = nodeIt.next();
 			if(nodeQualifies(currentNode)){
 				addChild(currentNode);
 			}
 		}
 	}
 
-	public Node getPointsToNode() {
+	public NodeImpl getPointsToNode() {
 		return pointsToNode;
 	}
 
-	public void setPointsToNode(Node pointsToNode) {
+	public void setPointsToNode(NodeImpl pointsToNode) {
 		this.pointsToNode = pointsToNode;
 	}
 
@@ -160,13 +160,13 @@ public class LoopSeekerNode {
 
 	}
 
-	private boolean nodeQualifies(Node currentNode) {
+	private boolean nodeQualifies(NodeImpl currentNode) {
 		// TODO Auto-generated method stub
 		boolean isStreetNode = false;
 		boolean isThruNode = false;
 //		first check that it has at least two inLinks and 2 outLinks, and that they are of street capacity
-		Map<Id, ? extends Link> inLinkMap = currentNode.getInLinks();
-		Map<Id, ? extends Link> outLinkMap = currentNode.getOutLinks();
+		Map<Id, ? extends LinkImpl> inLinkMap = currentNode.getInLinks();
+		Map<Id, ? extends LinkImpl> outLinkMap = currentNode.getOutLinks();
 		if(inLinkMap.size() >= 2 && outLinkMap.size() >= 2)
 			isThruNode = true;
 		isStreetNode = checkIfStreetNode(inLinkMap);
@@ -179,9 +179,9 @@ public class LoopSeekerNode {
 
 
 
-	private boolean checkIfStreetNode(Map<Id, ? extends Link> linkMap) {
+	private boolean checkIfStreetNode(Map<Id, ? extends LinkImpl> linkMap) {
 		// TODO Auto-generated method stub
-		Iterator<? extends Link> linkIterator = linkMap.values().iterator();
+		Iterator<? extends LinkImpl> linkIterator = linkMap.values().iterator();
 		while(linkIterator.hasNext()){
 			if(linkIterator.next().getCapacity(this.rootNode.capPeriod) != this.rootNode.streetCap)
 				return false;
