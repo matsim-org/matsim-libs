@@ -1,10 +1,10 @@
 package playground.andreas.intersection.dijkstra;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkWrapper {
@@ -27,15 +27,15 @@ public class NetworkWrapper {
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
-		for (Link link : networkLayer.getLinks().values()) {
+		for (LinkImpl link : networkLayer.getLinks().values()) {
 			wrappedNetwork.createNode(link.getId(), link.getToNode().getCoord());
 			numberOfNodesGenerated++;
 		}
 
-		for (Node node : networkLayer.getNodes().values()) {
-			for (Link inLink : node.getInLinks().values()) {
-				for (Link outLink : node.getOutLinks().values()) {
-					Link link = wrappedNetwork.createLink(new IdImpl(numberOfLinksGenerated),
+		for (NodeImpl node : networkLayer.getNodes().values()) {
+			for (LinkImpl inLink : node.getInLinks().values()) {
+				for (LinkImpl outLink : node.getOutLinks().values()) {
+					LinkImpl link = wrappedNetwork.createLink(new IdImpl(numberOfLinksGenerated),
 							wrappedNetwork.getNode(inLink.getId()), wrappedNetwork.getNode(outLink.getId().toString()),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),

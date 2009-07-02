@@ -26,12 +26,12 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -136,7 +136,7 @@ public class ItsumoSim extends ExternalMobsim {
 							continue ;
 						}
 						NetworkRoute rr = (NetworkRoute) leg.getRoute();
-						for (Link link : rr.getLinks()) {
+						for (LinkImpl link : rr.getLinks()) {
 							out.write("    <route>"); out.newLine();
 							out.write("     <laneset>" + link.getId() + "</laneset>"); out.newLine();
 							out.write("    </route>"); out.newLine();

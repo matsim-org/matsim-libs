@@ -25,11 +25,11 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
@@ -128,8 +128,8 @@ public class PlansGeneratorControler extends Controler {
 		Population pop = new PopulationImpl();
 		log.info("  generating plans... ");
 
-		LinkedList <Link> fromLinks = new LinkedList<Link>();
-		LinkedList <Link> toLinks = new LinkedList<Link>();
+		LinkedList <LinkImpl> fromLinks = new LinkedList<LinkImpl>();
+		LinkedList <LinkImpl> toLinks = new LinkedList<LinkImpl>();
 
 		fromLinks.add(this.network.getLink("1"));
 		fromLinks.add(this.network.getLink("2"));
@@ -138,9 +138,9 @@ public class PlansGeneratorControler extends Controler {
 
 
 		for(int i=0; i < 1000; i++){
-			for (Link fromLink : fromLinks) {
+			for (LinkImpl fromLink : fromLinks) {
 
-				for (Link toLink : toLinks) {
+				for (LinkImpl toLink : toLinks) {
 
 					if (!fromLink.equals(toLink)){
 
@@ -160,7 +160,7 @@ public class PlansGeneratorControler extends Controler {
 
 
 	/** Generates one Person a time */
-	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
+	private void generatePerson(final int ii, final LinkImpl fromLink, final LinkImpl toLink, final Population population) {
 		PersonImpl p = new PersonImpl(new IdImpl(String.valueOf(ii)));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {

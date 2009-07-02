@@ -25,12 +25,12 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -115,8 +115,8 @@ public class MyControler1 extends Controler {
 		log.info("  generating plans... ");
 
 
-		Link link9 = this.network.getLink("9");
-		Link link15 = this.network.getLink("15");
+		LinkImpl link9 = this.network.getLink("9");
+		LinkImpl link15 = this.network.getLink("15");
 		for (int i=0; i<100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i+1));
 

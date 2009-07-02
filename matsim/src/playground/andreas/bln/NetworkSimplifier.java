@@ -26,13 +26,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.utils.misc.Time;
 
@@ -62,17 +62,17 @@ public class NetworkSimplifier {
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
 
-		for (Node node : network.getNodes().values()) {
+		for (NodeImpl node : network.getNodes().values()) {
 
 			if(this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
 
-				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
+				List<LinkImpl> iLinks = new ArrayList<LinkImpl> (node.getInLinks().values());
 
-				for (Link inLink : iLinks) {
+				for (LinkImpl inLink : iLinks) {
 
-					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
+					List<LinkImpl> oLinks = new ArrayList<LinkImpl> (node.getOutLinks().values());
 
-					for (Link outLink : oLinks) {
+					for (LinkImpl outLink : oLinks) {
 
 						if(inLink != null && outLink != null){
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
@@ -112,7 +112,7 @@ public class NetworkSimplifier {
 									
 									// Only merge links with same attributes									
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
-										Link newLink = network.createLink(
+										LinkImpl newLink = network.createLink(
 												new IdImpl(inLink.getId() + "-" + outLink.getId()),
 												inLink.getFromNode(),
 												outLink.getToNode(),
@@ -176,7 +176,7 @@ public class NetworkSimplifier {
 	/** 
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
-	private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB){
+	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
 
 		boolean bothLinksHaveSameLinkStats = true;
 				
