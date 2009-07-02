@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.benjamin.income;
 
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -41,7 +41,7 @@ public class IncomePlansCalcRoute extends PlansCalcRoute{
 	/**
 	 * Uses the speed factors from the config group and the rerouting of the factory 
 	 */
-	public IncomePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
+	public IncomePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, 
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
