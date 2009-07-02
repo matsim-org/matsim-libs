@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -44,26 +44,26 @@ public class BestFitRouter extends CMCFRouter {
 	public	void route() {
 		Population pop = this.population;
 		//to keep tracking about the used paths, we need a new Map where we can change the flow values;
-		Map<List<Link>, Double> flowValues = new HashMap<List<Link>, Double>();
-		for(Commodity<Node> c: this.pathFlow.getCommodities()){
-			for(List<Link> path: this.pathFlow.getFlowPaths(c))
+		Map<List<LinkImpl>, Double> flowValues = new HashMap<List<LinkImpl>, Double>();
+		for(Commodity<NodeImpl> c: this.pathFlow.getCommodities()){
+			for(List<LinkImpl> path: this.pathFlow.getFlowPaths(c))
 				flowValues.put(path, this.pathFlow.getFlowValue(c, path));
 		}
 		int routedPersons = 0;
 		for(PersonImpl p: pop.getPersons().values()){
 			LegImpl leg = p.getSelectedPlan().getNextLeg(p.getSelectedPlan().getFirstActivity());
-			Node 	from = leg.getRoute().getStartLink().getToNode(),
+			NodeImpl 	from = leg.getRoute().getStartLink().getToNode(),
 					to = leg.getRoute().getEndLink().getFromNode();
 			// now search path for rerouting
-			List<Link> path = null;
-			Commodity<Node> com = this.pathFlow.getCommodity(from, to);
+			List<LinkImpl> path = null;
+			Commodity<NodeImpl> com = this.pathFlow.getCommodity(from, to);
 			if(com == null){
 				System.out.println("Warning, no commodity in CMCF solution found from "+from+" to "+to+"!  Skipping person with id "+p.getId());
 				continue;
 			}
 			assert(com != null);
 			double max = 0;
-			for(List<Link> pp: this.pathFlow.getFlowPaths(com)){
+			for(List<LinkImpl> pp: this.pathFlow.getFlowPaths(com)){
 				double flow = flowValues.get(pp);
 				if( (flow > max) && (flow > 0)){
 					path = pp;

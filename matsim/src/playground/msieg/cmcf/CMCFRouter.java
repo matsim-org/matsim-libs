@@ -32,11 +32,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReader;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -54,7 +54,7 @@ public abstract class CMCFRouter implements NetworkReader{
 
 	protected NetworkLayer network;
 	protected Population population;
-	protected PathFlow<Node, Link> pathFlow;
+	protected PathFlow<NodeImpl, LinkImpl> pathFlow;
 
 
 	public CMCFRouter(final String networkFile, final String plansFile, final String cmcfFile) {
@@ -107,7 +107,7 @@ public abstract class CMCFRouter implements NetworkReader{
 	}
 
 	protected void loadCMCFSolution() throws NumberFormatException, IOException{
-		this.pathFlow = new HashPathFlow<Node, Link>();
+		this.pathFlow = new HashPathFlow<NodeImpl, LinkImpl>();
 		BufferedReader in = new BufferedReader(new FileReader(this.cmcfFile));
 		String line = null;
 		while ((line = in.readLine()) != null) {
@@ -125,7 +125,7 @@ public abstract class CMCFRouter implements NetworkReader{
 				String toID = line.substring(0,line.indexOf(" ("));
 				String pathString = line.substring(line.indexOf("): ")+3).trim();
 
-				List<Link> path = new LinkedList<Link>();
+				List<LinkImpl> path = new LinkedList<LinkImpl>();
 				StringTokenizer st = new StringTokenizer(pathString);
 				while(st.hasMoreTokens()){
 					path.add(this.network.getLink(st.nextToken()));

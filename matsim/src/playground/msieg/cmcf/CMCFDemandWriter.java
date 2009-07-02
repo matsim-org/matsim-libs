@@ -28,11 +28,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -186,7 +186,7 @@ public class CMCFDemandWriter{
 		while(tabs-- > 0)
 			tab += '\t';
 		//in advance, read input data and store all the demands accumulated:
-		Commodities<Node> com = new Commodities<Node>();
+		Commodities<NodeImpl> com = new Commodities<NodeImpl>();
 
 		PlanImpl plan;
 		ActivityImpl act1, act2;
@@ -202,7 +202,7 @@ public class CMCFDemandWriter{
 		//now write the output
 		log(tab+"<demands>\n", out);
 		int counter = 1;
-		for(Commodity<Node> c: com){
+		for(Commodity<NodeImpl> c: com){
 			if(c.getOrigin() == c.getDestination()){
 				log(tab+"\t<!--- Skipping commodity, because start node equals target --->", out);
 				continue;

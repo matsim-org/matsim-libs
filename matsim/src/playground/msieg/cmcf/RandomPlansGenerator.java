@@ -29,10 +29,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -139,7 +139,7 @@ public class RandomPlansGenerator {
 			person.addPlan(plan);
 
 			//create random home and work link
-			Link lHome, lWork;
+			LinkImpl lHome, lWork;
 			LeastCostPathCalculator.Path lPath = null;
 			double randTime;
 			do{
@@ -177,10 +177,10 @@ public class RandomPlansGenerator {
 		return pop;
 	}
 
-	private Link getRandomLink(){
+	private LinkImpl getRandomLink(){
 		int i = this.rand.nextInt(this.network.getLinks().size());
-		Link randomLink = null;
-		for (Iterator<Link> iterator = this.network.getLinks().values().iterator(); i >= 0; i--) {
+		LinkImpl randomLink = null;
+		for (Iterator<LinkImpl> iterator = this.network.getLinks().values().iterator(); i >= 0; i--) {
 			randomLink = iterator.next();
 		}
 		return randomLink;

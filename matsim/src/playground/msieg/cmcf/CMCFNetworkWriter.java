@@ -8,11 +8,12 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReader;
+import org.matsim.core.network.NodeImpl;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -115,7 +116,7 @@ public class CMCFNetworkWriter implements NetworkReader {
 		while(tabs-- > 0)
 			tab += '\t';
 		log(tab+"<nodes>\n", out);
-		for (Map.Entry<Id, Node> entry: this.netLayer.getNodes().entrySet()){
+		for (Map.Entry<Id, NodeImpl> entry: this.netLayer.getNodes().entrySet()){
 			log(tab+"\t<node id=\""+entry.getKey()+"\" " +
 					"x=\""+entry.getValue().getCoord().getX()+"\" " +
 					"y=\""+entry.getValue().getCoord().getY()+"\" />\n", out);
@@ -146,7 +147,7 @@ public class CMCFNetworkWriter implements NetworkReader {
 		while(tabs-- > 0)
 			tab += '\t';
 		log(tab+"<edges>", out);
-		for (Link l: this.netLayer.getLinks().values()){
+		for (LinkImpl l: this.netLayer.getLinks().values()){
 			log(tab+"\t<edge id=\""+l.getId()+"\">\n", out);
 			log(tab+"\t\t<from>"+l.getFromNode().getId()+"</from>\n", out);
 			log(tab+"\t\t<to>"+l.getToNode().getId()+"</to>\n", out);
