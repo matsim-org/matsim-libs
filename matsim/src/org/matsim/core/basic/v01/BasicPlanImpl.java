@@ -65,11 +65,12 @@ public class BasicPlanImpl implements BasicPlan {
 	}
 
 	public boolean isSelected() {
-		return isSelected;
+		throw new UnsupportedOperationException("Not supported at this level");
 	}
 
 	public void setSelected(boolean selected) {
-		this.isSelected = selected;
+		throw new UnsupportedOperationException("Not supported at this level");
+//		this.isSelected = selected;
 	}
 
 
@@ -82,17 +83,17 @@ public class BasicPlanImpl implements BasicPlan {
 		this.type = type;
 	}
 
-	public List<? extends BasicPlanElement> getPlanElements() {
+	public final List<? extends BasicPlanElement> getPlanElements() {
 		return this.actsLegs;
 	}
 
-	public void addLeg(final BasicLeg leg) {
-		if (this.actsLegs.size() %2 == 0 ) throw (new IndexOutOfBoundsException("Error: Tried to insert leg at non-leg position"));
+	public final void addLeg(final BasicLeg leg) {
+		if (this.actsLegs.size() %2 == 0 ) throw (new IllegalStateException("Error: Tried to insert leg at non-leg position"));
 		this.actsLegs.add(leg);
 	}
 
-	public void addActivity(final BasicActivity act) {
-		if (this.actsLegs.size() %2 != 0 ) throw (new IndexOutOfBoundsException("Error: Tried to insert act at non-act position"));
+	public final void addActivity(final BasicActivity act) {
+		if (this.actsLegs.size() %2 != 0 ) throw (new IllegalStateException("Error: Tried to insert act at non-act position"));
 		this.actsLegs.add(act);
 	}
 
