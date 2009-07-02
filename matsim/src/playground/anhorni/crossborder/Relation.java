@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 import java.util.Collections;
 import java.util.Vector;
@@ -107,9 +107,9 @@ public class Relation {
 		Iterator<Integer> n_it = this.fromZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();
-			Node node=network.getNode(Integer.toString(n_i));
+			NodeImpl node=network.getNode(Integer.toString(n_i));
 					
-			for (Link l : node.getOutLinks().values()) {
+			for (LinkImpl l : node.getOutLinks().values()) {
 				if (this.totalOutLinkCapacity>0.0) {
 					this.outLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/this.totalOutLinkCapacity));					
 				}
@@ -122,9 +122,9 @@ public class Relation {
 		n_it = this.toZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();
-			Node node=network.getNode(Integer.toString(n_i));
+			NodeImpl node=network.getNode(Integer.toString(n_i));
 		
-			for (Link l : node.getInLinks().values()) {
+			for (LinkImpl l : node.getInLinks().values()) {
 				if (this.totalInLinkCapacity>0.0) {
 					this.inLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/this.totalInLinkCapacity));
 				}
@@ -142,9 +142,9 @@ public class Relation {
 		Iterator<Integer> n_it = this.fromZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();			
-			Node node=network.getNode(Integer.toString(n_i));
+			NodeImpl node=network.getNode(Integer.toString(n_i));
 			
-			for (Link l : node.getOutLinks().values()) {
+			for (LinkImpl l : node.getOutLinks().values()) {
 				this.totalOutLinkCapacity+=l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			}
 		}
@@ -152,9 +152,9 @@ public class Relation {
 		n_it = this.toZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();
-			Node node=network.getNode(Integer.toString(n_i));
+			NodeImpl node=network.getNode(Integer.toString(n_i));
 		
-			for (Link l : node.getInLinks().values()) {
+			for (LinkImpl l : node.getInLinks().values()) {
 				this.totalInLinkCapacity+=l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			}//for
 		}

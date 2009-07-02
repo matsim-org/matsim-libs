@@ -2,11 +2,11 @@ package playground.anhorni.locationchoice.cs.test;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -34,10 +34,10 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 			
 		NetworkLayer network = controler.getNetwork();
 		
-		Link link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
+		LinkImpl link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
 		ActivityImpl fromAct = new org.matsim.core.population.ActivityImpl("home", link0);
 		
-		Link link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
+		LinkImpl link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
 		ActivityImpl toAct = new org.matsim.core.population.ActivityImpl("shop", link1);
 		fromAct.setEndTime(0.0);
 		

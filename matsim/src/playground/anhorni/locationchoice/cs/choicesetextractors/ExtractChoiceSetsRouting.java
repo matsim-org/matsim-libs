@@ -26,12 +26,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -99,12 +99,12 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		 * Link linkBefore = choiceSet.getTrip().getBeforeShoppingAct().getLink(); ...
 		 */
 		//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
-		Link linkBefore = network.getLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
+		LinkImpl linkBefore = network.getLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
 		ActivityImpl fromAct0 = new org.matsim.core.population.ActivityImpl("beforeShop", linkBefore);
 		fromAct0.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
 		fromAct0.setCoord(linkBefore.getCoord());
 					
-		Link link = network.getLink(linkId);
+		LinkImpl link = network.getLink(linkId);
 		ActivityImpl toAct0 = new org.matsim.core.population.ActivityImpl("shop", link);
 		toAct0.setCoord(link.getCoord());
 					
@@ -120,7 +120,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		fromAct1.setCoord(toAct0.getCoord());
 					
 		//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
-		Link linkAfter = network.getLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
+		LinkImpl linkAfter = network.getLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
 		ActivityImpl toAct1 = new org.matsim.core.population.ActivityImpl("afterShop", linkAfter);
 		toAct1.setCoord(linkAfter.getCoord());
 					

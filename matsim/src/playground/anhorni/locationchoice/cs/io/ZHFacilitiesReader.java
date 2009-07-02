@@ -5,9 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -62,7 +62,7 @@ public class ZHFacilitiesReader {
 				String name = entries[6].trim();
 				
 				Coord exactPosition = new CoordImpl(xCH, yCH);
-				Link closestLink = network.getNearestLink(exactPosition);
+				LinkImpl closestLink = network.getNearestLink(exactPosition);
 				
 				facilities.addFacilityByLink(closestLink.getId(), new ZHFacility(
 									new IdImpl(shopID),
