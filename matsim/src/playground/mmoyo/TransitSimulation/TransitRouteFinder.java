@@ -34,6 +34,7 @@ public class TransitRouteFinder {
 		this.ptRouter = ptRouter;
 	}
 	
+	/**returns a list of legs that represent a PT connection between two activities locations*/ 
 	public List<LegImpl> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final PersonImpl person ){
 		List<LegImpl> legList = new ArrayList<LegImpl>();
 		
@@ -70,7 +71,7 @@ public class TransitRouteFinder {
 				lastLinkType = linkType;
 				i++;
 			}
-			legList = logicToPlainTranslator.convertToPlainLeg(legList);
+			legList = logicToPlainTranslator.convertToPlainLeg(legList); //translates the listLeg into the plainNetwork
 		}
 		return legList;
 	}

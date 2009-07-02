@@ -7,6 +7,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -22,15 +23,15 @@ import playground.mmoyo.PTRouter.PTRouter2;
  * This class contains the options to route with a TransitSchedule object 
  */
 public class Main {
-	private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
+	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
-	private static final String CONFIG =  path  + "config.xml";
-	private static final String PLANFILE = path + "plans.xml";
-	private static final String OUTPUTPLANS = path + "output_plans_with_Transit.xml";
-	private static final String PLAINNETWORK = path + "plainNetwork.xml";
-	private static final String LOGICNETWORK = path + "logicNetwork.xml";
-	private static final String LOGICTRANSITSCHEDULE = path + "logicTransitSchedule.xml";
-	private static final String TRANSITSCHEDULEFILE = path + "transitSchedule.xml";
+	private static final String CONFIG =  PATH  + "config.xml";
+	private static final String PLANFILE = PATH + "plans.xml";
+	private static final String OUTPUTPLANS = PATH + "output_plans_with_Transit.xml";
+	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
+	private static final String LOGICNETWORK = PATH + "logicNetwork.xml";
+	private static final String LOGICTRANSITSCHEDULE = PATH + "logicTransitSchedule.xml";
+	private static final String TRANSITSCHEDULEFILE = PATH + "transitSchedule.xml";
 	
 	public static void main(String[] args) {
 		NetworkLayer plainNet= new NetworkLayer(new NetworkFactory());
@@ -73,16 +74,18 @@ public class Main {
 				}
 				break;
 
-			case 3: //Routes a population*/
+			case 3: //Routes a population/
 	    		ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 	    		ptActWriter.findRouteForActivities();
+	    		new PopulationWriter(ptActWriter.crazyPopulation, PATH + "crazyplans.xml", "v4").write();
+	    		
 	    		break;
 
 			case 4:  //tests the TransitRouteFinder class
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.printPTLegs(transitSchedule);
 				break;
-			
+				
 			case 5: //creates GIS net from plainNetwork*/
 				//Nodes2ESRIShape nodes2ESRIShape = new Nodes2ESRIShape();
 				break;

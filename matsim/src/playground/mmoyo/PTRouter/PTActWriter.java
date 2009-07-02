@@ -56,6 +56,9 @@ public class PTActWriter {
 	private final String TRANSFER = "Transfer";
 	private final String DETTRANSFER = "DetTransfer";
 	
+	//public List<Id> crazyAgentList = new ArrayList<Id>(); 
+	public Population crazyPopulation = new PopulationImpl();
+	
 	@Deprecated
 	public PTActWriter(final PTOb ptOb){
 		this.ptRouter = ptOb.getPtRouter2();
@@ -127,20 +130,18 @@ public class PTActWriter {
 				NetworkRoute netRoute= (NetworkRoute) leg.getRoute(); 
 				System.out.println(" ");
 				System.out.println(leg.toString());
-				
 				/*
 				for ( Link l : netRoute.getLinks()){
 					System.out.print("(" + l.getFromNode().getId() + ")----" + l.getId() + "---->(" + l.getToNode().getId() + ")" );
 				}
 				*/
-				
-				
 			}
 		}
 	}
 	
 	public void findRouteForActivities(){
 		Population newPopulation = new PopulationImpl();
+		
 		int numPlans=0;
 
 		int trips=0;
@@ -255,7 +256,6 @@ public class PTActWriter {
 			
 	}//createPTActs
 	
-	
 	/**
 	 * Cuts up the found path into acts and legs according to the type of links contained in the path
 	 */
@@ -299,7 +299,7 @@ public class PTActWriter {
 				}
 
 			}else if(link.getType().equals(TRANSFER) ){  //add the PTleg and a Transfer Act
-				if (lastLink.getType().equals(STANDARD)){
+				//if (lastLink.getType().equals(STANDARD)){
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
 					newPlan.addLeg(newPTLeg(TransportMode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime)); //-->: The legMode car is temporal only for visualization purposes
@@ -307,7 +307,21 @@ public class PTActWriter {
 					double endTime = accumulatedTime + linkTravelTime;
 					newPlan.addActivity(newPTAct("transf", link.getFromNode().getCoord(), link, accumulatedTime, endTime));
 					first=false;
-				}
+					
+					////////////////////////////// find crazy connections
+					NodeImpl nodeA = path.nodes.get(0);
+					NodeImpl nodeB = path.nodes.get(path.nodes.size()-1);
+					double a_bDistance = CoordUtils.calcDistance(nodeA.getCoord() , nodeB.getCoord());
+					double a_TransterDistance = CoordUtils.calcDistance(nodeA.getCoord() , link.getFromNode().getCoord());
+					double b_TransterDistance = CoordUtils.calcDistance(nodeB.getCoord() , link.getFromNode().getCoord());
+					if(a_TransterDistance > a_bDistance || b_TransterDistance > a_bDistance){
+						PersonImpl crazyPerson = newPlan.getPerson();
+						if (!crazyPopulation.getPersons().containsValue(crazyPerson))
+							crazyPopulation.addPerson(newPlan.getPerson());
+					}
+					///////////////////////////
+					
+				//}
 			}
 			else if (link.getType().equals(DETTRANSFER)){
 				/**standard links*/
@@ -412,5 +426,4 @@ public class PTActWriter {
 		logicNet.removeNode(destinationNode);
 	}
 
-	
 }

@@ -5,7 +5,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -20,8 +19,8 @@ import playground.mmoyo.input.PTLineAggregator;
  * Executable class to perform data input, validations and routing test according to timetable information
  */
 public class PTControler2 {
-   //private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
-	private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
+   private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
+	//private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
     
 	private static final String CONFIG =  path  + "config.xml";
 	private static final String NETFILE = path + "network.xml";

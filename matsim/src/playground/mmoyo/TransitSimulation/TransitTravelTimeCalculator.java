@@ -64,7 +64,7 @@ public class TransitTravelTimeCalculator {
 					nodeDeparturesMap.put(transitStopFacility.getId(), nodeDeparturesArray);
 					
 					
-					/**finds the link that joins both stations, calculate and save its travel time*/ 
+					/**finds the link that joins both stations, calculates and saves its travel time*/ 
 					if (!first){
 						for (LinkImpl lastLink : node.getInLinks().values()){
 							if (lastLink.getFromNode().equals(lastNode)){

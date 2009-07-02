@@ -35,7 +35,7 @@ import playground.mmoyo.PTRouter.PTTimeTable2;
  * -Plain network: A node represent a station. A link represents a simple connection between stations 
  * -logic layer network: with sequences of independent nodes for each TansitLine, include transfer links
  * -logicTransitSchedule: with a cloned stop facility for each transit stop of each Transit Line with new Id's mapped to the real transitFaciliteies
- * -A PTRouter object containing departure information according o the logicTransitSchedule
+ * -A PTRouter object containing departure information according to the logicTransitSchedule
  * -logicToPlainConverter: translates logic nodes and links into plain nodes and links. 
  */
 
@@ -47,8 +47,8 @@ public class LogicFactory{
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
 	
 	private Map<Id,List<NodeImpl>> facilityNodeMap = new TreeMap<Id,List<NodeImpl>>(); /** <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
-	public Map<NodeImpl,NodeImpl> logicToPlanStopMap = new TreeMap<NodeImpl,NodeImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
-	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();
+	public Map<Id,NodeImpl> logicToPlanStopMap = new TreeMap<Id,NodeImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
+	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();                  
 	
 	long newLinkId=0;
 	long newPlainLinkId=0;
@@ -84,7 +84,7 @@ public class LogicFactory{
 					Id logicalId= createLogicalId(idStopFacility, transitRoute.getId()); 
 					NodeImpl logicNode= logicNet.createNode(logicalId, coord);
 					NodeImpl plainNode= createPlainNode(transitStopFacility);
-					logicToPlanStopMap.put(logicNode, plainNode);
+					logicToPlanStopMap.put(logicNode.getId(), plainNode);
 					
 					//fill the facilityNodeMap to create transfer links later on
 					if (!facilityNodeMap.containsKey(idStopFacility)){
@@ -173,8 +173,6 @@ public class LogicFactory{
 		
 		return (numInGoingStandards>0) && (numOutgoingStandards>0); 
 	}
-	
-	
 	
 	/**links for the logical network, one for transitRoute*/
 	private void createLogicLink(Id id, NodeImpl fromNode, NodeImpl toNode, String type){

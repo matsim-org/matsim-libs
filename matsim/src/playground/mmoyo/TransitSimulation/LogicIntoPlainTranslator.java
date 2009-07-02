@@ -18,6 +18,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
+import org.matsim.api.basic.v01.Id;
 
 /**
  * Translates logic nodes and links into plain nodes and links. 
@@ -25,10 +26,10 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 public class LogicIntoPlainTranslator {
 	private NetworkLayer plainNet;
 	private MultiKeyMap joiningLinkMap;
-	private Map<NodeImpl,NodeImpl> logicToPlainStopMap;
+	private Map<Id,NodeImpl> logicToPlainStopMap;
 	
 	/**the constructor creates the joiningLinkMap that stores the relation between logic and plain Nodes*/ 
-	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<NodeImpl,NodeImpl> logicToPlanStopMap) {
+	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<Id,NodeImpl> logicToPlanStopMap) {
 		this.plainNet= plainNetwork;
 		this.logicToPlainStopMap = logicToPlanStopMap;
 		
@@ -42,16 +43,16 @@ public class LogicIntoPlainTranslator {
 		}
 	}
 
-	private NodeImpl convertToPlain(NodeImpl logicNode){
-		return logicToPlainStopMap.get(logicNode);
+	private NodeImpl convertToPlain(Id logicNodeId){
+		return logicToPlainStopMap.get(logicNodeId);
 	}
 	
 	private LinkImpl convertToPlain(final LinkImpl logicLink){
 		LinkImpl logicAliasLink = logicLink;
 		if (logicLink.getType().equals("Transfer") || logicLink.getType().equals("DetTransfer"))
 			logicAliasLink= findLastStandardLink(logicLink);
-		NodeImpl fromPlainNode = convertToPlain(logicAliasLink.getFromNode());
-		NodeImpl toPlainNode = convertToPlain(logicAliasLink.getToNode());
+		NodeImpl fromPlainNode = convertToPlain(logicAliasLink.getFromNode().getId());
+		NodeImpl toPlainNode = convertToPlain(logicAliasLink.getToNode().getId());
 		LinkImpl planLink = (LinkImpl)joiningLinkMap.get(fromPlainNode, toPlainNode); 
 		return planLink;
 	}
