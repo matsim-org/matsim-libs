@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.facilities.ActivityOption;
-import org.matsim.core.api.facilities.OpeningTime;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
