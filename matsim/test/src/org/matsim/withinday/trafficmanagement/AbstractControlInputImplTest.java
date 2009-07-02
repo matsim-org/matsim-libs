@@ -20,13 +20,13 @@
 
 package org.matsim.withinday.trafficmanagement;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;

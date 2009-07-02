@@ -27,13 +27,13 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
@@ -124,7 +124,7 @@ public class CoopersRouteProviderTest extends TestCase {
 
 
 	/**
-	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.api.population.NetworkRoute)}.
+	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.population.routes.NetworkRoute)}.
 	 */
 	public void testProvidesRoute() {
 	  //create route which is driven by the person in the real simulated world

@@ -22,13 +22,13 @@ package org.matsim.planomat.costestimators;
 
 import java.util.List;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.misc.Time;
 

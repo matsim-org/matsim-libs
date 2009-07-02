@@ -20,7 +20,6 @@
 
 package org.matsim.core.facilities;
 
-import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;

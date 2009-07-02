@@ -23,7 +23,6 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;

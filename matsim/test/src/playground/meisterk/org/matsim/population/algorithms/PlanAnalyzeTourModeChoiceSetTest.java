@@ -28,10 +28,10 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkIdComparator;

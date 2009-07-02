@@ -21,9 +21,9 @@
 package org.matsim.examples;
 
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;

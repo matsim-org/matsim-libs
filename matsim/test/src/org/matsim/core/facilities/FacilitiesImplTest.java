@@ -20,7 +20,6 @@
 
 package org.matsim.core.facilities;
 
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;

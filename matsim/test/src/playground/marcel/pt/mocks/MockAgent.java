@@ -21,12 +21,12 @@
 package playground.marcel.pt.mocks;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.population.GenericRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.integration.ExperimentalTransitRoute;

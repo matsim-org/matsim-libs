@@ -25,11 +25,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.facilities.ActivityFacilities;
-import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicActivityOption;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.testcases.MatsimTestCase;

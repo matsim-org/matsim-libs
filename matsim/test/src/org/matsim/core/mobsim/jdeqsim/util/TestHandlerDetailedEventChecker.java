@@ -11,7 +11,6 @@ import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
@@ -29,6 +28,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements BasicPersonEventHandler {

@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement;
 
-import org.matsim.core.api.population.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.trafficmanagement.controlinput.AbstractControlInputImpl;
 
 /**

@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.mocks;
 
-import org.matsim.core.api.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;

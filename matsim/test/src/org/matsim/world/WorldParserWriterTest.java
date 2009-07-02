@@ -20,8 +20,8 @@
 
 package org.matsim.world;
 
-import org.matsim.core.api.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;

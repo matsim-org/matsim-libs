@@ -26,13 +26,13 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;

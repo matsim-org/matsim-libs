@@ -20,7 +20,6 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NodeNetworkRoute;
