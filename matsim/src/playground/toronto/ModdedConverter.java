@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -128,12 +129,7 @@ public class ModdedConverter {
 			if (tabs[7].equals("L")){
 				tabs[7]="H";
 			}
-			if (this.tmpTabs[4].equals("L")){
-				this.tmpTabs[4]="H";
-			}
-			if (this.tmpTabs[7].equals("L")){
-				this.tmpTabs[7]="H";
-			}
+
 			String tripId = tabs[0] + "-" + tabs[1] + "-" + tabs[2];
 			String mode = tabs[16]; 
 			if(!this.tmpTripId.equals(tripId)&&mode.equals("0")){
@@ -231,7 +227,12 @@ public class ModdedConverter {
 					this.tmpEndTime = endTime;
 					this.tmpTabs = tabs;
 					this.tmpTripId = tripId;
-
+					if (this.tmpTabs[4].equals("L")){
+						this.tmpTabs[4]="H";
+					}
+					if (this.tmpTabs[7].equals("L")){
+						this.tmpTabs[7]="H";
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -279,14 +280,14 @@ public class ModdedConverter {
 	}
 
 	public static void main(final String[] args) {
-		String oldPlansFilename = "C:\\workspace\\matsim\\input\\ConvertPlan\\fout_modechoices_good.txt";
-		String newPlansFilename = "C:\\workspace\\matsim\\output\\ConvertPlan\\plans.xml.gz";
-		String zoneFilename = "C:\\workspace\\matsim\\input\\ConvertPlan\\centroids.txt";
+		String oldPlansFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\fout_modechoices_good.txt";
+		String newPlansFilename = "C:\\Thesis_HJY\\matsim\\output\\ConvertPlan\\plans.xml.gz";
+		String zoneFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\centroids.txt";
 		
 		ModdedConverter c = new ModdedConverter();
 
 		Gbl.createConfig(null);
-		c.setZones((ZoneLayer) Gbl.createWorld().createLayer(new IdImpl("zones"),
+		c.setZones((ZoneLayer) Gbl.getWorld().createLayer(new IdImpl("zones"),
 				"toronto_test"));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
@@ -333,7 +334,7 @@ public class ModdedConverter {
 			PopulationWriter writer = new PopulationWriter(c.pop,
 					newPlansFilename, "v4", 1.0);
 			writer.writeStartPlans();
-			String line = reader.readLine();
+			String line;
 			do {
 				line = reader.readLine();
 				if (line != null) {
