@@ -21,8 +21,6 @@
 package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.BasicActivityImpl;
@@ -32,13 +30,7 @@ import org.matsim.core.utils.misc.Time;
 
 public class ActivityImpl extends BasicActivityImpl implements Activity {
 
-	private BasicLink link = null;
-	private ActivityFacility facility = null;
 	private double dur = Time.UNDEFINED_TIME;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	public ActivityImpl(final String type, final LinkImpl link) {
 		super(type.intern());
@@ -72,22 +64,15 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		this.setFacility(act.getFacility());
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-	
 	public void setCoord( final Coord coord ) {
 		super.setCoord ( coord ) ;
 	}
-
-	public void setFacility(final ActivityFacility facility) {
-		this.facility = facility;
+	
+	public LinkImpl getLink(){
+		return (LinkImpl) super.getLink();
 	}
-
-	public void setLink(final BasicLink link) {
-		this.link = link;
-	}
-
+	
+	
 	@Override
 	public final String toString() {
 		return "[type=" + this.getType() + "]" +
@@ -97,37 +82,6 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 				"[endTime=" + Time.writeTime(this.getEndTime()) + "]";
 	}
 
-
-	// here to return correct link type
-	public final LinkImpl getLink() {
-		return (LinkImpl)this.link;
-	}
-
-	public ActivityFacility getFacility() {
-		return this.facility;
-	}
-
-	public void setFacilityId(final Id id) {
-		throw new UnsupportedOperationException("not yet, please wait...");
-	}
-	
-	@Override
-	public final Id getLinkId() { // convenience method
-		if (this.link != null)
-			return this.link.getId();
-		return null;
-	}
-	
-	public void setLinkId(final Id id) {
-		throw new UnsupportedOperationException("not yet, please wait...");
-	}
-	
-	@Override
-	public final Id getFacilityId() {
-		if (this.facility != null)
-			return this.facility.getId();
-		return null;
-	}
 
 
 	/**
