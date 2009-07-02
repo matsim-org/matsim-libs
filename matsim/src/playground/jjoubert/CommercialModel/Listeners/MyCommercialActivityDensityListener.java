@@ -25,12 +25,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.network.NetworkLayer;
 
 public class MyCommercialActivityDensityListener implements IterationStartsListener, IterationEndsListener{
 	
@@ -58,7 +58,7 @@ public class MyCommercialActivityDensityListener implements IterationStartsListe
 			e.printStackTrace();
 		}
 		
-		Network nw = event.getControler().getNetwork();
+		NetworkLayer nw = event.getControler().getNetwork();
 		this.cs = new MyCommercialActivityDensityWriter(this.outputCommercialActivityDensity, nw);
 		event.getControler().getEvents().addHandler(this.cs);
 	}	

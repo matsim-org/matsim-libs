@@ -25,15 +25,15 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 public class MyCommercialActivityDensityWriter implements BasicActivityStartEventHandler{
 	
 	private BufferedWriter outputGapDensity;
-	private Network network;
+	private NetworkLayer network;
 	
-	public MyCommercialActivityDensityWriter(BufferedWriter output, Network nw) {
+	public MyCommercialActivityDensityWriter(BufferedWriter output, NetworkLayer nw) {
 		this.outputGapDensity = output;
 		this.network = nw;
 	}
@@ -48,7 +48,7 @@ public class MyCommercialActivityDensityWriter implements BasicActivityStartEven
 			double timeSeconds = event.getTime();
 			int hour = (int) Math.floor((timeSeconds) / 3600);
 
-			Link link = this.network.getLink( event.getLinkId() );
+			LinkImpl link = this.network.getLink( event.getLinkId() );
 			try {
 				this.outputGapDensity.write(String.valueOf(link.getCoord().getX()));
 				this.outputGapDensity.write(",");
