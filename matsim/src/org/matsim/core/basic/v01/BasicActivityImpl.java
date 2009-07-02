@@ -39,7 +39,7 @@ public class BasicActivityImpl implements BasicActivity {
 	protected BasicLink link = null;
 	protected ActivityFacility facility = null;
 
-	public BasicActivityImpl(String type) {
+	protected BasicActivityImpl(String type) {
 		this.type = type;
 	}
 	
