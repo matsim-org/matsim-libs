@@ -7,15 +7,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 public class CellNetworkMapping {
 
 	private final static Logger log = Logger.getLogger(TestCellKnowledge.class);
 	
-	private Network network;
-	private Map <Node, Cell> nodesMapping;
+	private NetworkLayer network;
+	private Map <NodeImpl, Cell> nodesMapping;
 	private Map <Integer, Cell> cells;
 	
 	private double xMin;
@@ -26,7 +26,7 @@ public class CellNetworkMapping {
 	private int yZones = 2;
 	private int maxNodesPerZone = 25;
 	
-	public CellNetworkMapping(Network network)
+	public CellNetworkMapping(NetworkLayer network)
 	{
 		this.network = network;
 	}
@@ -36,19 +36,19 @@ public class CellNetworkMapping {
 		createCoreMapping();
 	}
 	
-	public Cell getCell(Node node)
+	public Cell getCell(NodeImpl node)
 	{
 		return nodesMapping.get(node);
 	}
 	
-	public Network getNetwork()
+	public NetworkLayer getNetwork()
 	{
 		return network;
 	}
 	
 	private void createCoreMapping()
 	{
-		nodesMapping = new HashMap<Node, Cell>();
+		nodesMapping = new HashMap<NodeImpl, Cell>();
 		
 		getNetworkDimensions();
 		
@@ -76,7 +76,7 @@ public class CellNetworkMapping {
 		}
 		
 		// assign Nodes to their Core Cells
-		for (Node node : network.getNodes().values())
+		for (NodeImpl node : network.getNodes().values())
 		{
 			Cell coreCell = getCoreCell(node);
 			if (coreCell != null) coreCell.addNode(node);
@@ -97,12 +97,12 @@ public class CellNetworkMapping {
 		// create Nodes Mapping
 		for (Cell cell : cells.values())
 		{
-			List<Node> nodes = cell.getNodes();
+			List<NodeImpl> nodes = cell.getNodes();
 			
 			// otherwise cell.getNodes() would return null
 			if (!cell.hasChildren())
 			{
-				for (Node node : nodes)
+				for (NodeImpl node : nodes)
 				{
 					nodesMapping.put(node, cell);
 				}
@@ -121,7 +121,7 @@ public class CellNetworkMapping {
 */
 	}
 	
-	private Cell getCoreCell(Node node)
+	private Cell getCoreCell(NodeImpl node)
 	{
 		//return nodesMapping.get(node);
 		for (Cell cell : cells.values())
@@ -145,15 +145,15 @@ public class CellNetworkMapping {
 	
 	private void getNetworkDimensions()
 	{
-		Collection<Node> nodes = network.getNodes().values();
+		Collection<NodeImpl> nodes = network.getNodes().values();
 		
-		Node firstNode = nodes.iterator().next();
+		NodeImpl firstNode = nodes.iterator().next();
 		xMin = firstNode.getCoord().getX();
 		xMax = firstNode.getCoord().getX();
 		yMin = firstNode.getCoord().getY();
 		yMax = firstNode.getCoord().getY();
 		
-		for (Node node : nodes)
+		for (NodeImpl node : nodes)
 		{
 			Coord coord = node.getCoord();
 			double xCoord = coord.getX();

@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -52,21 +52,21 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	{
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected Path findRoute(Node fromNode, Node toNode)
+	protected Path findRoute(NodeImpl fromNode, NodeImpl toNode)
 	{
-		Node previousNode = null;
-		Node currentNode = fromNode;
-		Link currentLink;
+		NodeImpl previousNode = null;
+		NodeImpl currentNode = fromNode;
+		LinkImpl currentLink;
 		double routeLength = 0.0;
 		
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, Node> knownNodesMap = null;
+		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
+		ArrayList<LinkImpl> links = new ArrayList<LinkImpl>();
+		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
 		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
@@ -84,7 +84,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 				break;
 			}
 			
-			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
+			LinkImpl[] linksArray = currentNode.getOutLinks().values().toArray(new LinkImpl[currentNode.getOutLinks().size()]);
 			
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
 			linksArray = KnowledgeTools.getKnownLinks(linksArray, knownNodesMap);
@@ -99,13 +99,13 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 				break;
 			}
 			
-			Link nextLink = null;
+			LinkImpl nextLink = null;
 			double angle = Math.PI;	// worst possible start value
 			
 			// get the Link with the nearest direction to the destination node
 			for(int i = 0; i < linksArray.length; i++)
 			{
-				if(linksArray[i] instanceof Link)
+				if(linksArray[i] instanceof LinkImpl)
 				{
 					double newAngle = calcAngle (fromNode, toNode, linksArray[i].getToNode());
 					
@@ -176,7 +176,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		errorCounter = i;
 	}
 	
-	protected double calcAngle(Node currentNode, Node toNode, Node nextLinkNode)
+	protected double calcAngle(NodeImpl currentNode, NodeImpl toNode, NodeImpl nextLinkNode)
 	{
 		double v1x = nextLinkNode.getCoord().getX() - currentNode.getCoord().getX();
 		double v1y = nextLinkNode.getCoord().getY() - currentNode.getCoord().getY();

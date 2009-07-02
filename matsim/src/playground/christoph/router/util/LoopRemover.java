@@ -22,7 +22,7 @@ package playground.christoph.router.util;
 
 import java.util.List;
 
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 public class LoopRemover {
@@ -38,7 +38,7 @@ public class LoopRemover {
 		 * Maybe a Problem: two nodes could be connected with more than one link.
 		 * It's a question of the definition of a "loop" if comparing links would be better...
 		 */ 		 	
-		List<Node> newNodes = path.nodes;
+		List<NodeImpl> newNodes = path.nodes;
 				
 		for(int i = 0; i < newNodes.size(); i++)
 		{		

@@ -24,24 +24,24 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 
 public class BasicSelectNodesImpl implements SelectNodes {
 
 	NetworkLayer network;
  
-	public void addNodesToMap(Map<Id, Node> nodeList)
+	public void addNodesToMap(Map<Id, NodeImpl> nodeList)
 	{
 		// TODO Auto-generated method stub
 	}
 
-	public Map<Id, Node> getNodes()
+	public Map<Id, NodeImpl> getNodes()
 	{
 		// TODO Auto-generated method stub
 		//return new ArrayList<Node>();
-		return new TreeMap<Id, Node>();
+		return new TreeMap<Id, NodeImpl>();
 	}
 
 	public NetworkLayer getNetwork() 

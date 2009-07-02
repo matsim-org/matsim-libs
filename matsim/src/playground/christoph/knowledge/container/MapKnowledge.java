@@ -4,41 +4,41 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 public class MapKnowledge extends BasicNodeKnowledge{
 
-	private Map<Id, Node> nodes;
+	private Map<Id, NodeImpl> nodes;
 	
 	public MapKnowledge()
 	{
-		this.nodes = new HashMap<Id, Node>();
+		this.nodes = new HashMap<Id, NodeImpl>();
 	}
 
-	public MapKnowledge(Map<Id, Node> nodes)
+	public MapKnowledge(Map<Id, NodeImpl> nodes)
 	{
 		this.nodes = nodes;
 	}
 	
-	public void addNode(Node node)
+	public void addNode(NodeImpl node)
 	{
 		nodes.put(node.getId(), node);
 	}
 	
-	public void removeNode(Node node)
+	public void removeNode(NodeImpl node)
 	{
 		nodes.remove(node.getId());
 	}
 	
 	
-	public boolean knowsNode(Node node)
+	public boolean knowsNode(NodeImpl node)
 	{
 		return nodes.containsKey(node.getId());
 	}
 
 	
-	public boolean knowsLink(Link link)
+	public boolean knowsLink(LinkImpl link)
 	{
 		// if no Map found or the Map is empty -> Person knows the entire network, return true
 		if ( nodes == null ) return true;
@@ -49,7 +49,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 	}
 	
 	
-	public Map<Id, Node> getKnownNodes() 
+	public Map<Id, NodeImpl> getKnownNodes() 
 	{
 		return nodes;
 	}

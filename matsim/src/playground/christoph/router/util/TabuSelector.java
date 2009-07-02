@@ -23,8 +23,8 @@ package playground.christoph.router.util;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 
 
@@ -37,7 +37,7 @@ public class TabuSelector {
 
 	private final static Logger log = Logger.getLogger(TabuSelector.class);
 	
-	public static Link[] getLinks(Link[] links, Node previousNode)
+	public static LinkImpl[] getLinks(LinkImpl[] links, NodeImpl previousNode)
 	{	
 		/*
 		 * If there is no previous Node (i.e. Person is at the first Node of a Leg)
@@ -46,7 +46,7 @@ public class TabuSelector {
 		if(previousNode == null) return links;
 		
 		// remove Links to the previous node, if other Links are available
-		ArrayList<Link> newLinks = new ArrayList<Link>();
+		ArrayList<LinkImpl> newLinks = new ArrayList<LinkImpl>();
 		for(int i = 0; i < links.length; i++)
 		{
 			// if the link doesn't head to the previous Node -> add to possible Links
@@ -63,7 +63,7 @@ public class TabuSelector {
 //		else log.info("Found outgoing Links to new Nodes!");
 			
 		// create Array that is returned
-		Link[] returnedLinks = new Link[newLinks.size()];
+		LinkImpl[] returnedLinks = new LinkImpl[newLinks.size()];
 		for(int i = 0; i < newLinks.size(); i++) returnedLinks[i] = newLinks.get(i);			
 		
 		return returnedLinks;

@@ -5,8 +5,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.router.util.TravelCost;
 
@@ -17,7 +17,7 @@ import playground.christoph.router.util.KnowledgeTravelCost;
 public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	
 	protected TravelCost travelCostcalculator;
-	protected Map<Link, Double> linkTravelCosts;
+	protected Map<LinkImpl, Double> linkTravelCosts;
 	protected boolean useLookupTable = true;
 	protected boolean updateLookupTable = false;
 	
@@ -38,7 +38,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		return this.travelCostcalculator;
 	}
 	
-	public double getLinkTravelCost(final Link link, final double time) 
+	public double getLinkTravelCost(final LinkImpl link, final double time) 
 	{
 		// try getting NodeKnowledge from the Persons Knowledge
 		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
@@ -69,11 +69,11 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	{
 //		log.info("Creating LookupTable f�r LinkTravelTimes. Time = " + time);
 		LinkIdComparator linkComparator = new LinkIdComparator();
-		linkTravelCosts = new TreeMap<Link, Double>(linkComparator);
+		linkTravelCosts = new TreeMap<LinkImpl, Double>(linkComparator);
 		
 		for (QueueLink queueLink : myQueueNetwork.getLinks().values())
 		{
-			Link link = queueLink.getLink();
+			LinkImpl link = queueLink.getLink();
 			linkTravelCosts.put(link, travelCostcalculator.getLinkTravelCost(link, time));
 		}
 	}
@@ -84,7 +84,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		
 		for (Id id : links2Update.keySet())
 		{
-			Link link = this.myQueueNetwork.getNetworkLayer().getLink(id);
+			LinkImpl link = this.myQueueNetwork.getNetworkLayer().getLink(id);
 			linkTravelCosts.put(link, travelCostcalculator.getLinkTravelCost(link, time));
 		}
 	}

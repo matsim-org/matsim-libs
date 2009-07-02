@@ -10,14 +10,14 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -32,12 +32,12 @@ public class TestCellKnowledge {
 
 	private final static Logger log = Logger.getLogger(TestCellKnowledge.class);
 	
-	private Network network;
+	private NetworkLayer network;
 	private Population population;
 	private Config config;
 	private PersonImpl person;
 	private SelectNodesDijkstra selectNodesDijkstra;
-	private Map<Id, Node> nodesMap;
+	private Map<Id, NodeImpl> nodesMap;
 	private CellKnowledge cellKnowledge;
 	private CellNetworkMapping cellNetworkMapping;
 	private CellKnowledgeCreator createCellKnowledge;
@@ -104,7 +104,7 @@ public class TestCellKnowledge {
 	{
 		PlanImpl plan = person.getSelectedPlan();
 		
-		nodesMap = new TreeMap<Id, Node>();
+		nodesMap = new TreeMap<Id, NodeImpl>();
 		
 		// get all acts of the selected plan
 		ArrayList<ActivityImpl> acts = new ArrayList<ActivityImpl>();					
@@ -116,8 +116,8 @@ public class TestCellKnowledge {
 		
 		for(int j = 1; j < acts.size(); j++)
 		{						
-			Node startNode = acts.get(j-1).getLink().getToNode();
-			Node endNode = acts.get(j).getLink().getFromNode();
+			NodeImpl startNode = acts.get(j-1).getLink().getToNode();
+			NodeImpl endNode = acts.get(j).getLink().getFromNode();
 				
 			selectNodesDijkstra.setStartNode(startNode);
 			selectNodesDijkstra.setEndNode(endNode);

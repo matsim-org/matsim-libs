@@ -3,9 +3,9 @@ package playground.christoph.knowledge.container;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 
 public interface NodeKnowledge {
@@ -14,13 +14,13 @@ public interface NodeKnowledge {
 	
 	public void setPerson(PersonImpl person);
 	
-	public void setNetwork(Network network);
+	public void setNetwork(NetworkLayer network);
 	
-	public Network getNetwork();
+	public NetworkLayer getNetwork();
 	
-	public boolean knowsNode(Node node);
+	public boolean knowsNode(NodeImpl node);
 	
-	public boolean knowsLink(Link link);
+	public boolean knowsLink(LinkImpl link);
 	
-	public Map<Id, Node> getKnownNodes();
+	public Map<Id, NodeImpl> getKnownNodes();
 }

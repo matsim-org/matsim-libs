@@ -21,8 +21,9 @@
 package playground.christoph.router;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
@@ -70,7 +71,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		this.timeFunction = timeFunction;
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double startTime)
 	{
 /*		log.info(this);
 		log.info(fromNode);
@@ -150,7 +151,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	{
 		TravelCost costFunctionClone;
 		TravelTime timeFunctionClone;
-		Network networkClone = this.myQueueNetwork.getNetworkLayer();
+		NetworkLayer networkClone = this.myQueueNetwork.getNetworkLayer();
 		
 		if(this.costFunction instanceof KnowledgeTravelCost)
 		{

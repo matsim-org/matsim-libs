@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.knowledge.container.CellKnowledge.CellData;
 
@@ -17,7 +17,7 @@ public class CellKnowledgeCreator {
 		this.cellNetworkMapping = cellNetworkMapping;
 	}
 	
-	public CellKnowledge createCellKnowledge(Map<Id, Node> knownNodes)
+	public CellKnowledge createCellKnowledge(Map<Id, NodeImpl> knownNodes)
 	{	
 		/*
 		 * - find all involved Cells (iterate over all known Nodes)
@@ -39,10 +39,10 @@ public class CellKnowledgeCreator {
 		else
 		{
 			cellKnowledge.setWhiteList(false);
-			Map<Id, Node> unknownNodes = new HashMap<Id, Node>();
+			Map<Id, NodeImpl> unknownNodes = new HashMap<Id, NodeImpl>();
 			unknownNodes.putAll(cellNetworkMapping.getNetwork().getNodes());
 			
-			for (Node node : knownNodes.values())
+			for (NodeImpl node : knownNodes.values())
 			{
 				unknownNodes.remove(node.getId());
 			}
@@ -51,7 +51,7 @@ public class CellKnowledgeCreator {
 		}
 		
 		// find all involved Cells, create CellData Object for them and add the known Nodes
-		for (Node node : knownNodes.values())
+		for (NodeImpl node : knownNodes.values())
 		{
 			Cell cell = cellNetworkMapping.getCell(node);
 			

@@ -20,7 +20,7 @@
 
 package playground.christoph.router.util;
 
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -32,7 +32,7 @@ public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalc
 	protected MyQueueNetwork myQueueNetwork;
 	protected double time;
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, PersonImpl person)
+	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double starttime, PersonImpl person)
 	{
 		this.person = person;
 		

@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -39,7 +39,7 @@ public class WardropTest {
 	//protected static ScenarioData scenarioData;
 	protected static Scenario scenario;
 	protected static Population population;
-	protected static Network network;
+	protected static NetworkLayer network;
 	protected static Config config;
 //	protected static NetworkFactory networkFactory = new NetworkFactory();
 

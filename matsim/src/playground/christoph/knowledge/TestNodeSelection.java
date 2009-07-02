@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -37,7 +37,7 @@ import playground.christoph.knowledge.utils.GetAllIncludedLinks;
 public class TestNodeSelection {
 	
 	NetworkLayer network;
-	Map<Id, Node> selectedNodesMap;
+	Map<Id, NodeImpl> selectedNodesMap;
 	
 	final String networkFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
 	final String kmzFile = "kmzFile.kmz";
@@ -45,7 +45,7 @@ public class TestNodeSelection {
 	
 	protected void init()
 	{
-		selectedNodesMap = new TreeMap<Id, Node>();
+		selectedNodesMap = new TreeMap<Id, NodeImpl>();
 	}
 	
 	protected void loadNetwork()
@@ -83,15 +83,15 @@ public class TestNodeSelection {
 	// nicht selektierte Nodes aus dem Netzwerk entfernen
 	protected void removeOtherNodes()
 	{
-		Map<Id, Node> nodesToRemove = new TreeMap<Id, Node>();
+		Map<Id, NodeImpl> nodesToRemove = new TreeMap<Id, NodeImpl>();
 		
 		// iterate over Array or Iteratable 
-		for (Node node : network.getNodes().values())
+		for (NodeImpl node : network.getNodes().values())
 		{
 			if(!selectedNodesMap.containsKey(node.getId())) nodesToRemove.put(node.getId(), node);
 		}
 
-		for (Node node : nodesToRemove.values()) 
+		for (NodeImpl node : nodesToRemove.values()) 
 		{
 			network.removeNode(node);
 		}

@@ -25,9 +25,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -53,20 +53,20 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 	{
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected Path findRoute(Node fromNode, Node toNode)
+	protected Path findRoute(NodeImpl fromNode, NodeImpl toNode)
 	{
-		Node currentNode = fromNode;
-		Link currentLink;
+		NodeImpl currentNode = fromNode;
+		LinkImpl currentLink;
 		double routeLength = 0.0;
 		
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, Node> knownNodesMap = null;
+		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
+		ArrayList<LinkImpl> links = new ArrayList<LinkImpl>();
+		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
 		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
@@ -83,7 +83,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 				break;
 			}
 			
-			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
+			LinkImpl[] linksArray = currentNode.getOutLinks().values().toArray(new LinkImpl[currentNode.getOutLinks().size()]);
 		
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
 			linksArray = KnowledgeTools.getKnownLinks(linksArray, knownNodesMap);
@@ -98,7 +98,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 			int nextLink = MatsimRandom.getRandom().nextInt(linksArray.length);
 			
 			// make the chosen link to the new current link
-			if(linksArray[nextLink] instanceof Link)
+			if(linksArray[nextLink] instanceof LinkImpl)
 			{
 				currentLink = linksArray[nextLink];
 				currentNode = currentLink.getToNode();

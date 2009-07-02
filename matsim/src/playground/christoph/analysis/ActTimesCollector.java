@@ -32,10 +32,10 @@ import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 public class ActTimesCollector implements BasicActivityStartEventHandler, BasicActivityEndEventHandler {
 
@@ -44,7 +44,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 	// <Person's Id, Person's EventData>
 	protected TreeMap<Id, EventData> data = new TreeMap<Id, EventData>();
 	//protected NetworkLayer network;
-	protected Network network;
+	protected NetworkLayer network;
 	protected Population population;
 	
 	protected double startTime = 0.0;
@@ -99,7 +99,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		}
 		else if (network != null)
 		{
-			Link link = network.getLink(linkId);
+			LinkImpl link = network.getLink(linkId);
 			//eventData.addStartActivityEvent(event.getTime(), link.getCenter());
 			eventData.addStartActivityEvent(event.getTime(), link.getCoord());
 		}
@@ -152,7 +152,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		}
 		else if (network != null)
 		{
-			Link link = network.getLink(linkId);
+			LinkImpl link = network.getLink(linkId);
 			eventData.addEndActivityEvent(event.getTime(), link.getCoord());
 			//eventData.addEndActivityEvent(event.time, link.getCenter());
 		}
@@ -264,13 +264,13 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 	}
 	
 	//public void setNetwork(NetworkLayer nw)
-	public void setNetwork(Network nw)
+	public void setNetwork(NetworkLayer nw)
 	{
 		network = nw;
 	}
 	
 	//public NetworkLayer getNetwork()
-	public Network getNetwork()
+	public NetworkLayer getNetwork()
 	{
 		return network;
 	}

@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 
 public class GetAllIncludedLinks {
 
@@ -52,9 +52,9 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<Link> getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes)
+	public ArrayList<LinkImpl> getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes)
 	{
-		ArrayList<Link> includedLinks = new ArrayList<Link>();
+		ArrayList<LinkImpl> includedLinks = new ArrayList<LinkImpl>();
 		getAllLinks(network, includedNodes, includedLinks);
 		return includedLinks;
 	}
@@ -67,9 +67,9 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<Link> getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap)
+	public ArrayList<LinkImpl> getAllLinks(NetworkLayer network, Map<Id, NodeImpl> includedNodesMap)
 	{
-		ArrayList<Link> includedLinks = new ArrayList<Link>();
+		ArrayList<LinkImpl> includedLinks = new ArrayList<LinkImpl>();
 		getAllLinks(network, includedNodesMap, includedLinks);
 		return includedLinks;
 	}
@@ -82,15 +82,15 @@ public class GetAllIncludedLinks {
 	 * @param ArrayList< Node > includedNodes
 	 * @param ArrayList< Link > includedLinks
 	 */
-	public void getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes, ArrayList<Link> includedLinks)
+	public void getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes, ArrayList<LinkImpl> includedLinks)
 	{		
 		// get all links of the network
-		Map<Id, Link> linkMap = network.getLinks();
+		Map<Id, LinkImpl> linkMap = network.getLinks();
 		
-		for (Link link : linkMap.values()) 
+		for (LinkImpl link : linkMap.values()) 
 		{
-			Node fromNode = link.getFromNode();
-			Node toNode = link.getToNode();
+			NodeImpl fromNode = link.getFromNode();
+			NodeImpl toNode = link.getToNode();
 			
 			// check, if the node is contained in the given list
 			if(includedNodes.contains(fromNode) && includedNodes.contains(toNode))
@@ -111,15 +111,15 @@ public class GetAllIncludedLinks {
 	 * @param Map< Id, Node > includedNodesMap
 	 * @param ArrayList< Link > includedLinks
 	 */
-	public void getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap, ArrayList<Link> includedLinks)
+	public void getAllLinks(NetworkLayer network, Map<Id, NodeImpl> includedNodesMap, ArrayList<LinkImpl> includedLinks)
 	{	
 		// get all links of the network
-		Map<Id, Link> linkMap = network.getLinks();
+		Map<Id, LinkImpl> linkMap = network.getLinks();
 		
-		for (Link link : linkMap.values()) 
+		for (LinkImpl link : linkMap.values()) 
 		{
-			Node fromNode = link.getFromNode();
-			Node toNode = link.getToNode();
+			NodeImpl fromNode = link.getFromNode();
+			NodeImpl toNode = link.getToNode();
 			
 			// check, if the node is contained in the given list
 			if(includedNodesMap.containsKey(fromNode.getId()) && includedNodesMap.containsKey(toNode.getId()))

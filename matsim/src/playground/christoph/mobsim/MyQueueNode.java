@@ -21,18 +21,18 @@
 package playground.christoph.mobsim;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.QueueLane;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.NodeImpl;
 
 public class MyQueueNode extends QueueNode{
 	
 	final private static Logger log = Logger.getLogger(MyQueueNode.class);
 	
-	public MyQueueNode(Node n, QueueNetwork queueNetwork)
+	public MyQueueNode(NodeImpl n, QueueNetwork queueNetwork)
 	{
 		super(n, queueNetwork);
 	}

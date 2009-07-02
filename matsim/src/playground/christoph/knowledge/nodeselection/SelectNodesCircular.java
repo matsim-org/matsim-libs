@@ -35,17 +35,17 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 
 public class SelectNodesCircular extends BasicSelectNodesImpl{
 
 	double distance;
-	Node centerNode;
-	Link centerLink;
+	NodeImpl centerNode;
+	LinkImpl centerLink;
 	
 	public SelectNodesCircular(NetworkLayer net)
 	{
@@ -53,7 +53,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		distance = 0.0;
 	}
 	
-	public Map<Id, Node> getNodes(Node center, double dist)
+	public Map<Id, NodeImpl> getNodes(NodeImpl center, double dist)
 	{
 		distance = dist;
 		centerNode = center;
@@ -61,7 +61,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		return getNodes();
 	}
 	
-	public void getNodes(Node center, double dist, Map<Id, Node> nodesMap)
+	public void getNodes(NodeImpl center, double dist, Map<Id, NodeImpl> nodesMap)
 	{
 		distance = dist;
 		centerNode = center;
@@ -69,7 +69,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		addNodesToMap(nodesMap);
 	}
 	
-	public Map<Id, Node> getNodes(Link link, double dist)
+	public Map<Id, NodeImpl> getNodes(LinkImpl link, double dist)
 	{
 		distance = dist;
 		centerLink = link;
@@ -77,7 +77,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		return getNodes();
 	}
 	
-	public void getNodes(Link link, double dist, Map<Id, Node> nodesMap)
+	public void getNodes(LinkImpl link, double dist, Map<Id, NodeImpl> nodesMap)
 	{
 		distance = dist;
 		centerLink = link;
@@ -86,26 +86,26 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 	}
 	
 	@Override
-	public Map<Id, Node> getNodes()
+	public Map<Id, NodeImpl> getNodes()
 	{
-		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
+		Map<Id, NodeImpl> nodesMap = new TreeMap<Id, NodeImpl>();
 		addNodesToMap(nodesMap);
 		
 		return nodesMap;
 	}
 	
 	@Override
-	public void addNodesToMap(Map<Id, Node> nodesMap) 
+	public void addNodesToMap(Map<Id, NodeImpl> nodesMap) 
 	{	
 		if(centerNode != null || centerLink != null)
 		{
-			if(nodesMap == null) nodesMap = new TreeMap<Id, Node>();
+			if(nodesMap == null) nodesMap = new TreeMap<Id, NodeImpl>();
 			
 			// get all nodes of the network
-			Map<Id, Node> networkNodesMap = network.getNodes();
+			Map<Id, NodeImpl> networkNodesMap = network.getNodes();
 			
 			// iterate over Array or Iteratable 
-			for (Node node : networkNodesMap.values())
+			for (NodeImpl node : networkNodesMap.values())
 			{
 				Coord coord = node.getCoord();
 	
@@ -134,20 +134,20 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		this.distance = distance;
 	}
 
-	public Node getNode() {
+	public NodeImpl getNode() {
 		return centerNode;
 	}
 
-	public void setNode(Node centerNode) {
+	public void setNode(NodeImpl centerNode) {
 		centerLink = null;
 		this.centerNode = centerNode;
 	}
 
-	public Link getLink() {
+	public LinkImpl getLink() {
 		return centerLink;
 	}
 
-	public void setLink(Link centerLink) {
+	public void setLink(LinkImpl centerLink) {
 		centerNode = null;
 		this.centerLink = centerLink;
 	}

@@ -38,14 +38,14 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -91,15 +91,15 @@ public class BasicSimulation {
 			if (pe instanceof ActivityImpl) {
 				act = (ActivityImpl) pe;
 			} else if (pe instanceof LegImpl) {
-				ArrayList<Node> routeNodes = new ArrayList<Node>();
+				ArrayList<NodeImpl> routeNodes = new ArrayList<NodeImpl>();
 				LegImpl leg = (LegImpl) pe;
 				ActivityImpl nextAct = plan.getNextActivity(leg);
 				
 				// Ziellink holen
-				Link destinationLink = nextAct.getLink();
+				LinkImpl destinationLink = nextAct.getLink();
 				
-				Link currentLink = act.getLink();
-				Node currentNode = currentLink.getToNode();
+				LinkImpl currentLink = act.getLink();
+				NodeImpl currentNode = currentLink.getToNode();
 				
 				// solange wir das Ziel nicht erreicht habenMap		
 				while(!currentLink.equals(destinationLink))
@@ -130,9 +130,9 @@ public class BasicSimulation {
 					int nextLink = random.nextInt(linkCount);
 					
 					// den gewaehlten Link zum neuen CurrentLink machen
-					if(links[nextLink] instanceof Link)
+					if(links[nextLink] instanceof LinkImpl)
 					{
-						currentLink = (Link)links[nextLink];
+						currentLink = (LinkImpl)links[nextLink];
 						currentNode = currentLink.getToNode();
 					}
 					else

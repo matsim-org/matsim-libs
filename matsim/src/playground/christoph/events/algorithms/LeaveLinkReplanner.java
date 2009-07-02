@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
@@ -69,7 +69,7 @@ public class LeaveLinkReplanner {
 	protected double time;
 	protected PersonAgent personAgent;
 	protected PersonImpl person;
-	protected Node node;
+	protected NodeImpl node;
 	protected PlanImpl plan;
 	protected QueueNode queueNode;
 	protected QueueVehicle vehicle;
@@ -158,10 +158,10 @@ public class LeaveLinkReplanner {
 		//newFromAct.setDuration(0);
 		
 		// Create a copy of the ArrayList - don't edit the ArrayList itself! 
-		ArrayList<Node> nodesRoute = new ArrayList<Node>();
+		ArrayList<NodeImpl> nodesRoute = new ArrayList<NodeImpl>();
 		nodesRoute.addAll(route.getNodes());
 
-		ArrayList<Node> nodeBuffer = new ArrayList<Node>();
+		ArrayList<NodeImpl> nodeBuffer = new ArrayList<NodeImpl>();
 		
 		/*
 		 *  Remove all Nodes from the Route that have already been passed.
@@ -170,7 +170,7 @@ public class LeaveLinkReplanner {
 		 */
 		for (int i = 0; i < currentNodeIndex - 1; i++)
 		{
-			Node node = nodesRoute.get(0);
+			NodeImpl node = nodesRoute.get(0);
 			
 			nodeBuffer.add(node);
 			nodesRoute.remove(0);
@@ -260,12 +260,12 @@ public class LeaveLinkReplanner {
 	 */
 	protected boolean checkRoute(NetworkRoute route)
 	{
-		List<Node> nodes = route.getNodes();
+		List<NodeImpl> nodes = route.getNodes();
 		
 		if(nodes.size() == 0) return true;
 	
-		Node currentNode;
-		Node nextNode;
+		NodeImpl currentNode;
+		NodeImpl nextNode;
 		
 		for (int i = 1; i < nodes.size() - 1; i++)
 		{
@@ -274,7 +274,7 @@ public class LeaveLinkReplanner {
 
 			boolean foundLink = false;
 			
-			for (Link link : currentNode.getOutLinks().values())
+			for (LinkImpl link : currentNode.getOutLinks().values())
 			{
 				if (link.getToNode() == nextNode)
 				{

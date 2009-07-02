@@ -28,9 +28,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
@@ -59,7 +59,7 @@ public class ParallelCreateKnownNodesMap {
 	 * @param nodeSelectors
 	 * @param numberOfThreads
 	 */
-	public static void run(final Population population, final Network network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
+	public static void run(final Population population, final NetworkLayer network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
 	{
 		int numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
@@ -143,12 +143,12 @@ public class ParallelCreateKnownNodesMap {
 	private static class SelectNodesThread implements Runnable 
 	{
 		public final int threadId;
-		private final Network network;
+		private final NetworkLayer network;
 		private final ArrayList<SelectNodes> nodeSelectors;
 		private final SelectNodes[][] nodeSelectorArray;
 		private final List<PersonImpl> persons = new LinkedList<PersonImpl>();
 		
-		public SelectNodesThread(final int i, Network network, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
+		public SelectNodesThread(final int i, NetworkLayer network, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
 		{
 			this.threadId = i;
 			this.network = network;
@@ -175,7 +175,7 @@ public class ParallelCreateKnownNodesMap {
 				 */
 				if(person.getCustomAttributes().get("NodeKnowledge") == null) 
 				{	
-					Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
+					Map<Id, NodeImpl> nodesMap = new TreeMap<Id, NodeImpl>();
 					
 					NodeKnowledge nodeKnowledge = new MapKnowledge(nodesMap);
 					nodeKnowledge.setPerson(person);
@@ -219,7 +219,7 @@ public class ParallelCreateKnownNodesMap {
 					if (MapKnowledgeDB.class.getName().equals(NodeKnowledgeStorageType))
 					{
 						NodeKnowledge nodeKnowledge = (NodeKnowledge)person.getCustomAttributes().get("NodeKnowledge");
-						Map<Id, Node> nodesMap = nodeKnowledge.getKnownNodes();
+						Map<Id, NodeImpl> nodesMap = nodeKnowledge.getKnownNodes();
 						
 						MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB(nodesMap);
 						mapKnowledgeDB.setPerson(person);

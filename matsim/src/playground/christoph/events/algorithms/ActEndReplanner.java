@@ -21,11 +21,11 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -226,7 +226,7 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 
 		String newRouteString = "PersonId: " + person.getId();
 		newRouteString = newRouteString + "; LinkCount: " + ((NetworkRoute)betweenLeg.getRoute()).getLinks().size() + ";";
-		for (Link link : ((NetworkRoute)betweenLeg.getRoute()).getLinks())
+		for (LinkImpl link : ((NetworkRoute)betweenLeg.getRoute()).getLinks())
 		{
 			newRouteString = newRouteString + " " + link.getId();
 		}

@@ -33,15 +33,15 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.api.population.NetworkRoute;
 import org.matsim.core.api.population.Route;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.basic.v01.BasicRouteImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -53,7 +53,7 @@ public class Wardrop {
 	private static final Logger log = Logger.getLogger(Wardrop.class);
 	
 	//protected NetworkLayer network;
-	protected Network network;
+	protected NetworkLayer network;
 	protected Population population;
 	
 	protected ActTimesCollector actTimesCollector;
@@ -90,7 +90,7 @@ public class Wardrop {
 
 
 	//public Wardrop(NetworkLayer network, Population population)
-	public Wardrop(Network network, Population population)
+	public Wardrop(NetworkLayer network, Population population)
 	{
 		this.network = network;
 		this.population = population;
@@ -205,7 +205,7 @@ public class Wardrop {
 	{
 		if (network != null)
 		{
-			for(Node node:network.getNodes().values())
+			for(NodeImpl node:network.getNodes().values())
 			{
 				Coord coord = node.getCoord();
 				double xcoord = coord.getX();
@@ -219,12 +219,12 @@ public class Wardrop {
 		}
 	}
 	
-	public int getZone(Link link)
+	public int getZone(LinkImpl link)
 	{
 		return getZone(link.getCoord());
 	}
 	
-	public int getZone(Node node)
+	public int getZone(NodeImpl node)
 	{
 		return getZone(node.getCoord());
 	}

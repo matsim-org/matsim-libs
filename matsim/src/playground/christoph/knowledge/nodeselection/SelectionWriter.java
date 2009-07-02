@@ -27,8 +27,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
@@ -124,7 +124,7 @@ public class SelectionWriter extends Writer {
 						// Nodes
 						this.handler.startNodes(out);
 						
-						Map<Id, Node> nodesMap = KnowledgeTools.getKnownNodes(p);
+						Map<Id, NodeImpl> nodesMap = KnowledgeTools.getKnownNodes(p);
 						this.handler.nodes(nodesMap, out);
 						
 						this.handler.endNodes(out);

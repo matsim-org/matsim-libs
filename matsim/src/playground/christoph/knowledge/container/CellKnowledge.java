@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 public class CellKnowledge extends BasicNodeKnowledge {
 
@@ -41,13 +41,13 @@ public class CellKnowledge extends BasicNodeKnowledge {
 	}
 	
 	
-	public Map<Id, Node> getKnownNodes()
+	public Map<Id, NodeImpl> getKnownNodes()
 	{
-		Map<Id, Node> nodes = new HashMap<Id, Node>();
+		Map<Id, NodeImpl> nodes = new HashMap<Id, NodeImpl>();
 		
 		for (CellData cellData : cellDataMap.values())
 		{
-			for (Node node : cellData.getWhiteList())
+			for (NodeImpl node : cellData.getWhiteList())
 			{
 				nodes.put(node.getId(), node);
 			}
@@ -56,10 +56,10 @@ public class CellKnowledge extends BasicNodeKnowledge {
 		if (whiteList) return nodes;
 		else
 		{
-			Map<Id, Node> blackNodes = new HashMap<Id, Node>();
+			Map<Id, NodeImpl> blackNodes = new HashMap<Id, NodeImpl>();
 			blackNodes.putAll(cellNetworkMapping.getNetwork().getNodes());
 
-			for (Node node : nodes.values())
+			for (NodeImpl node : nodes.values())
 			{
 				blackNodes.remove(node.getId());
 			}
@@ -78,7 +78,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 	}
 	
 	
-	public boolean knowsNode(Node node)
+	public boolean knowsNode(NodeImpl node)
 	{
 		Cell cell = getKnowledgeCell(node);
 		
@@ -112,7 +112,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 	}
 	
 	
-	public boolean knowsLink(Link link)
+	public boolean knowsLink(LinkImpl link)
 	{
 		// if no Map found or the Map is empty -> Person knows the entire network, return true
 		if ( cellDataMap == null ) return true;
@@ -126,7 +126,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 	 * If the Cell or one of its Parents is part of the Knowledge
 	 * return the known Cell. 
 	 */
-	private Cell getKnowledgeCell(Node node)
+	private Cell getKnowledgeCell(NodeImpl node)
 	{
 		Cell cell = cellNetworkMapping.getCell(node);
 		
@@ -144,17 +144,17 @@ public class CellKnowledge extends BasicNodeKnowledge {
 	public class CellData
 	{
 		Cell cell;					// Cell...
-		List<Node> nodesList; 		// List of Nodes on the Black or WhiteList
+		List<NodeImpl> nodesList; 		// List of Nodes on the Black or WhiteList
 		boolean whiteList;			// true if WhiteList, false if BlackList
 		
 		public CellData(Cell cell)
 		{
 			this.cell = cell;
-			nodesList = new ArrayList<Node>();
+			nodesList = new ArrayList<NodeImpl>();
 			whiteList = true;	// by default
 		}
 		
-		public void addNode(Node node)
+		public void addNode(NodeImpl node)
 		{
 			nodesList.add(node);
 		}
@@ -172,8 +172,8 @@ public class CellKnowledge extends BasicNodeKnowledge {
 			if (2 * thisNodeCount > cellNodeCount)
 			{
 				whiteList = false;
-				List<Node> blackList = new ArrayList<Node>();
-				for (Node node : cell.getNodes())
+				List<NodeImpl> blackList = new ArrayList<NodeImpl>();
+				for (NodeImpl node : cell.getNodes())
 				{
 					if (!nodesList.contains(node)) blackList.add(node);
 				}
@@ -195,15 +195,15 @@ public class CellKnowledge extends BasicNodeKnowledge {
 			return cell;
 		}
 		
-		public List<Node> getWhiteList()
+		public List<NodeImpl> getWhiteList()
 		{
 			if (whiteList) return nodesList;
 			else
 			{
-				List<Node> revertNodes = new ArrayList<Node>(); 
+				List<NodeImpl> revertNodes = new ArrayList<NodeImpl>(); 
 				revertNodes.addAll(cell.getNodes());
 				
-				for(Node node : nodesList)
+				for(NodeImpl node : nodesList)
 				{
 					revertNodes.remove(node);
 				}
@@ -214,7 +214,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 		/*
 		 * List maybe a Black- or a WhiteList - check via isWhiteList()!
 		 */
-		public List<Node> getList()
+		public List<NodeImpl> getList()
 		{
 			return nodesList;
 		}

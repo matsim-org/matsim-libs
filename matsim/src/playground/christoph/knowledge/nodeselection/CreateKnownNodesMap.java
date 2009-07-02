@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.network.Network;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -44,7 +44,7 @@ public class CreateKnownNodesMap {
 	
 	private final static Logger log = Logger.getLogger(CreateKnownNodesMap.class);
 	
-	public static void collectAllSelectedNodes(Population population, Network network)
+	public static void collectAllSelectedNodes(Population population, NetworkLayer network)
 	{
 		for (PersonImpl person : population.getPersons().values()) 
 		{
@@ -52,7 +52,7 @@ public class CreateKnownNodesMap {
 		}
 	}
 	
-	private static void collectAllSelectedNodes(PersonImpl person, Network network)
+	private static void collectAllSelectedNodes(PersonImpl person, NetworkLayer network)
 	{					
 		ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)person.getCustomAttributes().get("NodeSelectors");
 		
@@ -69,16 +69,16 @@ public class CreateKnownNodesMap {
 	 * The handling of the nodeSelectors should probably be outsourced...
 	 * Implementing them direct in the nodeSelectors could be a good solution...
 	 */
-	public static void collectSelectedNodes(PersonImpl p, Network network, SelectNodes nodeSelector)
+	public static void collectSelectedNodes(PersonImpl p, NetworkLayer network, SelectNodes nodeSelector)
 	{		
 		PlanImpl plan = p.getSelectedPlan();
 		
 		// get Nodes from the Person's Knowledge
-		Map<Id, Node> nodesMap = null;
+		Map<Id, NodeImpl> nodesMap = null;
 		
 		if (p.getCustomAttributes().get("NodeKnowledge") == null)
 		{
-			nodesMap = new TreeMap<Id, Node>();
+			nodesMap = new TreeMap<Id, NodeImpl>();
 			
 			NodeKnowledge nodeKnowledge = new MapKnowledge(nodesMap);
 			nodeKnowledge.setPerson(p);
@@ -104,8 +104,8 @@ public class CreateKnownNodesMap {
 			
 			for(int j = 1; j < acts.size(); j++)
 			{						
-				Node startNode = acts.get(j-1).getLink().getToNode();
-				Node endNode = acts.get(j).getLink().getFromNode();
+				NodeImpl startNode = acts.get(j-1).getLink().getToNode();
+				NodeImpl endNode = acts.get(j).getLink().getFromNode();
 					
 				((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
 				((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);

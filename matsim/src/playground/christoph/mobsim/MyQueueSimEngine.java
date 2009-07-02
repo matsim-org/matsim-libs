@@ -8,8 +8,6 @@ import java.util.TreeMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Link;
-import org.matsim.core.api.network.Node;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -17,6 +15,8 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -30,7 +30,7 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	protected static boolean actEndReplanning = true; 
 	protected static boolean leaveLinkReplanning = true;
 
-	protected Map <Node, QueueLink[]> lookupTable;
+	protected Map <NodeImpl, QueueLink[]> lookupTable;
 	protected QueueNetwork network;
 	protected ReplanningQueueSimulation simulation;
 	
@@ -207,13 +207,13 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	public void createLookupTable()
 	{
 		log.info("start creating table...");
-		lookupTable = new TreeMap<Node, QueueLink[]>();
+		lookupTable = new TreeMap<NodeImpl, QueueLink[]>();
 		for(QueueNode queueNode : this.network.getNodes().values())
 		{			
 			QueueLink[] queueLinks = new QueueLink[queueNode.getNode().getInLinks().size()];
 			
 			int index = 0;
-			for(Link link : queueNode.getNode().getInLinks().values())
+			for(LinkImpl link : queueNode.getNode().getInLinks().values())
 			{
 				queueLinks[index] = this.network.getQueueLink(link.getId());
 				

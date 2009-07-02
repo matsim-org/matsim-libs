@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.network.Node;
+import org.matsim.core.network.NodeImpl;
 
 /*
  * Unterste Zellenebene: keine Children mehr und daf�r eine Liste mit Nodes 
@@ -29,12 +29,12 @@ public class Cell {
 	private Cell[] childrenCells = null;
 	private boolean hasChildren = false;
 	
-	private List<Node> nodes;
+	private List<NodeImpl> nodes;
 	
 	public Cell()
 	{
 		id = getNextId();
-		nodes = new ArrayList<Node>();
+		nodes = new ArrayList<NodeImpl>();
 	}
 	
 	private static int getNextId()
@@ -118,7 +118,7 @@ public class Cell {
 				cell.setParentCell(this);
 			}
 			
-			for (Node node : nodes)
+			for (NodeImpl node : nodes)
 			{
 				Coord coord = node.getCoord();
 				double xCoord = coord.getX();
@@ -171,7 +171,7 @@ public class Cell {
 		return childrenCells == null;
 	}
 	
-	public void addNode(Node node)
+	public void addNode(NodeImpl node)
 	{
 		nodes.add(node);
 	}
@@ -184,12 +184,12 @@ public class Cell {
 	/*
 	 * Returns the Nodes of this Cell and of its Children
 	 */
-	public List<Node> getAllNodes()
+	public List<NodeImpl> getAllNodes()
 	{
 		if(nodes != null) return nodes;
 		else
 		{
-			List<Node> returnNodes = new ArrayList<Node>();
+			List<NodeImpl> returnNodes = new ArrayList<NodeImpl>();
 			for (Cell cell : childrenCells)
 			{
 				returnNodes.addAll(cell.getNodes());
@@ -201,18 +201,18 @@ public class Cell {
 	/*
 	 * Returns only the Nodes of this Cell - may return null!
 	 */
-	public List<Node> getNodes()
+	public List<NodeImpl> getNodes()
 	{
 		return nodes;
 	}
 	
-	public Map<Node, Cell> getNodesMapping()
+	public Map<NodeImpl, Cell> getNodesMapping()
 	{
-		Map<Node, Cell> mapping = new HashMap<Node, Cell>();
+		Map<NodeImpl, Cell> mapping = new HashMap<NodeImpl, Cell>();
 		
 		if (nodes != null)
 		{
-			for (Node node : nodes)
+			for (NodeImpl node : nodes)
 			{
 				mapping.put(node, this);
 			}

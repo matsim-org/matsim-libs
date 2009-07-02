@@ -23,11 +23,11 @@ package playground.christoph.mobsim;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.matsim.core.api.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.LinkImpl;
 
 public class MyQueueLink extends QueueLink {
 	
@@ -36,7 +36,7 @@ public class MyQueueLink extends QueueLink {
 	 */
 	private final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 	
-	public MyQueueLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) 
+	public MyQueueLink(final LinkImpl l, final QueueNetwork queueNetwork, final QueueNode toNode) 
 	{
 		super(l, queueNetwork, toNode);
 	}

@@ -21,8 +21,8 @@
 package playground.christoph.router;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -53,19 +53,19 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	}
 	
 	@Deprecated
-	public KnowledgePlansCalcRoute(final Network network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) 
+	public KnowledgePlansCalcRoute(final NetworkLayer network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) 
 	{
 		super(network, router, routerFreeflow);
 		configGroup = new PlansCalcRouteConfigGroup();
 	}
 		
-	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator,
+	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 		configGroup = group;
 	}
 	
-	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 		configGroup = group;
 	}

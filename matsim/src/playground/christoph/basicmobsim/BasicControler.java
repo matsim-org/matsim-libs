@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 
 import playground.christoph.events.algorithms.ActEndReplanner;
