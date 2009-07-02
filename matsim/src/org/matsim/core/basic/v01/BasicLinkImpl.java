@@ -37,7 +37,7 @@ import org.matsim.world.AbstractLocation;
 
 public class BasicLinkImpl
 // <L extends BasicLinkI, N extends BasicNodeI > // and then change all BasicLink/BasicNode below into L and N
-extends AbstractLocation
+extends AbstractLocation // yyyyyy ????
 implements BasicLink
 {
 	protected BasicNode from = null;
@@ -55,7 +55,7 @@ implements BasicLink
 	// object, the BasicLink must contains geographic info. Since this must be defined
 	// by the to- and from-node, they HAVE to contain a coordinate. (see also BasicNode)
 	// If this is not O.K., then the BasicLink must not extend Location.
-	public BasicLinkImpl(final NetworkLayer network, final Id id, final BasicNode from, final BasicNode to) {
+	protected BasicLinkImpl(final NetworkLayer network, final Id id, final BasicNode from, final BasicNode to) {
 		super(network, id, 
 				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
 		);
@@ -71,20 +71,20 @@ implements BasicLink
 		return CoordUtils.calcDistance(this.center, coord);
 	}
 
-	public BasicNode getFromNode() {
+	public BasicNode getFromNode() { // not final since type needs to be overwritten
 		return this.from;
 	}
 
-	public BasicNode getToNode() {
+	public BasicNode getToNode() { // not final since type needs to be overwritten
 		return this.to;
 	}
 
-	public boolean setFromNode(final BasicNode node) {
+	public final boolean setFromNode(final BasicNode node) {
 		this.from = node;
 		return true;
 	}
 
-	public boolean setToNode(final BasicNode node) {
+	public final boolean setToNode(final BasicNode node) {
 		this.to = node;
 		return true;
 	}
@@ -96,11 +96,11 @@ implements BasicLink
  	 * @param time - the current time
 	 * @return the capacity per network's capperiod timestep
 	 */
-	public double getCapacity(final double time) {
+	public double getCapacity(final double time) { // not final since needed in TimeVariantLinkImpl
 		return this.capacity;
 	}
 
-	public void setCapacity(final double capacity) {
+	public final void setCapacity(final double capacity) { // NOT needed in TimeVariantLinkImpl.  Sets "base" capacity (time-indep)
 		this.capacity = capacity;
 	}
 	/**
@@ -109,38 +109,38 @@ implements BasicLink
 	 * @param time - the current time
 	 * @return freespeed
 	 */
-	public double getFreespeed(final double time) {
+	public double getFreespeed(final double time) { // not final since needed in TimeVariantLinkImpl
 		return this.freespeed;
 	}
 	/**
 	 * Sets the freespeed velocity of the link in meter per seconds.
 	 */
-	public void setFreespeed(final double freespeed) {
+	public final void setFreespeed(final double freespeed) {
 		this.freespeed = freespeed;
 	}
 
-	public double getLength() {
+	public final double getLength() {
 		return this.length;
 	}
 
-	public void setLength(final double length) {
+	public final void setLength(final double length) {
 		this.length = length;
 	}
 
-	public double getNumberOfLanes(final double time) {
+	public double getNumberOfLanes(final double time) { // not final since needed in TimeVariantLinkImpl
 		return this.nofLanes;
 	}
 
-	public void setNumberOfLanes(final double lanes) {
+	public final void setNumberOfLanes(final double lanes) {
 		this.nofLanes = lanes;
 	}
 	
-	public void setAllowedModes(final Set<TransportMode> modes) {
+	public final void setAllowedModes(final Set<TransportMode> modes) {
 		this.allowedModes.clear();
 		this.allowedModes.addAll(modes);
 	}
 	
-	public Set<TransportMode> getAllowedModes() {
+	public final Set<TransportMode> getAllowedModes() {
 		return this.allowedModes.clone();
 	}
 	
