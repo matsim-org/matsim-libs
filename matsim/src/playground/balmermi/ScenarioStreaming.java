@@ -114,8 +114,8 @@ public class ScenarioStreaming {
 		PopulationWriter plansWriter = new PopulationWriter(population,sl.getScenario().getKnowledges());
 
 		System.out.println("adding algorithms...");
+		population.addAlgorithm(new PersonConsolidateInitDemand(sl.getScenario().getKnowledges()));
 		population.addAlgorithm(plansWriter);
-		population.addAlgorithm(new PersonConsolidateInitDemand());
 		Gbl.printMemoryUsage();
 		System.out.println("done. (adding algorithms)");
 
