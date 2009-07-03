@@ -23,6 +23,7 @@ package org.matsim.core.router.util;
 import org.matsim.core.network.LinkImpl;
 
 
+
 /**
  * A simple interface to retrieve the travel time on links.
  *

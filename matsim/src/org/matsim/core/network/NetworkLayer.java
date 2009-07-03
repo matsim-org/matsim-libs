@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Network;
@@ -219,7 +218,7 @@ public class NetworkLayer extends Layer implements Network {
 		return this.nodes.get(new IdImpl(id));
 	}
 
-	public final NodeImpl getNode(final Id id) {
+	public NodeImpl getNode(final Id id) {
 		return this.nodes.get(id);
 	}
 

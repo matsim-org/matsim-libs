@@ -21,7 +21,6 @@
 package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
@@ -126,12 +125,12 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public final NodeImpl getFromNode() {
+	public NodeImpl getFromNode() {
 		return (NodeImpl)this.from;
 	}
 
 	@Override
-	public final NodeImpl getToNode() {
+	public NodeImpl getToNode() {
 		return (NodeImpl)this.to;
 	}
 

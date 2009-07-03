@@ -119,7 +119,7 @@ implements BasicLink
 		this.freespeed = freespeed;
 	}
 
-	public final double getLength() {
+	public double getLength() {
 		return this.length;
 	}
 
