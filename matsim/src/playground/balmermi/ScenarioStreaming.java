@@ -36,6 +36,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.balmermi.modules.PersonConsolidateInitDemand;
+import playground.balmermi.modules.PersonStupidDeleteKnowledgeForStreamingModule;
 
 public class ScenarioStreaming {
 
@@ -116,6 +117,7 @@ public class ScenarioStreaming {
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonConsolidateInitDemand(sl.getScenario().getKnowledges()));
 		population.addAlgorithm(plansWriter);
+		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sl.getScenario().getKnowledges()));
 		Gbl.printMemoryUsage();
 		System.out.println("done. (adding algorithms)");
 
