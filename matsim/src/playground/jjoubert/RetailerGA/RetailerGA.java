@@ -56,7 +56,11 @@ public class RetailerGA {
 			for(int i = 0; i < this.populationSize-1; i++){
 				ArrayList<Integer> newSolution = this.mutate(this.initialSolution.getGenome());
 				double newSolutionFitness = this.fitnessFunction.evaluate(newSolution);
-				this.generation.add(new RetailerGenome(newSolutionFitness, newSolution));
+				RetailerGenome newGenome = new RetailerGenome(newSolutionFitness, newSolution);
+				this.generation.add(newGenome);
+				
+				// Check if the new solution is better than the incumbent.
+				checkIncumbent(newGenome);
 			}
 		}
 	}
@@ -86,6 +90,19 @@ public class RetailerGA {
 		return populationSize;
 	}
 	
+
+	private void checkIncumbent(RetailerGenome genome){
+		if(this.fitnessFunction.isMax()){
+			if(genome.getFitness() > this.incumbent.getFitness()){
+				this.incumbent = genome;
+			}
+		} else{
+			if(genome.getFitness() < this.incumbent.getFitness()){
+				this.incumbent = genome;
+			}			
+		}
+	}
+
 	public String toString(){
 		String result = new String();
 		for(int i = 0; i < populationSize; i++){
@@ -94,9 +111,13 @@ public class RetailerGA {
 				result += String.valueOf(generation.get(i).getGenome().get(j)) + " -> ";
 			}
 			result += String.valueOf(generation.get(i).getGenome().get(genomeLength-1)) + 
-					"\t\t" + String.valueOf(generation.get(i).getFitness()) + "\n";
+			"\t\t" + String.valueOf(generation.get(i).getFitness());
+			if(this.incumbent == this.generation.get(i)){
+				result += "*";
+			}
+			result += "\n";
 		}		
 		return result;
 	}
-
+	
 }

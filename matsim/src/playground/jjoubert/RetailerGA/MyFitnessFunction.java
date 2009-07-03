@@ -29,8 +29,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class MyFitnessFunction {
 	private ArrayList<Coordinate> points;
 	private int numberOfPoints;
+	private final boolean max;
 
-	public MyFitnessFunction(int number){
+	public MyFitnessFunction(boolean isMax, int number){
+		this.max = isMax;
 		this.numberOfPoints = number;
 		this.points = new ArrayList<Coordinate>(this.numberOfPoints);		
 		generateRandomInstance(this.numberOfPoints,0,100,0,100);
@@ -64,6 +66,10 @@ public class MyFitnessFunction {
 
 	public ArrayList<Coordinate> getPoints() {
 		return points;
+	}
+
+	public boolean isMax() {
+		return max;
 	}
 		
 }

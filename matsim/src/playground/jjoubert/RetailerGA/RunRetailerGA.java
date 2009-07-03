@@ -38,7 +38,7 @@ public class RunRetailerGA {
 		MyPermutator p = new MyPermutator();
 		ArrayList<Integer> first = p.permutate(genomeLength);
 		
-		MyFitnessFunction ff = new MyFitnessFunction(genomeLength);
+		MyFitnessFunction ff = new MyFitnessFunction(false, genomeLength);
 		RetailerGA ga = new RetailerGA(populationSize, genomeLength, ff, first);
 		ga.generateFirstGeneration();
 		for(int i = 0; i < numberOfGenerations; i++){
