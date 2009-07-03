@@ -20,6 +20,8 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.TreeMap;
+
 import org.matsim.core.config.Module;
 
 public class EvacuationConfigGroup  extends Module{
@@ -47,6 +49,7 @@ public class EvacuationConfigGroup  extends Module{
 	 */
 	private static final String FLOODING_DATA_FILE = "floodingDataFile";
 
+
 	/**
 	 * name of the buildings shape file in config
 	 */
@@ -61,6 +64,13 @@ public class EvacuationConfigGroup  extends Module{
 	 * type of the scenario 
 	 */
 	private static final String SCENARIO = "scenario";
+	
+	/**
+	 * size of the scenario
+	 */
+	private static final String SAMPLE_SIZE = "sampleSize";
+	
+	
 	
 	/**
 	 * file name of the flooding data file
@@ -80,7 +90,12 @@ public class EvacuationConfigGroup  extends Module{
 	/**
 	 * the scenario type
 	 */
-	private EvacuationScenario scenario;
+	private EvacuationScenario scenario = EvacuationScenario.night;
+	
+	/**
+	 * 
+	 */
+	private double sampleSize = 0.;
 	
 
 	public EvacuationConfigGroup(){
@@ -97,6 +112,10 @@ public class EvacuationConfigGroup  extends Module{
 			return getBuildingsFile();
 		}else if (SHORELINE_FILE.equals(key)) {
 			return getShorelineFile();
+		}else if (SCENARIO.equals(key)) {
+			return getEvacuationScanrio().toString();
+		}else if (SAMPLE_SIZE.equals(key)) {
+			return Double.toString(getSampleSize());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -113,12 +132,25 @@ public class EvacuationConfigGroup  extends Module{
 			setShorelineFile(value.replace('\\', '/'));
 		}else if(SCENARIO.equals(key)){
 			setEvacuationScenario(value);
+		}else if(SAMPLE_SIZE.equals(key)){
+			setSampleSize(value);
 		}else {
 			throw new IllegalArgumentException(key);
 		}
 	}
 
 
+	@Override
+	protected final TreeMap<String, String> getParams() {
+		TreeMap<String, String> map = new TreeMap<String, String>();
+		map.put(FLOODING_DATA_FILE, getValue(FLOODING_DATA_FILE));
+		map.put(BUILDINGS_FILE, getValue(BUILDINGS_FILE));
+		map.put(SCENARIO, getValue(SCENARIO));
+		map.put(SAMPLE_SIZE, getValue(SAMPLE_SIZE));
+		return map;
+	}
+	
+	
 	/**
 	 *
 	 * @return the file name of the evacuation area file
@@ -211,4 +243,19 @@ public class EvacuationConfigGroup  extends Module{
 		}
 	}
 
+	/**
+	 * 
+	 * @return the size of the scenario
+	 */
+	public double getSampleSize() {
+		return this.sampleSize;
+	}
+	
+	/**
+	 * 
+	 * @param sampleSize
+	 */
+	public void setSampleSize(String sampleSize) {
+		this.sampleSize = Double.parseDouble(sampleSize);
+	}
 }
