@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
-//		suite.addTestSuite(TransitRouterTest.class); // TODO [MR] disabled tests as input files not yet in repository
+		suite.addTestSuite(TransitRouterTest.class);
 
 		return suite;
 	}

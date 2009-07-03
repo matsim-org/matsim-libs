@@ -21,16 +21,21 @@
 package playground.marcel.pt.router;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
@@ -40,10 +45,14 @@ public class TransitRouterTest extends MatsimTestCase {
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
+	private static Coord homeCoord = new CoordImpl(7000, 5500);
+	private static Coord workCoord = new CoordImpl(31000, 21000);
+	private static Coord l1Coord = new CoordImpl(17500, 21000);
+	private static Coord l2Coord = new CoordImpl(44000, 23000);
+	
 	public void testGetNextDepartures() throws SAXException, ParserConfigurationException, IOException {
 
-		String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
-		inputDir = "../thesis-data/examples/minibln/";
+		String inputDir = getPackageInputDirectory();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
@@ -52,16 +61,15 @@ public class TransitRouterTest extends MatsimTestCase {
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-//		TransitRouter router = new TransitRouter(schedule);
-//		router.getNextDeparturesAtStop(schedule.getFacilities().get(new IdImpl("stop2")), Time.parseTime("07:01:00"));
-//		router.getNextDeparturesAtStop(schedule.getFacilities().get(new IdImpl("1")), Time.parseTime("07:01:00"));
+		TransitRouter router = new TransitRouter(schedule);
+		router.getNextDeparturesAtStop(schedule.getFacilities().get(new IdImpl("2")), Time.parseTime("07:01:00"));
+		router.getNextDeparturesAtStop(schedule.getFacilities().get(new IdImpl("1")), Time.parseTime("07:01:00"));
 
 		// TODO [MR] missing assert-statement, until now the code just tests if it compiles/runs without Exception
 	}
 
 	public void testCalcRoute() throws SAXException, ParserConfigurationException, IOException {
-		String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
-		inputDir = "../thesis-data/examples/minibln/";
+		String inputDir = getPackageInputDirectory();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
@@ -70,19 +78,18 @@ public class TransitRouterTest extends MatsimTestCase {
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-//		TransitRouter router = new TransitRouter(schedule);
-		//		router.calcRoute(new CoordImpl(200, 200), new CoordImpl(4800, 800), Time.parseTime("07:01:00"));
-//		List<Id> linkIds = router.calcRoute(schedule.getFacilities().get(new IdImpl("h")).getCoord(),
-//				schedule.getFacilities().get(new IdImpl("l2")).getCoord(),
-//				Time.parseTime("07:01:00"));
-//		assertNotNull(linkIds);
-//		assertEquals(7, linkIds.size());
-//		assertEquals(new IdImpl(0), linkIds.get(0));
-//		assertEquals(new IdImpl(1), linkIds.get(1));
-//		assertEquals(new IdImpl(12), linkIds.get(2));
-//		assertEquals(new IdImpl(9), linkIds.get(3));
-//		assertEquals(new IdImpl(10), linkIds.get(4));
-//		assertEquals(new IdImpl(16), linkIds.get(5));
-//		assertEquals(new IdImpl(7), linkIds.get(6));
+		TransitRouter router = new TransitRouter(schedule);
+		router.calcRoute(new CoordImpl(200, 200), new CoordImpl(4800, 800), Time.parseTime("07:01:00"));
+		
+		List<Id> linkIds = router.calcRoute(homeCoord, l2Coord, Time.parseTime("07:01:00"));
+		assertNotNull(linkIds);
+		assertEquals(7, linkIds.size());
+		assertEquals(new IdImpl(0), linkIds.get(0));
+		assertEquals(new IdImpl(1), linkIds.get(1));
+		assertEquals(new IdImpl(12), linkIds.get(2));
+		assertEquals(new IdImpl(9), linkIds.get(3));
+		assertEquals(new IdImpl(10), linkIds.get(4));
+		assertEquals(new IdImpl(16), linkIds.get(5));
+		assertEquals(new IdImpl(7), linkIds.get(6));
 	}
 }
