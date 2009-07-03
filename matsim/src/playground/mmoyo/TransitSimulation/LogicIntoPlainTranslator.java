@@ -57,7 +57,7 @@ public class LogicIntoPlainTranslator {
 		return planLink;
 	}
 	
-	/**in case of a transfer link of the logic Network, the last standard link is returned, because transfer links do not exist in the pain network*/
+	/**in case of a transfer link of the logic Network, the last standard link is returned, because transfer links do not exist in the plain network*/
 	private LinkImpl findLastStandardLink (LinkImpl transferLink){
 		LinkImpl standardLink = null;
 		for (LinkImpl inLink: transferLink.getFromNode().getInLinks().values()){

@@ -26,7 +26,6 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
@@ -56,8 +55,7 @@ public class PTActWriter {
 	private final String TRANSFER = "Transfer";
 	private final String DETTRANSFER = "DetTransfer";
 	
-	//public List<Id> crazyAgentList = new ArrayList<Id>(); 
-	public Population crazyPopulation = new PopulationImpl();
+	//public Population detouredPopulation = new PopulationImpl();  //temporal to find plans with detoured trips
 	
 	@Deprecated
 	public PTActWriter(final PTOb ptOb){
@@ -130,11 +128,10 @@ public class PTActWriter {
 				NetworkRoute netRoute= (NetworkRoute) leg.getRoute(); 
 				System.out.println(" ");
 				System.out.println(leg.toString());
-				/*
-				for ( Link l : netRoute.getLinks()){
-					System.out.print("(" + l.getFromNode().getId() + ")----" + l.getId() + "---->(" + l.getToNode().getId() + ")" );
+				
+				for (NodeImpl node : netRoute.getNodes()){
+					System.out.print(node.getId() + " " );
 				}
-				*/
 			}
 		}
 	}
@@ -242,7 +239,7 @@ public class PTActWriter {
 			}
 			x++;
 		}
-				
+
 		System.out.println("total " + total + " average: " + (total/durations.size()));
 		
 		/*
@@ -308,18 +305,19 @@ public class PTActWriter {
 					newPlan.addActivity(newPTAct("transf", link.getFromNode().getCoord(), link, accumulatedTime, endTime));
 					first=false;
 					
-					////////////////////////////// find crazy connections
+					/*
+					////////////////////////////// find roundabout connections
 					NodeImpl nodeA = path.nodes.get(0);
 					NodeImpl nodeB = path.nodes.get(path.nodes.size()-1);
 					double a_bDistance = CoordUtils.calcDistance(nodeA.getCoord() , nodeB.getCoord());
 					double a_TransterDistance = CoordUtils.calcDistance(nodeA.getCoord() , link.getFromNode().getCoord());
 					double b_TransterDistance = CoordUtils.calcDistance(nodeB.getCoord() , link.getFromNode().getCoord());
 					if(a_TransterDistance > a_bDistance || b_TransterDistance > a_bDistance){
-						PersonImpl crazyPerson = newPlan.getPerson();
-						if (!crazyPopulation.getPersons().containsValue(crazyPerson))
-							crazyPopulation.addPerson(newPlan.getPerson());
+						PersonImpl detouredPerson = newPlan.getPerson();
+						if (!detouredPopulation.getPersons().containsValue(deoturedPerson))
+							detouredPopulation.addPerson(newPlan.getPerson());
 					}
-					///////////////////////////
+					///////////////////////////*/
 					
 				//}
 			}

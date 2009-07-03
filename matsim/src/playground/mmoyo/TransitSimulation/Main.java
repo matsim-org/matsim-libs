@@ -1,20 +1,16 @@
 package playground.mmoyo.TransitSimulation;
 
 import java.io.IOException;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
-
 import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
@@ -27,7 +23,7 @@ import playground.mmoyo.PTRouter.PTRouter2;
  */
 public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
-	//private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
+	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
 	private static final String PLANFILE = PATH + "plans.xml";
 	private static final String OUTPUTPLANS = PATH + "output_plans_with_Transit.xml";
@@ -81,18 +77,24 @@ public class Main {
 			case 3: //Routes a population/
 	    		ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 	    		ptActWriter.findRouteForActivities();
-	    		new PopulationWriter(ptActWriter.crazyPopulation, PATH + "crazyplans.xml", "v4").write();
-	    		
+	    		//new PopulationWriter(ptActWriter.detouredPopulation, PATH + "detouredplans.xml", "v4").write();
 	    		break;
 
-			case 4:  //tests the TransitRouteFinder class
+			case 4:  //tests the TransitRouteFinder class with the population of PTActWriter class
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.printPTLegs(transitSchedule);
 				break;
 				
 			case 5: //creates GIS net from plainNetwork*/
-				//Nodes2ESRIShape nodes2ESRIShape = new Nodes2ESRIShape();
+				/*
+				plainNet=logicFactory.getPlainNet();
+				org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape nodes2ESRIShape = new Nodes2ESRIShape(plainNet, PATH + "ESRISNet.xml");
+				nodes2ESRIShape.write();
+				*/
 				break;
+		
+
+		
 		}
 	}
 }
