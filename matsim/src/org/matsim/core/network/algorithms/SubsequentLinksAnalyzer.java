@@ -28,9 +28,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkIdComparator;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
@@ -105,31 +104,35 @@ public class SubsequentLinksAnalyzer {
 		}
 	}
 
+	/**
+	 * @param l
+	 * @param thetas map of outgoing-link and theta of that link. must include at least one entry, otherwise it won't work!
+	 * @return the link with the smallest theta, if multiple links have the same smallest theta, the one with the biggest capacity is returned.
+	 */
 	private LinkImpl computeSubsequentLink(final LinkImpl l, final Map<LinkImpl, Double> thetas) {
-		LinkImpl outLink = null;
 		List<LinkImpl> minThetaOutLinks = new ArrayList<LinkImpl>();
-		while (outLink == null) {
-			minThetaOutLinks.clear();
-			double absMin = Collections.min(thetas.values()).doubleValue();
-			for (Map.Entry<LinkImpl, Double> entry : thetas.entrySet()) {
-				if (absMin == (entry.getValue()).doubleValue())
-					minThetaOutLinks.add(entry.getKey());
-			}
-			if (minThetaOutLinks.size() == 1) {
-				outLink = minThetaOutLinks.get(0);
-			} else if (minThetaOutLinks.size() == 2) {
-				LinkImpl outLinkA = minThetaOutLinks.get(0);
-				LinkImpl outLinkB = minThetaOutLinks.get(1);
-				double capA = outLinkA.getCapacity(Time.UNDEFINED_TIME);
-				double capB = outLinkB.getCapacity(Time.UNDEFINED_TIME);
-				if (l.getCapacity(Time.UNDEFINED_TIME) > Math.min(capA, capB)) {
-					outLink = (capA >= capB) ? outLinkA : outLinkB;
-				} else {
-					outLink = (MatsimRandom.getRandom().nextDouble() < 0.5) ? outLinkA : outLinkB;
-				}
+
+		minThetaOutLinks.clear();
+		double absMin = Collections.min(thetas.values()).doubleValue();
+		for (Map.Entry<LinkImpl, Double> entry : thetas.entrySet()) {
+			if (absMin == (entry.getValue()).doubleValue()) {
+				minThetaOutLinks.add(entry.getKey());
 			}
 		}
-		return outLink;
+		if (minThetaOutLinks.size() == 1) {
+			return minThetaOutLinks.get(0);
+		}
+	
+		double maxCapacity = Double.NEGATIVE_INFINITY;
+		LinkImpl maxCapLink = null;
+		for (LinkImpl link : minThetaOutLinks) {
+			double cap = link.getCapacity(Time.UNDEFINED_TIME);
+			if (cap > maxCapacity)  {
+				maxCapacity = cap;
+				maxCapLink = link;
+			}
+		}
+		return maxCapLink;
 	}
 
 }
