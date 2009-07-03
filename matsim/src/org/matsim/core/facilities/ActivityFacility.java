@@ -24,11 +24,12 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.population.*;
 import org.matsim.core.basic.v01.facilities.BasicActivityFacility;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.world.*;
+import org.matsim.world.Location;
+import org.matsim.world.World;
+import org.matsim.world.ZoneLayer;
 
 public interface ActivityFacility extends BasicActivityFacility, Location, Facility {
 
