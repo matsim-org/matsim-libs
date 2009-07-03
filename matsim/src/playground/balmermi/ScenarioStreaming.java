@@ -35,6 +35,8 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 
+import playground.balmermi.modules.PersonConsolidateInitDemand;
+
 public class ScenarioStreaming {
 
 	//////////////////////////////////////////////////////////////////////
@@ -108,11 +110,12 @@ public class ScenarioStreaming {
 
 		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(population,network);
-		PopulationWriter plansWriter = new PopulationWriter(population);
+		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+		PopulationWriter plansWriter = new PopulationWriter(population,sl.getScenario().getKnowledges());
 
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(plansWriter);
+		population.addAlgorithm(new PersonConsolidateInitDemand());
 		Gbl.printMemoryUsage();
 		System.out.println("done. (adding algorithms)");
 

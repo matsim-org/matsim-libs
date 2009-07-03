@@ -34,6 +34,7 @@ import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -43,7 +44,11 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.modules.ReRouteLandmarks;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ScenarioCut {
@@ -246,6 +251,21 @@ public class ScenarioCut {
 		for (Id id : toRemove) { scenario.getPopulation().getPersons().remove(id); }
 		System.out.println("=> "+scenario.getPopulation().getPersons().size()+" persons left.");
 		System.out.println("done. " + (new Date()));
+
+		System.out.println("re-initializing initial routes...");
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
+		preProcessLandmarks.run(scenario.getNetwork());
+		ReRouteLandmarks router = new ReRouteLandmarks(scenario.getNetwork(),timeCostCalc,timeCostCalc,preProcessLandmarks);
+		router.prepareReplanning();
+		for (PersonImpl person : scenario.getPopulation().getPersons().values()) {
+			for (PlanImpl plan : person.getPlans()) {
+				router.handlePlan(plan);
+			}
+		}
+		router.finishReplanning();
+		Gbl.printMemoryUsage();
+		System.out.println("done. (re-initializing initial routes)");
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -274,7 +294,7 @@ public class ScenarioCut {
 		calcExtent(scenario);
 		new NetworkWriter(scenario.getNetwork()).write();
 		new FacilitiesWriter(scenario.getActivityFacilities()).write();
-		new PopulationWriter(scenario.getPopulation()).write();
+		new PopulationWriter((PopulationImpl)scenario.getPopulation(),scenario.getKnowledges()).write();
 	}
 	
 	//////////////////////////////////////////////////////////////////////

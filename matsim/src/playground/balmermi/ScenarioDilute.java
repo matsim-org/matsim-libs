@@ -120,8 +120,8 @@ public class ScenarioDilute {
 
 		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(population,network);
-		PopulationWriter plansWriter = new PopulationWriter(population);
+		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+		PopulationWriter plansWriter = new PopulationWriter(population,sl.getScenario().getKnowledges());
 
 		System.out.println("adding algorithms...");
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest);
