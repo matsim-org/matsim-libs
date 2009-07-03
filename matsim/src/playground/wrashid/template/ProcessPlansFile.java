@@ -17,6 +17,10 @@ import org.matsim.core.population.PopulationWriter;
 import playground.andreas.bln.DuplicatePlans;
 import playground.andreas.bln.NewPopulation;
 
+/*
+ * In KeepOnlyMIVPlans, you find an example where facilities are also involved...
+ */
+
 public class ProcessPlansFile extends NewPopulation {
 	public static void main(String[] args) {
 
