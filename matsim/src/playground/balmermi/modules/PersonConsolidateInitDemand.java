@@ -126,8 +126,6 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 		}
 		Set<String> kActTypes = new TreeSet<String>();
 		for (ActivityOption aok : kActOptions) { kActTypes.add(aok.getType()); }
-		System.out.println("d: "+dActTypes);
-		System.out.println("k: "+kActTypes);
 		if (!dActTypes.equals(kActTypes)) {
 			throw new RuntimeException("Person id="+plan.getPerson().getId()+": know<=>des does not fit!");
 		}
