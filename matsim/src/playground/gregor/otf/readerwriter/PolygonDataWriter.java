@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import org.geotools.data.FeatureSource;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
 
-public class TileDrawerDataWriter extends OTFDataWriter {
+public class PolygonDataWriter extends OTFDataWriter {
 
 
 	
@@ -17,13 +17,17 @@ public class TileDrawerDataWriter extends OTFDataWriter {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 864783194545566461L;
-	private String data;
+	private static final long serialVersionUID = 7454644070258134874L;
+	private SimpleBackgroundFeatureDrawer data;
 
 
 
-	public TileDrawerDataWriter() {
-		this.data = "localhost:8080";
+	public PolygonDataWriter(FeatureSource fs, float [] color ) {
+		try {
+			this.data = new SimpleBackgroundFeatureDrawer(fs,color);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

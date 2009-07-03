@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class InundationData implements Serializable{
 
 	static final float [] empty = new float [] {1,1,1,0};
 	
-	static final int RES = 8;
+	public static final int RES = 8;
 	static final byte [][] walsh16 = new byte [][] {
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 		{1,1,1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1},

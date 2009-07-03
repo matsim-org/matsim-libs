@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import org.matsim.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
+
+import playground.gregor.otf.drawer.OTFTilesDrawer;
 
 public class TileDrawerDataReader extends OTFDataReader{
 
@@ -42,7 +44,7 @@ public class TileDrawerDataReader extends OTFDataReader{
 		        Object obj = istream.readObject();
 		 
 		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new TileDrawer());
+		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
 		        }
 		    }
 		    catch(IOException e){

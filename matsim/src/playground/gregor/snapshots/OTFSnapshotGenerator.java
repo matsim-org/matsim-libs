@@ -17,10 +17,11 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.MY_STATIC_STUFF;
-import playground.gregor.otf.SimpleBackgroundTextureDrawer;
+import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 import playground.gregor.snapshots.postprocessors.ConfluenceArrowsFromEvents;
 import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
 import playground.gregor.snapshots.postprocessors.EvacuationLinksTeleporter;
+import playground.gregor.snapshots.postprocessors.SheltersColorizer;
 import playground.gregor.snapshots.postprocessors.TimeDependentColorizer;
 import playground.gregor.snapshots.postprocessors.WrongDirectionArrowsFromEvents;
 import playground.gregor.snapshots.writers.LineStringTree;
@@ -45,6 +46,9 @@ public class OTFSnapshotGenerator {
 		this.scenario.getConfig().network().setInputFile("../../outputs/output/output_network.xml.gz");
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
+		this.scenario.getConfig().simulation().setEndTime(5*3600);
+		this.scenario.getConfig().evacuation().setBuildingsFile("../../inputs/networks/buildings_v20090403.shp");
+		this.scenario.getConfig().evacuation().setSampleSize("0.01");
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		sl.loadNetwork();
 		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz"; 
@@ -68,7 +72,10 @@ public class OTFSnapshotGenerator {
 		TimeDependentColorizer t = new TimeDependentColorizer();
 		ev.addHandler(t);
 		
-		SimpleBackgroundTextureDrawer sbg = new SimpleBackgroundTextureDrawer("./res/arrow.png");
+		SheltersColorizer s = new SheltersColorizer(this.scenario.getConfig().evacuation().getBuildingsFile(),this.scenario.getConfig().simulation().getSnapshotPeriod(), this.scenario.getConfig().evacuation().getSampleSize());
+		ev.addHandler(s);
+		
+		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("./res/arrow.png");
 		ConfluenceArrowsFromEvents c = new ConfluenceArrowsFromEvents(sbg,this.scenario.getNetwork());
 		
 //		SimpleBackgroundTextureDrawer sbgII = new SimpleBackgroundTextureDrawer("./res/arrow.png");
@@ -84,11 +91,13 @@ public class OTFSnapshotGenerator {
 //		ev.removeHandler(w);
 		c.createArrows();
 //		w.createArrows();
+		ev.removeHandler(s);
 		
-		PositionInfo.lsTree = new LineStringTree(getFeatures(),(NetworkLayer) this.scenario.getNetwork());
+		PositionInfo.lsTree = new LineStringTree(getFeatures(),this.scenario.getNetwork());
 		
 		MVISnapshotWriter writer = new MVISnapshotWriter(this.scenario);
 		writer.addSimpleBackgroundTextureDrawer(sbg);
+		writer.setSheltersOccupancyMap(s.getOccMap());
 //		writer.addSimpleBackgroundTextureDrawer(sbgII);
 //		writer.addSimpleBackgroundTextureDrawer(sbgIII);
 		

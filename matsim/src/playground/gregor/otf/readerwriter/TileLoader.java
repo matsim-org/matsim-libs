@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.jfree.util.Log;
+
+import playground.gregor.otf.drawer.Tile;
 
 import com.sun.opengl.util.texture.TextureIO;
 
@@ -35,7 +36,7 @@ public class TileLoader extends Thread implements Serializable {
 
 	@Override
 	public void run(){
-		while (running) {
+		while (this.running) {
 			if (System.currentTimeMillis() > this.oldTime  + 2000){
 				this.oldTime = System.currentTimeMillis();
 				System.out.println("dynamic cache:" + this.tilesQueue.size()  + " static cache:" + this.tiles.size() + " requests:" + this.requests.size());
@@ -72,11 +73,11 @@ public class TileLoader extends Thread implements Serializable {
 		InputStream is = null;
 		try {
 			is = getBGImageStream(tr.refCoordX, tr.refCoordY, tr.geoWidth, tr.geoWidth, Tile.LENGTH, Tile.LENGTH);
-			tr.tile.tx = TextureIO.newTextureData(is,false,"png");
+			tr.tile.setTx(TextureIO.newTextureData(is,false,"png"));
 		} catch (IOException e) {
 			
 			this.requests.clear();
-			tr.tile.tx = null;
+			tr.tile.setTx(null);
 		}
 //		try {
 //			is.close();
@@ -92,7 +93,7 @@ public class TileLoader extends Thread implements Serializable {
 
 			while (this.tilesQueue.size() > MAX_CACHE*0.75) {
 				Tile tile = this.tilesQueue.poll();
-				tile.tex = null;
+				tile.setTex(null);
 				this.tiles.remove(tile.id);
 				
 			}
@@ -131,7 +132,7 @@ public class TileLoader extends Thread implements Serializable {
 	public void addRequest(Tile t, double refCoordX, double refCoordY, double geoWidth){
 
 		TileRequest req = new TileRequest();
-		t.time = System.currentTimeMillis();
+		t.setTime(System.currentTimeMillis());
 		req.tile = t;
 		req.refCoordX = refCoordX;
 		req.refCoordY = refCoordY;

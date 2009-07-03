@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -8,9 +8,10 @@ import java.nio.ByteBuffer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 
-public class TextutreDataReader extends OTFDataReader{
+public class PolygonDataReader extends OTFDataReader{
 
 	@Override
 	public void connect(Receiver receiver) {
@@ -40,8 +41,8 @@ public class TextutreDataReader extends OTFDataReader{
 		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
 		        Object obj = istream.readObject();
 		 
-		        if(obj instanceof SimpleBackgroundTextureDrawer){
-		        	OGLSimpleBackgroundLayer.addPersistentItem((SimpleBackgroundTextureDrawer)obj);
+		        if(obj instanceof SimpleBackgroundFeatureDrawer){
+		        	OGLSimpleBackgroundLayer.addPersistentItem((SimpleBackgroundFeatureDrawer)obj);
 		        }
 		    }
 		    catch(IOException e){
@@ -50,6 +51,7 @@ public class TextutreDataReader extends OTFDataReader{
 		    catch(ClassNotFoundException e){
 		        e.printStackTrace();
 		    }
+		
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,34 +8,38 @@ import java.nio.ByteBuffer;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 
-public class TextureDataWriter extends OTFDataWriter {
+public class InundationDataWriter extends OTFDataWriter {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8078062058033632057L;
-	private SimpleBackgroundTextureDrawer sbg;
+	private static final long serialVersionUID = 6693752092591508527L;
+	
+	private final InundationData data;
 
-	public TextureDataWriter(SimpleBackgroundTextureDrawer sbg) {
-		this.sbg = sbg;
+	public InundationDataWriter(InundationData data) {
+		this.data = data;
 	}
 
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
+		
+		
 		ByteArrayOutputStream a = new ByteArrayOutputStream();
-
+		
 		ObjectOutputStream o = new ObjectOutputStream(a);
-		o.writeObject(this.sbg);
-
+		o.writeObject(this.data);
+		
 		out.putInt(a.toByteArray().length);
+		
 		out.put(a.toByteArray());
-
+		
 	}
 
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

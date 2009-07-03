@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -8,37 +8,26 @@ import java.nio.ByteBuffer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 
-public class InundationDataReader extends OTFDataReader {
-	
-	private final OTFInundationDrawer drawer;
-	private Dummy receiver;
+import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 
-	public InundationDataReader() {
-		this.drawer = new OTFInundationDrawer();
-		Dummy.myDrawer = this.drawer;
-	}
-	
+public class TextutreDataReader extends OTFDataReader{
+
 	@Override
 	public void connect(Receiver receiver) {
-		this.receiver = (Dummy) receiver;
-		
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-//		this.drawer.invalidate(graph);
-		this.receiver = new Dummy();
-		graph.addItem(this.receiver);
-		this.receiver.setTime(graph.getTime());
+		// TODO Auto-generated method stub
 		
-//		this.receiver.invalidate(graph);
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		
 		int size = in.getInt();
 		
 		 byte[] byts = new byte[size];
@@ -46,7 +35,6 @@ public class InundationDataReader extends OTFDataReader {
 		 
 		 
 		    in.get(byts);
-		 
 		    
 		    ObjectInputStream istream = null;
 		 
@@ -54,9 +42,8 @@ public class InundationDataReader extends OTFDataReader {
 		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
 		        Object obj = istream.readObject();
 		 
-		        if(obj instanceof InundationData){
-		        	this.drawer.setData((InundationData) obj);
-		            System.out.println("deserialization successful");
+		        if(obj instanceof OTFBackgroundTexturesDrawer){
+		        	OGLSimpleBackgroundLayer.addPersistentItem((OTFBackgroundTexturesDrawer)obj);
 		        }
 		    }
 		    catch(IOException e){
@@ -65,10 +52,6 @@ public class InundationDataReader extends OTFDataReader {
 		    catch(ClassNotFoundException e){
 		        e.printStackTrace();
 		    }
-//		this.drawer.setData(data);
-		
-		
-		
 	}
 
 	@Override

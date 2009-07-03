@@ -5,15 +5,15 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.gregor.otf.SimpleBackgroundTextureDrawer;
+import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 
 public class WrongDirectionArrowsFromEvents extends ConfluenceArrowsFromEvents{
 
 
 
-	private final SimpleBackgroundTextureDrawer wrongDir;
+	private final OTFBackgroundTexturesDrawer wrongDir;
 
-	public WrongDirectionArrowsFromEvents(SimpleBackgroundTextureDrawer arrows, SimpleBackgroundTextureDrawer wrongDir,
+	public WrongDirectionArrowsFromEvents(OTFBackgroundTexturesDrawer arrows, OTFBackgroundTexturesDrawer wrongDir,
 			NetworkLayer network) {
 		super(arrows, network);
 		this.wrongDir = wrongDir;

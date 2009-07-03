@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,10 +16,10 @@ import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
-import playground.gregor.otf.InundationData.InundationGeometry;
-import playground.gregor.otf.InundationData.Polygon;
-import playground.gregor.otf.InundationData.Quad;
-import playground.gregor.otf.InundationData.Triangle;
+import playground.gregor.otf.readerwriter.InundationData.InundationGeometry;
+import playground.gregor.otf.readerwriter.InundationData.Polygon;
+import playground.gregor.otf.readerwriter.InundationData.Quad;
+import playground.gregor.otf.readerwriter.InundationData.Triangle;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

@@ -20,7 +20,9 @@ import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingLine;
+import org.matsim.evacuation.flooding.FloodingReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -34,16 +36,21 @@ public class FloodLineShape {
 	private final String output;
 	private FeatureType featureType;
 	private GeometryFactory geofac;
+	private FeatureType featureType2;
+	private final String output2;
 
-	public FloodLineShape(String netcdf, String output) {
+	public FloodLineShape(String netcdf, String output, String output2) {
 		this.netcdf = netcdf;
 		this.output = output;
+		this.output2 = output2;
 	}
 
 	private void run() {
 		initFeatureType();
-		FloodingLine fl = new FloodingLine(this.netcdf);
+		FloodingReader fr = new FloodingReader(this.netcdf,true);
+		FloodingLine fl = new FloodingLine(fr);
 		Collection<Feature> fts = new ArrayList<Feature>();
+		Collection<Feature> fts2 = new ArrayList<Feature>();
 		int singletons = 0;
 		for (int i = 0; i <= 120; i += 1) {
 			List<ArrayList<Coordinate>> allCoords = fl.getFloodLine(i);
@@ -66,8 +73,21 @@ public class FloodLineShape {
 			}
 		}
 		System.out.println("singletons:" + singletons);
+		
+		
+		for (FloodingInfo fi : fr.getFloodingInfos()) {
+			Point p = this.geofac.createPoint(fi.getCoordinate());
+			try {
+				fts2.add(this.featureType2.create(new Object[] {p, fi.getFloodingTime()}));
+			} catch (IllegalAttributeException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
 		try {
 			ShapeFileWriter.writeGeometries(fts, this.output);
+			ShapeFileWriter.writeGeometries(fts2, this.output2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -82,9 +102,14 @@ public class FloodLineShape {
 		attribs[1] = AttributeTypeFactory.newAttributeType("time",
 				Integer.class);
 
+		AttributeType[] attribs2 = new AttributeType[2];
+		attribs2[0] = DefaultAttributeTypeFactory.newAttributeType("Point",
+				Point.class, true, null, null, crs);
+		attribs2[1] = AttributeTypeFactory.newAttributeType("time",
+				Integer.class);		
 		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attribs,
-					"node");
+			this.featureType = FeatureTypeBuilder.newFeatureType(attribs,"node");
+			this.featureType2 = FeatureTypeBuilder.newFeatureType(attribs2,"node2");
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
@@ -96,10 +121,11 @@ public class FloodLineShape {
 	public static void main(String[] args) {
 		 String netcdf = "../../inputs/flooding/flooding_old.sww";
 //		String netcdf = "test/input/playground/gregor/data/flooding.sww";
-		String output = "./floodLine.shp";
+		String output = "../../analysis/mesh/floodLine.shp";
+		String output2 = "../../analysis/mesh/floodPoints.shp";
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("WGS84_UTM47S");
-		FloodLineShape fls = new FloodLineShape(netcdf, output);
+		FloodLineShape fls = new FloodLineShape(netcdf, output, output2);
 		fls.run();
 	}
 

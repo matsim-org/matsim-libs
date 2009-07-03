@@ -1,4 +1,6 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
+
+import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -7,26 +9,37 @@ import java.nio.ByteBuffer;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFData.Receiver;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 
-public class PolygonDataReaderII extends OTFDataReader{
+import playground.gregor.otf.drawer.OTFInundationDrawer;
+import playground.gregor.otf.drawer.OTFSheltersDrawer;
+import playground.gregor.otf.drawer.TimeDependentTrigger;
+
+public class SheltersReader extends OTFDataReader {
+
+	private OTFSheltersDrawer drawer;
+	private TimeDependentTrigger receiver;
 
 	@Override
 	public void connect(Receiver receiver) {
-		// TODO Auto-generated method stub
+		this.receiver = (TimeDependentTrigger) receiver;
+		
 		
 	}
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		// TODO Auto-generated method stub
+//		this.drawer.invalidate(graph);
+		this.receiver = new TimeDependentTrigger();
+		this.receiver.setDrawer(this.drawer);
+		graph.addItem(this.receiver);
+		this.receiver.setTime(graph.getTime());
 		
+//		this.receiver.invalidate(graph);
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
+		
 		int size = in.getInt();
 		
 		 byte[] byts = new byte[size];
@@ -34,6 +47,7 @@ public class PolygonDataReaderII extends OTFDataReader{
 		 
 		 
 		    in.get(byts);
+		 
 		    
 		    ObjectInputStream istream = null;
 		 
@@ -41,8 +55,9 @@ public class PolygonDataReaderII extends OTFDataReader{
 		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
 		        Object obj = istream.readObject();
 		 
-		        if(obj instanceof SimpleBackgroundFeatureDrawer){
-		        	OGLSimpleBackgroundLayer.addPersistentItem((SimpleBackgroundFeatureDrawer)obj);
+		        if(obj instanceof OTFSheltersDrawer){
+		        	this.drawer = (OTFSheltersDrawer) obj;
+		            System.out.println("deserialization successful");
 		        }
 		    }
 		    catch(IOException e){
@@ -51,6 +66,9 @@ public class PolygonDataReaderII extends OTFDataReader{
 		    catch(ClassNotFoundException e){
 		        e.printStackTrace();
 		    }
+//		this.drawer.setData(data);
+		
+		
 		
 	}
 
@@ -59,5 +77,6 @@ public class PolygonDataReaderII extends OTFDataReader{
 		// TODO Auto-generated method stub
 		
 	}
-
 }
+
+

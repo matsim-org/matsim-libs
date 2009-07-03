@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.drawer;
 
 import static javax.media.opengl.GL.GL_MODELVIEW_MATRIX;
 import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
@@ -11,17 +11,12 @@ import java.util.Collection;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import org.apache.log4j.Logger;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
-import playground.gregor.otf.InundationData.InundationGeometry;
+import playground.gregor.otf.readerwriter.InundationData;
+import playground.gregor.otf.readerwriter.InundationData.InundationGeometry;
 
-public class OTFInundationDrawer extends AbstractBackgroundDrawer {
+public class OTFInundationDrawer extends OTFTimeDependentDrawer {
 
-	
-	private static final Logger log = Logger.getLogger(OTFInundationDrawer.class);
 	
 	double[] modelview = new double[16];
 	double[] projection = new double[16];
@@ -37,24 +32,16 @@ public class OTFInundationDrawer extends AbstractBackgroundDrawer {
 	
 	private  short timeSlotIdx = -1;
 	private InundationData data;
-	private OTFOGLDrawer drawer2;
 
 
-//	public OTFInundationDrawer(OTFOGLDrawer drawer2) {
-//		this.drawer2 = drawer2;
-//	}
-
-	public void onDraw(GL gl) {
-//		onDraw(gl,this.drawer2.now);
-		
-	}
 	
 
+	@Override
 	public void onDraw(GL gl, int time) {
 
 
 		
-		this.timeSlotIdx = (short) (((short) ((time - 3*3600)/60)));
+		this.timeSlotIdx = (((short) ((time - 3*3600)/60)));
 		
 		if (this.timeSlotIdx < 0) {
 			return;

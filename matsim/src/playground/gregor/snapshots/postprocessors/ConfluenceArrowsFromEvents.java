@@ -13,17 +13,17 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.gregor.otf.SimpleBackgroundTextureDrawer;
+import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 
 public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 
 	protected static final double PI_HALF = Math.PI/2;
 	protected static final double TWO_PI = 2 * Math.PI;
 	protected final Map<NodeImpl,NodeInfo> infos = new HashMap<NodeImpl,NodeInfo>();
-	protected final SimpleBackgroundTextureDrawer sbg;
+	protected final OTFBackgroundTexturesDrawer sbg;
 	private final NetworkLayer network;
 	
-	public ConfluenceArrowsFromEvents(SimpleBackgroundTextureDrawer sbg, NetworkLayer network) {
+	public ConfluenceArrowsFromEvents(OTFBackgroundTexturesDrawer sbg, NetworkLayer network) {
 		this.sbg = sbg;
 		this.network = network;
 	}

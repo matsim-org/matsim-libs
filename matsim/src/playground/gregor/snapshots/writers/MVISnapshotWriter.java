@@ -23,7 +23,9 @@ package playground.gregor.snapshots.writers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.geotools.data.FeatureSource;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -42,20 +44,21 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
-import playground.gregor.otf.Dummy;
-import playground.gregor.otf.InundationDataFromBinaryFileReader;
-import playground.gregor.otf.InundationDataFromNetcdfReader;
-import playground.gregor.otf.InundationDataReader;
-import playground.gregor.otf.InundationDataWriter;
-import playground.gregor.otf.PolygonDataReader;
-import playground.gregor.otf.PolygonDataReaderII;
-import playground.gregor.otf.PolygonDataWriter;
-import playground.gregor.otf.PolygonDataWriterII;
-import playground.gregor.otf.SimpleBackgroundTextureDrawer;
-import playground.gregor.otf.TextureDataWriter;
-import playground.gregor.otf.TextutreDataReader;
-import playground.gregor.otf.TileDrawerDataReader;
-import playground.gregor.otf.TileDrawerDataWriter;
+import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
+import playground.gregor.otf.drawer.OTFSheltersDrawer;
+import playground.gregor.otf.drawer.TimeDependentTrigger;
+import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
+import playground.gregor.otf.readerwriter.InundationDataFromNetcdfReader;
+import playground.gregor.otf.readerwriter.InundationDataReader;
+import playground.gregor.otf.readerwriter.InundationDataWriter;
+import playground.gregor.otf.readerwriter.PolygonDataReader;
+import playground.gregor.otf.readerwriter.PolygonDataWriter;
+import playground.gregor.otf.readerwriter.SheltersReader;
+import playground.gregor.otf.readerwriter.SheltersWriter;
+import playground.gregor.otf.readerwriter.TextureDataWriter;
+import playground.gregor.otf.readerwriter.TextutreDataReader;
+import playground.gregor.otf.readerwriter.TileDrawerDataReader;
+import playground.gregor.otf.readerwriter.TileDrawerDataWriter;
 
 
 public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
@@ -100,20 +103,23 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 //			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReader(OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast).createData()));
 		}
 		
+
+		
 		try {
-			this.quad.addAdditionalElement(new PolygonDataWriterII(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
+			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
 			this.quad.addAdditionalElement(new TileDrawerDataWriter());
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.LINKS_FILE),linksColor));
 			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.NODES_FILE),nodesColor));
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.BUILDINGS_FILE),buildingsColor));
+//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.BUILDINGS_FILE),buildingsColor));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		for (SimpleBackgroundTextureDrawer sbg : this.sbgs){
+		for (OTFBackgroundTexturesDrawer sbg : this.sbgs){
 			this.quad.addAdditionalElement(new TextureDataWriter(sbg));
 		}
-		connect.add(PolygonDataWriterII.class,PolygonDataReaderII.class);
+		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		
@@ -134,9 +140,21 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		//		connect.add(InundationDataReader.class,Dummy.class);
 		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
 		connect.add(TextureDataWriter.class,TextutreDataReader.class);
+		if (this.occMap != null) {
+			try {
+				FeatureSource fs = ShapeFileReader.readDataFile(this.BUILDINGS_FILE);
+				OTFSheltersDrawer sd = new OTFSheltersDrawer(fs,this.occMap,OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast);
+				this.quad.addAdditionalElement(new SheltersWriter(sd));
+				connect.add(SheltersWriter.class,SheltersReader.class);
+				connect.add(SheltersReader.class,TimeDependentTrigger.class);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		if (this.insertWave) {
 			connect.add(InundationDataWriter.class,InundationDataReader.class);
-			connect.add(InundationDataReader.class,Dummy.class);
+			connect.add(InundationDataReader.class,TimeDependentTrigger.class);
 		}
 	}
 
@@ -173,7 +191,8 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	private double lastTime=-1;
 	private int cntTimesteps=0;
 //	private SimpleBackgroundTextureDrawer sbg;
-	private final List<SimpleBackgroundTextureDrawer> sbgs = new ArrayList<SimpleBackgroundTextureDrawer>();
+	private final List<OTFBackgroundTexturesDrawer> sbgs = new ArrayList<OTFBackgroundTexturesDrawer>();
+private Map<String, ArrayList<Double>> occMap = null;
 
 
 	public void addVehicle(final double time, final ExtendedPositionInfo position) {
@@ -208,13 +227,19 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		//		}
 	}
 
-	public void addSimpleBackgroundTextureDrawer(SimpleBackgroundTextureDrawer sbg) {
+	public void addSimpleBackgroundTextureDrawer(OTFBackgroundTexturesDrawer sbg) {
 		this.sbgs.add(sbg);
 	}
 
 	@Override
 	public void finish() {
 		close();
+	}
+
+
+	public void setSheltersOccupancyMap(Map<String, ArrayList<Double>> occMap) {
+		this.occMap  = occMap;
+		
 	}
 
 

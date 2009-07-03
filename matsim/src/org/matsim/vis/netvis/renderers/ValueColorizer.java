@@ -21,17 +21,23 @@
 package org.matsim.vis.netvis.renderers;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  * @author gunnar
  */
-public class ValueColorizer {
+public class ValueColorizer implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2510927168023208677L;
 
 	// MEMBER VARIABLES
 
-	private double[] values;
+	private final double[] values;
 
-	private Color[] colors;
+	private final Color[] colors;
 
 	// CONSTRUCTION
 
@@ -49,7 +55,7 @@ public class ValueColorizer {
 
 	private int upperIndex(double val) {
 		int result = 0;
-		while (values[result] < val && result < values.length - 1)
+		while (this.values[result] < val && result < this.values.length - 1)
 			result++;
 		return result;
 
@@ -62,12 +68,12 @@ public class ValueColorizer {
 	public Color getColor(double value) {
 		final int u = upperIndex(value);
 		if (u == 0) {
-			return colors[0];
+			return this.colors[0];
 		}
-		final double w = (value - values[u - 1]) / (values[u] - values[u - 1]);
-		final int r = bound(w * colors[u].getRed() + (1 - w) * colors[u - 1].getRed());
-		final int g = bound(w * colors[u].getGreen() + (1 - w) * colors[u - 1].getGreen());
-		final int b = bound(w * colors[u].getBlue() + (1 - w) * colors[u - 1].getBlue());
+		final double w = (value - this.values[u - 1]) / (this.values[u] - this.values[u - 1]);
+		final int r = bound(w * this.colors[u].getRed() + (1 - w) * this.colors[u - 1].getRed());
+		final int g = bound(w * this.colors[u].getGreen() + (1 - w) * this.colors[u - 1].getGreen());
+		final int b = bound(w * this.colors[u].getBlue() + (1 - w) * this.colors[u - 1].getBlue());
 
 		return new Color(r, g, b);
 	}

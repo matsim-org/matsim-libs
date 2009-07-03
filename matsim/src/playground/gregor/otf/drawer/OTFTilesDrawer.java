@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.drawer;
 
 import static javax.media.opengl.GL.GL_MODELVIEW_MATRIX;
 import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
@@ -20,18 +20,20 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
+import playground.gregor.otf.readerwriter.TileLoader;
+
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
 
-public class TileDrawer extends AbstractBackgroundDrawer implements Serializable{
+public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializable{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8732378231241446615L;
 	
-	private static final Logger log = Logger.getLogger(TileDrawer.class);
+	private static final Logger log = Logger.getLogger(OTFTilesDrawer.class);
 	double[] modelview = new double[16];
 	double[] projection = new double[16];
 	int[] viewport = new int[4];
@@ -54,7 +56,7 @@ public class TileDrawer extends AbstractBackgroundDrawer implements Serializable
 	private boolean stopped = false;
 	
 	
-	public TileDrawer() {
+	public OTFTilesDrawer() {
 
 		this.loader = new TileLoader(this.tilesMap);
 		this.loader.start();
@@ -168,29 +170,29 @@ public class TileDrawer extends AbstractBackgroundDrawer implements Serializable
 
 
 	private void drawTile(Tile t, GL gl) {
-		if (t.tex == null) {
-			if (t.tx == null) {
+		if (t.getTex() == null) {
+			if (t.getTx() == null) {
 				this.loader.kill();
 				this.stopped  = true;
 				log.error("Could not fetch tile from server. Most probably there is no tiles server running on localhost:8080.\nOTFVis will continue without background image drawing.");
 				return;
 			}
-			t.tex = TextureIO.newTexture(t.tx);
-			t.tx = null;
+			t.setTex(TextureIO.newTexture(t.getTx()));
+			t.setTx(null);
 		}
 		
 		if (this.stopped) {
 			return;
 		}
-		final TextureCoords tc = t.tex.getImageTexCoords();
+		final TextureCoords tc = t.getTex().getImageTexCoords();
 		final float tx1 = tc.left();
 		final float ty1 = tc.top();
 		final float tx2 = tc.right();
 		final float ty2 = tc.bottom();
 
 		final float z = 1.1f;
-		t.tex.enable();
-		t.tex.bind();
+		t.getTex().enable();
+		t.getTex().bind();
 		
 		gl.glColor4f(1,1,1,1);
 
@@ -200,7 +202,7 @@ public class TileDrawer extends AbstractBackgroundDrawer implements Serializable
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(t.tX, t.tY+t.sY, z);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(t.tX, t.tY, z);
 		gl.glEnd();
-		t.tex.disable();
+		t.getTex().disable();
 	
 
 	}

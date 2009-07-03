@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.drawer;
 
 import static javax.media.opengl.GL.GL_QUADS;
 
@@ -15,7 +15,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
-public class SimpleBackgroundTextureDrawer  extends AbstractBackgroundDrawer implements Serializable{
+public class OTFBackgroundTexturesDrawer  extends AbstractBackgroundDrawer implements Serializable{
 
 
 	/**
@@ -29,7 +29,7 @@ public class SimpleBackgroundTextureDrawer  extends AbstractBackgroundDrawer imp
 	
 	private boolean converted = false;
 	
-	public SimpleBackgroundTextureDrawer(String name) {
+	public OTFBackgroundTexturesDrawer(String name) {
 		this.name = name;
 		
 	}

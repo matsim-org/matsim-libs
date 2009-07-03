@@ -1,4 +1,4 @@
-package playground.gregor.otf;
+package playground.gregor.otf.readerwriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -8,25 +8,41 @@ import java.nio.ByteBuffer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 
-public class PolygonDataReader extends OTFDataReader{
+import playground.gregor.otf.drawer.OTFInundationDrawer;
+import playground.gregor.otf.drawer.TimeDependentTrigger;
 
+public class InundationDataReader extends OTFDataReader {
+	
+	private final OTFInundationDrawer drawer;
+	private TimeDependentTrigger receiver;
+
+	public InundationDataReader() {
+		this.drawer = new OTFInundationDrawer();
+//		TimeDependentTrigger.myDrawer = this.drawer;
+	}
+	
 	@Override
 	public void connect(Receiver receiver) {
-		// TODO Auto-generated method stub
+		this.receiver = (TimeDependentTrigger) receiver;
+		
 		
 	}
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		// TODO Auto-generated method stub
+//		this.drawer.invalidate(graph);
+		this.receiver = new TimeDependentTrigger();
+		this.receiver.setDrawer(this.drawer);
+		graph.addItem(this.receiver);
+		this.receiver.setTime(graph.getTime());
 		
+//		this.receiver.invalidate(graph);
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
+		
 		int size = in.getInt();
 		
 		 byte[] byts = new byte[size];
@@ -34,6 +50,7 @@ public class PolygonDataReader extends OTFDataReader{
 		 
 		 
 		    in.get(byts);
+		 
 		    
 		    ObjectInputStream istream = null;
 		 
@@ -41,8 +58,9 @@ public class PolygonDataReader extends OTFDataReader{
 		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
 		        Object obj = istream.readObject();
 		 
-		        if(obj instanceof SimpleBackgroundFeatureDrawer){
-		        	OGLSimpleBackgroundLayer.addPersistentItem((SimpleBackgroundFeatureDrawer)obj);
+		        if(obj instanceof InundationData){
+		        	this.drawer.setData((InundationData) obj);
+		            System.out.println("deserialization successful");
 		        }
 		    }
 		    catch(IOException e){
@@ -51,6 +69,9 @@ public class PolygonDataReader extends OTFDataReader{
 		    catch(ClassNotFoundException e){
 		        e.printStackTrace();
 		    }
+//		this.drawer.setData(data);
+		
+		
 		
 	}
 
