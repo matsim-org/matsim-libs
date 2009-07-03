@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.Module;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 /**
  * Provides access to planomat config parameters.
@@ -21,9 +20,34 @@ public class PlanomatConfigGroup extends Module {
 
 	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
 
-	public static final String CETIN_COMPATIBLE = "org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator";
-	public static final String CHARYPAR_ET_AL_COMPATIBLE = "org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator";
-
+	/**
+	 * Enumeration of different specifications of traffic flow simulations how trips in activity plans are interpreted.
+	 * 
+	 * @author meisterk
+	 *
+	 */
+	public static enum SimLegInterpretation {
+		/**
+		 * Use this value if events should be interpreted the way they are simulated in traffic flow simulations based on the specification in:<br>
+		 * Cetin, N. (2005) Large-scale parallel graph-based simulations, Ph.D. Thesis, ETH Zurich, Zurich.<br>
+		 * <ul>
+		 * <li> The link of the origin activity is not simulated, and thus not included in this leg travel time estimation.
+		 * <li> The link of the destination activity is simulated, and thus has to be included in this leg travel time estimation.
+		 * </ul>
+		 */
+		CetinCompatible, 
+		/**
+		 * Use this value if events should be interpreted the way they are simulated in traffic flow simulations based on the specification in:<br>
+		 * Charypar, D., K. W. Axhausen and K. Nagel (2007) 
+		 * Event-driven queue-based traffic flow microsimulation, 
+		 * paper presented at the 86th Annual Meeting of the Transportation Research Board, Washington, D.C., January 2007.<br>
+		 * <ul>
+		 * <li> The link of the origin activity is simulated, and thus has to be included in this leg travel time estimation.
+		 * <li> The link of the destination activity is not simulated, and thus not included in this leg travel time estimation.
+		 * </ul>
+		 */
+		CharyparEtAlCompatible}; 
+	
 	public static enum TripStructureAnalysisLayerOption {facility,link}
 
 	/**
@@ -90,18 +114,20 @@ public class PlanomatConfigGroup extends Module {
 		/**
 		 * Defines how events should be interpreted.
 		 * <h3>Possible values</h3>
-		 * The parameter value is the class name of an implementation of the interface {@link LegTravelTimeEstimator}. The following values are possible:
 		 * <ul>
-		 * <li>{@link org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator} for use with java mobsim</li>
-		 * <li>{@link org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator} for use with deqsim implementations</li>
+		 * <li><code>CetinCompatible</code> for use with java mobsim</li>
+		 * <li><code>CharyparEtAlCompatibleLegTravelTimeEstimator</code> for use with deqsim implementations</li>
 		 * </ul>
 		 * <h3>Default value</h3>
-		 * {@link org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator}
+		 * <code>CetinCompatible</code>
 		 * <h3>Notes</h3>
 		 * Different implementations of traffic flow simulations use different interpretations of trips.  
 		 * Planomat has to use the same interpretation as the used traffic flow simulation.
 		 */
-		LEG_TRAVEL_TIME_ESTIMATOR_NAME("legTravelTimeEstimator", PlanomatConfigGroup.CETIN_COMPATIBLE, ""),
+		/**
+		 * 
+		 */
+		LEG_TRAVEL_TIME_ESTIMATOR_NAME("legTravelTimeEstimator", PlanomatConfigGroup.SimLegInterpretation.CetinCompatible.toString(), ""),
 		/**
 		 * Enables logging in order to get some insight to the planomat functionality.
 		 * <h3>Possible values</h3>
@@ -230,10 +256,10 @@ public class PlanomatConfigGroup extends Module {
 		PlanomatConfigParameter.POSSIBLE_MODES.setActualValue(possibleModes);
 	}
 
-	public String getLegTravelTimeEstimatorName() {
-		return PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getActualValue();
+	public SimLegInterpretation getSimLegInterpretation() {
+		return PlanomatConfigGroup.SimLegInterpretation.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getActualValue());
 	}
-
+	
 	public int getLevelOfTimeResolution() {
 		return Integer.parseInt(PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getActualValue());
 	}
@@ -246,10 +272,6 @@ public class PlanomatConfigGroup extends Module {
 		PlanomatConfigParameter.DO_LOGGING.setActualValue(Boolean.toString(doLogging));
 	}
 	
-//	public String getOptimizationToolbox() {
-//	return PlanomatConfigParameter.OPTIMIZATION_TOOLBOX.getActualValue();
-//	}
-
 	public int getPopSize() {
 		return Integer.parseInt(PlanomatConfigParameter.POPSIZE.getActualValue());
 	}

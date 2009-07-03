@@ -42,7 +42,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals(0, expectedConfig.getPossibleModes().toArray().length);
 		assertEquals( 
 				PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getDefaultValue(), 
-				expectedConfig.getLegTravelTimeEstimatorName() );
+				expectedConfig.getSimLegInterpretation().toString() );
 		assertEquals( 
 				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getDefaultValue()), 
 				expectedConfig.getLevelOfTimeResolution());
@@ -69,7 +69,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 //		assertTrue(Arrays.deepEquals(
 //				new TransportMode[]{TransportMode.car, TransportMode.pt}, 
 //				Gbl.getConfig().planomat().getPossibleModes()));
-		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, expectedConfig.getLegTravelTimeEstimatorName() );
+		assertEquals( PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, expectedConfig.getSimLegInterpretation() );
 		assertEquals( 1000, expectedConfig.getJgapMaxGenerations() );
 		assertEquals( 6, expectedConfig.getLevelOfTimeResolution() );
 		assertEquals( true, expectedConfig.isDoLogging() );

@@ -109,7 +109,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
-		this.estimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(controler.getConfig().planomat().getLegTravelTimeEstimatorName(), this.router);
+		this.estimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(controler.getConfig().planomat().getSimLegInterpretation(), this.router);
 		
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());

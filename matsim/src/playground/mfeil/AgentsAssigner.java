@@ -26,9 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
@@ -40,10 +40,10 @@ import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 
@@ -81,10 +81,12 @@ public class AgentsAssigner implements PlanAlgorithm{
 		
 		this.controler				= controler;
 		PlansCalcRoute router 		= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		LegTravelTimeEstimator legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(
-				controler.getTravelTimeCalculator(), 
-				tDepDelayCalc, 
+
+		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
+		FixedRouteLegTravelTimeEstimator legTravelTimeEstimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
 				router);
+
 		this.timer					= new TimeModeChoicer2(controler, legTravelTimeEstimator, scorer);
 		this.locator 				= locator;
 		this.finder					= finder;

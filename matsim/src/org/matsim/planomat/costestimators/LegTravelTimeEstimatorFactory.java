@@ -21,7 +21,6 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup.PlanomatConfigParameter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 
@@ -36,20 +35,11 @@ public class LegTravelTimeEstimatorFactory {
 		this.tDepDelayCalc = depDelayCalc;
 	}
 
-	public LegTravelTimeEstimator getLegTravelTimeEstimator(String ltteName, PlansCalcRoute routingAlgorithm) {
+	public LegTravelTimeEstimator getLegTravelTimeEstimator(PlanomatConfigGroup.SimLegInterpretation ltteName, PlansCalcRoute routingAlgorithm) {
 		
-		LegTravelTimeEstimator legTravelTimeEstimator = null;
-
-		if (ltteName.equals(PlanomatConfigGroup.CETIN_COMPATIBLE)) {
-			legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(travelTime, tDepDelayCalc, routingAlgorithm);
-		} else if (ltteName.equals(PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE)) {
-			legTravelTimeEstimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(travelTime, tDepDelayCalc, routingAlgorithm);
-		} else {
-			throw new RuntimeException("legTravelTimeEstimator value: \"" + PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getActualValue() + "\" is not allowed.");
-		}
+		LegTravelTimeEstimator legTravelTimeEstimator = new FixedRouteLegTravelTimeEstimator(this.travelTime, this.tDepDelayCalc, routingAlgorithm, ltteName);
 		
 		return legTravelTimeEstimator;
 	}
-	
 	
 }

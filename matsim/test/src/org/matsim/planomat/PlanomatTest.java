@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsBuilderImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -51,10 +52,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
@@ -136,8 +136,12 @@ public class PlanomatTest extends MatsimTestCase {
 		events.addHandler(depDelayCalc);
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
-		
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
+
+		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
+		LegTravelTimeEstimator ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				plansCalcRoute);
+
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 
 		log.info("Testing " + testRun.toString() + "...");
@@ -288,7 +292,10 @@ public class PlanomatTest extends MatsimTestCase {
 		
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
 
-		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, plansCalcRoute);
+		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
+		ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, 
+				plansCalcRoute);
 
 		// run the method
 		Planomat testee = new Planomat(ltte, null, this.scenario.getConfig().planomat());
