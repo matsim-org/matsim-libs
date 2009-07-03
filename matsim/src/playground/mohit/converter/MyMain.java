@@ -24,7 +24,7 @@ public class MyMain {
 		final VisumNetwork vNetwork = new VisumNetwork();
 		  
 		try {
-			new playground.mohit.VisumNetworkReader(vNetwork).read("C:\\Users\\MOSES\\Desktop\\netwF.net"); // yalcin
+			new playground.mohit.converter.VisumNetworkReader(vNetwork).read("C:\\Users\\MOSES\\Desktop\\netwF.net"); // yalcin
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
