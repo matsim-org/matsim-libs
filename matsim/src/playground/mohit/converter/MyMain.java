@@ -3,9 +3,10 @@ package playground.mohit.converter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.mohit.converter.VisumNetwork.Departure;
 import playground.mohit.converter.VisumNetwork.LineRouteItem;
 import playground.mohit.converter.VisumNetwork.Stop;
@@ -19,7 +20,7 @@ public class MyMain {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final VisumNetwork vNetwork = new VisumNetwork();
 		  
 		try {
@@ -64,7 +65,8 @@ public class MyMain {
 			
 		}
 		
-		TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		new Visum2TransitSchedule(vNetwork, schedule).convert();
 		
 		try {

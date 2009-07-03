@@ -1,21 +1,24 @@
 package playground.mmoyo.TransitSimulation;
 
 import java.io.IOException;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.mmoyo.PTRouter.PTActWriter;
 import playground.mmoyo.PTRouter.PTRouter2;
 
@@ -35,7 +38,8 @@ public class Main {
 	
 	public static void main(String[] args) {
 		NetworkLayer plainNet= new NetworkLayer(new NetworkFactory());
-		TransitSchedule transitSchedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		PTActWriter ptActWriter;
 		
 		/***************reads the transitSchedule file**********/

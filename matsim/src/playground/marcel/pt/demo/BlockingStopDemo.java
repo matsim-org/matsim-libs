@@ -33,7 +33,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -47,15 +46,12 @@ import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.analysis.VehicleTracker;
 import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.integration.TransitQueueSimulation;
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class BlockingStopDemo {
 
@@ -67,7 +63,8 @@ public class BlockingStopDemo {
 	private static final double busDeparture = 7.0 * 3600 + 3 * 60 + 15;
 
 	private final Scenario scenario = new ScenarioImpl();
-	private final TransitSchedule schedule = new TransitScheduleImpl();
+	private final TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+	private final TransitSchedule schedule = this.builder.createTransitSchedule();
 	private final Id[] ids = new Id[nOfLinks * 2 + 2];
 
 	private TransitQueueSimulation sim = null;
@@ -85,7 +82,7 @@ public class BlockingStopDemo {
 	}
 
 	private void createNetwork() {
-		NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
+		NetworkLayer network = this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		NodeImpl[] nodes = new NodeImpl[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
@@ -107,7 +104,7 @@ public class BlockingStopDemo {
 			stops[i] = new TransitStopFacility(this.ids[i], this.scenario.createCoord(1000 + i*500, 0), false);
 			stops[i].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i+1]));
 			this.schedule.addStopFacility(stops[i]);
-			stopList.add(new TransitRouteStopImpl(stops[i], 100 + i*70, 120 + i*70));
+			stopList.add(this.builder.createTransitRouteStop(stops[i], 100 + i*70, 120 + i*70));
 		}
 
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
@@ -118,13 +115,13 @@ public class BlockingStopDemo {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
 		networkRoute.setLinks(startLink, linkList, endLink);
-		TransitRoute tRoute1 = new TransitRouteImpl(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute1 = this.builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
 
-		TransitLine tLine1 = new TransitLineImpl(this.ids[1]);
+		TransitLine tLine1 = this.builder.createTransitLine(this.ids[1]);
 		tLine1.addRoute(tRoute1);
 		this.schedule.addTransitLine(tLine1);
 
-		tRoute1.addDeparture(new DepartureImpl(this.ids[1], busDeparture));
+		tRoute1.addDeparture(this.builder.createDeparture(this.ids[1], busDeparture));
 
 		// line 2
 		stopList = new ArrayList<TransitRouteStop>(nOfStops);
@@ -132,7 +129,7 @@ public class BlockingStopDemo {
 			stops[i+nOfStops] = new TransitStopFacility(this.ids[i+nOfStops], this.scenario.createCoord(1000 + i*500, 500), true);
 			stops[i+nOfStops].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i+1+nOfLinks]));
 			this.schedule.addStopFacility(stops[i+nOfStops]);
-			stopList.add(new TransitRouteStopImpl(stops[i+nOfStops], 100 + i*70, 120 + i*70));
+			stopList.add(this.builder.createTransitRouteStop(stops[i+nOfStops], 100 + i*70, 120 + i*70));
 		}
 
 		startLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks]);
@@ -143,13 +140,13 @@ public class BlockingStopDemo {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
 		networkRoute.setLinks(startLink, linkList, endLink);
-		TransitRoute tRoute2 = new TransitRouteImpl(this.ids[2], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute2 = this.builder.createTransitRoute(this.ids[2], networkRoute, stopList, TransportMode.bus);
 
-		TransitLine tLine2 = new TransitLineImpl(this.ids[2]);
+		TransitLine tLine2 = this.builder.createTransitLine(this.ids[2]);
 		tLine2.addRoute(tRoute2);
 		this.schedule.addTransitLine(tLine2);
 
-		tRoute2.addDeparture(new DepartureImpl(this.ids[2], busDeparture));
+		tRoute2.addDeparture(this.builder.createDeparture(this.ids[2], busDeparture));
 
 //		try {
 //			new TransitScheduleWriterV1(this.schedule).write("blockingStopSchedule.xml");

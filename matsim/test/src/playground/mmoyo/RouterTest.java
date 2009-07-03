@@ -27,8 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.Leg;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,9 +43,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.mmoyo.PTRouter.PTOb;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
@@ -84,7 +85,8 @@ public class RouterTest extends MatsimTestCase {
 		// setup very simple scenario
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/input/playground/marcel/pt/transitSchedule/network.xml");
-		TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 		Population population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile("test/input/playground/marcel/pt/plans.xml");

@@ -39,6 +39,7 @@ import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class TransitScheduleReaderTest extends MatsimTestCase {
 
@@ -51,7 +52,8 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());

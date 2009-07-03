@@ -37,7 +37,7 @@ public class DepartureImpl implements Departure {
 	
 	private BasicVehicle vehicle = null;
 
-	public DepartureImpl(final Id id, final double departureTime) {
+	protected DepartureImpl(final Id id, final double departureTime) {
 		this.id = id;
 		this.departureTime = departureTime;
 	}

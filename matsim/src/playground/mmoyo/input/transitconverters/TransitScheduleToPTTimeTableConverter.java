@@ -13,13 +13,14 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.Departure;
 import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 
@@ -33,7 +34,8 @@ public class TransitScheduleToPTTimeTableConverter {
 	}
 
 	public PTTimeTable2 getPTTimeTable(final String transitScheduleFile, final NetworkLayer net) {
-		TransitSchedule transitSchedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		try {
 			new TransitScheduleReaderV1(transitSchedule, net).readFile(transitScheduleFile);
 		} catch (SAXException e) {

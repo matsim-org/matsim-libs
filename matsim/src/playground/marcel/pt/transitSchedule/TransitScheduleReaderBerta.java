@@ -53,6 +53,7 @@ import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 /**
  * Reads transit schedule information from BERTA XML files once used 
@@ -272,7 +273,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		TransitStopFacility facility = this.schedule.getFacilities().get(hp.id);
 		if (facility == null) {
 			Coord coord = this.wgs84ToRBS.transform(this.soldnerToWgs84.transform(new CoordImpl(hp.x/1000.0, hp.y/1000.0)));
-			facility = new TransitStopFacility(hp.id, coord);
+			facility = this.schedule.getBuilder().createTransitStopFacility(hp.id, coord);
 			this.schedule.addStopFacility(facility);
 		}
 		return facility;
@@ -324,7 +325,8 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		// TODO [MR] remove after testing
-		TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 		TransitScheduleReaderBerta reader = new TransitScheduleReaderBerta(schedule, transformation);
 		reader.setLocalDtdDirectory("../thesis-data/examples/berta/");

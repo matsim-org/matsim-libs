@@ -34,27 +34,26 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
 import playground.marcel.pt.integration.TransitQueueSimulation;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.marcel.pt.tryout.CreatePseudoNetwork;
 
 public class PseudoNetworkDemo {
 
 	private static final String SERVERNAME = "pseudoNetworkDemo";
 	
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String networkFile = null;
 		String transitScheduleFile = null;
 		if (args.length == 1) {
@@ -84,7 +83,8 @@ public class PseudoNetworkDemo {
 			}
 		}
 		
-		TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		try {
 			new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 		} catch (SAXException e1) {
@@ -98,7 +98,7 @@ public class PseudoNetworkDemo {
 		network.getLinks().clear();
 		network.getNodes().clear();
 		
-		new CreatePseudoNetwork(schedule, (NetworkLayer) network).run();
+		new CreatePseudoNetwork(schedule, network).run();
 		
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		LinkImpl link1 = network.getLink(scenario.createId("1"));

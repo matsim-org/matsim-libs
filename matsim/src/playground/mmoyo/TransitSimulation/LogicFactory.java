@@ -17,16 +17,14 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
 import playground.marcel.pt.transitSchedule.api.Departure;
 import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.mmoyo.PTRouter.PTRouter2;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 
@@ -43,7 +41,8 @@ public class LogicFactory{
 	private TransitSchedule transitSchedule;
 	private NetworkLayer logicNet= new NetworkLayer();
 	private NetworkLayer plainNet= new NetworkLayer();
-	private TransitSchedule logicTransitSchedule = new TransitScheduleImpl(); 
+	private TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+	private TransitSchedule logicTransitSchedule = builder.createTransitSchedule();
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
 	
 	private Map<Id,List<NodeImpl>> facilityNodeMap = new TreeMap<Id,List<NodeImpl>>(); /** <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
@@ -66,7 +65,7 @@ public class LogicFactory{
 	private void createLogicNet(){
 	
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
-			TransitLine logicTransitLine = new TransitLineImpl(transitLine.getId()); 
+			TransitLine logicTransitLine = this.builder.createTransitLine(transitLine.getId()); 
 			
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				List<TransitRouteStop> logicTransitStops = new ArrayList<TransitRouteStop>();
@@ -102,15 +101,15 @@ public class LogicFactory{
 					}
 
 					//create logical stops and stopFacilities
-					TransitStopFacility logicTransitStopFacility = new TransitStopFacility(logicalId, coord); 
+					TransitStopFacility logicTransitStopFacility = this.builder.createTransitStopFacility(logicalId, coord); 
 					logicTransitSchedule.addStopFacility(logicTransitStopFacility);
-					TransitRouteStop logicTransitRouteStop = new TransitRouteStopImpl(logicTransitStopFacility, transitRouteStop.getArrivalDelay(), transitRouteStop.getDepartureDelay()); 
+					TransitRouteStop logicTransitRouteStop = this.builder.createTransitRouteStop(logicTransitStopFacility, transitRouteStop.getArrivalDelay(), transitRouteStop.getDepartureDelay()); 
 					logicTransitStops.add(logicTransitRouteStop);
 					
 					lastLogicNode= logicNode;
 					lastPlainNode= plainNode;
 				}
-				TransitRoute logicTransitRoute = new TransitRouteImpl(transitRoute.getId(), null, logicTransitStops, transitRoute.getTransportMode());
+				TransitRoute logicTransitRoute = this.builder.createTransitRoute(transitRoute.getId(), null, logicTransitStops, transitRoute.getTransportMode());
 				for (Departure departure: transitRoute.getDepartures().values()) {
 					logicTransitRoute.addDeparture(departure);
 				}

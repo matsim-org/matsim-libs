@@ -82,7 +82,7 @@ public class OTFDemo {
 
 //		org.matsim.run.OTFVis.main(new String[] {});
 		
-		OTFDemo.ptConnect("OTFServer_Transit");
+//		OTFDemo.ptConnect("OTFServer_Transit");
 	}
 	
 	public static void ptConnect(final String servername) {

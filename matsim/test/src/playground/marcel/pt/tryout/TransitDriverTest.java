@@ -48,13 +48,14 @@ import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.integration.TransitQueueVehicle;
 import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.mocks.MockAgent;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.Departure;
 import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class TransitDriverTest extends MatsimTestCase {
 
@@ -68,7 +69,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
@@ -143,7 +145,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));

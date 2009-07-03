@@ -12,16 +12,14 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.DepartureImpl;
-import playground.marcel.pt.transitSchedule.TransitLineImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteImpl;
-import playground.marcel.pt.transitSchedule.TransitRouteStopImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
+import playground.marcel.pt.transitSchedule.api.Departure;
 import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTTimeTable2;
 
@@ -29,7 +27,8 @@ import playground.mmoyo.PTRouter.PTTimeTable2;
  * From PTtimeTable to transitShcedule converter 
  */
 public class ToTransitScheduleConverter {
-	final TransitSchedule transitSchedule = new TransitScheduleImpl();
+	final TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+	final TransitSchedule transitSchedule = builder.createTransitSchedule();
 	
 	public ToTransitScheduleConverter (){
 				
@@ -47,7 +46,7 @@ public class ToTransitScheduleConverter {
 			Id ptLineId = ptLine.getId();
 			boolean transitLineExists = this.transitSchedule.getTransitLines().containsKey(ptLineId); 
 			if (!transitLineExists){
-				transitLine = new TransitLineImpl(ptLineId);
+				transitLine = this.builder.createTransitLine(ptLineId);
 			}else{
 				transitLine = transitSchedule.getTransitLines().get(ptLineId);
 			}
@@ -56,25 +55,25 @@ public class ToTransitScheduleConverter {
 			List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
 			for (Id idNode : ptLine.getNodeRoute()){				
 				if (!transitSchedule.getFacilities().containsKey(idNode)){
-					TransitStopFacility transitStopFacility =  new 	TransitStopFacility(idNode, ptNet.getNode(idNode).getCoord());
+					TransitStopFacility transitStopFacility =  this.builder.createTransitStopFacility(idNode, ptNet.getNode(idNode).getCoord());
 					transitSchedule.addStopFacility(transitStopFacility);	
 				}
 				double min = ptLine.getMinutes().get(x++).doubleValue();  
 				double arrivalDelay = min*60;
 				double departureDelay = min*60;
-				transitRouteStops.add(new TransitRouteStopImpl(transitSchedule.getFacilities().get(idNode), arrivalDelay, departureDelay));
+				transitRouteStops.add(this.builder.createTransitRouteStop(transitSchedule.getFacilities().get(idNode), arrivalDelay, departureDelay));
 			}
 			
 			Id idTransitRoute = new IdImpl(ptLineId + "-" +  ptLine.getDirection());
 			NetworkRoute networkRoute= null; //new NodeNetworkRoute(null, null);
-			TransitRoute transitRoute = new  TransitRouteImpl(idTransitRoute, networkRoute, transitRouteStops, TransportMode.pt);
+			TransitRoute transitRoute = this.builder.createTransitRoute(idTransitRoute, networkRoute, transitRouteStops, TransportMode.pt);
 			transitRoute.setTransportMode(ptLine.getTransportMode());
 			x=0;
 			for (String strDeparture : ptLine.getDepartures()){
 				Id idDeparture = new IdImpl(x);
 				//double dblDeparture =x;			// fictional departures
 				double dblDeparture=  Time.parseTime(strDeparture);
-				DepartureImpl departure = new DepartureImpl (idDeparture, dblDeparture);
+				Departure departure = this.builder.createDeparture(idDeparture, dblDeparture);
 				transitRoute.addDeparture(departure);
 				x++;
 			}

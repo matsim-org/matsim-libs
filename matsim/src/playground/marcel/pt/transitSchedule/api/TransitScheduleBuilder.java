@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitLine.java
+ * TransitScheduleBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,49 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package playground.marcel.pt.transitSchedule.api;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.transitSchedule.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
+public interface TransitScheduleBuilder {
 
-/**
- * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
- * 
- * @author mrieser
- */
-public class TransitLineImpl implements TransitLine {
-
-	private final Id lineId;
-	private final Map<Id, TransitRoute> transitRoutes = new LinkedHashMap<Id, TransitRoute>();
-
-	protected TransitLineImpl(final Id id) {
-		this.lineId = id;
-	}
-
-	public Id getId() {
-		return this.lineId;
-	}
-
-	public void addRoute(final TransitRoute transitRoute) {
-		final Id id = transitRoute.getId();
-		if (this.transitRoutes.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit route with id " + id.toString());
-		}
-		this.transitRoutes.put(id, transitRoute);
-	}
-
-	public Map<Id, TransitRoute> getRoutes() {
-		return Collections.unmodifiableMap(this.transitRoutes);
-	}
-
-	public void removeRoute(final TransitRoute route) {
-		this.transitRoutes.remove(route.getId());
-	}
+	public abstract TransitSchedule createTransitSchedule();
+	
+	public abstract TransitLine createTransitLine(final Id lineId);
+	
+	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode);
+	
+	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
+	
+	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate);
+	
+	public abstract Departure createDeparture(final Id departureId, final double time);
 
 }

@@ -49,7 +49,7 @@ public class TransitRouteImpl implements TransitRoute {
 	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
 	private TransportMode transportMode;
 
-	public TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
+	protected TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode) {
 		this.routeId = id;
 		this.route = route;
 		this.stops.addAll(stops);

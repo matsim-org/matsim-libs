@@ -36,7 +36,7 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	private final double departureDelay;
 	private final double arrivalDelay;
 
-	public TransitRouteStopImpl(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
+	protected TransitRouteStopImpl(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
 		this.stop = stop;
 		this.departureDelay = departureDelay;
 		this.arrivalDelay = arrivalDelay;

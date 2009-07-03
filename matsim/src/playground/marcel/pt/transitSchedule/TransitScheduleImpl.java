@@ -29,6 +29,7 @@ import org.matsim.transitSchedule.TransitStopFacility;
 
 import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 /**
  * Default implementation of {@link TransitSchedule}.
@@ -41,8 +42,10 @@ public class TransitScheduleImpl implements TransitSchedule {
 
 	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
 	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
-
-	public TransitScheduleImpl() {
+	private final TransitScheduleBuilder builder;
+	
+	protected TransitScheduleImpl(final TransitScheduleBuilder builder) {
+		this.builder = builder;
 	}
 
 	public void addTransitLine(final TransitLine line) {
@@ -67,6 +70,10 @@ public class TransitScheduleImpl implements TransitSchedule {
 	
 	public Map<Id, TransitStopFacility> getFacilities() {
 		return Collections.unmodifiableMap(this.stopFacilities);
+	}
+	
+	public TransitScheduleBuilder getBuilder() {
+		return this.builder;
 	}
 
 }

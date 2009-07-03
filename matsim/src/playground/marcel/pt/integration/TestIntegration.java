@@ -35,10 +35,11 @@ import org.matsim.run.OTFVis;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderBerta;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 
 public class TestIntegration {
@@ -66,12 +67,13 @@ public class TestIntegration {
 		config.simulation().setSnapshotPeriod(60);
 		config.simulation().setEndTime(12.0*3600);
 		
-		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		sl.loadScenario();	
 
-		final TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
@@ -112,14 +114,15 @@ public class TestIntegration {
 		ScenarioLoader sl = new ScenarioLoader("test/input/playground/marcel/pt/config.xml");
 		Scenario scenario = sl.getScenario();
 		
-		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		sl.loadScenario();
 		
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 
-		final TransitSchedule schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule = builder.createTransitSchedule();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);

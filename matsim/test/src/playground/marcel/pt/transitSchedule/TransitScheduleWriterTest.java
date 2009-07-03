@@ -44,6 +44,7 @@ import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class TransitScheduleWriterTest extends MatsimTestCase {
 
@@ -60,10 +61,17 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		LinkImpl l3 = network.createLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
 		LinkImpl l4 = network.createLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
 
-		TransitStopFacility stop1 = new TransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
-		TransitStopFacility stop2 = new TransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
-		TransitStopFacility stop3 = new TransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000));
-		TransitStopFacility stop4 = new TransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule1 = builder.createTransitSchedule();
+
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000));
+		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
+		schedule1.addStopFacility(stop1);
+		schedule1.addStopFacility(stop2);
+		schedule1.addStopFacility(stop3);
+		schedule1.addStopFacility(stop4);
 
 		// prepare some schedule, without network-route
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(4);
@@ -82,17 +90,13 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		TransitLine line1 = new TransitLineImpl(new IdImpl("8"));
 		line1.addRoute(route1);
 
-		TransitSchedule schedule1 = new TransitScheduleImpl();
-		schedule1.addStopFacility(stop1);
-		schedule1.addStopFacility(stop2);
-		schedule1.addStopFacility(stop3);
-		schedule1.addStopFacility(stop4);
 		schedule1.addTransitLine(line1);
 
 		// write and read it
 		String filename = getOutputDirectory() + "scheduleNoRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
-		TransitSchedule schedule2 = new TransitScheduleImpl();
+		TransitScheduleBuilder builder2 = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule2, network).readFile(filename);
 
 		// first test, without network-route
@@ -110,7 +114,8 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		// write and read version with network-route
 		filename = getOutputDirectory() + "scheduleWithRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
-		TransitSchedule schedule3 = new TransitScheduleImpl();
+		TransitScheduleBuilder builder3 = new TransitScheduleBuilderImpl();
+		TransitSchedule schedule3 = builder3.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule3, network).readFile(filename);
 
 		assertEquals(schedule1, schedule3);

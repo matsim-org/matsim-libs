@@ -40,5 +40,7 @@ public interface TransitSchedule {
 	public abstract Map<Id, TransitLine> getTransitLines();
 
 	public abstract Map<Id, TransitStopFacility> getFacilities();
+	
+	public abstract TransitScheduleBuilder getBuilder();
 
 }

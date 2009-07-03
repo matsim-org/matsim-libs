@@ -30,18 +30,20 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.TransitScheduleImpl;
+import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
+import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class PtControler extends Controler {
 
 	private final TransitSchedule schedule;
 	
-	public PtControler(String configFileName) {
+	public PtControler(final String configFileName) {
 		super(configFileName);
 		
-		this.schedule = new TransitScheduleImpl();
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		this.schedule = builder.createTransitSchedule();
 		try {
 			new TransitScheduleReaderV1(this.schedule, this.network).readFile(this.config.getParam("transit", "inputSchedule"));
 		} catch (SAXException e) {
@@ -54,7 +56,7 @@ public class PtControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm getRoutingAlgorithm(TravelCost travelCosts, TravelTime travelTimes) {
+	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 		return new PlansCalcPtRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.schedule);
 	}
 	
