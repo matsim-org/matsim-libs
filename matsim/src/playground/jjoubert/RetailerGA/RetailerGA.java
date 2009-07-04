@@ -21,6 +21,9 @@
 package playground.jjoubert.RetailerGA;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
+import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
 public class RetailerGA {
 	private final int populationSize;
@@ -30,6 +33,13 @@ public class RetailerGA {
 	private final MyFitnessFunction fitnessFunction;
 	private final RetailerGenome initialSolution;
 	private RetailerGenome incumbent;
+	private CumulativeDistribution cdf;
+	private double best;
+	private double average;
+	private double worst;
+	private final int numberOfMutationsToMutant = 3;
+	private final double diversityThreshold = 0.25;
+	private final double diversityMutationFraction = 0.25;
 	
 
 	public RetailerGA(	int populationSize, 
@@ -41,9 +51,12 @@ public class RetailerGA {
 		this.genomeLength = genomeLength;
 		this.fitnessFunction = fitnessFunction;
 		double firstFitness = fitnessFunction.evaluate(initialSolution);
-		this.initialSolution = new RetailerGenome(firstFitness, initialSolution);
+		this.initialSolution = new RetailerGenome(firstFitness, 
+											this.fitnessFunction.isMax(),
+											initialSolution);
 		this.incumbent = this.initialSolution;
 		generation = new ArrayList<RetailerGenome>(populationSize);
+		this.cdf = null;
 	}
 	
 	public void generateFirstGeneration(){
@@ -54,16 +67,40 @@ public class RetailerGA {
 			this.generation.add(this.initialSolution);
 
 			for(int i = 0; i < this.populationSize-1; i++){
-				ArrayList<Integer> newSolution = this.mutate(this.initialSolution.getGenome());
+				/*
+				 * To ensure diversity, each member of the population is at least 5
+				 * swaps from the original genome. This might be too many for short
+				 * genomes, but too FEW for large genomes.
+				 * TODO Check for diversity.
+				 */
+				ArrayList<Integer> newSolution = this.initialSolution.clone();
+				for(int j = 0; j < numberOfMutationsToMutant; j++){
+					newSolution = this.mutate(newSolution);
+				}
 				double newSolutionFitness = this.fitnessFunction.evaluate(newSolution);
-				RetailerGenome newGenome = new RetailerGenome(newSolutionFitness, newSolution);
+				RetailerGenome newGenome = new RetailerGenome(newSolutionFitness, 
+											this.fitnessFunction.isMax(),
+											newSolution);
 				this.generation.add(newGenome);
 				
 				// Check if the new solution is better than the incumbent.
 				checkIncumbent(newGenome);
 			}
 		}
+		Collections.sort(this.generation);
+		if(this.fitnessFunction.isMax()){
+			setBest(Double.NEGATIVE_INFINITY);
+			setAverage(Double.NEGATIVE_INFINITY);
+			setWorst(Double.NEGATIVE_INFINITY);
+		} else{
+			setBest(Double.POSITIVE_INFINITY);
+			setAverage(Double.POSITIVE_INFINITY);
+			setWorst(Double.POSITIVE_INFINITY);
+		}
+		calculateStats();
+		buildCDF();
 	}
+	
 	
 	public ArrayList<Integer> mutate(ArrayList<Integer> genome){
 		/*
@@ -102,8 +139,70 @@ public class RetailerGA {
 			}			
 		}
 	}
+	
+	private void checkDiversity() {
+		ArrayList<RetailerGenome> incumbentList = new ArrayList<RetailerGenome>();
+		RetailerGenome thisGenome = null;
+		
+		int pos = 0;
+		boolean end = false;
+		while(!end && pos < populationSize){
+			thisGenome = this.generation.get(pos);
+			if(thisGenome.getFitness() == this.incumbent.getFitness()){
+				incumbentList.add(thisGenome);
+				pos++;
+			} else{
+				end = true;
+			}
+		}
+		if( ((double)incumbentList.size())/((double)populationSize) > diversityThreshold){
+			for(int i = 0; i < incumbentList.size()*diversityMutationFraction; i++){
+				thisGenome = incumbentList.get(i);
+				if(thisGenome != this.incumbent){
+					ArrayList<Integer> newGenome = this.mutate(thisGenome.getGenome());
+					for(int j = 0; j < genomeLength; j++){
+						thisGenome.getGenome().set(j, newGenome.get(j));
+					}
+				}
+			}
+			Collections.sort(this.generation);
+		}		
+	}
+
+	private void buildCDF(){
+		double [] x = new double[populationSize+1];
+		double [] y = new double[populationSize+1];
+		x[0] = -0.5;
+		y[0] = 0.0;
+		x[populationSize] = populationSize - 1;
+		y[populationSize] = 1.0;
+		
+		ArrayList<Double> copy = new ArrayList<Double>(populationSize);
+		if(this.fitnessFunction.isMax()){
+			double minValue = 0.95*this.generation.get(populationSize - 1).getFitness();
+			for (RetailerGenome gn : this.generation) {
+				copy.add(Double.valueOf(gn.getFitness()) - minValue);
+			}
+		} else{
+			double maxValue = 1.05*this.generation.get(populationSize - 1).getFitness();
+			for (RetailerGenome gn : this.generation) {
+				copy.add(maxValue - Double.valueOf(gn.getFitness()));
+			}
+		}
+		double total = 0;
+		for (Double d : copy) {
+			total += d;
+		}
+		for(int i = 0; i < populationSize-1; i++){
+			x[i+1] = Double.valueOf(i) + 0.5;
+			y[i+1] = y[i] + (copy.get(i) / total);
+		}
+		
+		this.cdf = new CumulativeDistribution(x, y);
+	}
 
 	public String toString(){
+		Collections.sort(this.generation);
 		String result = new String();
 		for(int i = 0; i < populationSize; i++){
 			result += String.valueOf(i+1) + ":\t";
@@ -119,5 +218,212 @@ public class RetailerGA {
 		}		
 		return result;
 	}
+
+	public void evolve(double elites, double mutants, int crossoverType) {
+		int numElites = (int) Math.max(1, Math.round(elites*populationSize));
+		int numMutants = (int) Math.max(1, Math.round(mutants*populationSize));
+		int numCrossovers = populationSize - numElites - numMutants;
+		
+		ArrayList<RetailerGenome> newGeneration = new ArrayList<RetailerGenome>(populationSize);
+		
+		/* 
+		 * Add all the elites
+		 */
+		newGeneration.add(this.incumbent);
+		for(int i = 1; i < numElites; i++){
+			newGeneration.add(this.generation.get(i));
+		}
+		
+		/* 
+		 * Add all the mutants. An individual is randomly selected (weighted) from
+		 * the current generation, and 5 random swaps are performed.
+		 */
+		for(int i = 0; i < numMutants; i++){
+			int pos = (int) this.cdf.sampleFromCDF();
+			ArrayList<Integer> al = generation.get(pos).clone();
+			for(int j = 0; j < numberOfMutationsToMutant; j++){
+				ArrayList<Integer> newAl = this.mutate(al);
+				for(int k = 0; k < genomeLength; k++){
+					al.set(k, newAl.get(k));
+				}
+			}
+			RetailerGenome newGn = new RetailerGenome(this.fitnessFunction.evaluate(al), 
+													  this.fitnessFunction.isMax(), 
+													  al);
+			newGeneration.add(newGn);			
+		}
+		
+		/*
+		 * Fill the rest of the new generation with offspring.
+		 */
+		switch (crossoverType) {
+		case 1: 
+			/* Enhanced Edge Recombination (EER) from Michalewicz (1992) produces
+			 * a single offspring from two parents. 
+			 */
+			
+		 break;
+			
+			
+		case 2: 
+			/* Merged crossover (MX) first introduced by Blanton & 
+			 * Wainwright (1993) produces a single offspring from two parents. 
+			 */
+			
+			break;
+			
+		case 3: 
+			/* Partially Matched Crossover (PMX) from Goldberg & Lingle (1985)
+			 * produces two offspreing from two parents.
+			 */
+			int i = 0;
+			while(i < numCrossovers){
+				ArrayList<Integer> P1 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
+				ArrayList<Integer> P2 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
+				ArrayList<RetailerGenome> offspring = this.performPMX(P1, P2);				
+				
+				if(newGeneration.size() < this.populationSize - 1){
+					newGeneration.addAll(offspring);
+					i+= 2;
+				} else{
+					newGeneration.add(offspring.get(0));
+					i++;
+				}
+			}
+			if(newGeneration.size() != this.populationSize){
+				System.err.printf("After PMX the new generation is of size %d, and not %d", newGeneration.size(), this.populationSize);
+				System.exit(0);
+			}
+			for(int j = 0; j < populationSize; j++){
+				this.generation.set(j, newGeneration.get(j));
+				checkIncumbent(newGeneration.get(j));
+			}
+			break;
+			
+		default:
+			System.err.printf("Crossover type %d not implemented!", crossoverType);
+			break;
+		}		
+		/*
+		 * Check for diversity. This is done by checking how many solutions share the same
+		 * fitness as the incumbent. If the threshold is exceeded, mutate half of them.
+		 */
+		Collections.sort(this.generation);
+		checkDiversity();
+		calculateStats();
+		buildCDF();
+	}
+	
+	private void calculateStats() {
+		double total = 0;
+		for (RetailerGenome rg : this.generation) {
+			total += rg.getFitness();
+		}
+		setBest(this.incumbent.getFitness());
+		setAverage(total / populationSize);
+		setWorst(generation.get(populationSize-1).getFitness());		
+	}
+
+	public ArrayList<RetailerGenome> performPMX(ArrayList<Integer> P1,
+												ArrayList<Integer> P2){
+		ArrayList<RetailerGenome> offspring = new ArrayList<RetailerGenome>(2);
+		
+		// Generate two empty offspring ArrayLists, only containing zeros
+		ArrayList<Integer> c1 = new ArrayList<Integer>(this.genomeLength);
+		ArrayList<Integer> c2 = new ArrayList<Integer>(this.genomeLength);
+		for(int i = 0; i < this.genomeLength; i++){
+			c1.add(Integer.MIN_VALUE);
+			c2.add(Integer.MIN_VALUE);
+		}
+		
+		/* 
+		 * Generate 2 random points, and cross-copy the segments from the parent between
+		 * the two points to the alternate offspring. 
+		 */		
+		ArrayList<Integer> twoPoints = permutator.permutate(genomeLength);
+		int pointA = Math.min(twoPoints.get(0), twoPoints.get(1));
+		int pointB = Math.max(twoPoints.get(0), twoPoints.get(1));
+		for(int j = pointA-1; j <= pointB-1; j++){
+			c1.set(j, P2.get(j));
+			c2.set(j, P1.get(j));
+		}
+
+		// Finish first offspring
+		int pos = 0;
+		while(pos < this.genomeLength){
+			// Find out if C1 contains P1(pos)
+			if(c1.contains(P1.get(pos))){
+				pos++;
+			} else{
+				int thePos = findPmxPosition(pos, c1, P1);
+				c1.set(thePos, P1.get(pos));
+				pos++;
+			}
+		}
+		// Finish second offspring
+		pos = 0;
+		while(pos < this.genomeLength){
+			// Find out if C2 contains P2(pos)
+			if(c2.contains(P2.get(pos))){
+				pos++;
+			} else{
+				int thePos = findPmxPosition(pos, c2, P2);
+				c2.set(thePos, P2.get(pos));
+				pos++;
+			}
+		}
+		RetailerGenome offspring1 = new RetailerGenome(this.fitnessFunction.evaluate(c1), 
+													   this.fitnessFunction.isMax(),
+													   c1);
+		RetailerGenome offspring2 = new RetailerGenome(this.fitnessFunction.evaluate(c2), 
+				   									   this.fitnessFunction.isMax(),
+				   									   c2);
+		offspring.add(offspring1);
+		offspring.add(offspring2);
+		
+		return offspring;		
+	}
+	
+	private int findPmxPosition(int position, ArrayList<Integer> thisList, ArrayList<Integer> parentList){
+		int result = Integer.MIN_VALUE;
+		if(thisList.get(position) == Integer.MIN_VALUE){
+			result = position;
+		} else{
+			int filledPoint = thisList.get(position);
+			int filledPointPosition = parentList.indexOf(filledPoint);
+			result = findPmxPosition(filledPointPosition, thisList, parentList);			
+		}
+		
+		return result;
+	}
+
+
+	
+	public RetailerGenome getIncumbent() {
+		return incumbent;
+	}
+
+	private void setBest(double best) {
+		this.best = best;
+	}
+
+	private void setAverage(double average) {
+		this.average = average;
+	}
+
+	private void setWorst(double worst) {
+		this.worst = worst;
+	}
+	
+	public ArrayList<Double> getStats(){
+		ArrayList<Double> result = new ArrayList<Double>(3);
+		result.add(this.best);
+		result.add(this.average);
+		result.add(this.worst);
+		return result;
+	}
+
+
+
 	
 }

@@ -22,21 +22,43 @@ package playground.jjoubert.RetailerGA;
 
 import java.util.ArrayList;
 
-public class RetailerGenome {
+public class RetailerGenome implements Comparable<RetailerGenome>, Cloneable{
 	private double fitness;
+	private final boolean isMax;
 	private final ArrayList<Integer> genome;
 	
-	public RetailerGenome(double fitness, ArrayList<Integer> genome){
+	public RetailerGenome(double fitness, boolean isMax, ArrayList<Integer> genome){
 		this.fitness = fitness;
+		this.isMax = isMax;
 		this.genome = genome;
 	}
 
 	public double getFitness() {
 		return fitness;
 	}
+
+	public boolean isMax() {
+		return isMax;
+	}
 	
 	public ArrayList<Integer> getGenome() {
 		return genome;
+	}
+
+	public int compareTo(RetailerGenome gn) {
+		if(this.isMax){
+			return (int) (gn.getFitness() - this.getFitness());
+		} else{
+			return (int) (this.getFitness() - gn.getFitness());
+		}
+	}
+	
+	public ArrayList<Integer> clone(){
+		ArrayList<Integer> result = new ArrayList<Integer>(genome.size());
+		for (Integer integer : this.genome) {
+			result.add(Integer.valueOf(integer));
+		}
+		return result;
 	}
 	
 }
