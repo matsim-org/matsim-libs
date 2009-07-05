@@ -19,8 +19,6 @@
 
 package org.matsim.core.api.experimental.population;
 
-import java.util.List;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -30,7 +28,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 
 /**
  * @author dgrether
@@ -40,14 +37,19 @@ public interface PopulationBuilder extends BasicPopulationBuilder {
 	PersonImpl createPerson(Id id);
 
 	PlanImpl createPlan(BasicPerson person);
+	// yyyyyy needs to return "Plan"
 
 	ActivityImpl createActivityFromCoord(String actType, Coord coord);
+	// yyyyyy needs to return "Activity"
 	
-	ActivityImpl createActivityFromFacilityId(String actType, Id facilityId);
-
+//	Activity createActivityFromFacilityId(String actType, Id facilityId);
+	// disabled until everything else is figured out
+	
 	ActivityImpl createActivityFromLinkId(String actType, Id linkId);
+	// yyyyyy needs to return "Activity"
 	
 	LegImpl createLeg(TransportMode legMode);
+	// yyyyyy needs to return "Leg".
 
 	/**
 	 * Creates a new Route object
@@ -55,6 +57,7 @@ public interface PopulationBuilder extends BasicPopulationBuilder {
 	 * @return a BasicRoute Object with the links set accordingly
 	 * @deprecated needs to be verified // TODO [MR] verify
 	 */
-	RouteWRefs createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
+//	Route createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
+	// disabled until everything else is figured out
 
 }
