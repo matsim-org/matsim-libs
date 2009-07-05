@@ -21,11 +21,10 @@
 package org.matsim.core.api.experimental.population;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.core.population.routes.RouteWRefs;
 
 public interface Leg extends BasicLeg, PlanElement {
 
 	// in order to get correct type(s):
-	public RouteWRefs getRoute();
+	public Route getRoute();
 
 }
