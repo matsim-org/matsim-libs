@@ -30,8 +30,6 @@ import playground.jjoubert.DateString;
 
 public class RunRetailerGA {
 
-	
-	
 	public static void main(String[] args) {
 		
 		int genomeLength = 100;
