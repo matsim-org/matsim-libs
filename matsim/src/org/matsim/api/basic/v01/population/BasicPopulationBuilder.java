@@ -38,6 +38,7 @@ public interface BasicPopulationBuilder extends Serializable{
 	public BasicActivity createActivityFromCoord(String actType, Coord coord);
 
 //	public BasicActivity createActivityFromFacilityId(String actType, Id facilityId);
+	// disabled until everything else is figured out
 
 	public BasicActivity createActivityFromLinkId(String actType, Id linkId);
 	
@@ -50,5 +51,6 @@ public interface BasicPopulationBuilder extends Serializable{
 	 * @deprecated needs to be verified
 	 */
 //	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
+	// disabled until everything else is figured out
 
 }
