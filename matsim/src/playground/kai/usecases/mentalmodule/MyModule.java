@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -12,7 +13,6 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.population.Population;
@@ -170,8 +170,8 @@ ActivityStartEventHandler
 			
 			List<Id> routeIdList = new ArrayList<Id>() ;
 			routeIdList.add(id) ; routeIdList.add(id) ;
-			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
-			leg.setRoute(route) ;
+//			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
+//			leg.setRoute(route) ;
 			
 //			BasicLink link ;
 //			BasicAct wAct = pb.createAct("work") ;
