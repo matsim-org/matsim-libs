@@ -219,7 +219,7 @@ public class RetailerGA {
 		return result;
 	}
 
-	public void evolve(double elites, double mutants, int crossoverType) {
+	public void evolve(double elites, double mutants, int crossoverType, ArrayList<Integer> precedenceVector) {
 		int numElites = (int) Math.max(1, Math.round(elites*populationSize));
 		int numMutants = (int) Math.max(1, Math.round(mutants*populationSize));
 		int numCrossovers = populationSize - numElites - numMutants;
@@ -254,7 +254,11 @@ public class RetailerGA {
 		}
 		
 		/*
-		 * Fill the rest of the new generation with offspring.
+		 * Fill the rest of the new generation with offspring. 
+		 */
+		
+		/*
+		 * Perform crossover based on mechanism selected.
 		 */
 		switch (crossoverType) {
 		case 1: 
@@ -269,6 +273,20 @@ public class RetailerGA {
 			/* Merged crossover (MX) first introduced by Blanton & 
 			 * Wainwright (1993) produces a single offspring from two parents. 
 			 */
+			if(precedenceVector != null){
+				int i = 0;
+				while(i < numCrossovers){
+					ArrayList<Integer> P1 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
+					ArrayList<Integer> P2 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
+
+					RetailerGenome offspring = this.performMX(P1, P2, precedenceVector);
+					newGeneration.add(offspring);
+					i++;				
+				}
+			} else{
+				System.err.println("Trying to perform Merged Crossover without a precedence vector!");
+				System.exit(0);
+			}
 			
 			break;
 			
@@ -278,8 +296,10 @@ public class RetailerGA {
 			 */
 			int i = 0;
 			while(i < numCrossovers){
+
 				ArrayList<Integer> P1 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
 				ArrayList<Integer> P2 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
+				
 				ArrayList<RetailerGenome> offspring = this.performPMX(P1, P2);				
 				
 				if(newGeneration.size() < this.populationSize - 1){
@@ -294,21 +314,25 @@ public class RetailerGA {
 				System.err.printf("After PMX the new generation is of size %d, and not %d", newGeneration.size(), this.populationSize);
 				System.exit(0);
 			}
-			for(int j = 0; j < populationSize; j++){
-				this.generation.set(j, newGeneration.get(j));
-				checkIncumbent(newGeneration.get(j));
-			}
 			break;
 			
 		default:
 			System.err.printf("Crossover type %d not implemented!", crossoverType);
 			break;
 		}		
+
+		/*
+		 * Set the newly generated population as the current generation.
+		 */
+		for(int j = 0; j < populationSize; j++){
+			this.generation.set(j, newGeneration.get(j));
+			checkIncumbent(newGeneration.get(j));
+		}
+		Collections.sort(this.generation);
 		/*
 		 * Check for diversity. This is done by checking how many solutions share the same
 		 * fitness as the incumbent. If the threshold is exceeded, mutate half of them.
 		 */
-		Collections.sort(this.generation);
 		checkDiversity();
 		calculateStats();
 		buildCDF();
@@ -326,6 +350,7 @@ public class RetailerGA {
 
 	public ArrayList<RetailerGenome> performPMX(ArrayList<Integer> P1,
 												ArrayList<Integer> P2){
+		
 		ArrayList<RetailerGenome> offspring = new ArrayList<RetailerGenome>(2);
 		
 		// Generate two empty offspring ArrayLists, only containing zeros
@@ -384,6 +409,32 @@ public class RetailerGA {
 		return offspring;		
 	}
 	
+	private RetailerGenome performMX(ArrayList<Integer> p1,
+									 ArrayList<Integer> p2,
+									 ArrayList<Integer> precedence) {
+
+		ArrayList<Integer> c1 = new ArrayList<Integer>(genomeLength);
+		for(int i = 0; i < genomeLength; i++){
+			int p1Element = p1.get(i);
+			int p2Element = p2.get(i);
+			int posP1 = precedence.indexOf(p1Element);
+			int posP2 = precedence.indexOf(p2Element);
+			if(posP1 < posP2){
+				c1.add(p1Element);
+				int p2SwapPos = p2.indexOf(p1Element);
+				Collections.swap(p2, i, p2SwapPos);
+			} else{
+				c1.add(p2Element);
+				int p1SwapPos = p1.indexOf(p2Element);
+				Collections.swap(p1, i, p1SwapPos);
+			}
+		}
+		RetailerGenome gn = new RetailerGenome(this.fitnessFunction.evaluate(c1), 
+											   this.fitnessFunction.isMax(),
+											   c1);
+		return gn;
+	}
+
 	private int findPmxPosition(int position, ArrayList<Integer> thisList, ArrayList<Integer> parentList){
 		int result = Integer.MIN_VALUE;
 		if(thisList.get(position) == Integer.MIN_VALUE){

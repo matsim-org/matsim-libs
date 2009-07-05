@@ -35,17 +35,17 @@ public class RunRetailerGA {
 	public static void main(String[] args) {
 		
 		int genomeLength = 100;
-		int populationSize = 50;
-		int numberOfGenerations = 5000;
-		double elites = 0.1;
-		double mutants = 0.1;
+		int populationSize = 100;
+		int numberOfGenerations = 1000;
+		double elites = 0.10;
+		double mutants = 0.05;
 		/*
 		 * Crossover types implemented:
 		 * 	1 - TODO Enhanced Edge Recombination
-		 *  2 - TODO Merged Crossover
+		 *  2 - Merged Crossover
 		 *  3 - Partially Matched Crossover
 		 */
-		int crossoverType = 3;
+		int crossoverType = 2;
 		ArrayList<ArrayList<Double>> solutionProgress = new ArrayList<ArrayList<Double>>(numberOfGenerations);		
 		
 		/*
@@ -58,17 +58,27 @@ public class RunRetailerGA {
 		RetailerGA ga = new RetailerGA(populationSize, genomeLength, ff, first);
 		ga.generateFirstGeneration();
 		solutionProgress.add(ga.getStats());
-		
+		long tNow = 0;
+		long total = 0;
 		for(int i = 0; i < numberOfGenerations; i++){
-			ga.evolve(elites, mutants, crossoverType);
+			tNow = System.currentTimeMillis();
+			ga.evolve(elites, mutants, crossoverType, ff.getPrecedenceVector());
+			total += System.currentTimeMillis() - tNow;
 			solutionProgress.add(ga.getStats());
 		}
+		double avgTime = ((double)total) / ((double)numberOfGenerations);
 		
 		/*
 		 * Print out the last generation to the console.
 		 */
-		String out = ga.toString();
-		System.out.printf(out);
+//		String out = ga.toString();
+//		System.out.printf(out);
+		System.out.printf("Statistics for crossover type %d:\n", crossoverType);
+		System.out.printf("\t                   Genome length:  %d\n", genomeLength);
+		System.out.printf("\t                 Population size:  %d\n", populationSize);
+		System.out.printf("\t           Number of generations:  %d\n", numberOfGenerations);
+		System.out.printf("\t               Incumbent fitness:  %6.2f\n", ga.getIncumbent().getFitness());
+		System.out.printf("\tAverage time per generation (ms):  %6.2f\n", avgTime);
 		
 		/*
 		 * Print out the solution progress to a file for R-graph.

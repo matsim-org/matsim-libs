@@ -21,6 +21,7 @@
 package playground.jjoubert.RetailerGA;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -30,12 +31,13 @@ public class MyFitnessFunction {
 	private ArrayList<Coordinate> points;
 	private int numberOfPoints;
 	private final boolean max;
+	private ArrayList<Integer> precedenceVector;
 
 	public MyFitnessFunction(boolean isMax, int number){
 		this.max = isMax;
 		this.numberOfPoints = number;
 		this.points = new ArrayList<Coordinate>(this.numberOfPoints);		
-		generateRandomInstance(this.numberOfPoints,0,100,0,100);
+		this.precedenceVector = generateRandomInstance(this.numberOfPoints,-100,100,-100,100);
 	}	
 
 	public Double evaluate(ArrayList<Integer> solution){
@@ -53,16 +55,49 @@ public class MyFitnessFunction {
 		return fitness;
 	}
 
-	public void generateRandomInstance(int numberOfPoints, int xMin, int xMax, int yMin, int yMax){
+	public ArrayList<Integer> generateRandomInstance(int numberOfPoints, int xMin, int xMax, int yMin, int yMax){
+		/*
+		 * Create depot at point (0,0)
+		 */
+		Coordinate depot = new Coordinate (0, 0);
+		this.points.add(depot);
+		/*
+		 * Create the remainder of the points
+		 */
 		double xDif = (double) (xMax - xMin);
 		double yDif = (double) (yMax - yMin);
-		for(int i = 0; i < numberOfPoints; i++){
+		for(int i = 1; i < numberOfPoints; i++){
 			double x = xMin + MatsimRandom.getRandom().nextDouble()*xDif;
 			double y = yMin + MatsimRandom.getRandom().nextDouble()*yDif;
 			Coordinate c = new Coordinate(x, y);
 			this.points.add(c);
 		}
+		ArrayList<Integer> precedenceVector = this.createPrecedenceVector();
+		return precedenceVector;
 	}	
+
+	private ArrayList<Integer> createPrecedenceVector() {
+		ArrayList<Integer> result = new ArrayList<Integer>(this.numberOfPoints);
+		ArrayList<Double> distances = new ArrayList<Double>(numberOfPoints);
+		Coordinate depot  = new Coordinate(0.0, 0,0);
+		for (Coordinate c : this.getPoints()) {
+			distances.add(depot.distance(c));
+		}
+		
+		ArrayList<Double> newDistances = new ArrayList<Double>(numberOfPoints);
+		for (Double double1 : distances) {
+			newDistances.add(Double.valueOf(double1));
+		}
+		Collections.sort(newDistances);
+		
+		while(newDistances.size() > 0){
+			int index = distances.indexOf(newDistances.get(0));
+			result.add(index+1);
+			newDistances.remove(0);
+		}		
+		
+		return result;
+	}
 
 	public ArrayList<Coordinate> getPoints() {
 		return points;
@@ -71,5 +106,14 @@ public class MyFitnessFunction {
 	public boolean isMax() {
 		return max;
 	}
+
+	public ArrayList<Integer> getPrecedenceVector() {
+		return precedenceVector;
+	}
+
+	public void setPrecedenceVector(ArrayList<Integer> precedenceVector) {
+		this.precedenceVector = precedenceVector;
+	}
+
 		
 }
