@@ -28,14 +28,14 @@ import java.util.List;
 * @author dgrether
 */
 public interface BasicPlan<P extends BasicPlanElement> extends Serializable{
+	// yyyyyy should be parameterized in terms of "Person".
+	// yyyy In contrast, (Basic)PlanElement is NOT needed.
 
 	public List<P> getPlanElements();
 
 	public void addLeg(final BasicLeg leg);
-	// TODO kn This should not be in a pure data class.  (But maybe this is not a pure data class.)
 
 	public void addActivity(final BasicActivity act);
-	// TODO kn This should not be in a pure data class.  (But maybe this is not a pure data class.)
 
 	public boolean isSelected();
 	
