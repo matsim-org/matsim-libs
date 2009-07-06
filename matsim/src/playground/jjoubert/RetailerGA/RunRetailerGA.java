@@ -43,7 +43,7 @@ public class RunRetailerGA {
 		 *  2 - Merged Crossover
 		 *  3 - Partially Matched Crossover
 		 */
-		int crossoverType = 2;
+		int crossoverType = 3;
 		ArrayList<ArrayList<Double>> solutionProgress = new ArrayList<ArrayList<Double>>(numberOfGenerations);		
 		
 		/*

@@ -36,7 +36,7 @@ public class AverageEventsToGAP {
 
 	private final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/PostProcess/";
 	private final static String FOLDER = ROOT + "Run";
-	private final static String[] RUNS = {"01","02","03","04"};
+	private final static String[] RUNS = {"01","02","03","04", "05", "06"};
 
 	/**
 	 * This class reads in multiple files containing the normalized values of simulated minor 

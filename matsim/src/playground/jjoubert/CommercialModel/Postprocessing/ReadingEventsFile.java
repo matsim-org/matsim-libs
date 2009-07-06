@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyAllEventCounter.java
+ * ReadingEventsFile.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,47 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialModel.Listeners;
+package playground.jjoubert.CommercialModel.Postprocessing;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.events.Events;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 
-public class MyCommercialActivityDensityWriter implements BasicActivityStartEventHandler{
+import playground.jjoubert.CommercialModel.Listeners.MyCommercialActivityDensityWriter;
+
+public class ReadingEventsFile {
 	
-	private BufferedWriter outputGapDensity;
-	private NetworkLayer network;
-	
-	public MyCommercialActivityDensityWriter(BufferedWriter output, NetworkLayer nw) {
-		this.outputGapDensity = output;
-		this.network = nw;
-	}
+	public static void main(String [] args){
 
-	public void reset(int iteration) {
+		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/";
+		String networkFilename = root + "Input/networkSA.xml";
+		String outputCommercialActivityDensityFilename = root + "Output/Run06/it.100-7699/100.eventsTruckMinor.txt";
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
+			try{
+				NetworkLayer nl = new NetworkLayer();
+				MatsimNetworkReader nr = new MatsimNetworkReader(nl);
+				nr.readFile(networkFilename);
+				
+				String input = root + "/Output/Run06/it.100-7699/100.events.txt.gz";
+				Events events = new Events();
+				MyCommercialActivityDensityWriter handler = new MyCommercialActivityDensityWriter(bw, nl);	
+				events.addHandler(handler);
 
-	}
-
-	public void handleEvent(BasicActivityStartEvent event) {
-
-		if(event.getActType().equalsIgnoreCase("minor")){
-			double timeSeconds = event.getTime();
-			int hour = (int) Math.floor((timeSeconds) / 3600);
-
-			LinkImpl link = this.network.getLink( event.getLinkId() );
-			try {
-				this.outputGapDensity.write(String.valueOf(link.getCoord().getX()));
-				this.outputGapDensity.write(",");
-				this.outputGapDensity.write(String.valueOf(link.getCoord().getY()));
-				this.outputGapDensity.write(",");
-				this.outputGapDensity.write(Integer.toString(hour));
-				this.outputGapDensity.newLine();
-			} catch (IOException e) {
-				e.printStackTrace();
+				MatsimEventsReader reader = new MatsimEventsReader(events);
+				reader.readFile(input);
+				System.out.println("Events file read!");					
+			} finally{
+				bw.close();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
