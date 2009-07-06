@@ -85,6 +85,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 		FixedRouteLegTravelTimeEstimator legTravelTimeEstimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				router);
 
 		this.timer					= new TimeModeChoicer2(controler, legTravelTimeEstimator, scorer);

@@ -218,6 +218,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		FixedRouteLegTravelTimeEstimator ltte = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 

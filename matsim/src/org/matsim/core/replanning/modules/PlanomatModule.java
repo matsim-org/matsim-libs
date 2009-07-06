@@ -95,7 +95,10 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 		PlansCalcRoute routingAlgorithm = (PlansCalcRoute) this.controler.getRoutingAlgorithm(this.travelCost, this.travelTime);
 		
 		PlanAlgorithm planomatInstance = new Planomat(
-				this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(this.config.getSimLegInterpretation(), routingAlgorithm), 
+				this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+						this.config.getSimLegInterpretation(),
+						this.config.getRoutingCapability(),
+						routingAlgorithm), 
 				this.scoringFunctionFactory, 
 				this.config);
 

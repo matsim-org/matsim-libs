@@ -90,6 +90,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 		this.legTravelTimeEstimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				this.router);
 		
 		this.finder 				= finder;	

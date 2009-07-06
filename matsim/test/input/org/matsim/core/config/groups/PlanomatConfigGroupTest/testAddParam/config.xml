@@ -6,6 +6,7 @@
 
 		<param name="populationSize" value="10" />
 		<param name="simLegInterpretation" value="CharyparEtAlCompatible" />
+		<param name="routingCapability" value="linearInterpolation" />
 		<param name="possibleModes" value="car,pt" />
 		<param name="jgapMaxGenerations" value="1000" />
 		<param name="levelOfTimeResolution" value="6" />

@@ -70,6 +70,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 //				new TransportMode[]{TransportMode.car, TransportMode.pt}, 
 //				Gbl.getConfig().planomat().getPossibleModes()));
 		assertEquals( PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, expectedConfig.getSimLegInterpretation() );
+		assertEquals( PlanomatConfigGroup.RoutingCapability.linearInterpolation, expectedConfig.getRoutingCapability() );
 		assertEquals( 1000, expectedConfig.getJgapMaxGenerations() );
 		assertEquals( 6, expectedConfig.getLevelOfTimeResolution() );
 		assertEquals( true, expectedConfig.isDoLogging() );

@@ -97,6 +97,7 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 
 		FixedRouteLegTravelTimeEstimator ltte = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());

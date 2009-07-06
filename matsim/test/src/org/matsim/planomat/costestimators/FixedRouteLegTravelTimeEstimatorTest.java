@@ -122,7 +122,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 			FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-					simLegInterpretation, 
+					simLegInterpretation,
+					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					plansCalcRoute);
 			
 			Events events = new Events();
@@ -273,6 +274,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 		Id linkId = this.originAct.getLinkId();
 
@@ -333,6 +335,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
 		Events events = new Events();
@@ -415,6 +418,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
 		Id linkId = ((NetworkRoute) this.testLeg.getRoute()).getLinks().get(0).getId();

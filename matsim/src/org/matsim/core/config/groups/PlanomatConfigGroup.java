@@ -46,8 +46,14 @@ public class PlanomatConfigGroup extends Module {
 		 * <li> The link of the destination activity is not simulated, and thus not included in this leg travel time estimation.
 		 * </ul>
 		 */
-		CharyparEtAlCompatible}; 
-	
+		CharyparEtAlCompatible;
+	} 
+
+	public static enum RoutingCapability {
+		fixedRoute,
+		linearInterpolation;
+	}
+
 	public static enum TripStructureAnalysisLayerOption {facility,link}
 
 	/**
@@ -124,10 +130,11 @@ public class PlanomatConfigGroup extends Module {
 		 * Different implementations of traffic flow simulations use different interpretations of trips.  
 		 * Planomat has to use the same interpretation as the used traffic flow simulation.
 		 */
-		/**
-		 * 
-		 */
 		SIM_LEG_INTERPRETATION("simLegInterpretation", PlanomatConfigGroup.SimLegInterpretation.CetinCompatible.toString(), ""),
+		/**
+		 * TODO comment that
+		 */
+		ROUTING_CAPABILITY("routingCapability", PlanomatConfigGroup.RoutingCapability.fixedRoute.toString(), ""),
 		/**
 		 * Enables logging in order to get some insight to the planomat functionality.
 		 * <h3>Possible values</h3>
@@ -258,6 +265,10 @@ public class PlanomatConfigGroup extends Module {
 
 	public SimLegInterpretation getSimLegInterpretation() {
 		return PlanomatConfigGroup.SimLegInterpretation.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getActualValue());
+	}
+	
+	public RoutingCapability getRoutingCapability() {
+		return PlanomatConfigGroup.RoutingCapability.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.ROUTING_CAPABILITY.getActualValue());
 	}
 	
 	public int getLevelOfTimeResolution() {

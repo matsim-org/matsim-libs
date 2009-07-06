@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LegTravelTimeEstimatorFactory.java
+ * LinearInterpolationLegTravelTimeEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,45 +20,44 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 
-public class LegTravelTimeEstimatorFactory {
+public class LinearInterpolationLegTravelTimeEstimator implements
+		LegTravelTimeEstimator {
 
-	private final TravelTime travelTime;
-	private final DepartureDelayAverageCalculator tDepDelayCalc;
+	protected final TravelTime linkTravelTimeEstimator;
+	protected final DepartureDelayAverageCalculator tDepDelayCalc;
+	private final PlansCalcRoute plansCalcRoute;
+	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
-	public LegTravelTimeEstimatorFactory(TravelTime travelTime, DepartureDelayAverageCalculator depDelayCalc) {
+	public LinearInterpolationLegTravelTimeEstimator(
+			TravelTime linkTravelTimeEstimator,
+			DepartureDelayAverageCalculator depDelayCalc,
+			PlansCalcRoute plansCalcRoute,
+			SimLegInterpretation simLegInterpretation) {
 		super();
-		this.travelTime = travelTime;
-		this.tDepDelayCalc = depDelayCalc;
+		this.linkTravelTimeEstimator = linkTravelTimeEstimator;
+		tDepDelayCalc = depDelayCalc;
+		this.plansCalcRoute = plansCalcRoute;
+		this.simLegInterpretation = simLegInterpretation;
 	}
 
-	public LegTravelTimeEstimator getLegTravelTimeEstimator(
-			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
-			PlanomatConfigGroup.RoutingCapability routingCapability,
-			PlansCalcRoute routingAlgorithm) {
-		
-		LegTravelTimeEstimator legTravelTimeEstimator = null;
-		if (routingCapability.equals(PlanomatConfigGroup.RoutingCapability.fixedRoute)) {
-			legTravelTimeEstimator = new FixedRouteLegTravelTimeEstimator(
-					this.travelTime, 
-					this.tDepDelayCalc, 
-					routingAlgorithm,
-					simLegInterpretation);
-			
-		} else if (routingCapability.equals(PlanomatConfigGroup.RoutingCapability.linearInterpolation)) {
-			
-			legTravelTimeEstimator = new LinearInterpolationLegTravelTimeEstimator(
-					this.travelTime,
-					this.tDepDelayCalc,
-					routingAlgorithm,
-					simLegInterpretation);
-			
-		}
-		
-		return legTravelTimeEstimator;
+	public double getLegTravelTimeEstimation(Id personId, double departureTime,
+			ActivityImpl actOrigin, ActivityImpl actDestination,
+			LegImpl legIntermediate) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
-	
+
+	public void reset() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

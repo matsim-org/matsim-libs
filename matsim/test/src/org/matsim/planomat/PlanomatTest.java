@@ -139,7 +139,8 @@ public class PlanomatTest extends MatsimTestCase {
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 		LegTravelTimeEstimator ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
@@ -295,6 +296,7 @@ public class PlanomatTest extends MatsimTestCase {
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 		ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, 
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
 		// run the method
