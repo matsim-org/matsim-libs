@@ -35,9 +35,9 @@ public class LegTravelTimeEstimatorFactory {
 		this.tDepDelayCalc = depDelayCalc;
 	}
 
-	public LegTravelTimeEstimator getLegTravelTimeEstimator(PlanomatConfigGroup.SimLegInterpretation ltteName, PlansCalcRoute routingAlgorithm) {
+	public LegTravelTimeEstimator getLegTravelTimeEstimator(PlanomatConfigGroup.SimLegInterpretation simLegInterpretation, PlansCalcRoute routingAlgorithm) {
 		
-		LegTravelTimeEstimator legTravelTimeEstimator = new FixedRouteLegTravelTimeEstimator(this.travelTime, this.tDepDelayCalc, routingAlgorithm, ltteName);
+		LegTravelTimeEstimator legTravelTimeEstimator = new FixedRouteLegTravelTimeEstimator(this.travelTime, this.tDepDelayCalc, routingAlgorithm, simLegInterpretation);
 		
 		return legTravelTimeEstimator;
 	}

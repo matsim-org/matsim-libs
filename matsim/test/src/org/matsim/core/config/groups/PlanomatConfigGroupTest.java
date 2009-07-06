@@ -41,7 +41,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 				expectedConfig.getJgapMaxGenerations() );
 		assertEquals(0, expectedConfig.getPossibleModes().toArray().length);
 		assertEquals( 
-				PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getDefaultValue(), 
+				PlanomatConfigGroup.PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getDefaultValue(), 
 				expectedConfig.getSimLegInterpretation().toString() );
 		assertEquals( 
 				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getDefaultValue()), 

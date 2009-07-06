@@ -127,7 +127,7 @@ public class PlanomatConfigGroup extends Module {
 		/**
 		 * 
 		 */
-		LEG_TRAVEL_TIME_ESTIMATOR_NAME("legTravelTimeEstimator", PlanomatConfigGroup.SimLegInterpretation.CetinCompatible.toString(), ""),
+		SIM_LEG_INTERPRETATION("simLegInterpretation", PlanomatConfigGroup.SimLegInterpretation.CetinCompatible.toString(), ""),
 		/**
 		 * Enables logging in order to get some insight to the planomat functionality.
 		 * <h3>Possible values</h3>
@@ -257,7 +257,7 @@ public class PlanomatConfigGroup extends Module {
 	}
 
 	public SimLegInterpretation getSimLegInterpretation() {
-		return PlanomatConfigGroup.SimLegInterpretation.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getActualValue());
+		return PlanomatConfigGroup.SimLegInterpretation.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.SIM_LEG_INTERPRETATION.getActualValue());
 	}
 	
 	public int getLevelOfTimeResolution() {
