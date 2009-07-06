@@ -12,7 +12,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
-import playground.florian.jaxb.scores01.ObjectFactory;
 import playground.florian.jaxb.scores01.XMLScoreType;
 import playground.florian.jaxb.scores01.XMLScores;
 
@@ -22,19 +21,8 @@ public class ScoreReader extends MatsimJaxbXmlParser {
 	private ArrayList<Double> worstScore = new ArrayList<Double>();
 	private ArrayList<Double> executedScore = new ArrayList<Double>();
 	
-	public ScoreReader(String schemaLocation, String filename) {
+	public ScoreReader(String schemaLocation) {
 		super(schemaLocation);
-		try {
-			this.readFile(filename);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public ArrayList<Double> getAverageAverageScores(){
@@ -54,6 +42,7 @@ public class ScoreReader extends MatsimJaxbXmlParser {
 	}
 	
 	
+	@Override
 	public void readFile(String filename) throws JAXBException, SAXException,ParserConfigurationException, IOException {
 		//create jaxb infrastructure
 		JAXBContext jc;
@@ -74,4 +63,21 @@ public class ScoreReader extends MatsimJaxbXmlParser {
 			}
 			System.out.println("finish unmarschalling " + filename);
 	}
+	
+	public static void main(String[] args){
+		ScoreReader reader = new ScoreReader("schema");
+		try {
+			reader.readFile("myFilename.xml");
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 }
