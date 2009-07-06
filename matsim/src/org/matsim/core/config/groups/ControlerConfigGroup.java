@@ -43,6 +43,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String RUNID = "runId";
 	private static final String LINKTOLINK_ROUTING_ENABLED = "enableLinkToLinkRouting";
 	private static final String EVENTS_FILE_FORMAT = "eventsFileFormat";
+	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
@@ -54,6 +55,8 @@ public class ControlerConfigGroup extends Module {
 	private String runId = null;
 	
 	private EventsFileFormat[] eventsFileFormats = new EventsFileFormat[] {EventsFileFormat.txt};
+	
+	private int writeEventsInterval=1;
 	
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -84,6 +87,8 @@ public class ControlerConfigGroup extends Module {
 				}
 			}
 			return str.toString();
+		} else if (WRITE_EVENTS_INTERVAL.equals(key)) {
+			return Integer.toString(getWriteEventsInterval());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -121,6 +126,8 @@ public class ControlerConfigGroup extends Module {
 				formats[i++] = EventsFileFormat.valueOf(part.trim());
 			}
 			this.eventsFileFormats = formats;
+		}else if (WRITE_EVENTS_INTERVAL.equals(key)) {
+			setWriteEventsInterval(Integer.parseInt(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -136,6 +143,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(RUNID, getValue(RUNID));
 		map.put(LINKTOLINK_ROUTING_ENABLED, Boolean.toString(this.isLinkToLinkRoutingEnabled()));
 		map.put(EVENTS_FILE_FORMAT, getValue(EVENTS_FILE_FORMAT));
+		map.put(WRITE_EVENTS_INTERVAL, getValue(WRITE_EVENTS_INTERVAL));
 		return map;
 	}
 	
@@ -204,6 +212,14 @@ public class ControlerConfigGroup extends Module {
 
 	public void setEventsFileFormats(final EventsFileFormat[] eventsFileFormats) {
 		this.eventsFileFormats = eventsFileFormats.clone();
+	}
+
+	public int getWriteEventsInterval() {
+		return writeEventsInterval;
+	}
+
+	public void setWriteEventsInterval(int writeEventsInterval) {
+		this.writeEventsInterval = writeEventsInterval;
 	}
 
 }

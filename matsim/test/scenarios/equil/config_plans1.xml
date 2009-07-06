@@ -23,6 +23,7 @@
 		<param name="outputDirectory" value="./output/equil" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
+		<param name= "writeEventsInterval" value="4" />
 	</module>
 
 	<module name="simulation">

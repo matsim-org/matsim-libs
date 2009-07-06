@@ -310,6 +310,33 @@ public class ControlerTest extends MatsimTestCase {
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 9)).exists());
 		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 10)).exists());
 	}
+	
+	/**
+	 * @author wrashid
+	 */
+	public void testSetWriteEventsIntervalConfig() {
+		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(10);
+
+		final Controler controler = new Controler(config);
+		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
+				3 == controler.getWriteEventsInterval());
+		controler.setCreateGraphs(false);
+		controler.run();
+		assertEquals(4, controler.getWriteEventsInterval());
+
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 1)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 2)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 3)).exists());
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 4)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 5)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 6)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 7)).exists());
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 8)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 9)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 10)).exists());
+	}
 
 	/**
 	 * @author mrieser

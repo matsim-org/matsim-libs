@@ -119,22 +119,25 @@ import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
 
 /**
- * The Controler is responsible for complete simulation runs, including
- * the initialization of all required data, running the iterations and
- * the replanning, analyses, etc.
- *
+ * The Controler is responsible for complete simulation runs, including the
+ * initialization of all required data, running the iterations and the
+ * replanning, analyses, etc.
+ * 
  * @author mrieser
  */
 public class Controler {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
-	/*package*/ static final String FILENAME_EVENTS_TXT = "events.txt.gz";
-	/*package*/ static final String FILENAME_EVENTS_XML = "events.xml.gz";
+	/* package */static final String FILENAME_EVENTS_TXT = "events.txt.gz";
+	/* package */static final String FILENAME_EVENTS_XML = "events.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt";
 	public static final String FILENAME_SCORESTATS = "scorestats.txt";
-	public static final String FILENAME_TRAVELDISTANCESTATS="traveldistancestats.txt";
+	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats.txt";
 
-	private enum ControlerState {Init, Running, Shutdown, Finished}
+	private enum ControlerState {
+		Init, Running, Shutdown, Finished
+	}
+
 	private ControlerState state = ControlerState.Init;
 
 	private static String outputPath = null;
@@ -161,16 +164,17 @@ public class Controler {
 	protected StrategyManager strategyManager = null;
 
 	/**
-	 * Defines in which iterations the events should be written. <tt>1</tt> is in every iteration,
-	 * <tt>2</tt> in every second, <tt>10</tt> in every 10th, and so forth. <tt>0</tt> disables the writing
-	 * of events completely.
+	 * Defines in which iterations the events should be written. <tt>1</tt> is
+	 * in every iteration, <tt>2</tt> in every second, <tt>10</tt> in every
+	 * 10th, and so forth. <tt>0</tt> disables the writing of events
+	 * completely.
 	 */
-	/*package*/ int writeEventsInterval = 1;
+	/* package */int writeEventsInterval = -1;
 
 	/* default analyses */
-	/*package*/ CalcLinkStats linkStats = null;
-	/*package*/ CalcLegTimes legTimes = null;
-	/*package*/ VolumesAnalyzer volumes = null;
+	/* package */CalcLinkStats linkStats = null;
+	/* package */CalcLegTimes legTimes = null;
+	/* package */VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
 
@@ -183,8 +187,8 @@ public class Controler {
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
 	/**
-	 * This variable is used to store the log4j output before it can be written to
-	 * a file. This is needed to set the output directory before logging.
+	 * This variable is used to store the log4j output before it can be written
+	 * to a file. This is needed to set the output directory before logging.
 	 */
 	private CollectLogMessagesAppender collectLogMessagesAppender = null;
 
@@ -194,14 +198,15 @@ public class Controler {
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	/**
-	 * This instance encapsulates all behavior concerning the ControlerEvents/Listeners
+	 * This instance encapsulates all behavior concerning the
+	 * ControlerEvents/Listeners
 	 */
 	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(this);
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
-	private final List<QueueSimulationListener> queueSimulationListener  = new ArrayList<QueueSimulationListener>();
-	
+	private final List<QueueSimulationListener> queueSimulationListener = new ArrayList<QueueSimulationListener>();
+
 	private final Thread shutdownHook = new Thread() {
 		@Override
 		public void run() {
@@ -233,15 +238,16 @@ public class Controler {
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
-	 *
-	 * @param args The arguments to initialize the controler with. <code>args[0]</code> is expected to
-	 * 		contain the path to a configuration file, <code>args[1]</code>, if set, is expected to contain
-	 * 		the path to a local copy of the DTD file used in the configuration file.
+	 * 
+	 * @param args
+	 *            The arguments to initialize the controler with.
+	 *            <code>args[0]</code> is expected to contain the path to a
+	 *            configuration file, <code>args[1]</code>, if set, is
+	 *            expected to contain the path to a local copy of the DTD file
+	 *            used in the configuration file.
 	 */
 	public Controler(final String[] args) {
-		this(args.length > 0 ? args[0] : null,
-				args.length > 1 ? args[1] : null,
-				null);
+		this(args.length > 0 ? args[0] : null, args.length > 1 ? args[1] : null, null);
 	}
 
 	public Controler(final String configFileName) {
@@ -257,25 +263,34 @@ public class Controler {
 	}
 
 	/**
-	 * (Obviously) instantiates the controler with config, network, and population given.
-	 * This is more tricky than it looks, since a full population needs to be referenced to the
-	 * network, and the population reader knows about the network as a side effect.</p>
+	 * (Obviously) instantiates the controler with config, network, and
+	 * population given. This is more tricky than it looks, since a full
+	 * population needs to be referenced to the network, and the population
+	 * reader knows about the network as a side effect.
+	 * </p>
 	 * 
-	 *  <i> However,</i> if the population does not contain references to the network (e.g. activity locations
-	 *  given by coordinates, and legs empty), then the referencing seems to be done automagically by the 
-	 *  Controler.  It is, however, still necessary to give a network ...</p>
-	 *  
-	 *  If, for whatever reason, you want the controler to do something, then stop and do some of your code, then
-	 *  resume, you need to look into the concept of ControlerListeners, which are explained by example in src/tutorials/... .
-	 *  
-	 *  Kai, feb'08</p>
+	 * <i> However,</i> if the population does not contain references to the
+	 * network (e.g. activity locations given by coordinates, and legs empty),
+	 * then the referencing seems to be done automagically by the Controler. It
+	 * is, however, still necessary to give a network ...
+	 * </p>
+	 * 
+	 * If, for whatever reason, you want the controler to do something, then
+	 * stop and do some of your code, then resume, you need to look into the
+	 * concept of ControlerListeners, which are explained by example in
+	 * src/tutorials/... .
+	 * 
+	 * Kai, feb'08
+	 * </p>
 	 * 
 	 * <p>
-	 * Using this constructor will disable the creation of the scenario data instance used 
-	 * to load consistent scenarios. Lanes and SingalSystems won't be initialized automatically even
-	 * if set in config! Take care that this is done by yourself.
+	 * Using this constructor will disable the creation of the scenario data
+	 * instance used to load consistent scenarios. Lanes and SingalSystems won't
+	 * be initialized automatically even if set in config! Take care that this
+	 * is done by yourself.
 	 * 
-	 * dg, march 09<p>
+	 * dg, march 09
+	 * <p>
 	 * 
 	 * @param config
 	 * @param network
@@ -288,25 +303,24 @@ public class Controler {
 		this.scenarioData.setPopulation(population);
 		this.network = network;
 		this.population = population;
-		//FIXME dg march 09: this warning should not be needed if there wouldn't be a
-		//world without any humanthinkable concept
-		log.warn("Using this constructor will disable the creation of the scenario data instance used for" +
-				"to ensure consistent scenarios. Lanes and SingalSystems won't be initialized automatically even" +
-				"if set in config! " +
-				"Take care that this is done by yourself.");
+		// FIXME dg march 09: this warning should not be needed if there
+		// wouldn't be a
+		// world without any humanthinkable concept
+		log.warn("Using this constructor will disable the creation of the scenario data instance used for"
+				+ "to ensure consistent scenarios. Lanes and SingalSystems won't be initialized automatically even"
+				+ "if set in config! " + "Take care that this is done by yourself.");
 	}
-	
-	public Controler(Scenario scenario){
+
+	public Controler(Scenario scenario) {
 		this(null, null, scenario.getConfig());
 		this.scenarioData = (ScenarioImpl) scenario;
 		this.network = (NetworkLayer) this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 	}
-	
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config) {
 		super();
-		//catch logs before doing something
+		// catch logs before doing something
 		this.collectLogMessagesAppender = new CollectLogMessagesAppender();
 		Logger.getRootLogger().addAppender(this.collectLogMessagesAppender);
 		Gbl.printSystemInfo();
@@ -315,7 +329,8 @@ public class Controler {
 		this.dtdFileName = dtdFileName;
 		if (configFileName == null) {
 			if (config == null) {
-				throw new IllegalArgumentException("Either the config or the filename of a configfile must be set to initialize the Controler.");
+				throw new IllegalArgumentException(
+						"Either the config or the filename of a configfile must be set to initialize the Controler.");
 			}
 			this.config = config;
 		} else {
@@ -356,23 +371,23 @@ public class Controler {
 	 * select if single cpu handler to use or parallel
 	 */
 	private void initEvents() {
-		final String PARALLEL_EVENT_HANDLING="parallelEventHandling";
-		final String NUMBER_OF_THREADS="numberOfThreads";
-		final String ESTIMATED_NUMBER_OF_EVENTS="estimatedNumberOfEvents";
+		final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
+		final String NUMBER_OF_THREADS = "numberOfThreads";
+		final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
 		String numberOfThreads = Gbl.getConfig().findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
 		String estimatedNumberOfEvents = Gbl.getConfig().findParam(PARALLEL_EVENT_HANDLING, ESTIMATED_NUMBER_OF_EVENTS);
 
-		if (numberOfThreads!=null){
-			int numOfThreads=Integer.parseInt(numberOfThreads);
+		if (numberOfThreads != null) {
+			int numOfThreads = Integer.parseInt(numberOfThreads);
 			// the user wants to user parallel events handling
-			if (estimatedNumberOfEvents!=null){
-				int estNumberOfEvents=Integer.parseInt(estimatedNumberOfEvents);
-				this.events=new ParallelEvents(numOfThreads,estNumberOfEvents);
+			if (estimatedNumberOfEvents != null) {
+				int estNumberOfEvents = Integer.parseInt(estimatedNumberOfEvents);
+				this.events = new ParallelEvents(numOfThreads, estNumberOfEvents);
 			} else {
-				this.events=new ParallelEvents(numOfThreads);
+				this.events = new ParallelEvents(numOfThreads);
 			}
 		} else {
-			this.events=new Events();
+			this.events = new Events();
 		}
 	}
 
@@ -380,8 +395,8 @@ public class Controler {
 		int firstIteration = this.config.controler().getFirstIteration();
 		int lastIteration = this.config.controler().getLastIteration();
 		this.state = ControlerState.Running;
-		String divider = "###################################################" ;
-		String marker = "### " ;
+		String divider = "###################################################";
+		String marker = "### ";
 
 		for (iteration = firstIteration; (iteration <= lastIteration) && (this.state == ControlerState.Running); iteration++) {
 			log.info(divider);
@@ -407,8 +422,8 @@ public class Controler {
 			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
 			this.stopwatch.endOperation("iteration");
 			this.stopwatch.write(this.getNameForOutputFilename("stopwatch.txt"));
-			log.info(marker + "ITERATION " + iteration + " ENDS") ;
-			log.info(divider) ;
+			log.info(marker + "ITERATION " + iteration + " ENDS");
+			log.info(divider);
 		}
 
 	}
@@ -425,13 +440,13 @@ public class Controler {
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 
 			// dump plans
-			new PopulationWriter(this.population, ((ScenarioImpl)this.getScenarioData()).getKnowledges(), this.getNameForOutputFilename("output_plans.xml.gz"),
-					this.config.plans().getOutputVersion()).write();
-			//dump network
+			new PopulationWriter(this.population, ((ScenarioImpl) this.getScenarioData()).getKnowledges(), this
+					.getNameForOutputFilename("output_plans.xml.gz"), this.config.plans().getOutputVersion()).write();
+			// dump network
 			new NetworkWriter(this.network, this.getNameForOutputFilename("output_network.xml.gz")).write();
 			// dump world
 			new WorldWriter(this.getWorld(), this.getNameForOutputFilename("output_world.xml.gz")).write();
-  		// dump config
+			// dump config
 			new ConfigWriter(this.config, this.getNameForOutputFilename("output_config.xml.gz")).write();
 			// dump facilities
 			ActivityFacilities facilities = this.getFacilities();
@@ -442,7 +457,8 @@ public class Controler {
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
 			} else {
-				// only remove hook when regular shutdown, otherwise we can't as the shutdown is already in progress...
+				// only remove hook when regular shutdown, otherwise we can't as
+				// the shutdown is already in progress...
 				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
 				log.info("S H U T D O W N   ---   regular shutdown completed.");
 			}
@@ -450,42 +466,44 @@ public class Controler {
 		}
 	}
 
-	/** Initializes the Controler with the parameters from the configuration.
+	/**
+	 * Initializes the Controler with the parameters from the configuration.
 	 * This method is called after the configuration is loaded, and after the
 	 * scenario data (network, population) is read.
 	 */
 	protected void setUp() {
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config
+					.travelTimeCalculator());
 		}
 		if (this.travelCostCalculator == null) {
-			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
+			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config
+					.charyparNagelScoring());
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
-		
-		if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)){
+		if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {
 			this.leastCostPathCalculatorFactory = new DijkstraFactory();
-		}
-		else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)){
-			this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
-		}
-		else {
+		} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
+			this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config
+					.charyparNagelScoring()));
+		} else {
 			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 		}
 
-		if (this.config.controler().isLinkToLinkRoutingEnabled()){
-			this.leastCostPathCalculatorFactory = new LeastCostPathCalculatorInvertedNetProxyFactory(this.leastCostPathCalculatorFactory);
+		if (this.config.controler().isLinkToLinkRoutingEnabled()) {
+			this.leastCostPathCalculatorFactory = new LeastCostPathCalculatorInvertedNetProxyFactory(
+					this.leastCostPathCalculatorFactory);
 		}
-		
-		
-		/* TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has 15min-steps,
-		 * while volumes uses 60min-steps! It works a.t.m., but the traveltimes
-		 * in linkStats are the avg. traveltimes between xx.00 and xx.15, and not
-		 * between xx.00 and xx.59
+
+		/*
+		 * TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
+		 * 15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
+		 * traveltimes in linkStats are the avg. traveltimes between xx.00 and
+		 * xx.15, and not between xx.00 and xx.59
 		 */
 		this.linkStats = new CalcLinkStats(this.network);
-		this.volumes = new VolumesAnalyzer(3600, 24*3600-1, this.network);
+		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
 		this.legTimes = new CalcLegTimes(this.population);
 		this.events.addHandler(this.legTimes);
 
@@ -498,9 +516,11 @@ public class Controler {
 		this.strategyManager = loadStrategyManager();
 	}
 
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * private methods
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	/**
 	 * Initializes log4j to write log output to files in output directory.
@@ -508,13 +528,13 @@ public class Controler {
 	private void initLogging() {
 		Logger.getRootLogger().removeAppender(this.collectLogMessagesAppender);
 		try {
-			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender.getLogEvents(), this.config.controler().getRunId());
+			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender
+					.getLogEvents(), this.config.controler().getRunId());
 		} catch (IOException e) {
 			log.error("Cannot create logfiles: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
-
 
 	/**
 	 * Loads the configuration object with the correct settings.
@@ -536,19 +556,26 @@ public class Controler {
 		configwriter.write();
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
+
+		// use writeEventsInterval from config file, only if not already
+		// initialized programmatically
+		if (writeEventsInterval == -1) {
+			this.writeEventsInterval=config.controler().getWriteEventsInterval();
+		}
 	}
 
 	private final void setUpOutputDir() {
 		outputPath = this.config.controler().getOutputDirectory();
 		if (outputPath.endsWith("/")) {
-			outputPath = outputPath.substring(0, outputPath.length()-1);
+			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
 
 		// make the tmp directory
 		File outputDir = new File(outputPath);
 		if (outputDir.exists()) {
 			if (outputDir.isFile()) {
-				throw new RuntimeException("Cannot create output directory. " + outputPath + " is a file and cannot be replaced by a directory.");
+				throw new RuntimeException("Cannot create output directory. " + outputPath
+						+ " is a file and cannot be replaced by a directory.");
 			}
 			if (outputDir.list().length > 0) {
 				if (this.overwriteFiles) {
@@ -557,13 +584,18 @@ public class Controler {
 					log.warn("### " + outputPath);
 					log.warn("###########################################################");
 				} else {
-					// the directory is not empty, we do not overwrite any files!
-					throw new RuntimeException("The output directory " + outputPath + " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+					// the directory is not empty, we do not overwrite any
+					// files!
+					throw new RuntimeException(
+							"The output directory "
+									+ outputPath
+									+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
 				}
 			}
 		} else {
 			if (!outputDir.mkdirs()) {
-				throw new RuntimeException("The output directory path " + outputPath + " could not be created. Check pathname and permissions!");
+				throw new RuntimeException("The output directory path " + outputPath
+						+ " could not be created. Check pathname and permissions!");
 			}
 		}
 
@@ -573,22 +605,25 @@ public class Controler {
 		}
 		File itersDir = new File(outputPath + "/" + DIRECTORY_ITERS);
 		if (!itersDir.mkdir() && !itersDir.exists()) {
-			throw new RuntimeException("The iterations directory " + (outputPath + "/" + DIRECTORY_ITERS) + " could not be created.");
+			throw new RuntimeException("The iterations directory " + (outputPath + "/" + DIRECTORY_ITERS)
+					+ " could not be created.");
 		}
 	}
 
-	/** Load all the required data. Currently, this only calls {@link #loadNetwork()} and {@link #loadPopulation()},
-	 * if this data was not given in the Constructor.
+	/**
+	 * Load all the required data. Currently, this only calls
+	 * {@link #loadNetwork()} and {@link #loadPopulation()}, if this data was
+	 * not given in the Constructor.
 	 */
 	private void loadData() {
-		if (this.scenarioData == null){
+		if (this.scenarioData == null) {
 			this.scenarioData = new ScenarioImpl(this.config);
-			((NetworkLayer)this.scenarioData.getNetwork()).setFactory(this.getNetworkFactory());
+			((NetworkLayer) this.scenarioData.getNetwork()).setFactory(this.getNetworkFactory());
 			this.loader = new ScenarioLoader(this.scenarioData);
 			this.loader.loadScenario();
 			this.network = loadNetwork();
 			this.population = loadPopulation();
-			
+
 			if (this.getWorld() != null) {
 				new WorldCheck().run(this.getWorld());
 			}
@@ -596,33 +631,38 @@ public class Controler {
 	}
 
 	/**
-	 * Loads the network for the simulation.  In most cases, this should be an instance of {@link QueueNetwork}
-	 * for the standard QueueSimulation.
-	 * <br>
-	 * <strong>It is highly recommended NOT to overwrite this method!</strong> This method should be private, but is
-	 * only protected at the moment because of backward-compatibility with the old Controler class. In general,
-	 * it is recommended to pass a custom network and population using the special
+	 * Loads the network for the simulation. In most cases, this should be an
+	 * instance of {@link QueueNetwork} for the standard QueueSimulation. <br>
+	 * <strong>It is highly recommended NOT to overwrite this method!</strong>
+	 * This method should be private, but is only protected at the moment
+	 * because of backward-compatibility with the old Controler class. In
+	 * general, it is recommended to pass a custom network and population using
+	 * the special
 	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
-	 * @deprecated Use the constructor {@link #Controler(Config, NetworkLayer, Population)} instead.
+	 * 
+	 * @deprecated Use the constructor
+	 *             {@link #Controler(Config, NetworkLayer, Population)} instead.
 	 * @return The network to be used for the simulation.
 	 */
-	@Deprecated 
+	@Deprecated
 	protected NetworkLayer loadNetwork() {
-		return (NetworkLayer)this.scenarioData.getNetwork();
+		return (NetworkLayer) this.scenarioData.getNetwork();
 	}
 
 	/**
-	 * Loads the population for the simulation.
-	 * <br>
-	 * <strong>It is highly recommended NOT to overwrite this method!</strong> This method should be private, but is
-	 * only protected at the moment because of backward-compatibility with the old Controler class. In general,
-	 * it is recommended to pass a custom network and population using the special
+	 * Loads the population for the simulation. <br>
+	 * <strong>It is highly recommended NOT to overwrite this method!</strong>
+	 * This method should be private, but is only protected at the moment
+	 * because of backward-compatibility with the old Controler class. In
+	 * general, it is recommended to pass a custom network and population using
+	 * the special
 	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
-	 *
-	 * @deprecated Use the constructor {@link #Controler(Config, NetworkLayer, Population)} instead.
+	 * 
+	 * @deprecated Use the constructor
+	 *             {@link #Controler(Config, NetworkLayer, Population)} instead.
 	 * @return The population to be used for the simulation.
 	 */
-	@Deprecated 
+	@Deprecated
 	protected Population loadPopulation() {
 		return this.scenarioData.getPopulation();
 	}
@@ -637,28 +677,33 @@ public class Controler {
 	}
 
 	/**
-	 * Loads the {@link ScoringFunctionFactory} to be used for plans-scoring. This
-	 * method will only be called if the user has not yet manually set a custom scoring
-	 * function with {@link #setScoringFunctionFactory(ScoringFunctionFactory)}.
-	 *
+	 * Loads the {@link ScoringFunctionFactory} to be used for plans-scoring.
+	 * This method will only be called if the user has not yet manually set a
+	 * custom scoring function with
+	 * {@link #setScoringFunctionFactory(ScoringFunctionFactory)}.
+	 * 
 	 * @return The ScoringFunctionFactory to be used for plans-scoring.
 	 */
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		return new CharyparNagelScoringFunctionFactory(this.config.charyparNagelScoring());
 	}
 
-	/** Loads a default set of {@link org.matsim.core.controler.listener ControlerListener} to provide basic functionality.
-	 * <b>Note:</b> Be very careful if you overwrite this method! The order how the listeners are added is very important.
-	 * Check the comments in the source file before overwriting this method!
+	/**
+	 * Loads a default set of
+	 * {@link org.matsim.core.controler.listener ControlerListener} to provide
+	 * basic functionality. <b>Note:</b> Be very careful if you overwrite this
+	 * method! The order how the listeners are added is very important. Check
+	 * the comments in the source file before overwriting this method!
 	 */
 	protected void loadCoreListeners() {
 
-		/* The order how the listeners are added is very important!
-		 * As dependencies between different listeners exist or listeners
-		 * may read and write to common variables, the order is important.
-		 * Example: The RoadPricing-Listener modifies the scoringFunctionFactory,
-		 * which in turn is used by the PlansScoring-Listener.
-		 * Note that the execution order is contrary to the order the listeners are added to the list.
+		/*
+		 * The order how the listeners are added is very important! As
+		 * dependencies between different listeners exist or listeners may read
+		 * and write to common variables, the order is important. Example: The
+		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
+		 * turn is used by the PlansScoring-Listener. Note that the execution
+		 * order is contrary to the order the listeners are added to the list.
 		 */
 
 		this.addCoreControlerListener(new CoreControlerListener());
@@ -666,7 +711,6 @@ public class Controler {
 		// the default handling of plans
 		this.plansScoring = new PlansScoring();
 		this.addCoreControlerListener(this.plansScoring);
-
 
 		// load road pricing, if requested
 		if (this.config.roadpricing().getTollLinksFile() != null) {
@@ -679,9 +723,11 @@ public class Controler {
 	}
 
 	/**
-	 * Loads the default set of {@link org.matsim.core.controler.listener ControlerListener} to provide some more basic functionality.
-	 * Unlike the core ControlerListeners the order in which the listeners of this method are added must not affect
-	 * the correctness of the code.
+	 * Loads the default set of
+	 * {@link org.matsim.core.controler.listener ControlerListener} to provide
+	 * some more basic functionality. Unlike the core ControlerListeners the
+	 * order in which the listeners of this method are added must not affect the
+	 * correctness of the code.
 	 */
 	protected void loadControlerListeners() {
 		// optional: LegHistogram
@@ -699,7 +745,8 @@ public class Controler {
 
 		// optional: travel distance stats
 		try {
-			this.travelDistanceStats = new TravelDistanceStats(this.population, this.getNameForOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
+			this.travelDistanceStats = new TravelDistanceStats(this.population, this
+					.getNameForOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 			this.addControlerListener(this.travelDistanceStats);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
@@ -717,7 +764,7 @@ public class Controler {
 
 	/**
 	 * Creates the path where all iteration-related data should be stored.
-	 *
+	 * 
 	 * @param iteration
 	 */
 	private void makeIterationPath(final int iteration) {
@@ -733,38 +780,49 @@ public class Controler {
 
 	private void resetRandomNumbers() {
 		MatsimRandom.reset(this.config.global().getRandomSeed() + iteration);
-		MatsimRandom.getRandom().nextDouble(); // draw one because of strange "not-randomness" is the first draw...
-		// Fixme [kn] this should really be ten thousand draws instead of just one
+		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
+		// "not-randomness" is the first
+		// draw...
+		// Fixme [kn] this should really be ten thousand draws instead of just
+		// one
 	}
 
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * protected methods for overwriting
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	protected void runMobSim() {
-		//dg feb 09: this null checks are not really safe
-		//consider the case that a user copies a config with some
-		//externalMobsim or JDEQSim information in it and isn't aware
-		//that those configs will be used instead of the "normal" queuesimulation
-		//configuration
-		/* well, that's the user's problem if he doesn't know what settings he starts his simulation with.  mr/mar09 */
+		// dg feb 09: this null checks are not really safe
+		// consider the case that a user copies a config with some
+		// externalMobsim or JDEQSim information in it and isn't aware
+		// that those configs will be used instead of the "normal"
+		// queuesimulation
+		// configuration
+		/*
+		 * well, that's the user's problem if he doesn't know what settings he
+		 * starts his simulation with. mr/mar09
+		 */
 		if (this.externalMobsim == null) {
-			final String JDEQ_SIM="JDEQSim";
-			if (this.config.getModule(JDEQ_SIM)!=null){
-				JDEQSimulation sim= new JDEQSimulation(this.network, this.population, this.events);
+			final String JDEQ_SIM = "JDEQSim";
+			if (this.config.getModule(JDEQ_SIM) != null) {
+				JDEQSimulation sim = new JDEQSimulation(this.network, this.population, this.events);
 				sim.run();
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
 				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
-				if (this.config.scenario().isUseLanes()){
+				if (this.config.scenario().isUseLanes()) {
 					if (this.scenarioData.getLaneDefinitions() == null) {
 						throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
 					}
 					sim.setLaneDefinitions(this.scenarioData.getLaneDefinitions());
 				}
-				if (this.config.scenario().isUseSignalSystems()){
-					if ((this.scenarioData.getSignalSystems() == null)|| (this.scenarioData.getSignalSystemConfigurations() == null)){
-						throw new IllegalStateException("Signal systems and signal system configurations have to be set if feature is enabled!");
+				if (this.config.scenario().isUseSignalSystems()) {
+					if ((this.scenarioData.getSignalSystems() == null)
+							|| (this.scenarioData.getSignalSystemConfigurations() == null)) {
+						throw new IllegalStateException(
+								"Signal systems and signal system configurations have to be set if feature is enabled!");
 					}
 					sim.setSignalSystems(this.scenarioData.getSignalSystems(), this.scenarioData.getSignalSystemConfigurations());
 				}
@@ -776,26 +834,30 @@ public class Controler {
 		}
 	}
 
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * methods for core ControlerListeners
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	/**
 	 * Add a core ControlerListener to the Controler instance
-	 *
+	 * 
 	 * @param l
 	 */
 	protected final void addCoreControlerListener(final ControlerListener l) {
 		this.controlerListenerManager.addCoreControlerListener(l);
 	}
 
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * methods for ControlerListeners
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	/**
 	 * Add a ControlerListener to the Controler instance
-	 *
+	 * 
 	 * @param l
 	 */
 	public final void addControlerListener(final ControlerListener l) {
@@ -804,50 +866,57 @@ public class Controler {
 
 	/**
 	 * Removes a ControlerListener from the Controler instance
-	 *
+	 * 
 	 * @param l
 	 */
 	public final void removeControlerListener(final ControlerListener l) {
 		this.controlerListenerManager.removeControlerListener(l);
 	}
 
-
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * Options
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	/**
-	 * Sets whether the Controler is allowed to overwrite files in the output directory or not. <br>
-	 * When starting, the Controler can check that the output directory is empty or does not yet exist,
-	 * so no files will be overwritten (default setting). While useful in a productive environment,
-	 * this security feature may be interfering in test cases or while debugging. <br>
+	 * Sets whether the Controler is allowed to overwrite files in the output
+	 * directory or not. <br>
+	 * When starting, the Controler can check that the output directory is empty
+	 * or does not yet exist, so no files will be overwritten (default setting).
+	 * While useful in a productive environment, this security feature may be
+	 * interfering in test cases or while debugging. <br>
 	 * <strong>Use this setting with caution, as it can result in data loss!</strong>
-	 *
+	 * 
 	 * @param overwrite
-	 *          whether files and directories should be overwritten (true) or not (false)
+	 *            whether files and directories should be overwritten (true) or
+	 *            not (false)
 	 */
 	public final void setOverwriteFiles(final boolean overwrite) {
 		this.overwriteFiles = overwrite;
 	}
 
 	/**
-	 * Returns whether the Controler is currently allowed to overwrite files in the output directory.
-	 *
-	 * @return true if the Controler is currently allowed to overwrite files in the output directory,
-	 * 				 false if not.
+	 * Returns whether the Controler is currently allowed to overwrite files in
+	 * the output directory.
+	 * 
+	 * @return true if the Controler is currently allowed to overwrite files in
+	 *         the output directory, false if not.
 	 */
 	public final boolean getOverwriteFiles() {
 		return this.overwriteFiles;
 	}
 
 	/**
-	 * Sets in which iterations events should be written to a file.
-	 * If set to <tt>1</tt>, the events will be written in every iteration.
-	 * If set to <tt>2</tt>, the events are written every second iteration.
-	 * If set to <tt>10</tt>, the events are written in every 10th iteration.
-	 * To disable writing of events completely, set the interval to <tt>0</tt> (zero).
-	 *
-	 * @param interval in which iterations events should be written
+	 * Sets in which iterations events should be written to a file. If set to
+	 * <tt>1</tt>, the events will be written in every iteration. If set to
+	 * <tt>2</tt>, the events are written every second iteration. If set to
+	 * <tt>10</tt>, the events are written in every 10th iteration. To
+	 * disable writing of events completely, set the interval to <tt>0</tt>
+	 * (zero).
+	 * 
+	 * @param interval
+	 *            in which iterations events should be written
 	 */
 	public final void setWriteEventsInterval(final int interval) {
 		this.writeEventsInterval = interval;
@@ -859,12 +928,13 @@ public class Controler {
 
 	/**
 	 * Sets whether graphs showing some analyses should automatically be
-	 * generated during the simulation. The generation of graphs usually
-	 * takes a small amount of time that does not have any weight in big
-	 * simulations, but add a significant overhead in smaller runs or in
-	 * test cases where the graphical output is not even requested.
-	 *
-	 * @param createGraphs true if graphs showing analyses' output should be generated.
+	 * generated during the simulation. The generation of graphs usually takes a
+	 * small amount of time that does not have any weight in big simulations,
+	 * but add a significant overhead in smaller runs or in test cases where the
+	 * graphical output is not even requested.
+	 * 
+	 * @param createGraphs
+	 *            true if graphs showing analyses' output should be generated.
 	 */
 	public final void setCreateGraphs(final boolean createGraphs) {
 		this.createGraphs = createGraphs;
@@ -877,9 +947,11 @@ public class Controler {
 		return this.createGraphs;
 	}
 
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * Optional setters that allow to overwrite some default algorithms used
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	public final void setTravelCostCalculator(final TravelCost travelCostCalculator) {
 		this.travelCostCalculator = travelCostCalculator;
@@ -892,70 +964,85 @@ public class Controler {
 	public final TravelTime getTravelTimeCalculator() {
 		return this.travelTimeCalculator;
 	}
-	
+
 	/**
-	 * Sets a new {@link org.matsim.core.scoring.ScoringFunctionFactory} to use. <strong>Note:</strong> This will
-	 * reset all scores calculated so far! Only call this before any events are generated in an iteration.
-	 *
-	 * @param factory The new ScoringFunctionFactory to be used.
+	 * Sets a new {@link org.matsim.core.scoring.ScoringFunctionFactory} to use.
+	 * <strong>Note:</strong> This will reset all scores calculated so far!
+	 * Only call this before any events are generated in an iteration.
+	 * 
+	 * @param factory
+	 *            The new ScoringFunctionFactory to be used.
 	 */
 	public final void setScoringFunctionFactory(final ScoringFunctionFactory factory) {
 		this.scoringFunctionFactory = factory;
 	}
 
 	/**
-	 * @return the currently used {@link org.matsim.core.scoring.ScoringFunctionFactory}
-	 * for scoring plans.
+	 * @return the currently used
+	 *         {@link org.matsim.core.scoring.ScoringFunctionFactory} for
+	 *         scoring plans.
 	 */
 	public final ScoringFunctionFactory getScoringFunctionFactory() {
 		return this.scoringFunctionFactory;
 	}
 
 	/**
-	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager} used for the replanning of plans.
+	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
+	 *         used for the replanning of plans.
 	 */
 	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
 	}
-	
-	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory(){
+
+	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		return this.leastCostPathCalculatorFactory;
 	}
-	
-	public void setLeastCostPathCalculatorFactory(LeastCostPathCalculatorFactory factory){
+
+	public void setLeastCostPathCalculatorFactory(LeastCostPathCalculatorFactory factory) {
 		this.leastCostPathCalculatorFactory = factory;
 	}
-	
 
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * Factory methods
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	/**
-	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes of plans with the default
-	 * (= the current from the last or current iteration) travel costs and travel times. Only to be used by
-	 * a single thread, use multiple instances for multiple threads!
+	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
+	 *         of plans with the default (= the current from the last or current
+	 *         iteration) travel costs and travel times. Only to be used by a
+	 *         single thread, use multiple instances for multiple threads!
 	 */
 	public PlanAlgorithm getRoutingAlgorithm() {
 		return getRoutingAlgorithm(this.getTravelCostCalculator(), this.getTravelTimeCalculator());
 	}
 
 	/**
-	 * @param travelCosts the travel costs to be used for the routing
-	 * @param travelTimes the travel times to be used for the routing
-	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes of plans with the specified
-	 * travelCosts and travelTimes. Only to be used by a single thread, use multiple instances for multiple threads!
+	 * @param travelCosts
+	 *            the travel costs to be used for the routing
+	 * @param travelTimes
+	 *            the travel times to be used for the routing
+	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
+	 *         of plans with the specified travelCosts and travelTimes. Only to
+	 *         be used by a single thread, use multiple instances for multiple
+	 *         threads!
 	 */
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		if ((this.roadPricing != null) && (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
-			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.roadPricing.getRoadPricingScheme());
+		if ((this.roadPricing != null)
+				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
+			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
+					.getLeastCostPathCalculatorFactory(), this.roadPricing.getRoadPricingScheme());
 		}
-		return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+		return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
+				.getLeastCostPathCalculatorFactory());
 	}
 
-	/* ===================================================================
+	/*
+	 * ===================================================================
 	 * Informational methods
-	 * =================================================================== */
+	 * ===================================================================
+	 */
 
 	public static final int getIteration() {
 		// I don't really like this to be static..., marcel, 17jan2008
@@ -979,7 +1066,7 @@ public class Controler {
 	}
 
 	public final ActivityFacilities getFacilities() {
-		//TODO dg
+		// TODO dg
 		if (this.scenarioData == null) {
 			return null;
 		}
@@ -999,15 +1086,16 @@ public class Controler {
 	}
 
 	/**
-	 * This is here for testing purposes only.  Kai, mar08
+	 * This is here for testing purposes only. Kai, mar08
 	 */
 	@Deprecated
 	public final Scenario getScenarioData() {
-		return this.scenarioData ;
+		return this.scenarioData;
 	}
 
 	/**
-	 * @return real-world traffic counts if available, <code>null</code> if no data is available.
+	 * @return real-world traffic counts if available, <code>null</code> if no
+	 *         data is available.
 	 */
 	public final Counts getCounts() {
 		return this.counts;
@@ -1020,7 +1108,7 @@ public class Controler {
 	public final CalcLinkStats getLinkStats() {
 		return this.linkStats;
 	}
-	
+
 	public VolumesAnalyzer getVolumes() {
 		return this.volumes;
 	}
@@ -1030,7 +1118,7 @@ public class Controler {
 	 *         pricing is simulated.
 	 */
 	public final RoadPricing getRoadPricing() {
-		//TODO dg
+		// TODO dg
 		return this.roadPricing;
 	}
 
@@ -1043,7 +1131,7 @@ public class Controler {
 
 	/**
 	 * Returns the path to a directory where temporary files can be stored.
-	 *
+	 * 
 	 * @return path to a temp-directory.
 	 */
 	public static final String getTempPath() {
@@ -1051,9 +1139,11 @@ public class Controler {
 	}
 
 	/**
-	 * Returns the path to the specified iteration directory. The directory path does not include the trailing '/'.
-	 *
-	 * @param iteration the iteration the path to should be returned
+	 * Returns the path to the specified iteration directory. The directory path
+	 * does not include the trailing '/'.
+	 * 
+	 * @param iteration
+	 *            the iteration the path to should be returned
 	 * @return path to the specified iteration directory
 	 */
 	public static final String getIterationPath(final int iteration) {
@@ -1061,8 +1151,9 @@ public class Controler {
 	}
 
 	/**
-	 * Returns the path of the current iteration directory. The directory path does not include the trailing '/'.
-	 *
+	 * Returns the path of the current iteration directory. The directory path
+	 * does not include the trailing '/'.
+	 * 
 	 * @return path to the current iteration directory
 	 */
 	public static final String getIterationPath() {
@@ -1070,9 +1161,11 @@ public class Controler {
 	}
 
 	/**
-	 * Returns the complete filename to access an iteration-file with the given basename.
-	 *
-	 * @param filename the basename of the file to access
+	 * Returns the complete filename to access an iteration-file with the given
+	 * basename.
+	 * 
+	 * @param filename
+	 *            the basename of the file to access
 	 * @return complete path and filename to a file in a iteration directory
 	 */
 	public static final String getIterationFilename(final String filename) {
@@ -1083,37 +1176,42 @@ public class Controler {
 	}
 
 	/**
-	 * Returns the complete filename to access an iteration-file with the given basename.
-	 *
-	 * @param filename the basename of the file to access
-	 * @param iteration the iteration to which the path of the file should point
+	 * Returns the complete filename to access an iteration-file with the given
+	 * basename.
+	 * 
+	 * @param filename
+	 *            the basename of the file to access
+	 * @param iteration
+	 *            the iteration to which the path of the file should point
 	 * @return complete path and filename to a file in a iteration directory
 	 */
 	public static final String getIterationFilename(final String filename, final int iteration) {
 		return getIterationPath(iteration) + "/" + iteration + "." + filename;
 	}
-	
+
 	/**
-	 * @param filename the basename of the file to access
-	 * @return complete path to filename prefixed with the runId in the controler config module (if set) 
-	 * to a file in the output-directory
-	 */	
-	public final String getNameForOutputFilename(String filename){
+	 * @param filename
+	 *            the basename of the file to access
+	 * @return complete path to filename prefixed with the runId in the
+	 *         controler config module (if set) to a file in the
+	 *         output-directory
+	 */
+	public final String getNameForOutputFilename(String filename) {
 		StringBuilder s = new StringBuilder(outputPath);
 		s.append('/');
-		if (this.config.controler().getRunId() != null){
+		if (this.config.controler().getRunId() != null) {
 			s.append(this.config.controler().getRunId());
 			s.append('.');
 		}
 		s.append(filename);
 		return s.toString();
 	}
-	
 
 	/**
 	 * Returns the complete filename to access a file in the output-directory.
-	 *
-	 * @param filename the basename of the file to access
+	 * 
+	 * @param filename
+	 *            the basename of the file to access
 	 * @return complete path and filename to a file in the output-directory
 	 */
 	public static final String getOutputFilename(final String filename) {
@@ -1135,7 +1233,8 @@ public class Controler {
 	 * implemented as a ControlerListener, to keep the structure of the
 	 * Controler as simple as possible.
 	 */
-	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ShutdownListener {
+	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener,
+			ShutdownListener {
 
 		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
 
@@ -1146,11 +1245,12 @@ public class Controler {
 		public void notifyStartup(final StartupEvent event) {
 			final Controler c = event.getControler();
 			// make sure all routes are calculated.
-			ParallelPersonAlgorithmRunner.run(c.getPopulation(), c.config.global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-				public AbstractPersonAlgorithm getPersonAlgorithm() {
-					return new PersonPrepareForSim(c.getRoutingAlgorithm(), c.getNetwork());
-				}
-			});
+			ParallelPersonAlgorithmRunner.run(c.getPopulation(), c.config.global().getNumberOfThreads(),
+					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+						public AbstractPersonAlgorithm getPersonAlgorithm() {
+							return new PersonPrepareForSim(c.getRoutingAlgorithm(), c.getNetwork());
+						}
+					});
 		}
 
 		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -1161,14 +1261,14 @@ public class Controler {
 			if ((controler.writeEventsInterval > 0) && (event.getIteration() % controler.writeEventsInterval == 0)) {
 				for (EventsFileFormat format : controler.config.controler().getEventsFileFormats()) {
 					switch (format) {
-						case txt:
-							this.eventWriters.add(new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS_TXT)));
-							break;
-						case xml:
-							this.eventWriters.add(new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML)));
-							break;
-						default:
-							log.warn("Unknown events file format specified: " + format.toString() + ".");
+					case txt:
+						this.eventWriters.add(new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS_TXT)));
+						break;
+					case xml:
+						this.eventWriters.add(new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML)));
+						break;
+					default:
+						log.warn("Unknown events file format specified: " + format.toString() + ".");
 					}
 				}
 				for (EventWriter writer : this.eventWriters) {
@@ -1210,9 +1310,8 @@ public class Controler {
 			if (controler.legTimes != null) {
 				controler.legTimes.writeStats(getIterationFilename("tripdurations.txt"));
 				// - print averages in log
-				log.info("[" + iteration + "] average trip duration is: "
-						+ (int)controler.legTimes.getAverageTripDuration() + " seconds = "
-						+ Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
+				log.info("[" + iteration + "] average trip duration is: " + (int) controler.legTimes.getAverageTripDuration()
+						+ " seconds = " + Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 			}
 		}
 
@@ -1221,12 +1320,13 @@ public class Controler {
 				writer.closeFile();
 			}
 		}
-		
+
 	}
 
-	/* ===================================================================
-	 * main
-	 * =================================================================== */
+	/*
+	 * =================================================================== main
+	 * ===================================================================
+	 */
 
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -1240,7 +1340,6 @@ public class Controler {
 		System.exit(0);
 	}
 
-	
 	public List<QueueSimulationListener> getQueueSimulationListener() {
 		return this.queueSimulationListener;
 	}
