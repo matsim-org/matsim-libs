@@ -20,7 +20,7 @@ import playground.johannes.teach.telematics.Homework2;
  */
 public class FindNashGG {
 
-	private static double maxError = 1400;
+//	private static double maxError = 1400;
 	
 	private static double STEP = 100;
 	

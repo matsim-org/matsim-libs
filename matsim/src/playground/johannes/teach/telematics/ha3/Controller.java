@@ -38,6 +38,12 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.api.experimental.population.Person;
@@ -58,13 +64,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -239,15 +239,15 @@ public class Controller extends WithindayControler {
 		}
 	}
 	
-	public static class RouteTTObserver implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
+	public static class RouteTTObserver implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
 
-		private Set<Person> route1;
+		private Set<Id> route1;
 		
-		private Set<Person> route2;
+		private Set<Id> route2;
 		
-		private TObjectDoubleHashMap<Person> personTTs;
+		private TObjectDoubleHashMap<Id> personTTs;
 		
-		private TObjectDoubleHashMap<Person> departureTimes;
+		private TObjectDoubleHashMap<Id> departureTimes;
 		
 		private BufferedWriter writer;
 		
@@ -276,30 +276,30 @@ public class Controller extends WithindayControler {
 			this.reset(0);
 		}
 		
-		public void handleEvent(AgentDepartureEvent event) {
-			departureTimes.put(event.getPerson(), event.getTime());
+		public void handleEvent(BasicAgentDepartureEvent event) {
+			departureTimes.put(event.getPersonId(), event.getTime());
 		}
 
 		public void reset(int iteration) {
-			route1 = new HashSet<Person>();
-			route2 = new HashSet<Person>();
-			personTTs = new TObjectDoubleHashMap<Person>();
-			departureTimes = new TObjectDoubleHashMap<Person>();
+			route1 = new HashSet<Id>();
+			route2 = new HashSet<Id>();
+			personTTs = new TObjectDoubleHashMap<Id>();
+			departureTimes = new TObjectDoubleHashMap<Id>();
 		}
 
-		public void handleEvent(AgentArrivalEvent event) {
-			double depTime = departureTimes.get(event.getPerson());
+		public void handleEvent(BasicAgentArrivalEvent event) {
+			double depTime = departureTimes.get(event.getPersonId());
 			if(depTime == 0)
 				throw new RuntimeException("Agent departure time not found!");
 			
-			personTTs.put(event.getPerson(), event.getTime() - depTime);
+			personTTs.put(event.getPersonId(), event.getTime() - depTime);
 		}
 
-		public void handleEvent(LinkEnterEvent event) {
+		public void handleEvent(BasicLinkEnterEvent event) {
 			if(event.getLinkId().toString().equals("4")) {
-				route1.add(event.getPerson());
+				route1.add(event.getPersonId());
 			} else if(event.getLinkId().toString().equals("5")) {
-				route2.add(event.getPerson());
+				route2.add(event.getPersonId());
 			}
 		}
 
@@ -350,10 +350,10 @@ public class Controller extends WithindayControler {
 			TDoubleArrayList unguidedTTs = new TDoubleArrayList();
 			TDoubleArrayList guidedTTs = new TDoubleArrayList();
 			
-			for(Person p : route1) {
+			for(Id p : route1) {
 				route1TTs.add(personTTs.get(p));
 			}
-			for(Person p : route2) {
+			for(Id p : route2) {
 				route2TTs.add(personTTs.get(p));
 			}
 			
@@ -361,10 +361,10 @@ public class Controller extends WithindayControler {
 			avr_route2TTs = StatUtils.mean(route2TTs.toNativeArray());
 			
 			for(Person p : factory.getGuidedPersons())
-				guidedTTs.add(personTTs.get(p));
+				guidedTTs.add(personTTs.get(p.getId()));
 			
 			for(Person p : factory.getUnguidedPersons())
-				unguidedTTs.add(personTTs.get(p));
+				unguidedTTs.add(personTTs.get(p.getId()));
 			
 			avr_guidedTTs = StatUtils.mean(guidedTTs.toNativeArray());
 			avr_unguidedTTs = StatUtils.mean(unguidedTTs.toNativeArray());

@@ -39,6 +39,12 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -53,14 +59,8 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
@@ -219,15 +219,15 @@ public class Homework2 extends Controler {
 		}
 	}
 	
-	public static class RouteTTObserver implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
+	public static class RouteTTObserver implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
 
-		private Set<PersonImpl> route1;
+		private Set<Id> route1;
 		
-		private Set<PersonImpl> route2;
+		private Set<Id> route2;
 		
-		private TObjectDoubleHashMap<PersonImpl> personTTs;
+		private TObjectDoubleHashMap<Id> personTTs;
 		
-		private TObjectDoubleHashMap<PersonImpl> departureTimes;
+		private TObjectDoubleHashMap<Id> departureTimes;
 		
 		private BufferedWriter writer;
 		
@@ -250,30 +250,30 @@ public class Homework2 extends Controler {
 			this.reset(0);
 		}
 		
-		public void handleEvent(AgentDepartureEvent event) {
-			departureTimes.put(event.getPerson(), event.getTime());
+		public void handleEvent(BasicAgentDepartureEvent event) {
+			departureTimes.put(event.getPersonId(), event.getTime());
 		}
 
 		public void reset(int iteration) {
-			route1 = new HashSet<PersonImpl>();
-			route2 = new HashSet<PersonImpl>();
-			personTTs = new TObjectDoubleHashMap<PersonImpl>();
-			departureTimes = new TObjectDoubleHashMap<PersonImpl>();
+			route1 = new HashSet<Id>();
+			route2 = new HashSet<Id>();
+			personTTs = new TObjectDoubleHashMap<Id>();
+			departureTimes = new TObjectDoubleHashMap<Id>();
 		}
 
-		public void handleEvent(AgentArrivalEvent event) {
-			double depTime = departureTimes.get(event.getPerson());
+		public void handleEvent(BasicAgentArrivalEvent event) {
+			double depTime = departureTimes.get(event.getPersonId());
 			if(depTime == 0)
 				throw new RuntimeException("Agent departure time not found!");
 			
-			personTTs.put(event.getPerson(), event.getTime() - depTime);
+			personTTs.put(event.getPersonId(), event.getTime() - depTime);
 		}
 
-		public void handleEvent(LinkEnterEvent event) {
+		public void handleEvent(BasicLinkEnterEvent event) {
 			if(event.getLinkId().toString().equals("4")) {
-				route1.add(event.getPerson());
+				route1.add(event.getPersonId());
 			} else if(event.getLinkId().toString().equals("5")) {
-				route2.add(event.getPerson());
+				route2.add(event.getPersonId());
 			}
 		}
 
@@ -310,10 +310,10 @@ public class Homework2 extends Controler {
 			TDoubleArrayList route1TTs = new TDoubleArrayList();
 			TDoubleArrayList route2TTs = new TDoubleArrayList();
 			
-			for(PersonImpl p : route1) {
+			for(Id p : route1) {
 				route1TTs.add(personTTs.get(p));
 			}
-			for(PersonImpl p : route2) {
+			for(Id p : route2) {
 				route2TTs.add(personTTs.get(p));
 			}
 			
