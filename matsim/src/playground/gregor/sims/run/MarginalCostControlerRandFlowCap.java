@@ -45,7 +45,7 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 		super.setUp();
 		
 		
-		LinkFlowCapRandomizer lr = new LinkFlowCapRandomizer(this.network, this.c, 0.);
+//		LinkFlowCapRandomizer lr = new LinkFlowCapRandomizer(this.network, this.c, 0.);
 		
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
@@ -56,7 +56,7 @@ public class MarginalCostControlerRandFlowCap extends Controler{
 		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
 		this.strategyManager = loadStrategyManager();
 		this.addControlerListener(sc);
-		this.addControlerListener(lr);
+//		this.addControlerListener(lr);
 	}
 
 	public static void main(final String[] args) {
