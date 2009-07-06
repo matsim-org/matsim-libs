@@ -20,28 +20,35 @@ import playground.johannes.teach.telematics.Homework2;
  */
 public class FindNashGG {
 
-	private static double maxError = 100;
+	private static double maxError = 1400;
 	
 	private static double STEP = 100;
 	
-	private static Random random = new Random(0);
+	private static Random random = new Random(1);
 	
 //	private static double numRoutes = 2;
+	
+	private static String baseDir;
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/fearonni/vsp-work/teach/telematik/dynamic-guidance/results.txt"));
+		baseDir = args[0];
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(baseDir + "results.txt"));
 		writer.write("tt_pred_1\ttt_pred_2\ttt_real_1\ttt_real_2\terror\taccepted");
 		writer.newLine();
+		
+		for(int j = 0; j < 500; j++) {
 		
 		double error_i = Double.MAX_VALUE;
 		double error_iminus1 = Double.MAX_VALUE;
 		
-		double[] tt_pred_i = new double[]{470, 470};
+		double[] tt_pred_i = new double[]{random.nextInt(1000)+432, random.nextInt(1000)+432};
 		double[] tt_pred_last = new double[2];
-		while(error_i > maxError) {
+		for(int i = 0; i < 200; i++) {
+//		while(error_i > maxError) {
 			/*
 			 * run the mobility simulation
 			 */
@@ -68,22 +75,33 @@ public class FindNashGG {
 			writer.write("\t");
 			writer.write(Double.toString(error_i));
 			writer.write("\t");
-			/*
-			 * check if we improved
-			 */
-			if(error_i > error_iminus1) {
+//			/*
+//			 * check if we improved
+//			 */
+//			if(error_i > error_iminus1) {
+//				tt_pred_i[0] = tt_pred_last[0];
+//				tt_pred_i[1] = tt_pred_last[1];
+//				
+//				writer.write("no");
+//			} else {
+//				writer.write("yes");
+//			}
+//			writer.newLine();
+//			writer.flush();
+//			/*
+//			 * remember this prediction
+//			 */
+//			tt_pred_last[0] = tt_pred_i[0];
+//			tt_pred_last[1] = tt_pred_i[1];
+			
+			double p = 1 - (error_i / (error_i + error_iminus1));
+			if(random.nextDouble() < p) {
+				writer.write("yes");
+			} else {
 				tt_pred_i[0] = tt_pred_last[0];
 				tt_pred_i[1] = tt_pred_last[1];
-				
 				writer.write("no");
-			} else {
-				writer.write("yes");
 			}
-			writer.newLine();
-			writer.flush();
-			/*
-			 * remember this prediction
-			 */
 			tt_pred_last[0] = tt_pred_i[0];
 			tt_pred_last[1] = tt_pred_i[1];
 			/*
@@ -101,14 +119,24 @@ public class FindNashGG {
 //			} else {
 //				tt_pred_i[k] = tt_pred_i[k] - STEP;
 //			}
-			STEP = 100;//Math.pow(error_i, 1.0)/10000.0;
+//			STEP = 100;//Math.pow(error_i, 1.0)/10000.0;
+			STEP = error_i/1000.0;
+			 
 			tt_pred_i[k] = tt_pred_i[k] + ((random.nextDouble() * 2 * STEP) - STEP);
+			
+			while(tt_pred_i[0] < 432 || tt_pred_i[1] < 432) {
+				tt_pred_i[k] = tt_pred_i[k] + ((random.nextDouble() * 2 * STEP) - STEP);
+			}
+			
+			writer.newLine();
+			writer.flush();
+		}
 		}
 		writer.close();
 	}
 	
 	private static Tuple<double[], double[]> runMobsim(double[] prediction) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/fearonni/vsp-work/teach/telematik/dynamic-guidance/matsim/prediction.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(baseDir + "matsim/prediction.txt"));
 		writer.write("tt_pred_1\ttt_pred_2");
 		writer.newLine();
 		writer.write(Double.toString(prediction[0]));
@@ -118,13 +146,13 @@ public class FindNashGG {
 		/*
 		 * run matsim
 		 */
-		Homework2.main(new String[]{"/Users/fearonni/vsp-work/teach/telematik/dynamic-guidance/matsim/config.ha2.xml"});
+		Homework2.main(new String[]{baseDir + "matsim/config.ha2.xml"});
 		/*
 		 * read results
 		 */
 		double[] tt_real = new double[2];
 		double[] n_real = new double[2];
-		BufferedReader reader = new BufferedReader(new FileReader("/Users/fearonni/vsp-work/teach/telematik/dynamic-guidance/matsim/output/routeTravelTimes.txt"));
+		BufferedReader reader = new BufferedReader(new FileReader(baseDir + "matsim/output/routeTravelTimes.txt"));
 		reader.readLine();
 		String line = reader.readLine();
 //		while((line = reader.readLine()) != null) {

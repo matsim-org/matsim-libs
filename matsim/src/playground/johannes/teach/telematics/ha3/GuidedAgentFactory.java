@@ -21,36 +21,30 @@
 /**
  * 
  */
-package playground.johannes.eut;
+package playground.johannes.teach.telematics.ha3;
 
-import java.io.BufferedWriter;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;
 import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
+import playground.johannes.eut.ForceReplan;
+import playground.johannes.eut.PreventReplan;
+import playground.johannes.itsc08.ReactRouteGuidance;
+
 /**
  * @author illenberger
  *
  */
-public class GuidedAgentFactory extends WithindayAgentLogicFactory implements IterationStartsListener{
+public class GuidedAgentFactory extends WithindayAgentLogicFactory {// implements IterationStartsListener{
 
 	private final double equipmentFraction;
 	
@@ -62,17 +56,12 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 	
 	private Random random;
 	
-	private EUTRouterAnalyzer analyzer;
+	private Set<Person> guidedPersons;
 	
-	private BenefitAnalyzer benefitAnalyzer;
-	
-	private BufferedWriter writer;
-	
-	private Set<PersonImpl> guidedPersons;
-	
-	private Map<PersonImpl, PlanImpl> selectedPlans;
+	private Set<Person> unguidedPersons;
 	
 	private long randomSeed;
+//	private Map<Person, Plan> selectedPlans;
 	
 	/**#
 	 * @param network
@@ -86,34 +75,18 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 		this.randomSeed = randomSeed;
 	}
 
-	public void setRouteAnalyzer(EUTRouterAnalyzer analyzer) {
-		this.analyzer = analyzer;
-	}
-	
-	public void setBenefitAnalyzer(BenefitAnalyzer benefitAnalyzer) {
-		this.benefitAnalyzer = benefitAnalyzer;
-	}
-	
 	@Override
 	public AgentContentment createAgentContentment(WithindayAgent agent) {
-		selectedPlans = new HashMap<PersonImpl, PlanImpl>();
+//		selectedPlans = new HashMap<Person, Plan>();
 		random.nextDouble();
 		if(random.nextDouble() < equipmentFraction) {
-			if(analyzer != null)
-				analyzer.addGuidedPerson(agent.getPerson());
-			if(benefitAnalyzer != null)
-				benefitAnalyzer.addGuidedPerson(agent.getPerson());
-			try {
-				writer.write(agent.getPerson().getId().toString());
-				writer.newLine();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 			guidedPersons.add(agent.getPerson());
-			selectedPlans.put(agent.getPerson(), agent.getPerson().getSelectedPlan());
+//			selectedPlans.put(agent.getPerson(), agent.getPerson().getSelectedPlan());
 			return forceReplan;
-		} else
+		} else {
+			unguidedPersons.add(agent.getPerson());
 			return preventReplan;
+		}
 	}
 
 	@Override
@@ -121,34 +94,26 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 		return router;
 	}
 	
-	public Set<PersonImpl> getGuidedPersons() {
+	public Set<Person> getGuidedPersons() {
 		return guidedPersons;
+	}
+	
+	public Set<Person> getUnguidedPersons() {
+		return unguidedPersons;
 	}
 
 	public void reset() {
-		try {
-			if (writer != null)
-				writer.close();
-
-			writer = IOUtils.getBufferedWriter(Controler
-					.getIterationFilename("guidedPersons.txt"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		random = new Random(randomSeed);
-		guidedPersons = new HashSet<PersonImpl>();
+		guidedPersons = new HashSet<Person>();
+		unguidedPersons = new HashSet<Person>();
 	}
 
-//	public void notifyAfterMobsim(AfterMobsimEvent event) {
-//		
+//	public void notifyIterationStarts(IterationStartsEvent event) {
+//		if (selectedPlans != null) {
+//			for (Person person : selectedPlans.keySet()) {
+//				person.exchangeSelectedPlan(selectedPlans.get(person), false);
+//			}
+//		}
 //	}
-
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (selectedPlans != null) {
-			for (PersonImpl person : selectedPlans.keySet()) {
-				person.exchangeSelectedPlan(selectedPlans.get(person), false);
-			}
-		}
-	}
 
 }

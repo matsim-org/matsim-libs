@@ -182,7 +182,7 @@ public class EstimReactiveLinkTT implements
 
 			int deltaT = time - this.lastEvent;
 			this.lastEvent = time;
-			if(deltaT > 4) {
+			if(deltaT > 10) {
 //				this.currentOutFlow = this.outCount/(double)deltaT;
 				
 				this.outCount = 0;

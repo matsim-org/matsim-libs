@@ -25,6 +25,8 @@ package playground.johannes.socialnetworks.graph.spatial.io;
 
 import java.awt.Color;
 
+import jj2000.j2k.roi.MaxShiftSpec;
+
 import net.opengis.kml._2.BoundaryType;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -79,13 +81,23 @@ public class SpatialGridKMLWriter {
 		double maxVal = - Double.MAX_VALUE;
 		for(int row = 0; row < grid.getNumRows(); row++) {
 			for(int col = 0; col < grid.getNumCols(row); col++) {
-				double val = grid.getValue(row, col);
-				minVal = Math.min(minVal, val);
-				maxVal = Math.max(maxVal, val);
+				Double val = grid.getValue(row, col);
+				if(val != null) {
+					minVal = Math.min(minVal, val);
+					maxVal = Math.max(maxVal, val);
+				}
 			}
 		}
-		double binSize = 1000.0;
-		double numBins = (int) Math.ceil(maxVal/binSize);
+		
+		System.out.println("Min score = " + minVal + ", max socre = "+maxVal);
+		
+		minVal = 100;
+		maxVal = 250;
+		double binSize = 1.0;
+		double numBins = (int) Math.ceil((maxVal - minVal)/binSize);
+		
+		System.out.println("num bins = " + numBins);
+		
 		StyleType[] polySytleTypes = new StyleType[(int) numBins];
 		for(int i = 0; i < numBins; i++) {
 			PolyStyleType polyStyleType = objectFactory.createPolyStyleType();
@@ -126,8 +138,16 @@ public class SpatialGridKMLWriter {
 				
 				PlacemarkType polyPlacemarkType = objectFactory.createPlacemarkType();
 				polyPlacemarkType.setAbstractGeometryGroup(objectFactory.createPolygon(polygonType));
-				polyPlacemarkType.setStyleUrl(polySytleTypes[(int)Math.floor(grid.getValue(row, col)/binSize)].getId());
-				polyPlacemarkType.setName(String.valueOf(grid.getValue(row, col)));
+				Double val = grid.getValue(row, col);
+				if(val != null) {
+					int bin = (int)Math.floor((val - minVal)/binSize);
+					bin = (int) Math.min(bin, maxVal-minVal) - 1;
+					bin = (int) Math.max(bin, 0);
+					
+					polyPlacemarkType.setStyleUrl(polySytleTypes[bin].getId());
+					polyPlacemarkType.setName(String.valueOf(val));
+				}
+				
 				
 				polyFolderType.getAbstractFeatureGroup().add(objectFactory.createPlacemark(polyPlacemarkType));
 				

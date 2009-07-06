@@ -40,6 +40,7 @@ import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -49,8 +50,40 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 
 	private Map<Ego<?>, String> styleIds = new HashMap<Ego<?>, String>();
 	
+//	private Distribution distribution = new Distribution();
+	
+	private double minValue = - Double.MAX_VALUE;
+	
+	private double maxValue = Double.MAX_VALUE;
+	
+	private double descretization = 1.0;
+	
 	public KMLScoreColorizer(LinkType vertexIconLink) {
 		super(vertexIconLink);
+	}
+
+	public double getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(double minValue) {
+		this.minValue = minValue;
+	}
+
+	public double getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(double maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public double getDescretization() {
+		return descretization;
+	}
+
+	public void setDescretization(double descretization) {
+		this.descretization = descretization;
 	}
 
 	@Override
@@ -65,10 +98,15 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 				if(score != null)
 					sum += score; 	
 			}
-			int val = (int) (sum/person.getPlans().size());
-			values.put(val, String.valueOf(val));
+			double avr = sum/person.getPlans().size();
+			avr = Math.min(avr, maxValue);
+			avr = Math.max(avr, minValue);
+			avr = Math.floor(avr/descretization) * descretization;
+			values.put(avr, String.valueOf(avr));
 			
-			styleIds.put(ego, String.valueOf(val));
+			styleIds.put(ego, String.valueOf(avr));
+			
+//			distribution.add(val);
 		}
 		
 		return values;
@@ -89,7 +127,12 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		KMLWriter writer = new KMLWriter();
 		writer.setDrawEdges(false);
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
-		writer.setVertexStyle(new KMLScoreColorizer(writer.getVertexIconLink()));
+		KMLScoreColorizer colorizer = new KMLScoreColorizer(writer.getVertexIconLink());
+		colorizer.setMaxValue(250);
+		colorizer.setMinValue(100);
+		writer.setVertexStyle(colorizer);
 		writer.write(socialnet, "/Users/fearonni/vsp-work/runs-svn/run669/scores.kmz");
+		
+//		Distribution.writeHistogram(colorizer.distribution.absoluteDistribution(), "/Users/fearonni/vsp-work/runs-svn/run669/sorces.hist");
 	}
 }

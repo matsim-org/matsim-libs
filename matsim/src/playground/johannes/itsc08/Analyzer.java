@@ -100,8 +100,11 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	
 //	private BufferedWriter arrivalTimeWriter;
 	
-	public Analyzer(Controler controler) {
+	private IncidentGenerator inicidents;
+	
+	public Analyzer(Controler controler, IncidentGenerator incidents) {
 		this.controler = controler;
+		this.inicidents = incidents;
 	}
 
 	
@@ -268,7 +271,10 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		
 		double scoresum = 0;
 		for(PlanImpl p : plans) {
-			scoresum += p.getScore().doubleValue();
+			Double score = p.getScore();
+			if(score == null)
+				score = 0.0;
+			scoresum += score.doubleValue();
 		}
 		double result = scoresum/(double)plans.size();
 		if(Double.isNaN(result))
@@ -314,7 +320,8 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			traveltimes.put(event.getPerson(), triptime);
 			if (((NetworkRoute) ((LegImpl)event.getPerson().getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
-				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
+//				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
+				if(inicidents.isBadDay()) {
 					// bad day
 					addTravelTime(riskyBadTripTimes, (int)e.getTime(), triptime);
 				} else {

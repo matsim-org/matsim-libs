@@ -25,6 +25,7 @@ package playground.johannes.itsc08;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -48,8 +49,13 @@ public class IncidentGenerator implements StartupListener, BeforeMobsimListener 
 
 	private double capacityFactor;
 	
-	public IncidentGenerator(double capacityFactor) {
+	private Random random;
+	
+	private boolean isBadDay;
+	
+	public IncidentGenerator(double capacityFactor, long rndSeed) {
 		this.capacityFactor = capacityFactor;
+		random = new Random(rndSeed);
 	}
 	
 	public void notifyStartup(StartupEvent event) {
@@ -63,10 +69,18 @@ public class IncidentGenerator implements StartupListener, BeforeMobsimListener 
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {	
 		if(event.getIteration() > -1) {
-			if(event.getIteration() % 2 == 0)
+//			if(event.getIteration() % 2 == 0)
+			if(random.nextDouble() <= 0.5) {
 				event.getControler().getNetwork().setNetworkChangeEvents(badEvents);
-			else
+				isBadDay = true;
+			} else {
+				isBadDay = false;
 				event.getControler().getNetwork().setNetworkChangeEvents(emptyEvents);
+			}
 		}
 	}	
+	
+	public boolean isBadDay() {
+		return isBadDay;
+	}
 }

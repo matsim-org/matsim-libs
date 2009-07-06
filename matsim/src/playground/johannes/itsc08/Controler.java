@@ -73,10 +73,10 @@ public class Controler extends WithindayControler {
 
 	@Override
 	protected void setUp() {
-		IncidentGenerator i = new IncidentGenerator(Double.parseDouble(config.getParam("eut", "capacityFactor")));
+		IncidentGenerator i = new IncidentGenerator(Double.parseDouble(config.getParam("eut", "capacityFactor")), config.global().getRandomSeed());
 		this.addControlerListener(i);
 		
-		Analyzer analyzer = new Analyzer(this);
+		Analyzer analyzer = new Analyzer(this, i);
 		this.addControlerListener(analyzer);
 		this.equipmentFraction = string2Double(config.getParam("eut", "alpha"));
 		super.setUp();
@@ -126,7 +126,7 @@ public class Controler extends WithindayControler {
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
-			Controler.this.factory = new GuidedAgentFactory(Controler.this.network, Controler.this.config.charyparNagelScoring(), Controler.this.reactTTs, Controler.this.equipmentFraction);
+			Controler.this.factory = new GuidedAgentFactory(Controler.this.network, Controler.this.config.charyparNagelScoring(), Controler.this.reactTTs, Controler.this.equipmentFraction, config.global().getRandomSeed());
 
 		}
 
