@@ -33,7 +33,7 @@ public class LogicIntoPlainTranslator {
 		this.plainNet= plainNetwork;
 		this.logicToPlainStopMap = logicToPlanStopMap;
 		
-		/**creates the JoiningLinkMa, it contains fromNode and toNode as keys, and the link between them as value */
+		/**creates the JoiningLinkMap, it contains fromNode and toNode as keys, and the link between them as value */
 		int linkNum = plainNet.getLinks().size();
 		joiningLinkMap = MultiKeyMap.decorate(new LRUMap(linkNum));
 		for (LinkImpl plainLink : plainNet.getLinks().values()){
@@ -69,7 +69,7 @@ public class LogicIntoPlainTranslator {
 		return standardLink;
 	}
 
-	private List<LinkImpl> convertToPlain(List<LinkImpl> logicLinks){
+	public List<LinkImpl> convertToPlain(List<LinkImpl> logicLinks){
 		List<LinkImpl> plainLinks  = new ArrayList<LinkImpl>();
 		for (LinkImpl logicLink: logicLinks){
 			LinkImpl plainLink= convertToPlain(logicLink);
@@ -100,6 +100,27 @@ public class LogicIntoPlainTranslator {
 	public List<LegImpl> convertToPlainLeg (List<LegImpl> logicLegList){
 		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
 		for(LegImpl logicLeg : logicLegList){
+			NetworkRoute logicRoute= (NetworkRoute)logicLeg.getRoute();
+			List<LinkImpl> plainLinks = convertToPlain(logicRoute.getLinks());
+			
+			//if(plainLinks.size()>0){
+				NetworkRoute plainRoute = new LinkNetworkRoute(null, null);
+				plainRoute.setLinks(null, plainLinks, null);
+				
+				LegImpl plainLeg = new LegImpl(logicLeg.getMode());
+				plainLeg = logicLeg;
+				plainLeg.setRoute(plainRoute);
+				plainLegList.add(plainLeg);
+				logicLeg.setRoute(plainRoute);
+			//}
+		}
+		logicLegList = null;
+		return plainLegList;
+	}
+	
+	public List<LegImpl> convertToPlainLegORIGINAL (List<LegImpl> logicLegList){
+		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
+		for(LegImpl logicLeg : logicLegList){
 			NetworkRoute logicNetworkRoute= (NetworkRoute)logicLeg.getRoute();
 			List<LinkImpl> plainLinkList = new ArrayList<LinkImpl>();
 			
@@ -108,7 +129,7 @@ public class LogicIntoPlainTranslator {
 					plainLinkList.add(link);
 			}
 			if(plainLinkList.size()>0){
-				NetworkRoute plainRoute = new LinkNetworkRoute(null, null); 
+				NetworkRoute plainRoute = new LinkNetworkRoute(null, null);
 				plainRoute.setLinks(null, plainLinkList, null);
 				
 				LegImpl plainLeg = new LegImpl(TransportMode.pt);

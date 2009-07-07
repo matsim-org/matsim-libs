@@ -10,6 +10,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.xml.sax.SAXException;
 import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
@@ -22,8 +23,8 @@ import playground.mmoyo.PTRouter.PTRouter2;
  * This class contains the options to route with a TransitSchedule object 
  */
 public class Main {
-	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
-	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
+	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
+	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
 	private static final String PLANFILE = PATH + "plans.xml";
 	private static final String OUTPUTPLANS = PATH + "output_plans_with_Transit.xml";
@@ -50,10 +51,11 @@ public class Main {
 			e.printStackTrace();
 		}
 		/*******************************************************/
+	
 		
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		
-		int option =3;
+		int option =1;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -84,7 +86,7 @@ public class Main {
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.printPTLegs(transitSchedule);
 				break;
-				
+
 			case 5: //creates GIS net from plainNetwork*/
 				/*
 				plainNet=logicFactory.getPlainNet();
@@ -92,9 +94,18 @@ public class Main {
 				nodes2ESRIShape.write();
 				*/
 				break;
-		
+				
+			case 6:
+				//agent 35420 
+				NodeImpl node1 = plainNet.getNode("299598");
+				NodeImpl node2 = plainNet.getNode("8503006");
+				double distance = CoordUtils.calcDistance(node1.getCoord(), node2.getCoord());
+				System.out.println(distance);
+				//-->check if they nodes are joined by  detTransfer link 
+				break;
 
-		
+				
+				
 		}
 	}
 }

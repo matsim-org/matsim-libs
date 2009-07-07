@@ -80,7 +80,7 @@ public class LogicFactory{
 					//Create nodes
 					Coord coord = transitStopFacility.getCoord();
 					Id idStopFacility = transitStopFacility.getId();  
-					Id logicalId= createLogicalId(idStopFacility, transitRoute.getId()); 
+					Id logicalId= createLogicalId(idStopFacility, transitLine.getId()); 
 					NodeImpl logicNode= logicNet.createNode(logicalId, coord);
 					NodeImpl plainNode= createPlainNode(transitStopFacility);
 					logicToPlanStopMap.put(logicNode.getId(), plainNode);
@@ -123,7 +123,7 @@ public class LogicFactory{
 		createDetachedTransferLinks(400);
 	}
 	
-	//Created a new id for a new node. Besides important values are stores in logicStopMap. */ 
+	//Created a new id for a new node. the nodeLinMap stores the transitLine of each node. */ 
 	private Id createLogicalId(final Id idStopFacility, final Id lineId){
 		Id newId = new IdImpl(newStopId++);
 		nodeLineMap.put(newId, lineId);
@@ -133,11 +133,13 @@ public class LogicFactory{
 	private void createTransferLinks(){
 		for (List<NodeImpl> chList : facilityNodeMap.values()) 
 			for (NodeImpl fromNode : chList) 
-				for (NodeImpl toNode : chList) 
-					if (!fromNode.equals(toNode) && willJoin2StandardLinks(fromNode, toNode)){
+				for (NodeImpl toNode : chList){ 
+					boolean belongToSameLine = nodeLineMap.get(fromNode.getId()) == nodeLineMap.get(toNode.getId());
+					if (!belongToSameLine && !fromNode.equals(toNode)  && willJoin2StandardLinks(fromNode, toNode)){
 						Id idNewLink = new IdImpl("T" + ++newLinkId);
 						createLogicLink(idNewLink, fromNode, toNode, "Transfer");
 					}
+				}
 		facilityNodeMap = null;
 	}
 	

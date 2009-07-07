@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(RouterTest.class);
+		suite.addTestSuite(PTRouterTest.class);
 
 		return suite;
 	}

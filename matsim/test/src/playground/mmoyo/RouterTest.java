@@ -79,6 +79,7 @@ public class RouterTest extends MatsimTestCase {
 	}
 	
 	
+	
 	public void testWithVerySimpleTransitSchedule() throws SAXException, ParserConfigurationException, IOException {
 		/* for integration into MATSim, the following must work */
 		
@@ -118,4 +119,6 @@ public class RouterTest extends MatsimTestCase {
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(TransportMode.walk, legs.get(2).getMode());
 	}
+	
+	
 }

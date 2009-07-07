@@ -116,8 +116,9 @@ public class PTActWriter {
 	public void printPTLegs(final TransitSchedule transitSchedule){
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
 		
-		for (PersonImpl person: this.population.getPersons().values()) {
-			//Person person = population.getPersons().get(new IdImpl("2180188"));
+		//for (PersonImpl person: this.population.getPersons().values()) {
+		if (true){	
+			PersonImpl person = population.getPersons().get(new IdImpl("2180188"));
 	
 			PlanImpl plan = person.getPlans().get(0);
 	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
@@ -125,13 +126,14 @@ public class PTActWriter {
 			List<LegImpl> legList = transitRouteFinder.calculateRoute (act1, act2, person);
 			
 			for (LegImpl leg : legList){
-				NetworkRoute netRoute= (NetworkRoute) leg.getRoute(); 
+				NetworkRoute networkRoute = (NetworkRoute)leg.getRoute(); 
 				System.out.println(" ");
 				System.out.println(leg.toString());
 				
-				for (NodeImpl node : netRoute.getNodes()){
-					System.out.print(node.getId() + " " );
-				}
+				System.out.print(networkRoute);
+				//for (NodeImpl node : networkRoute.getNodes()){
+				//	System.out.print(node.getId() + " " );
+				//}
 			}
 		}
 	}
@@ -150,7 +152,7 @@ public class PTActWriter {
 		
 		for (PersonImpl person: this.population.getPersons().values()) {
 		//if ( true ) {
-			//Person person = population.getPersons().get(new IdImpl("3246022")); // 5636428  2949483 
+			//PersonImpl person = population.getPersons().get(new IdImpl("35420")); // 5636428  2949483 
  			System.out.println(numPlans + " id:" + person.getId());
 			PlanImpl plan = person.getPlans().get(0);
 
