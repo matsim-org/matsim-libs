@@ -32,8 +32,8 @@ public class RunRetailerGA {
 
 	public static void main(String[] args) {
 		
-		int genomeLength = 100;
-		int populationSize = 100;
+		int genomeLength = 10;
+		int populationSize = 10;
 		int numberOfGenerations = 1000;
 		double elites = 0.10;
 		double mutants = 0.05;
@@ -54,7 +54,6 @@ public class RunRetailerGA {
 		
 		MyFitnessFunction ff = new MyFitnessFunction(false, genomeLength);
 		RetailerGA ga = new RetailerGA(populationSize, genomeLength, ff, first);
-		ga.generateFirstGeneration();
 		solutionProgress.add(ga.getStats());
 		long tNow = 0;
 		long total = 0;
@@ -69,9 +68,9 @@ public class RunRetailerGA {
 		/*
 		 * Print out the last generation to the console.
 		 */
-//		String out = ga.toString();
-//		System.out.printf(out);
-		System.out.printf("Statistics for crossover type %d:\n", crossoverType);
+		String out = ga.toString();
+		System.out.printf(out);
+		System.out.printf("\nStatistics for crossover type %d:\n", crossoverType);
 		System.out.printf("\t                   Genome length:  %d\n", genomeLength);
 		System.out.printf("\t                 Population size:  %d\n", populationSize);
 		System.out.printf("\t           Number of generations:  %d\n", numberOfGenerations);
@@ -82,7 +81,8 @@ public class RunRetailerGA {
 		 * Print out the solution progress to a file for R-graph.
 		 */
 		DateString ds = new DateString();
-		String fileName = "/Users/johanwjoubert/R-Source/Input/GA-Progress-" + ds.toString() + ".txt";		
+		String fileName = "C:/Documents and Settings/ciarif/My Documents/Francesco/Projects/Agent Based Retailers/Runs/GA-Progress-" + ds.toString() + ".txt";
+		//String fileName = "/Users/johanwjoubert/R-Source/Input/GA-Progress-" + ds.toString() + ".txt";		
 		writeSolutionProgressToFile(solutionProgress, fileName);
 	}
 

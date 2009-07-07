@@ -56,7 +56,7 @@ public class RetailerGA {
 											initialSolution);
 		this.incumbent = this.initialSolution;
 		generation = new ArrayList<RetailerGenome>(populationSize);
-		this.cdf = null;
+		this.generateFirstGeneration();
 	}
 	
 	public void generateFirstGeneration(){
@@ -71,7 +71,6 @@ public class RetailerGA {
 				 * To ensure diversity, each member of the population is at least 5
 				 * swaps from the original genome. This might be too many for short
 				 * genomes, but too FEW for large genomes.
-				 * TODO Check for diversity.
 				 */
 				ArrayList<Integer> newSolution = this.initialSolution.clone();
 				for(int j = 0; j < numberOfMutationsToMutant; j++){
@@ -117,8 +116,7 @@ public class RetailerGA {
 		ArrayList<Integer> strip = permutator.permutate(genomeLength);
 		int pos1 = strip.get(0)-1;
 		int pos2 = strip.get(1)-1;
-		result.set(pos1, genome.get(pos2));
-		result.set(pos2, genome.get(pos1));		
+		Collections.swap(result, pos1, pos2);
 		
 		return result;
 	}
