@@ -42,7 +42,6 @@ import com.sun.opengl.util.BufferUtil;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -55,6 +54,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
@@ -113,7 +113,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		else  this.drivenLinks.put(driven, count + 1);
 	}
 
-	protected List<PlanImpl> getPersonsNOW(Population plans, QueueNetwork net) {
+	protected List<PlanImpl> getPersonsNOW(PopulationImpl plans, QueueNetwork net) {
 		List<PlanImpl> actPersons = new ArrayList<PlanImpl>();
 		QueueLink link = net.getLinks().get(linkId);
 		Collection<QueueVehicle> vehs = link.getAllVehicles();
@@ -122,7 +122,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		return actPersons;
 	}
 
-	protected List<PlanImpl> getPersons(Population plans, QueueNetwork net) {
+	protected List<PlanImpl> getPersons(PopulationImpl plans, QueueNetwork net) {
 		List<PlanImpl> actPersons = new ArrayList<PlanImpl>();
 
 		for (PersonImpl person : plans.getPersons().values()) {
@@ -224,7 +224,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		}
 	}
 	
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		this.drivenLinks = new HashMap<LinkImpl,Integer> ();
 //		QueueLink link = net.getQueueLink(this.linkId);
 //		String start = link.getLink().getFromNode().getId().toString();

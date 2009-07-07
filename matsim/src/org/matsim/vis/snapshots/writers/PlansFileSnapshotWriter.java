@@ -20,13 +20,13 @@
 
 package org.matsim.vis.snapshots.writers;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -48,7 +48,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 
 	private double currenttime = -1;
 
-	private Population plans = null;
+	private PopulationImpl plans = null;
 
 	public PlansFileSnapshotWriter(final String snapshotFilePrefix, final String snapshotFileSuffix){
 		this.filePrefix = snapshotFilePrefix;

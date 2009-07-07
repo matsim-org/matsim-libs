@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -44,6 +43,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
@@ -66,7 +66,7 @@ public class DEQSim extends ExternalMobsim {
 
 	private IterationStopWatch stopwatch = null;
 
-	public DEQSim(final Population population, final Events events) {
+	public DEQSim(final PopulationImpl population, final Events events) {
 		super(population, events);
 	}
 

@@ -48,7 +48,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -86,6 +85,7 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -154,7 +154,7 @@ public class Controler {
 
 	protected Events events = null;
 	protected NetworkLayer network = null;
-	protected Population population = null;
+	protected PopulationImpl population = null;
 	private Counts counts = null;
 	private final NetworkFactory networkFactory = new NetworkFactory(this.network);
 
@@ -296,7 +296,7 @@ public class Controler {
 	 * @param network
 	 * @param population
 	 */
-	public Controler(final Config config, final NetworkLayer network, final Population population) {
+	public Controler(final Config config, final NetworkLayer network, final PopulationImpl population) {
 		this(null, null, config);
 		this.scenarioData = new ScenarioImpl(config);
 		this.scenarioData.setNetwork(network);
@@ -638,10 +638,10 @@ public class Controler {
 	 * because of backward-compatibility with the old Controler class. In
 	 * general, it is recommended to pass a custom network and population using
 	 * the special
-	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
+	 * {@link #Controler(Config, QueueNetwork, PopulationImpl) Constructor}.
 	 * 
 	 * @deprecated Use the constructor
-	 *             {@link #Controler(Config, NetworkLayer, Population)} instead.
+	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)} instead.
 	 * @return The network to be used for the simulation.
 	 */
 	@Deprecated
@@ -656,14 +656,14 @@ public class Controler {
 	 * because of backward-compatibility with the old Controler class. In
 	 * general, it is recommended to pass a custom network and population using
 	 * the special
-	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
+	 * {@link #Controler(Config, QueueNetwork, PopulationImpl) Constructor}.
 	 * 
 	 * @deprecated Use the constructor
-	 *             {@link #Controler(Config, NetworkLayer, Population)} instead.
+	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)} instead.
 	 * @return The population to be used for the simulation.
 	 */
 	@Deprecated
-	protected Population loadPopulation() {
+	protected PopulationImpl loadPopulation() {
 		return this.scenarioData.getPopulation();
 	}
 
@@ -1077,7 +1077,7 @@ public class Controler {
 		return this.network;
 	}
 
-	public final Population getPopulation() {
+	public final PopulationImpl getPopulation() {
 		return this.population;
 	}
 

@@ -27,7 +27,6 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -38,6 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -114,7 +114,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		return vertex;
 	}
 	
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		//Person person = plans.getPerson(this.agentID);
 		String prefix = agentId + "-";
 		

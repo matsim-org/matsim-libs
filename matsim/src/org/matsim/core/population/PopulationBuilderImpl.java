@@ -29,7 +29,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.experimental.population.Route;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -51,7 +50,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 //	private final Scenario scenario;
 
 	@Deprecated
-	public PopulationBuilderImpl(NetworkLayer network, Population population, ActivityFacilities facilities) {
+	public PopulationBuilderImpl(NetworkLayer network, PopulationImpl population, ActivityFacilities facilities) {
 		this.network = network;
 //		this.population = population;
 		this.facilities = facilities;

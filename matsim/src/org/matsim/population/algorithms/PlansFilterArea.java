@@ -25,10 +25,10 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * Filters out plans from persons where none of the act's locations are within
@@ -51,7 +51,7 @@ public class PlansFilterArea {
 		this.maxY = max.getY();
 	}
 
-	public void run(final Population plans) {
+	public void run(final PopulationImpl plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// first search all persons without plans

@@ -30,10 +30,10 @@ import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -50,14 +50,14 @@ public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgent
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
-	private Population population = null;
+	private PopulationImpl population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
 	private final TreeMap<String, int[]> legStats = new TreeMap<String, int[]>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
 
-	public CalcLegTimes(final Population population) {
+	public CalcLegTimes(final PopulationImpl population) {
 		this.population = population;
 	}
 

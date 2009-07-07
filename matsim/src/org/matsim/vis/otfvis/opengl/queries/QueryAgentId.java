@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -60,7 +60,7 @@ public class QueryAgentId implements OTFQuery {
 	public void draw(OTFDrawer drawer) {
 	}
 
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
 		for( QueueLink qlink : net.getLinks().values()) {

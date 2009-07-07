@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -41,6 +40,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -51,7 +51,7 @@ public class ExternalMobsim {
 	private static final String CONFIG_MODULE = "simulation";
 
 	protected Events events;
-	protected Population population;
+	protected PopulationImpl population;
 
 	protected String plansFileName = null;
 	protected String eventsFileName = null;
@@ -61,7 +61,7 @@ public class ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
-	public ExternalMobsim(final Population population, final Events events) {
+	public ExternalMobsim(final PopulationImpl population, final Events events) {
 		this.population = population;
 		this.events = events;
 		init();

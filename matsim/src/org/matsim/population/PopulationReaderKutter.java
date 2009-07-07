@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -32,6 +31,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -44,7 +44,7 @@ public class PopulationReaderKutter implements PopulationReader {
 
 	private final static double ANTEIL = 10; // (1/ANTEIL) of the kutter-data will be used; 1 = 100%, 2 = 50%, 10 = 10%
 
-	/*package*/ final Population population;
+	/*package*/ final PopulationImpl population;
 	private final PersonRowHandler rowHandler = new PersonRowHandler();
 	private final TabularFileParser parser = new TabularFileParser();
 	private final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
@@ -52,7 +52,7 @@ public class PopulationReaderKutter implements PopulationReader {
 	private double totalsum = 0.0;
 	/*package*/ final Layer tvzLayer; // ZoneLayer containing 'tvz' (traffic analysis zones)
 
-	public PopulationReaderKutter(final Population plans, final Layer tvzLayer) {
+	public PopulationReaderKutter(final PopulationImpl plans, final Layer tvzLayer) {
 		this.population = plans;
 		this.tvzLayer = tvzLayer;
 		this.parserConfig.setDelimiterRegex("\t");

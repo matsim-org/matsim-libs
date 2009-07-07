@@ -30,7 +30,6 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -146,7 +145,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		this.knowledges = knowledges2;
 	}
 
-	public PopulationWriter(Population population2, Knowledges knowledges2, String iterationFilename, String outversion) {
+	public PopulationWriter(PopulationImpl population2, Knowledges knowledges2, String iterationFilename, String outversion) {
 		this(population2, knowledges2, iterationFilename, outversion, 1.0);
 	}
 

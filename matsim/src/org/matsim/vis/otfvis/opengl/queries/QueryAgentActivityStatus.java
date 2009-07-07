@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis.opengl.queries;
 import java.util.Collection;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -32,6 +31,7 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -47,7 +47,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 	int activityNr = -1;
 	double finished = 0;
 
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		PersonImpl person = plans.getPersons().get(this.agentId);
 		if (person == null) return;
 

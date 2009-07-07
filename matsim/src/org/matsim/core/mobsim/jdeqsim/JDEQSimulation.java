@@ -24,13 +24,13 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -42,11 +42,11 @@ import org.matsim.core.utils.misc.Time;
 public class JDEQSimulation {
 
 	private static final Logger log = Logger.getLogger(JDEQSimulation.class);
-	Population population;
+	PopulationImpl population;
 	NetworkLayer network;
 	
 
-	public JDEQSimulation(final NetworkLayer network, final Population population, final Events events) {
+	public JDEQSimulation(final NetworkLayer network, final PopulationImpl population, final Events events) {
 		// constructor
 
 		this.population = population;

@@ -25,12 +25,12 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.collections.QuadTree.Rect;
@@ -117,7 +117,7 @@ public class QueryLinkId implements OTFQuery {
 		}
 	}
 	
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;

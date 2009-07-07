@@ -31,13 +31,13 @@ import javax.media.opengl.GL;
 
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -84,7 +84,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 	private MyEventsHandler handler = null;
 
 	
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		if(handler == null) {
 			handler = new MyEventsHandler(agentId);
 			events.addHandler(handler);

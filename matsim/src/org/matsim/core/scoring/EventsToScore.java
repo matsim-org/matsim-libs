@@ -32,13 +32,13 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * Calculates continuously the score of the selected plans of a given population
@@ -53,18 +53,18 @@ import org.matsim.core.population.PlanImpl;
 public class EventsToScore implements BasicAgentArrivalEventHandler, AgentDepartureEventHandler, BasicAgentStuckEventHandler,
 		BasicAgentMoneyEventHandler, ActivityStartEventHandler, BasicActivityEndEventHandler {
 
-	private Population population = null;
+	private PopulationImpl population = null;
 	private ScoringFunctionFactory sfFactory = null;
 	private final TreeMap<Id, ScoringFunction> agentScorers = new TreeMap<Id, ScoringFunction>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
 
-	public EventsToScore(final Population population, final ScoringFunctionFactory factory) {
+	public EventsToScore(final PopulationImpl population, final ScoringFunctionFactory factory) {
 		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
 	}
 
-	public EventsToScore(final Population population, final ScoringFunctionFactory factory, final double learningRate) {
+	public EventsToScore(final PopulationImpl population, final ScoringFunctionFactory factory, final double learningRate) {
 		super();
 		this.population = population;
 		this.sfFactory = factory;

@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package org.matsim.core.api.experimental;
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Households;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
@@ -46,7 +46,7 @@ public interface Scenario extends BasicScenario {
 
 	public ActivityFacilities getActivityFacilities() ;
 
-	public Population getPopulation() ;
+	public PopulationImpl getPopulation() ;
 	
 	public Knowledges getKnowledges();
 	

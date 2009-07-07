@@ -29,13 +29,13 @@ import javax.swing.filechooser.FileFilter;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -181,7 +181,7 @@ public class OTFVis {
 		Scenario scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(args[0]);
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 		Events events = new Events();
 		
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(network, population, events);

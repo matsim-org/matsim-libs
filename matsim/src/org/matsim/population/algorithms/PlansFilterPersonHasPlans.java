@@ -24,8 +24,8 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * This algorithm filters out all persons without plans, leaving only persons in the
@@ -39,7 +39,7 @@ public class PlansFilterPersonHasPlans {
 		super();
 	}
 
-	public void run(final Population plans) {
+	public void run(final PopulationImpl plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// first search all persons without plans

@@ -20,8 +20,8 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.PersonAlgorithm;
 
 public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFilter {
@@ -46,7 +46,7 @@ public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFil
 		return this.count;
 	}
 
-	public void run(Population population) {
+	public void run(PopulationImpl population) {
 		for (PersonImpl person : population.getPersons().values()) {
 			run(person);
 		}

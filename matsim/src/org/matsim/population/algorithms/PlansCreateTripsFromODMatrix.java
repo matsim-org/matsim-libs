@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -32,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.world.WorldUtils;
@@ -56,7 +56,7 @@ public class PlansCreateTripsFromODMatrix {
 		this.timeBinSize = (24*3600) / timeDistribution.size();
 	}
 
-	public void run(final Population plans) {
+	public void run(final PopulationImpl plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (plans.getName() == null) {

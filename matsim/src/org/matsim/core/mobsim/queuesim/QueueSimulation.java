@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -57,6 +56,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -104,7 +104,7 @@ public class QueueSimulation {
 	private double infoTime = 0;
 
 	private final Config config;
-	protected final Population plans;
+	protected final PopulationImpl plans;
 	protected QueueNetwork network;
 	protected NetworkLayer networkLayer;
 
@@ -166,7 +166,7 @@ public class QueueSimulation {
 	 * @param plans
 	 * @param events
 	 */
-	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
+	public QueueSimulation(final NetworkLayer network, final PopulationImpl plans, final Events events) {
 		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();

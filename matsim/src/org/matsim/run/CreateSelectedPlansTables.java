@@ -25,13 +25,13 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -46,8 +46,8 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CreateSelectedPlansTables {
 
-	private Population plans0;
-	private Population plans1;
+	private PopulationImpl plans0;
+	private PopulationImpl plans1;
 
 	private final static String outfileTable="./output/analyseSelectedPlansTable.txt";
 	private final static String outfileAverages="./output/analyseSelectedPlansTableAverages.txt";
@@ -106,7 +106,7 @@ public class CreateSelectedPlansTables {
 		new MatsimNetworkReader(this.network).readFile(networkPath);
 	}
 
-	private void readPlansFile(final String plansfilePath, final Population plans) {
+	private void readPlansFile(final String plansfilePath, final PopulationImpl plans) {
 		System.out.println("  reading file "+plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, this.network);
 		plansReader.readFile(plansfilePath);

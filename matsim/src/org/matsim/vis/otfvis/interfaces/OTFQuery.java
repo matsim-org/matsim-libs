@@ -22,9 +22,9 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.io.Serializable;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 /**
  * An interface for the live version of the OTFVis.
@@ -77,7 +77,7 @@ public interface OTFQuery extends Serializable{
 	 * @param quad The quadtree with writer objects.
 	 * 
 	 */
-	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) ;
+	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) ;
 	
 	/**
 	 * Remove is called when a query is removed, to give the query the option to

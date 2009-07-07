@@ -21,13 +21,13 @@
 package org.matsim.api.basic.v01;
 
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
@@ -42,7 +42,7 @@ import org.matsim.vehicles.BasicVehicles;
 
 	private final Config config;
 	private final NetworkLayer network;
-	private final Population population;
+	private final PopulationImpl population;
 	
 	private BasicScenarioImpl2() {
 		this(new Config());
@@ -64,7 +64,7 @@ import org.matsim.vehicles.BasicVehicles;
 		return this.network;
 	}
 
-	public Population getPopulation() {
+	public PopulationImpl getPopulation() {
 		return this.population;
 	}
 

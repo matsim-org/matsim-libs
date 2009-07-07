@@ -23,12 +23,12 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 
@@ -42,7 +42,7 @@ public class PlansDefineKnowledge {
 		this.knowledges = knowledges;
 	}
 
-	public void run(Population plans) {
+	public void run(PopulationImpl plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// get home, work and other activities

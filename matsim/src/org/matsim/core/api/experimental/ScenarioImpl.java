@@ -21,7 +21,6 @@ package org.matsim.core.api.experimental;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -29,6 +28,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
@@ -56,7 +56,7 @@ public class ScenarioImpl implements Scenario {
 	//mandatory attributes 
 	private Config config;
 	private NetworkLayer network;
-	private Population population;
+	private PopulationImpl population;
 	private ActivityFacilities facilities;
 	
 	//non-mandatory attributes
@@ -159,7 +159,7 @@ public class ScenarioImpl implements Scenario {
 	/**
 	 * @see org.matsim.core.api.experimental.Scenario#getPopulation()
 	 */
-	public Population getPopulation() {
+	public PopulationImpl getPopulation() {
 		return this.population;
 	}
 
@@ -223,7 +223,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Deprecated
-	public void setPopulation(Population population2) {
+	public void setPopulation(PopulationImpl population2) {
 		this.population = population2;
 	}
 

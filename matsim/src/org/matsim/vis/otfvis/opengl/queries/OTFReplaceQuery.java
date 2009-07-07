@@ -20,9 +20,9 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -42,7 +42,7 @@ public class OTFReplaceQuery implements OTFQuery {
 		return false;
 	}
 
-	public void query(QueueNetwork net, Population plans, Events events,
+	public void query(QueueNetwork net, PopulationImpl plans, Events events,
 			OTFServerQuad quad) {
 	}
 

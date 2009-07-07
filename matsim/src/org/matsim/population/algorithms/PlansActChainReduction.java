@@ -25,11 +25,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 public class PlansActChainReduction {
 
@@ -47,7 +47,7 @@ public class PlansActChainReduction {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final TreeMap<String, ArrayList<PersonImpl>> calcChainFrequencies(final Population plans) {
+	private final TreeMap<String, ArrayList<PersonImpl>> calcChainFrequencies(final PopulationImpl plans) {
 		// TreeMap(String chain, ArrayList(Person person))
 		TreeMap<String, ArrayList<PersonImpl>> chains = new TreeMap<String, ArrayList<PersonImpl>>();
 		// fill up the chains TreeMap
@@ -103,7 +103,7 @@ public class PlansActChainReduction {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Population plans) {
+	public void run(PopulationImpl plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// TreeMap(String chain, ArrayList(Person person))

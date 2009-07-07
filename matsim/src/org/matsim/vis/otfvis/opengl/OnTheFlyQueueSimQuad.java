@@ -23,11 +23,11 @@ package org.matsim.vis.otfvis.opengl;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
@@ -86,7 +86,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		this.myOTFServer.updateStatus(time);
 	}
 
-	public OnTheFlyQueueSimQuad(final NetworkLayer net, final Population plans, final Events events) {
+	public OnTheFlyQueueSimQuad(final NetworkLayer net, final PopulationImpl plans, final Events events) {
 		super(net, plans, events);
 
 		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");

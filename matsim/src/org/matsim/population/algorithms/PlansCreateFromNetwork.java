@@ -20,7 +20,6 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -28,6 +27,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 public class PlansCreateFromNetwork {
 
@@ -54,7 +54,7 @@ public class PlansCreateFromNetwork {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Population plans) {
+	public void run(final PopulationImpl plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (plans.getName() == null) {

@@ -23,10 +23,10 @@ package org.matsim.core.facilities;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.facilities.BasicActivityFacility;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
@@ -48,7 +48,7 @@ public interface ActivityFacility extends BasicActivityFacility, Location, Facil
 	 * 
 	 * <p><b>Note:</b> Other data structures than the {@link World} and the {@link NetworkLayer} of MATSim
 	 * will not be updated (i.e. the references to links and facilities in a {@link PlanImpl}
-	 * of an agent of the {@link Population}).</p>
+	 * of an agent of the {@link PopulationImpl}).</p>
 	 * 
 	 * <p><b>Mapping rule (zone-facility):</b> The facility gets one zones assigned, in which 
 	 * the facility is located in, or---if no such zone exists---the facility does not get a zone assigned.</p>

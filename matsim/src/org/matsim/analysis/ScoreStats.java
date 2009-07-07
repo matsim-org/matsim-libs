@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -36,6 +35,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -60,7 +60,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	final private static int INDEX_AVERAGE = 2;
 	final private static int INDEX_EXECUTED = 3;
 
-	final private Population population;
+	final private PopulationImpl population;
 	final private BufferedWriter out;
 
 	private final boolean createPNG;
@@ -78,7 +78,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public ScoreStats(final Population population, final String filename, final boolean createPNG) throws FileNotFoundException, IOException {
+	public ScoreStats(final PopulationImpl population, final String filename, final boolean createPNG) throws FileNotFoundException, IOException {
 		this.population = population;
 		this.createPNG = createPNG;
 		this.out = IOUtils.getBufferedWriter(filename);

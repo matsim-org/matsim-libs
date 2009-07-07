@@ -39,7 +39,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -48,6 +47,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Point;
 public class SelectedPlans2ESRIShape {
 
 	private final CoordinateReferenceSystem crs;
-	private final Population population;
+	private final PopulationImpl population;
 	private double outputSample = 1;
 	private double actBlurFactor = 0;
 	private double legBlurFactor = 0;
@@ -82,7 +82,7 @@ public class SelectedPlans2ESRIShape {
 	private FeatureType featureTypeLeg;
 	private final GeometryFactory geofac;
 
-	public SelectedPlans2ESRIShape(final Population population, final CoordinateReferenceSystem crs, final String outputDir) {
+	public SelectedPlans2ESRIShape(final PopulationImpl population, final CoordinateReferenceSystem crs, final String outputDir) {
 		this.population = population;
 		this.crs = crs;
 		this.outputDir = outputDir;

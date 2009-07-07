@@ -25,11 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -108,7 +108,7 @@ public class StrategyManager {
 	 * @param population
 	 * @param iteration the current iteration we're handling
 	 */
-	public void run(final Population population, final int iteration) {
+	public void run(final PopulationImpl population, final int iteration) {
 		handleChangeRequests(iteration);
 		run(population);
 	}
@@ -119,7 +119,7 @@ public class StrategyManager {
 	 *
 	 * @param population
 	 */
-	public void run(final Population population) {
+	public void run(final PopulationImpl population) {
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.init();
