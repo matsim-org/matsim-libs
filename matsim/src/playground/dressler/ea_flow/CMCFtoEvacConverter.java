@@ -32,7 +32,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -44,6 +43,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 /**
@@ -54,7 +54,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class CMCFtoEvacConverter {
 
 	private NetworkLayer network;
-	private Population population;
+	private PopulationImpl population;
 	
 	public static NetworkLayer constructNetwork(String networkfile, String demandfile) throws JDOMException, IOException{
 		// read networ and add en1 and en2 and el1
@@ -94,8 +94,8 @@ public class CMCFtoEvacConverter {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static Population readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
-		Population result = new PopulationImpl();
+	public static PopulationImpl readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
+		PopulationImpl result = new PopulationImpl();
 		PopulationBuilder pb = result.getPopulationBuilder() ;
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
@@ -178,7 +178,7 @@ public class CMCFtoEvacConverter {
 			NetworkWriter writer = new NetworkWriter( network, networkfileout);
 			writer.write();
 			System.out.println(networkfile+"  conveted successfully \n"+"output written in: "+networkfileout);
-			Population population = readCMCFDemands(demandfile, network, false);
+			PopulationImpl population = readCMCFDemands(demandfile, network, false);
 			PopulationWriter pwriter = new PopulationWriter(population, plansfileout);
 			pwriter.write();
 			System.out.println(demandfile+"conveted succssfully \n"+"output written in :\n"+plansfileout);

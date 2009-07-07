@@ -32,7 +32,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -44,6 +43,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -107,7 +107,7 @@ public class PrimaryLocationDrawing {
 	public void run() {
 		HashMap<String,Feature> ftDist = getFeatures(this.districts);
 		ArrayList<Zone> zones = getZones();
-		Population pop = getPopulation(ftDist,zones);
+		PopulationImpl pop = getPopulation(ftDist,zones);
 		PlansCalcRoute router = new PlansCalcRoute(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost(), new DijkstraFactory());
 		router.run(pop);
 		new PopulationWriter(pop,this.demandFilename, "v4").write();
@@ -194,12 +194,12 @@ public class PrimaryLocationDrawing {
 		return l;
 	}
 
-	private Population getPopulation(final HashMap<String, Feature> ftDist,
+	private PopulationImpl getPopulation(final HashMap<String, Feature> ftDist,
 			final ArrayList<Zone> zones) {
 
 
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		int count = 0;
 		for (Entry<String, Feature> e : ftDist.entrySet()) {
 			Feature ft = e.getValue();

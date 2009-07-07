@@ -37,7 +37,6 @@ import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,6 +44,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -91,7 +91,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 	// this.geofac = null;
 	// }
 
-	public SelectedPlans2ESRIShapeChanged(Population population,
+	public SelectedPlans2ESRIShapeChanged(PopulationImpl population,
 			CoordinateReferenceSystem crs, String outputDir) {
 		super(population, crs, outputDir);
 		this.outputDir = outputDir;
@@ -258,7 +258,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network)
 				.readFile(populationFilename);
 

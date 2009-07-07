@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.visum.filter.EventFilterA;
 import playground.yu.visum.writer.UserDefAtt;
@@ -23,7 +23,7 @@ import playground.yu.visum.writer.UserDefAtt;
  */
 public abstract class FinalEventFilterA extends EventFilterA {
 	/*-----------------------MEMBER VARIABLES---------------------*/
-	protected Population plans;
+	protected PopulationImpl plans;
 
 	protected NetworkLayer network;
 
@@ -44,7 +44,7 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	 * @param network
 	 *            - the NetworkLayer, which will be created in test
 	 */
-	public FinalEventFilterA(Population plans, NetworkLayer network) {
+	public FinalEventFilterA(PopulationImpl plans, NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 	}

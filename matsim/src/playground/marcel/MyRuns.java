@@ -46,7 +46,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -63,6 +62,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -178,7 +178,7 @@ public class MyRuns {
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		Scenario scenario = sl.loadScenario();
-		final Population plans = scenario.getPopulation();
+		final PopulationImpl plans = scenario.getPopulation();
 
 		System.out.println("  processing plans...");
 		new PlansFilterByLegMode(TransportMode.pt, true).run(plans);

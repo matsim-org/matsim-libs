@@ -27,7 +27,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -38,6 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.TransitStopFacility;
 
@@ -156,7 +156,7 @@ public class BlockingStopDemo {
 	}
 
 	private void createPopulation() {
-		Population population = this.scenario.getPopulation();
+		PopulationImpl population = this.scenario.getPopulation();
 		PopulationBuilder pb = population.getPopulationBuilder();
 //		TransitStopFacility[] stops = this.schedule.getFacilities().values().toArray(new TransitStopFacility[this.schedule.getFacilities().size()]);
 		TransitLine tLine1 = this.schedule.getTransitLines().get(this.ids[1]);

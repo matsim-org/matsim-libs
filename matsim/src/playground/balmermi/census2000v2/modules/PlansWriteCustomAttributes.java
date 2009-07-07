@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 public class PlansWriteCustomAttributes {
 
@@ -60,7 +60,7 @@ public class PlansWriteCustomAttributes {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Population plans) {
+	public void run(final PopulationImpl plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
 		Set<String> keys = new HashSet<String>();

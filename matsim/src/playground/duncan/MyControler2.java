@@ -34,7 +34,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -44,6 +43,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -57,10 +57,10 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyControler2 {
 	private static final Logger log = Logger.getLogger(MyControler2.class);
 
-	private static Population createPlansFromShp(final FeatureSource n) {
+	private static PopulationImpl createPlansFromShp(final FeatureSource n) {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
 
-		Population population = new PopulationImpl() ;
+		PopulationImpl population = new PopulationImpl() ;
 		int popCnt = 0 ;
 
 		FeatureIterator it = null; try {
@@ -125,7 +125,7 @@ public class MyControler2 {
 
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
 
-		Population plans=null ;
+		PopulationImpl plans=null ;
 		try {
 			plans = createPlansFromShp( ShapeFileReader.readDataFile(shpFile) );
 		} catch (IOException e) {

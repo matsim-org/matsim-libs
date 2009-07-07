@@ -29,13 +29,13 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -50,7 +50,7 @@ public class PlanExcluder {
 
 	private static final Logger log = Logger.getLogger(PlanExcluder.class);
 //	private final NetworkLayer network;
-	private final Population plans;
+	private final PopulationImpl plans;
 	private final Collection<Polygon> ps;
 
 
@@ -60,7 +60,7 @@ public class PlanExcluder {
 
 
 
-	public PlanExcluder(final NetworkLayer network, final Population population,
+	public PlanExcluder(final NetworkLayer network, final PopulationImpl population,
 			final Collection<Polygon> ps) {
 //		this.network = network;
 		this.plans = population;
@@ -69,9 +69,9 @@ public class PlanExcluder {
 
 
 
-	public Population run() {
+	public PopulationImpl run() {
 
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 
 		for (PersonImpl person : this.plans.getPersons().values()) {
 
@@ -124,11 +124,11 @@ public class PlanExcluder {
 		world.complete();
 
 
-		final Population population = new PopulationImpl();
+		final PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
 
 
-		Population toSave = new PlanExcluder(network,population,ls).run();
+		PopulationImpl toSave = new PlanExcluder(network,population,ls).run();
 		new PopulationWriter(toSave,"./output/analysis/padang_plans_v20080618_reduced.xml.gz", "v4").write();
 
 	}

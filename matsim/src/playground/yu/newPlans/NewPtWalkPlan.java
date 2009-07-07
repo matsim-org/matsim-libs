@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -35,6 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -57,11 +57,11 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewPtWalkPlan(final Population plans) {
+	public NewPtWalkPlan(final PopulationImpl plans) {
 		super(plans);
 	}
 
-	public NewPtWalkPlan(final Population population, final String filename) {
+	public NewPtWalkPlan(final PopulationImpl population, final String filename) {
 		super(population, filename);
 	}
 
@@ -124,7 +124,7 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		NewPtWalkPlan npwp = new NewPtWalkPlan(population, outputFilename);
 

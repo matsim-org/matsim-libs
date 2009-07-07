@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
@@ -41,6 +40,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -48,7 +48,7 @@ import org.matsim.world.World;
 
 public class AnalyzePlans {
 
-	private Population plans = new PopulationImpl();
+	private PopulationImpl plans = new PopulationImpl();
 	private ActivityFacilities facilities;
 	private NetworkLayer network;
 	

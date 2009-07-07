@@ -27,7 +27,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -41,6 +40,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -49,7 +49,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CarDepartureCounter implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
-	private final Population ppl;
+	private final PopulationImpl ppl;
 
 	private int cdc = 0, cac = 0;
 
@@ -57,7 +57,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		return this.cac;
 	}
 
-	public CarDepartureCounter(final Population ppl) {
+	public CarDepartureCounter(final PopulationImpl ppl) {
 		this.ppl = ppl;
 	}
 
@@ -74,7 +74,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Population ppl = new PopulationImpl();
+		PopulationImpl ppl = new PopulationImpl();
 
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(ppl, network).readFile(plansFilename);

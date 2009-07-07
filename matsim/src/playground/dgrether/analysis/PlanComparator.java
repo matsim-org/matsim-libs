@@ -24,11 +24,11 @@ import java.util.Date;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -45,7 +45,7 @@ public class PlanComparator {
 	/**
    * the object holding the population
    */
-	private Population population;
+	private PopulationImpl population;
 
 	/**
    * the data needed to compare the plans is stored here
@@ -105,8 +105,8 @@ public class PlanComparator {
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected Population loadPlansFile(final String filename, NetworkLayer network) {
-		Population plans = new PopulationImpl();
+	protected PopulationImpl loadPlansFile(final String filename, NetworkLayer network) {
+		PopulationImpl plans = new PopulationImpl();
 
 		printNote("", "  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans, network);

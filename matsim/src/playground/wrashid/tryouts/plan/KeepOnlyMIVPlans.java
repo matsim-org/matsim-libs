@@ -4,7 +4,6 @@ import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -15,6 +14,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationReaderMatsimV4;
@@ -52,7 +52,7 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesPath);
 		world.complete();
 		
-		Population inPop = new PopulationImpl();
+		PopulationImpl inPop = new PopulationImpl();
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(networkFile);
@@ -65,7 +65,7 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 		dp.writeEndPlans();
 	}
 
-	public KeepOnlyMIVPlans(Population plans, String filename) {
+	public KeepOnlyMIVPlans(PopulationImpl plans, String filename) {
 		super(plans, filename);
 	}
 

@@ -32,7 +32,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.BasicLegImpl;
 import org.matsim.core.basic.v01.BasicRouteImpl;
 import org.matsim.core.events.Events;
@@ -43,6 +42,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -54,7 +54,7 @@ public class Wardrop {
 	
 	//protected NetworkLayer network;
 	protected NetworkLayer network;
-	protected Population population;
+	protected PopulationImpl population;
 	
 	protected ActTimesCollector actTimesCollector;
 	
@@ -90,7 +90,7 @@ public class Wardrop {
 
 
 	//public Wardrop(NetworkLayer network, Population population)
-	public Wardrop(NetworkLayer network, Population population)
+	public Wardrop(NetworkLayer network, PopulationImpl population)
 	{
 		this.network = network;
 		this.population = population;

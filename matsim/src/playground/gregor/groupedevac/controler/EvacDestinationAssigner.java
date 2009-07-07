@@ -27,7 +27,6 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
@@ -38,6 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -47,7 +47,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class EvacDestinationAssigner implements ScoringListener {
 
-	private Population population;
+	private PopulationImpl population;
 
 	private HashMap<LinkImpl,ArrayList<PlanImpl>> linkPlanMapping;
 	private HashMap<LinkImpl,Id> linkColor;

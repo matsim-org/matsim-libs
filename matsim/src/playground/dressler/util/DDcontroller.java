@@ -22,7 +22,6 @@ package playground.dressler.util;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -35,6 +34,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.netvis.NetVis;
@@ -71,7 +71,7 @@ public class DDcontroller {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		if (testplans) {

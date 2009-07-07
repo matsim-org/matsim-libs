@@ -29,11 +29,11 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 /**
@@ -62,7 +62,7 @@ public class SimplifyPersons {
 		double minY = centerY - halfradius;
 		double maxY = centerY + halfradius;
 		
-		Population pop = data.getPopulation();
+		PopulationImpl pop = data.getPopulation();
 		List<PersonImpl> remove = new LinkedList<PersonImpl>();
 		for(PersonImpl p : pop.getPersons().values()) {
 			for(int i = 1; i < p.getPlans().size(); i = 1)

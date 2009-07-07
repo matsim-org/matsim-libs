@@ -20,9 +20,9 @@
 
 package playground.balmermi.mz;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
@@ -53,7 +53,7 @@ public class MZ2Plans {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  creating plans object... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		System.out.println("  done.");
 
 		System.out.println("  running plans modules... ");

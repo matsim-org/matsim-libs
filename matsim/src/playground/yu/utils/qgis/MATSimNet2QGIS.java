@@ -37,13 +37,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -152,7 +152,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 
 	public void readPlans(final String plansFilename,
 			final AbstractPersonAlgorithm pa) {
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 		pa.run(population);
 	}

@@ -30,7 +30,6 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -41,6 +40,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -95,7 +95,7 @@ public class NetworkCutter {
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
 
-		final Population pop = new PopulationImpl();
+		final PopulationImpl pop = new PopulationImpl();
 		new MatsimPopulationReader(pop, network).readFile(plansFile);
 
 		run(network, pop);
@@ -105,7 +105,7 @@ public class NetworkCutter {
 		network_writer.write();
 	}
 
-	public void run(NetworkLayer net, Population pop) {
+	public void run(NetworkLayer net, PopulationImpl pop) {
 		for (PersonImpl person : pop.getPersons().values())
 			for (PlanImpl plan : person.getPlans())
 				for (PlanElement pe : plan.getPlanElements())

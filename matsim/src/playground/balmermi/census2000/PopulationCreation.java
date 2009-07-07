@@ -20,7 +20,6 @@
 
 package playground.balmermi.census2000;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -28,6 +27,7 @@ import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.matrices.Matrices;
@@ -90,7 +90,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

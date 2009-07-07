@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
@@ -38,6 +37,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -129,7 +129,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);

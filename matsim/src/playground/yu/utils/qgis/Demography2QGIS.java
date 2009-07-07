@@ -28,7 +28,6 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -36,6 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -52,7 +52,7 @@ import playground.yu.utils.CompareSelectedPlansTable;
  * 
  */
 public class Demography2QGIS extends CompareSelectedPlansTable {
-	private Population plans;
+	private PopulationImpl plans;
 	private static final String HEADER = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "planType;planScore;departureTime;"
 			+ "planTravelTime;planTravelDistance;numberOfTrips";

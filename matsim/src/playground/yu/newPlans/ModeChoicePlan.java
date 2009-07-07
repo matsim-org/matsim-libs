@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -33,6 +32,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -47,7 +47,7 @@ public class ModeChoicePlan extends NewPopulation {
 	/**
 	 * @param plans
 	 */
-	public ModeChoicePlan(final Population plans) {
+	public ModeChoicePlan(final PopulationImpl plans) {
 		super(plans);
 	}
 
@@ -117,7 +117,7 @@ public class ModeChoicePlan extends NewPopulation {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		ModeChoicePlan mcp = new ModeChoicePlan(population);
 
 		new MatsimPopulationReader(population, network).readFile(config.plans()

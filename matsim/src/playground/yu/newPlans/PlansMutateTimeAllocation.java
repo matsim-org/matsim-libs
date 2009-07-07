@@ -23,13 +23,13 @@
  */
 package playground.yu.newPlans;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
@@ -46,7 +46,7 @@ public class PlansMutateTimeAllocation {
 		new MatsimNetworkReader(network)
 				.readFile("D:/fromNB04/wm/Toronto/toronto/networks/changedNetworkWithManeuvers/network.xml");
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network)
 				.readFile("D:/fromNB04/wm/Toronto/toronto/plans/xy/plans.xml.gz");
 

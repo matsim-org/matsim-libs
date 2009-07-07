@@ -26,7 +26,7 @@ package playground.johannes.mobsim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * A builder class that builds {@link DeliberateAgent} instances by decorating
@@ -62,7 +62,7 @@ public class DeliberateAgentBuilder implements MobsimAgentBuilder {
 	 * @param population the population of persons.
 	 * @param sBuilder the strategy builder.
 	 */
-	public DeliberateAgentBuilder(Population population, IntradayStrategyBuilder sBuilder) {
+	public DeliberateAgentBuilder(PopulationImpl population, IntradayStrategyBuilder sBuilder) {
 		this.strategyBuilder = sBuilder;
 		planAgentBuilder = new PlanAgentBuilder(population);
 	}

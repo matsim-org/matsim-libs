@@ -27,12 +27,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -44,7 +44,7 @@ public class CreateKnownNodesMap {
 	
 	private final static Logger log = Logger.getLogger(CreateKnownNodesMap.class);
 	
-	public static void collectAllSelectedNodes(Population population, NetworkLayer network)
+	public static void collectAllSelectedNodes(PopulationImpl population, NetworkLayer network)
 	{
 		for (PersonImpl person : population.getPersons().values()) 
 		{

@@ -5,13 +5,13 @@ package playground.yu.utils.qgis;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -101,7 +101,7 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		ModeWithNewAttributeTextLayer4QGIS mwnatl = new ModeWithNewAttributeTextLayer4QGIS(

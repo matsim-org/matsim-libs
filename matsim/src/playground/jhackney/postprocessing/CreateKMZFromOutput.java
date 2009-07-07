@@ -19,12 +19,12 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
@@ -68,7 +68,7 @@ public class CreateKMZFromOutput {
 			config.socnetmodule().setInitIter(Integer.toString(i));
 //			config.socnetmodule().setInitIter(Integer.toString(0));
 			Knowledges kn = new KnowledgesImpl();
-			Population plans = Scenario.readPlansAndKnowledges(network, kn);
+			PopulationImpl plans = Scenario.readPlansAndKnowledges(network, kn);
 			//read in social network
 			System.out.println(" Initializing the social network ...");
 			SocialNetwork snet=new SocialNetwork(plans);

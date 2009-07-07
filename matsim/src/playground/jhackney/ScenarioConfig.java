@@ -22,7 +22,6 @@ package playground.jhackney;
 
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.Events;
@@ -34,6 +33,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.counts.Counts;
@@ -222,9 +222,9 @@ public abstract class ScenarioConfig {
 //		System.out.println("  done.");
 //		return plans;
 //	}
-	public static final Population readPlans(final NetworkLayer network, final int i) {
+	public static final PopulationImpl readPlans(final NetworkLayer network, final int i) {
 		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
 //		String filename=input_directory +Gbl.getConfig().plans().getInputFile();
 		String filename=input_directory +popFileName;
@@ -236,9 +236,9 @@ public abstract class ScenarioConfig {
 		return plans;
 	}
 	
-	public static final Population readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
+	public static final PopulationImpl readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		String filename=input_directory +popFileName;
 		System.out.println(filename);
 		new MatsimPopulationReader(plans, (NetworkLayer) network, kn).readFile(filename);

@@ -24,11 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 
 import playground.msieg.structure.Commodity;
@@ -42,7 +42,7 @@ public class BestFitRouter extends CMCFRouter {
 	
 	@Override
 	public	void route() {
-		Population pop = this.population;
+		PopulationImpl pop = this.population;
 		//to keep tracking about the used paths, we need a new Map where we can change the flow values;
 		Map<List<LinkImpl>, Double> flowValues = new HashMap<List<LinkImpl>, Double>();
 		for(Commodity<NodeImpl> c: this.pathFlow.getCommodities()){

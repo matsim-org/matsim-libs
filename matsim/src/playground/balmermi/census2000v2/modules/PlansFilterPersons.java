@@ -25,11 +25,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.balmermi.census2000v2.data.CAtts;
@@ -63,7 +63,7 @@ public class PlansFilterPersons {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Population plans) {
+	public void run(final PopulationImpl plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
 		// remove persons which are only part of the 'zivilrechtliche' population

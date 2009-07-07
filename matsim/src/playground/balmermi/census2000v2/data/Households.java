@@ -29,12 +29,12 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -91,7 +91,7 @@ public class Households {
 	// public methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void parse(String infile, Population plans, ActivityFacilities facilities) {
+	public final void parse(String infile, PopulationImpl plans, ActivityFacilities facilities) {
 		int line_cnt = 0;
 		try {
 			FileReader fr = new FileReader(infile);

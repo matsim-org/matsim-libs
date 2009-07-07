@@ -3,7 +3,6 @@
  */
 package playground.yu.analysis.forZrh;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -12,6 +11,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -33,22 +33,22 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 	private int[] throughArrCount;
 
 	public LegTravelTimeModalSplit4Zrh(int binSize, int nofBins,
-			Population plans) {
+			PopulationImpl plans) {
 		super(binSize, nofBins, plans);
 		throughTravelTimes = new double[nofBins + 1];
 		throughArrCount = new int[nofBins + 1];
 	}
 
-	public LegTravelTimeModalSplit4Zrh(int binSize, Population plans) {
+	public LegTravelTimeModalSplit4Zrh(int binSize, PopulationImpl plans) {
 		this(binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public LegTravelTimeModalSplit4Zrh(Population ppl, RoadPricingScheme toll) {
+	public LegTravelTimeModalSplit4Zrh(PopulationImpl ppl, RoadPricingScheme toll) {
 		this(ppl);
 		this.toll = toll;
 	}
 
-	public LegTravelTimeModalSplit4Zrh(Population plans) {
+	public LegTravelTimeModalSplit4Zrh(PopulationImpl plans) {
 		this(300, plans);
 	}
 
@@ -170,7 +170,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 

@@ -21,13 +21,13 @@ package playground.dgrether.cmcf;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.dgrether.DgPaths;
@@ -53,8 +53,8 @@ public class CMCFPlanSplitter {
 	public static void main(final String[] args) {
 		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
 //		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
-		Population plans = MatsimIo.loadPlans(plansFile, net);
-		Population plansOne = new PopulationImpl();
+		PopulationImpl plans = MatsimIo.loadPlans(plansFile, net);
+		PopulationImpl plansOne = new PopulationImpl();
 		for (PersonImpl p : plans.getPersons().values()) {
 			PlanImpl pl = p.getSelectedPlan();
 		  int i = 0;

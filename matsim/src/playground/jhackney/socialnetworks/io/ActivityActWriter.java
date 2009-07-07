@@ -7,11 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * Writes the correspondence table between the facilities and the acts in the plans
@@ -42,7 +42,7 @@ public class ActivityActWriter {
 		}
 
 	}
-	public void write(int iter, Population myPlans){
+	public void write(int iter, PopulationImpl myPlans){
 //		System.out.println("AAW will write to"+out.toString());
 		Iterator<PersonImpl> pIt = myPlans.getPersons().values().iterator();
 		while(pIt.hasNext()){

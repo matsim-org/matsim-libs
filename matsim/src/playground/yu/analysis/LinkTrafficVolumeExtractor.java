@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -16,6 +15,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -40,7 +40,7 @@ public class LinkTrafficVolumeExtractor {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 

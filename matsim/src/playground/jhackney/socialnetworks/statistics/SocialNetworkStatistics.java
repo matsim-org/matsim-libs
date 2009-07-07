@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Location;
@@ -158,7 +158,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	public void calculate(int iteration, SocialNetwork snet, Population plans, Knowledges knowledges) {
+	public void calculate(int iteration, SocialNetwork snet, PopulationImpl plans, Knowledges knowledges) {
 		// First instantiate the JUNG-compatible graph structure
 		if (snet.isUNDIRECTED()) {
 			this.g = new UndirectedSparseGraph();
@@ -241,7 +241,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 	
-	private void runEdgeStatistics(int iter, Population plans) {
+	private void runEdgeStatistics(int iter, PopulationImpl plans) {
 		StatisticalMoments smDD = new StatisticalMoments();
 		StatisticalMoments smDur = new StatisticalMoments();
 		StatisticalMoments smNum = new StatisticalMoments();
@@ -289,7 +289,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	private Vector<PersonImpl> getEdgePersons(Edge e, Population plans) {
+	private Vector<PersonImpl> getEdgePersons(Edge e, PopulationImpl plans) {
 		Vector<PersonImpl> persons = new Vector<PersonImpl>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
 		PersonImpl p1 = plans.getPersons().get((Id) v1.getUserDatum("personId"));
@@ -311,7 +311,7 @@ public class SocialNetworkStatistics {
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);
 		return dist;
 	}
-	private double getDyadDistance(Edge myEdge, Population plans) {
+	private double getDyadDistance(Edge myEdge, PopulationImpl plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
 		PersonImpl pFrom = plans.getPersons().get((Id) vFrom.getUserDatum("personId"));
@@ -345,7 +345,7 @@ public class SocialNetworkStatistics {
 		return 2. * g.numEdges() / g.numVertices();
 	}
 
-	private void runPersonStatistics(int iter, Population plans, SocialNetwork snet, Knowledges knowledges) {
+	private void runPersonStatistics(int iter, PopulationImpl plans, SocialNetwork snet, Knowledges knowledges) {
 
 		double clusteringRatio = 0.;
 		double clusterCoef = 0.;
@@ -495,7 +495,7 @@ public class SocialNetworkStatistics {
 	 * @param snet
 	 * @param plans
 	 */
-	void fillGraph(Graph g, SocialNetwork snet, Population plans) {
+	void fillGraph(Graph g, SocialNetwork snet, PopulationImpl plans) {
 		Vertex v;
 		Edge e;
 		for (PersonImpl p : plans.getPersons().values()) {

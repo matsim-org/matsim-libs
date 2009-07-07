@@ -3,14 +3,14 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 public class PersonsRandomizeId {
 
-	public PersonsRandomizeId(Population plans){
+	public PersonsRandomizeId(PopulationImpl plans){
 			
 		int minId=14141414;
 		int maxId=0;

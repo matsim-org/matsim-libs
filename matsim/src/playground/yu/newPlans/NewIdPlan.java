@@ -24,12 +24,12 @@
 package playground.yu.newPlans;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -41,7 +41,7 @@ public class NewIdPlan extends NewPopulation {
 	/**
 	 * @param plans
 	 */
-	public NewIdPlan(final Population plans) {
+	public NewIdPlan(final PopulationImpl plans) {
 		super(plans);
 	}
 
@@ -61,7 +61,7 @@ public class NewIdPlan extends NewPopulation {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		NewIdPlan nip = new NewIdPlan(plans);
 		new MatsimPopulationReader(plans, network).readFile(config.plans()
 				.getInputFile());

@@ -33,10 +33,10 @@ import java.util.HashSet;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.statistics.Distribution;
@@ -57,7 +57,7 @@ public class DistanceDistribution {
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
-		Population population = data.getPopulation();
+		PopulationImpl population = data.getPopulation();
 		
 		Collection<PersonImpl> persons2 = new HashSet<PersonImpl>();
 		double xmin = 678000;

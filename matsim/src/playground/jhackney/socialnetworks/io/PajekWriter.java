@@ -32,11 +32,11 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -83,7 +83,7 @@ public class PajekWriter {
 
 	}
 
-	public void write(TreeSet<SocialNetEdge> links, Population plans, int iter) {
+	public void write(TreeSet<SocialNetEdge> links, PopulationImpl plans, int iter) {
 		BufferedWriter pjnet = null;
 
 		// from config
@@ -159,7 +159,7 @@ public class PajekWriter {
 		}
 		//}
 	}
-	public void writeGeo(Population plans, SocialNetwork snet, int iter) {
+	public void writeGeo(PopulationImpl plans, SocialNetwork snet, int iter) {
 
 		GeoStatistics gstat = new GeoStatistics(plans, snet);
 		Graph g = gstat.makeJungGraph();

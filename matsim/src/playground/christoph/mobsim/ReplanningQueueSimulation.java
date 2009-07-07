@@ -24,13 +24,13 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
@@ -51,7 +51,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	protected final PriorityBlockingQueue<DriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected final double timeOffset = 30.0;
 	
-	public ReplanningQueueSimulation(final NetworkLayer network, final Population population, final Events events)
+	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final Events events)
 	{
 		super(network, population, events);
 

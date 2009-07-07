@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
@@ -64,7 +64,7 @@ public class GravityBasedAnnealer {
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
-		Population population = data.getPopulation();
+		PopulationImpl population = data.getPopulation();
 		
 		String outputDir = config.getParam(MODULE_NAME, "output");
 		/*

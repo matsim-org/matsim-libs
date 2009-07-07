@@ -29,10 +29,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * A builder class that builds {@link PlanAgent} instances out of {@link PersonImpl}
@@ -49,7 +49,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 
 	private static final Logger log = Logger.getLogger(PlanAgentBuilder.class);
 	
-	private final Population population;
+	private final PopulationImpl population;
 	
 	// =======================================================
 	// constructor
@@ -62,7 +62,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 * @param population
 	 *            the population of persons.
 	 */
-	public PlanAgentBuilder(Population population) {
+	public PlanAgentBuilder(PopulationImpl population) {
 		this.population = population;
 	}
 

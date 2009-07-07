@@ -26,13 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -78,7 +78,7 @@ public class SpatialInteractorActs {
 	 * @param rndEncounterProb
 	 * @param iteration
 	 */
-	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration) {
+	public void interact(PopulationImpl plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration) {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
@@ -120,7 +120,7 @@ public class SpatialInteractorActs {
 	 * @param plans
 	 * @return
 	 */
-	private LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> makeActivityMap(Population plans){
+	private LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> makeActivityMap(PopulationImpl plans){
 		System.out.println("Making a new activity map for spatial interactions");
 		LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> activityMap=new LinkedHashMap<ActivityOption,ArrayList<PersonImpl>>();
 		for (PersonImpl p1 : plans.getPersons().values()) {

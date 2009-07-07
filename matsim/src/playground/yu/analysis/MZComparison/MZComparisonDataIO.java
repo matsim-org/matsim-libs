@@ -18,10 +18,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.plot.PlotOrientation;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -170,7 +170,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {

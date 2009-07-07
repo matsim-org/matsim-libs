@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.newPlans.NewPopulation;
 
@@ -47,11 +47,11 @@ public class NewAgentPtPlan extends NewPopulation {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentPtPlan(final Population plans) {
+	public NewAgentPtPlan(final PopulationImpl plans) {
 		super(plans);
 	}
 
-	public NewAgentPtPlan(final Population population, final String filename) {
+	public NewAgentPtPlan(final PopulationImpl population, final String filename) {
 		super(population, filename);
 	}
 

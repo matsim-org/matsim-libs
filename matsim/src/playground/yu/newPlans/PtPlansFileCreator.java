@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -18,6 +17,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -30,9 +30,9 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PtPlansFileCreator {
 	private int personCount = 0;
-	private Population pop = null;
+	private PopulationImpl pop = null;
 
-	public void setPop(final Population pop) {
+	public void setPop(final PopulationImpl pop) {
 		this.pop = pop;
 	}
 
@@ -40,7 +40,7 @@ public class PtPlansFileCreator {
 		this.network = network;
 	}
 
-	public Population getPop() {
+	public PopulationImpl getPop() {
 		return this.pop;
 	}
 

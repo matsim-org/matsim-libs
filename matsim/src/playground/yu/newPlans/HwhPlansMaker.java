@@ -26,12 +26,12 @@ package playground.yu.newPlans;
 import java.util.Set;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -49,7 +49,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 	/**
 	 * @param network
 	 */
-	public HwhPlansMaker(NetworkLayer network, Config config, Population plans) {
+	public HwhPlansMaker(NetworkLayer network, Config config, PopulationImpl plans) {
 		super(network);
 		this.config = config;
 		for (int i = 0; i <= 24; i++) {
@@ -91,7 +91,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		HwhPlansMaker hpm = new HwhPlansMaker(network, config, population);
 

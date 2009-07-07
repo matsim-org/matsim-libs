@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -13,6 +12,7 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
@@ -95,7 +95,7 @@ public class Matsim4Urbansim {
 		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
 		facWriter.write();
 
-		Population oldPop ;
+		PopulationImpl oldPop ;
 		if ( config.plans().getInputFile() != null ) {
 			log.info("Population specified in matsim config file; assuming WARM start with pre-existing pop file.");
 			log.info("Persons not found in pre-existing pop file are added; persons no longer in urbansim persons file are removed." ) ;
@@ -108,7 +108,7 @@ public class Matsim4Urbansim {
 			oldPop=null ;
 		}
 
-		Population newPop = new PopulationImpl();
+		PopulationImpl newPop = new PopulationImpl();
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, samplingRate ) ;
 		oldPop=null ;

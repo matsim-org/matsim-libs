@@ -2,13 +2,13 @@ package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -22,7 +22,7 @@ public class DuplicatePlans extends NewPopulation {
 
 	private int numberOfCopies;
 	
-	public DuplicatePlans(Population plans, String filename, int numberOfCopies) {
+	public DuplicatePlans(PopulationImpl plans, String filename, int numberOfCopies) {
 		super(plans, filename);
 		this.numberOfCopies = numberOfCopies;
 	}
@@ -55,7 +55,7 @@ public class DuplicatePlans extends NewPopulation {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		Population inPop = new PopulationImpl();
+		PopulationImpl inPop = new PopulationImpl();
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
 		popReader.readFile(inPlansFile);
 

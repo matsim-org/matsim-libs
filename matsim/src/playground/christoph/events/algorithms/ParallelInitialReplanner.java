@@ -26,9 +26,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -91,7 +91,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	}
 	
 	
-	public static void run(Population population, double time)
+	public static void run(PopulationImpl population, double time)
 	{
 		ArrayList<PersonImpl> persons = new ArrayList<PersonImpl>();
 		

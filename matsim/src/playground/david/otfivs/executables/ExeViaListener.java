@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -48,6 +47,7 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
@@ -148,7 +148,7 @@ QueueSimulationAfterSimStepListener {
 
 	private QueueNetwork queueNetwork;
 	protected OnTheFlyServer myOTFServer;
-	private Population population;
+	private PopulationImpl population;
 	private Events events;
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {

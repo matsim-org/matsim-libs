@@ -28,10 +28,10 @@ import java.io.Writer;
 import java.util.Arrays;
 
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.msieg.cmcf.BestFitTimeRouter;
 import playground.msieg.cmcf.CMCFDemandWriter;
@@ -138,7 +138,7 @@ public class IncreasingDemandRunner {
 			//Step 2: create plans and new config
 			RandomPlansGenerator rpg = new RandomPlansGenerator(netFile);
 			rpg.setSeed(seed);
-			Population randPop = rpg.createPlans(agents);
+			PopulationImpl randPop = rpg.createPlans(agents);
 			popFile = topDir+File.separatorChar+"plans"+agents+"random.xml";
 			rpg.writePlans(randPop, popFile);
 			

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -23,6 +22,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
@@ -33,7 +33,7 @@ public class TestCellKnowledge {
 	private final static Logger log = Logger.getLogger(TestCellKnowledge.class);
 	
 	private NetworkLayer network;
-	private Population population;
+	private PopulationImpl population;
 	private Config config;
 	private PersonImpl person;
 	private SelectNodesDijkstra selectNodesDijkstra;

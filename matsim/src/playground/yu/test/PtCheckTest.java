@@ -23,10 +23,10 @@ package playground.yu.test;
 import java.io.IOException;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.yu.analysis.PtCheck2;
@@ -43,7 +43,7 @@ public class PtCheckTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		try {
 			PtCheck2 pc = new PtCheck2(ptcheckFilename);
 

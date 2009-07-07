@@ -26,10 +26,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000v2.data.CAtts;
 
@@ -57,7 +57,7 @@ public class PopulationAddCustomAttributes {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Population pop) {
+	public void run(PopulationImpl pop) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		try {
 			FileReader fr = new FileReader(this.infile);

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -42,6 +41,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -199,7 +199,7 @@ public class Wait2Link_2Acts1LinkTest {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		SameActLoc sal = new SameActLoc();
 

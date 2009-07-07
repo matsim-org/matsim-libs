@@ -30,13 +30,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.util.TravelCost;
@@ -93,7 +93,7 @@ public class MultiSourceEAF {
 	 * @return
 	 */
 	private static HashMap<NodeImpl,Integer> readPopulation(final NetworkLayer network, final String filename){
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population,network).readFile(filename);
 		network.connect();
 		HashMap<NodeImpl,Integer> allnodes = new HashMap<NodeImpl,Integer>();
@@ -307,7 +307,7 @@ public class MultiSourceEAF {
 				}
 			}
 			if(outputplansfile!=null){
-				Population output = fluss.createPoulation(plansfile);
+				PopulationImpl output = fluss.createPoulation(plansfile);
 				// TODO remove emptylegs from Flow.java ... not needed anymore
 //				if (emptylegs) {
 //					Config config = Gbl.createConfig(new String[] {});

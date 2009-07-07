@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -34,6 +33,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.ExeRunner;
 
 public class EctmSim extends ExternalMobsim {
@@ -45,7 +45,7 @@ public class EctmSim extends ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(EctmSim.class);
 
-	public EctmSim(final Population population, final Events events) {
+	public EctmSim(final PopulationImpl population, final Events events) {
 		super(population, events);
 	}
 

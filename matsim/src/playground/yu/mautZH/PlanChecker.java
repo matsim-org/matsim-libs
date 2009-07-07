@@ -33,13 +33,13 @@ import java.util.HashMap;
 
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -165,7 +165,7 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PlanChecker pc = new PlanChecker(planCheckFilename);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);

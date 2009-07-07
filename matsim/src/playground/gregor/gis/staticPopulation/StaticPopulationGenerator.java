@@ -29,7 +29,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -39,6 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -71,7 +71,7 @@ public class StaticPopulationGenerator {
 
 	public void createPopulation() {
 		int id = 0;
-		final Population population = new PopulationImpl();
+		final PopulationImpl population = new PopulationImpl();
 		int inhabitants_all = 0;
 		int lost = 0;
 		for (final Feature zone : this.zones) {

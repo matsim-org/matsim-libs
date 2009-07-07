@@ -32,7 +32,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
@@ -41,6 +40,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledge;
@@ -461,7 +461,7 @@ public class PlansCreateFromCensus2000 {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Population plans, final Layer municipalityLayer) {
+	public void run(final PopulationImpl plans, final Layer municipalityLayer) {
 		log.info("    running " + this.getClass().getName() + " algorithm...");
 
 		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("plans DB is not empty!"); }

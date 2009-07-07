@@ -12,13 +12,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Layer;
@@ -84,7 +84,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 		}
 	}
 
-	public void readPersons( Population population, ActivityFacilities facilities, double fraction) {
+	public void readPersons( PopulationImpl population, ActivityFacilities facilities, double fraction) {
 		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
 		System.exit(-1) ;
 		Map<Id,Id> gridcellFromJob = new HashMap<Id,Id>() ;
@@ -96,7 +96,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	}
 
 	public long personCnt = 0 ;
-	void readPersonsFromHouseholds ( Population population, ActivityFacilities facilities, double fraction ) {
+	void readPersonsFromHouseholds ( PopulationImpl population, ActivityFacilities facilities, double fraction ) {
 		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
 		System.exit(-1) ;
 		try {

@@ -38,12 +38,12 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -84,7 +84,7 @@ public class TravelTimeHistogram {
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
-		Population population = data.getPopulation();
+		PopulationImpl population = data.getPopulation();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		/*
 		 * Make grid...
@@ -389,7 +389,7 @@ public class TravelTimeHistogram {
 		
 	}
 	
-	private static int getPersons(Coord ego, double radius, Population pop) {
+	private static int getPersons(Coord ego, double radius, PopulationImpl pop) {
 		int count = 0;
 		for(PersonImpl p : pop.getPersons().values()) {
 			double r = CoordUtils.calcDistance(ego, p.getSelectedPlan().getFirstActivity().getCoord());

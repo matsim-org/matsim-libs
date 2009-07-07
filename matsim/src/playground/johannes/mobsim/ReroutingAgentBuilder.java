@@ -23,7 +23,7 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.population.PopulationImpl;
 
 
 /**
@@ -32,12 +32,12 @@ import org.matsim.core.api.experimental.population.Population;
  */
 public class ReroutingAgentBuilder extends DeliberateAgentBuilder {
 
-	public static ReroutingAgentBuilder newInstance(Population population, RouteProviderBuilder builder) {
+	public static ReroutingAgentBuilder newInstance(PopulationImpl population, RouteProviderBuilder builder) {
 		ReroutingStrategyBuilder sBuilder = new ReroutingStrategyBuilder(builder);
 		return new ReroutingAgentBuilder(population, sBuilder);
 	}
 	
-	private ReroutingAgentBuilder(Population population,	IntradayStrategyBuilder builder) {
+	private ReroutingAgentBuilder(PopulationImpl population,	IntradayStrategyBuilder builder) {
 		super(population, builder);
 	}
 

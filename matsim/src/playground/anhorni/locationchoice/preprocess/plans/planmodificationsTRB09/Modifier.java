@@ -1,17 +1,17 @@
 package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 
 public abstract class Modifier {
 
-	protected Population plans=null;
+	protected PopulationImpl plans=null;
 	protected NetworkLayer network=null;
 	protected ActivityFacilities  facilities=null;
 
 
-	public Modifier(Population plans, NetworkLayer network, ActivityFacilities  facilities) {
+	public Modifier(PopulationImpl plans, NetworkLayer network, ActivityFacilities  facilities) {
 		this.plans=plans;
 		this.network=network;
 		this.facilities=facilities;

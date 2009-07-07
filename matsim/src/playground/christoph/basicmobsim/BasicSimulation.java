@@ -37,7 +37,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -49,12 +48,13 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 public class BasicSimulation {
 	
 	private final Config config;
-	protected final Population plans;
+	protected final PopulationImpl plans;
 	protected NetworkLayer networkLayer;
 
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
@@ -66,7 +66,7 @@ public class BasicSimulation {
 
 	final private static Logger log = Logger.getLogger(BasicSimulation.class);
 	
-	public BasicSimulation(final NetworkLayer network, final Population plans, final Events events) {
+	public BasicSimulation(final NetworkLayer network, final PopulationImpl plans, final Events events) {
 		Simulation.reset();
 		this.config = Gbl.getConfig();
 		

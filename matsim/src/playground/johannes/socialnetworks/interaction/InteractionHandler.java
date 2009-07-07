@@ -32,7 +32,6 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
@@ -41,6 +40,7 @@ import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**

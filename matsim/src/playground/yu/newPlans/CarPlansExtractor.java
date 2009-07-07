@@ -6,13 +6,13 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -29,7 +29,7 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 	/**
 	 * @param plans
 	 */
-	public CarPlansExtractor(Population plans) {
+	public CarPlansExtractor(PopulationImpl plans) {
 		super(plans);
 	}
 
@@ -37,7 +37,7 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 	 * @param population
 	 * @param filename
 	 */
-	public CarPlansExtractor(Population population, String filename) {
+	public CarPlansExtractor(PopulationImpl population, String filename) {
 		super(population, filename);
 	}
 

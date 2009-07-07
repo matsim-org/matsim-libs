@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -19,6 +18,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -163,7 +163,7 @@ public class MergeCoord {
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);
@@ -243,7 +243,7 @@ public class MergeCoord {
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);

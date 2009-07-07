@@ -5,10 +5,10 @@ import java.io.IOException;
 import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.referencing.FactoryException;
@@ -42,7 +42,7 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network)
 				.readFile(populationFilename);
 		/*

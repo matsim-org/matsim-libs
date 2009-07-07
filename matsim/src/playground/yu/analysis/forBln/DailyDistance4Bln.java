@@ -6,13 +6,13 @@ package playground.yu.analysis.forBln;
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -606,7 +606,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		// RoadPricingReaderXMLv1 tollReader = new
 		// RoadPricingReaderXMLv1(network);

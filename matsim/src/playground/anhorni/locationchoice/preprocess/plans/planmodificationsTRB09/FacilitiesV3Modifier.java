@@ -4,18 +4,18 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Counter;
 
 public class FacilitiesV3Modifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
 
-	public FacilitiesV3Modifier(Population plans, NetworkLayer network, ActivityFacilities  facilities){
+	public FacilitiesV3Modifier(PopulationImpl plans, NetworkLayer network, ActivityFacilities  facilities){
 		super(plans, network, facilities);
 	}
 

@@ -20,13 +20,13 @@
 
 package playground.david;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 public class SimRunTelematics {
@@ -40,7 +40,7 @@ public class SimRunTelematics {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		Population population = new MyPopulation();
+		PopulationImpl population = new MyPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 

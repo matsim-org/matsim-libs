@@ -21,7 +21,6 @@ package playground.dgrether.analysis.activity;
 import java.io.File;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -30,6 +29,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -71,7 +71,7 @@ public class ModeActivityDurationAnalyser {
 //		Gbl.getWorld().setNetworkLayer(net);
 //		Gbl.getWorld().complete();
 
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
 		plansParser.readFile(PLANSFILE);
 

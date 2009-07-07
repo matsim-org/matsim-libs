@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentEvent;
 import org.matsim.core.events.AgentStuckEvent;
@@ -42,6 +41,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -62,7 +62,7 @@ public class LegDistance implements LinkEnterEventHandler,
 	private double[] legDistances;
 	private int[] legCount;
 	private RoadPricingScheme toll = null;
-	private Population ppl = null;
+	private PopulationImpl ppl = null;
 	/**
 	 * @param arg0
 	 *            - String agentId;
@@ -113,7 +113,7 @@ public class LegDistance implements LinkEnterEventHandler,
 	}
 
 	public LegDistance(NetworkLayer network, RoadPricingScheme toll,
-			Population ppl) {
+			PopulationImpl ppl) {
 		this(network);
 		this.toll = toll;
 		this.ppl = ppl;

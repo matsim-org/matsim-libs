@@ -23,12 +23,12 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -53,7 +53,7 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentCarPlan(final Population plans, final String filename) {
+	public NewAgentCarPlan(final PopulationImpl plans, final String filename) {
 		super(plans, filename);
 	}
 
@@ -81,7 +81,7 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		NewAgentCarPlan nac = new NewAgentCarPlan(population,
 				outputPlansFilename);
 		PopulationReader plansReader = new MatsimPopulationReader(population,

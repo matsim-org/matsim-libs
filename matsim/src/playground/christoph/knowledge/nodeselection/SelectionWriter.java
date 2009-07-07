@@ -26,10 +26,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
 import org.matsim.knowledges.Knowledge;
@@ -47,7 +47,7 @@ public class SelectionWriter extends Writer {
 	private FileNameCreator fileNameCreator;
 	
 	private SelectionWriterHandler handler = null;
-	private final Population population;
+	private final PopulationImpl population;
 
 	private final static Logger log = Logger.getLogger(SelectionWriter.class);
 
@@ -60,7 +60,7 @@ public class SelectionWriter extends Writer {
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
 	 */
-	public SelectionWriter(final Population population, final String filename, final String dtdFile, final String version, final String description)
+	public SelectionWriter(final PopulationImpl population, final String filename, final String dtdFile, final String version, final String description)
 	{
 		super();
 		

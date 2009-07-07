@@ -26,11 +26,11 @@ import java.io.IOException;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -72,7 +72,7 @@ public class KtiPtTester {
 		Gbl.printRoundTime();
 		readPtTimeMatrix("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx");
 		Gbl.printRoundTime();
-		Population population = this.data.getPopulation();
+		PopulationImpl population = this.data.getPopulation();
 		Gbl.printRoundTime();
 		SwissHaltestellen haltestellen = new SwissHaltestellen((NetworkLayer) this.data.getNetwork());
 		try {

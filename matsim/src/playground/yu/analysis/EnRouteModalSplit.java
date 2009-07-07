@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.AgentEvent;
@@ -42,6 +41,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -81,7 +81,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	protected double[] othersDep = null, othersArr = null, othersStuck = null,
 			othersEnRoute = null;
 
-	protected final Population plans;
+	protected final PopulationImpl plans;
 
 	protected RoadPricingScheme toll = null;
 
@@ -95,7 +95,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	 *            The number of time bins for this analysis.
 	 */
 	public EnRouteModalSplit(String scenario, final int binSize,
-			final int nofBins, Population plans) {
+			final int nofBins, PopulationImpl plans) {
 		super();
 		this.scenario = scenario;
 		this.binSize = binSize;
@@ -139,15 +139,15 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	 *            The size of a time bin in seconds.
 	 */
 	public EnRouteModalSplit(String scenario, final int binSize,
-			Population plans) {
+			PopulationImpl plans) {
 		this(scenario, binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public EnRouteModalSplit(String scenario, Population plans) {
+	public EnRouteModalSplit(String scenario, PopulationImpl plans) {
 		this(scenario, 300, plans);
 	}
 
-	public EnRouteModalSplit(String scenario, Population ppl,
+	public EnRouteModalSplit(String scenario, PopulationImpl ppl,
 			RoadPricingScheme toll) {
 		this(scenario, ppl);
 		this.toll = toll;
@@ -430,7 +430,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		// RoadPricingReaderXMLv1 tollReader = new

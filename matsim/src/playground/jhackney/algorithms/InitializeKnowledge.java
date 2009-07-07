@@ -3,11 +3,11 @@ package playground.jhackney.algorithms;
 import java.io.File;
 import java.util.Iterator;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 
@@ -16,7 +16,7 @@ import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final Population plans, final ActivityFacilities facilities, Knowledges knowledges){
+	public InitializeKnowledge(final PopulationImpl plans, final ActivityFacilities facilities, Knowledges knowledges){
 
 		ActivityActReader aar = null;
 

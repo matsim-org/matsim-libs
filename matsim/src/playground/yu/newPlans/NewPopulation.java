@@ -23,8 +23,8 @@
  */
 package playground.yu.newPlans;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -36,12 +36,12 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected PopulationWriter pw;
 	protected NetworkLayer net;
 
-	public NewPopulation(final Population plans) {
+	public NewPopulation(final PopulationImpl plans) {
 		this.pw = new PopulationWriter(plans);
 		this.pw.writeStartPlans();
 	}
 
-	public NewPopulation(final Population population, final String filename) {
+	public NewPopulation(final PopulationImpl population, final String filename) {
 		this.pw = new PopulationWriter(population, filename, "v4");
 		this.pw.writeStartPlans();
 	}
@@ -50,7 +50,7 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	/**
 	 *
 	 */
-	public NewPopulation(final NetworkLayer network, final Population plans) {
+	public NewPopulation(final NetworkLayer network, final PopulationImpl plans) {
 		this(plans);
 		this.net = network;
 	}

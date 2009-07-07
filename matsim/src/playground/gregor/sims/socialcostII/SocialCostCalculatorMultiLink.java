@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEvent;
@@ -25,6 +24,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
@@ -39,7 +39,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 	private final NetworkLayer network;
 	private final int binSize;
 	private final TravelTimeCalculator travelTimeCalculator;
-	private final Population population;
+	private final PopulationImpl population;
 	
 	private Integer maxK;
 	private final int minK;
@@ -53,7 +53,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 
 	private final static int MSA_OFFSET = 0;
 	
-	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population) {
+	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, PopulationImpl population) {
 		this.network = network;
 		this.binSize = binSize;
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed

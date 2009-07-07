@@ -1,7 +1,7 @@
 package playground.yu.visum.filter.finalFilters;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 /**
@@ -24,7 +24,7 @@ public class NewPlansWriter extends FinalPersonFilter {
 	 * @param plans -
 	 *            Parameter for constructor of PlansWriter.
 	 */
-	public NewPlansWriter(Population plans) {
+	public NewPlansWriter(PopulationImpl plans) {
 		this.plansWriter = new PopulationWriter(plans);
 	}
 

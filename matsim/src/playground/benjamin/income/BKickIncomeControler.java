@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.benjamin.income;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -70,8 +70,8 @@ public class BKickIncomeControler extends Controler {
 	
 
 	@Override
-	protected Population loadPopulation() {
-		Population pop = super.loadPopulation();
+	protected PopulationImpl loadPopulation() {
+		PopulationImpl pop = super.loadPopulation();
 		new PlanCalcType().run(pop);
 		return pop;
 	}

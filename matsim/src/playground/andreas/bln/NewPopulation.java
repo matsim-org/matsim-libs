@@ -1,7 +1,7 @@
 package playground.andreas.bln;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -15,12 +15,12 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected PopulationWriter popWriter;
 	protected NetworkLayer net;
 
-	public NewPopulation(final Population population) {
+	public NewPopulation(final PopulationImpl population) {
 		this.popWriter = new PopulationWriter(population);
 		this.popWriter.writeStartPlans();
 	}
 
-	public NewPopulation(final Population population, final String filename) {
+	public NewPopulation(final PopulationImpl population, final String filename) {
 		this.popWriter = new PopulationWriter(population, filename, "v4");
 		this.popWriter.writeStartPlans();
 	}
@@ -29,7 +29,7 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	/**
 	 *
 	 */
-	public NewPopulation(final NetworkLayer network, final Population population) {
+	public NewPopulation(final NetworkLayer network, final PopulationImpl population) {
 		this(population);
 		this.net = network;
 	}

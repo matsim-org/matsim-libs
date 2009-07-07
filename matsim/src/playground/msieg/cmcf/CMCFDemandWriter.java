@@ -27,7 +27,6 @@ import java.io.Writer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -38,6 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.xml.sax.SAXException;
 
@@ -47,7 +47,7 @@ import playground.msieg.structure.Commodity;
 public class CMCFDemandWriter{
 
 	private final NetworkLayer network;
-	private final Population plans;
+	private final PopulationImpl plans;
 	private final PopulationReader popReader;
 	//The input tag has to be specified before converting starts,
 	//it must equal the network name, otherwise CMCF won't run.

@@ -11,12 +11,12 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.cppdeqsim.DEQSimControler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
@@ -43,7 +43,7 @@ public class GenerateChoiceSets {
 
 	//private static int idOffset = 20000000;
 	//private final static double epsilon = 0.01;
-	private Population choiceSetPopulation = new PopulationImpl();
+	private PopulationImpl choiceSetPopulation = new PopulationImpl();
 
 	private final NetworkLayer network = new NetworkLayer();
 	//private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
@@ -268,9 +268,9 @@ public class GenerateChoiceSets {
 		this.output();
 	}
 
-	private Population createChoiceSetPopulationFromMZ() {
+	private PopulationImpl createChoiceSetPopulationFromMZ() {
 
-		Population temporaryPopulation = new PopulationImpl();
+		PopulationImpl temporaryPopulation = new PopulationImpl();
 
 		try {
 			new PlansCreateFromMZ(this.choiceSetPopulationFile,this.outdir+"/output_wegeketten.dat",1,7).run(temporaryPopulation);

@@ -20,7 +20,6 @@
 
 package playground.jhackney.algorithms;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -28,6 +27,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -57,7 +57,7 @@ public class EgoNetMakeActivitySpaces {
 		NetworkLayer network =Scenario.readNetwork();
 		
 		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		Knowledges knowledges = new KnowledgesImpl();
 		System.out.println(config.plans().getInputFile());
 		new MatsimPopulationReader(plans, network, knowledges).readFile(config.plans().getInputFile());

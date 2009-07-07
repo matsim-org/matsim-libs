@@ -35,7 +35,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,6 +44,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 
@@ -72,7 +72,7 @@ public class Getagentcoords {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 

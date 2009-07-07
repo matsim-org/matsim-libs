@@ -41,7 +41,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -53,6 +52,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -107,7 +107,7 @@ public class DistanceAnalysis {
 	private final FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private final Population population;
+	private final PopulationImpl population;
 	private Envelope envelope = null;
 	private QuadTree<PersonImpl> personTree;
 	private final NetworkLayer network;
@@ -124,7 +124,7 @@ public class DistanceAnalysis {
 
 
 
-	public DistanceAnalysis(final FeatureSource features, final Population population, final NetworkLayer network) throws Exception {
+	public DistanceAnalysis(final FeatureSource features, final PopulationImpl population, final NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
@@ -387,7 +387,7 @@ public class DistanceAnalysis {
 
 
 		log.info("loading population from " + config.plans().getInputFile());
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
 //		plansReader.readFile("./badPersons.xml");

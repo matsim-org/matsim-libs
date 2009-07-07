@@ -2,13 +2,13 @@ package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB0
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -19,7 +19,7 @@ import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class PlanModifications {
 
-	private Population plans=null;
+	private PopulationImpl plans=null;
 	private NetworkLayer network=null;
 	private ActivityFacilities  facilities =null;
 	private String outputpath="";

@@ -2,7 +2,6 @@ package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -11,6 +10,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -26,7 +26,7 @@ public class ShuffleCoords extends NewPopulation {
 
 	private double radius; // meter
 	
-	public ShuffleCoords(Population plans, String filename, double radius) {
+	public ShuffleCoords(PopulationImpl plans, String filename, double radius) {
 		super(plans, filename);
 		this.radius = radius;
 	}
@@ -73,7 +73,7 @@ public class ShuffleCoords extends NewPopulation {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		Population inPop = new PopulationImpl();
+		PopulationImpl inPop = new PopulationImpl();
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
 		popReader.readFile(inPlansFile);
 

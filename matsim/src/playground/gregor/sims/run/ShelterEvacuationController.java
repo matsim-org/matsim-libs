@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
@@ -88,12 +88,12 @@ public class ShelterEvacuationController extends Controler {
 	}
 
 	@Override
-	protected Population loadPopulation() {
+	protected PopulationImpl loadPopulation() {
 		if (this.buildings == null) {
 			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
 		}
 		EvacuationPopulationFromShapeFileLoader epl = new EvacuationPopulationFromShapeFileLoader(this.buildings,this.scenarioData);
-		Population pop = epl.getPopulation();
+		PopulationImpl pop = epl.getPopulation();
 		this.esnl.generateShelterLinks();
 		return pop;
 	}

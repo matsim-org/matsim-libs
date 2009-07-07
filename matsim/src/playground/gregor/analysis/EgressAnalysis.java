@@ -40,7 +40,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -50,6 +49,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -73,7 +73,7 @@ public class EgressAnalysis {
 	private final FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private final Population population;
+	private final PopulationImpl population;
 	private final Envelope envelope = null;
 	private QuadTree<PersonImpl> personTree;
 	private final NetworkLayer network;
@@ -88,7 +88,7 @@ public class EgressAnalysis {
 	private final Map<Id, EgressNode> egressNodes;
 
 
-	public EgressAnalysis(final FeatureSource features, final Population population,
+	public EgressAnalysis(final FeatureSource features, final PopulationImpl population,
 			final NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
@@ -258,7 +258,7 @@ public class EgressAnalysis {
 
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		log.info("done.");

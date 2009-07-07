@@ -3,9 +3,9 @@ package playground.jhackney.socialnetworks.statistics;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.Location;
 
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
@@ -28,14 +28,14 @@ public class GeoStatistics {
 	 * @author jhackney
 	 */
 	Graph gg;
-	Population plans;
+	PopulationImpl plans;
 	SocialNetwork snet;
 	LinkedHashMap<Location, Vertex> locVertex = new LinkedHashMap<Location, Vertex>();
 	LinkedHashMap<Vertex, Location> vertexLoc = new LinkedHashMap<Vertex,Location>();
 	LinkedHashMap<Edge, Double> edgeStrength = new LinkedHashMap<Edge,Double>();
 //	Collection<Location> locations;
 
-	public GeoStatistics(Population plans, SocialNetwork snet) {
+	public GeoStatistics(PopulationImpl plans, SocialNetwork snet) {
 
 		this.plans=plans;
 		this.snet=snet;

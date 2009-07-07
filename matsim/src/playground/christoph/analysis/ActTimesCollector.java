@@ -31,11 +31,11 @@ import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 
 public class ActTimesCollector implements BasicActivityStartEventHandler, BasicActivityEndEventHandler {
 
@@ -45,7 +45,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 	protected TreeMap<Id, EventData> data = new TreeMap<Id, EventData>();
 	//protected NetworkLayer network;
 	protected NetworkLayer network;
-	protected Population population;
+	protected PopulationImpl population;
 	
 	protected double startTime = 0.0;
 	protected double endTime = Double.MAX_VALUE;
@@ -275,12 +275,12 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		return network;
 	}
 	
-	public void setPopulation(Population pop)
+	public void setPopulation(PopulationImpl pop)
 	{
 		population = pop;
 	}
 	
-	public Population getPopulation()
+	public PopulationImpl getPopulation()
 	{
 		return population;
 	}

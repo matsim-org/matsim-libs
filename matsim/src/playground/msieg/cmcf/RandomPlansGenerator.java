@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -39,6 +38,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
@@ -125,12 +125,12 @@ public class RandomPlansGenerator {
 		this.routingAlgo = new Dijkstra(this.network, costFunction, costFunction, preProcessData);
 	}
 
-	public Population createPlans(final int numberOfAgents){
+	public PopulationImpl createPlans(final int numberOfAgents){
 		return this.createPlans(numberOfAgents, 6*3600, 7*3600);
 	}
 
-	public Population createPlans(final int numberOfAgents, final int startTime, final int endTime){
-		Population pop = new PopulationImpl();
+	public PopulationImpl createPlans(final int numberOfAgents, final int startTime, final int endTime){
+		PopulationImpl pop = new PopulationImpl();
 		this.initDijkstra();
 
 		for(int i=1; i <= numberOfAgents; i++){
@@ -186,13 +186,13 @@ public class RandomPlansGenerator {
 		return randomLink;
 	}
 
-	public void writePlans(final Population plans){
+	public void writePlans(final PopulationImpl plans){
 		PopulationWriter pwriter = new PopulationWriter(plans);
 		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
 		pwriter.write();
 	}
 
-	public void writePlans(final Population plans, final String file){
+	public void writePlans(final PopulationImpl plans, final String file){
 		PopulationWriter pwriter = new PopulationWriter(plans, file, "v4", 1.0);
 		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
 		pwriter.write();
@@ -217,7 +217,7 @@ public class RandomPlansGenerator {
 
 		RandomPlansGenerator rpg = new RandomPlansGenerator(inFile);
 
-		Population pop = rpg.createPlans(number, start, end);
+		PopulationImpl pop = rpg.createPlans(number, start, end);
 
 		String outFile = "";
 		if(inFile.lastIndexOf('/') != -1)

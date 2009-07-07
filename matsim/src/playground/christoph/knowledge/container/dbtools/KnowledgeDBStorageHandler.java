@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.DBStorage;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -22,9 +22,9 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 	private boolean stopHandler = false;
 	private boolean running = false;
 	
-	private Population population;
+	private PopulationImpl population;
 	
-	public KnowledgeDBStorageHandler(Population population)
+	public KnowledgeDBStorageHandler(PopulationImpl population)
 	{
 		this.population = population;
 	}

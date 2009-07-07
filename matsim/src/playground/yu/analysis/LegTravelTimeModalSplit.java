@@ -29,7 +29,6 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -42,6 +41,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
@@ -65,7 +65,7 @@ import playground.yu.utils.io.SimpleWriter;
 public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
 
-	protected final Population plans;
+	protected final PopulationImpl plans;
 
 	protected RoadPricingScheme toll = null;
 
@@ -89,7 +89,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	 *
 	 */
 	public LegTravelTimeModalSplit(final int binSize, final int nofBins,
-			final Population plans) {
+			final PopulationImpl plans) {
 		this.plans = plans;
 		this.binSize = binSize;
 
@@ -109,15 +109,15 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		othersArrCount = new int[nofBins + 1];
 	}
 
-	public LegTravelTimeModalSplit(final int binSize, final Population plans) {
+	public LegTravelTimeModalSplit(final int binSize, final PopulationImpl plans) {
 		this(binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public LegTravelTimeModalSplit(final Population plans) {
+	public LegTravelTimeModalSplit(final PopulationImpl plans) {
 		this(300, plans);
 	}
 
-	public LegTravelTimeModalSplit(Population ppl, RoadPricingScheme toll) {
+	public LegTravelTimeModalSplit(PopulationImpl ppl, RoadPricingScheme toll) {
 		this(ppl);
 		this.toll = toll;
 	}
@@ -339,7 +339,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 

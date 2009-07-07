@@ -1,10 +1,10 @@
 package playground.jhackney.algorithms;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -14,7 +14,7 @@ public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements P
 	double[] score=null;
 	int i=0;
 
-	public PlansPlotScoreDistance(Population plans) {
+	public PlansPlotScoreDistance(PopulationImpl plans) {
 		super();
 		this.dist= new double[plans.getPersons().size()];
 		this.score= new double[plans.getPersons().size()];

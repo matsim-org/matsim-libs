@@ -27,12 +27,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
@@ -76,7 +76,7 @@ public class SocialNetwork {
 
 	private final static Logger log = Logger.getLogger(SocialNetwork.class);
 
-	public SocialNetwork(Population plans) {
+	public SocialNetwork(PopulationImpl plans) {
 
 		this.persons=plans.getPersons().values();
 
@@ -137,7 +137,7 @@ public class SocialNetwork {
 	 *  and to link them; stratified sampling.
 	 * @param plans
 	 */
-	private void initEuclidRandomNetwork(Population plans) {
+	private void initEuclidRandomNetwork(PopulationImpl plans) {
 
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED distance-dependent Erdos/Renyi random graph.");
@@ -194,7 +194,7 @@ public class SocialNetwork {
 	 * 
 	 * @author jhackney
 	 */
-	private void initBASocialNetwork(Population plans) {
+	private void initBASocialNetwork(PopulationImpl plans) {
 
 		double gamma = 2.5; //
 		int kbar=Integer.parseInt(socnetConfig.getSocNetKbar()); 
@@ -268,7 +268,7 @@ public class SocialNetwork {
 	 * @author jhackney
 	 * 
 	 */
-	void initRandomSocialNetwork( Population plans ){
+	void initRandomSocialNetwork( PopulationImpl plans ){
 
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED Erdos/Renyi random graph. Dorogovtsev and Mendes 2003.");
@@ -297,7 +297,7 @@ public class SocialNetwork {
 	/**
 	 * Not implemented
 	 */
-	void initWattsSocialNetwork( Population plans ){
+	void initWattsSocialNetwork( PopulationImpl plans ){
 
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported.");
 		throw new UnsupportedOperationException();
@@ -306,7 +306,7 @@ public class SocialNetwork {
 	/**
 	 * Not implemented
 	 */
-	void initJGNSocialNetwork(Population plans) {
+	void initJGNSocialNetwork(PopulationImpl plans) {
 
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. To generate a similar network, initialize a random network and let a small number of agents introduce friends to each other.");
 		throw new UnsupportedOperationException();
@@ -315,7 +315,7 @@ public class SocialNetwork {
 	/**
 	 * Unsupported. Use "random" keyword and kbar = 0
 	 */
-	void initEmptySocialNetwork( Population plans) {
+	void initEmptySocialNetwork( PopulationImpl plans) {
 
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. Use a \"random\" social network instead, with kbar=0");
 		throw new UnsupportedOperationException();
@@ -330,7 +330,7 @@ public class SocialNetwork {
 	 * 
 	 * @author jhackney
 	 */
-	void initReadInNetwork(Population plans){
+	void initReadInNetwork(PopulationImpl plans){
 
 		String filename = socnetConfig.getInDirName()+ "socialnets/stats/edge.txt";
 		new MakeSocialNetworkFromFile(this, plans).read(filename, Integer.valueOf(socnetConfig.getInitIter()).intValue());

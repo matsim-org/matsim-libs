@@ -5,9 +5,9 @@ import java.io.FileReader;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
@@ -18,11 +18,11 @@ import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class MakeSocialNetworkFromFile {
 
-	private Population plans;
+	private PopulationImpl plans;
 	private SocialNetwork snet;
 	private final Logger log = Logger.getLogger(MakeSocialNetworkFromFile.class);
 
-	public MakeSocialNetworkFromFile(SocialNetwork snet, Population plans){
+	public MakeSocialNetworkFromFile(SocialNetwork snet, PopulationImpl plans){
 		// initialize a new SocialNetwork -- uses config params
 		this.plans=plans;
 		this.snet=snet;

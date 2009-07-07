@@ -3,8 +3,8 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -15,7 +15,7 @@ public PersonGetEgoNetGetPlans(){
 	super();
 }
 
-	public PopulationImpl extract(final PersonImpl ego, final Population plans) throws Exception{
+	public PopulationImpl extract(final PersonImpl ego, final PopulationImpl plans) throws Exception{
 
 
 		PopulationImpl socialPlans=new PopulationImpl();

@@ -22,7 +22,6 @@ package playground.dgrether;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -34,6 +33,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
@@ -54,7 +54,7 @@ public class Plansgenerator {
 	private static final String plansOut = "../matsimWithindayTesting/testdata/tests/withinday/newPlans.xml";
 
 	private NetworkLayer network;
-	private Population plans;
+	private PopulationImpl plans;
 
 	private void init() {
 		Config config = Gbl.createConfig(null);

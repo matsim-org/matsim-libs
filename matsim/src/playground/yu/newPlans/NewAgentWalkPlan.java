@@ -26,7 +26,6 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -35,6 +34,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -55,11 +55,11 @@ public class NewAgentWalkPlan extends NewPopulation {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentWalkPlan(final Population plans) {
+	public NewAgentWalkPlan(final PopulationImpl plans) {
 		super(plans);
 	}
 
-	public NewAgentWalkPlan(final Population population, final String filename) {
+	public NewAgentWalkPlan(final PopulationImpl population, final String filename) {
 		super(population, filename);
 	}
 
@@ -130,7 +130,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		NewAgentWalkPlan nawp = new NewAgentWalkPlan(population);
 		new MatsimPopulationReader(population, network).readFile(config.plans()
 				.getInputFile());

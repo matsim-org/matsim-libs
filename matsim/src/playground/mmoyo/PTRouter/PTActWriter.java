@@ -7,7 +7,6 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -19,6 +18,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -37,7 +37,7 @@ import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
  */
 public class PTActWriter {
 	private Walk walk = new Walk();
-	private final Population population;
+	private final PopulationImpl population;
 	private String outputFile;
 	private String plansFile;
 	private NodeImpl originNode;
@@ -93,7 +93,7 @@ public class PTActWriter {
 	}
 	
 	public void SimplifyPtLegs(){
-		Population outPopulation = new PopulationImpl();
+		PopulationImpl outPopulation = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(outPopulation,logicNet);
 		plansReader.readFile(outputFile);
 		
@@ -137,7 +137,7 @@ public class PTActWriter {
 	}
 	
 	public void findRouteForActivities(){
-		Population newPopulation = new PopulationImpl();
+		PopulationImpl newPopulation = new PopulationImpl();
 		
 		int numPlans=0;
 

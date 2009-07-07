@@ -32,10 +32,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
@@ -43,7 +43,7 @@ import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 public class PopProviderFile implements PopulationProvider {
 
 	String filename;
-	Population population;
+	PopulationImpl population;
 	NetworkLayer network;
 	
 	public PopProviderFile(String filename) {

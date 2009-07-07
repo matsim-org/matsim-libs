@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -38,6 +37,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
+
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
@@ -103,7 +104,7 @@ public class PseudoNetworkDemo {
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		LinkImpl link1 = network.getLink(scenario.createId("1"));
 
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 		PersonImpl person = population.getPopulationBuilder().createPerson(new IdImpl(1));
 		population.getPersons().put(person.getId(), person);
 		PlanImpl plan = population.getPopulationBuilder().createPlan(person);

@@ -23,12 +23,12 @@ package playground.balmermi.census2000v2.modules;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 public class PlansAnalyse {
 
@@ -70,7 +70,7 @@ public class PlansAnalyse {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Population plans) {
+	public void run(final PopulationImpl plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
 		double[] lic_cnt = new double[2]; // yes,no

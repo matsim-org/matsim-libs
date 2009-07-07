@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -39,6 +38,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -111,7 +111,7 @@ public class MyRuns {
 		loader.loadScenario();
 		
 		Scenario scenario = loader.getScenario();
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 
 		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);
 		psfaet.run(population);
@@ -123,7 +123,7 @@ public class MyRuns {
 		
 	}
 	
-	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, NetworkLayer network) {
+	public static PopulationImpl initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, NetworkLayer network) {
 
 		PopulationImpl population = null;
 

@@ -29,13 +29,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -83,7 +83,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		ScoreVariance sv = new ScoreVariance(outputFilename);
 

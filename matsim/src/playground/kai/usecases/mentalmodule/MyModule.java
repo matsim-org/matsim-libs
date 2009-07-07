@@ -15,7 +15,6 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.ActivityEndEvent;
@@ -35,6 +34,7 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 @SuppressWarnings("unused")
 public class MyModule implements
@@ -52,7 +52,7 @@ ActivityStartEventHandler
 	
 	Scenario sc ;
 	NetworkLayer net ;
-	Population pop ;
+	PopulationImpl pop ;
 	
 	public MyModule(Controler controler) {
 		

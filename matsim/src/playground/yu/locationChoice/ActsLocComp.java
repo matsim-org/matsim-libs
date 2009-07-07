@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,6 +42,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -130,7 +130,7 @@ public class ActsLocComp {
 		ActivityFacilities af = scenarioA.getActivityFacilities();
 		new MatsimFacilitiesReader(af).readFile(facFile);
 
-		Population popA = scenarioA.getPopulation();
+		PopulationImpl popA = scenarioA.getPopulation();
 		new MatsimPopulationReader(popA, net).readFile(popFileA);
 
 		ActsLocRecorder alrA = new ActsLocRecorder();
@@ -144,7 +144,7 @@ public class ActsLocComp {
 		ActivityFacilities afB = scenarioB.getActivityFacilities();
 		new MatsimFacilitiesReader(afB).readFile(facFile);
 
-		Population popB = scenarioB.getPopulation();
+		PopulationImpl popB = scenarioB.getPopulation();
 		new MatsimPopulationReader(popB, net).readFile(popFileB);
 
 		ActsLocRecorder alrB = new ActsLocRecorder();

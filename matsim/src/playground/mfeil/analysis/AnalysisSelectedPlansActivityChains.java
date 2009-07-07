@@ -32,13 +32,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
 
@@ -50,7 +50,7 @@ import org.matsim.knowledges.Knowledges;
  */
 public class AnalysisSelectedPlansActivityChains {
 
-	protected final Population population;
+	protected final PopulationImpl population;
 	protected final String outputDir;
 	protected ArrayList<List<PlanElement>> activityChains;
 	protected ArrayList<ArrayList<PlanImpl>> plans;
@@ -60,7 +60,7 @@ public class AnalysisSelectedPlansActivityChains {
 	
 
 
-	public AnalysisSelectedPlansActivityChains(final Population population, Knowledges knowledges, final String outputDir) {
+	public AnalysisSelectedPlansActivityChains(final PopulationImpl population, Knowledges knowledges, final String outputDir) {
 		this.population = population;
 		this.outputDir = outputDir;
 		this.knowledges = knowledges;

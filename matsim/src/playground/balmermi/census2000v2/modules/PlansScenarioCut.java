@@ -27,10 +27,10 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
@@ -67,7 +67,7 @@ public class PlansScenarioCut {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void run(Population plans) {
+	public final void run(PopulationImpl plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		Set<Id> removeids = new TreeSet<Id>();
 		Map<Id,PersonImpl> persons = plans.getPersons();

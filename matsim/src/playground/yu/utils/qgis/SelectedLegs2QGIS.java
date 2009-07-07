@@ -10,12 +10,12 @@ import org.geotools.feature.Feature;
 import org.jfree.util.Log;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -32,7 +32,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 	 * @param crs
 	 * @param outputDir
 	 */
-	public SelectedLegs2QGIS(Population population,
+	public SelectedLegs2QGIS(PopulationImpl population,
 			CoordinateReferenceSystem crs, String outputDir) {
 		super(population, crs, outputDir);
 	}
@@ -68,7 +68,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network)
 				.readFile(populationFilename);
 

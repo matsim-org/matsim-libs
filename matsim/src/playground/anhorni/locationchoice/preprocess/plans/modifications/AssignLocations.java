@@ -24,13 +24,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 //import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.preprocess.helper.QuadTreeRing;
@@ -95,7 +95,7 @@ public class AssignLocations {
 	}
 	
 
-	public void run(Population plans, String type) {	
+	public void run(PopulationImpl plans, String type) {	
 		Iterator<PersonImpl> person_it = plans.getPersons().values().iterator();
 		while (person_it.hasNext()) {
 			PersonImpl person = person_it.next();

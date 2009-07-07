@@ -26,7 +26,6 @@ import java.util.Set;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -35,6 +34,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -46,7 +46,7 @@ public class AvoidOldNodes extends NewPopulation {
 	private boolean nullRoute = false;
 	private final Set<String> nodeIds;
 
-	public AvoidOldNodes(final NetworkLayer network, final Population plans) {
+	public AvoidOldNodes(final NetworkLayer network, final PopulationImpl plans) {
 		super(network, plans);
 		this.nodeIds = new HashSet<String>();
 	}
@@ -99,7 +99,7 @@ public class AvoidOldNodes extends NewPopulation {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		AvoidOldNodes aon = new AvoidOldNodes(network, population);
 		aon.addNode("100000");
 		aon.addLink("3000000");

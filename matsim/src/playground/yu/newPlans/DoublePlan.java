@@ -20,13 +20,13 @@
 
 package playground.yu.newPlans;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -47,7 +47,7 @@ public class DoublePlan extends NewPopulation {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public DoublePlan(Population plans, String filename) {
+	public DoublePlan(PopulationImpl plans, String filename) {
 		super(plans, filename);
 	}
 
@@ -83,7 +83,7 @@ public class DoublePlan extends NewPopulation {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);

@@ -36,11 +36,11 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import org.xml.sax.Attributes;
 
@@ -111,7 +111,7 @@ public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLRe
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadPopulation();
 		Scenario scenario = loader.getScenario();
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 		SNGraphMLReader<PersonImpl> reader = new SNGraphMLReader<PersonImpl>(population);
 		SocialNetwork<PersonImpl> g = reader.readGraph(socialnetFile);
 		

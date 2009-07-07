@@ -3,12 +3,12 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -313,7 +313,7 @@ public class CarAvailStatistics extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		CarAvailStatistics cas = new CarAvailStatistics();
 

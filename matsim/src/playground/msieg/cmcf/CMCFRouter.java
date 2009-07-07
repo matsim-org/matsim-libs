@@ -31,13 +31,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReader;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
@@ -53,7 +53,7 @@ public abstract class CMCFRouter implements NetworkReader{
 	private final String networkFile, plansFile, cmcfFile;
 
 	protected NetworkLayer network;
-	protected Population population;
+	protected PopulationImpl population;
 	protected PathFlow<NodeImpl, LinkImpl> pathFlow;
 
 

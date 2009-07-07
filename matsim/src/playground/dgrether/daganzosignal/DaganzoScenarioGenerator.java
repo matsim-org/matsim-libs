@@ -26,7 +26,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -38,6 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -188,7 +188,7 @@ public class DaganzoScenarioGenerator {
 
 	private void createPlans(Scenario scenario) {
 		NetworkLayer network = scenario.getNetwork();
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		LinkImpl l1 = network.getLink(scenario.createId("1"));

@@ -22,7 +22,6 @@ package playground.david.otfvis;
 
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -30,6 +29,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
@@ -83,7 +83,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSim2FILE(final NetworkLayer net, final Population plans, final Events events) {
+	public OnTheFlyQueueSim2FILE(final NetworkLayer net, final PopulationImpl plans, final Events events) {
 		super(net, plans, events);
 		// TODO Auto-generated constructor stub
 	}
@@ -121,7 +121,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		// Read plans file with special Reader Implementation
 		PopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);

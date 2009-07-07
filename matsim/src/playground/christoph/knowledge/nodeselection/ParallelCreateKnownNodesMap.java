@@ -27,11 +27,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -59,7 +59,7 @@ public class ParallelCreateKnownNodesMap {
 	 * @param nodeSelectors
 	 * @param numberOfThreads
 	 */
-	public static void run(final Population population, final NetworkLayer network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
+	public static void run(final PopulationImpl population, final NetworkLayer network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
 	{
 		int numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		

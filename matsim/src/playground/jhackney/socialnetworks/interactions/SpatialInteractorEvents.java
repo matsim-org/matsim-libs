@@ -5,11 +5,11 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
@@ -46,7 +46,7 @@ public class SpatialInteractorEvents {
 		log.warn("Methods are only for Undirected social interactions");
 	}
 
-	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration,
+	public void interact(PopulationImpl plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration,
 			LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm) {
 
 		this.log.info(" Looking through plans and tracking which Persons could interact "+iteration);

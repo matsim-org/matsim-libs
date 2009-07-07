@@ -31,13 +31,13 @@ import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -75,7 +75,7 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Population ppl = new PopulationImpl();
+		PopulationImpl ppl = new PopulationImpl();
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(ppl, network).readFile(plansFilename);
 		ModeChoiceByDistance mcbd;

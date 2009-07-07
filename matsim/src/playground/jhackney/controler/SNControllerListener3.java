@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -44,6 +43,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -335,7 +335,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final Population plans, ActivityFacilities facilities ) {
+	void initializeKnowledge(final PopulationImpl plans, ActivityFacilities facilities ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

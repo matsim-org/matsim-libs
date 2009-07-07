@@ -18,11 +18,11 @@ import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
@@ -49,7 +49,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
 
-	public Route2QGIS(Population population,
+	public Route2QGIS(PopulationImpl population,
 			final CoordinateReferenceSystem crs, final String outputDir,
 			final NetworkLayer network,
 			final Map<List<Id>, Integer> routeCounters) {
@@ -169,7 +169,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		RouteSummary rs = new RouteSummary(outputDir + "/routeCompare.txt.gz");
 

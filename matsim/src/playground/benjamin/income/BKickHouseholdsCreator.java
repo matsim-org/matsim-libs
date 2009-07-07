@@ -24,11 +24,11 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.basic.BasicIncome;
@@ -78,7 +78,7 @@ public class BKickHouseholdsCreator {
 		MatsimNetworkReader netreader = new MatsimNetworkReader(network);
 		netreader.readFile(networkFile);
 		
-    Population pop = sc.getPopulation();
+    PopulationImpl pop = sc.getPopulation();
     MatsimPopulationReader popReader = new MatsimPopulationReader(pop, network);
     popReader.readFile(plansFile);
     

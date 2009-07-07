@@ -27,21 +27,21 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.utils.GetAllLinks;
 
 public class GenerateKnowledge {
 
-	Population population;
+	PopulationImpl population;
 	NetworkLayer network;
 	double distance;
 	
-	public GenerateKnowledge (Population pop, NetworkLayer net, double dist)
+	public GenerateKnowledge (PopulationImpl pop, NetworkLayer net, double dist)
 	{
 		population = pop;
 		network = net;

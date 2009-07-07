@@ -20,7 +20,6 @@
 
 package playground.jhackney;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -28,6 +27,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
@@ -74,7 +74,7 @@ public class MakeScenario {
 //		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");

@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -23,6 +22,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -95,7 +95,7 @@ public class NetworkCalibrator {
 		this.l1 = net.createLink(new IdImpl(1), n1, n2, 100, fs, CAP, WIDTH/PERS_WIDTH);
 		LinkImpl l2 = net.createLink(new IdImpl(3), n2, n3, 50, fs, 20000, PERSONS/(50/CELLSIZE));
 		
-		Population pop = sc.getPopulation();
+		PopulationImpl pop = sc.getPopulation();
 		PopulationBuilder pb = pop.getPopulationBuilder();
 		for (int i = 0; i < PERSONS; i++) {
 			PersonImpl p = pb.createPerson(new IdImpl(i));

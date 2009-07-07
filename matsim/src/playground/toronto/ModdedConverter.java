@@ -11,7 +11,6 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -19,6 +18,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -61,9 +61,9 @@ public class ModdedConverter {
 		}
 	}
 
-	private Population pop;
+	private PopulationImpl pop;
 
-	public void setPop(final Population pop) {
+	public void setPop(final PopulationImpl pop) {
 		this.pop = pop;
 	}
 

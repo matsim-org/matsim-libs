@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
@@ -34,6 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -100,7 +100,7 @@ public class ActivityDurationAnalyser {
 
 		//reading plans, filter and calculate activity durations
 		for (String file : plansFiles) {
-			Population plans = new PopulationImpl();
+			PopulationImpl plans = new PopulationImpl();
 			MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
 			plansParser.readFile(file);
 			ActivityDurationCounter adc = new ActivityDurationCounter();

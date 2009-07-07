@@ -27,13 +27,13 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -58,7 +58,7 @@ public class PlanFilter {
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		Scenario sc = sl.loadScenario();
 		final NetworkLayer network = sc.getNetwork();
-		final Population population = sc.getPopulation();
+		final PopulationImpl population = sc.getPopulation();
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		System.out.println("smallRadius\tbigRadius\t#linksSmall\t#linksBig\t#peopleSmall\t#peopleLeavingBig");
@@ -117,7 +117,7 @@ public class PlanFilter {
 		Scenario sc = sl.loadScenario();
 		final Config config = sc.getConfig();
 		final NetworkLayer network = sc.getNetwork();
-		final Population population = sc.getPopulation();
+		final PopulationImpl population = sc.getPopulation();
 
 		System.out.println("  finding AOI links");
 

@@ -24,7 +24,6 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -34,6 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -52,16 +52,16 @@ public class PlansGeneratorControler extends Controler {
 
 	/** Should be overwritten in case of artificial population */
 	@Override
-	protected Population loadPopulation() {
+	protected PopulationImpl loadPopulation() {
 
 //		return generate4wPersons();
 		return generateSimplePlans();
 	}
 
-	private Population generate4wPersons(){
+	private PopulationImpl generate4wPersons(){
 
 		int numberOfPlans = 1;
-		Population pop = new PopulationImpl();
+		PopulationImpl pop = new PopulationImpl();
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
@@ -121,11 +121,11 @@ public class PlansGeneratorControler extends Controler {
 		return pop;
 	}
 
-	private Population generateSimplePlans(){
+	private PopulationImpl generateSimplePlans(){
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		Population pop = new PopulationImpl();
+		PopulationImpl pop = new PopulationImpl();
 		log.info("  generating plans... ");
 
 		LinkedList <LinkImpl> fromLinks = new LinkedList<LinkImpl>();
@@ -160,7 +160,7 @@ public class PlansGeneratorControler extends Controler {
 
 
 	/** Generates one Person a time */
-	private void generatePerson(final int ii, final LinkImpl fromLink, final LinkImpl toLink, final Population population) {
+	private void generatePerson(final int ii, final LinkImpl fromLink, final LinkImpl toLink, final PopulationImpl population) {
 		PersonImpl p = new PersonImpl(new IdImpl(String.valueOf(ii)));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {

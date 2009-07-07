@@ -26,13 +26,13 @@ package playground.yu.analysis;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 
 /**
@@ -44,7 +44,7 @@ import org.matsim.core.utils.charts.XYLineChart;
  */
 public class PtRate implements IterationEndsListener, ShutdownListener {
 	// -----------------------------MEMBER VARIABLES-----------------------
-	private final Population population;
+	private final PopulationImpl population;
 	private final PtCheck check;
 	private final int maxIters;
 	private final String BetaTraveling;
@@ -75,7 +75,7 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public PtRate(final Population population, final String filename,
+	public PtRate(final PopulationImpl population, final String filename,
 			final int maxIters, final String BetaTraveling,
 			final String BetaTravelingPt) throws FileNotFoundException,
 			IOException {

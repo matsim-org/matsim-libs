@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -38,6 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
@@ -600,7 +600,7 @@ public class Flow {
 	/**
 	 * 
 	 */
-	public Population createPoulation(String oldfile){
+	public PopulationImpl createPoulation(String oldfile){
 		//check whether oldfile exists
 		//boolean org = (oldfile!=null);
 		//HashMap<Node,LinkedList<Person>> orgpersons = new  HashMap<Node,LinkedList<Person>>();
@@ -627,7 +627,7 @@ public class Flow {
 		}*/
 		
 		//construct Population
-		Population result =new PopulationImpl();
+		PopulationImpl result =new PopulationImpl();
 		int id =1;
 		for (TimeExpandedPath path : this._TimeExpandedPaths){
 			if(path.isforward()){

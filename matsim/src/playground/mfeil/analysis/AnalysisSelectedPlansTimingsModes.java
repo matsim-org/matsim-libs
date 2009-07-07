@@ -28,12 +28,12 @@ import java.util.List;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
 
@@ -45,7 +45,7 @@ import org.matsim.knowledges.Knowledges;
  */
 public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActivityChains {
 
-	public AnalysisSelectedPlansTimingsModes(final Population population, final Knowledges knowledges, final String outputDir) {
+	public AnalysisSelectedPlansTimingsModes(final PopulationImpl population, final Knowledges knowledges, final String outputDir) {
 		super (population, knowledges, outputDir);
 	}
 	

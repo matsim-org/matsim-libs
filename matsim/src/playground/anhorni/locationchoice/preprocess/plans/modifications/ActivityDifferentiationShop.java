@@ -7,7 +7,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -17,6 +16,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.World;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
@@ -25,7 +25,7 @@ import playground.anhorni.locationchoice.preprocess.helper.QuadTreeRing;
 
 public class ActivityDifferentiationShop {
 	
-	private Population plans = new PopulationImpl();
+	private PopulationImpl plans = new PopulationImpl();
 	private final static Logger log = Logger.getLogger(ActivityDifferentiationShop.class);
 	
 	// from Microcensus for all modes
@@ -35,7 +35,7 @@ public class ActivityDifferentiationShop {
 	private ActivityFacilities facilitiesActDiff;
 	private String facilitiesActDifffilePath = "input/facilities/facilitiesActDiff.xml.gz";
 	
-	public ActivityDifferentiationShop(Population plans) {
+	public ActivityDifferentiationShop(PopulationImpl plans) {
 		this.plans = plans;
 	}
 	
@@ -155,11 +155,11 @@ public class ActivityDifferentiationShop {
 		assignShops.run(this.plans, "shop_grocery");	
 	}
 	
-	public Population getPlans() {
+	public PopulationImpl getPlans() {
 		return plans;
 	}
 
-	public void setPlans(Population plans) {
+	public void setPlans(PopulationImpl plans) {
 		this.plans = plans;
 	}
 }

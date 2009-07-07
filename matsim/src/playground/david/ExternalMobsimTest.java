@@ -20,7 +20,6 @@
 
 package playground.david;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
@@ -29,6 +28,7 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -44,7 +44,7 @@ public class ExternalMobsimTest {
 		System.out.println("[External MOBSIM called"  + "]");
 
 		Events events_ = new Events();
-		Population population_ = new PopulationImpl();
+		PopulationImpl population_ = new PopulationImpl();
 
 		//load pop from popfile
 		System.out.println("[External MOBSIM"  + "] loading plansfile: " + args[0]);

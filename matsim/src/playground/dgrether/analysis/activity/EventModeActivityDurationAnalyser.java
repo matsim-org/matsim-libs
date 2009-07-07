@@ -25,7 +25,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
@@ -39,6 +38,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.misc.Time;
@@ -88,7 +88,7 @@ public class EventModeActivityDurationAnalyser {
 //		Gbl.getWorld().setNetworkLayer(net);
 //		Gbl.getWorld().complete();
 
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
 		plansParser.readFile(PLANSFILE);
 
@@ -119,9 +119,9 @@ public class EventModeActivityDurationAnalyser {
 		int workActivityNonCarCount = 0;
 		double durTemp;
 
-		private final Population plans;
+		private final PopulationImpl plans;
 
-		public ActivityDurationHandler(final Population plans) {
+		public ActivityDurationHandler(final PopulationImpl plans) {
 			this.plans = plans;
 		}
 

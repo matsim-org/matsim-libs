@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 
@@ -45,7 +45,7 @@ import org.matsim.core.replanning.StrategyManager;
 public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 	private Set<Id> noNewPlans = new HashSet<Id>();
 
-	public void run(final Population population) {
+	public void run(final PopulationImpl population) {
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies)
 			strategy.init();

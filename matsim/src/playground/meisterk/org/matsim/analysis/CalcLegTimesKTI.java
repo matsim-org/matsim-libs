@@ -24,12 +24,12 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 /**
  * Calculates average trip durations by mode.
@@ -39,12 +39,12 @@ import org.matsim.core.population.PersonImpl;
  */
 public class CalcLegTimesKTI implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
-	private Population population = null;
+	private PopulationImpl population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<TransportMode, Double> sumTripDurationsByMode = new TreeMap<TransportMode, Double>();
 	private final TreeMap<TransportMode, Integer> sumTripsByMode = new TreeMap<TransportMode, Integer>();
 
-	public CalcLegTimesKTI(Population population) {
+	public CalcLegTimesKTI(PopulationImpl population) {
 		super();
 		this.population = population;
 	}

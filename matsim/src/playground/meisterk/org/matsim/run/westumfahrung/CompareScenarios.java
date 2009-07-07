@@ -15,7 +15,6 @@ import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -26,6 +25,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
@@ -53,12 +53,12 @@ public class CompareScenarios {
 	static class CaseStudyResult {
 
 		private final String name;
-		private final Population plans;
+		private final PopulationImpl plans;
 		private final CalcLegTimes calcLegTimes;
 		private final PlanAverageScore planAverageScore;
 		private final CalcAverageTripLength calcAverageTripLength;
 
-		public CaseStudyResult(final String name, final Population plans,
+		public CaseStudyResult(final String name, final PopulationImpl plans,
 				final CalcLegTimes calcLegTimes, final PlanAverageScore planAverageScore,
 				final CalcAverageTripLength calcAverageTripLength) {
 			super();
@@ -73,7 +73,7 @@ public class CompareScenarios {
 			return this.name;
 		}
 
-		public Population getRouteSwitchers() {
+		public PopulationImpl getRouteSwitchers() {
 			return this.plans;
 		}
 
@@ -320,7 +320,7 @@ public class CompareScenarios {
 		for (Integer analysis : this.analysisNames.keySet()) {
 			personIdRecorders.put(analysis, new TreeMap<String, PersonIdRecorder>());
 		}
-		TreeMap<String, Population> scenarioPlans = new TreeMap<String, Population>();
+		TreeMap<String, PopulationImpl> scenarioPlans = new TreeMap<String, PopulationImpl>();
 		TreeMap<String, NetworkLayer> scenarioNetworks = new TreeMap<String, NetworkLayer>();
 
 		PersonIdRecorder personIdRecorder = null;
@@ -406,7 +406,7 @@ public class CompareScenarios {
 				// choose right network
 				world.setNetworkLayer(scenarioNetworks.get(scenarioName));
 
-				Population plansSubPop = new PopulationImpl();
+				PopulationImpl plansSubPop = new PopulationImpl();
 				switch(analysis.intValue()) {
 				case TRANSIT_AGENTS_ANALYSIS_NAME:
 					personIterator = transitAgentsIds.iterator();

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
@@ -19,6 +18,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
@@ -32,7 +32,7 @@ public class LocationModifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(LocationModifier.class);
 
-	public LocationModifier(Population plans, NetworkLayer network, ActivityFacilities  facilities) {
+	public LocationModifier(PopulationImpl plans, NetworkLayer network, ActivityFacilities  facilities) {
 		super(plans, network, facilities);
 		this.initShopLeisure();
 	}

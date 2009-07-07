@@ -24,7 +24,6 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -35,6 +34,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.transitSchedule.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
@@ -57,7 +57,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
 
-	public TransitQueueSimulation(final NetworkLayer network, final Population population, final Events events) {
+	public TransitQueueSimulation(final NetworkLayer network, final PopulationImpl population, final Events events) {
 		super(network, population, events);
 	
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));

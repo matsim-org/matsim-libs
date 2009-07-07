@@ -30,7 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -39,6 +38,7 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -154,7 +154,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
-			Population population = s.getPopulation();
+			PopulationImpl population = s.getPopulation();
 
 			catl = new CalcAverageTripLength();
 			ms = new ModeSplit(toll);

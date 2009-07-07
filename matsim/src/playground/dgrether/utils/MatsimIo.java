@@ -24,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -33,6 +32,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -76,8 +76,8 @@ public class MatsimIo {
 	}
 
 
-	public static Population loadPlans(final String filename, final NetworkLayer network) {
-		Population plans = new PopulationImpl();
+	public static PopulationImpl loadPlans(final String filename, final NetworkLayer network) {
+		PopulationImpl plans = new PopulationImpl();
 		log.info("  reading plans xml file... ");
 		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		plansReader.readFile(filename);
@@ -86,7 +86,7 @@ public class MatsimIo {
 	}
 
 
-	public static void writePlans(final Population plans, final String filename) {
+	public static void writePlans(final PopulationImpl plans, final String filename) {
 		if (Gbl.getConfig() == null) {
 			Gbl.createConfig(null);
 		}

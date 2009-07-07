@@ -11,11 +11,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 
@@ -45,7 +45,7 @@ import playground.kai.urbansim.ids.LocationId;
 public class PseudoGravityModel {
 	private static final Logger log = Logger.getLogger(PseudoGravityModel.class);
 
-	private Population population ;
+	private PopulationImpl population ;
 	private ActivityFacilities facilities ;
 	private Map<Id,Id> locationFromJob ;
 	
@@ -90,7 +90,7 @@ public class PseudoGravityModel {
 	}
 	
 	// TODO: there should actually a ctor that constructs this w/o coords (i.e. computes them internally)
-	public PseudoGravityModel ( Population population, ActivityFacilities facilities, Map<Id,Id> locationFromJob ) {
+	public PseudoGravityModel ( PopulationImpl population, ActivityFacilities facilities, Map<Id,Id> locationFromJob ) {
 		this.population = population ;
 		this.facilities = facilities ;
 		this.locationFromJob = locationFromJob ;

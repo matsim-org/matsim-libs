@@ -2,9 +2,9 @@ package playground.yu.visum.filter.finalFilters;
 
 import java.util.List;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
@@ -27,7 +27,7 @@ public class AveTraSpeCal extends LinkAveCalA {
 	 * @param network -
 	 *            contains useful information from network-file
 	 */
-	public AveTraSpeCal(final Population plans, final NetworkLayer network) {
+	public AveTraSpeCal(final PopulationImpl plans, final NetworkLayer network) {
 		super(plans, network);
 	}
 

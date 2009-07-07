@@ -5,24 +5,24 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 
 
 public class AssignLeisureTripDistances {
 	
-	private Population plans = new PopulationImpl();
+	private PopulationImpl plans = new PopulationImpl();
 	private final static Logger log = Logger.getLogger(AssignLeisureTripDistances.class);
 	
 	// from Microcensus for all modes
 	private double groceryShare = 0.66;
 	private int numberOfShopActs;
 	
-	public AssignLeisureTripDistances(Population plans) {
+	public AssignLeisureTripDistances(PopulationImpl plans) {
 		this.plans = plans;
 	}
 	
@@ -108,11 +108,11 @@ public class AssignLeisureTripDistances {
 		log.info("Share:\t"+ (100.0* assignedNumberOf_GroceryActs / this.numberOfShopActs));
 	}
 
-	public Population getPlans() {
+	public PopulationImpl getPlans() {
 		return plans;
 	}
 
-	public void setPlans(Population plans) {
+	public void setPlans(PopulationImpl plans) {
 		this.plans = plans;
 	}
 }

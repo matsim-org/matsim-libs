@@ -22,7 +22,6 @@ package playground.jhackney.postprocessing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -30,6 +29,7 @@ import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
@@ -55,7 +55,7 @@ public class AnalyzeScores {
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
 
-	static Population plans;
+	static PopulationImpl plans;
 	static ActivityFacilities facilities;
 	static Knowledges knowledges;
 	

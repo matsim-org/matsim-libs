@@ -26,12 +26,12 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.algorithms.CompareActs;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -67,7 +67,7 @@ public class TrackActsOverlap {
 	 * @param iteration
 	 * 
 	 */
-	public void trackActs(Population plans, int iteration) {
+	public void trackActs(PopulationImpl plans, int iteration) {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
@@ -90,7 +90,7 @@ public class TrackActsOverlap {
 	 * @param plans
 	 * @return activityMap
 	 */
-	private LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> makeActivityMap(Population plans){
+	private LinkedHashMap<ActivityOption,ArrayList<PersonImpl>> makeActivityMap(PopulationImpl plans){
 		log.info("Making a new activity map for spatial scores");
 //		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
 		for (PersonImpl p1 : plans.getPersons().values()) {

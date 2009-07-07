@@ -20,7 +20,6 @@
 
 package playground.jhackney;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.Events;
@@ -34,6 +33,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
@@ -194,9 +194,9 @@ public abstract class Scenario {
 //		return Matrices.getSingleton();
 //	}
 
-	public static final Population readPlans(final NetworkLayer network) {
+	public static final PopulationImpl readPlans(final NetworkLayer network) {
 		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		System.out.println(config.plans().getInputFile());
 		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
 		System.out.println("  done.");
@@ -205,9 +205,9 @@ public abstract class Scenario {
 
 
 	
-	public static final Population readPlans(final NetworkLayer network, final int i) {
+	public static final PopulationImpl readPlans(final NetworkLayer network, final int i) {
 		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
 		String filename=input_directory +config.plans().getInputFile();
 		System.out.println(filename);
@@ -217,9 +217,9 @@ public abstract class Scenario {
 		return plans;
 	}
 
-	public static final Population readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
+	public static final PopulationImpl readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		System.out.println(config.plans().getInputFile());
 		new MatsimPopulationReader(plans, (NetworkLayer) network, kn).readFile(config.plans().getInputFile());
 		System.out.println("  done.");
@@ -257,7 +257,7 @@ public abstract class Scenario {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(final Population plans) {
+	public static final void writePlans(final PopulationImpl plans) {
 		System.out.println("  writing plans xml file... ");
 		new PopulationWriter(plans).write();
 		System.out.println("  done.");

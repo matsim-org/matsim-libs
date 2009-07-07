@@ -26,12 +26,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
@@ -83,7 +83,7 @@ public class SubPopScorer {
   	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
 	}
 
-	private Set<Id> filterPlans(Population plans) {
+	private Set<Id> filterPlans(PopulationImpl plans) {
 		PlanCollectFromAlgorithm collector = new PlanCollectFromAlgorithm();
 		RouteLinkFilter linkFilter = new RouteLinkFilter(collector);
 		for (String id : this.linkIds) {

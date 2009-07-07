@@ -2,7 +2,6 @@ package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -11,6 +10,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -34,10 +34,10 @@ public class GeoFilterPersonPlan extends NewPopulation {
 	private int planswritten = 0;
 	private int personshandled = 0;
 	private NetworkLayer targetNet;
-	private Population origPop;
+	private PopulationImpl origPop;
 
 
-	public GeoFilterPersonPlan(Population plans, String filename, Population origPop, NetworkLayer targetNet) {
+	public GeoFilterPersonPlan(PopulationImpl plans, String filename, PopulationImpl origPop, NetworkLayer targetNet) {
 		super(plans, filename);
 		this.targetNet = targetNet;
 		this.origPop = origPop;
@@ -98,11 +98,11 @@ public class GeoFilterPersonPlan extends NewPopulation {
 		NetworkLayer targetNet = new NetworkLayer();
 		new MatsimNetworkReader(targetNet).readFile(targetNetworkFile);
 
-		Population inPop = new PopulationImpl();
+		PopulationImpl inPop = new PopulationImpl();
 		PopulationReader popReader = new MatsimPopulationReader(inPop, bigNet);
 		popReader.readFile(inPlansFile);
 		
-		Population origPop = new PopulationImpl();
+		PopulationImpl origPop = new PopulationImpl();
 		PopulationReader origPopReader = new MatsimPopulationReader(origPop, bigNet);
 		origPopReader.readFile(origPlansFile);
 

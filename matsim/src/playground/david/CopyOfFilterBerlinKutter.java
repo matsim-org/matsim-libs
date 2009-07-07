@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -33,6 +32,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -71,7 +71,7 @@ class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 }
 
 public class CopyOfFilterBerlinKutter {
-	public static Population relevantPopulation;
+	public static PopulationImpl relevantPopulation;
 	public static NetworkLayer network;
 
 	public static void main(final String[] args) {
@@ -88,7 +88,7 @@ public class CopyOfFilterBerlinKutter {
 		new MatsimNetworkReader(network).readFile(netFileName);
 
 		relevantPopulation = new PopulationImpl();
-		Population population = new MyPopulation();
+		PopulationImpl population = new MyPopulation();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, network);
 //		population.addAlgorithm(new FilterPersonsNonCarMode());
 		plansReader.readFile(popFileName);

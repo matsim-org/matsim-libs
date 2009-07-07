@@ -30,10 +30,10 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
@@ -121,7 +121,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
 		Scenario scenario = loader.getScenario();
-		Population population = scenario.getPopulation();
+		PopulationImpl population = scenario.getPopulation();
 		
 		SocialNetwork<PersonImpl> socialnet = new SocialNetwork<PersonImpl>(population);
 		KMLWriter writer = new KMLWriter();

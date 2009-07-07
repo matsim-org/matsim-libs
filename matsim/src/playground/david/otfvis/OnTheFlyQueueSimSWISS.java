@@ -20,7 +20,6 @@
 
 package playground.david.otfvis;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -28,6 +27,7 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.world.World;
@@ -42,7 +42,7 @@ public class OnTheFlyQueueSimSWISS {
 	public static void main(final String[] args) {
 		QueueSimulation sim;
 		NetworkLayer net;
-		Population population;
+		PopulationImpl population;
 		Events events;
 
 		String netFileName = "../../tmp/network.xml.gz";

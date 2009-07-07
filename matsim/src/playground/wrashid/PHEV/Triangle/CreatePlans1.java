@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -17,6 +16,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledge;
@@ -31,7 +31,7 @@ public class CreatePlans1 {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		Knowledges knowledges = new KnowledgesImpl();
 		Gbl.reset();
 		args=new String[1];

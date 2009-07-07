@@ -22,12 +22,12 @@ package playground.mfeil.MDSAM;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,11 +41,11 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
  */
 public class UniSAM {
 	
-	private final Population population;
+	private final PopulationImpl population;
 	private final int agentIDthreshold;
 	private static final Logger 			log = Logger.getLogger(UniSAM.class);
 	
-	public UniSAM (Population population) {
+	public UniSAM (PopulationImpl population) {
 		this.population = population;
 		this.agentIDthreshold = 324;
 	}
