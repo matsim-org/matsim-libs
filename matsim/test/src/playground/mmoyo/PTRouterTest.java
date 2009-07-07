@@ -69,7 +69,7 @@ public class PTRouterTest extends MatsimTestCase {
 		assertEquals(new IdImpl("17"), logicList.get(5).getId());
 		assertEquals(new IdImpl("18"), logicList.get(6).getId());
 		assertEquals(new IdImpl("19"), logicList.get(7).getId());
-		assertEquals(new IdImpl("W2"), logicList.get(7).getId());
+		assertEquals(new IdImpl("W2"), logicList.get(8).getId());
 		
 	
 		
