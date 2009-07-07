@@ -20,7 +20,6 @@
 
 package org.matsim.demandmodeling.primloc;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -31,6 +30,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
@@ -110,7 +110,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");

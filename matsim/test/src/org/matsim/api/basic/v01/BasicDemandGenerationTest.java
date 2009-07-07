@@ -34,7 +34,6 @@ import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -43,6 +42,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -165,7 +165,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		
 		//read population again, now the code gets really ugly, dirty and worth to refactor...
 		Scenario scenario = new ScenarioImpl();
-		Population population  = scenario.getPopulation();
+		PopulationImpl population  = scenario.getPopulation();
 		NetworkLayer network = (NetworkLayer)scenario.getNetwork();
 		//this is really ugly...
 		this.createFakeNetwork(scenario, network);
@@ -186,7 +186,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		}
 	}
 	
-	private void checkContent(Population population) {
+	private void checkContent(PopulationImpl population) {
 		assertNotNull(population);
 		assertEquals(ids.size(), population.getPersons().size());
 		PersonImpl pers;

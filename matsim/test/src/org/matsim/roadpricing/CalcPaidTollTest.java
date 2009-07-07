@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -35,6 +34,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
@@ -188,7 +188,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		assertEquals(expectedToll, scoreWithoutToll - scoreWithToll, 1e-8);
 	}
 
-	private Population runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
+	private PopulationImpl runTollSimulation(final String tollFile, final String tollType, final CharyparNagelScoringConfigGroup config) {
 		NetworkLayer network = Fixture.createNetwork1();
 
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
@@ -204,12 +204,12 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		RoadPricingScheme scheme = reader.getScheme();
 		assertEquals(tollType, scheme.getType());
 
-		Population population = Fixture.createPopulation1(network);
+		PopulationImpl population = Fixture.createPopulation1(network);
 		runTollSimulation(network, population, scheme, config);
 		return population;
 	}
 
-	private void runTollSimulation(final NetworkLayer network, final Population population, final RoadPricingScheme toll, final CharyparNagelScoringConfigGroup config) {
+	private void runTollSimulation(final NetworkLayer network, final PopulationImpl population, final RoadPricingScheme toll, final CharyparNagelScoringConfigGroup config) {
 		Events events = new Events();
 		CalcPaidToll paidToll = new CalcPaidToll(network, toll);
 		events.addHandler(paidToll);

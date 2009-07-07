@@ -29,7 +29,6 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -46,6 +45,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -75,7 +75,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change);
 
 		// create a population
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		PersonImpl person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
 		PersonImpl person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
 		plans.getPersons().put(person1.getId(), person1);
@@ -126,7 +126,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
-		Population plans = new PopulationImpl();
+		PopulationImpl plans = new PopulationImpl();
 		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(PersonImpl p : persons1) {
 			plans.getPersons().put(p.getId(), p);

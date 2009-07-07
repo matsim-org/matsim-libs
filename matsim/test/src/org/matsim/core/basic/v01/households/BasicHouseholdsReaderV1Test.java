@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsReaderV10;
@@ -101,7 +101,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 	}
 
 	private void createTestPopulation(ScenarioImpl scenario) {
-		Population pop = scenario.getPopulation();
+		PopulationImpl pop = scenario.getPopulation();
 		p23 = pop.getPopulationBuilder().createPerson(id23);
 		p42 = pop.getPopulationBuilder().createPerson(id42);
 		p43 = pop.getPopulationBuilder().createPerson(id43);

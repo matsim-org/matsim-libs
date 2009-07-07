@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -42,6 +41,7 @@ import org.matsim.core.events.EventsBuilderImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -182,7 +182,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testee.run(testPlan);
 
 		// write out the test person and the modified plan into a file
-		Population outputPopulation = new PopulationImpl();
+		PopulationImpl outputPopulation = new PopulationImpl();
 		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
 
 		log.info("Writing plans file...");
@@ -305,7 +305,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, null);
 
 		// write out the test person and the modified plan into a file
-		Population outputPopulation = new PopulationImpl();
+		PopulationImpl outputPopulation = new PopulationImpl();
 		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
 
 		System.out.println("Writing plans file...");

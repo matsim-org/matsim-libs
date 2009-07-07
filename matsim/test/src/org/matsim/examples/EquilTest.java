@@ -20,7 +20,6 @@
 
 package org.matsim.examples;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -28,6 +27,7 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -47,7 +47,7 @@ public class EquilTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 

@@ -23,7 +23,6 @@ package playground.meisterk.org.matsim.planomat;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.Events;
@@ -35,6 +34,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -59,7 +59,7 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
 
 		NetworkLayer network = null;
-		Population population = null;
+		PopulationImpl population = null;
 
 		log.info("Reading network xml file...");
 		network = new NetworkLayer();

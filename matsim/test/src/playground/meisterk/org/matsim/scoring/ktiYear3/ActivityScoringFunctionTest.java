@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
@@ -46,6 +45,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -69,7 +69,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	private final static Id TEST_PERSON_ID = new IdImpl("123");
 
-	private Population population;
+	private PopulationImpl population;
 	private PlanImpl plan;
 	private Config config;
 	private ActivityFacilities facilities;
@@ -249,7 +249,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 			}
 		}
 		// write out the test person and the modified plan into a file
-		Population outputPopulation = new PopulationImpl();
+		PopulationImpl outputPopulation = new PopulationImpl();
 		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
 		
 		logger.info("Writing plans file...");

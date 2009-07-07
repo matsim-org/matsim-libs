@@ -10,7 +10,6 @@ import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
@@ -28,6 +27,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -38,7 +38,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 //	private HashMap<Id, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<Id, ExpectedNumberOfEvents>();
 	protected boolean printEvent = true;
 
-	public void checkAssertions(final Population population) {
+	public void checkAssertions(final PopulationImpl population) {
 
 		// at least one event
 		assertTrue(events.size() > 0);
@@ -162,7 +162,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();
-		Population population = data.getPopulation();
+		PopulationImpl population = data.getPopulation();
 		if (populationModifier != null) {
 			population = populationModifier.modifyPopulation(population);
 		}

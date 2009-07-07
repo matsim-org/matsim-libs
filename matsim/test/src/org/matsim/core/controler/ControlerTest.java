@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -38,6 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
@@ -62,7 +62,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PersonImpl person1 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
@@ -145,7 +145,7 @@ public class ControlerTest extends MatsimTestCase {
 		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
 		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
 		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
@@ -170,7 +170,7 @@ public class ControlerTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PersonImpl person1 = null;
 		LegImpl leg1 = null;
 		LegImpl leg2 = null;
@@ -227,7 +227,7 @@ public class ControlerTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PersonImpl person1 = null;
 		ActivityImpl act1a = null;
 		ActivityImpl act1b = null;

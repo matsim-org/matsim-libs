@@ -31,7 +31,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
@@ -52,6 +51,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -802,7 +802,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		final LinkImpl link1;
 		final LinkImpl link2;
 		final LinkImpl link3;
-		final Population plans;
+		final PopulationImpl plans;
 		final ArrayList<NodeImpl> nodes3;
 		final ArrayList<NodeImpl> nodes23;
 

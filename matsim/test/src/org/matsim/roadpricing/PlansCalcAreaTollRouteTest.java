@@ -22,11 +22,11 @@ package org.matsim.roadpricing;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -58,7 +58,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333
 		 */
 
-		Population population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -109,7 +109,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink("7");
 		toll.addCost(6*3600, 10*3600, 0.06);
 
-		Population population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -138,7 +138,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink("5");
 		toll.addCost(6*3600, 10*3600, 0.06);
 
-		Population population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
@@ -163,7 +163,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addLink("11");
 		toll.addCost(8*3600, 10*3600, 1.0); // high costs!
 
-		Population population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);

@@ -25,7 +25,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
@@ -38,6 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -140,8 +140,8 @@ import org.matsim.core.utils.misc.Time;
 	 * @param network the network returned by {@link #createNetwork1()}
 	 * @return a population for network1
 	 **/
-	protected static Population createPopulation1(final NetworkLayer network) {
-		Population population = new PopulationImpl();
+	protected static PopulationImpl createPopulation1(final NetworkLayer network) {
+		PopulationImpl population = new PopulationImpl();
 
 		LinkImpl link0 = network.getLink(new IdImpl(0));
 		LinkImpl link1 = network.getLink(new IdImpl(1));
@@ -162,7 +162,7 @@ import org.matsim.core.utils.misc.Time;
 		return population;
 	}
 	
-	private static void addPersonToPopulation(final PersonImpl person, final Population population) {
+	private static void addPersonToPopulation(final PersonImpl person, final PopulationImpl population) {
 		population.getPersons().put(person.getId(), person);
 	}
 
@@ -170,8 +170,8 @@ import org.matsim.core.utils.misc.Time;
 	 * @param network the network returned by {@link #createNetwork2()}
 	 * @return a population for network2
 	 **/
-	protected static Population createPopulation2(final NetworkLayer network) {
-		Population population = new PopulationImpl();
+	protected static PopulationImpl createPopulation2(final NetworkLayer network) {
+		PopulationImpl population = new PopulationImpl();
 
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")), population);
 
@@ -208,10 +208,10 @@ import org.matsim.core.utils.misc.Time;
 		return person;
 	}
 
-	protected static Population createReferencePopulation1(final CharyparNagelScoringConfigGroup config) {
+	protected static PopulationImpl createReferencePopulation1(final CharyparNagelScoringConfigGroup config) {
 		// run mobsim once without toll and get score for network1/population1
 		NetworkLayer network = createNetwork1();
-		Population referencePopulation = Fixture.createPopulation1(network);
+		PopulationImpl referencePopulation = Fixture.createPopulation1(network);
 		Events events = new Events();
 		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);

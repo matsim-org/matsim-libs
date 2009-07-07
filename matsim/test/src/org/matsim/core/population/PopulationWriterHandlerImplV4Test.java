@@ -22,7 +22,6 @@ package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -43,7 +42,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
 		Gbl.createWorld().setNetworkLayer(network);
 		
-		Population pop = new PopulationImpl();
+		PopulationImpl pop = new PopulationImpl();
 		PopulationBuilder pb = pop.getPopulationBuilder();
 		PersonImpl person = pb.createPerson(new IdImpl(1));
 		PlanImpl plan = pb.createPlan(person);
@@ -61,7 +60,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		String filename = getOutputDirectory() + "population.xml";
 		new BasicPopulationWriter(pop).writeV4(filename);
 		
-		Population pop2 = new PopulationImpl();
+		PopulationImpl pop2 = new PopulationImpl();
 		new MatsimPopulationReader(pop2, network).readFile(filename);
 		PersonImpl person2 = pop2.getPersons().get(new IdImpl(1));
 		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);

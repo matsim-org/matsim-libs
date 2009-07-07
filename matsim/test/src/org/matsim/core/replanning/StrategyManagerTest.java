@@ -20,11 +20,11 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -42,7 +42,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testChangeRequests() {
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		for (int i = 0; i < 1000; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.getPersons().put(p.getId(), p);
@@ -122,7 +122,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testRemoveStrategy() {
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.getPersons().put(p.getId(), p);
@@ -179,7 +179,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testOptimisticBehavior() {
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
@@ -238,7 +238,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 			plans[i] = p.createPlan(false);
 			plans[i].setScore(Double.valueOf(i*10));
 		}
-		Population pop = new PopulationImpl();
+		PopulationImpl pop = new PopulationImpl();
 		pop.getPersons().put(p.getId(), p);
 		
 		// run with default settings

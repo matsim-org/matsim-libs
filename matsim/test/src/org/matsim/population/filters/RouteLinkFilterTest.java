@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -36,6 +35,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -45,7 +45,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 	public void testRouteLinkFilter() {
 		loadConfig(null); // used to set the default dtd-location
-		Population population = getTestPopulation();
+		PopulationImpl population = getTestPopulation();
 
 		TestAlgorithm tester = new TestAlgorithm();
 
@@ -58,14 +58,14 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		assertEquals(2, linkFilter.getCount());
 	}
 
-	private Population getTestPopulation() {
+	private PopulationImpl getTestPopulation() {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 
 		LinkImpl link1 = network.getLink(new IdImpl(1));
 		LinkImpl link20 = network.getLink(new IdImpl(20));
 
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 
 		PersonImpl person;
 		PlanImpl plan;

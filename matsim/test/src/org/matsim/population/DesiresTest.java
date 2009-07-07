@@ -24,10 +24,10 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -46,7 +46,7 @@ public class DesiresTest extends MatsimTestCase {
 
 		log.info("  creating single person with desires... ");
 		Scenario scenario = new ScenarioImpl();
-		Population pop = scenario.getPopulation();
+		PopulationImpl pop = scenario.getPopulation();
 		PersonImpl p = new PersonImpl(new IdImpl(0));
 		pop.getPersons().put(p.getId(), p);
 		Desires d = p.createDesires("created by 'DesiresTest.testReadWriteDesires'");

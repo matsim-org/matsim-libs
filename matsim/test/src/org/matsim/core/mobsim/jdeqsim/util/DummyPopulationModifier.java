@@ -1,19 +1,19 @@
 package org.matsim.core.mobsim.jdeqsim.util;
 
-import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.population.PopulationImpl;
 
 
 public class DummyPopulationModifier implements PopulationModifier {
-	Population population=null;
+	PopulationImpl population=null;
 	
 	// does not modify population at all
 	// needed to pass population to tests
-	public Population modifyPopulation(Population population) {
+	public PopulationImpl modifyPopulation(PopulationImpl population) {
 		this.population=population;
 		return population;
 	}
 
-	public Population getPopulation(){
+	public PopulationImpl getPopulation(){
 		return population;
 	} 
 

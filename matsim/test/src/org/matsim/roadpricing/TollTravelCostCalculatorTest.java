@@ -21,13 +21,13 @@
 package org.matsim.roadpricing;
 
 import org.matsim.core.api.experimental.population.PlanElement;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -55,7 +55,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		toll.setType("distance");
 		toll.addLink("5");
 		toll.addLink("11");
-		Population population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
@@ -107,7 +107,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		toll.setType("cordon");
 		toll.addLink("5");
 		toll.addLink("11");
-		Population population = Fixture.createPopulation2(network);
+		PopulationImpl population = Fixture.createPopulation2(network);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
@@ -151,7 +151,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	 *
 	 * @param population
 	 */
-	private void clearRoutes(final Population population) {
+	private void clearRoutes(final PopulationImpl population) {
 		for (PersonImpl person : population.getPersons().values()) {
 			for (PlanImpl plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {

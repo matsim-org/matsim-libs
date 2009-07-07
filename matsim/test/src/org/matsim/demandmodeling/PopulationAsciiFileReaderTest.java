@@ -21,11 +21,11 @@ package org.matsim.demandmodeling;
 
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
@@ -45,7 +45,7 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 
 		String f = this.getClassInputDirectory() + filename;
 		PopulationAsciiFileReader p = new PopulationAsciiFileReader(zoneLayer);
-		Population plans = p.readFile(f);
+		PopulationImpl plans = p.readFile(f);
 		assertNotNull(plans);
 		assertEquals(2, plans.getPersons().size());
 		PersonImpl p1 = plans.getPersons().get(new IdImpl("1"));

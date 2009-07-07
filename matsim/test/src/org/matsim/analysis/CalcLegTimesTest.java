@@ -22,7 +22,6 @@ package org.matsim.analysis;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.AgentDepartureEvent;
@@ -36,6 +35,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.Time;
@@ -47,7 +47,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	public static final Id DEFAULT_PERSON_ID = new IdImpl(123);
 	public static final Id DEFAULT_LINK_ID = new IdImpl(456);
 	
-	private Population population = null;
+	private PopulationImpl population = null;
 	private NetworkLayer network = null;
 	
 	protected void setUp() throws Exception {

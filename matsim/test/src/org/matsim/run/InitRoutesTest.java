@@ -23,7 +23,6 @@ package org.matsim.run;
 import java.io.File;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -36,6 +35,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -62,7 +62,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
-		Population population = new PopulationImpl();
+		PopulationImpl population = new PopulationImpl();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		population.getPersons().put(person.getId(), person);
 		PlanImpl plan = person.createPlan(true);
@@ -89,7 +89,7 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		Population population2 = new PopulationImpl();
+		PopulationImpl population2 = new PopulationImpl();
 		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		PersonImpl person2 = population2.getPersons().get(new IdImpl("1"));
