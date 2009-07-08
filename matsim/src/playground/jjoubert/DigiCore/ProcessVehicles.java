@@ -55,7 +55,7 @@ public class ProcessVehicles {
 						if(line >= startLine || linesRead <= numberOfLinesToRead){
 							if(inputString.length == 6){
 								// Open the file for the vehicle 
-								vehicleFile = "/Volumes/Data/DigiCore/VehicleFiles/" + inputString[0] + ".txt";
+								vehicleFile = root + "Vehicles/" + inputString[0] + ".txt";
 								output = new BufferedWriter(new FileWriter(vehicleFile, true) , 10000 );
 
 								// Write the record to the associated file
@@ -99,7 +99,7 @@ public class ProcessVehicles {
 											output.close();
 
 											// Open the file for the new vehicle.
-											vehicleFile = "/Volumes/Data/DigiCore/VehicleFiles/" + inputString[0] + ".txt";
+											vehicleFile = root + "Vehicles/" + inputString[0] + ".txt";
 											try {
 												output = new BufferedWriter(new FileWriter(vehicleFile, true) , 100000 );
 											} catch (IOException e) {
