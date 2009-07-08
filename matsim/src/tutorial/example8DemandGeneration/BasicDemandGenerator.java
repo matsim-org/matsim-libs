@@ -29,16 +29,16 @@ import org.geotools.feature.Feature;
 
 import com.vividsolutions.jts.geom.Point;
 
+import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.experimental.population.Leg;
-import org.matsim.core.api.experimental.population.Person;
-import org.matsim.core.api.experimental.population.Plan;
-import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.experimental.population.PopulationWriter;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -56,9 +56,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
  * @author dgrether
  *
  */
-public class DemandGenerator {
+public class BasicDemandGenerator {
 
-	private static final Logger log = Logger.getLogger(DemandGenerator.class);
+	private static final Logger log = Logger.getLogger(BasicDemandGenerator.class);
 	
 	private static int ID = 0;
 
@@ -70,7 +70,7 @@ public class DemandGenerator {
 		String netFile = exampleDirectory + "network.xml";
 		String zonesFile = exampleDirectory + "zones.shp";
 		
-		Scenario scenario = new ScenarioImpl();
+		BasicScenario scenario = new BasicScenarioImpl();
 		
 		FeatureSource fts = ShapeFileReader.readDataFile(zonesFile); //reads the shape file in
 		Random rnd = new Random();
@@ -100,25 +100,25 @@ public class DemandGenerator {
 		}
 		createActivities(scenario, rnd, recreation, commercial); //this method creates the remaining activities
 		String popFilename = exampleDirectory + "population.xml";
-		new PopulationWriter(scenario.getPopulation()).write(popFilename); // and finally the population will be written to a xml file
+		new BasicPopulationWriter(scenario.getPopulation()).write(popFilename); // and finally the population will be written to a xml file
 		log.info("population written to: " + popFilename);
 	}
 
-	private static void createActivities(Scenario scenario, Random rnd,  Feature recreation, Feature commercial) {
-		Population pop =  scenario.getPopulation();
-		PopulationBuilder pb = pop.getPopulationBuilder(); //the population builder creates all we need 
+	private static void createActivities(BasicScenario scenario, Random rnd,  Feature recreation, Feature commercial) {
+		BasicPopulation<BasicPerson<BasicPlan>> pop =  scenario.getPopulation();
+		BasicPopulationBuilder pb = pop.getPopulationBuilder(); //the population builder creates all we need 
 		
-		for (Person pers : pop.getPersons().values()) { //this loop iterates over all persons
-			Plan plan = pers.getPlans().get(0); //each person has exactly one plan, that has been created in createPersons(...)
-			Activity homeAct = (Activity) plan.getPlanElements().get(0); //every plan has only one activity so far (home activity)
+		for (BasicPerson<BasicPlan> pers : pop.getPersons().values()) { //this loop iterates over all persons
+			BasicPlan<BasicActivity> plan = pers.getPlans().get(0); //each person has exactly one plan, that has been created in createPersons(...)
+			BasicActivity homeAct = plan.getPlanElements().get(0); //every plan has only one activity so far (home activity)
 			homeAct.setEndTime(7*3600); // sets the endtime of this activity to 7 am
 
-			Leg leg = pb.createLeg(TransportMode.car);
+			BasicLeg leg = pb.createLeg(TransportMode.car);
 			plan.addLeg(leg); // there needs to be a log between two activities
 			
 			//work activity on a random link within one of the commercial areas
 			Point p = getRandomPointInFeature(rnd, commercial);
-			Activity work = pb.createActivityFromCoord("w", scenario.createCoord(p.getX(), p.getY()));
+			BasicActivity work = pb.createActivityFromCoord("w", scenario.createCoord(p.getX(), p.getY()));
 			double startTime = 8*3600;
 			work.setStartTime(startTime);
 			work.setEndTime(startTime + 6*3600);
@@ -128,7 +128,7 @@ public class DemandGenerator {
 			
 			//recreation activity on a random link within one of the recreation area 
 			p = getRandomPointInFeature(rnd, recreation);
-			Activity leisure = pb.createActivityFromCoord("l", scenario.createCoord(p.getX(), p.getY()));
+			BasicActivity leisure = pb.createActivityFromCoord("l", scenario.createCoord(p.getX(), p.getY()));
 			leisure.setEndTime(3600*19);
 			plan.addActivity(leisure);
 
@@ -136,21 +136,21 @@ public class DemandGenerator {
 			
 			//finally the second home activity - it is clear that this activity needs to be on the same link
 			//as the first activity - since in this tutorial our agents do not relocate ;-)
-			Activity homeActII = pb.createActivityFromCoord("h", homeAct.getCoord());
+			BasicActivity homeActII = pb.createActivityFromCoord("h", homeAct.getCoord());
 			plan.addActivity(homeActII);
 		}
 
 	}
 
-	private static void createPersons(Scenario scenario, Feature ft, Random rnd, int number) {
-		Population pop = scenario.getPopulation();
-		PopulationBuilder pb = pop.getPopulationBuilder();
+	private static void createPersons(BasicScenario scenario, Feature ft, Random rnd, int number) {
+		BasicPopulation<BasicPerson<BasicPlan<?>>> pop = scenario.getPopulation();
+		BasicPopulationBuilder pb = pop.getPopulationBuilder();
 		for (; number > 0; number--) {
-			Person pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
+			BasicPerson<BasicPlan<?>> pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
 			pop.addPerson( pers ) ;
-			Plan plan = pb.createPlan(pers);
+			BasicPlan<?> plan = pb.createPlan(pers);
 			Point p = getRandomPointInFeature(rnd, ft);
-			Activity act = pb.createActivityFromCoord("h", scenario.createCoord(p.getX(), p.getY()));
+			BasicActivity act = pb.createActivityFromCoord("h", scenario.createCoord(p.getX(), p.getY()));
 			plan.addActivity(act);
 			pers.addPlan( plan ) ;
 		}

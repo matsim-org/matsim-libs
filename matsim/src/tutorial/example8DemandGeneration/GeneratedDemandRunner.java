@@ -35,6 +35,7 @@ public class GeneratedDemandRunner {
 	 */
 	public static void main(String[] args) {
 		Controler controler = new Controler("../matsimExamples/tutorial/example8DemandGeneration/config.xml");
+		controler.setOverwriteFiles(true) ;
 		controler.run();
 
 		String[] outputMvi = {"../matsimExamples/tutorial/example8DemandGeneration/output/ITERS/it.0/0.otfvis.mvi"};
