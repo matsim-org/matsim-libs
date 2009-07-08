@@ -9,7 +9,7 @@ import playground.mmoyo.PTRouter.Walk;
  */
 public class PTTravelTime implements TravelTime {
 	double walkSpeed =  Walk.walkingSpeed();
-	private PTTimeTable2 ptTimeTable; // = new PTTimeTable2();
+	private PTTimeTable ptTimeTable; 
 	public CostValidator costValidator = new CostValidator();
 	private String type = "";
 	double walkTime=0;
@@ -17,7 +17,7 @@ public class PTTravelTime implements TravelTime {
 	double waitingTime=0;
 	double transTime=0;
 	
-	public PTTravelTime(PTTimeTable2 ptTimeTable) {
+	public PTTravelTime(PTTimeTable ptTimeTable) {
 		this.ptTimeTable = ptTimeTable; 
 	}
 	

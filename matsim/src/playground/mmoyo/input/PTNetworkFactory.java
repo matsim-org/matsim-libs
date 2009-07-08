@@ -19,7 +19,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 /** 
  * Second version of network factory for the PTCase2 (with no relationship to street network) 
  * Represent a network layer with independent route with transfer links at intersections 
@@ -27,16 +27,16 @@ import playground.mmoyo.PTRouter.PTTimeTable2;
  * @param ptTimeTable empty timetable object to be filled with inFileName data 
  * @param outFileName path of network file to be created
  */ 
-public class PTNetworkFactory2 {
-	private static Logger log = Logger.getLogger(PTNetworkFactory2.class);
+public class PTNetworkFactory {
+	private static Logger log = Logger.getLogger(PTNetworkFactory.class);
 	
 	public Map <Id,Double> linkTravelTimeMap = new TreeMap <Id,Double>();
 
-	public PTNetworkFactory2(){
+	public PTNetworkFactory(){
 		super();
 	}
 	
-	public NetworkLayer createNetwork(final String inFileName, final PTTimeTable2 ptTimeTable, final String outFileName){
+	public NetworkLayer createNetwork(final String inFileName, final PTTimeTable ptTimeTable, final String outFileName){
 		NetworkLayer ptNetworkLayer1 = readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer1, ptTimeTable);
 		createTransferLinks(ptNetworkLayer1, ptTimeTable);
@@ -50,7 +50,7 @@ public class PTNetworkFactory2 {
 	}
 	
 	@Deprecated
-	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
+	public NetworkLayer readNetwork(String inFileName, PTTimeTable ptTimeTable){
 		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
 		readTimeTable(ptNetworkLayer, ptTimeTable);
 		return ptNetworkLayer;
@@ -87,7 +87,7 @@ public class PTNetworkFactory2 {
 	/**
 	 * Reads the timetable File, validates that every node exists and loads the data in the ptTimeTable object
 	 */	
-	public void readTimeTable(final NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
+	public void readTimeTable(final NetworkLayer ptNetworkLayer, PTTimeTable ptTimeTable){
 		PTNode ptLastNode = null;
 		for (PTLine ptLine :  ptTimeTable.getPtLineList()) {
 			//Test code
@@ -134,7 +134,7 @@ public class PTNetworkFactory2 {
 		//return ptTimeTable;
 	}
 	
-	public void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
+	public void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable ptTimeTable) {
 		PTStation stationMap = new PTStation(ptTimeTable);
 		int maxLinkKey=0;
 		for (List<Id> chList : stationMap.getIntersecionMap().values()) {
@@ -238,7 +238,7 @@ public class PTNetworkFactory2 {
 	 * This was the first intent to get valid paths 
 	 */
 	@Deprecated
-	public void setDetNextLinks (NetworkLayer net, PTTimeTable2 ptTimeTable){
+	public void setDetNextLinks (NetworkLayer net, PTTimeTable ptTimeTable){
 		List <LinkImpl> eliminateList = new ArrayList<LinkImpl>();
 		for (LinkImpl link: net.getLinks().values()){
 			if (link.getType().equals("DetTransfer")){

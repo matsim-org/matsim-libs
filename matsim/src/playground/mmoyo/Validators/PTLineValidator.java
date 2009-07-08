@@ -1,6 +1,6 @@
 package playground.mmoyo.Validators;
 
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 import playground.mmoyo.PTRouter.PTTravelCost;
 import playground.mmoyo.PTRouter.PTTravelTime1;
 import playground.mmoyo.PTRouter.MyDijkstra;
@@ -22,7 +22,7 @@ public class PTLineValidator {
 	 * @param ptTimeTable
 	 * @param net
 	 */
-	public void getIsolatedPTLines(PTTimeTable2 ptTimeTable, NetworkLayer net){
+	public void getIsolatedPTLines(PTTimeTable ptTimeTable, NetworkLayer net){
 		int isolated=0;
 		int comparisons=0;
 		PTTravelCost ptTravelCost = new PTTravelCost(ptTimeTable);

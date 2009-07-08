@@ -21,7 +21,7 @@ import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 import playground.mmoyo.PTRouter.PTLine;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 
 /**
  * From PTtimeTable to transitShcedule converter 
@@ -35,7 +35,7 @@ public class ToTransitScheduleConverter {
 	}
 	
 	/**reads a PTTimetable and writes a transitFile*/
-	public void createTransitSchedule(final PTTimeTable2 ptTimeTable, final NetworkLayer ptNet, String outTransitFile) {
+	public void createTransitSchedule(final PTTimeTable ptTimeTable, final NetworkLayer ptNet, String outTransitFile) {
 		TransitLine transitLine;
 		/*
 		for (Node node:  ptNet.getNodes().values()){

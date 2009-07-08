@@ -10,7 +10,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
 import playground.mmoyo.input.PTStation;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.StationValidator;
 
@@ -24,7 +24,7 @@ public class PTNodeFactory {
 		
 	}
 			
-	public PTNodeFactory(final NetworkLayer net, final PTTimeTable2 ptTimeTable) {
+	public PTNodeFactory(final NetworkLayer net, final PTTimeTable ptTimeTable) {
 		this.net = net;
 		this.ptStation = new PTStation(ptTimeTable);
 		this.sValidator = new StationValidator(net);

@@ -13,13 +13,13 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.mmoyo.PTRouter.PTRouter2;
+import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.Walk;
 /**
  * Receives two acts and returns a list of PT legs connecting their coordinates 
  */
 public class TransitRouteFinder {
-	private PTRouter2 ptRouter;
+	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainTranslator;
 	private static Walk walk = new Walk();
 	
@@ -30,7 +30,7 @@ public class TransitRouteFinder {
 	}
 	
 	@Deprecated
-	public TransitRouteFinder(PTRouter2 ptRouter ){
+	public TransitRouteFinder(PTRouter ptRouter ){
 		this.ptRouter = ptRouter;
 	}
 	

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import playground.mmoyo.PTRouter.PTLine;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.Coord;
 
@@ -20,7 +20,7 @@ public class PTStation {
 	Coord coord;
 	Id idFareZone;
 
-	public PTStation(PTTimeTable2 ptTimeTable) {
+	public PTStation(PTTimeTable ptTimeTable) {
 		this.createIntersecionMap(ptTimeTable);
 	}
 	
@@ -64,7 +64,7 @@ public class PTStation {
 		this.idFareZone = idFareZone;
 	}
 
-	public void createIntersecionMap(final PTTimeTable2 ptTimeTable){
+	public void createIntersecionMap(final PTTimeTable ptTimeTable){
 		//-> Use idImpl or PTnode types instead of String??
 		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
 			for (Id idNode : ptLine.getNodeRoute()) {

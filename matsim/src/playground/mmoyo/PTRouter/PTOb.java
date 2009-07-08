@@ -1,6 +1,6 @@
 package playground.mmoyo.PTRouter;
 
-import playground.mmoyo.input.PTNetworkFactory2;
+import playground.mmoyo.input.PTNetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 
@@ -9,10 +9,10 @@ import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
  */
 public class PTOb {
 	private NetworkLayer networkLayer; 
-	public  PTRouter2 ptRouter2;  //-->: make private
-	private PTTimeTable2 ptTimeTable;
+	public  PTRouter ptRouter;  //-->: make private
+	private PTTimeTable ptTimeTable;
 
-	private PTNetworkFactory2 ptNetworkFactory =new PTNetworkFactory2();
+	private PTNetworkFactory ptNetworkFactory =new PTNetworkFactory();
 	private String outPutPlanFile; 
 	private String config;
 	private String plansFile;
@@ -24,7 +24,7 @@ public class PTOb {
 		this.config = configFile;
 	    this.plansFile= plansFile;
 	    this.ptNetFile= ptNetFileName;
-	    this.ptTimeTable = new PTTimeTable2(timeTableFile);
+	    this.ptTimeTable = new PTTimeTable(timeTableFile);
 	}
 
 	public PTOb(String configFile, String ptNetFileName, String plansFile, String outPutPlansFile){
@@ -40,7 +40,7 @@ public class PTOb {
 	}
 	
 	public void createRouter(){
-		ptRouter2 = new PTRouter2(networkLayer, ptTimeTable);
+		ptRouter = new PTRouter(networkLayer, ptTimeTable);
 	}
 	
 	public void createPTNetWithTLinks(String inNetFile){
@@ -56,11 +56,11 @@ public class PTOb {
 		return networkLayer;
 	}
 
-	public PTRouter2 getPtRouter2() {
-		return ptRouter2;
+	public PTRouter getPtRouter() {
+		return ptRouter;
 	}
 
-	public PTTimeTable2 getPtTimeTable() {
+	public PTTimeTable getPtTimeTable() {
 		return ptTimeTable;
 	}
 
@@ -76,7 +76,7 @@ public class PTOb {
 		return plansFile;
 	}
 
-	public PTNetworkFactory2 getPtNetworkFactory() {
+	public PTNetworkFactory getPtNetworkFactory() {
 		return ptNetworkFactory;
 	}
 
@@ -84,11 +84,11 @@ public class PTOb {
 		this.networkLayer = ptNetworkLayer;
 	}
 
-	public void setPtRouter2(final PTRouter2 ptRouter2) {
-		this.ptRouter2 = ptRouter2;
+	public void setPtRouter2(final PTRouter ptRouter) {
+		this.ptRouter = ptRouter;
 	}	
 		
-	public void setPTTimeTable(final PTTimeTable2 ptTimeTable) {
+	public void setPTTimeTable(final PTTimeTable ptTimeTable) {
 		this.ptTimeTable= ptTimeTable;
 	}
 

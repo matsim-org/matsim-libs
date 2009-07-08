@@ -37,7 +37,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -67,7 +66,7 @@ public class RouterTest extends MatsimTestCase {
 		// searches and shows a PT path between two coordinates 
 		Coord coord1 = new CoordImpl(747420, 262794);   
 		Coord coord2 = new CoordImpl(685862, 254136);
-		Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
+		Path path2 = pt.getPtRouter().findPTPath (coord1, coord2, 24372, 300);
 		System.out.println(path2.links.size());
 		for (LinkImpl link : path2.links){
 			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + link.getType() + link.getToNode().getId() );
@@ -77,8 +76,6 @@ public class RouterTest extends MatsimTestCase {
 		assertEquals( "1311" , path2.links.get(10).getId().toString() ) ;
 		assertEquals( "250" , path2.links.get(20).getId().toString() ) ;
 	}
-	
-	
 	
 	public void testWithVerySimpleTransitSchedule() throws SAXException, ParserConfigurationException, IOException {
 		/* for integration into MATSim, the following must work */
@@ -119,6 +116,5 @@ public class RouterTest extends MatsimTestCase {
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(TransportMode.walk, legs.get(2).getMode());
 	}
-	
 	
 }

@@ -122,7 +122,7 @@ public class PTControler2 {
 				NodeImpl nodeA = pt.getPtNetworkLayer().getNode("_8506000");
 				NodeImpl nodeB = pt.getPtNetworkLayer().getNode("_8503309");
 				//Path path2 = pt.getPtRouter2().findRoute(nodeA, nodeB, 45386);
-				Path path2 = pt.getPtRouter2().findPTPath (coord1, coord2, 24372, 300);
+				Path path2 = pt.getPtRouter().findPTPath (coord1, coord2, 24372, 300);
 				System.out.println(path2.links.size());
 				for (LinkImpl l : path2.links){
 					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + l.getType() + l.getToNode().getId() );
@@ -150,7 +150,7 @@ public class PTControler2 {
 	    		 *  warning: PTTimeTable xml format will not be used anymore and will be replaced completely by TransitSchedule
 	    		 * */
 	    		TransitScheduleToPTTimeTableConverter transitScheduleToPTTimeTableConverter = new TransitScheduleToPTTimeTableConverter();
-	    		PTTimeTable2 ptTimeTable = transitScheduleToPTTimeTableConverter.getPTTimeTable(path + "transitSchedule.xml", pt.getPtNetworkLayer());
+	    		PTTimeTable ptTimeTable = transitScheduleToPTTimeTableConverter.getPTTimeTable(path + "transitSchedule.xml", pt.getPtNetworkLayer());
 	    		pt.setPTTimeTable(ptTimeTable);
 	    		PTActWriter ptActWriter3 = new PTActWriter(pt);
 	    		ptActWriter3.findRouteForActivities();

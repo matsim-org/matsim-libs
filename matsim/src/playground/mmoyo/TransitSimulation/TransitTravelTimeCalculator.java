@@ -16,7 +16,7 @@ import playground.marcel.pt.transitSchedule.api.TransitLine;
 import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 
 /**
  * Calculates and stores travel time according to the logicTransitSchedule object
@@ -86,7 +86,7 @@ public class TransitTravelTimeCalculator {
 	}
 
 	
-	public void fillTimeTable(PTTimeTable2 ptTimeTable2){
+	public void fillTimeTable(PTTimeTable ptTimeTable2){
 		ptTimeTable2.setLinkTravelTimeMap(linkTravelTimeMap);
 		ptTimeTable2.setNodeDeparturesMap(nodeDeparturesMap);
 		//linkTravelTimeMap = null;

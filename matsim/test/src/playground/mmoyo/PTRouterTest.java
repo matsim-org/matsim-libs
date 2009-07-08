@@ -18,7 +18,7 @@ import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
-import playground.mmoyo.PTRouter.PTRouter2;
+import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 
@@ -39,7 +39,7 @@ public class PTRouterTest extends MatsimTestCase {
 		new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULE);
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer logicNet= logicFactory.getLogicNet();
-		PTRouter2 ptRouter = logicFactory.getPTRouter();
+		PTRouter ptRouter = logicFactory.getPTRouter();
 		////////////////////////////////////////////////////////
 		
 		///////Tests transfer times

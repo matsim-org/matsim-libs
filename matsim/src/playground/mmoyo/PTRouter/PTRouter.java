@@ -30,20 +30,20 @@ import org.matsim.core.router.util.TravelTime;
  * @param ptLinkCostCalculator Class that contains the weight information of links
  * @param time Milliseconds after the midnight in which the trip must begin
  */
-public class PTRouter2{
+public class PTRouter{
 	private NetworkLayer logicNet;
 	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
 	public TravelTime ptTravelTime;   //> make private 
 	
-	public PTRouter2(NetworkLayer logicNet, PTTimeTable2 ptTimetable) {
+	public PTRouter(NetworkLayer logicNet, PTTimeTable ptTimetable) {
 		this.logicNet = logicNet;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
 	}
 	
-	public PTRouter2(NetworkLayer logicNet, PTTimeTable2 ptTimetable, LogicIntoPlainTranslator logicToPlainConverter) {
+	public PTRouter(NetworkLayer logicNet, PTTimeTable ptTimetable, LogicIntoPlainTranslator logicToPlainConverter) {
 		this.logicNet = logicNet;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);

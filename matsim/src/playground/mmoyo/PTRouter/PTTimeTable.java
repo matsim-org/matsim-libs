@@ -9,28 +9,28 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
-import playground.mmoyo.input.PTLinesReader2;
+import playground.mmoyo.input.PTLinesReader;
 
 /**
  * Contains the information of departures for every station and PTLine
  * @param TimeTableFile path of file with departure information
  */
-public class PTTimeTable2{
+public class PTTimeTable{
 	private List<PTLine> ptLineList;
-	private PTLinesReader2 ptLinesReader;
+	private PTLinesReader ptLinesReader;
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	private Map <Id, LinkImpl> nextLinkMap = new TreeMap <Id, LinkImpl>();
 	private static Time time;
 	
 	@Deprecated
-	public PTTimeTable2(final String TimeTableFile){
+	public PTTimeTable(final String TimeTableFile){
 		ptLineList = new ArrayList<PTLine>();
-		ptLinesReader = new PTLinesReader2(ptLineList);
+		ptLinesReader = new PTLinesReader(ptLineList);
 		ptLinesReader.readFile(TimeTableFile);
 	}
 
-	public PTTimeTable2(){
+	public PTTimeTable(){
 		
 	}
 	

@@ -2,6 +2,8 @@ package playground.mmoyo.PTRouter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -19,18 +21,17 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
+
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.TransitSimulation.LogicFactory;
+import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 /**
  * Reads a plan file, finds a PT connection between two acts creating new PT legs and acts between them
  * and writes a output_plan file
@@ -46,7 +47,8 @@ public class PTActWriter {
 	private LinkImpl walkLink2;
 	
 	private NetworkLayer logicNet;
-	private PTRouter2 ptRouter;
+	private NetworkLayer plainNet;
+	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainConverter;
 	private boolean withTransitSchedule = false;
 	
@@ -55,11 +57,13 @@ public class PTActWriter {
 	private final String TRANSFER = "Transfer";
 	private final String DETTRANSFER = "DetTransfer";
 	
+	Map <Id, Double> costMap = new TreeMap <Id, Double>();
+	
 	//public Population detouredPopulation = new PopulationImpl();  //temporal to find plans with detoured trips
 	
 	@Deprecated
 	public PTActWriter(final PTOb ptOb){
-		this.ptRouter = ptOb.getPtRouter2();
+		this.ptRouter = ptOb.getPtRouter();
 		this.logicNet= ptOb.getPtNetworkLayer();
 		this.outputFile = ptOb.getOutPutFile();
 		this.plansFile =  ptOb.getPlansFile();
@@ -81,6 +85,7 @@ public class PTActWriter {
 		
 		LogicFactory logicFactory = new LogicFactory(transitSchedule);
 		this.logicNet= logicFactory.getLogicNet();
+		this.plainNet= logicFactory.getPlainNet();
 		this.ptRouter = logicFactory.getPTRouter();
 		this.logicToPlainConverter = logicFactory.getLogicToPlainConverter();
 		
@@ -88,24 +93,21 @@ public class PTActWriter {
 		config = Gbl.createConfig(new String[]{ configFile, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
 		
 		this.population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, logicNet);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, this.plainNet);
 		plansReader.readFile(plansFile);
 	}
 	
 	public void SimplifyPtLegs(){
-		PopulationImpl outPopulation = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(outPopulation,logicNet);
-		plansReader.readFile(outputFile);
 		
 		SimplifyPtLegs SimplifyPtLegs = new SimplifyPtLegs();
 		
-		for (PersonImpl person: this.population.getPersons().values()) {
+		for (PersonImpl person: population.getPersons().values()) {
 			//if (true){ Person person = population.getPersons().get(new IdImpl("3937204"));
 			System.out.println(person.getId());
 			SimplifyPtLegs.run(person.getPlans().get(0));
 		}
 		
-		System.out.println("writing output plan file...");
+		System.out.println("writing output plan file..." + outputFile );
 		new PopulationWriter(this.population, outputFile, "v4").write();
 		System.out.println("done");	
 	}
@@ -188,6 +190,8 @@ public class PTActWriter {
 				    		duration= System.currentTimeMillis()-startTime;
 				    		
 				    		if(path!=null){
+
+				    			this.costMap.put(person.getId(), path.travelTime);
 				    			if (path.nodes.size()>1){
 					    			createWlinks(lastActCoord, path, actCoord);
 				    			    durations.add(duration);
@@ -252,7 +256,13 @@ public class PTActWriter {
 		// start the matsim iterations (configured by the config file)
 		controler.run();
 		*/
-			
+		
+		System.out.println ("---------------------------------------------");
+		for(Map.Entry <Id,Double> entry: costMap.entrySet() ){
+			Id idAgent = entry.getKey(); 
+			Double travelTime = entry.getValue();
+			System.out.println (idAgent + "-"  + Double.toString(travelTime));
+		}
 	}//createPTActs
 	
 	/**
@@ -278,7 +288,7 @@ public class PTActWriter {
 			if (link.getType().equals(STANDARD)){
 				if (first){ // first pt veh boarding
 					double waitTime  = ((PTTravelTime)ptRouter.ptTravelTime).transferTime(lastLink, accumulatedTime);					
-					newPlan.addActivity(newPTAct("wait_1st_pt", link.getFromNode().getCoord(), link, accumulatedTime , accumulatedTime + waitTime));
+					newPlan.addActivity(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , accumulatedTime + waitTime));
 					accumulatedTime = accumulatedTime + waitTime; 
 					first=false;
 				}

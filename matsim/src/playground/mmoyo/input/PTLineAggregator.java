@@ -10,7 +10,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import playground.mmoyo.PTRouter.PTLine;
 import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 import java.util.TreeMap;
 
 import org.matsim.core.network.LinkImpl;
@@ -24,10 +24,10 @@ import org.matsim.core.network.NetworkLayer;
  */
 public class PTLineAggregator {
 	private NetworkLayer net;
-	private PTTimeTable2 timeTable;
+	private PTTimeTable timeTable;
 	private String filePath;
 
-	public PTLineAggregator(String filePath, NetworkLayer net, PTTimeTable2 timeTable) {
+	public PTLineAggregator(String filePath, NetworkLayer net, PTTimeTable timeTable) {
 		this.net = net;
 		this.timeTable = timeTable;
 		this.filePath = filePath;

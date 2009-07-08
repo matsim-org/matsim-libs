@@ -38,11 +38,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTTimeTable;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
-import playground.mmoyo.input.PTNetworkFactory2;
+import playground.mmoyo.input.PTNetworkFactory;
 
 public class PlansCalcPtRoute extends PlansCalcRoute {
 
@@ -63,10 +63,10 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 		String transitScheduleFilename = "test/input/playground/marcel/pt/transitSchedule.xml";
 		
 		TransitScheduleToPTTimeTableConverter transitScheduleToPTTimeTableConverter = new TransitScheduleToPTTimeTableConverter();
-		PTTimeTable2 timeTable = transitScheduleToPTTimeTableConverter.getPTTimeTable(transitScheduleFilename, network);
+		PTTimeTable timeTable = transitScheduleToPTTimeTableConverter.getPTTimeTable(transitScheduleFilename, network);
 //		new PTLineAggregator(ptNewLinesFilename, net, timeTable).addLines();
 
-		PTNetworkFactory2 ptNetFactory = new PTNetworkFactory2(); // this looks like it could be an abstract Utility class.
+		PTNetworkFactory ptNetFactory = new PTNetworkFactory(); // this looks like it could be an abstract Utility class.
 		// internal setup of things should happen internally somewhere, not be called externally...
 //		ptNetFactory.createTransferLinks(net, timeTable); // this looks like it could be a static helper method
 //		ptNetFactory.createDetachedTransfers(net, 300); // this also.

@@ -25,8 +25,8 @@ import playground.marcel.pt.transitSchedule.api.TransitRoute;
 import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
-import playground.mmoyo.PTRouter.PTRouter2;
-import playground.mmoyo.PTRouter.PTTimeTable2;
+import playground.mmoyo.PTRouter.PTRouter;
+import playground.mmoyo.PTRouter.PTTimeTable;
 
 /**
  * Reads a TransitSchedule and creates from it:
@@ -226,11 +226,11 @@ public class LogicFactory{
 		return this.logicToPlainTranslator ;
 	}
 
-	public PTRouter2 getPTRouter(){
-		PTTimeTable2 logicPTTimeTable = new PTTimeTable2();
+	public PTRouter getPTRouter(){
+		PTTimeTable logicPTTimeTable = new PTTimeTable();
 		TransitTravelTimeCalculator transitTravelTimeCalculator = new TransitTravelTimeCalculator(logicTransitSchedule,logicNet);
 		transitTravelTimeCalculator.fillTimeTable(logicPTTimeTable);
-		PTRouter2 ptRouter = new PTRouter2(logicNet, logicPTTimeTable, logicToPlainTranslator);
+		PTRouter ptRouter = new PTRouter(logicNet, logicPTTimeTable, logicToPlainTranslator);
 		return ptRouter; 
 	}
 
