@@ -43,6 +43,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -60,10 +61,12 @@ public class NewDemandWithFacilities4Zrh {
 		private PersonImpl currentPerson = null;
 		private Knowledge currentKnowledge = null;
 		private long facCnt = 0;
+		private Knowledges knowledges;
 
-		public CreateActFacility(final ActivityFacilities activityFacilities) {
+		public CreateActFacility(final ActivityFacilities activityFacilities, Knowledges knowledges) {
 			afs = activityFacilities;
 			afMap = new HashMap<Coord, ActivityFacility>();
+			this.knowledges = knowledges;
 		}
 
 		// public ActivityFacilities getActivityfacilities() {
@@ -73,12 +76,11 @@ public class NewDemandWithFacilities4Zrh {
 		@Override
 		public void run(final PersonImpl person) {
 			currentPerson = (PersonImpl) person;
-			currentKnowledge = currentPerson.getKnowledge();
+			currentKnowledge = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if (currentKnowledge == null)
-				currentKnowledge = new Knowledge();
+				knowledges.getBuilder().createKnowledge(person.getId(), "");
 			for (PlanImpl plan : person.getPlans())
 				run(plan);
-			currentPerson.setKnowledge(currentKnowledge);
 		}
 
 		public void run(final PlanImpl plan) {
@@ -129,18 +131,20 @@ public class NewDemandWithFacilities4Zrh {
 		// String outputFacilitiesFilename = args[3];
 
 		ScenarioImpl scenario = new ScenarioImpl();
-
+		
 		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFilename);
 
+		Knowledges knowledges = scenario.getKnowledges();
+		
 		PopulationImpl pop = scenario.getPopulation();
-		new MatsimPopulationReader(pop, net).readFile(inputPopFilename);
+		new MatsimPopulationReader(pop, net, knowledges).readFile(inputPopFilename);
 
 		ActivityFacilities afs = scenario.getActivityFacilities();
 
-		new CreateActFacility(afs).run(pop);
+		new CreateActFacility(afs, knowledges).run(pop);
 
-		new PopulationWriter(pop, outputPopFilename).write();
+		new PopulationWriter(pop, knowledges).writeFile(outputPopFilename);
 		new FacilitiesWriter(afs, outputFacilitiesFilename).write();
 
 		System.out.println("----->done.");

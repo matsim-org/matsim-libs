@@ -44,7 +44,6 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 	private String isEmployed;
 
 	private TreeSet<String> travelcards = null;
-	protected BasicKnowledge knowledge = null;
 	private Desires desires = null;
 	
 	private T selectedPlan = null;
@@ -169,16 +168,9 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 		return this.travelcards;
 	}
 
-	public final BasicKnowledge getKnowledge() {
-		return this.knowledge;
-	}
 
 	public final Desires getDesires() {
 		return this.desires;
-	}
-
-	public void setKnowledge(final BasicKnowledge knowledge) {
-		this.knowledge = knowledge;
 	}
 
 }

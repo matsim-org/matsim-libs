@@ -26,14 +26,12 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.households.Household;
-import org.matsim.knowledges.Knowledge;
 import org.matsim.population.Desires;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
@@ -157,7 +155,6 @@ public class PersonImpl implements Person {
 		b.append("[car_avail=").append(this.getCarAvail()).append("]");
 		b.append("[employed=").append(this.getEmployed()).append("]");
 		b.append("[travelcards=").append(this.getTravelcards() == null ? "null" : this.getTravelcards().size()).append("]");
-		b.append("[knowledge=").append(this.getKnowledge() == null ? "null" : this.getKnowledge()).append("]");
 		b.append("[nof_plans=").append(this.getPlans() == null ? "null" : this.getPlans().size()).append("]");
 	  return b.toString();
 	}
@@ -195,15 +192,6 @@ public class PersonImpl implements Person {
 		}
 	}
 
-	public Knowledge createKnowledge(final String desc) {
-		if (this.delegate.getKnowledge() == null) {
-			Knowledge k = new Knowledge();
-			k.setDescription(desc);
-			this.delegate.setKnowledge(k);
-		}
-		return (Knowledge) this.delegate.getKnowledge();
-	}
-
 	public void addTravelcard(final String type) {
 		this.delegate.addTravelcard(type);
 	}
@@ -238,10 +226,6 @@ public class PersonImpl implements Person {
 
 	public Id getId() {
 		return this.delegate.getId();
-	}
-
-	public Knowledge getKnowledge() {
-		return (Knowledge) this.delegate.getKnowledge();
 	}
 
 	public String getLicense() {
@@ -297,10 +281,6 @@ public class PersonImpl implements Person {
 			this.customizableDelegate = new CustomizableImpl();
 		}
 		return this.customizableDelegate.getCustomAttributes();
-	}
-
-	public void setKnowledge(final Knowledge knowledge) {
-		this.delegate.setKnowledge(knowledge);
 	}
 
 }
