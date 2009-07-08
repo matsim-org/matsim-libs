@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -19,6 +18,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.PlanElement;
 
 /**
  * Translates logic nodes and links into plain nodes and links. 

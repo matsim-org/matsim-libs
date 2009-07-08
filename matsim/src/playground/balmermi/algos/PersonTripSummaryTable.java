@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;

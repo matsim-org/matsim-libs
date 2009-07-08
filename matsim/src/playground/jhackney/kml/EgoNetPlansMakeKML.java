@@ -48,7 +48,7 @@ import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;

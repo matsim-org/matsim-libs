@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;

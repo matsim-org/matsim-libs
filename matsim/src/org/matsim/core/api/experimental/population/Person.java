@@ -20,13 +20,10 @@
 package org.matsim.core.api.experimental.population;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.utils.customize.Customizable;
 
 /**
  * @author dgrether
  */
-public interface Person extends BasicPerson<PlanImpl>, Customizable{
-	
-	
+public interface Person extends BasicPerson<Plan>, Customizable{
 }

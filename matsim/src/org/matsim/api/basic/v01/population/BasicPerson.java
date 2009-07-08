@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Identifiable;
  */
 public interface BasicPerson<T extends BasicPlan> extends Identifiable, Serializable {
 
-	public List<T> getPlans();
+	public List<? extends T> getPlans();
 
 	public void setId(final Id id);
 

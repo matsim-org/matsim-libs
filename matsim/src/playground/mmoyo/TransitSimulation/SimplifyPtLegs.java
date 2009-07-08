@@ -1,6 +1,5 @@
 package playground.mmoyo.TransitSimulation;
 
-import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -8,6 +7,7 @@ import org.matsim.core.population.PlanImpl;
 import java.util.ArrayList;
 import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
 
 /**
  * A sequence of PT-Acts and PT-Activities starts with a leg "walk to PT" and ends with a act "exit PT" and a walk leg 

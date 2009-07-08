@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.Id;
  *
  * @author dgrether
  */
-public interface BasicActivity extends BasicPlanElement {
+public interface BasicActivity extends PlanElement {
 	// NOTE: Activity is NOT a location, since there is no consistent way to set the coord directly.  
 	// If we need an interface for getCoord funktionality (e.g. for quadtree entries), it needs to have a different name.
 	// kai, jul09

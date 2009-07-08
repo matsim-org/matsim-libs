@@ -33,8 +33,11 @@ public interface BasicPopulation<T extends BasicPerson> extends Serializable {
 	
 	public void setName(String name);
 
-	public Map<Id, T> getPersons();
+	public Map<Id,? extends T> getPersons();
 	
+	public void addPerson(final T p); 
+	// yyyy resurrected.  move to BasicPopulation once certain that this is a good idea  
+
 	public BasicPopulationBuilder getPopulationBuilder();
 
 }

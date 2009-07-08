@@ -3,7 +3,7 @@ package playground.jhackney.postprocessing;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.population.PlanElement;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;

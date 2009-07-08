@@ -26,8 +26,10 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.population.Person;
+import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.households.Household;
@@ -41,6 +43,7 @@ import org.matsim.utils.customize.CustomizableImpl;
  * @see org.matsim.core.population.PersonImpl
  */
 public class PersonImpl implements Person {
+	// yyyyyy extends BasicPersonImpl ??
 
 	private final static Logger log = Logger.getLogger(PersonImpl.class);
 
@@ -63,8 +66,8 @@ public class PersonImpl implements Person {
 		this.delegate.setSelectedPlan(selectedPlan);
 	}
 	
-	public final boolean addPlan(PlanImpl p){
-		return this.delegate.addPlan(p);
+	public final boolean addPlan(Plan p){
+		return this.delegate.addPlan( (PlanImpl) p);
 	}
 
 	public PlanImpl createPlan(final boolean selected) {

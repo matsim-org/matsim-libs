@@ -51,7 +51,7 @@ public class LatticeGenerator {
 				BasicPopulationBuilder pb = population.getPopulationBuilder() ;
 				BasicActivity act = pb.createActivityFromCoord("home", new CoordImpl(col,row) ); 
 				plan.addActivity(act);
-				person.getPlans().add(plan);
+				person.addPlan( plan ) ;
 				
 				population.getPersons().put(person.getId(), person);
 //				socialnet.addEgo(person);

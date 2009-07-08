@@ -26,6 +26,9 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+
+import com.vividsolutions.jts.geom.Point;
+
 import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
@@ -38,8 +41,6 @@ import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * This class generates a simple artificial MATSim demand for 
@@ -146,12 +147,12 @@ public class DemandGenerator {
 		BasicPopulationBuilder pb = pop.getPopulationBuilder();
 		for (; number > 0; number--) {
 			BasicPerson<BasicPlan<?>> pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
-			pop.getPersons().put(pers.getId(), pers);
+			pop.addPerson( pers ) ;
 			BasicPlan<?> plan = pb.createPlan(pers);
 			Point p = getRandomPointInFeature(rnd, ft);
 			BasicActivity act = pb.createActivityFromCoord("h", scenario.createCoord(p.getX(), p.getY()));
 			plan.addActivity(act);
-			pers.getPlans().add(plan);
+			pers.addPlan( plan ) ;
 		}
 	}
 	

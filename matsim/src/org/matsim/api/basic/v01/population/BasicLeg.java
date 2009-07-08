@@ -26,7 +26,7 @@ import org.matsim.api.basic.v01.TransportMode;
 /**
 * @author dgrether
 */
-public interface BasicLeg extends BasicPlanElement {
+public interface BasicLeg extends PlanElement {
 	// yyyyyy should be parameterized in terms of "Route"
 
 	public TransportMode getMode();

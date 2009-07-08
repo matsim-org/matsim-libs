@@ -30,19 +30,19 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xml.sax.Attributes;
+
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-
-import org.xml.sax.Attributes;
 
 import playground.johannes.socialnetworks.graph.SparseVertex;
 import playground.johannes.socialnetworks.graph.io.AbstractGraphMLReader;
@@ -55,7 +55,7 @@ import playground.johannes.socialnetworks.graph.social.SocialTie;
  * @author illenberger
  *
  */
-public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLReader {
+public class SNGraphMLReader<P extends BasicPerson> extends AbstractGraphMLReader {
 
 	private static final String WSPACE = " ";
 	
@@ -106,14 +106,14 @@ public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLRe
 	}
 
 	@SuppressWarnings("deprecation")
-	public static SocialNetwork<PersonImpl> loadFromConfig(String configFile, String socialnetFile) {
+	public static SocialNetwork<Person> loadFromConfig(String configFile, String socialnetFile) {
 		Config config = Gbl.createConfig(new String[]{configFile});
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadPopulation();
 		Scenario scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
-		SNGraphMLReader<PersonImpl> reader = new SNGraphMLReader<PersonImpl>(population);
-		SocialNetwork<PersonImpl> g = reader.readGraph(socialnetFile);
+		SNGraphMLReader<Person> reader = new SNGraphMLReader<Person>(population);
+		SocialNetwork<Person> g = reader.readGraph(socialnetFile);
 		
 		return g;
 	}

@@ -19,20 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.io;
 
+import gnu.trove.TDoubleObjectHashMap;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import gnu.trove.TDoubleObjectHashMap;
 import net.opengis.kml._2.LinkType;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoader;
+import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
@@ -40,7 +41,6 @@ import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
-import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
@@ -123,7 +123,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		Scenario scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
 		
-		SocialNetwork<PersonImpl> socialnet = new SocialNetwork<PersonImpl>(population);
+		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
 		KMLWriter writer = new KMLWriter();
 		writer.setDrawEdges(false);
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());

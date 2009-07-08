@@ -150,7 +150,7 @@ public class IVT2006ToGraphML {
 		BasicPerson<BasicPlan<BasicPlanElement>> person = new BasicPersonImpl<BasicPlan<BasicPlanElement>>(
 				new IdImpl(id));
 		BasicPlan<BasicPlanElement> plan = new BasicPlanImpl(person);
-		person.getPlans().add(plan);
+		person.addPlan( plan ) ;
 //		BasicActivityImpl act = new BasicActivityImpl(HOME_ACT_TYPE);
 //		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),
 //				Double.parseDouble(y))));

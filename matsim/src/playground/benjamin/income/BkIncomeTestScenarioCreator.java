@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
@@ -156,7 +157,7 @@ public class BkIncomeTestScenarioCreator {
 			
 			plan.addActivity(act3);
 			
-			pop.getPersons().put(p.getId(), p);
+			pop.addPerson(p);
 //			homeEndTime++;				
 		}
 		log.info("created population...");

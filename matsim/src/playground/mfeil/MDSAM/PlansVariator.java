@@ -38,8 +38,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.api.experimental.population.PlanElement;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 

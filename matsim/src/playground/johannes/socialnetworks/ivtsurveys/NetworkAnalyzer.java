@@ -29,10 +29,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.api.experimental.population.Person;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
@@ -79,7 +80,7 @@ public class NetworkAnalyzer {
 		}
 		
 		logger.info(String.format("Loading graph %1$s...", graphfile));
-		SocialNetwork<PersonImpl> g = SNGraphMLReader.loadFromConfig(args[0], graphfile);
+		SocialNetwork<Person> g = SNGraphMLReader.loadFromConfig(args[0], graphfile);
 		
 		if(!output.endsWith("/"))
 			output = output + "/";

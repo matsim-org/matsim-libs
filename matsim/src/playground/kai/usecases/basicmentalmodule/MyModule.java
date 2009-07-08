@@ -111,10 +111,10 @@ BasicActivityEndEventHandler
 			Id id = sc.createId("1") ; 
 
 			BasicPerson<BasicPlan> person = pb.createPerson(id) ;
-			pop.getPersons().put(id,person);
+			pop.addPerson(person);
 			
 			BasicPlan newPlan = pb.createPlan(person) ; 
-			person.getPlans().add( newPlan ) ;
+			person.addPlan(newPlan ) ;
 			
 			// FIXME: This creational method has the side effect of also adding the created Object.  In my view:
 			// - either createAndAddPlan

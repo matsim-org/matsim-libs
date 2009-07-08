@@ -38,7 +38,7 @@ public class SocialNetworkFactory<P extends BasicPerson<?>> implements GraphFact
 
 	private BasicPopulation<P> population;
 	
-	private Iterator<P> popIterator;
+	private Iterator<? extends P> popIterator;
 	
 	public SocialNetworkFactory(BasicPopulation<P> population) {
 		this.population = population;

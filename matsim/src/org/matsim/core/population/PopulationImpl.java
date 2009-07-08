@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -76,7 +77,7 @@ public class PopulationImpl implements Population {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void addPerson(final PersonImpl p) {
+	public final void addPerson(final Person p) {
 		// validation
 		if (this.getPersons().containsKey(p.getId())) {
 			throw new IllegalArgumentException("Person with id = " + p.getId() + " already exists.");
@@ -91,18 +92,18 @@ public class PopulationImpl implements Population {
 
 		if (!this.isStreaming) {
 			// streaming is off, just add the person to our list
-			this.getPersons().put(p.getId(), p);
+			this.getPersons().put(p.getId(), (PersonImpl) p);
 		} else {
 			// streaming is on, run algorithm on the person and write it to file.
 
 			/* Add Person to map, for algorithms might reference to the person
 			 * with "agent = population.getPersons().get(personId);"
 			 * remove it after running the algorithms! */
-			this.getPersons().put(p.getId(), p);
+			this.getPersons().put(p.getId(), (PersonImpl) p);
 
 			// run algos
 			for (PersonAlgorithm algo : this.personAlgos) {
-				algo.run(p);
+				algo.run( (PersonImpl) p);
 			}
 
 			// remove again as we are streaming
