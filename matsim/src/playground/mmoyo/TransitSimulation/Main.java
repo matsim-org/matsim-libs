@@ -26,7 +26,7 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
-	private static final String PLANFILE = PATH + "DetouredPlansSimplified.xml";  //"plans.xml";
+	private static final String PLANFILE = PATH + "plans.xml";
 	private static final String OUTPUTPLANS = PATH + "output_plans_with_Transit.xml";
 	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
 	private static final String LOGICNETWORK = PATH + "logicNetwork.xml";
@@ -101,14 +101,12 @@ public class Main {
 				NodeImpl node2 = plainNet.getNode("8503006");
 				double distance = CoordUtils.calcDistance(node1.getCoord(), node2.getCoord());
 				System.out.println(distance);
-				//-->check if they nodes are joined by detTransfer link 
+				//-->check if their nodes are joined by detTransfer links 
 				break;
 				
 			case 7:  //simplifies a plan
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, PATH + "simplifiedDetouredPlans.xml");
 				ptActWriter.SimplifyPtLegs();
-				
-				//ptActWriter.SimplifyPtLegs(logicFactory.getPlainNet());
 				break;
 		}
 	}
