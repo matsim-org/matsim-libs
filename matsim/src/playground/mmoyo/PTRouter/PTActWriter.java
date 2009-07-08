@@ -257,12 +257,14 @@ public class PTActWriter {
 		controler.run();
 		*/
 		
+		/* This is to compare the travelTime of path with different cost calculations
 		System.out.println ("---------------------------------------------");
 		for(Map.Entry <Id,Double> entry: costMap.entrySet() ){
 			Id idAgent = entry.getKey(); 
 			Double travelTime = entry.getValue();
 			System.out.println (idAgent + "-"  + Double.toString(travelTime));
 		}
+		*/
 	}//createPTActs
 	
 	/**
