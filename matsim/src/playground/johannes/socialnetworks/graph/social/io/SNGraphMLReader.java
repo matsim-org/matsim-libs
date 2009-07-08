@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xml.sax.Attributes;
-
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
@@ -43,6 +41,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoader;
+import org.xml.sax.Attributes;
 
 import playground.johannes.socialnetworks.graph.SparseVertex;
 import playground.johannes.socialnetworks.graph.io.AbstractGraphMLReader;
@@ -55,7 +54,7 @@ import playground.johannes.socialnetworks.graph.social.SocialTie;
  * @author illenberger
  *
  */
-public class SNGraphMLReader<P extends BasicPerson> extends AbstractGraphMLReader {
+public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLReader {
 
 	private static final String WSPACE = " ";
 	
