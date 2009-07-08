@@ -271,6 +271,10 @@ public class PlanomatConfigGroup extends Module {
 		return PlanomatConfigGroup.RoutingCapability.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.ROUTING_CAPABILITY.getActualValue());
 	}
 	
+	public void setRoutingCapability(PlanomatConfigGroup.RoutingCapability routingCapability) {
+		PlanomatConfigParameter.ROUTING_CAPABILITY.setActualValue(routingCapability.toString());
+	}
+	
 	public int getLevelOfTimeResolution() {
 		return Integer.parseInt(PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getActualValue());
 	}

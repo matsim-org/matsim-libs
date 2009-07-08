@@ -31,8 +31,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		testSuite.addTestSuite(DepartureDelayAverageCalculatorTest.class);
 		testSuite.addTestSuite(FixedRouteLegTravelTimeEstimatorTest.class);
-//		testSuite.addTestSuite(CetinCompatibleLegTravelTimeEstimatorTest.class);
-//		testSuite.addTestSuite(CharyparEtAlCompatibleLegTravelTimeEstimatorTest.class);
+		testSuite.addTestSuite(LinearInterpolationLegTravelTimeEstimatorTest.class);
 		//$JUnit-END$
 
 		return testSuite;

@@ -37,6 +37,8 @@ public interface LegTravelTimeEstimator {
 	/**
 	 * Implement your assumption on travel time estimation here.
 	 * 
+	 * TODO don't have to pass a Leg-type object, a TransportMode object would be enough
+	 * 
 	 * @param personId identifier of the replanning person
 	 * @param departureTime the departure time of the leg
 	 * @param actOrigin the activity at the beginning of the leg

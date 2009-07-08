@@ -20,21 +20,36 @@
 
 package org.matsim.planomat.costestimators;
 
+import java.util.HashMap;
+import java.util.zip.Adler32;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.world.Location;
 
 public class LinearInterpolationLegTravelTimeEstimator implements
-		LegTravelTimeEstimator {
+LegTravelTimeEstimator {
+
+	public static final double SAMPLING_DISTANCE = 3600.0;
 
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute plansCalcRoute;
+	// TODO process simLegInterpretation
+	// clarify if this should be processed here, or in the router, which means become a config parameter for matsim / the router
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
+
+	private boolean doLogging = false;
+
+	private final static Logger logger = Logger.getLogger(LinearInterpolationLegTravelTimeEstimator.class);
 
 	public LinearInterpolationLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
@@ -48,16 +63,111 @@ public class LinearInterpolationLegTravelTimeEstimator implements
 		this.simLegInterpretation = simLegInterpretation;
 	}
 
+	private class DynamicODMatrixEntry {
+
+		private final Location origin;
+		private final Location destination;
+		private final TransportMode mode;
+		private final double departureTime;
+		private final int hash;
+
+		public DynamicODMatrixEntry(Location origin, Location destination,
+				TransportMode mode, double departureTime) {
+			super();
+			this.origin = origin;
+			this.destination = destination;
+			this.mode = mode;
+			this.departureTime = departureTime;
+
+			Adler32 adler32 = new Adler32();
+			adler32.update(this.origin.getId().toString().getBytes());
+			adler32.update(this.destination.getId().toString().getBytes());
+			adler32.update(this.mode.toString().getBytes());
+			adler32.update((int) this.departureTime);
+			this.hash = (int) adler32.getValue();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+
+			DynamicODMatrixEntry other = (DynamicODMatrixEntry) obj;
+
+			if (this.departureTime != other.departureTime) {
+				return false;
+			}
+			if (!this.mode.equals(other.mode)) {
+				return false;
+			}
+			if (!this.origin.getId().equals(other.origin.getId())) {
+				return false;
+			}
+			if (!this.destination.getId().equals(other.destination.getId())) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			return this.hash;
+		}
+
+	}
+
+	private HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
+
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination,
 			LegImpl legIntermediate) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		// get values at sampling points
+		double samplingPoint = Double.MIN_VALUE;
+		double[] samplingPointsTravelTimes = new double[2];
+		for (int ii = 0; ii <= 1; ii++) {
+
+			samplingPointsTravelTimes[ii] = 0.0;
+			
+			switch(ii) {
+			case 0:
+				samplingPoint = Math.floor(departureTime / LinearInterpolationLegTravelTimeEstimator.SAMPLING_DISTANCE) * LinearInterpolationLegTravelTimeEstimator.SAMPLING_DISTANCE;
+				break;
+			case 1:
+				samplingPoint = Math.ceil(departureTime / LinearInterpolationLegTravelTimeEstimator.SAMPLING_DISTANCE) * LinearInterpolationLegTravelTimeEstimator.SAMPLING_DISTANCE;
+				break;
+			}
+
+			DynamicODMatrixEntry entry = new DynamicODMatrixEntry(actOrigin.getLink(), actDestination.getLink(), legIntermediate.getMode(), samplingPoint);
+			if (this.dynamicODMatrix.containsKey(entry)) {
+				samplingPointsTravelTimes[ii] = this.dynamicODMatrix.get(entry);
+				if (this.doLogging) {
+					logger.info(Time.writeTime(samplingPoint) + "\t" + Time.writeTime(samplingPointsTravelTimes[ii]) + "\t" + " [from cache]");
+				}
+			} else {
+				samplingPointsTravelTimes[ii] += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, samplingPoint);
+				this.dynamicODMatrix.put(entry, samplingPointsTravelTimes[ii]);
+				if (this.doLogging) {
+					logger.info(Time.writeTime(samplingPoint) + "\t" + Time.writeTime(samplingPointsTravelTimes[ii]) + "\t" + " [from router]");
+				}
+			}
+
+		}
+
+		// linear interpolation
+		double m = (samplingPointsTravelTimes[1] - samplingPointsTravelTimes[0]) / LinearInterpolationLegTravelTimeEstimator.SAMPLING_DISTANCE;
+		// use right-hand sampling point to calculate y_0
+		double y_0 = samplingPointsTravelTimes[1] - m * samplingPoint;
+
+		return m * departureTime + y_0;
 	}
 
 	public void reset() {
-		// TODO Auto-generated method stub
+		this.dynamicODMatrix.clear();
 
+	}
+
+	public void setDoLogging(boolean doLogging) {
+		this.doLogging = doLogging;
 	}
 
 }
