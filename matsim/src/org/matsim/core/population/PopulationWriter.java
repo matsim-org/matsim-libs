@@ -348,6 +348,15 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			this.writeEndPlans();
 		}
 	}
+	
+	/**
+	 * Writes to a file given as parameter.
+	 * @param filename path to the file.
+	 */
+	public void writeFile(String filename){
+		this.outfile = filename;
+		write();
+	}
 
 	public PopulationWriterHandler getHandler() {
 		return this.handler;
