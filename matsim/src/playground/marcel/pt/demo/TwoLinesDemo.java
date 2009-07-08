@@ -225,17 +225,17 @@ public class TwoLinesDemo {
 		TransitStopFacility stop6 = this.schedule.getFacilities().get(this.ids[6]);
 		
 		{ // person 1
-			PersonImpl person = pb.createPerson(this.ids[1]);
-			PlanImpl plan = pb.createPlan(person);
-			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
+			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[1]);
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:01:00"));
-			LegImpl leg1 = pb.createLeg(TransportMode.pt);
+			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
-			ActivityImpl act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:01:00"));
-			LegImpl leg2 = pb.createLeg(TransportMode.pt);
+			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
-			ActivityImpl act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
+			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 			
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
@@ -248,17 +248,17 @@ public class TwoLinesDemo {
 		}
 
 		{ // person 2
-			PersonImpl person = pb.createPerson(this.ids[2]);
-			PlanImpl plan = pb.createPlan(person);
-			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
+			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[2]);
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:06:00"));
-			LegImpl leg1 = pb.createLeg(TransportMode.pt);
+			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
-			ActivityImpl act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:06:00"));
-			LegImpl leg2 = pb.createLeg(TransportMode.pt);
+			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
-			ActivityImpl act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
+			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 			
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
@@ -271,17 +271,17 @@ public class TwoLinesDemo {
 		}
 
 		{ // person 3
-			PersonImpl person = pb.createPerson(this.ids[3]);
-			PlanImpl plan = pb.createPlan(person);
-			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[1]);
+			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[3]);
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:11:00"));
-			LegImpl leg1 = pb.createLeg(TransportMode.pt);
+			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
-			ActivityImpl act2 = pb.createActivityFromLinkId("pt interaction", this.ids[3]);
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:11:00"));
-			LegImpl leg2 = pb.createLeg(TransportMode.pt);
+			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
-			ActivityImpl act3 = pb.createActivityFromLinkId("pt interaction", this.ids[6]);
+			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 			
 			plan.addActivity(act1);
 			plan.addLeg(leg1);

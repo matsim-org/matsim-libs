@@ -67,7 +67,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 	@Override
 	public void run(PersonImpl person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPersons().get(person.getId());
+		playground.balmermi.census2000.data.MyPerson p = this.persons.getPersons().get(person.getId());
 
 		// calc plan distance and main purpose
 		double plan_dist = 0.0;

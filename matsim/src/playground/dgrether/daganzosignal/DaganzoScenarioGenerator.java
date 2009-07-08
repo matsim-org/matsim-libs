@@ -21,11 +21,11 @@
 package playground.dgrether.daganzosignal;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -41,6 +41,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLane;
@@ -196,9 +197,9 @@ public class DaganzoScenarioGenerator {
 		PopulationBuilder builder = population.getPopulationBuilder();
 
 		for (int i = 1; i <= 3600; i++) {
-			PersonImpl p = builder.createPerson(scenario.createId(Integer
+			PersonImpl p = (PersonImpl) builder.createPerson(scenario.createId(Integer
 					.toString(i)));
-			PlanImpl plan = builder.createPlan(p);
+			PlanImpl plan = (PlanImpl) builder.createPlan(p);
 			p.addPlan(plan);
 			// home
 			// homeEndTime = homeEndTime + ((i - 1) % 3);
@@ -206,11 +207,11 @@ public class DaganzoScenarioGenerator {
 				homeEndTime++;
 			}
 
-			ActivityImpl act1 = builder.createActivityFromLinkId("h", l1.getId());
+			ActivityImpl act1 = (ActivityImpl) builder.createActivityFromLinkId("h", l1.getId());
 			act1.setEndTime(homeEndTime);
 			plan.addActivity(act1);
 			// leg to home
-			LegImpl leg = builder.createLeg(TransportMode.car);
+			LegImpl leg = (LegImpl) builder.createLeg(TransportMode.car);
 			// TODO check this
 			NetworkRoute route = new NodeNetworkRoute(l1, l7);
 			if (isAlternativeRouteEnabled) {
@@ -224,7 +225,7 @@ public class DaganzoScenarioGenerator {
 
 			plan.addLeg(leg);
 			
-			ActivityImpl act2 = builder.createActivityFromLinkId("h", l7.getId());
+			ActivityImpl act2 = (ActivityImpl) builder.createActivityFromLinkId("h", l7.getId());
 			act2.setLink(l7);
 			plan.addActivity(act2);
 			population.addPerson(p);

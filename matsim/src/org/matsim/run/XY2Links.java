@@ -22,7 +22,6 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
@@ -30,6 +29,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**

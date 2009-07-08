@@ -20,7 +20,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -43,7 +42,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatModuleTest extends MatsimTestCase {
 
-	private Scenario scenario = null;
+	private ScenarioImpl scenario = null;
 
 	@Override
 	protected void setUp() throws Exception {

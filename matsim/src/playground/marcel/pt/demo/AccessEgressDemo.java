@@ -151,13 +151,13 @@ public class AccessEgressDemo {
 				continue;
 			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
-				PersonImpl person = pb.createPerson(this.scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
-				PlanImpl plan = pb.createPlan(person);
-				ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[i]);
+				PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
+				PlanImpl plan = (PlanImpl) pb.createPlan(person);
+				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[i]);
 				act1.setEndTime(departureTime + j * agentInterval);
-				LegImpl leg = pb.createLeg(TransportMode.pt);
+				LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
 				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, lastStop));
-				ActivityImpl act2 = pb.createActivityFromLinkId("work", this.ids[nOfLinks - 1]);
+				ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks - 1]);
 
 				population.getPersons().put(person.getId(), person);
 				person.getPlans().add(plan);

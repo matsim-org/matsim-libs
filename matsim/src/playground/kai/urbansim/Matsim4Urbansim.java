@@ -3,7 +3,6 @@ package playground.kai.urbansim;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -15,6 +14,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoader;
 
 /**
  * Class that is meant to interface with urbansim.  As of nov08, only working for the urbansim "parcel"

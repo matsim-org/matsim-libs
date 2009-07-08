@@ -23,7 +23,6 @@
  */
 package playground.yu.test;
 
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -31,6 +30,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**

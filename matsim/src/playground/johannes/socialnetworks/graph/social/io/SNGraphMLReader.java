@@ -37,12 +37,12 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioLoader;
 
 import playground.johannes.socialnetworks.graph.SparseVertex;
 import playground.johannes.socialnetworks.graph.io.AbstractGraphMLReader;

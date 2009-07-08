@@ -35,7 +35,7 @@ public class Household implements Comparable<Household>  {
 	public Integer hh_id;
 	public CoordImpl coord;
 	public int hh_cat;
-	public HashSet<Person> persons = new HashSet<Person>();
+	public HashSet<MyPerson> persons = new HashSet<MyPerson>();
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -56,7 +56,7 @@ public class Household implements Comparable<Household>  {
 		else { return 0; }
 	}
 
-	public final boolean addPerson(Person p) {
+	public final boolean addPerson(MyPerson p) {
 		return this.persons.add(p);
 	}
 
@@ -80,9 +80,9 @@ public class Household implements Comparable<Household>  {
 
 	public final int getKidCount() {
 		int cnt = 0;
-		Iterator<Person> p_it = this.persons.iterator();
+		Iterator<MyPerson> p_it = this.persons.iterator();
 		while (p_it.hasNext()) {
-			Person p = p_it.next();
+			MyPerson p = p_it.next();
 			if (p.age < 15) { cnt++; }
 		}
 		return cnt;

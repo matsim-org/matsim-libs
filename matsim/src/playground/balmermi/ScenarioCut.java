@@ -27,9 +27,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
@@ -49,13 +47,14 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 	
-	private static void calcExtent(Scenario scenario) {
+	private static void calcExtent(ScenarioImpl scenario) {
 		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
 		for (ActivityFacility f : scenario.getActivityFacilities().getFacilities().values()) {
@@ -220,7 +219,7 @@ public class ScenarioCut {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reducePopulation(Scenario scenario) {
+	private static void reducePopulation(ScenarioImpl scenario) {
 		System.out.println("removing persons containing links and/or facilities that are removed..." + (new Date()));
 		Set<Id> linkIds = scenario.getNetwork().getLinks().keySet();
 		Set<Id> facIds = scenario.getActivityFacilities().getFacilities().keySet();
@@ -271,7 +270,7 @@ public class ScenarioCut {
 	//////////////////////////////////////////////////////////////////////
 	
 	private static void reduceScenario(String[] args) {
-		Scenario scenario = new ScenarioLoader(args[0]).loadScenario();
+		ScenarioImpl scenario = new ScenarioLoader(args[0]).loadScenario();
 		calcExtent(scenario);
 		if (args.length == 4) {
 			Coord center = new CoordImpl(args[1],args[2]);

@@ -107,7 +107,7 @@ public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm impl
 
 	@Override
 	public void run(PersonImpl person) {
-		playground.balmermi.census2000.data.Person p = persons.getPerson(Integer.valueOf(person.getId().toString()));
+		playground.balmermi.census2000.data.MyPerson p = persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Household hh = p.getHousehold();
 		Municipality muni = hh.getMunicipality();
 

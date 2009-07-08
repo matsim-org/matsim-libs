@@ -56,7 +56,7 @@ public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanA
 
 	@Override
 	public void run(PersonImpl person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
+		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		model.setAge(p.getAge());
 		model.setHHDimension(p.getHousehold().getPersonCount());
 		model.setHHKids(p.getHousehold().getKidCount());

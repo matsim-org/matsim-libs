@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,41 +20,20 @@
 
 package org.matsim.core.api.experimental.population;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 
 /**
- * @author dgrether
+ * @author nagel
+ *
  */
-public interface PopulationBuilder extends BasicPopulationBuilder {
-
-	Person createPerson(Id id);
-
-	Plan createPlan(BasicPerson person);
-	// yyyyyy needs to return "Plan"
-
-	Activity createActivityFromCoord(String actType, Coord coord);
-	// yyyyyy needs to return "Activity"
-	
-//	Activity createActivityFromFacilityId(String actType, Id facilityId);
-	// disabled until everything else is figured out
-	
-	Activity createActivityFromLinkId(String actType, Id linkId);
-	// yyyyyy needs to return "Activity"
-	
-	Leg createLeg(TransportMode legMode);
-	// yyyyyy needs to return "Leg".
+public class PopulationWriter extends BasicPopulationWriter {
 
 	/**
-	 * Creates a new Route object
-	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
-	 * @return a BasicRoute Object with the links set accordingly
-	 * @deprecated needs to be verified // TODO [MR] verify
+	 * @param population
 	 */
-//	Route createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
-	// disabled until everything else is figured out
+	public PopulationWriter(BasicPopulation population) {
+		super(population);
+	}
 
 }

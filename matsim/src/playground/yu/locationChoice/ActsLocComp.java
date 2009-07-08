@@ -31,12 +31,10 @@ import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -122,7 +120,7 @@ public class ActsLocComp {
 		String popFileB = args[3];
 		String outputFile = args[4];
 		// senario A
-		Scenario scenarioA = new ScenarioImpl();
+		ScenarioImpl scenarioA = new ScenarioImpl();
 
 		NetworkLayer net = scenarioA.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFile);

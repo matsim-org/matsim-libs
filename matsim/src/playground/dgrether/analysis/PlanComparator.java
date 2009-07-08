@@ -23,7 +23,6 @@ package playground.dgrether.analysis;
 import java.util.Date;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -31,6 +30,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioLoader;
 
 /**
  * This Class is able to compare two plan files of different iterations. In a

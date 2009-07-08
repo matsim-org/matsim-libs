@@ -20,7 +20,6 @@
 
 package playground.yu.newPlans;
 
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -28,6 +27,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioLoader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type

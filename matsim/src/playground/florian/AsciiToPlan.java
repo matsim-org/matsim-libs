@@ -76,8 +76,8 @@ public class AsciiToPlan {
 			int j=0;
 			zaehler++;
 			Id id =new IdImpl(zaehler); 
-			PersonImpl person = pb.createPerson(id);
-			PlanImpl plan = pb.createPlan(person);
+			PersonImpl person = (PersonImpl) pb.createPerson(id);
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
 			person.addPlan(plan);
 			//Lese wichtige Daten ein
 //			spalten_v = StringUtils.explode(zeile, TRENNER);

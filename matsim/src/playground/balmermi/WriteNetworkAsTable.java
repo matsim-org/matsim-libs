@@ -20,10 +20,10 @@
 
 package playground.balmermi;
 
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkSummary;
+import org.matsim.core.scenario.ScenarioLoader;
 
 import playground.balmermi.algos.NetworkWriteVolumesAsTable;
 

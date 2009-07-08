@@ -22,7 +22,7 @@ package playground.balmermi.census2000.data;
 
 
 
-public class Person implements Comparable<Person> {
+public class MyPerson implements Comparable<MyPerson> {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -43,7 +43,7 @@ public class Person implements Comparable<Person> {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Person(Integer p_id, Household hh) {
+	public MyPerson(Integer p_id, Household hh) {
 		this.p_id = p_id;
 		this.hh = hh;
 	}
@@ -52,7 +52,7 @@ public class Person implements Comparable<Person> {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 
-	public int compareTo(Person other) {
+	public int compareTo(MyPerson other) {
 		if (this.p_id < other.p_id) { return -1; }
 		else if (this.p_id > other.p_id) { return 1; }
 		else { return 0; }

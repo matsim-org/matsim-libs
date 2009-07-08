@@ -233,7 +233,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 	@Override
 	public void run(PersonImpl person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
+		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 		Id zone_id = p.getHousehold().getMunicipality().getZone().getId();
 		int[] vals = this.zones.get(zone_id);
 

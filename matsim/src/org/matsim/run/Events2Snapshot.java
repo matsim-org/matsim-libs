@@ -23,12 +23,12 @@ package org.matsim.run;
 import java.io.File;
 import java.util.Iterator;
 
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.vis.netvis.VisConfig;

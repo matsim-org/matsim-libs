@@ -25,7 +25,6 @@ import java.io.IOException;
 
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -34,6 +33,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;

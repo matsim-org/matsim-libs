@@ -10,10 +10,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.MY_STATIC_STUFF;

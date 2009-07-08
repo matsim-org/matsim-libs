@@ -17,13 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api.experimental;
+package org.matsim.core.scenario;
 
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.SAXException;
+
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.BasicScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -38,7 +42,6 @@ import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.world.MatsimWorldReader;
-import org.xml.sax.SAXException;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -54,6 +57,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  */
 public class ScenarioLoader extends BasicScenarioLoader {
+	// yyyy quite possibly, move functionality from BasicScenarioLoader into this here and delete BasicScenarioLoader. kai, jul09
 
 	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
 
@@ -75,8 +79,8 @@ public class ScenarioLoader extends BasicScenarioLoader {
 
 	
 	@Override
-	public Scenario getScenario() {
-		return (Scenario)super.getScenario();
+	public ScenarioImpl getScenario() {
+		return (ScenarioImpl)super.getScenario();
 	}
 
 	/**
@@ -85,7 +89,7 @@ public class ScenarioLoader extends BasicScenarioLoader {
 	 * optional elements.
 	 * @return the Scenario
 	 */
-	public Scenario loadScenario() {
+	public ScenarioImpl loadScenario() {
 		this.loadWorld();
 		this.loadNetwork();
 		this.loadActivityFacilities();

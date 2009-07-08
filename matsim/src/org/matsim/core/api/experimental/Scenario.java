@@ -18,15 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.api.experimental;
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.households.Households;
-import org.matsim.knowledges.Knowledges;
-import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.vehicles.BasicVehicles;
 
 
 
@@ -36,7 +29,7 @@ import org.matsim.vehicles.BasicVehicles;
  * has to provide consistent implementations
  * for the different return types, e.g. Network, 
  * Facilities or Population.
- * @see org.matsim.core.api.experimental.ScenarioLoader
+ * @see org.matsim.core.scenario.ScenarioLoader
  * @author dgrether
  *
  */
@@ -44,20 +37,21 @@ public interface Scenario extends BasicScenario {
 
 	public NetworkLayer getNetwork();
 
-	public ActivityFacilities getActivityFacilities() ;
-
 	public PopulationImpl getPopulation() ;
 	
-	public Knowledges getKnowledges();
-	
-	public Households getHouseholds();
-	
-	public BasicVehicles getVehicles();
-
-	public BasicLaneDefinitions getLaneDefinitions();
-	
-	public BasicSignalSystems getSignalSystems();
-	
-	public BasicSignalSystemConfigurations getSignalSystemConfigurations();
+	// the following are available via the Impl only
+//	public ActivityFacilities getActivityFacilities() ;
+//
+//	public Knowledges getKnowledges();
+//	
+//	public Households getHouseholds();
+//	
+//	public BasicVehicles getVehicles();
+//
+//	public BasicLaneDefinitions getLaneDefinitions();
+//	
+//	public BasicSignalSystems getSignalSystems();
+//	
+//	public BasicSignalSystemConfigurations getSignalSystemConfigurations();
 	
 }

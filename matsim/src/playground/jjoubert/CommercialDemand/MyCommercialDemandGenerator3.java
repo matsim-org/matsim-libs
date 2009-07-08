@@ -28,6 +28,10 @@ import java.util.GregorianCalendar;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
@@ -37,9 +41,7 @@ import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -50,9 +52,6 @@ import playground.jjoubert.CommercialTraffic.ActivityLocations;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
 import playground.jjoubert.Utilities.MyXmlConverter;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGenerator3 {
 	// String value that must be set
@@ -199,7 +198,7 @@ public class MyCommercialDemandGenerator3 {
 				for (PlanImpl pp : planList) {
 					// Create a truck agent
 					Id id = sc.createId(Long.toString(agentId));
-					PersonImpl truck = pb.createPerson(id);
+					PersonImpl truck = (PersonImpl) pb.createPerson(id);
 					truck.addPlan(pp);
 					pp.setPerson(truck);
 //					pp.setSelected(true);

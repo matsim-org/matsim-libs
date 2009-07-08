@@ -30,11 +30,11 @@ import net.opengis.kml._2.LinkType;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.social.Ego;

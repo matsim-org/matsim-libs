@@ -24,6 +24,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.xml.sax.SAXException;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
@@ -38,8 +40,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-
-import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
@@ -105,14 +105,14 @@ public class PseudoNetworkDemo {
 		LinkImpl link1 = network.getLink(scenario.createId("1"));
 
 		PopulationImpl population = scenario.getPopulation();
-		PersonImpl person = population.getPopulationBuilder().createPerson(new IdImpl(1));
+		PersonImpl person = (PersonImpl) population.getPopulationBuilder().createPerson(new IdImpl(1));
 		population.getPersons().put(person.getId(), person);
-		PlanImpl plan = population.getPopulationBuilder().createPlan(person);
+		PlanImpl plan = (PlanImpl) population.getPopulationBuilder().createPlan(person);
 		person.addPlan(plan);
-		ActivityImpl act = population.getPopulationBuilder().createActivityFromLinkId("home", link1.getId());
+		ActivityImpl act = (ActivityImpl) population.getPopulationBuilder().createActivityFromLinkId("home", link1.getId());
 		act.setEndTime(4*3600.0);
 		plan.addActivity(act);
-		LegImpl leg = population.getPopulationBuilder().createLeg(TransportMode.walk);
+		LegImpl leg = (LegImpl) population.getPopulationBuilder().createLeg(TransportMode.walk);
 		leg.setTravelTime(15*3600.0);
 		leg.setRoute(network.getFactory().createRoute(TransportMode.walk, link1, link1));
 		plan.addLeg(leg);

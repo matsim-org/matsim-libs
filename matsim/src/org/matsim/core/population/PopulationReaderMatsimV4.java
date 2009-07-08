@@ -27,10 +27,14 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
@@ -50,8 +54,6 @@ import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.Desires;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
@@ -119,7 +121,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	public PopulationReaderMatsimV4(final Scenario scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.facilities = scenario.getActivityFacilities();
+		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.knowledges = new KnowledgesImpl();
 	}
 	

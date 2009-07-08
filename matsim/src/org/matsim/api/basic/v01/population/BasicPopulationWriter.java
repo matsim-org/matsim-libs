@@ -28,6 +28,7 @@ import org.matsim.core.population.PopulationWriter;
  * @author mrieser
  */
 public class BasicPopulationWriter {
+	// this really is essentially a factory. :-)
 
 	private final BasicPopulation population;
 	

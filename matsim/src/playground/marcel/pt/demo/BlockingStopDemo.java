@@ -164,13 +164,13 @@ public class BlockingStopDemo {
 
 		// bus-passengers line 1
 		for (int i = 1; i < nOfStops; i++) {
-			PersonImpl person = pb.createPerson(this.scenario.createId(Integer.toString(-i)));
-			PlanImpl plan = pb.createPlan(person);
-			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[i]);
+			PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(-i)));
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[i]);
 			act1.setEndTime(startTime + i*60);
-			LegImpl leg = pb.createLeg(TransportMode.pt);
+			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(this.schedule.getFacilities().get(this.ids[i-1]), tLine1, this.schedule.getFacilities().get(this.ids[nOfStops-1])));
-			ActivityImpl act2 = pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
 
 			population.getPersons().put(person.getId(), person);
 			person.getPlans().add(plan);
@@ -182,13 +182,13 @@ public class BlockingStopDemo {
 
 		// bus-passengers line 2
 		for (int i = 1; i < nOfStops; i++) {
-			PersonImpl person = pb.createPerson(this.scenario.createId(Integer.toString(-i-nOfStops)));
-			PlanImpl plan = pb.createPlan(person);
-			ActivityImpl act1 = pb.createActivityFromLinkId("home", this.ids[nOfLinks+i]);
+			PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(-i-nOfStops)));
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[nOfLinks+i]);
 			act1.setEndTime(startTime + i*60);
-			LegImpl leg = pb.createLeg(TransportMode.pt);
+			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(this.schedule.getFacilities().get(this.ids[nOfStops+i-1]), tLine2, this.schedule.getFacilities().get(this.ids[2*nOfStops-1])));
-			ActivityImpl act2 = pb.createActivityFromLinkId("work", this.ids[2*nOfLinks-1]);
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[2*nOfLinks-1]);
 
 			population.getPersons().put(person.getId(), person);
 			person.getPlans().add(plan);
@@ -211,13 +211,13 @@ public class BlockingStopDemo {
 		carRoute1.setLinks(network.getLinks().get(this.ids[0]), links1, network.getLinks().get(this.ids[nOfLinks-1]));
 		carRoute2.setLinks(network.getLinks().get(this.ids[nOfLinks]), links2, network.getLinks().get(this.ids[2*nOfLinks-1]));
 		for (int i = 0; i < nOfCars; i++) {
-			PersonImpl person = pb.createPerson(this.scenario.createId(Integer.toString(i)));
-			PlanImpl plan = pb.createPlan(person);
-			ActivityImpl act1a = pb.createActivityFromLinkId("home", this.ids[0]);
+			PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(i)));
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			ActivityImpl act1a = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[0]);
 			act1a.setEndTime(startTime + i*carsHeading);
-			LegImpl leg1 = pb.createLeg(TransportMode.car);
+			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.car);
 			leg1.setRoute(carRoute1);
-			ActivityImpl act1b = pb.createActivityFromLinkId("work", this.ids[4]);
+			ActivityImpl act1b = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[4]);
 
 			population.getPersons().put(person.getId(), person);
 			person.getPlans().add(plan);
@@ -226,13 +226,13 @@ public class BlockingStopDemo {
 			plan.addLeg(leg1);
 			plan.addActivity(act1b);
 
-			PersonImpl person2 = pb.createPerson(this.scenario.createId(Integer.toString(i+nOfCars)));
-			PlanImpl plan2 = pb.createPlan(person2);
-			ActivityImpl act2a = pb.createActivityFromLinkId("home", this.ids[nOfLinks]);
+			PersonImpl person2 = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(i+nOfCars)));
+			PlanImpl plan2 = (PlanImpl) pb.createPlan(person2);
+			ActivityImpl act2a = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[nOfLinks]);
 			act2a.setEndTime(startTime + i*carsHeading);
-			LegImpl leg2 = pb.createLeg(TransportMode.car);
+			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.car);
 			leg2.setRoute(carRoute2);
-			ActivityImpl act2b = pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
+			ActivityImpl act2b = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
 
 			population.getPersons().put(person2.getId(), person2);
 			person2.getPlans().add(plan2);

@@ -66,7 +66,7 @@ public class PlansCreatePopulation {
 		Iterator<Integer> pid_it = this.persons.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Integer pid = pid_it.next();
-			playground.balmermi.census2000.data.Person p = this.persons.getPersons().get(pid);
+			playground.balmermi.census2000.data.MyPerson p = this.persons.getPersons().get(pid);
 			PersonImpl person = new PersonImpl(new IdImpl(pid.toString()));
 			person.setSex(p.getSex());
 			person.setAge(p.getAge());

@@ -4,7 +4,6 @@
 package playground.yu.test;
 
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -15,6 +14,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;

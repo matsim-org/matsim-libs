@@ -28,7 +28,6 @@ import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -40,6 +39,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.CompressedNetworkRoute;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

@@ -27,12 +27,12 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -42,12 +42,12 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -332,13 +332,14 @@ public class PlanomatTest extends MatsimTestCase {
 	private static final class ScenarioCreatePersonEventHandler implements BasicPersonEventHandler{
 
 		private Scenario scenario;
-
+		
 		public ScenarioCreatePersonEventHandler(Scenario scenario) {
 			this.scenario = scenario;
 		}
 
 		public void handleEvent(BasicPersonEvent event) {
-			this.scenario.getPopulation().getPersons().put(event.getPersonId(), this.scenario.getPopulation().getPopulationBuilder().createPerson(event.getPersonId()));
+			if (!this.scenario.getPopulation().getPersons().containsKey(event.getPersonId()))
+			  this.scenario.getPopulation().addPerson(this.scenario.getPopulation().getPopulationBuilder().createPerson(event.getPersonId()));
 		}
 
 		public void reset(int iteration) {

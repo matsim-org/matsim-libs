@@ -41,7 +41,7 @@ public class Persons {
 	private static final String ALWAYS = "always";
 	private static final String SOMETIMES = "sometimes";
 
-	public final HashMap<Integer,Person> persons = new HashMap<Integer,Person>();
+	public final HashMap<Integer,MyPerson> persons = new HashMap<Integer,MyPerson>();
 	public Households households;
 	private final String inputfile;
 
@@ -93,11 +93,11 @@ public class Persons {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Person getPerson(Integer id) {
+	public final MyPerson getPerson(Integer id) {
 		return this.persons.get(id);
 	}
 
-	public final HashMap<Integer,Person> getPersons() {
+	public final HashMap<Integer,MyPerson> getPersons() {
 		return this.persons;
 	}
 	
@@ -125,7 +125,7 @@ public class Persons {
 				Household hh = this.households.getHousehold(hh_id);
 				if (hh != null) {
 					Integer p_id = Integer.parseInt(entries[1].trim());
-					Person p = new Person(p_id,hh);
+					MyPerson p = new MyPerson(p_id,hh);
 					boolean is_new = hh.addPerson(p);
 					if (!is_new) {
 						Gbl.errorMsg("Line " + line_cnt + ", p_id: " + p_id + " already exists in household id=" + hh.hh_id);
@@ -180,7 +180,7 @@ public class Persons {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void print() {
-		Iterator<Person> p_it = this.persons.values().iterator();
+		Iterator<MyPerson> p_it = this.persons.values().iterator();
 		while (p_it.hasNext()) {
 			System.out.println(p_it.next().toString());
 		}
@@ -192,9 +192,9 @@ public class Persons {
 			BufferedWriter out = new BufferedWriter(fw);
 			out.write("p_id\thh_id\tx_coord\ty_coord\tp_age\tp_sex\tp_swiss\tp_employed\tp_caravail\tp_license\n");
 			out.flush();
-			Iterator<Person> p_it = this.persons.values().iterator();
+			Iterator<MyPerson> p_it = this.persons.values().iterator();
 			while (p_it.hasNext()) {
-				Person p = p_it.next();
+				MyPerson p = p_it.next();
 				char sex = 'f'; if (p.male) { sex = 'm'; }
 				int swiss = 0; if (p.swiss) { swiss = 1; }
 				int empl = 0; if (p.employed) { empl = 1; }

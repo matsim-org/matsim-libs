@@ -67,7 +67,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 
 	@Override
 	public void run(PersonImpl person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
+		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Coord home_coord = null;
 		Coord work_coord = null;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {

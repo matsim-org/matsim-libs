@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.jgap.Population;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -21,10 +20,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.StringUtils;
 
 
 public class AsciiToPlan {
@@ -79,8 +76,8 @@ public class AsciiToPlan {
 			int j=0;
 			zaehler++;
 			Id id =new IdImpl(zaehler); 
-			PersonImpl person = pb.createPerson(id);
-			PlanImpl plan = pb.createPlan(person);
+			PersonImpl person = (PersonImpl) pb.createPerson(id);
+			PlanImpl plan = (PlanImpl) pb.createPlan(person);
 			person.addPlan(plan);
 			//Lese wichtige Daten ein
 //			spalten_v = StringUtils.explode(zeile, TRENNER);

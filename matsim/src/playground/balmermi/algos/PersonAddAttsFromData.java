@@ -52,7 +52,7 @@ public class PersonAddAttsFromData extends AbstractPersonAlgorithm implements Pl
 	@Override
 	public void run(PersonImpl person) {
 		Id id = person.getId();
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(id.toString()));
+		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.parseInt(id.toString()));
 		if (p == null) {
 			Gbl.errorMsg("Person id=" + id + " does not exist in the person data!");
 		}

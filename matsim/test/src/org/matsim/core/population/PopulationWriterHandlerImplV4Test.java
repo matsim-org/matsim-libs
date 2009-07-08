@@ -44,10 +44,10 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		
 		PopulationImpl pop = new PopulationImpl();
 		PopulationBuilder pb = pop.getPopulationBuilder();
-		PersonImpl person = pb.createPerson(new IdImpl(1));
-		PlanImpl plan = pb.createPlan(person);
+		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
+		PlanImpl plan = (PlanImpl) pb.createPlan(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));
-		LegImpl leg = pb.createLeg(TransportMode.undefined);
+		LegImpl leg = (LegImpl) pb.createLeg(TransportMode.undefined);
 		RouteWRefs route = new GenericRouteImpl(link1, link2);
 		route.setTravelTime(123);
 		route.setDistance(9876.54);

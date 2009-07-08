@@ -268,7 +268,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		}
 		if ((prim_coord == null) || (home_coord.equals(prim_coord))) {
 			// only one location
-			playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
+			playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 			Zone z = p.getHousehold().getMunicipality().getZone();
 			double radius = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (PlanElement pe : plan.getPlanElements()) {

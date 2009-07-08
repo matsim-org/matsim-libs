@@ -3,6 +3,7 @@ package playground.gregor.calibration;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
@@ -14,8 +15,6 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -98,15 +97,15 @@ public class NetworkCalibrator {
 		PopulationImpl pop = sc.getPopulation();
 		PopulationBuilder pb = pop.getPopulationBuilder();
 		for (int i = 0; i < PERSONS; i++) {
-			PersonImpl p = pb.createPerson(new IdImpl(i));
-			PlanImpl plan = pb.createPlan(p);
+			PersonImpl p = (PersonImpl) pb.createPerson(new IdImpl(i));
+			PlanImpl plan = (PlanImpl) pb.createPlan(p);
 			p.addPlan(plan);
-			ActivityImpl a0 = pb.createActivityFromLinkId("h", l0.getId());
+			ActivityImpl a0 = (ActivityImpl) pb.createActivityFromLinkId("h", l0.getId());
 			a0.setEndTime(0);
 			plan.addActivity(a0);
-			LegImpl l = pb.createLeg(TransportMode.car);
+			LegImpl l = (LegImpl) pb.createLeg(TransportMode.car);
 			plan.addLeg(l);
-			ActivityImpl a1 = pb.createActivityFromLinkId("w", l2.getId());
+			ActivityImpl a1 = (ActivityImpl) pb.createActivityFromLinkId("w", l2.getId());
 			plan.addActivity(a1);
 			pop.addPerson(p);
 		}

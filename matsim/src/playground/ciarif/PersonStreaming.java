@@ -29,7 +29,7 @@ import org.matsim.core.population.PopulationWriter;
 
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Households;
-import playground.balmermi.census2000.data.Person;
+import playground.balmermi.census2000.data.MyPerson;
 import playground.balmermi.census2000.data.Persons;
 
 public class PersonStreaming {
@@ -57,7 +57,7 @@ public class PersonStreaming {
 		System.out.println("  adding person modules... ");
 		Household hh = new Household(0,null);
 //		hh.coord = new Coord(100,100);
-		Person person = new Person(0,hh);
+		MyPerson person = new MyPerson(0,hh);
 //		//person.age = 30;
 //		//person.car_avail = "always";
 //		//person.license = true;
