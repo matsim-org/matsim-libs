@@ -42,6 +42,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCase {
 
+	private static final Id FIRST_LINK_ID = new IdImpl("1002");
 	private static final Id HIGHWAY_LINK_ID = new IdImpl("4005");
 	
 	private final static Logger logger = Logger.getLogger(LinearInterpolationLegTravelTimeEstimatorTest.class);
@@ -98,7 +99,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 				
 				switch(mode) {
 				case car:
-					assertEquals(Time.parseTime("01:12:00"), travelTime);
+					assertEquals(Time.parseTime("02:00:00"), travelTime);
 					break;
 				case pt:
 					assertEquals(Time.parseTime("04:00:00"), travelTime);
@@ -142,11 +143,11 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 			logger.info(str + "\t" + Time.writeTime(travelTime));
 			
 			if (str.equals("06:10:00")) {
-				assertEquals(Time.parseTime("01:32:00"), travelTime);
+				assertEquals("02:20:00", Time.writeTime(travelTime));
 			} else if (str.equals("06:15:00")) {
-				assertEquals(Time.parseTime("01:30:00"), travelTime);
+				assertEquals("02:18:00", Time.writeTime(travelTime));
 			} else {
-				assertEquals(Time.parseTime("01:12:00"), travelTime);
+				assertEquals("02:00:00", Time.writeTime(travelTime));
 			}
 			
 		}
@@ -185,6 +186,8 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 			double freespeed = 0.0;
 			if (linkId.equals(HIGHWAY_LINK_ID)) {
 				freespeed = 100.0 / 3.6;
+			} else if (linkId.equals(FIRST_LINK_ID)) {
+				freespeed = 80.0 / 3.6;
 			} else {
 				freespeed = 50.0 / 3.6;
 			}

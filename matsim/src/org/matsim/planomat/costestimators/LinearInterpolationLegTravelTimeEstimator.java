@@ -43,8 +43,6 @@ LegTravelTimeEstimator {
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute plansCalcRoute;
-	// TODO process simLegInterpretation
-	// clarify if this should be processed here, or in the router, which means become a config parameter for matsim / the router
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
 	private boolean doLogging = false;
@@ -139,12 +137,29 @@ LegTravelTimeEstimator {
 
 			DynamicODMatrixEntry entry = new DynamicODMatrixEntry(actOrigin.getLink(), actDestination.getLink(), legIntermediate.getMode(), samplingPoint);
 			if (this.dynamicODMatrix.containsKey(entry)) {
+				
 				samplingPointsTravelTimes[ii] = this.dynamicODMatrix.get(entry);
 				if (this.doLogging) {
 					logger.info(Time.writeTime(samplingPoint) + "\t" + Time.writeTime(samplingPointsTravelTimes[ii]) + "\t" + " [from cache]");
 				}
+				
 			} else {
-				samplingPointsTravelTimes[ii] += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, samplingPoint);
+				
+				// TODO clarify usage of departure delay calculator
+				// TODO pt legs prodcued by the router are compatibe to cetin-like traffic flows simulations, but not to charypar et al like simulations 
+				
+				if (legIntermediate.getMode().equals(TransportMode.car)) {
+					if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
+						samplingPointsTravelTimes[ii] += this.linkTravelTimeEstimator.getLinkTravelTime(actOrigin.getLink(), samplingPoint);
+					}
+				}
+				samplingPointsTravelTimes[ii] += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, samplingPoint + samplingPointsTravelTimes[ii]);
+				if (legIntermediate.getMode().equals(TransportMode.car)) {
+					if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
+						samplingPointsTravelTimes[ii] += this.linkTravelTimeEstimator.getLinkTravelTime(actDestination.getLink(), samplingPoint + samplingPointsTravelTimes[ii]);
+					}
+				}
+
 				this.dynamicODMatrix.put(entry, samplingPointsTravelTimes[ii]);
 				if (this.doLogging) {
 					logger.info(Time.writeTime(samplingPoint) + "\t" + Time.writeTime(samplingPointsTravelTimes[ii]) + "\t" + " [from router]");
