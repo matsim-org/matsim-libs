@@ -20,13 +20,9 @@
 
 package org.matsim.core.population;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.basic.v01.BasicPlanImpl;
@@ -39,7 +35,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
-public class PlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
+public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
 	/**
 	 * @deprecated use Leg.Mode instead
 	 */
@@ -53,15 +49,13 @@ public class PlanImpl implements Plan { //zzzz would be better with inheritance 
 	 */
 	@Deprecated
 	public static final double UNDEF_SCORE = Double.NaN;
-
-	private final BasicPlanImpl delegate;
 	
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
 
 	public PlanImpl(final PersonImpl person) {
-		this.delegate = new BasicPlanImpl(person);
+		super(person);
 	}
 
 	public final ActivityImpl createActivity(final String type, final Coord coord) {
@@ -180,31 +174,20 @@ public class PlanImpl implements Plan { //zzzz would be better with inheritance 
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	@SuppressWarnings("unchecked")
-	public final List<PlanElement> getPlanElements() {
-		return (List<PlanElement>) this.delegate.getPlanElements();
-	}
-
+	@Override
 	public final PersonImpl getPerson() {
-		return (PersonImpl) this.delegate.getPerson();
+		return (PersonImpl) super.getPerson();
 	}
 
-	public void setPerson(final PersonImpl person) {
-		this.delegate.setPerson(person);
-	}
-
+	@Override
 	public final boolean isSelected() {
 		return this.getPerson().getSelectedPlan() == this;
 	}
 	
 
+	@Override
 	public void setSelected(final boolean selected) {
 		this.getPerson().setSelectedPlan(this); 
-//		this.delegate.setSelected(selected);
 	}
 
 	@Override
@@ -329,28 +312,4 @@ public class PlanImpl implements Plan { //zzzz would be better with inheritance 
 		return (ActivityImpl) getPlanElements().get(getPlanElements().size() - 1);
 	}
 
-	public void addActivity(BasicActivity act) {
-		delegate.addActivity(act);
-	}
-
-	public void addLeg(BasicLeg leg) {
-		delegate.addLeg(leg);
-	}
-
-	public final Double getScore() {
-		return delegate.getScore();
-	}
-
-	public Type getType() {
-		return delegate.getType();
-	}
-
-	public void setScore(Double score) {
-		delegate.setScore(score);
-	}
-
-	public void setType(Type type) {
-		delegate.setType(type);
-	}
-	
 }

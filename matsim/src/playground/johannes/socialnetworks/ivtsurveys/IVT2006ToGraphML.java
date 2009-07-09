@@ -31,13 +31,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -77,9 +76,9 @@ public class IVT2006ToGraphML {
 		String popfilename = args[2];
 		String graphfile = args[3];
 
-		SocialNetwork<BasicPerson<BasicPlan<BasicPlanElement>>> socialnet = new SocialNetwork<BasicPerson<BasicPlan<BasicPlanElement>>>();
+		SocialNetwork<BasicPerson<BasicPlan<PlanElement>>> socialnet = new SocialNetwork<BasicPerson<BasicPlan<PlanElement>>>();
 		BasicPopulation population = new PopulationImpl();
-		HashMap<String, Ego<BasicPerson<BasicPlan<BasicPlanElement>>>> egos = new HashMap<String, Ego<BasicPerson<BasicPlan<BasicPlanElement>>>>();
+		HashMap<String, Ego<BasicPerson<BasicPlan<PlanElement>>>> egos = new HashMap<String, Ego<BasicPerson<BasicPlan<PlanElement>>>>();
 		
 		int maxId = 0;
 		/*
@@ -94,13 +93,13 @@ public class IVT2006ToGraphML {
 			/*
 			 * Create a BasicPerson
 			 */
-			BasicPerson<BasicPlan<BasicPlanElement>> person = createPerson(
+			BasicPerson<BasicPlan<PlanElement>> person = createPerson(
 					tokens[0], tokens[1], tokens[2], population);
 			population.getPersons().put(person.getId(), person);
 			/*
 			 * Create an Ego
 			 */
-			Ego<BasicPerson<BasicPlan<BasicPlanElement>>> ego = socialnet
+			Ego<BasicPerson<BasicPlan<PlanElement>>> ego = socialnet
 					.addEgo(person);
 			egos.put(tokens[0], ego);
 			maxId = Math.max(Integer.parseInt(tokens[0]), maxId);
@@ -110,18 +109,18 @@ public class IVT2006ToGraphML {
 		 */
 		logger.info("Loading alters from file " + alterfile);
 
-		Set<Ego<BasicPerson<BasicPlan<BasicPlanElement>>>> anonymousVertices = new HashSet<Ego<BasicPerson<BasicPlan<BasicPlanElement>>>>();
+		Set<Ego<BasicPerson<BasicPlan<PlanElement>>>> anonymousVertices = new HashSet<Ego<BasicPerson<BasicPlan<PlanElement>>>>();
 		reader = IOUtils.getBufferedReader(alterfile);
 		while ((line = reader.readLine()) != null) {
 			String[] tokens = line.split(TAB);
-			Ego<BasicPerson<BasicPlan<BasicPlanElement>>> ego = egos.get(tokens[0]);
+			Ego<BasicPerson<BasicPlan<PlanElement>>> ego = egos.get(tokens[0]);
 			if (ego == null) {
 				logger.fatal(String.format("Ego with id %1$s not found!", tokens[0]));
 			} else {
-				BasicPerson<BasicPlan<BasicPlanElement>> person = createPerson(String.valueOf(++maxId), tokens[1], tokens[2],population);
+				BasicPerson<BasicPlan<PlanElement>> person = createPerson(String.valueOf(++maxId), tokens[1], tokens[2],population);
 				population.getPersons().put(person.getId(), person);
 
-				Ego<BasicPerson<BasicPlan<BasicPlanElement>>> alter = socialnet
+				Ego<BasicPerson<BasicPlan<PlanElement>>> alter = socialnet
 						.addEgo(person);
 
 				socialnet.addEdge(ego, alter);
@@ -145,11 +144,11 @@ public class IVT2006ToGraphML {
 			SNGraphMLWriter.writeAnonymousVertices(anonymousVertices, args[4]);
 	}
 
-	private static BasicPerson<BasicPlan<BasicPlanElement>> createPerson(
+	private static BasicPerson<BasicPlan<PlanElement>> createPerson(
 			String id, String x, String y, BasicPopulation population) {
-		BasicPerson<BasicPlan<BasicPlanElement>> person = new BasicPersonImpl<BasicPlan<BasicPlanElement>>(
+		BasicPerson<BasicPlan<PlanElement>> person = new BasicPersonImpl<BasicPlan<PlanElement>>(
 				new IdImpl(id));
-		BasicPlan<BasicPlanElement> plan = new BasicPlanImpl(person);
+		BasicPlan<PlanElement> plan = new BasicPlanImpl(person);
 		person.addPlan( plan ) ;
 //		BasicActivityImpl act = new BasicActivityImpl(HOME_ACT_TYPE);
 //		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),

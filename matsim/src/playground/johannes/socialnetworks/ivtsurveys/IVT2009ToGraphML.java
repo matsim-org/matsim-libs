@@ -36,13 +36,12 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.BasicPersonImpl;
 import org.matsim.core.basic.v01.BasicPlanImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -120,7 +119,7 @@ public class IVT2009ToGraphML {
 		SocialNetwork<BasicPerson<?>> socialnet = new SocialNetwork<BasicPerson<?>>();
 		
 		Set<Ego<BasicPerson<?>>> alters = new HashSet<Ego<BasicPerson<?>>>();
-		Set egoSet = new HashSet<Ego<BasicPerson<BasicPlan<BasicPlanElement>>>>();
+		Set egoSet = new HashSet<Ego<BasicPerson<BasicPlan<PlanElement>>>>();
 		/*
 		 * go through all user ids
 		 */
@@ -174,7 +173,7 @@ public class IVT2009ToGraphML {
 					 * create the alters
 					 */
 					for (int i = NUM_ALTERS_1; i > 0; i--) {
-						BasicPerson<BasicPlan<BasicPlanElement>> alterPerson = createAlter(ALTER_1_KEY, i, egoData, id, population);
+						BasicPerson<BasicPlan<PlanElement>> alterPerson = createAlter(ALTER_1_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.getPersons().put(alterPerson.getId(), alterPerson);
 							Ego<BasicPerson<?>> alter = socialnet.addEgo(alterPerson);
@@ -186,7 +185,7 @@ public class IVT2009ToGraphML {
 					}
 
 					for (int i = NUM_ALTERS_2; i > 0; i--) {
-						BasicPerson<BasicPlan<BasicPlanElement>> alterPerson = createAlter(ALTER_2_KEY, i, egoData, id, population);
+						BasicPerson<BasicPlan<PlanElement>> alterPerson = createAlter(ALTER_2_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.getPersons().put(alterPerson.getId(), alterPerson);
 							Ego<BasicPerson<?>> alter = socialnet.addEgo(alterPerson);
@@ -308,11 +307,11 @@ public class IVT2009ToGraphML {
 		return str;
 	}
 	
-	private static BasicPerson<BasicPlan<BasicPlanElement>> createPerson(String id, Coord coord, String age, BasicPopulation population) {
-		BasicPersonImpl<BasicPlan<BasicPlanElement>> person = new BasicPersonImpl<BasicPlan<BasicPlanElement>>(new IdImpl(id));
+	private static BasicPerson<BasicPlan<PlanElement>> createPerson(String id, Coord coord, String age, BasicPopulation population) {
+		BasicPersonImpl<BasicPlan<PlanElement>> person = new BasicPersonImpl<BasicPlan<PlanElement>>(new IdImpl(id));
 		if(age != null)
 				person.setAge(Integer.parseInt(age));
-		BasicPlan<BasicPlanElement> plan = new BasicPlanImpl(person);
+		BasicPlan<PlanElement> plan = new BasicPlanImpl(person);
 		if(coord == null)
 			throw new NullPointerException("Null coordinates are not allowed.");
 //		BasicActivityImpl act = new BasicActivityImpl("home");
@@ -320,12 +319,12 @@ public class IVT2009ToGraphML {
 		BasicActivity act = population.getPopulationBuilder().createActivityFromCoord("home", coord);
 		
 		plan.addActivity(act);
-		person.getPlans().add(plan);
+		person.addPlan(plan);
 		
 		return person;
 	}
 	
-	private static BasicPerson<BasicPlan<BasicPlanElement>> createAlter(String alterKey, int counter, Map<String, String> egoData, String egoId, BasicPopulation population) {
+	private static BasicPerson<BasicPlan<PlanElement>> createAlter(String alterKey, int counter, Map<String, String> egoData, String egoId, BasicPopulation population) {
 		String alterAge = getValue(egoData, makeKey(alterKey, ALTER_AGE_KEY, counter));
 //		if(alterAge == null)
 //			logger.warn(String.format("Missing age for alter %1$s of userId %2$s. Ignoring.", counter, egoId));
@@ -361,7 +360,7 @@ public class IVT2009ToGraphML {
 	
 	private static String getValue(Map<String, String> egoData, String key) {
 		String value = egoData.get(key);
-		if(value != null && EMPTY.equalsIgnoreCase(value.trim()))
+		if((value != null) && EMPTY.equalsIgnoreCase(value.trim()))
 			return null;
 		return value;
 	}

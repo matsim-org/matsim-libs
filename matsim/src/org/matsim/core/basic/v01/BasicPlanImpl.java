@@ -27,15 +27,15 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 
 /**
  * @author david
  */
-public class BasicPlanImpl implements BasicPlan {
+public class BasicPlanImpl implements BasicPlan<PlanElement> {
 
-	protected ArrayList<BasicPlanElement> actsLegs = new ArrayList<BasicPlanElement>();
+	protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
 
 	private Double score = null;
 	private BasicPerson person = null;
@@ -83,7 +83,7 @@ public class BasicPlanImpl implements BasicPlan {
 		this.type = type;
 	}
 
-	public final List<? extends BasicPlanElement> getPlanElements() {
+	public final List<PlanElement> getPlanElements() {
 		return this.actsLegs;
 	}
 

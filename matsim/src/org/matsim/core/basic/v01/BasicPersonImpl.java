@@ -59,7 +59,7 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 		return this.plans.add(plan);
 	}
 	
-	public final T getSelectedPlan(){
+	public T getSelectedPlan(){
 		return this.selectedPlan;
 	}
 	
@@ -71,7 +71,7 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 		}
 	}
 
-	public List<T> getPlans() {
+	public List<? extends T> getPlans() {
 		return this.plans;
 	}
 
