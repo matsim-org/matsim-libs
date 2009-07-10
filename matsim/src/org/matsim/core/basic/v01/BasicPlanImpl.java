@@ -45,6 +45,7 @@ public class BasicPlanImpl implements BasicPlan<PlanElement> {
 	private boolean isSelected;
 
 	public BasicPlanImpl(final BasicPerson person) {
+		// yyyyyy this should be protected
 		this.person = person;
 	}
 	
