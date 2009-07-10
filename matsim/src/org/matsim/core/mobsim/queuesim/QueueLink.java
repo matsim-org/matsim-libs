@@ -456,6 +456,13 @@ public class QueueLink {
 		return this.originalLane.getSimulatedFlowCapacity();
 	}
 	
+	/**
+	 * @return the QueueLanes of this QueueLink
+	 */
+	public List<QueueLane> getQueueLanes(){
+		return this.queueLanes;
+	}
+	
 	public VisData getVisData() {
 		return this.visdata;
 	}

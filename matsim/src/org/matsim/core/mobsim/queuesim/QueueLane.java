@@ -295,7 +295,7 @@ public class QueueLane {
 		this.meterFromLinkEnd = meters;
 	}
 
-	protected double getMeterFromLinkEnd(){
+	public double getMeterFromLinkEnd(){
 		return this.meterFromLinkEnd;
 	}
 
