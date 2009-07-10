@@ -56,6 +56,7 @@ implements BasicLink
 	// by the to- and from-node, they HAVE to contain a coordinate. (see also BasicNode)
 	// If this is not O.K., then the BasicLink must not extend Location.
 	protected BasicLinkImpl(final NetworkLayer network, final Id id, final BasicNode from, final BasicNode to) {
+		// this is deliberately protected
 		super(network, id, 
 				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
 		);
