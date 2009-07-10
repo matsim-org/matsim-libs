@@ -40,6 +40,7 @@ public class BasicActivityImpl implements BasicActivity {
 	protected ActivityFacility facility = null;
 
 	protected BasicActivityImpl(String type) {
+		// this is deliberately "protected"
 		this.type = type;
 	}
 	
