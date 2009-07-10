@@ -43,6 +43,7 @@ public class BasicNodeImpl implements BasicNode {
 
 
 	protected BasicNodeImpl(Id id){
+		// this is deliberately "protected"
 		this.id = id;
 	}
 	
