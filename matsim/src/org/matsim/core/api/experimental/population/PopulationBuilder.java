@@ -31,21 +31,23 @@ import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 public interface PopulationBuilder extends BasicPopulationBuilder {
 
 	Person createPerson(Id id);
-
+	/**
+	 * @deprecated use createPlan() instead. the reference to the Person
+	 * is set when calling Person.addPlan(Plan p).
+	 */
+	@Deprecated
 	Plan createPlan(BasicPerson person);
-	// yyyyyy needs to return "Plan"
 
+	Plan createPlan();
+	
 	Activity createActivityFromCoord(String actType, Coord coord);
-	// yyyyyy needs to return "Activity"
 	
 //	Activity createActivityFromFacilityId(String actType, Id facilityId);
 	// disabled until everything else is figured out
 	
 	Activity createActivityFromLinkId(String actType, Id linkId);
-	// yyyyyy needs to return "Activity"
 	
 	Leg createLeg(TransportMode legMode);
-	// yyyyyy needs to return "Leg".
 
 	/**
 	 * Creates a new Route object

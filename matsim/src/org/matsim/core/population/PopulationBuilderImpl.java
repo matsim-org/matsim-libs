@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.experimental.population.Route;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -44,17 +44,13 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 
 	private static final Logger log = Logger.getLogger(PopulationBuilderImpl.class);
 
-//	private final Population population;
 	private final NetworkLayer network;
 	private final ActivityFacilities facilities;
-//	private final Scenario scenario;
 
 	@Deprecated
 	public PopulationBuilderImpl(NetworkLayer network, PopulationImpl population, ActivityFacilities facilities) {
 		this.network = network;
-//		this.population = population;
 		this.facilities = facilities;
-//		this.scenario = null;
 	}
 	
 	public PopulationBuilderImpl(final Scenario scenario) {
@@ -67,6 +63,10 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	public PersonImpl createPerson(final Id id) {
 		PersonImpl p = new PersonImpl(id);
 		return p;
+	}
+	
+	public Plan createPlan(){
+		return new PlanImpl();
 	}
 	
 	public PlanImpl createPlan(BasicPerson person) {

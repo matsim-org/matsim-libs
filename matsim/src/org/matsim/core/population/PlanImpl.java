@@ -58,6 +58,10 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		super(person);
 	}
 
+	public PlanImpl() {
+		super();
+	}
+
 	public final ActivityImpl createActivity(final String type, final Coord coord) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, coord);

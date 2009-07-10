@@ -46,4 +46,11 @@ public interface BasicPlan<P extends BasicPlanElement> extends Serializable{
 	public Double getScore();
 
 	public BasicPerson getPerson();
+	/**
+	 * Sets the reference to the person in the BasicPlan instance.
+	 * This is done automatically if using Person.addPlan(). Make
+	 * sure that the bidirectional reference is set correctly if
+	 * you are using this method!.
+	 */
+	public void setPerson(BasicPerson person);
 }

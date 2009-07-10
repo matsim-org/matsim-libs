@@ -54,6 +54,7 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 	}
 
 	public boolean addPlan(final T plan) {
+		plan.setPerson(this);
 		// Make sure there is a selected plan if there is at least one plan
 		if (this.selectedPlan == null) this.selectedPlan = plan;
 		return this.plans.add(plan);

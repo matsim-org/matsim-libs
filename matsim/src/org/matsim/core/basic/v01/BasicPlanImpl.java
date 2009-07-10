@@ -48,6 +48,9 @@ public class BasicPlanImpl implements BasicPlan<PlanElement> {
 		this.person = person;
 	}
 	
+	public BasicPlanImpl() {
+	}
+
 	public BasicPerson getPerson() {
 		return this.person;
 	}
