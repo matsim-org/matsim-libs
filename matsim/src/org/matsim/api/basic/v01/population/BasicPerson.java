@@ -33,7 +33,10 @@ public interface BasicPerson<T extends BasicPlan> extends Identifiable, Serializ
 	public List<? extends T> getPlans();
 
 	public void setId(final Id id);
-
+	/**
+	 * adds the plan to the Person's List of plans and
+	 * sets the reference to this person in the Plan instance.
+	 */
 	public boolean addPlan(final T p);
 
 }
