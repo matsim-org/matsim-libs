@@ -64,6 +64,7 @@ class OTFFrame extends JFrame {
 		super(string);
 	}
 
+	@Override
 	protected void processWindowEvent(WindowEvent e) {
 
 	        if (e.getID() == WindowEvent.WINDOW_CLOSING) {
@@ -74,7 +75,10 @@ class OTFFrame extends JFrame {
 	    }
 }
 
-
+/**
+ * This file starts OTFVis using a .mvi file.
+ * @author dstrippgen
+ */
 public class OnTheFlyClientFileQuad extends Thread {
 	
 	public static void endProgram(int code) {
@@ -89,7 +93,8 @@ public class OnTheFlyClientFileQuad extends Thread {
 			dialog.setDefaultCloseOperation(
 				    JDialog.DO_NOTHING_ON_CLOSE);
 				dialog.addWindowListener(new WindowAdapter() {
-				    public void windowClosing(WindowEvent we) {
+				    @Override
+						public void windowClosing(WindowEvent we) {
 				        
 				    }
 				});

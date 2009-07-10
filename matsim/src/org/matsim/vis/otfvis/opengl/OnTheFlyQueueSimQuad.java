@@ -34,11 +34,11 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 
 /**
+ * This class starts OTFVis in live mode, i.e. with a running QueueSimulation.
  * @author DS
- *
  */
 public class OnTheFlyQueueSimQuad extends QueueSimulation{
-	private OnTheFlyServer myOTFServer = null;
+	protected OnTheFlyServer myOTFServer = null;
 	private boolean ownServer = true;
 
 	public void setServer(OnTheFlyServer server) {
