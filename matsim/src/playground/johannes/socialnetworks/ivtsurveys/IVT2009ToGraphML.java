@@ -205,7 +205,7 @@ public class IVT2009ToGraphML {
 		 */
 		logger.info("Writing population to " + output+"ivt2009.plans.xml");
 		PopulationWriter popWriter = new PopulationWriter(population, output+"ivt2009.plans.xml");
-		popWriter.write();
+//		popWriter.write();
 		
 		logger.info("Writing social network to " + output + "ivt2009.graphml");
 //		SNGraphMLWriter graphWriter = new SNGraphMLWriter();

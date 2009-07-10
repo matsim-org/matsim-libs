@@ -32,7 +32,15 @@ public class GibbsEdgeSwitcher extends GibbsSampler {
 
 	private int[][] edges;
 	
-	public void sample(AdjacencyMatrix y, ConditionalDistribution d, int burninTime, MCMCSampleDelegate handler) {
+	public GibbsEdgeSwitcher() {
+		super();
+	}
+
+	public GibbsEdgeSwitcher(long seed) {
+		super(seed);
+	}
+
+	public void sample(AdjacencyMatrix y, ConditionalDistribution d, long burninTime, MCMCSampleDelegate handler) {
 		int N = y.getVertexCount();
 		int M = y.getEdgeCount();
 		edges = new int[M][2];
@@ -81,7 +89,7 @@ public class GibbsEdgeSwitcher extends GibbsSampler {
 				edges[idx_uv][0] = j;
 				edges[idx_uv][1] = v;
 				
-				accept = true;;
+				accept = true;
 			}
 		}
 		

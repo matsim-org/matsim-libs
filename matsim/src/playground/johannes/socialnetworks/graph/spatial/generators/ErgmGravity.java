@@ -45,15 +45,25 @@ public class ErgmGravity extends ErgmTerm {
 
 	private double descretization;
 	
-//	private double scale = 1000.0;
-	
 	private TIntObjectHashMap<TDoubleDoubleHashMap> normConstants;
-		
+	
 	public ErgmGravity(SpatialAdjacencyMatrix m, double descretization) {
 		this.descretization = descretization;
 		logger.info("Initializing ERGM gravity term...");
 		int n = m.getVertexCount();
 		normConstants = new TIntObjectHashMap<TDoubleDoubleHashMap>();
+		
+		double xmin = Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		double xmax = - Double.MAX_VALUE;
+		double ymax = - Double.MAX_VALUE;
+		for(int i = 0; i < n; i++) {
+			Coord c_i = m.getVertex(i).getCoordinate();
+			xmin = Math.min(xmin, c_i.getX());
+			ymin = Math.min(ymin, c_i.getY());
+			xmax = Math.max(xmax, c_i.getX());
+			ymax = Math.max(ymax, c_i.getY());
+		}
 		
 		for(int i = 0; i < n; i++) {
 			TDoubleDoubleHashMap norm_i = new TDoubleDoubleHashMap();
@@ -71,7 +81,24 @@ public class ErgmGravity extends ErgmTerm {
 			TDoubleDoubleIterator it = norm_i.iterator();
 			for(int k = 0; k < norm_i.size(); k++) {
 				it.advance();
-				double a = 2 * Math.PI * it.key() - Math.PI;
+				double r = it.key();
+				
+				double dx1 = (c_i.getX() - xmin) / descretization;
+				double dx2 = (xmax - c_i.getX()) / descretization;
+				double dy1 = (c_i.getY() - ymin) / descretization;
+				double dy2 = (ymax - c_i.getY()) / descretization;
+
+				double b = calculateCircleSegment(dx2, dy2, r);
+				b += calculateCircleSegment(dy1, dx2, r);
+				b += calculateCircleSegment(dx1, dy1, r);
+				b += calculateCircleSegment(dy2, dx1, r);
+
+				if (Double.isNaN(b)) {
+					throw new IllegalArgumentException();
+
+				}
+				double a = b * r - b / 2.0;				
+				
 				double count = it.value();
 				if(count == 0) {
 					count = 1;
@@ -87,14 +114,25 @@ public class ErgmGravity extends ErgmTerm {
 		}
 	}
 	
-//	public double getScalingFactor() {
-//		return scale;
-//	}
-//
-//	public void setScalingFactor(double scale) {
-//		this.scale = scale;
-//	}
-
+	public double calculateCircleSegment(double dx, double dy, double r) {
+		if(dx >= r && dy >= r) {
+			return Math.PI/2.0;
+		} else if (Math.sqrt(dx * dx + dy *dy) <= r){
+			return 0.0;
+		} else {
+			double alpha1 = 0;
+			if(dx < r)
+				alpha1 = Math.acos(dx/r);
+			
+			double alpha2 = 0;
+			if(dy < r)
+				alpha2 = Math.asin(dy/r);
+			
+			double alpha = Math.abs(alpha2 - alpha1);
+			return Math.PI * alpha / 180.0;
+		}
+	}
+	
 	public double getDescretization() {
 		return descretization;
 	}
@@ -104,8 +142,6 @@ public class ErgmGravity extends ErgmTerm {
 	}
 
 	private double getBin(double d) {
-//		double a = Math.PI * d *d;
-//		return Math.ceil(a / area);
 		return Math.ceil(d/descretization);
 	}
 	

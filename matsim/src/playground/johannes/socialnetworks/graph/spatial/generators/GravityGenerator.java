@@ -23,6 +23,7 @@
  */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,6 +45,7 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
+import playground.johannes.socialnetworks.graph.mcmc.ErgmPrefAttach;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.mcmc.MCMCSampleDelegate;
@@ -125,11 +127,21 @@ public class GravityGenerator {
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(thetaDensity);
 		
+//		Rectangle2D.Double boundingBox = null;
+//		if(densityGrid != null) {
+//			boundingBox = new Rectangle2D.Double();
+//			boundingBox.setFrame(densityGrid.getXmin() - 5*densityGrid.getResolution(), densityGrid.getYmin() - 5*densityGrid.getResolution(),
+//					(densityGrid.getXmax() - densityGrid.getXmin()) + 5*densityGrid.getResolution(),
+//					(densityGrid.getYmax() - densityGrid.getYmin()) + 5*densityGrid.getResolution());
+//		}
 		ErgmGravity gravity = new ErgmGravity(matrix, descretization);
 		gravity.setTheta(thetaGravity);
 		gravity.setDescretization(descretization);
 		terms[1] = gravity;
 		
+//		ErgmPrefAttach attach = new ErgmPrefAttach();
+//		attach.setTheta(0.1);
+//		terms[2] = attach;
 		
 		ergm.setErgmTerms(terms);
 		/*
