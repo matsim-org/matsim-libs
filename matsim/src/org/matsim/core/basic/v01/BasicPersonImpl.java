@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
@@ -50,6 +51,7 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 
 
 	public BasicPersonImpl(final Id id) {
+		// yyyyyy this should be protected
 		this.id = id;
 	}
 
