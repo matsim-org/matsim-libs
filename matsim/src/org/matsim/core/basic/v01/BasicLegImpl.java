@@ -35,6 +35,7 @@ public class BasicLegImpl implements BasicLeg {
 
 	
 	public BasicLegImpl(TransportMode mode) {
+		// yyyyyy this should be "protected"
 		this.mode = mode;
 	}
 
