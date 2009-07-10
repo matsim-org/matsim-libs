@@ -23,6 +23,7 @@ package org.matsim.core.basic.v01;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.core.utils.misc.Time;
@@ -47,6 +48,7 @@ public class BasicRouteImpl implements BasicRoute {
 	public BasicRouteImpl() {}
 	
 	public BasicRouteImpl(Id startLinkId, Id endLinkId){
+		// yyyyyy this should be protected
 		this.startLinkId = startLinkId;
 		this.endLinkId = endLinkId;
 	}
