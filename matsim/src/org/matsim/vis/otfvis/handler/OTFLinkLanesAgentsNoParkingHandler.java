@@ -40,6 +40,7 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 
 		private static final long serialVersionUID = 6541770536927233851L;
 
+		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
@@ -57,6 +58,7 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 
 	}
 	
+	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		String id = ByteBufferUtils.getString(in);
 
