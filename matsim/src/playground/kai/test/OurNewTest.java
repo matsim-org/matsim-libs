@@ -1,12 +1,40 @@
 package playground.kai.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-interface Person {
+interface BasicPlan {
 }
 
-class PersonImpl implements Person {
+class BasicPlanImpl implements BasicPlan {
+}
+
+interface Plan extends BasicPlan {
+}
+
+class PlanImpl extends BasicPlanImpl implements Plan {
+}
+
+interface BasicPerson<T extends BasicPlan> {
+	List<? extends T> getPlans() ;
+}
+
+class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
+	protected List<? extends T> plans = new ArrayList<T>() ;
+	public List<? extends T> getPlans() {
+		return plans ;
+	}
+}	
+
+interface Person extends BasicPerson<Plan> {
+}
+
+class PersonImpl extends BasicPersonImpl<Plan> implements Person {
+	public List<PlanImpl> getPlans() {
+		return (List<PlanImpl>) plans ;
+	}
 }
 
 interface Population {
@@ -33,7 +61,11 @@ public class OurNewTest {
 		
 		Person person = new PersonImpl() ;
 		
-//		pop.getPersons().put( 1, person ) ;
+		Plan plan = new PlanImpl() ;
+		
+		List<Plan> plans = (List<Plan>) person.getPlans() ;
+		
+		plans.add( plan ) ;
 
 
 		
