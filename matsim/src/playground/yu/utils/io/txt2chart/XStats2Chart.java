@@ -39,10 +39,14 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String fileBase = "../runs-svn/run686/";
-		String inputFile = fileBase + "traveldistancestats.txt";
+		// String fileBase = "../runs-svn/runFi34/";
+		String fileBase = "../matsimTests/breakdown/output/";
+		// String inputFile = fileBase + "traveldistancestats.txt";
+		String inputFile = fileBase + "scorestats.txt";
 		String chartFile = inputFile.replace("txt", "png");
-		int maxIter = 1001;
+		// /////////////////////////////////////////////
+		int maxIter = 2001;
+		// ////////////////////////////////////////////
 		String avgExec, avgWorst, avgAvg, avgBest;
 		double[] exec = new double[maxIter];
 		double[] worst = new double[maxIter];

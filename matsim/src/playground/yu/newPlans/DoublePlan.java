@@ -20,13 +20,14 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -60,12 +61,14 @@ public class DoublePlan extends NewPopulation {
 	public void run(PersonImpl person) {
 		pw.writePerson(person);
 		tmpPerson = person;
-		String oldId = person.getId().toString();
+		// String oldId = person.getId().toString();
+		int oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
-		createNewPerson(oldId + "A");
-		createNewPerson(oldId + "B");
-		createNewPerson(oldId + "C");
-		createNewPerson(oldId + "D");
+		createNewPerson(Integer.toString(oldId + 100));
+		// createNewPerson(oldId + "A");
+		// createNewPerson(oldId + "B");
+		// createNewPerson(oldId + "C");
+		// createNewPerson(oldId + "D");
 	}
 
 	private void createNewPerson(String newId) {
@@ -76,14 +79,16 @@ public class DoublePlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		String networkFilename = "../berlin data/v1/network.xml";
-		String plansFilename = "../berlin data/v2/bln_car_c.xml.gz";
-		String outputPlansFilename = "../berlin data/v2/bln_car_c_5x.xml.gz";
+		String networkFilename = "examples/equil/network.xml";
+		String plansFilename = "../matsimTests/breakdown/plans100withPt.xml";
+		String outputPlansFilename = "../matsimTests/breakdown/plans200withPt.xml";
 
-		NetworkLayer network = new NetworkLayer();
+		Scenario s = new ScenarioImpl();
+
+		NetworkLayer network = s.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = s.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
 		plansReader.readFile(plansFilename);

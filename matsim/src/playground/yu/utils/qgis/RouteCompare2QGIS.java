@@ -54,17 +54,19 @@ public class RouteCompare2QGIS extends Route2QGIS {
 
 	@Override
 	protected void initFeatureType() {
-		AttributeType[] attrRoute = new AttributeType[5];
+		AttributeType[] attrRoute = new AttributeType[6];
 		attrRoute[0] = DefaultAttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, this
 						.getCrs());
-		attrRoute[1] = AttributeTypeFactory.newAttributeType("ROUTEFLOWA",
+		attrRoute[1] = AttributeTypeFactory.newAttributeType("DIFF_B-A",
 				Double.class);
-		attrRoute[2] = AttributeTypeFactory.newAttributeType("ROUTEFLOWB",
+		attrRoute[2] = AttributeTypeFactory.newAttributeType("DIFF_SIGN",
 				Double.class);
-		attrRoute[3] = AttributeTypeFactory.newAttributeType("DIFF_B-A",
+		attrRoute[3] = AttributeTypeFactory.newAttributeType("ROUTEFLOWA",
 				Double.class);
-		attrRoute[4] = AttributeTypeFactory.newAttributeType("DIFF_SIGN",
+		attrRoute[4] = AttributeTypeFactory.newAttributeType("ROUTEFLOWB",
+				Double.class);
+		attrRoute[5] = AttributeTypeFactory.newAttributeType("(B-A)/A",
 				Double.class);
 		try {
 			this.setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(
@@ -91,7 +93,9 @@ public class RouteCompare2QGIS extends Route2QGIS {
 				Double diff = routeFlowsB.doubleValue()
 						- routeFlowsA.doubleValue();
 				Double absDiff = Math.abs(diff);
-				double width = 10.0 * Math.min(250.0, absDiff);
+				double width = 100.0 * Math.min(250.0,
+						routeFlowsA.intValue() == 0 ? 10.0 : absDiff
+								/ routeFlowsA.doubleValue());
 				coordinates = calculateCoordinates(coordinates, width,
 						routeLinkIds);
 				try {
@@ -104,9 +108,16 @@ public class RouteCompare2QGIS extends Route2QGIS {
 																	.createLinearRing(
 																			coordinates),
 															null, getGeofac()) },
-													this.getGeofac()),
-											routeFlowsA, routeFlowsB, absDiff,
-											diff / absDiff });
+													getGeofac()),
+											absDiff,
+											routeFlowsA.intValue() == 0 ? 0
+													: diff / absDiff,
+											routeFlowsA,
+											routeFlowsB,
+											routeFlowsA.intValue() == 0 ? 10
+													: absDiff
+															/ routeFlowsA
+																	.doubleValue() });
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}

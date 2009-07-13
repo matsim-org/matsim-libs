@@ -30,12 +30,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -125,8 +122,8 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 		Gbl.startMeasurement();
 
 		final String netFilename = "examples/equil/network.xml";
-		final String plansFilename = "examples/equil/plans100.xml";
-		final String outputFilename = "../matsimTests/Calibration/rop/plans100car_pt.xml";
+		final String plansFilename = "../matsimTests/breakdown/plans100.xml";
+		final String outputFilename = "../matsimTests/breakdown/plans100withPt.xml";
 
 		Gbl.createConfig(null);
 
