@@ -27,7 +27,6 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
@@ -69,7 +68,6 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private Scenario scenario;
 	
-	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -90,7 +88,12 @@ public class PlanomatTest extends MatsimTestCase {
 		//now overwrite the testee person in the scenario
 		scenario.getPopulation().getPersons().put(TEST_PERSON_ID, p);
 		
-		
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		this.scenario = null;
+		super.tearDown();
 	}
 
 	public void testRunDefault() {
@@ -102,10 +105,18 @@ public class PlanomatTest extends MatsimTestCase {
 	}
 
 	public void testRunCarPt() {
+		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
+		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
+		
+		this.modifyNetwork();
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
 
 	public void testRunCarPtWithEvents() {
+		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
+		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
+
+		this.modifyNetwork();
 		this.runATestRun(PlanomatTestRun.WITHEVENTS_CAR_PT);
 	}
 
@@ -114,12 +125,18 @@ public class PlanomatTest extends MatsimTestCase {
 	}
 
 	public void testCarAvailabilityAlways() {
+		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
+		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
+		
 		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		p.setCarAvail("always");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
 	
 	public void testCarAvailabilityNever() {
+		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
+		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
+		
 		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		p.setCarAvail("never");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
@@ -140,21 +157,13 @@ public class PlanomatTest extends MatsimTestCase {
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 		LegTravelTimeEstimator ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
-				PlanomatConfigGroup.RoutingCapability.fixedRoute,
+				this.scenario.getConfig().planomat().getRoutingCapability(),
 				plansCalcRoute);
 
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 
 		log.info("Testing " + testRun.toString() + "...");
 
-		// setup config
-		if (
-				PlanomatTestRun.NOEVENTS_CAR_PT.equals(testRun) ||
-				PlanomatTestRun.WITHEVENTS_CAR_PT.equals(testRun)) {
-
-			this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-		}
-		
 		// init Planomat
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.scenario.getConfig().planomat());
 		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
@@ -235,7 +244,6 @@ public class PlanomatTest extends MatsimTestCase {
 
 	public void testStepThroughPlan_WriteBack() throws InvalidConfigurationException {
 
-		// writeChromosome2Plan() has 3 arguments:
 		PlanImpl testPlan = null;
 		IChromosome testChromosome = null;
 		LegTravelTimeEstimator ltte = null;
@@ -322,17 +330,22 @@ public class PlanomatTest extends MatsimTestCase {
 
 	}
 
-
-	@Override
-	protected void tearDown() throws Exception {
-		this.scenario = null;
-		super.tearDown();
+	private void modifyNetwork() {
+		
+		for (int linkId = 2; linkId <= 10; linkId++) {
+			
+			if (linkId != 6) {
+				this.scenario.getNetwork().getLink(new IdImpl(linkId)).setFreespeed(2.778);
+			}
+			
+		}
+		
 	}
 
 	private static final class ScenarioCreatePersonEventHandler implements BasicPersonEventHandler{
 
 		private Scenario scenario;
-		
+
 		public ScenarioCreatePersonEventHandler(Scenario scenario) {
 			this.scenario = scenario;
 		}

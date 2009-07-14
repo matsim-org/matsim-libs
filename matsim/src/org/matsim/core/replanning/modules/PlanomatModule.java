@@ -41,8 +41,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class PlanomatModule extends AbstractMultithreadedModule {
 
-	private final NetworkLayer network;
-	private final Events events;
 	private final TravelCost travelCost;
 	private final TravelTime travelTime;
 	private final ScoringFunctionFactory scoringFunctionFactory;
@@ -61,8 +59,6 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 			TravelTime travelTime) {
 		super();
 		this.controler = controler;
-		this.events = events;
-		this.network = network;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.travelCost = travelCost;
 		this.travelTime = travelTime;
@@ -70,9 +66,9 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 		this.config = controler.getConfig().planomat();
 		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
-				this.network,
+				network,
 				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
-		this.events.addHandler(tDepDelayCalc);
+		events.addHandler(tDepDelayCalc);
 
 		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(this.travelTime, this.tDepDelayCalc);
 	}

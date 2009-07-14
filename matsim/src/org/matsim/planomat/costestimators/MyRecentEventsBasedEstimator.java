@@ -120,10 +120,9 @@ implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentAr
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
-
+			ActivityImpl actOrigin, ActivityImpl actDestination,
+			LegImpl legIntermediate, Boolean doModifyLeg) {
 		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, actOrigin.getLinkId(), actDestination.getLinkId(), "car"));
-	
 	}
 
 }

@@ -414,7 +414,20 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
 			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
+//			statement was replaced by the one below
+//			travelTime = this.estimator.getInterpolation(
+//					plan.getPerson().getId(), 
+//					now, (ActivityImpl)(plan.getPlanElements().get(i-1)), 
+//					(ActivityImpl)(plan.getPlanElements().get(i+1)), 
+//					(LegImpl)(plan.getPlanElements().get(i))
+//					);
+			travelTime = this.estimator.getLegTravelTimeEstimation(
+					plan.getPerson().getId(), 
+					now, (ActivityImpl)(plan.getPlanElements().get(i-1)), 
+					(ActivityImpl)(plan.getPlanElements().get(i+1)), 
+					(LegImpl)(plan.getPlanElements().get(i)),
+					null
+					);
 			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
@@ -462,8 +475,20 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		/* if start < outer (mode choice) */
 		for (int i=start+1;i<=outer-1;i=i+2){
 			((LegImpl)(actslegs.get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i-1)), (ActivityImpl)(actslegs.get(i+1)), (LegImpl)(actslegs.get(i)));
-			
+//			statement was replaced by the one below
+//			travelTime = this.estimator.getInterpolation(
+//					plan.getPerson().getId(), 
+//					now, 
+//					(ActivityImpl)(actslegs.get(i-1)), 
+//					(ActivityImpl)(actslegs.get(i+1)), 
+//					(LegImpl)(actslegs.get(i)));
+			travelTime = this.estimator.getLegTravelTimeEstimation(
+					plan.getPerson().getId(), 
+					now, 
+					(ActivityImpl)(actslegs.get(i-1)), 
+					(ActivityImpl)(actslegs.get(i+1)), 
+					(LegImpl)(actslegs.get(i)), 
+					null);
 			((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(actslegs.get(i))).setTravelTime(travelTime);
 			now = java.lang.Math.max(now+travelTime+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType()), ((ActivityImpl)(actslegs.get(i+1))).getEndTime());
@@ -478,8 +503,21 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 				else now +=offset;
 			}
 			((LegImpl)(actslegs.get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i-1)), (ActivityImpl)(actslegs.get(i+1)), (LegImpl)(actslegs.get(i)));
-			
+//			statement was replaced by the one below
+//			travelTime = this.estimator.getInterpolation(
+//					plan.getPerson().getId(), 
+//					now, 
+//					(ActivityImpl)(actslegs.get(i-1)), 
+//					(ActivityImpl)(actslegs.get(i+1)), 
+//					(LegImpl)(actslegs.get(i))
+//					);
+			travelTime = this.estimator.getLegTravelTimeEstimation(
+					plan.getPerson().getId(), 
+					now, 
+					(ActivityImpl)(actslegs.get(i-1)), 
+					(ActivityImpl)(actslegs.get(i+1)), 
+					(LegImpl)(actslegs.get(i)),
+					null);
 			((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(actslegs.get(i))).setTravelTime(travelTime);
 			now+=travelTime;
@@ -498,8 +536,21 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 					if (actslegs.size()>=i+3){
 						now+=this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType());
 						((LegImpl)(actslegs.get(i+2))).setDepartureTime(now);
-						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i+1)), (ActivityImpl)(actslegs.get(i+3)), (LegImpl)(actslegs.get(i+2)));
-						
+//						statement was replaced by the one below
+//						travelTime = this.estimator.getInterpolation(
+//								plan.getPerson().getId(), 
+//								now, 
+//								(ActivityImpl)(actslegs.get(i+1)), 
+//								(ActivityImpl)(actslegs.get(i+3)), 
+//								(LegImpl)(actslegs.get(i+2))
+//								);
+						travelTime = this.estimator.getLegTravelTimeEstimation(
+								plan.getPerson().getId(), 
+								now, 
+								(ActivityImpl)(actslegs.get(i+1)), 
+								(ActivityImpl)(actslegs.get(i+3)), 
+								(LegImpl)(actslegs.get(i+2)),
+								null);
 						((LegImpl)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
 						((LegImpl)(actslegs.get(i+2))).setTravelTime(travelTime);
 						now+=travelTime;
@@ -522,8 +573,21 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 			now = ((LegImpl)(actslegs.get(position+1))).getDepartureTime();
 			for (int i=position+1;i<=stop-1;i=i+2){
 				((LegImpl)(actslegs.get(i))).setDepartureTime(now);
-				travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i-1)), (ActivityImpl)(actslegs.get(i+1)), (LegImpl)(actslegs.get(i)));
-				
+//				statement was replaced by the one below
+//				travelTime = this.estimator.getInterpolation(
+//						plan.getPerson().getId(), 
+//						now, 
+//						(ActivityImpl)(actslegs.get(i-1)), 
+//						(ActivityImpl)(actslegs.get(i+1)), 
+//						(LegImpl)(actslegs.get(i))
+//						);
+				travelTime = this.estimator.getLegTravelTimeEstimation(
+						plan.getPerson().getId(), 
+						now, 
+						(ActivityImpl)(actslegs.get(i-1)), 
+						(ActivityImpl)(actslegs.get(i+1)), 
+						(LegImpl)(actslegs.get(i)), 
+						null);
 				((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
 				((LegImpl)(actslegs.get(i))).setTravelTime(travelTime);
 				now+=travelTime;
@@ -537,8 +601,21 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 				else {
 					if (now>((ActivityImpl)(actslegs.get(i+1))).getEndTime()){
 						((LegImpl)(actslegs.get(i+2))).setDepartureTime(now);
-						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(actslegs.get(i+1)), (ActivityImpl)(actslegs.get(i+3)), (LegImpl)(actslegs.get(i+2)));
-						
+//						statement was replaced by the one below
+//						travelTime = this.estimator.getInterpolation(
+//								plan.getPerson().getId(), 
+//								now, 
+//								(ActivityImpl)(actslegs.get(i+1)), 
+//								(ActivityImpl)(actslegs.get(i+3)), 
+//								(LegImpl)(actslegs.get(i+2))
+//								);
+						travelTime = this.estimator.getLegTravelTimeEstimation(
+								plan.getPerson().getId(), 
+								now, 
+								(ActivityImpl)(actslegs.get(i+1)), 
+								(ActivityImpl)(actslegs.get(i+3)), 
+								(LegImpl)(actslegs.get(i+2)), 
+								null);
 						((LegImpl)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
 						((LegImpl)(actslegs.get(i+2))).setTravelTime(travelTime);
 						now+=travelTime;

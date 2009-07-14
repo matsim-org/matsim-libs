@@ -28,12 +28,26 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatRunTest extends MatsimTestCase {
 
+	private Config config;
+	
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		this.config = super.loadConfig(this.getInputDirectory() + "config.xml");
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		this.config = null;
+	}
+
 	public void testMainDefault() {
-		this.runControlerTest(this.loadConfig(this.getInputDirectory() + "config.xml"));
+		this.runControlerTest(this.config);
 	}
 
 	public void testMainCarPt() {
-		this.runControlerTest(this.loadConfig(this.getInputDirectory() + "config.xml"));
+		this.runControlerTest(this.config);
 	}
 
 	private void runControlerTest(final Config config) {

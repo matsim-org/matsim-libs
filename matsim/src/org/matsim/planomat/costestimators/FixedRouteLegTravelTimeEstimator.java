@@ -66,7 +66,8 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
+			ActivityImpl actOrigin, ActivityImpl actDestination,
+			LegImpl legIntermediate, Boolean doModifyLeg) {
 
 		double legTravelTimeEstimation = 0.0;
 
@@ -104,9 +105,11 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		}
 
 		return legTravelTimeEstimation;
-
+		
 	}
 
+
+	
 	protected double processDeparture(final LinkImpl link, final double start) {
 
 		double departureDelayEnd = start + this.tDepDelayCalc.getLinkDepartureDelay(link, start);

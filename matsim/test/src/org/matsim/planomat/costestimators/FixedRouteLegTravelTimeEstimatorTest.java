@@ -142,7 +142,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					departureTime,
 					originAct,
 					destinationAct,
-					testLeg);
+					testLeg,
+					null);
 
 			double expectedLegEndTime = departureTime;
 
@@ -175,7 +176,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					departureTime,
 					originAct,
 					destinationAct,
-					testLeg);
+					testLeg,
+					null);
 
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
@@ -220,7 +222,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					departureTime,
 					originAct,
 					destinationAct,
-					testLeg);
+					testLeg,
+					null);
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
 
@@ -245,7 +248,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					departureTime,
 					originAct,
 					destinationAct,
-					ptLeg);
+					ptLeg,
+					null);
 			// the free speed travel time from h to w in equil-test, as simulated by Cetin, is 15 minutes
 			expectedLegEndTime = departureTime + (2 * Time.parseTime("00:15:00"));
 

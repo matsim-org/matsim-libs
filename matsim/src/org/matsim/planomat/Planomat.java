@@ -266,31 +266,22 @@ public class Planomat implements PlanAlgorithm {
 				leg.setMode(possibleModes[modeIndex]);
 			} // otherwise leave modes untouched
 
-			// save original route
-			if (!leg.getMode().equals(TransportMode.car)) {
-				tempRoute = leg.getRoute();
-			}
-
 			double anticipatedTravelTime = Math.rint(this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(),
 					now,
 					origin,
 					destination,
-					leg));
+					leg,
+					(action.equals(StepThroughPlanAction.EVALUATE)) ? Boolean.FALSE : Boolean.TRUE));
 
 			now += anticipatedTravelTime;
-
-			if (!leg.getMode().equals(TransportMode.car)) {
-				// recover original route
-				leg.setRoute(tempRoute);
-			}
-			leg.getRoute().setTravelTime(anticipatedTravelTime);
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
 				scoringFunction.endLeg(now);
 			}
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				leg.setTravelTime(anticipatedTravelTime);
+				leg.getRoute().setTravelTime(anticipatedTravelTime);
 				leg.setArrivalTime(now);
 			}
 			///////////////////////////////////////////////////////////////////////////////////////////

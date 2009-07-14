@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -115,9 +116,7 @@ LegTravelTimeEstimator {
 
 	private HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
 
-	public double getLegTravelTimeEstimation(Id personId, double departureTime,
-			ActivityImpl actOrigin, ActivityImpl actDestination,
-			LegImpl legIntermediate) {
+	protected double getInterpolation(double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
 		// get values at sampling points
 		double samplingPoint = Double.MIN_VALUE;
@@ -125,7 +124,7 @@ LegTravelTimeEstimator {
 		for (int ii = 0; ii <= 1; ii++) {
 
 			samplingPointsTravelTimes[ii] = 0.0;
-			
+
 			switch(ii) {
 			case 0:
 				samplingPoint = Math.floor(departureTime / LinearInterpolationLegTravelTimeEstimator.SAMPLING_DISTANCE) * LinearInterpolationLegTravelTimeEstimator.SAMPLING_DISTANCE;
@@ -136,31 +135,21 @@ LegTravelTimeEstimator {
 			}
 
 			DynamicODMatrixEntry entry = new DynamicODMatrixEntry(actOrigin.getLink(), actDestination.getLink(), legIntermediate.getMode(), samplingPoint);
+
 			if (this.dynamicODMatrix.containsKey(entry)) {
-				
+
 				samplingPointsTravelTimes[ii] = this.dynamicODMatrix.get(entry);
+
 				if (this.doLogging) {
 					logger.info(Time.writeTime(samplingPoint) + "\t" + Time.writeTime(samplingPointsTravelTimes[ii]) + "\t" + " [from cache]");
 				}
-				
+
 			} else {
-				
-				// TODO clarify usage of departure delay calculator
-				// TODO pt legs prodcued by the router are compatibe to cetin-like traffic flows simulations, but not to charypar et al like simulations 
-				
-				if (legIntermediate.getMode().equals(TransportMode.car)) {
-					if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-						samplingPointsTravelTimes[ii] += this.linkTravelTimeEstimator.getLinkTravelTime(actOrigin.getLink(), samplingPoint);
-					}
-				}
-				samplingPointsTravelTimes[ii] += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, samplingPoint + samplingPointsTravelTimes[ii]);
-				if (legIntermediate.getMode().equals(TransportMode.car)) {
-					if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-						samplingPointsTravelTimes[ii] += this.linkTravelTimeEstimator.getLinkTravelTime(actDestination.getLink(), samplingPoint + samplingPointsTravelTimes[ii]);
-					}
-				}
+
+				samplingPointsTravelTimes[ii] = this.simulateLegAndGetTravelTime(samplingPoint, actOrigin, actDestination, legIntermediate);
 
 				this.dynamicODMatrix.put(entry, samplingPointsTravelTimes[ii]);
+
 				if (this.doLogging) {
 					logger.info(Time.writeTime(samplingPoint) + "\t" + Time.writeTime(samplingPointsTravelTimes[ii]) + "\t" + " [from router]");
 				}
@@ -183,6 +172,45 @@ LegTravelTimeEstimator {
 
 	public void setDoLogging(boolean doLogging) {
 		this.doLogging = doLogging;
+	}
+
+	protected double simulateLegAndGetTravelTime(double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
+
+		double legTravelTimeEstimation = 0.0;
+		// TODO clarify usage of departure delay calculator
+
+		if (legIntermediate.getMode().equals(TransportMode.car)) {
+			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
+				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actOrigin.getLink(), departureTime);
+			}
+		}
+		legTravelTimeEstimation += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
+		if (legIntermediate.getMode().equals(TransportMode.car)) {
+			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
+				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actDestination.getLink(), departureTime + legTravelTimeEstimation);
+			}
+		}
+
+		return legTravelTimeEstimation;
+
+	}
+
+	public double getLegTravelTimeEstimation(Id personId, double departureTime,
+			ActivityImpl actOrigin, ActivityImpl actDestination,
+			LegImpl legIntermediate, Boolean doModifyLeg) {
+
+		double legTravelTimeEstimation = 0.0;
+
+		if (doModifyLeg == null) {
+			Gbl.errorMsg("Specify doModifyLeg with either true or false.");
+		} else if (doModifyLeg.equals(Boolean.TRUE)) {
+			legTravelTimeEstimation = this.simulateLegAndGetTravelTime(departureTime, actOrigin, actDestination, legIntermediate);
+		} else if (doModifyLeg.equals(Boolean.FALSE)){
+			legTravelTimeEstimation = this.getInterpolation(departureTime, actOrigin, actDestination, legIntermediate);
+		}
+
+		return legTravelTimeEstimation;
+
 	}
 
 }

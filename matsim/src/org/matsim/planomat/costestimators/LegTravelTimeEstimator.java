@@ -38,12 +38,14 @@ public interface LegTravelTimeEstimator {
 	 * Implement your assumption on travel time estimation here.
 	 * 
 	 * TODO don't have to pass a Leg-type object, a TransportMode object would be enough
+	 * TODO provide a base implementation of this interface processing planomat config sim leg interpretation
 	 * 
 	 * @param personId identifier of the replanning person
 	 * @param departureTime the departure time of the leg
 	 * @param actOrigin the activity at the beginning of the leg
 	 * @param actDestination the activity at the end of the leg
 	 * @param legIntermediate the leg for which a travel time is estimated
+	 * @param doModifyLeg control parameter indicaticating whether it is allowed that the leg object is modified or not 
 	 * @return a travel time estimation.
 	 */
 	public double getLegTravelTimeEstimation(
@@ -51,7 +53,8 @@ public interface LegTravelTimeEstimator {
 			double departureTime,
 			ActivityImpl actOrigin,
 			ActivityImpl actDestination,
-			LegImpl legIntermediate);
+			LegImpl legIntermediate,
+			Boolean doModifyLeg);
 	
 	public void reset();
 	

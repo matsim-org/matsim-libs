@@ -42,7 +42,15 @@ public class ScheduleCleaner {
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
 			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
+//			statement was replaced by the one below
+//			travelTime = this.estimator.getInterpolation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
+			travelTime = this.estimator.getLegTravelTimeEstimation(
+					plan.getPerson().getId(), 
+					now, 
+					(ActivityImpl)(plan.getPlanElements().get(i-1)), 
+					(ActivityImpl)(plan.getPlanElements().get(i+1)), 
+					(LegImpl)(plan.getPlanElements().get(i)),
+					null);
 			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;

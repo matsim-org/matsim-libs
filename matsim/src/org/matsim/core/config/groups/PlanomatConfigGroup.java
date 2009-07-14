@@ -233,6 +233,21 @@ public class PlanomatConfigGroup extends Module {
 
 	}
 
+	
+	
+	@Override
+	protected void checkConsistency() {
+		if (!EnumSet.noneOf(TransportMode.class).equals(this.getPossibleModes())) {
+			if (PlanomatConfigGroup.RoutingCapability.fixedRoute.equals(this.getRoutingCapability())) {
+				throw new RuntimeException(
+						"When config parameter \"" + PlanomatConfigParameter.POSSIBLE_MODES.parameterName + "\" is set, " +
+						"the value of config parameter \"" + PlanomatConfigParameter.ROUTING_CAPABILITY.parameterName + "\" must not have the value \"" +
+						PlanomatConfigGroup.RoutingCapability.fixedRoute + "\". Replace it, for example with the following value: \"" + 
+						PlanomatConfigGroup.RoutingCapability.linearInterpolation + "\".");
+			}
+		}
+	}
+
 	public int getJgapMaxGenerations() {
 		return Integer.parseInt(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getActualValue());
 	}

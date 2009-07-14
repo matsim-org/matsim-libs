@@ -95,7 +95,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 				
 				double travelTime = testee.getLegTravelTimeEstimation(
 						dummyPersonId, Time.parseTime(str), homeActivity,
-						workActivity, legIntermediate);
+						workActivity, legIntermediate, Boolean.FALSE);
 				
 				switch(mode) {
 				case car:
@@ -139,7 +139,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 			
 			double travelTime = testee.getLegTravelTimeEstimation(
 					dummyPersonId, Time.parseTime(str), homeActivity,
-					workActivity, legIntermediate);
+					workActivity, legIntermediate, Boolean.FALSE);
 			logger.info(str + "\t" + Time.writeTime(travelTime));
 			
 			if (str.equals("06:10:00")) {
