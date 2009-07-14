@@ -60,7 +60,7 @@ public class QueryAgentId implements OTFQuery {
 	public void draw(OTFDrawer drawer) {
 	}
 
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
 		for( QueueLink qlink : net.getLinks().values()) {
@@ -88,6 +88,7 @@ public class QueryAgentId implements OTFQuery {
 				}
 			}
 		}
+		return this;
 	}
 
 	public void remove() {

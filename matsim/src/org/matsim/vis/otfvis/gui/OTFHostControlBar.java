@@ -422,7 +422,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		stopMovie();
 		if(host.isLive()) {
 			liveHost.requestControllerStatus(OTFVisController.CANCEL);
-			requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
+			
+			//requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
 			simTime = 0;
 			updateTimeLabel();
 			repaint();

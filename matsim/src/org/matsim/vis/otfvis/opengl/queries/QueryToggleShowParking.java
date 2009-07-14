@@ -38,8 +38,9 @@ public class QueryToggleShowParking implements OTFQuery {
 	public void draw(OTFDrawer drawer) {
 	}
 
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
+		return this;
 	}
 
 	public void remove() {

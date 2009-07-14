@@ -27,6 +27,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import java.util.Set;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PopulationImpl;
@@ -83,7 +85,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private final Map<String, QuadStorage> quads = new HashMap<String, QuadStorage>();
 	protected final Set<String> updateThis = new HashSet<String>();
-	protected final Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
+	protected final HashMap<OTFQuery,OTFQuery> queryThis = new HashMap<OTFQuery,OTFQuery>();
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
 
@@ -173,11 +175,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		stepToIteration = 0;
 		requestStatus = 0;
 		stepToTime = 0;
-		synchronized (stepDone) {
-			stepDone.notifyAll();
-		}
 		synchronized (paused) {
 			paused.notifyAll();
+		}
+		synchronized (stepDone) {
+			stepDone.notifyAll();
 		}
 	}
 	public void cleanup() {
@@ -206,10 +208,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 		OTFServerQuad quad = quads.values().iterator().next().quad;
 		
-		for(OTFQuery query : queryThis) {
-			query.query(network, pop, events, quad);
+		for(OTFQuery query : queryThis.keySet()) {
+			queryThis.put(query, query.query(network, pop, events, quad));
 		}
-		queryThis.clear();
+		//queryThis.clear();
 		
 //		lastTime = time;
 	}
@@ -372,22 +374,25 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException {
+		OTFQuery result = null;
 		if (status == PAUSE) {
 			OTFServerQuad quad = quads.values().iterator().next().quad;
-			query.query(network, pop, events, quad);
+			result = query.query(network, pop, events, quad);
 		} else {
 			// otherwise == PLAY, we need to sort this into the array of demanding queries and then they will be answered next when updateStatus() is called
 			try {
 				synchronized (updateFinished) {
-					queryThis.add(query);
+					queryThis.put(query,query);
 					updateFinished.wait();
+					result = queryThis.get(query);
+					queryThis.remove(query);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 
-		return query;
+		return result;
 	}
 
 	public Collection<Double> getTimeSteps() throws RemoteException {
@@ -415,6 +420,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public boolean requestControllerStatus(int status) throws RemoteException {
 		stepToIteration = status & 0xffffff;
 		requestStatus = status & OTFVisController.ALL_FLAGS;
+		if(requestStatus == OTFVisController.CANCEL) {
+			reset();
+			requestStatus = OTFVisController.CANCEL;
+		}
 		return true;
 	}
 

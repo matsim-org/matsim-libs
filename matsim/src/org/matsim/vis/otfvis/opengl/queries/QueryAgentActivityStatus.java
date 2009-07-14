@@ -47,9 +47,9 @@ public class QueryAgentActivityStatus implements OTFQuery {
 	int activityNr = -1;
 	double finished = 0;
 
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		PersonImpl person = plans.getPersons().get(this.agentId);
-		if (person == null) return;
+		if (person == null) return this;
 
 		PlanImpl plan = person.getSelectedPlan();
 
@@ -71,7 +71,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 				}
 			}
 		}
-
+		return this;
 	}
 
 	public void remove() {

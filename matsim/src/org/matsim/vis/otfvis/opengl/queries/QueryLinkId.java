@@ -117,7 +117,7 @@ public class QueryLinkId implements OTFQuery {
 		}
 	}
 	
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
@@ -131,7 +131,7 @@ public class QueryLinkId implements OTFQuery {
 		if (width == 0) rect = new QuadTree.Rect(qsx-regionWidth, qsy-regionHeight, qsx+regionWidth, qsy+regionHeight);
 		else rect = new QuadTree.Rect(qsx,qsy,qsx+width, qsy+height);
 		quad.execute(rect, new AddIdStringExecutor(width == 0));
-
+		return this;
 	}
 
 	public void remove() {

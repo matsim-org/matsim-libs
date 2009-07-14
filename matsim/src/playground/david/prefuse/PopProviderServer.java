@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.otfvis.prefuse;
+package playground.david.prefuse;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,11 +26,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
@@ -38,13 +38,15 @@ import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
+import playground.david.otfvis.prefuse.PopulationProvider;
+
 public class PopProviderServer implements PopulationProvider {
 
 	public static class QueryImpl implements OTFQuery {
 		public void draw(OTFDrawer drawer) {		}
 		public Type getType() {			return Type.OTHER;		}
 		public boolean isAlive() {			return false;		}
-		public OTFQuery query(QueueNetwork net, PopulationImpl population, Events events,				OTFServerQuad quad) {	return this;	}
+		public OTFQuery query(QueueNetwork net, PopulationImpl population, Events events, OTFServerQuad quad) {return this;	}
 		public void remove() {		}
 		public void setId(String id) {		}
 	}
@@ -80,7 +82,7 @@ public class PopProviderServer implements PopulationProvider {
 	}
 
 	public static class QueryNet  extends QueryImpl {
-		private NetworkLayer net;
+		private Network net;
 		public OTFQuery query(QueueNetwork net, PopulationImpl population, Events events,
 				OTFServerQuad quad) {
 			this.net = net.getNetworkLayer();
@@ -96,7 +98,6 @@ public class PopProviderServer implements PopulationProvider {
 				OTFServerQuad quad) {
 			this.iId = fromNode ? net.getNetworkLayer().getNodes().keySet() : net.getNetworkLayer().getLinks().keySet();
 			this.iId = new HashSet(this.iId);
-
 			return this;
 		}
 	}
@@ -115,8 +116,7 @@ public class PopProviderServer implements PopulationProvider {
 	}
 
 	OTFClientQuad clientQ;
-	NetworkLayer netti = null;
-	
+	Network netti = null;
 	
 	public PopProviderServer(final OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
@@ -132,7 +132,7 @@ public class PopProviderServer implements PopulationProvider {
 //			};
 			netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;
 
-			
+//			
 //			Runnable loader = new Runnable() {
 //				synchronized public void run() {
 //					netti = ((QueryNet)(clientQ.doQuery(new QueryNet()))).net;

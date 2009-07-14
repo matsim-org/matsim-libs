@@ -37,14 +37,21 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import com.sun.opengl.util.BufferUtil;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
@@ -65,6 +72,8 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
+
+import com.sun.opengl.util.BufferUtil;
 
 public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
@@ -113,7 +122,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		else  this.drivenLinks.put(driven, count + 1);
 	}
 
-	protected List<PlanImpl> getPersonsNOW(PopulationImpl plans, QueueNetwork net) {
+	protected List<PlanImpl> getPersonsNOW(Population plans, QueueNetwork net) {
 		List<PlanImpl> actPersons = new ArrayList<PlanImpl>();
 		QueueLink link = net.getLinks().get(linkId);
 		Collection<QueueVehicle> vehs = link.getAllVehicles();
@@ -224,7 +233,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		}
 	}
 	
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		this.drivenLinks = new HashMap<LinkImpl,Integer> ();
 //		QueueLink link = net.getQueueLink(this.linkId);
 //		String start = link.getLink().getFromNode().getId().toString();
@@ -235,7 +244,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		if(tripOnly) collectLinksFromTrip(actPersons);
 		else collectLinks(actPersons);
 		
-		if(this.drivenLinks.size() == 0) return;
+		if(this.drivenLinks.size() == 0) return this;
 
 		// convert this to drawable info
 		this.vertex = new float[this.drivenLinks.size()*4];
@@ -250,6 +259,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 			this.vertex[pos++] = (float)node.getCoord().getX();
 			this.vertex[pos++] = (float)node.getCoord().getY();
 		}
+		return this;
 	}
 
 	public void draw(OTFDrawer drawer) {

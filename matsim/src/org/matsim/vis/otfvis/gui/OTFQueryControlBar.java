@@ -30,6 +30,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.ComboBoxModel;
@@ -195,7 +196,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	public void stateChanged(ChangeEvent e) {
 	}
 	
-	public void handleIdQuery(String id, String queryName) {
+	synchronized public void handleIdQuery(String id, String queryName) {
 		OTFQuery marked = null;
 		marked = createQuery(queryName);
 		if (marked != null) {
@@ -296,12 +297,22 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		handler.redrawHandlers();
 	}
 
-	public void drawQueries(OTFDrawer drawer) {
+	synchronized public void drawQueries(OTFDrawer drawer) {
 		for(OTFQuery query : this.queryItems) query.draw(drawer);
 	}
 
-	public void updateQueries() {
-		for(OTFQuery query : queryItems) if (query.isAlive()) handleQuery(query);
+	synchronized public void updateQueries() {
+		List<OTFQuery> replacedItems = new ArrayList<OTFQuery>();
+		
+		Iterator<OTFQuery> iter = queryItems.iterator();
+		while(iter.hasNext()) {
+			OTFQuery query = iter.next();
+			if (query.isAlive()) {
+				replacedItems.add(handleQuery(query));
+				iter.remove();
+			}
+		}
+		queryItems.addAll(replacedItems);
 	}
 
 }

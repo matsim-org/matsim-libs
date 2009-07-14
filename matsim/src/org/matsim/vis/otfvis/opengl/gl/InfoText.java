@@ -25,6 +25,7 @@ import static javax.media.opengl.GL.GL_QUADS;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -37,7 +38,7 @@ import javax.media.opengl.glu.GLUquadric;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 
-public  class InfoText {
+public  class InfoText implements Serializable {
 	private static LinkedList<InfoText> elements = new LinkedList<InfoText>(); 
 	private static Set<InfoText> elementsPermanent = new HashSet<InfoText>(); 
 	private static TextRenderer renderer = null;

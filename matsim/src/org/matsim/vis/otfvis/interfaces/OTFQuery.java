@@ -75,9 +75,12 @@ public interface OTFQuery extends Serializable{
 	 * @param net The QueueNetwork the simulation is running on.
 	 * @param plans The Population the simulation fed from.
 	 * @param quad The quadtree with writer objects.
+	 * @return a query containing results, usually this, but not with live queries, as in 
+	 * this case the result object should change whenever the result changes, as the RI stream
+	 * will actually only transport NEW objects. 
 	 * 
 	 */
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) ;
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) ;
 	
 	/**
 	 * Remove is called when a query is removed, to give the query the option to

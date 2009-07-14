@@ -114,7 +114,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		return vertex;
 	}
 	
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		//Person person = plans.getPerson(this.agentID);
 		String prefix = agentId + "-";
 		
@@ -122,7 +122,7 @@ public class QueryAgentPTBus implements OTFQuery {
 			if(person.getId().toString().startsWith(prefix, 0)) allIds.add(person.getId().toString());
 		}
 		
-		if (allIds.size()==0) return;
+		if (allIds.size()==0) return this;
 
 		PlanImpl plan = plans.getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
 
@@ -135,7 +135,7 @@ public class QueryAgentPTBus implements OTFQuery {
 //		}
 		
 		this.vertex = buildRoute(plan);
-
+		return this;
 	}
 
 	public void draw(OTFDrawer drawer) {

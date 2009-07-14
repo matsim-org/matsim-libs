@@ -164,13 +164,14 @@ QueueSimulationAfterSimStepListener {
 	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
 		int status = myOTFServer.updateStatus(e.getSimulationTime());
 		if(myOTFServer.getRequestStatus() == OTFVisController.CANCEL) {
-			try {
-				myOTFServer.requestControllerStatus(0);
-				myOTFServer.reset();
-			} catch (RemoteException e1) {
+//			try {
+//				myOTFServer.requestControllerStatus(0);
+//				myOTFServer.play();
+//				myOTFServer.reset();
+//			} catch (RemoteException e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} // reset status!
+//				e1.printStackTrace();
+//			} // reset status!
 			myOTFServer.reset();
 			throw new SimCanceledException();
 		}
@@ -185,6 +186,12 @@ QueueSimulationAfterSimStepListener {
 	protected void createServer(final UUID idOne, StartupEvent event) {
 		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, this.events, false);
 		myOTFServer.setControllerStatus(OTFVisController.STARTUP);
+		try {
+			myOTFServer.pause();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
 	}
 	public void notifyStartup(StartupEvent event) {
 		UUID idOne = UUID.randomUUID();
@@ -264,8 +271,8 @@ QueueSimulationAfterSimStepListener {
 		Gbl.getConfig().controler().setOutputDirectory("tmp_delete_this");
 
 		Controler controler = new ResetableMobsimControler(cfg);
-//		controlListener = new OTFControlerListener();
-		controlListener = new OTFPopShowListener();
+		controlListener = new OTFControlerListener();
+//		controlListener = new OTFPopShowListener();
 		controler.addControlerListener(controlListener);
 		controler.getQueueSimulationListener().add(controlListener);
 		controler.run();

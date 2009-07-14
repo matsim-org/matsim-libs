@@ -31,6 +31,7 @@ import javax.media.opengl.GL;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -75,7 +76,7 @@ public class QueryAgentPlan implements OTFQuery {
 	private byte[] colors = null;
 	private transient FloatBuffer vert;
 	private Object [] acts;
-	private transient InfoText agentText = null;
+	protected InfoText agentText = null;
 	private int lastActivity = -1;
 	private ByteBuffer cols; 
 
@@ -153,9 +154,9 @@ public class QueryAgentPlan implements OTFQuery {
 		}
 	}
 
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		PersonImpl person = plans.getPersons().get(new IdImpl(this.agentId));
-		if (person == null) return;
+		if (person == null) return this;
 
 		PlanImpl plan = person.getSelectedPlan();
 
@@ -169,7 +170,7 @@ public class QueryAgentPlan implements OTFQuery {
 		}
 
 		buildRoute(plan);
-
+		return this;
 	}
 
 	public void draw(OTFDrawer drawer) {

@@ -42,8 +42,9 @@ public class OTFReplaceQuery implements OTFQuery {
 		return false;
 	}
 
-	public void query(QueueNetwork net, PopulationImpl plans, Events events,
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events,
 			OTFServerQuad quad) {
+		return this;
 	}
 
 	public void remove() {

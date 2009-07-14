@@ -33,6 +33,7 @@ import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
+import org.matsim.core.events.PersonEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PersonImpl;
@@ -53,11 +54,13 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 	private static final long serialVersionUID = -7388598935268835323L;
 
-	public static class MyEventsHandler implements BasicPersonEventHandler, Serializable{
+	public List<String> events = new ArrayList<String>();
+
+	public  class MyEventsHandler implements BasicPersonEventHandler, Serializable{
 
 		private static final long serialVersionUID = 1L;
-		public final static List<String> events = new ArrayList<String>();
 		private final String agentId;
+		public List<BasicPersonEvent> orig_events = new ArrayList<BasicPersonEvent>();
 		
 		public MyEventsHandler(String agentId) {
 			this.agentId = agentId;
@@ -65,7 +68,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 		public void handleEvent(BasicPersonEvent event) {
 			if(event.getPersonId().toString().equals(this.agentId)){
-				events.add(event.toString());
+				orig_events.add(event);
 			}
 			
 		}
@@ -73,31 +76,51 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		public void reset(int iteration) {
 		}
 		
+		public List<String> getEvents () {
+			events = new ArrayList<String>();
+			for (BasicPersonEvent event : orig_events) {
+				events.add(event.toString());
+			}
+			orig_events.clear();
+			return events;
+		}
 	}
 
-	//private final float[] vertex = null;
-	private transient FloatBuffer vert;
-	private transient List<InfoText> texts = null;
-	private transient InfoText agentText = null;
+	private  List<InfoText> texts = null;
+	//private  InfoText agentText = null;
 
 	private boolean calcOffset = true;
 	private MyEventsHandler handler = null;
 
 	
-	public void query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) {
 		if(handler == null) {
 			handler = new MyEventsHandler(agentId);
 			events.addHandler(handler);
 			PersonImpl person = plans.getPersons().get(new IdImpl(this.agentId));
-			if (person == null) return;
-
-			PlanImpl plan = person.getSelectedPlan();
-
-			buildRoute(plan);
+			if (person != null) {
+				PlanImpl plan = person.getSelectedPlan();
+				buildRoute(plan);
+			}
+			this.events = handler.getEvents();
+			return this;
+		} else{
+			return this.clone();
 		}
-		
 	}
 
+	public QueryAgentEvents clone() {
+		QueryAgentEvents result = new QueryAgentEvents();
+		result.handler = this.handler;
+		result.vertex = this.vertex;
+		result.texts = this.texts;
+		result.agentText = this.agentText;
+		result.agentId = this.agentId;
+		result.calcOffset = this.calcOffset;
+		result.events = handler.getEvents();
+
+		return result;
+	}
 	public void draw(OTFDrawer drawer) {
 		if(drawer instanceof OTFOGLDrawer) {
 			draw((OTFOGLDrawer)drawer);
@@ -133,7 +156,6 @@ public class QueryAgentEvents extends QueryAgentPlan {
 				this.vertex[i] -=east;
 				this.vertex[i+1] -= north;
 			}
-			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 
 			if (pos != null) {
 				this.agentText = InfoText.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
@@ -146,12 +168,13 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		GL gl = drawer.getGL();
 		Color color = Color.ORANGE;
 		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.5);
+		FloatBuffer vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 
 		gl.glEnable(GL.GL_BLEND);
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
 		gl.glLineWidth(1.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
-		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
+		gl.glVertexPointer (2, GL.GL_FLOAT, 0, vert);
 		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
 		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
 		gl.glDisable(GL.GL_LINE_SMOOTH);
@@ -170,10 +193,10 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			}
 
 			int offset = 0;
-			for(String event : MyEventsHandler.events) {
+			for(String event : events) {
 				this.texts.add(InfoText.showTextPermanent(event,(float)pos.x + 150, (float)pos.y + 150 + 80*offset++,-0.0005f));
 			}
-			MyEventsHandler.events.clear();
+			events.clear();
 
 		}
 		gl.glDisable(GL.GL_BLEND);
@@ -186,7 +209,9 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		for (InfoText inf : this.texts) {
 			if(inf != null) InfoText.removeTextPermanent(inf);
 		}
+		this.texts.clear();
 		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
+		this.agentText = null;
 	}
 	
 	// this must be done every time again until it is removed
