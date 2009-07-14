@@ -32,7 +32,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Represents a vehicle.
- *
+ * 
  * @author rashid_waraich
  */
 public class Vehicle extends SimUnit {
@@ -62,7 +62,7 @@ public class Vehicle extends SimUnit {
 		linkIndex = -1;
 
 		/*
-		 * return at this position, if we are just testing using a dummy
+		 * return at this point, if we are just testing using a dummy
 		 * person/plan (to avoid null pointer exception)
 		 */
 		if (ownerPerson.getSelectedPlan() == null) {
@@ -71,10 +71,21 @@ public class Vehicle extends SimUnit {
 
 		PlanImpl plan = ownerPerson.getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+
+		/*
+		 * return at this point, if a person just performs one activity during
+		 * the whole day (e.g. stays at home), because no event needs to be
+		 * scheduled for this person.
+		 */
+		
+		if (actsLegs.size()==1){
+			return;
+		}
+
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
 		setCurrentLeg((LegImpl) actsLegs.get(legIndex));
-		ActivityImpl firstAct=(ActivityImpl) actsLegs.get(0);
+		ActivityImpl firstAct = (ActivityImpl) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
 		double departureTime = firstAct.getEndTime();
 
@@ -135,7 +146,7 @@ public class Vehicle extends SimUnit {
 	private LinkImpl[] getCurrentLinkRoute() {
 		return currentLinkRoute;
 	}
- 
+
 	public void setLegIndex(int legIndex) {
 		this.legIndex = legIndex;
 	}
@@ -272,8 +283,7 @@ public class Vehicle extends SimUnit {
 	}
 
 	public DeadlockPreventionMessage scheduleDeadlockPreventionMessage(double scheduleTime, Road road) {
-		DeadlockPreventionMessage dpMessage = MessageFactory.getDeadlockPreventionMessage(road.scheduler,
-				this);
+		DeadlockPreventionMessage dpMessage = MessageFactory.getDeadlockPreventionMessage(road.scheduler, this);
 		sendMessage(dpMessage, road, scheduleTime);
 		return dpMessage;
 	}
