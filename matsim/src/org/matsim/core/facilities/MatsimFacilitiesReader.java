@@ -26,9 +26,10 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import org.matsim.core.utils.io.MatsimXmlParser;
 
 /**
  * A reader for facilities-files of MATSim. This reader recognizes the format of the facilities-file and uses
@@ -37,12 +38,23 @@ import org.xml.sax.SAXException;
  * @author mrieser
  */
 public class MatsimFacilitiesReader extends MatsimXmlParser {
-	// FIXME: Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
-	// naming conventions?  kai, jan09
-	/* because all other readers in Matsim are also called Matsim*Reader,
+	/* Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
+	 * naming conventions?  kai, jan09
+	 * because all other readers in Matsim are also called Matsim*Reader,
 	 * e.g. MatsimPopulationReader, MatsimNetworkReader, MatsimWorldReader, ...
 	 * marcel, feb09
+	 * The logic seems to be:
+	 * - there is a "basic" MatsimXmlParser
+	 * - there are implementations AbcReaderMatsimVx
+	 * - there is a meta-class MatsimReaderAbc, which calls the Vx-Readers depending on the version
+	 * - yy there is usually also an interface AbcReader, which is, however, not consistent:
+	 *   () sometimes, it is there, and sometimes not
+	 *   () sometimes, it is read(), sometimes it is readFile( file), sometimes ...
+	 *   () sometimes it throws an i/o exception, sometimes not
+	 * Oh well.  
+	 * At least it seems indeed that the MatsimReader is indeed usually there. kai, jul09
 	 */
+
 
 	private final static String FACILITIES_V1 = "facilities_v1.dtd";
 

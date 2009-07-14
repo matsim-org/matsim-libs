@@ -49,7 +49,7 @@ public class BasicPlanImpl implements BasicPlan<PlanElement> {
 		this.person = person;
 	}
 	
-	public BasicPlanImpl() {
+	protected BasicPlanImpl() {
 	}
 
 	public BasicPerson getPerson() {

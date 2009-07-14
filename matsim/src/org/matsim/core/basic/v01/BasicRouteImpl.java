@@ -45,7 +45,8 @@ public class BasicRouteImpl implements BasicRoute {
 	 * start and the end link of a Route correctly.
 	 */
 	@Deprecated
-	public BasicRouteImpl() {}
+	protected BasicRouteImpl() {}
+	// deliberately protected.  kai, jul09
 	
 	public BasicRouteImpl(Id startLinkId, Id endLinkId){
 		// yyyyyy this should be protected

@@ -25,7 +25,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.BasicLocation;
-import org.matsim.core.basic.v01.facilities.*;
+import org.matsim.core.basic.v01.facilities.BasicActivityOption;
+import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 
 /**
@@ -38,7 +39,8 @@ public class BasicActivityOptionImpl implements BasicActivityOption {
 	private Map<DayType,SortedSet<BasicOpeningTime>> openingTimes = new HashMap<DayType, SortedSet<BasicOpeningTime>>();
 	private String type;
 	
-	public BasicActivityOptionImpl(String type) {
+	protected BasicActivityOptionImpl(String type) {
+		// this is deliberately protected. kai, jul09
 		this.type = type;
 	}
 

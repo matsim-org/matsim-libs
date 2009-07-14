@@ -11,6 +11,10 @@ public class BasicKnowledgeImpl implements BasicKnowledge<BasicActivityOption> {
 	private List<BasicActivityOption> activities;
 	private String description;
 	
+	protected BasicKnowledgeImpl() {
+		// this is deliberately protected.  kai, jul09
+	}
+	
 	public void addActivity(BasicActivityOption activity) {
 		if (this.activities == null) {
 			this.activities = new ArrayList<BasicActivityOption>();

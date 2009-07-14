@@ -138,7 +138,7 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 
 	public final void setEmployed(final String employed) {
 		this.isEmployed = (employed == null) ? null : employed.intern();
-		// FIXME: maybe I am getting this wrong, but it seems to me that this is a bit weird:
+		// yyyy: maybe I am getting this wrong, but it seems to me that this is a bit weird:
 		// - it accepts a String, implying that you can put in whatever you want
 		// - it also writes it without problems in the population writer
 		// - however, when reading it back in it complains that it wants "yes" or "no"
