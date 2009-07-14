@@ -52,7 +52,7 @@ public class PTRouter{
 	
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
 		double walkRange= distToWalk; 
-		NodeImpl origin= createWalkingNode(new IdImpl("W1"), coord1);
+		NodeImpl origin= createWalkingNode(new IdImpl("W1"), coord1);   //this is faster than network.createNode but uses PTNode
 		NodeImpl destination= createWalkingNode(new IdImpl("W2"), coord2);
 		
 		Collection <NodeImpl> nearOriginStops = findnStations (coord1, walkRange);
@@ -101,20 +101,22 @@ public class PTRouter{
 		NodeImpl fromNode;
 		NodeImpl toNode;
 		int x=0;
-		
-		
+		String type;
 		for (NodeImpl node : nearNodes){
 			if (to){
 				fromNode= walkNode;
 				toNode= node;
 				idLink = new IdImpl("WLO" + x++);
+				type = "Access";
 			}else{
 				fromNode= node;
 				toNode=  walkNode;
 				idLink = new IdImpl("WLD" + x++);
+				type = "Walking";
 			}
-			LinkImpl link= logicNet.createLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", "Walking");
-			//-->check if this temporary stuff improves the performance
+			
+			LinkImpl link= logicNet.createLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
+			//-->check if this improves the performance
 			//link.setFreespeed(link.getLength()* WALKING_SPEED);
 			newWalkLinks.add(link);
 		}

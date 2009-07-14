@@ -43,7 +43,7 @@ public class PTTimeTable{
 	 * Reads every ptline information and creates  
 	 * Minutemap to save average travel time from the fist station to any station of the ptLine 
 	 * NodeDepartureTime to save all departures times in a day for each node 
-	 * [MMoyo]17th June It will be completely replaced by  TransitTravelTimeCalculator 
+	 * [MMoyo]17th June It will be completely replaced by TransitTravelTimeCalculator 
 	 */
 	@Deprecated
 	public void calculateTravelTimes(NetworkLayer networklayer){
@@ -97,8 +97,8 @@ public class PTTimeTable{
 	*A binary search returns the next departure in a node after a given time 
 	*If the time is greater than the last departure, 
 	*returns the first departure(of the next day)*/
-	public double nextDepartureB(Id idPTNode,  double time){//,
-		double[]arrDep= nodeDeparturesMap.get(idPTNode);
+	public double nextDepartureB(Id idNode,  double time){//,
+		double[]arrDep= nodeDeparturesMap.get(idNode);
 		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){

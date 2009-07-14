@@ -47,6 +47,15 @@ public class LogicIntoPlainTranslator {
 		return logicToPlainStopMap.get(logicNodeId);
 	}
 	
+	public List<NodeImpl> convertNodesToPlain(List<NodeImpl> logicNodes){
+		List<NodeImpl> plainNodes  = new ArrayList<NodeImpl>();
+		for (NodeImpl logicNode: logicNodes){
+			NodeImpl plainNode= convertToPlain(logicNode.getId());
+			plainNodes.add(plainNode);
+		}
+		return plainNodes;
+	}	
+	
 	private LinkImpl convertToPlain(final LinkImpl logicLink){
 		LinkImpl logicAliasLink = logicLink;
 		if (logicLink.getType().equals("Transfer") || logicLink.getType().equals("DetTransfer"))

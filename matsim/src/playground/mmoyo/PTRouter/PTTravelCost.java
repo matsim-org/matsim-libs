@@ -17,10 +17,11 @@ public class PTTravelCost implements TravelCost {
 	}
 
 	public double getLinkTravelCost(LinkImpl link, double time) {
-		return 1;
+		//return 1;
 		//return link.getLength();
-		//return ptTravelTime.getLinkTravelTime(link, time);
+		return ptTravelTime.getLinkTravelTime(link, time);
 		//--> Compare fare zone from toNode and fromNode. If They are different then a extra cost is to be charged 
 	}
+	
 	
 }

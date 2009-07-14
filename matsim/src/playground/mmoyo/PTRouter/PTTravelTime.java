@@ -24,23 +24,23 @@ public class PTTravelTime implements TravelTime {
 	/**
 	 * Calculation of travel time for each link type:
 	 * Standard link: (toNode arrival- fromNode arrival)
-	 * Walking link : (distance* walk speed)
-	 * Transfer link: (2� veh departure - 1� veh arrival)
+	 * Walking link : (distance * walk speed)
+	 * Transfer link: (second veh departure - first veh arrival)
 	 * Detached transfer: (distance*walk speed) + (veh departure - walk arrival)  
 	 */
 	public double getLinkTravelTime(final LinkImpl link, final double time) {
 		type = link.getType();
-		if (type.equals("Transfer")){
-			travelTime= transferTime(link,time); 
-		}else if (type.equals("Walking")){
-			travelTime= (link.getLength()* walkSpeed);
-		}else if (type.equals("Standard")){
-			travelTime= ptTimeTable.getTravelTime(link);
-		}else if (type.equals("DetTransfer")){
+		if (type.equals("DetTransfer") || type.equals("Access")){
 			walkTime=link.getLength()* walkSpeed;
 			waitingTime= transferTime(link, time+walkTime);
 			travelTime= walkTime + waitingTime; 
-			//--> decide if the departures will be saved in map or in Node
+			//--> decide if the departures will be saved in map or in Node 
+		}else if (type.equals("Transfer")){
+			travelTime= transferTime(link,time); 
+		}else if (type.equals("Standard")){
+			travelTime= ptTimeTable.getTravelTime(link);
+		}else if (type.equals("Walking")){
+			travelTime= (link.getLength()* walkSpeed);
 		}
 		return travelTime;
 	}

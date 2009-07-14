@@ -31,8 +31,8 @@ import playground.mmoyo.PTRouter.PTTimeTable;
 /**
  * Reads a TransitSchedule and creates from it:
  * -Plain network: A node represent a station. A link represents a simple connection between stations 
- * -logic layer network: with sequences of independent nodes for each TansitLine, include transfer links
- * -logicTransitSchedule: with a cloned stop facility for each transit stop of each Transit Line with new Id's mapped to the real transitFaciliteies
+ * -logic layer network: with sequences of independent nodes for each TansitLine, includes transfer links
+ * -logicTransitSchedule: with a cloned stop facility for each transit stop of each Transit Line with new Id's mapped to the real transitFacilities
  * -A PTRouter object containing departure information according to the logicTransitSchedule
  * -logicToPlainConverter: translates logic nodes and links into plain nodes and links. 
  */
@@ -77,7 +77,7 @@ public class LogicFactory{
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
 					
-					//Create nodes
+					//Creates nodes
 					Coord coord = transitStopFacility.getCoord();
 					Id idStopFacility = transitStopFacility.getId();  
 					Id logicalId= createLogicalId(idStopFacility, transitLine.getId()); 
@@ -85,14 +85,14 @@ public class LogicFactory{
 					NodeImpl plainNode= createPlainNode(transitStopFacility);
 					logicToPlanStopMap.put(logicNode.getId(), plainNode);
 					
-					//fill the facilityNodeMap to create transfer links later on
+					//fills the facilityNodeMap to create transfer links later on
 					if (!facilityNodeMap.containsKey(idStopFacility)){
 						List<NodeImpl> nodeStationArray = new ArrayList<NodeImpl>();
 						facilityNodeMap.put(idStopFacility, nodeStationArray);
 					}
 					facilityNodeMap.get(idStopFacility).add(logicNode);
 
-					//Create links
+					//Creates links
 					if (!first){
 						createLogicLink(new IdImpl(newLinkId++), lastLogicNode, logicNode, "Standard");
 						createPlainLink(lastPlainNode, plainNode);
@@ -100,7 +100,7 @@ public class LogicFactory{
 						first=false;
 					}
 
-					//create logic stops and stopFacilities
+					//creates logic stops and stopFacilities
 					TransitStopFacility logicTransitStopFacility = this.builder.createTransitStopFacility(logicalId, coord); 
 					logicTransitSchedule.addStopFacility(logicTransitStopFacility);
 					TransitRouteStop logicTransitRouteStop = this.builder.createTransitRouteStop(logicTransitStopFacility, transitRouteStop.getArrivalDelay(), transitRouteStop.getDepartureDelay()); 
@@ -175,13 +175,13 @@ public class LogicFactory{
 		return (numInGoingStandards>0) && (numOutgoingStandards>0); 
 	}
 	
-	/**links for the logical network, one for transitRoute*/
+	/**Creates the links for the logical network, one for transitRoute*/
 	private void createLogicLink(Id id, NodeImpl fromNode, NodeImpl toNode, String type){
 		double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		logicNet.createLink(id, fromNode, toNode, length , 1.0 , 1.0, 1.0, "0", type);	
 	}
 	
-	/**links for the plain network, only one between two stations*/
+	/**Creates the links for the plain network, only one between two stations*/
 	private void createPlainLink(NodeImpl fromNode, NodeImpl toNode){
 		if (!fromNode.getOutNodes().containsValue(toNode)){
 			double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
@@ -209,7 +209,7 @@ public class LogicFactory{
 			System.out.println(this + ex.getMessage());
 		}
 		new NetworkWriter(logicNet, outLogicNetFile).write();
-		//new NetworkWriter(plainNet, outPlainNetFile).write();   //->for the time being the plainNet is itself the input
+		new NetworkWriter(plainNet, outPlainNetFile).write();
 		System.out.println("done.");
 	}
 
@@ -222,7 +222,7 @@ public class LogicFactory{
 		return this.plainNet;
 	}
 	
-	public LogicIntoPlainTranslator getLogicToPlainConverter(){
+	public LogicIntoPlainTranslator getLogicToPlainTranslator(){
 		return this.logicToPlainTranslator ;
 	}
 

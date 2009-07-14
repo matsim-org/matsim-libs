@@ -11,11 +11,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  * must not have two adjacent walking links
  */
 public class PathValidator {
-	final String TRANSFERTYPE = "Transfer";
-	final String STANDARDTYPE = "Standard";
-	final String DETTRANSFERTYPE = "DetTransfer";
-	final String WALKINGTYPE = "Walking";
-	final String NULLTYPE = null;
+	final String TRANSFER = "Transfer";
+	final String STANDARD = "Standard";
+	final String DETTRANSFER = "DetTransfer";
+	final String WALKING = "Walking";
+	final String ACCESS = "Access";
 	
 	public PathValidator (){
 	
@@ -46,60 +46,22 @@ public class PathValidator {
 		String type= link.getType();
 		
 		if (lastLink==null){
-			if (type.equals(WALKINGTYPE)) pass= true;
+			pass = type.equals(ACCESS);
 		}else{
 			String lastType = lastLink.getType();	
-			if (type.equals(TRANSFERTYPE)){
-				if (lastType.equals(TRANSFERTYPE)) 			pass = false; 
-				else if (lastType.equals(STANDARDTYPE)) 	pass = true;
-				else if (lastType.equals(DETTRANSFERTYPE)) 	pass = false;
-				else if (lastType.equals(WALKINGTYPE)) 		pass = false;
-				else if (lastType.equals(NULLTYPE)) 		pass = false;
-			}else if (type.equals(WALKINGTYPE)){
-				if (lastType.equals(TRANSFERTYPE)) 			pass = false;
-				else if (lastType.equals(STANDARDTYPE)) 	pass = true;
-				else if (lastType.equals(DETTRANSFERTYPE)) 	pass = false;
-				else if (lastType.equals(WALKINGTYPE)) 		pass = false;
-				else if (lastType.equals(NULLTYPE)) 		pass = true;
-			}else if (type.equals(STANDARDTYPE)){
-				if (lastType.equals(TRANSFERTYPE)) 			pass = true;
-				else if (lastType.equals(STANDARDTYPE)) 	pass = true;
-				else if (lastType.equals(DETTRANSFERTYPE)) 	pass = true;
-				else if (lastType.equals(WALKINGTYPE)) 		pass = true;
-				else if (lastType.equals(NULLTYPE)) 		pass = false;
-			}else if (type.equals(DETTRANSFERTYPE)){
-				if (lastType.equals(TRANSFERTYPE)) 			pass = false;
-				else if (lastType.equals(STANDARDTYPE)) 	pass = true;
-				else if (lastType.equals(DETTRANSFERTYPE)) 	pass = false;
-				else if (lastType.equals(WALKINGTYPE)) 		pass = false;
-				else if (lastType.equals(NULLTYPE)) 		pass = false;
+			
+			if (type.equals(DETTRANSFER)){
+				pass = lastType.equals(STANDARD);
+			}else if (type.equals(TRANSFER)){
+				pass= lastType.equals(STANDARD);
+			}else if (type.equals(STANDARD)){
+				//lastType null and walk are rejected
+				pass= (lastType.equals(DETTRANSFER) || lastType.equals(TRANSFER) || lastType.equals(STANDARD) || lastType.equals(ACCESS)); 
+			}else if (type.equals(WALKING)){
+				pass= lastType.equals(STANDARD);
 			}
 		}
 		return pass;
 	}
 
-	
-	
-	/*    //-> Is this possible?
-	 if (type.equals(null)){
-			if (lastType.equals(TRANSFERTYPE)) 			pass = false;
-			else if (lastType.equals(STANDARDTYPE)) 	pass = false;
-			else if (lastType.equals(DETTRANSFERTYPE)) 	pass = false;
-			else if (lastType.equals(WALKINGTYPE)) 		pass = false;
-			else if (lastType.equals(NULLTYPE)) 		pass = false;
-	}
-	*/
-	
-	
-	public void printPath(Path path){
-		System.out.print(path.toString());
-		/*
-		for (Link link : path.links){
-			System.out.print(b);
-			//link.getId()
-		}
-		*/	
-	}
-	
-	
-}//class
+}
