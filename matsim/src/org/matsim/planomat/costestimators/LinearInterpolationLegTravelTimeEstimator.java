@@ -20,6 +20,7 @@
 
 package org.matsim.planomat.costestimators;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.zip.Adler32;
 
@@ -28,7 +29,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -40,7 +40,12 @@ public class LinearInterpolationLegTravelTimeEstimator implements
 LegTravelTimeEstimator {
 
 	public static final double SAMPLING_DISTANCE = 3600.0;
-
+	/**
+	 * Modes whose optimal routes and travel times are variable throughout the day, and therefore have to be approximated.
+	 * They are in opposite to modes whose optimal routes and travel times are constant can be computed once and be cached afterwards.
+	 */
+	public static final EnumSet<TransportMode> MODES_WITH_VARIABLE_TRAVEL_TIME = EnumSet.of(TransportMode.car);
+	
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute plansCalcRoute;
@@ -115,6 +120,7 @@ LegTravelTimeEstimator {
 	}
 
 	private HashMap<DynamicODMatrixEntry, Double> dynamicODMatrix = new HashMap<DynamicODMatrixEntry, Double>();
+	private HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
 
 	protected double getInterpolation(double departureTime, ActivityImpl actOrigin, ActivityImpl actDestination, LegImpl legIntermediate) {
 
@@ -167,6 +173,7 @@ LegTravelTimeEstimator {
 
 	public void reset() {
 		this.dynamicODMatrix.clear();
+		this.travelTimeCache.clear();
 
 	}
 
@@ -179,17 +186,50 @@ LegTravelTimeEstimator {
 		double legTravelTimeEstimation = 0.0;
 		// TODO clarify usage of departure delay calculator
 
-		if (legIntermediate.getMode().equals(TransportMode.car)) {
+		if (MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode())) {
+			
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actOrigin.getLink(), departureTime);
 			}
-		}
-		legTravelTimeEstimation += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
-		if (legIntermediate.getMode().equals(TransportMode.car)) {
+			legTravelTimeEstimation += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actDestination.getLink(), departureTime + legTravelTimeEstimation);
 			}
+			
+		} else {
+			
+			HashMap<TransportMode, Double> legInformation = null; 
+			if (this.travelTimeCache.containsKey(legIntermediate)) {
+				legInformation = this.travelTimeCache.get(legIntermediate);
+			} else {
+				legInformation = new HashMap<TransportMode, Double>();
+				this.travelTimeCache.put(legIntermediate, legInformation);
+			}
+			if (legInformation.containsKey(legIntermediate.getMode())) {
+				legTravelTimeEstimation = legInformation.get(legIntermediate.getMode()).doubleValue();
+			} else {
+				legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+				legInformation.put(legIntermediate.getMode(), legTravelTimeEstimation);
+			}
+			
 		}
+		
+//		
+//		
+//		
+//		
+//		
+//		if (legIntermediate.getMode().equals(TransportMode.car)) {
+//			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
+//				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actOrigin.getLink(), departureTime);
+//			}
+//		}
+//		legTravelTimeEstimation += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
+//		if (legIntermediate.getMode().equals(TransportMode.car)) {
+//			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
+//				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actDestination.getLink(), departureTime + legTravelTimeEstimation);
+//			}
+//		}
 
 		return legTravelTimeEstimation;
 
@@ -202,10 +242,16 @@ LegTravelTimeEstimator {
 		double legTravelTimeEstimation = 0.0;
 
 		if (doModifyLeg == null) {
-			Gbl.errorMsg("Specify doModifyLeg with either true or false.");
-		} else if (doModifyLeg.equals(Boolean.TRUE)) {
+			throw new RuntimeException("Specify doModifyLeg with either true or false.");
+//			Gbl.errorMsg("Specify doModifyLeg with either true or false.");
+		}
+		
+		if (
+				doModifyLeg.equals(Boolean.TRUE) || 
+				(!MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode()))
+				) {
 			legTravelTimeEstimation = this.simulateLegAndGetTravelTime(departureTime, actOrigin, actDestination, legIntermediate);
-		} else if (doModifyLeg.equals(Boolean.FALSE)){
+		} else if (doModifyLeg.equals(Boolean.FALSE)) {
 			legTravelTimeEstimation = this.getInterpolation(departureTime, actOrigin, actDestination, legIntermediate);
 		}
 
