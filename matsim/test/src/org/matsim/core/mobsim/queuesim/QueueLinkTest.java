@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
@@ -344,7 +344,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private static final class Fixture {
-		/*package*/ final Scenario scenario;
+		/*package*/ final ScenarioImpl scenario;
 		/*package*/ final LinkImpl link1;
 		/*package*/ final LinkImpl link2;
 		/*package*/ final QueueNetwork queueNetwork;

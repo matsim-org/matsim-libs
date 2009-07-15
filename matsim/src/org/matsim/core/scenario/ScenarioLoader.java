@@ -26,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.BasicScenarioLoader;
 import org.matsim.core.config.Config;
@@ -52,7 +52,7 @@ import org.matsim.world.MatsimWorldReader;
  * of the scenario assuming that required parts are already 
  * loaded or created by the user.
  * 
- * @see org.matsim.core.api.experimental.Scenario
+ * @see org.matsim.core.api.experimental.ScenarioImpl
  * 
  * @author dgrether
  */
@@ -66,7 +66,7 @@ public class ScenarioLoader extends BasicScenarioLoader {
 		super.setScenario(new ScenarioImpl(this.config));
 	}
 
-	public ScenarioLoader(Scenario scenario) {
+	public ScenarioLoader(ScenarioImpl scenario) {
 		super(scenario);
 	}
 

@@ -30,7 +30,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
@@ -73,7 +73,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		this.knowledges = new KnowledgesImpl();
 	}
 	
-	public MatsimPopulationReader(final Scenario scenario) {
+	public MatsimPopulationReader(final ScenarioImpl scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();

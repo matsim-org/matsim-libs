@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -66,7 +66,7 @@ public class PlanomatTest extends MatsimTestCase {
 	
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
-	private Scenario scenario;
+	private ScenarioImpl scenario;
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -344,9 +344,9 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private static final class ScenarioCreatePersonEventHandler implements BasicPersonEventHandler{
 
-		private Scenario scenario;
+		private ScenarioImpl scenario;
 
-		public ScenarioCreatePersonEventHandler(Scenario scenario) {
+		public ScenarioCreatePersonEventHandler(ScenarioImpl scenario) {
 			this.scenario = scenario;
 		}
 

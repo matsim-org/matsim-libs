@@ -28,7 +28,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
@@ -104,7 +106,8 @@ public class NetworkCleaner {
 		return clusterNodes;
 	}
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network2) {
+		NetworkLayer network = (NetworkLayer) network2 ;
 		final Map<Id, NodeImpl> visitedNodes = new TreeMap<Id, NodeImpl>();
 		Map<Id, NodeImpl> biggestCluster = new TreeMap<Id, NodeImpl>();
 

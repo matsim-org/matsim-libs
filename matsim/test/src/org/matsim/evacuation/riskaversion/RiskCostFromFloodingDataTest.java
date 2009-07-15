@@ -3,7 +3,7 @@ package org.matsim.evacuation.riskaversion;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigReaderMatsimV1;
@@ -19,7 +19,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 
 	public void testRiskCostFromFloodingData() {
 		String config = getInputDirectory() + "config.xml";
-		Scenario sc = new ScenarioImpl();
+		ScenarioImpl sc = new ScenarioImpl();
 		new ConfigReaderMatsimV1(sc.getConfig()).readFile(config);
 		
 		new MatsimNetworkReader(sc.getNetwork()).readFile(sc.getConfig().network().getInputFile());

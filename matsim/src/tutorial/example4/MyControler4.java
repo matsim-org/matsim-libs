@@ -20,7 +20,7 @@
 
 package tutorial.example4;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -41,7 +41,7 @@ public class MyControler4 {
 		final String plansFilename = "./examples/equil/plans100.xml";
 
 		ScenarioLoader loader = new ScenarioLoader("./examples/tutorial/myConfig.xml");
-		Scenario scenario = loader.getScenario();
+		ScenarioImpl scenario = loader.getScenario();
 		Config config = scenario.getConfig();
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);

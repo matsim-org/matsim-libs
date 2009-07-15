@@ -20,7 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEvent;
@@ -40,7 +40,7 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser 
 	 */
 	public void testLongTravelTimeInEmptySlot() {
-		Scenario scenario = new ScenarioImpl(loadConfig(null));
+		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
     scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);

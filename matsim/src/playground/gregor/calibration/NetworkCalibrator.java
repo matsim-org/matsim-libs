@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
@@ -38,7 +38,7 @@ public class NetworkCalibrator {
 	
 	private void run() {
 		
-		Scenario sc = new ScenarioImpl();
+		ScenarioImpl sc = new ScenarioImpl();
 		createScenario(sc,FREESPEED);
 		createConfig(sc);
 		
@@ -56,7 +56,7 @@ public class NetworkCalibrator {
 	}
 	
 
-	private void createConfig(Scenario sc) {
+	private void createConfig(ScenarioImpl sc) {
 		Config c = sc.getConfig();
 		c.global().setCoordinateSystem(TransformationFactory.ATLANTIS);
 		c.simulation().setStartTime(0);
@@ -81,7 +81,7 @@ public class NetworkCalibrator {
 		
 	}
 
-	private void createScenario(Scenario sc, double fs) {
+	private void createScenario(ScenarioImpl sc, double fs) {
 		NetworkLayer net = (NetworkLayer)sc.getNetwork();
 		net.setCapacityPeriod(1);
 		net.setEffectiveCellSize(CELLSIZE);

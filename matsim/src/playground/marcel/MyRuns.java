@@ -44,7 +44,7 @@ import net.opengis.kml._2.TimeSpanType;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -98,7 +98,7 @@ public class MyRuns {
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
-		Scenario scenario = sl.getScenario();		
+		ScenarioImpl scenario = sl.getScenario();		
 
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
@@ -154,7 +154,7 @@ public class MyRuns {
 		System.out.println("RUN: filterCars");
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
-		Scenario scenario = sl.loadScenario();
+		ScenarioImpl scenario = sl.loadScenario();
 
 		System.out.println("  processing plans...");
 		new PlansFilterByLegMode(TransportMode.car, false).run(scenario.getPopulation());
@@ -177,7 +177,7 @@ public class MyRuns {
 		System.out.println("RUN: filterPt");
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
-		Scenario scenario = sl.loadScenario();
+		ScenarioImpl scenario = sl.loadScenario();
 		final PopulationImpl plans = scenario.getPopulation();
 
 		System.out.println("  processing plans...");
@@ -201,7 +201,7 @@ public class MyRuns {
 		System.out.println("RUN: filterWork");
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
-		Scenario scenario = sl.loadScenario();
+		ScenarioImpl scenario = sl.loadScenario();
 
 		new PersonRemoveCertainActs().run(scenario.getPopulation());
 		new PersonRemovePlansWithoutLegs().run(scenario.getPopulation());
@@ -219,7 +219,7 @@ public class MyRuns {
 		System.out.println("RUN: filterWorkEdu");
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
-		Scenario scenario = sl.loadScenario();
+		ScenarioImpl scenario = sl.loadScenario();
 
 		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
@@ -342,7 +342,7 @@ public class MyRuns {
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
-		Scenario scenario = sl.getScenario();
+		ScenarioImpl scenario = sl.getScenario();
 		
 		NetworkLayer network = scenario.getNetwork();
 

@@ -45,7 +45,7 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -311,7 +311,7 @@ public class Controler {
 				+ "if set in config! " + "Take care that this is done by yourself.");
 	}
 
-	public Controler(Scenario scenario) {
+	public Controler(ScenarioImpl scenario) {
 		this(null, null, scenario.getConfig());
 		this.scenarioData = (ScenarioImpl) scenario;
 		this.network = (NetworkLayer) this.scenarioData.getNetwork();
@@ -1089,7 +1089,7 @@ public class Controler {
 	 * This is here for testing purposes only. Kai, mar08
 	 */
 	@Deprecated
-	public final Scenario getScenarioData() {
+	public final ScenarioImpl getScenarioData() {
 		return this.scenarioData;
 	}
 

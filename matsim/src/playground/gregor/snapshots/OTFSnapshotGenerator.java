@@ -9,7 +9,7 @@ import java.util.Iterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
@@ -35,7 +35,7 @@ public class OTFSnapshotGenerator {
 
 	private final static double VIS_OUTPUT_SAMPLE = 1.;
 	
-	private final Scenario scenario;
+	private final ScenarioImpl scenario;
 	private final String eventsFile;
 	
 	public OTFSnapshotGenerator() {

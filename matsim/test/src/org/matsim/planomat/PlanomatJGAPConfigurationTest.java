@@ -28,7 +28,7 @@ import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
@@ -39,7 +39,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
-	private Scenario scenario;
+	private ScenarioImpl scenario;
 	
 	@Override
 	protected void setUp() throws Exception {

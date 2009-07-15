@@ -28,7 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -112,7 +112,7 @@ public class Wait2LinkCheckTest {
 		final String outFilename = "../data/ivtch/carPt_opt_run266/wait2linkTest.txt.gz";
 
 		Gbl.startMeasurement();
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

@@ -21,7 +21,7 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -82,7 +82,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	 * aforementioned plan.
 	 */
 	public void testAddMoney() {
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		setupScoringConfig(scenario.getConfig());
 
 		// score the same plan twice

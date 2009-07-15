@@ -2,7 +2,7 @@ package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -71,7 +71,7 @@ public class Matsim4Urbansim {
 		Config config = Gbl.createConfig(args);
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario scenarioData = loader.getScenario();
+		ScenarioImpl scenarioData = loader.getScenario();
 		
 		
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in

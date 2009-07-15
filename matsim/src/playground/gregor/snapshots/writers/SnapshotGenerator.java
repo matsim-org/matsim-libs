@@ -40,7 +40,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -68,7 +68,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 	private final double endTime;
 	private double visOutputMod;
 
-	public SnapshotGenerator(Scenario sc, MVISnapshotWriter writer) {
+	public SnapshotGenerator(ScenarioImpl sc, MVISnapshotWriter writer) {
 		this.network = sc.getNetwork();
 		this.eventLinks = new HashMap<Id, EventLink>((int)(this.network.getLinks().size()*1.1), 0.95f);
 		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);

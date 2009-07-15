@@ -20,7 +20,7 @@
 
 package playground.dressler.util;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -66,7 +66,7 @@ public class DDcontroller {
 		boolean otfvis = true;
 		boolean netvis = false & (!otfvis);
 
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);

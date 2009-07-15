@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -56,7 +56,7 @@ public class PlanFilter {
 		double[] bigRadiuses = {10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 25000, 30000, 40000, 50000};
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
-		Scenario sc = sl.loadScenario();
+		ScenarioImpl sc = sl.loadScenario();
 		final NetworkLayer network = sc.getNetwork();
 		final PopulationImpl population = sc.getPopulation();
 
@@ -114,7 +114,7 @@ public class PlanFilter {
 		double bigRadius = 14000;
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
-		Scenario sc = sl.loadScenario();
+		ScenarioImpl sc = sl.loadScenario();
 		final Config config = sc.getConfig();
 		final NetworkLayer network = sc.getNetwork();
 		final PopulationImpl population = sc.getPopulation();

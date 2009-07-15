@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
@@ -60,7 +60,7 @@ public class PopulationImpl implements Population {
 
 	private final PopulationBuilder pb ;
 	
-	private final Scenario sc ;
+	private final ScenarioImpl sc ;
 
 	// constructors:
 	
@@ -69,7 +69,7 @@ public class PopulationImpl implements Population {
 		this.pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE));
 	}
 	
-	public PopulationImpl(Scenario sc) {
+	public PopulationImpl(ScenarioImpl sc) {
 		this.sc = sc ;
 		this.pb = new PopulationBuilderImpl( sc ) ;
 	}

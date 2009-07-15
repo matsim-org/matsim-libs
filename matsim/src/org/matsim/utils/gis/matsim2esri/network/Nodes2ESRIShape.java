@@ -34,7 +34,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -125,7 +125,7 @@ public class Nodes2ESRIShape {
 			System.exit(-1) ;
 		}
 		
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);

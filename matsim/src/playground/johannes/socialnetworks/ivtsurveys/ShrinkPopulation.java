@@ -23,7 +23,7 @@
  */
 package playground.johannes.socialnetworks.ivtsurveys;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
@@ -43,7 +43,7 @@ public class ShrinkPopulation {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario data = loader.getScenario();
+		ScenarioImpl data = loader.getScenario();
 		loader.loadPopulation();
 		PopulationImpl population = data.getPopulation();
 		double sample = Double.parseDouble(args[2]);

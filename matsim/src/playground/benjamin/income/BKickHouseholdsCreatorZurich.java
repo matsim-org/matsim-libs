@@ -36,7 +36,7 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -91,7 +91,7 @@ public class BKickHouseholdsCreatorZurich {
 		FeatureSource fts = ShapeFileReader.readDataFile(gemeindenKantonZurichShapeFile);
 
 		
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile(DgPaths.IVTCHNET);
 		scenario.getConfig().plans().setInputFile(plansZurich);
 		ScenarioLoader loader = new ScenarioLoader(scenario);

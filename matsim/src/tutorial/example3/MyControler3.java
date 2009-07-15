@@ -20,7 +20,7 @@
 
 package tutorial.example3;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -36,7 +36,7 @@ public class MyControler3 {
 		final String plansFilename = "./examples/equil/plans100.xml";
 
 		ScenarioLoader loader = new ScenarioLoader("./examples/tutorial/myConfig.xml");
-		Scenario scenario = loader.getScenario();
+		ScenarioImpl scenario = loader.getScenario();
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,7 +43,7 @@ public class FourWaysVis {
 		//this is run
 //		OTFVis.playNetwork(netArray);
 		//this is hack
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFile);
 		PopulationImpl population = scenario.getPopulation();

@@ -26,16 +26,15 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Simple class to convert the links of MATSim network files to ESRI shape files. The network could be written either
@@ -56,12 +55,12 @@ public class Links2ESRIShape {
 	private final String filename;
 
 
-	public Links2ESRIShape(final NetworkLayer network, final String filename) {
+	public Links2ESRIShape(final Network network, final String filename) {
 		this(network, filename, new FeatureGeneratorBuilder(network));
 	}
 
-	public Links2ESRIShape(final NetworkLayer network, final String filename, final FeatureGeneratorBuilder builder) {
-		this.network = network;
+	public Links2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
+		this.network = (NetworkLayer) network;
 		this.filename = filename;
 		this.featureGenerator = builder.createFeatureGenerator();
 
@@ -100,7 +99,7 @@ public class Links2ESRIShape {
 			System.exit(-1) ;
 		}
 		
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);

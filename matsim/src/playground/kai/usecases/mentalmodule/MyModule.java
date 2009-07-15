@@ -14,7 +14,7 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.ActivityEndEvent;
@@ -50,7 +50,7 @@ ActivityStartEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
 	
-	Scenario sc ;
+	ScenarioImpl sc ;
 	NetworkLayer net ;
 	PopulationImpl pop ;
 	

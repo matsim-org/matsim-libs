@@ -25,7 +25,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -59,7 +59,7 @@ public class TestIntegration {
 //		new CreatePseudoNetwork().run();
 		
 		ScenarioLoader sl = new ScenarioLoader("test/input/playground/marcel/pt/config.xml");
-		Scenario scenario = sl.getScenario();
+		ScenarioImpl scenario = sl.getScenario();
 		final Config config = scenario.getConfig();
 		
 		config.network().setInputFile("../thesis-data/examples/berta/pseudoNetwork.xml");
@@ -99,7 +99,7 @@ public class TestIntegration {
 	
 	public static void mainEquil(final String[] args) {
 		ScenarioLoader sl = new ScenarioLoader("test/scenarios/equil/config.xml");
-		Scenario scenario = sl.loadScenario();
+		ScenarioImpl scenario = sl.loadScenario();
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 
 		final Events events = new Events();
@@ -112,7 +112,7 @@ public class TestIntegration {
 	
 	public static void main(final String[] args) {
 		ScenarioLoader sl = new ScenarioLoader("test/input/playground/marcel/pt/config.xml");
-		Scenario scenario = sl.getScenario();
+		ScenarioImpl scenario = sl.getScenario();
 		
 		NetworkLayer network = scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());

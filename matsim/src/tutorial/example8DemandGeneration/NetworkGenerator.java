@@ -6,9 +6,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -30,11 +30,8 @@ public class NetworkGenerator {
 	public static void main(String [] args) {
 		String osm = "./inputs/map.osm";
 		
-//		BasicScenario sc = new ScenarioImpl();
-		
-//    BasicNetwork net = sc.getNetwork();
-    
-		NetworkLayer net = new NetworkLayer();
+		Scenario sc = new ScenarioImpl() ;
+		Network net = sc.getNetwork();
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S); //the coordinate transformation is needed to get a projected  coordinate system
 		// for this basic example UTM zone 33 North is the right coordinate system. This may differ depending on your scenario. See also http://en.wikipedia.org/wiki/Universal_Transverse_Mercator
@@ -57,8 +54,8 @@ public class NetworkGenerator {
 
 		
 		//the remaining lines of code are necessary to create a ESRI shape file of the matsim network
-		Config c = Gbl.createConfig(null);
-		c.global().setCoordinateSystem(UTM33N);
+		
+		sc.getConfig().global().setCoordinateSystem(UTM33N);
 		
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(net);
 		builder.setWidthCoefficient(0.01);

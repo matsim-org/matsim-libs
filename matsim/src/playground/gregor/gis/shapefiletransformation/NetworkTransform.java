@@ -10,7 +10,7 @@ import java.util.Map;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,7 +45,7 @@ public class NetworkTransform {
 			map.put(id.toString(), MGC.coordinate2Coord(ft.getDefaultGeometry().getCentroid().getCoordinate()));
 			
 		}
-		Scenario sc = new ScenarioImpl();
+		ScenarioImpl sc = new ScenarioImpl();
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(this.net);
 		

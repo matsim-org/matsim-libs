@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
@@ -67,7 +67,7 @@ public class AccessEgressDemo {
 
 	private static final String SERVERNAME = "access_egress_demo";
 	
-	private final Scenario scenario = new ScenarioImpl();
+	private final ScenarioImpl scenario = new ScenarioImpl();
 	private final TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 	private final TransitSchedule schedule = this.builder.createTransitSchedule();
 	public final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];

@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Point;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
@@ -122,7 +122,7 @@ public class MyCommercialDemandGenerator3 {
 				
 		for(int sampleNumber = 1; sampleNumber <= numberOfSamples; sampleNumber++){
 			// Initiate the population builder
-			Scenario sc = new ScenarioImpl();
+			ScenarioImpl sc = new ScenarioImpl();
 			PopulationImpl population = sc.getPopulation();
 			PopulationBuilder pb = population.getPopulationBuilder();
 

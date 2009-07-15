@@ -29,7 +29,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
@@ -110,7 +110,7 @@ public class MyRuns {
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
 		
-		Scenario scenario = loader.getScenario();
+		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
 
 		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);

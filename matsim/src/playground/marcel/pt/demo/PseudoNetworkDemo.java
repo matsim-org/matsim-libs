@@ -25,7 +25,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.Leg;
@@ -66,7 +66,7 @@ public class PseudoNetworkDemo {
 			transitScheduleFile = "/Users/cello/Desktop/Mohit/berlinSchedule.xml";
 		}
 		
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		

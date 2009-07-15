@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -90,7 +90,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	}
 
 
-	public MVISnapshotWriter(Scenario sc) {
+	public MVISnapshotWriter(ScenarioImpl sc) {
 		super(sc.getConfig().simulation().getSnapshotPeriod(),new QueueNetwork(sc.getNetwork()),"../../outputs/output/movie.mvi");
 	}
 

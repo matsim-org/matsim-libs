@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -118,14 +118,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.knowledges = knowledges;
 	}
 	
-	public PopulationReaderMatsimV4(final Scenario scenario) {
+	public PopulationReaderMatsimV4(final ScenarioImpl scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.knowledges = new KnowledgesImpl();
 	}
 	
-	public PopulationReaderMatsimV4(final Scenario sc, Knowledges knowledges){
+	public PopulationReaderMatsimV4(final ScenarioImpl sc, Knowledges knowledges){
 		this(sc);
 		this.knowledges = knowledges;
 	}

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -52,7 +52,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
-	protected Scenario scenario = null;
+	protected ScenarioImpl scenario = null;
 	
 	protected static final Id TEST_PERSON_ID = new IdImpl("1");
 	private static final int TEST_PLAN_NR = 0;

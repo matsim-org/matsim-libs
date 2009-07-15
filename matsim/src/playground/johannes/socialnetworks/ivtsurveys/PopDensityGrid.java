@@ -28,7 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
@@ -53,7 +53,7 @@ public class PopDensityGrid {
 		Config config = Gbl.createConfig(new String[]{args[0]});
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario data = loader.getScenario();
+		ScenarioImpl data = loader.getScenario();
 
 		/*
 		 * Make grid...

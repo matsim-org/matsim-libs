@@ -15,7 +15,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -123,7 +123,7 @@ public class FloodLineShape {
 //		String netcdf = "test/input/playground/gregor/data/flooding.sww";
 		String output = "../../analysis/mesh/floodLine.shp";
 		String output2 = "../../analysis/mesh/floodPoints.shp";
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().global().setCoordinateSystem("WGS84_UTM47S");
 		FloodLineShape fls = new FloodLineShape(netcdf, output, output2);
 		fls.run();

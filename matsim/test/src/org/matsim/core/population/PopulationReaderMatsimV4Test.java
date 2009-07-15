@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,7 +43,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 	 * @throws IOException
 	 */
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
-		final Scenario scenario = new ScenarioImpl();
+		final ScenarioImpl scenario = new ScenarioImpl();
 		final NetworkLayer network = scenario.getNetwork();
 		final PopulationImpl population = scenario.getPopulation();
 		

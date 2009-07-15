@@ -32,8 +32,12 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -41,8 +45,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
@@ -97,7 +99,7 @@ public class OsmNetworkReader {
 	 * @param network An empty network where the converted OSM data will be stored.
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 */
-	public OsmNetworkReader(final NetworkLayer network, final CoordinateTransformation transformation) {
+	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation) {
 		this(network, transformation, true);
 	}
 
@@ -108,8 +110,8 @@ public class OsmNetworkReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public OsmNetworkReader(final NetworkLayer network, final CoordinateTransformation transformation, boolean useHighwayDefaults) {
-		this.network = network;
+	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, boolean useHighwayDefaults) {
+		this.network = (NetworkLayer) network;
 		this.transform = transformation;
 
 		if (useHighwayDefaults) {

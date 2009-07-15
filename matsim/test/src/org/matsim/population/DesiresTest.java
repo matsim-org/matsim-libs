@@ -22,7 +22,7 @@ package org.matsim.population;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -45,7 +45,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("running testReadWriteDesires()... ");
 
 		log.info("  creating single person with desires... ");
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		PopulationImpl pop = scenario.getPopulation();
 		PersonImpl p = new PersonImpl(new IdImpl(0));
 		pop.getPersons().put(p.getId(), p);

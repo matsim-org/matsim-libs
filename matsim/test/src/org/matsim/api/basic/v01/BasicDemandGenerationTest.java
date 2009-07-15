@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
@@ -164,7 +164,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		
 		
 		//read population again, now the code gets really ugly, dirty and worth to refactor...
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		PopulationImpl population  = scenario.getPopulation();
 		NetworkLayer network = (NetworkLayer)scenario.getNetwork();
 		//this is really ugly...

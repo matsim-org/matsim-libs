@@ -141,21 +141,21 @@ public class ScenarioImpl implements Scenario {
 	
 	
 	/**
-	 * @see org.matsim.core.api.experimental.Scenario#getActivityFacilities()
+	 * @see org.matsim.core.api.experimental.ScenarioImpl#getActivityFacilities()
 	 */
 	public ActivityFacilities getActivityFacilities() {
 		return this.facilities;
 	}
 
 	/**
-	 * @see org.matsim.core.api.experimental.Scenario#getNetwork()
+	 * @see org.matsim.core.api.experimental.ScenarioImpl#getNetwork()
 	 */
 	public NetworkLayer getNetwork() {
 		return this.network;
 	}
 
 	/**
-	 * @see org.matsim.core.api.experimental.Scenario#getPopulation()
+	 * @see org.matsim.core.api.experimental.ScenarioImpl#getPopulation()
 	 */
 	public PopulationImpl getPopulation() {
 		return this.population;

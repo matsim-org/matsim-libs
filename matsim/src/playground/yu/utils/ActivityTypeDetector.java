@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -151,7 +151,7 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 	}
 
 	public static void main(String[] args) {
-		Scenario s = new ScenarioImpl();
+		ScenarioImpl s = new ScenarioImpl();
 
 		NetworkLayer net = s.getNetwork();
 		new MatsimNetworkReader(net)

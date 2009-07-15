@@ -36,7 +36,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -83,7 +83,7 @@ public class TravelTimeHistogram {
 		Config config = Gbl.createConfig(new String[]{configfile});
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario data = loader.getScenario();
+		ScenarioImpl data = loader.getScenario();
 		PopulationImpl population = data.getPopulation();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		/*

@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
@@ -50,7 +50,7 @@ public class SimplifyPersons {
 		
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario data = loader.getScenario();
+		ScenarioImpl data = loader.getScenario();
 		
 		double centerX = 683000;
 		double centerY = 247000;

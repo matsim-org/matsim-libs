@@ -22,6 +22,7 @@ package org.matsim.core.network;
 
 import java.io.IOException;
 
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
@@ -31,14 +32,14 @@ public class NetworkWriter extends Writer {
 	private NetworkWriterHandler handler = null;
 	private final NetworkLayer network;
 
-	public NetworkWriter(final NetworkLayer network) {
+	public NetworkWriter(final Network network) {
 		this(network, Gbl.getConfig().network().getOutputFile());
 	}
 
-	public NetworkWriter(final NetworkLayer network, final String filename) {
+	public NetworkWriter(final Network network, final String filename) {
 
 		super();
-		this.network = network;
+		this.network = (NetworkLayer) network;
 		this.outfile = filename;
 		// always write out in newest version, currently v1
 		this.dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";

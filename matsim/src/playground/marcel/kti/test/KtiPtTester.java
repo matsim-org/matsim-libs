@@ -23,7 +23,7 @@ package playground.marcel.kti.test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -45,7 +45,7 @@ import playground.marcel.kti.router.SwissHaltestellen;
 public class KtiPtTester {
 
 	private Config config;
-	private Scenario data;
+	private ScenarioImpl data;
 	private Matrix ptTravelTimes = null;
 
 	public KtiPtTester(final String[] args) {

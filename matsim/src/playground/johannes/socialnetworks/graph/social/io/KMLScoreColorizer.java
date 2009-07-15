@@ -29,7 +29,7 @@ import net.opengis.kml._2.LinkType;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -120,7 +120,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		Config config = Gbl.createConfig(new String[]{"/Users/fearonni/vsp-work/runs-svn/run669/config.xml"});
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
+		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
 		
 		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);

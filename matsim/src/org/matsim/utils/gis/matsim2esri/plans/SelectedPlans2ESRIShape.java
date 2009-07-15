@@ -37,7 +37,7 @@ import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -258,7 +258,7 @@ public class SelectedPlans2ESRIShape {
 
 		final String outputDir = "./plans/";
 
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 

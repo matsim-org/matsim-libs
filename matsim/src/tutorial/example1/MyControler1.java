@@ -20,7 +20,7 @@
 
 package tutorial.example1;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -34,7 +34,7 @@ public class MyControler1 {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
 		new MatsimPopulationReader(scenario).readFile(plansFilename);

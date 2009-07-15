@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -35,7 +35,7 @@ public class NetworkToCarNetwork {
 		HashSet<String> excludes = getExludes();
 		
 		//�ffnen des Szenarios
-		Scenario sc = new ScenarioImpl();
+		ScenarioImpl sc = new ScenarioImpl();
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(NET_FILE);
 //		Network net2 = sc.getNetwork();

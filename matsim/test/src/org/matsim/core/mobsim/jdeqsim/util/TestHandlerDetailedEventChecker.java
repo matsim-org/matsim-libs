@@ -8,7 +8,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.ActivityStartEvent;
@@ -160,7 +160,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 		this.printEvent = printEvent;
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario data = loader.getScenario();
+		ScenarioImpl data = loader.getScenario();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		PopulationImpl population = data.getPopulation();
 		if (populationModifier != null) {

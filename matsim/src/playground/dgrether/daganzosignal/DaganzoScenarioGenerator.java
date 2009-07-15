@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
@@ -137,7 +137,7 @@ public class DaganzoScenarioGenerator {
 		}
 	}
 	
-	private void createIds(Scenario sc){
+	private void createIds(ScenarioImpl sc){
 		id1 = sc.createId("1");
 		id2 = sc.createId("2");
 		id4 = sc.createId("4");
@@ -187,7 +187,7 @@ public class DaganzoScenarioGenerator {
 	}
 
 
-	private void createPlans(Scenario scenario) {
+	private void createPlans(ScenarioImpl scenario) {
 		NetworkLayer network = scenario.getNetwork();
 		PopulationImpl population = scenario.getPopulation();
 		int firstHomeEndTime = 0;// 6 * 3600;

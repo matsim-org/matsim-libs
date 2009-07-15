@@ -31,7 +31,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -58,7 +58,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -70,7 +70,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		
 		int endTime = 30*3600;
 		int binSize = 15*60;
@@ -82,7 +82,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	
 	public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
 		String compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
-		Scenario scenario = new ScenarioImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
 		
 		int endTime = 12*3600;
 		int binSize = 1*60;
@@ -92,7 +92,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 				new PessimisticTravelTimeAggregator(binSize, numSlots), binSize, compareFile, false);
 	}
 
-	private final void doTravelTimeCalculatorTest(final Scenario scenario, final TravelTimeDataFactory ttDataFactory, 
+	private final void doTravelTimeCalculatorTest(final ScenarioImpl scenario, final TravelTimeDataFactory ttDataFactory, 
 			final AbstractTravelTimeAggregator aggregator, final int timeBinSize,
 			final String compareFile, final boolean generateNewData) throws IOException {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
@@ -166,7 +166,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testLongTravelTimeInEmptySlot() {
-		Scenario scenario = new ScenarioImpl(loadConfig(null));
+		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
 
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);

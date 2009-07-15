@@ -23,7 +23,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
@@ -47,7 +47,7 @@ public class ScoreGrid {
 		Config config = Gbl.createConfig(new String[]{"/Users/fearonni/vsp-work/runs-svn/run669/config.xml"});
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
+		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
 		CoordinateTransformation transform = new CH1903LV03toWGS84();
 //		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);

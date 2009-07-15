@@ -20,7 +20,7 @@
 
 package playground.yu.newPlans;
 
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -83,7 +83,7 @@ public class DoublePlan extends NewPopulation {
 		String plansFilename = "../matsimTests/breakdown/plans100withPt.xml";
 		String outputPlansFilename = "../matsimTests/breakdown/plans200withPt.xml";
 
-		Scenario s = new ScenarioImpl();
+		ScenarioImpl s = new ScenarioImpl();
 
 		NetworkLayer network = s.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);

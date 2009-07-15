@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
@@ -62,7 +62,7 @@ public class BlockingStopDemo {
 	private static final double startTime = 7.0 * 3600;
 	private static final double busDeparture = 7.0 * 3600 + 3 * 60 + 15;
 
-	private final Scenario scenario = new ScenarioImpl();
+	private final ScenarioImpl scenario = new ScenarioImpl();
 	private final TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 	private final TransitSchedule schedule = this.builder.createTransitSchedule();
 	private final Id[] ids = new Id[nOfLinks * 2 + 2];
