@@ -148,7 +148,7 @@ public class DemandGenerator {
 		for (; number > 0; number--) {
 			Person pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
 			pop.addPerson( pers ) ;
-			Plan plan = pb.createPlan(pers);
+			Plan plan = pb.createPlan();
 			Point p = getRandomPointInFeature(rnd, ft);
 			Activity act = pb.createActivityFromCoord("h", scenario.createCoord(p.getX(), p.getY()));
 			plan.addActivity(act);
