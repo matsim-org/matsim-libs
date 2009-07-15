@@ -36,6 +36,7 @@ import org.matsim.core.population.routes.RouteWRefs;
  * @author dgrether
  */
 public class NetworkFactory implements Serializable, NetworkBuilder {
+	// yyyyyy is it NetworkFactory or NetworkBuilder or do we really need both?  kai, jul09
 
 	private LinkFactory linkFactory = null;
 

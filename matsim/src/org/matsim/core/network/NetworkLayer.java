@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Network;
@@ -418,6 +419,7 @@ public class NetworkLayer extends Layer implements Network {
 	 * is successfully removed.
 	 */
 	public boolean removeLink(final LinkImpl link) {
+		// yy should eventually be added to the api.  kai, jul09
 		Id id = link.getId();
 		LinkImpl l = (LinkImpl)this.locations.get(id);
 
