@@ -23,7 +23,6 @@ package org.matsim.world;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
@@ -153,21 +152,6 @@ public abstract class Layer implements Serializable {
 	@Deprecated // string-based methods are discouraged
 	public final Location getLocation(final String location_id) {
 		return this.locations.get(new IdImpl(location_id));
-	}
-
-	/**
-	 * @param center the center coordinate of the to-be-returned locations.
-	 * @return all locations whose center coordinate equals <code>center</code>
-	 */
-	public final List<Location> getLocations(final Coord center) {
-		/* Hmm, shouldn't there be at most one location with equal center? -marcel/17mar2008 */
-		ArrayList<Location> locs = new ArrayList<Location>();
-		Iterator<Location> loc_it = this.locations.values().iterator();
-		while (loc_it.hasNext()) {
-			Location loc = loc_it.next();
-			if (loc.getCoord().equals(center)) { locs.add(loc); }
-		}
-		return locs;
 	}
 
 	/**
