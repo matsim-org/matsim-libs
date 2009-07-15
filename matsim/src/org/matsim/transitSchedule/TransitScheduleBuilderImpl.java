@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package org.matsim.transitSchedule;
 
 import java.util.List;
 
@@ -26,14 +26,15 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.api.Departure;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
+
 
 public class TransitScheduleBuilderImpl implements TransitScheduleBuilder {
 
@@ -54,7 +55,11 @@ public class TransitScheduleBuilderImpl implements TransitScheduleBuilder {
 	}
 
 	public TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate) {
-		return new TransitStopFacility(facilityId, coordinate);
+		return new TransitStopFacilityImpl(facilityId, coordinate);
+	}
+
+	public TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane) {
+		return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
 	}
 	
 	public Departure createDeparture(final Id departureId, final double time) {

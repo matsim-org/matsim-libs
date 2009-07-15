@@ -27,6 +27,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
+import org.matsim.core.events.Events;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -35,16 +36,15 @@ import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.TransitVehicle;
-import playground.marcel.pt.transitSchedule.api.Departure;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 public class TransitDriver implements TransitDriverAgent {
 
@@ -142,13 +142,14 @@ public class TransitDriver implements TransitDriverAgent {
 			int cntEgress = passengersLeaving.size();
 			int cntAccess = passengersEntering.size();
 			if (cntAccess > 0 || cntEgress > 0) {
+				Events events = TransitQueueSimulation.getEvents();
 				stopTime = 10.0 + cntAccess * 5 + cntEgress * 3;
-				TransitQueueSimulation.getEvents().processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
+				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 
 				for (PassengerAgent passenger : passengersLeaving) {
 					this.vehicle.removePassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
-					TransitQueueSimulation.getEvents().processEvent(new PersonLeavesVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+					events.processEvent(new PersonLeavesVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 					System.out.println("passenger exit: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 					agent.teleportToLink(stop.getLink());
 					agent.legEnds(now);
@@ -157,11 +158,11 @@ public class TransitDriver implements TransitDriverAgent {
 				for (PassengerAgent passenger : passengersEntering) {
 					this.vehicle.addPassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
-					TransitQueueSimulation.getEvents().processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+					events.processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 				}
 
-				TransitQueueSimulation.getEvents().processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now + stopTime, this.vehicle.getBasicVehicle().getId(), stop.getId()));
+				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now + stopTime, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 			}
 			return stopTime;
 		}

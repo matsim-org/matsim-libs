@@ -32,14 +32,16 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.api.Departure;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class TransitScheduleReaderTest extends MatsimTestCase {
 

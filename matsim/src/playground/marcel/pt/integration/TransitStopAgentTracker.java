@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
 public class TransitStopAgentTracker {

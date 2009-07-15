@@ -32,10 +32,10 @@ import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.events.handlers.BasicPersonEntersVehicleEventHandler;
 import org.matsim.core.basic.v01.events.handlers.BasicPersonLeavesVehicleEventHandler;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 
-import playground.marcel.pt.transitSchedule.api.Departure;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicleEventHandler, BasicPersonLeavesVehicleEventHandler {
 

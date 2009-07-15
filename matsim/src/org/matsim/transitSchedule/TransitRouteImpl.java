@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package org.matsim.transitSchedule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,11 +29,11 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.api.Departure;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 /**
  * Describes a route of a transit line, including its stops and the departures along this route.

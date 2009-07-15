@@ -12,8 +12,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.transitSchedule.api.TransitSchedule;
 
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.Walk;
 

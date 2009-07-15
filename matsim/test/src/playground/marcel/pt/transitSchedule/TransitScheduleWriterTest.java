@@ -36,15 +36,18 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.transitSchedule.api.Departure;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class TransitScheduleWriterTest extends MatsimTestCase {
 
@@ -75,19 +78,19 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 
 		// prepare some schedule, without network-route
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(4);
-		stops.add(new TransitRouteStopImpl(stop1, Time.UNDEFINED_TIME, 0));
-		stops.add(new TransitRouteStopImpl(stop2, 90, 120));
-		stops.add(new TransitRouteStopImpl(stop3, Time.UNDEFINED_TIME, 300));
-		stops.add(new TransitRouteStopImpl(stop4, 400, Time.UNDEFINED_TIME));
+		stops.add(builder.createTransitRouteStop(stop1, Time.UNDEFINED_TIME, 0));
+		stops.add(builder.createTransitRouteStop(stop2, 90, 120));
+		stops.add(builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, 300));
+		stops.add(builder.createTransitRouteStop(stop4, 400, Time.UNDEFINED_TIME));
 
-		TransitRoute route1 = new TransitRouteImpl(new IdImpl(1), null, stops, TransportMode.bus);
+		TransitRoute route1 = builder.createTransitRoute(new IdImpl(1), null, stops, TransportMode.bus);
 		route1.setDescription("Just a comment.");
 
-		route1.addDeparture(new DepartureImpl(new IdImpl("2"), 7.0*3600));
-		route1.addDeparture(new DepartureImpl(new IdImpl("4"), 7.0*3600 + 300));
-		route1.addDeparture(new DepartureImpl(new IdImpl("7"), 7.0*3600 + 600));
+		route1.addDeparture(builder.createDeparture(new IdImpl("2"), 7.0*3600));
+		route1.addDeparture(builder.createDeparture(new IdImpl("4"), 7.0*3600 + 300));
+		route1.addDeparture(builder.createDeparture(new IdImpl("7"), 7.0*3600 + 600));
 
-		TransitLine line1 = new TransitLineImpl(new IdImpl("8"));
+		TransitLine line1 = builder.createTransitLine(new IdImpl("8"));
 		line1.addRoute(route1);
 
 		schedule1.addTransitLine(line1);
@@ -108,7 +111,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		links.add(l2);
 		links.add(l3);
 		route.setLinks(l1, links, l4);
-		TransitRoute route2 = new TransitRouteImpl(new IdImpl(2), route, stops, TransportMode.bus);
+		TransitRoute route2 = builder.createTransitRoute(new IdImpl(2), route, stops, TransportMode.bus);
 		line1.addRoute(route2);
 
 		// write and read version with network-route

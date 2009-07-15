@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Departure.java
+ * TransitRouteStop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.api;
+package org.matsim.transitSchedule.api;
 
-import org.matsim.api.basic.v01.Identifiable;
-import org.matsim.vehicles.BasicVehicle;
 
 /**
- * Describes a single departure along a route in a transit line.
+ * Describes the stop within a route of a transit line. Specifies also at
+ * what time a headway is expected at the stop as offset from the route start.
  * 
  * @author mrieser
  */
-public interface Departure extends Identifiable {
+public interface TransitRouteStop {
 
-	public abstract double getDepartureTime();
+	public abstract TransitStopFacility getStopFacility();
 
-	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
-	public abstract void setVehicle(final BasicVehicle vehicle);
+	public abstract double getDepartureDelay();
 
-	public abstract BasicVehicle getVehicle();
+	public abstract double getArrivalDelay();
 
 }

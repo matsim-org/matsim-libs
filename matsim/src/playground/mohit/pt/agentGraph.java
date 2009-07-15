@@ -16,11 +16,11 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.demo.AccessEgressDemo;
-import playground.marcel.pt.transitSchedule.api.Departure;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 public class agentGraph extends Frame implements ActionListener{
 	AccessEgressDemo a;
 	TransitRouteAccessEgressAnalysis b;

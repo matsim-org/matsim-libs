@@ -25,9 +25,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.transitSchedule.api.TransitLine;
 
 public class ExperimentalTransitRoute extends GenericRouteImpl {
 

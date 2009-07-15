@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitSchedule.java
+ * TransitRoute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.api;
+package org.matsim.transitSchedule.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
- * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time data
- * and the infrastructure in form of stop facilities.
+ * Describes a route of a transit line, including its stops and the departures along this route.
  * 
  * @author mrieser
  */
-public interface TransitSchedule {
+public interface TransitRoute extends Identifiable {
 
-	public abstract void addTransitLine(final TransitLine line);
+	public abstract void setDescription(final String description);
 
-	public abstract void addStopFacility(final TransitStopFacility stop);
+	public abstract String getDescription();
 
-	public abstract Map<Id, TransitLine> getTransitLines();
+	/**
+	 * Sets the transport mode with which this transit route is handled, e.g.
+	 * {@link TransportMode#bus} or {@link TransportMode#train}.
+	 *
+	 * @param mode
+	 */
+	public abstract void setTransportMode(final TransportMode mode);
 
-	public abstract Map<Id, TransitStopFacility> getFacilities();
-	
-	public abstract TransitScheduleBuilder getBuilder();
+	public abstract TransportMode getTransportMode();
+
+	public abstract void addDeparture(final Departure departure);
+
+	public abstract Map<Id, Departure> getDepartures();
+
+	public abstract NetworkRoute getRoute();
+
+	public abstract void setRoute(final NetworkRoute route);
+
+	public abstract List<TransitRouteStop> getStops();
+
+	public abstract TransitRouteStop getStop(final TransitStopFacility stop);
 
 }

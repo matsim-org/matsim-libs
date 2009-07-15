@@ -28,7 +28,8 @@ import java.util.List;
 import javax.media.opengl.GL;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFData.Receiver;
@@ -38,7 +39,6 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import playground.marcel.pt.integration.TransitStopAgentTracker;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
 
 public class FacilityDrawer {
 	

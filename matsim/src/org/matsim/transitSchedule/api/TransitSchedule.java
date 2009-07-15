@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitRouteStop.java
+ * TransitSchedule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.api;
+package org.matsim.transitSchedule.api;
 
-import org.matsim.transitSchedule.TransitStopFacility;
+import java.util.Map;
+
+import org.matsim.api.basic.v01.Id;
 
 /**
- * Describes the stop within a route of a transit line. Specifies also at
- * what time a headway is expected at the stop as offset from the route start.
+ * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time data
+ * and the infrastructure in form of stop facilities.
  * 
  * @author mrieser
  */
-public interface TransitRouteStop {
+public interface TransitSchedule {
 
-	public abstract TransitStopFacility getStopFacility();
+	public abstract void addTransitLine(final TransitLine line);
 
-	public abstract double getDepartureDelay();
+	public abstract void addStopFacility(final TransitStopFacility stop);
 
-	public abstract double getArrivalDelay();
+	public abstract Map<Id, TransitLine> getTransitLines();
+
+	public abstract Map<Id, TransitStopFacility> getFacilities();
+	
+	public abstract TransitScheduleBuilder getBuilder();
 
 }

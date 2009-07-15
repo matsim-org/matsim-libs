@@ -43,17 +43,19 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import playground.marcel.SoldnerBerlinToWGS84;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 /**
  * Reads transit schedule information from BERTA XML files once used 
@@ -103,6 +105,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 
 	private final TransitSchedule schedule;
+	private final TransitScheduleBuilder builder;
 	private TransitLine currentTransitLine = null;
 	private BLinie tmpLinie = null;
 	private BHaltepunkt tmpHaltepunkt = null;
@@ -120,6 +123,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	
 	public TransitScheduleReaderBerta(final TransitSchedule schedule, final CoordinateTransformation coordTransformation) {
 		this.schedule = schedule;
+		this.builder = schedule.getBuilder();
 		this.wgs84ToRBS = coordTransformation;
 	}
 
@@ -201,7 +205,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		} else if (BETRIEBSZWEIGNUMMER.equals(name)) {
 			this.tmpLinie.betriebszweignummer = content;
 		} else if (LINIE.equals(name)) {
-			this.currentTransitLine = new TransitLineImpl(new IdImpl(this.tmpLinie.betriebszweig + " " + this.tmpLinie.id));
+			this.currentTransitLine = this.builder.createTransitLine(new IdImpl(this.tmpLinie.betriebszweig + " " + this.tmpLinie.id));
 		} else if (LINIENFAHRPLAN.equals(name)) {
 			if (this.currentTransitLine.getRoutes().size() > 0) {
 				this.schedule.addTransitLine(this.currentTransitLine);
@@ -244,7 +248,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 				transitRoutes.put(tRoute.getId(), tRoute);
 				this.currentTransitLine.addRoute(tRoute);
 			}
-			tRoute.addDeparture(new DepartureImpl(new IdImpl(this.departureCounter++), fahrt.departureTime));
+			tRoute.addDeparture(this.builder.createDeparture(new IdImpl(this.departureCounter++), fahrt.departureTime));
 		}
 	}
 
@@ -255,12 +259,12 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		for (BFahrzeitprofilpunkt profilpunkt : fahrzeitprofil.profilpunkte) {
 			timeOffset += profilpunkt.fahrzeit;
 			if (profilpunkt.routenpunkt.realStop) {
-				stops.add(new TransitRouteStopImpl(getStopFacility(profilpunkt.routenpunkt.haltepunkt), timeOffset, timeOffset + profilpunkt.wartezeit));
+				stops.add(this.builder.createTransitRouteStop(getStopFacility(profilpunkt.routenpunkt.haltepunkt), timeOffset, timeOffset + profilpunkt.wartezeit));
 			}
 			timeOffset += profilpunkt.wartezeit;
 		}
 		Id routeId = getTransitRouteId(route, fahrzeitprofil);
-		TransitRoute transitRoute = new TransitRouteImpl(routeId, null, stops, TransportMode.bus); // TODO find correct transport mode
+		TransitRoute transitRoute = this.builder.createTransitRoute(routeId, null, stops, TransportMode.bus); // TODO find correct transport mode
 		transitRoute.setDescription("Linie " + this.tmpLinie.publicId);
 		return transitRoute;
 	}

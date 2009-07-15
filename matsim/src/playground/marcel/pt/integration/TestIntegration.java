@@ -32,14 +32,14 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.run.OTFVis;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
-import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderBerta;
-import playground.marcel.pt.transitSchedule.TransitScheduleReaderV1;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 
 public class TestIntegration {

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Departure.java
+ * TransitLine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,45 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package org.matsim.transitSchedule.api;
+
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.vehicles.BasicVehicle;
-
-import playground.marcel.pt.transitSchedule.api.Departure;
+import org.matsim.api.basic.v01.Identifiable;
 
 /**
- * Describes a single departure along a route in a transit line.
+ * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
  * 
  * @author mrieser
  */
-public class DepartureImpl implements Departure {
+public interface TransitLine extends Identifiable {
 
-	private final Id id;
-	private final double departureTime;
-	
-	private BasicVehicle vehicle = null;
+	public abstract void addRoute(final TransitRoute transitRoute);
 
-	protected DepartureImpl(final Id id, final double departureTime) {
-		this.id = id;
-		this.departureTime = departureTime;
-	}
+	public abstract Map<Id, TransitRoute> getRoutes();
 
-	public Id getId() {
-		return this.id;
-	}
-
-	public double getDepartureTime() {
-		return this.departureTime;
-	}
-	
-	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
-	public void setVehicle(final BasicVehicle vehicle) {
-		this.vehicle = vehicle;
-	}
-	
-	public BasicVehicle getVehicle() {
-		return this.vehicle;
-	}
+	public abstract void removeRoute(final TransitRoute route);
 
 }

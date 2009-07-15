@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
  * Additional methods for drivers of public transport vehicles.

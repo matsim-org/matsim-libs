@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitLine.java
+ * ITransitStopFacility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,24 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.api;
+package org.matsim.transitSchedule.api;
 
-import java.util.Map;
-
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.core.facilities.Facility;
+import org.matsim.core.network.LinkImpl;
 
 /**
- * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
- * 
+ * A facility (infrastructure) describing a public transport stop.
+ *
  * @author mrieser
  */
-public interface TransitLine extends Identifiable {
+public interface TransitStopFacility extends Facility {
 
-	public abstract void addRoute(final TransitRoute transitRoute);
-
-	public abstract Map<Id, TransitRoute> getRoutes();
-
-	public abstract void removeRoute(final TransitRoute route);
+	boolean getIsBlockingLane();
+	
+	public void setLink(final LinkImpl link);
 
 }

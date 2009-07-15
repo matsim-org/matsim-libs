@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitScheduleBuilder.java
+ * TransitRouteStop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,28 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.api;
+package org.matsim.transitSchedule;
 
-import java.util.List;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.TransitStopFacility;
 
-public interface TransitScheduleBuilder {
+/**
+ * Describes the stop within a route of a transit line. Specifies also at
+ * what time a headway is expected at the stop as offset from the route start.
+ * 
+ * @author mrieser
+ */
+public class TransitRouteStopImpl implements TransitRouteStop {
 
-	public abstract TransitSchedule createTransitSchedule();
-	
-	public abstract TransitLine createTransitLine(final Id lineId);
-	
-	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode);
-	
-	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
-	
-	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate);
-	
-	public abstract Departure createDeparture(final Id departureId, final double time);
+	private final TransitStopFacility stop;
+	private final double departureDelay;
+	private final double arrivalDelay;
 
+	protected TransitRouteStopImpl(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
+		this.stop = stop;
+		this.departureDelay = departureDelay;
+		this.arrivalDelay = arrivalDelay;
+	}
+
+	public TransitStopFacility getStopFacility() {
+		return this.stop;
+	}
+
+	public double getDepartureDelay() {
+		return this.departureDelay;
+	}
+
+	public double getArrivalDelay() {
+		return this.arrivalDelay;
+	}
 }

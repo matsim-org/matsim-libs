@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * TransitScheduleBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package org.matsim.transitSchedule.api;
 
+import java.util.List;
+
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.population.routes.NetworkRoute;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
+/**
+ * @author mrieser
+ */
+public interface TransitScheduleBuilder {
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
-
-	private final TransitStopFacility exitStop;
-
-	public BusPassenger(final Id id, final TransitStopFacility exitStop) {
-		super(id);
-		this.exitStop = exitStop;
-	}
-
-	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return this.exitStop == stop;
-	}
-
-	public boolean ptLineAvailable(final TransitLine line) {
-		// TODO [MR] Auto-generated method stub
-		return true;
-	}
+	public abstract TransitSchedule createTransitSchedule();
+	
+	public abstract TransitLine createTransitLine(final Id lineId);
+	
+	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode);
+	
+	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
+	
+	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate);
+	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane);
+	
+	public abstract Departure createDeparture(final Id departureId, final double time);
 
 }

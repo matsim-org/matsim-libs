@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitRoute.java
+ * Departure.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.api;
-
-import java.util.List;
-import java.util.Map;
+package org.matsim.transitSchedule;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.Identifiable;
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.vehicles.BasicVehicle;
+
 
 /**
- * Describes a route of a transit line, including its stops and the departures along this route.
+ * Describes a single departure along a route in a transit line.
  * 
  * @author mrieser
  */
-public interface TransitRoute extends Identifiable {
+public class DepartureImpl implements Departure {
 
-	public abstract void setDescription(final String description);
+	private final Id id;
+	private final double departureTime;
+	
+	private BasicVehicle vehicle = null;
 
-	public abstract String getDescription();
+	protected DepartureImpl(final Id id, final double departureTime) {
+		this.id = id;
+		this.departureTime = departureTime;
+	}
 
-	/**
-	 * Sets the transport mode with which this transit route is handled, e.g.
-	 * {@link TransportMode#bus} or {@link TransportMode#train}.
-	 *
-	 * @param mode
-	 */
-	public abstract void setTransportMode(final TransportMode mode);
+	public Id getId() {
+		return this.id;
+	}
 
-	public abstract TransportMode getTransportMode();
-
-	public abstract void addDeparture(final Departure departure);
-
-	public abstract Map<Id, Departure> getDepartures();
-
-	public abstract NetworkRoute getRoute();
-
-	public abstract void setRoute(final NetworkRoute route);
-
-	public abstract List<TransitRouteStop> getStops();
-
-	public abstract TransitRouteStop getStop(final TransitStopFacility stop);
+	public double getDepartureTime() {
+		return this.departureTime;
+	}
+	
+	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
+	public void setVehicle(final BasicVehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+	
+	public BasicVehicle getVehicle() {
+		return this.vehicle;
+	}
 
 }

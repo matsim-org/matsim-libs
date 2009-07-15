@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitRouteStop.java
+ * Departure.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,39 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package org.matsim.transitSchedule.api;
 
-import org.matsim.transitSchedule.TransitStopFacility;
-
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.vehicles.BasicVehicle;
 
 /**
- * Describes the stop within a route of a transit line. Specifies also at
- * what time a headway is expected at the stop as offset from the route start.
+ * Describes a single departure along a route in a transit line.
  * 
  * @author mrieser
  */
-public class TransitRouteStopImpl implements TransitRouteStop {
+public interface Departure extends Identifiable {
 
-	private final TransitStopFacility stop;
-	private final double departureDelay;
-	private final double arrivalDelay;
+	public abstract double getDepartureTime();
 
-	protected TransitRouteStopImpl(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		this.stop = stop;
-		this.departureDelay = departureDelay;
-		this.arrivalDelay = arrivalDelay;
-	}
+	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
+	public abstract void setVehicle(final BasicVehicle vehicle);
 
-	public TransitStopFacility getStopFacility() {
-		return this.stop;
-	}
+	public abstract BasicVehicle getVehicle();
 
-	public double getDepartureDelay() {
-		return this.departureDelay;
-	}
-
-	public double getArrivalDelay() {
-		return this.arrivalDelay;
-	}
 }

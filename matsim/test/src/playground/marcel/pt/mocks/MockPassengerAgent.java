@@ -21,10 +21,10 @@
 package playground.marcel.pt.mocks;
 
 import org.matsim.core.facilities.ActivityFacility;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
 
 public class MockPassengerAgent implements PassengerAgent {
 

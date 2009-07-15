@@ -22,26 +22,26 @@ package org.matsim.transitSchedule;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.Facility;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
  *
  * @author mrieser
  */
-public class TransitStopFacility implements Facility {
+public class TransitStopFacilityImpl implements TransitStopFacility {
 
 	private final Id id;
 	private final Coord coord;
 	private LinkImpl link = null;
 	private final boolean isBlockingLane;
 
-	public TransitStopFacility(final Id id, final Coord coord) {
+	protected TransitStopFacilityImpl(final Id id, final Coord coord) {
 		this(id, coord, false);
 	}
 
-	public TransitStopFacility(final Id id, final Coord coord, final boolean isBlockingLane) {
+	protected TransitStopFacilityImpl(final Id id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;
 		this.coord = coord;
 		this.isBlockingLane = isBlockingLane;

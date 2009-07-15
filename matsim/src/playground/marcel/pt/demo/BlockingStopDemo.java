@@ -39,19 +39,19 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.analysis.VehicleTracker;
 import playground.marcel.pt.integration.ExperimentalTransitRoute;
 import playground.marcel.pt.integration.TransitQueueSimulation;
-import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
 
 public class BlockingStopDemo {
 
@@ -101,7 +101,7 @@ public class BlockingStopDemo {
 
 		// line 1
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i] = new TransitStopFacility(this.ids[i], this.scenario.createCoord(1000 + i*500, 0), false);
+			stops[i] = this.builder.createTransitStopFacility(this.ids[i], this.scenario.createCoord(1000 + i*500, 0), false);
 			stops[i].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i+1]));
 			this.schedule.addStopFacility(stops[i]);
 			stopList.add(this.builder.createTransitRouteStop(stops[i], 100 + i*70, 120 + i*70));
@@ -126,7 +126,7 @@ public class BlockingStopDemo {
 		// line 2
 		stopList = new ArrayList<TransitRouteStop>(nOfStops);
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i+nOfStops] = new TransitStopFacility(this.ids[i+nOfStops], this.scenario.createCoord(1000 + i*500, 500), true);
+			stops[i+nOfStops] = this.builder.createTransitStopFacility(this.ids[i+nOfStops], this.scenario.createCoord(1000 + i*500, 500), true);
 			stops[i+nOfStops].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i+1+nOfLinks]));
 			this.schedule.addStopFacility(stops[i+nOfStops]);
 			stopList.add(this.builder.createTransitRouteStop(stops[i+nOfStops], 100 + i*70, 120 + i*70));

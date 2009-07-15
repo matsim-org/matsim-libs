@@ -26,10 +26,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 
-import playground.marcel.pt.transitSchedule.api.TransitLine;
-import playground.marcel.pt.transitSchedule.api.TransitRoute;
-import playground.marcel.pt.transitSchedule.api.TransitRouteStop;
 
 
 /*package*/ class TransitRouterNetwork {

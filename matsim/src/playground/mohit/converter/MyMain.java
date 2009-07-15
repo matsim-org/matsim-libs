@@ -3,10 +3,11 @@ package playground.mohit.converter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import playground.marcel.pt.transitSchedule.TransitScheduleBuilderImpl;
-import playground.marcel.pt.transitSchedule.TransitScheduleWriterV1;
-import playground.marcel.pt.transitSchedule.api.TransitSchedule;
-import playground.marcel.pt.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+
 import playground.mohit.converter.VisumNetwork.Departure;
 import playground.mohit.converter.VisumNetwork.LineRouteItem;
 import playground.mohit.converter.VisumNetwork.Stop;
@@ -24,7 +25,7 @@ public class MyMain {
 		final VisumNetwork vNetwork = new VisumNetwork();
 		  
 		try {
-			new playground.mohit.converter.VisumNetworkReader(vNetwork).read("C:\\Users\\MOSES\\Desktop\\netwF.net"); // yalcin
+			new playground.mohit.converter.VisumNetworkReader(vNetwork).read("/Users/cello/Desktop/Mohit/netwF.net"); // yalcin
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
@@ -70,7 +71,7 @@ public class MyMain {
 		new Visum2TransitSchedule(vNetwork, schedule).convert();
 		
 		try {
-			new TransitScheduleWriterV1(schedule).write("C:\\Users\\MOSES\\Desktop\\transitschedulefina.xml");
+			new TransitScheduleWriterV1(schedule).write("/Users/cello/Desktop/Mohit/berlinSchedule.xml");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

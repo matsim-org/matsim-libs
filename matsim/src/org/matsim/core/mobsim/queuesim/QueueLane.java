@@ -45,7 +45,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.transitSchedule.TransitStopFacility;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
