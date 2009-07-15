@@ -41,6 +41,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 
+import playground.balmermi.modules.PersonStupidDeleteKnowledgeForStreamingModule;
+
 public class ScenarioDilute {
 
 	//////////////////////////////////////////////////////////////////////
@@ -127,6 +129,7 @@ public class ScenarioDilute {
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest);
 		filter.setAlternativeAOI(center,radius);
 		population.addAlgorithm(filter);
+		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sl.getScenario().getKnowledges()));
 		Gbl.printMemoryUsage();
 		System.out.println("done. (adding algorithms)");
 
