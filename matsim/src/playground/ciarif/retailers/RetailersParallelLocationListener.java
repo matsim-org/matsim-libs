@@ -29,6 +29,7 @@ package playground.ciarif.retailers;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -74,7 +75,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private Object[] links = null;
+	private ArrayList<LinkRetailersImpl> links = null;
 	
 	public RetailersParallelLocationListener() {
 	}
@@ -117,7 +118,6 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 					}
 					else { // retailer does not exists yet
 						Retailer r = new Retailer(rId, null);
-						System.out.println("The strategy " + entries[2] + " will be added to the retailer = " + rId);
 						r.addStrategy(controler, entries[2], this.links);
 						Id fId = new IdImpl (entries[1]);
 						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);

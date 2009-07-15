@@ -6,25 +6,33 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 
 public class LinksRetailerReader {
 	public final static String CONFIG_LINKS = "links";
 	public final static String CONFIG_GROUP = "Retailers";
 	private String linkIdFile;// = null;
-	protected Object[] links;
+	protected ArrayList<LinkRetailersImpl> links = new ArrayList<LinkRetailersImpl>();
 	private Controler controler;
-	
+	private ArrayList<Id> actualLinks;
+	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
 	public LinksRetailerReader (Controler controler){
 		this.controler = controler;
 	}
 	
-	public Object[] ReadLinks() {
+	public LinksRetailerReader(Controler controler, ArrayList<Id> retailersLinks) {
+		this.controler = controler;
+		this.actualLinks = retailersLinks;
+	}
+
+	public ArrayList<LinkRetailersImpl> ReadLinks() {
 		
 		this.linkIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS);
 		if (this.linkIdFile != null) { 
@@ -56,18 +64,40 @@ public class LinksRetailerReader {
 					allowed_links.add(l);
 				}
 				System.out.println("Links allowed for relocation have been added");
-				this.links = allowed_links.toArray();
+				this.links = allowed_links;
 			} 
 			catch (IOException e) {
 				Gbl.errorMsg(e);
 			}
 		}
 		else {//Francesco: if no file stating which links are allowed is defined, any link is allowed.
-			this.links = controler.getNetwork().getLinks().values().toArray();
-			//this.links = new ArrayList<Object>(controler.getNetwork().getLinks().values());
-			System.out.println("All links are allowed for relocation");
+			Integer linksMax = Integer.parseInt(String.valueOf(Math.round(actualLinks.size()*4)));
+			log.info("links max= " + linksMax);
+			log.info("actual Links= " + actualLinks);
+			//TODO note that usually the ratio links/ actual links is so large than this number doesn't really matter, but a check in this sense would be not bad! 
+			int i=0;
+			while (this.links.size()<linksMax) {
+				log.info("links size= " + links.size());
+				if (this.links.size()<actualLinks.size()) {
+					LinkRetailersImpl link = new LinkRetailersImpl (controler.getNetwork().getLink(actualLinks.get(i)), controler.getNetwork());
+					this.links.add(link);
+					i=i+1;
+				}
+				else {
+					int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
+					LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],controler.getNetwork());
+					if (actualLinks.contains(link.getId())) {}
+					else {	
+						this.links.add(link);
+					}	
+				}	
+				for (LinkRetailersImpl l:this.links) {
+					log.info("This link is allowed for relocation: " + l.getId()); 
+				}
+			
+				
+			}
 		}
-		return links;
-	}
-
+		return this.links;
+	}	
 }

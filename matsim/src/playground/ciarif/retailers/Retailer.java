@@ -1,5 +1,6 @@
 package playground.ciarif.retailers;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.matsim.api.basic.v01.Id;
@@ -28,22 +29,22 @@ public class Retailer {
 		return true;
 	}
 	
-	public final boolean addStrategy (Controler controler, String strategyName, Object [] links) {
+	public final boolean addStrategy (Controler controler, String strategyName, ArrayList<LinkRetailersImpl> arrayList) {
 		
 		if (strategyName.contains(RandomRetailerStrategy.NAME)) {
-			this.strategy = new RandomRetailerStrategy(controler.getNetwork(), links, controler.getWorld());
+			this.strategy = new RandomRetailerStrategy(controler.getNetwork(), arrayList, controler.getWorld());
 			return true;
 		}
 		else if (strategyName.contains(MaxLinkRetailerStrategy.NAME)) {
-			this.strategy = new MaxLinkRetailerStrategy (controler, links);
+			this.strategy = new MaxLinkRetailerStrategy (controler, arrayList);
 			return true;
 		}
 		else if (strategyName.contains(LogitMaxLinkRetailerStrategy.NAME)) {
-			this.strategy = new LogitMaxLinkRetailerStrategy (controler, links);
+			this.strategy = new LogitMaxLinkRetailerStrategy (controler, arrayList);
 			return true;
 		}
 		else if (strategyName.contains(CatchmentAreaRetailerStrategy.NAME)) {
-			this.strategy = new CatchmentAreaRetailerStrategy (controler, links);
+			this.strategy = new CatchmentAreaRetailerStrategy (controler, arrayList);
 			return true;
 		}
 		else { throw new RuntimeException("The strategy has been not added!"); }

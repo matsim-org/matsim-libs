@@ -31,8 +31,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.geotools.data.coverage.grid.file.FSCatalogEntry;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -44,8 +47,10 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -56,7 +61,7 @@ import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class RetailersSequentialLocationListener implements StartupListener, IterationEndsListener {
 	
-	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
+	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
 	
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
@@ -72,7 +77,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private Object[] links = null;
+	private ArrayList<LinkRetailersImpl> links = null;
 	private RetailZones retailZones = new RetailZones();
 	private ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
 	public RetailersSequentialLocationListener() {
@@ -86,8 +91,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
-		this.lrr = new LinksRetailerReader (controler);
-		this.links = lrr.ReadLinks(); 
+		
 		this.txf = new MakeATableFromXMLFacilities("output/facilities_table2.txt");
 		ActivityFacilitiesImpl facs = (ActivityFacilitiesImpl) controler.getFacilities();
 		txf.write(facs);
@@ -95,10 +99,12 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
 		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
+		ArrayList<Id> retailersLinks = new ArrayList<Id>();
 		if (this.facilityIdFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");
 		}
+		
 		else {
-			try {
+			try { //TODO Modify this!!!! In the sequential case other attributes for the retailer are needed, or in any case some of those which are now there are completely useless!!!!!
 				this.retailers = new Retailers();
 				FileReader fr = new FileReader(this.facilityIdFile);
 				BufferedReader br = new BufferedReader(fr);
@@ -113,14 +119,16 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 						Id fId = new IdImpl (entries[1]);
 						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
 						this.retailers.getRetailers().get(rId).addFacility(f);
+						retailersLinks.add(f.getLink().getId());
 					}
 					else { // retailer does not exists yet
 						Retailer r = new Retailer(rId, null);
 						System.out.println("The strategy " + entries[2] + " will be added to the retailer = " + rId);
-						r.addStrategy(controler, entries[2], this.links);
+						//r.addSequentialStrategy(controler, entries[2], this.links);
 						Id fId = new IdImpl (entries[1]);
 						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
+						retailersLinks.add(f.getLink().getId());
 						this.retailers.addRetailer(r);
 					}
 				}
@@ -129,6 +137,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				Gbl.errorMsg(e);
 			}
 		}
+		this.lrr = new LinksRetailerReader (controler, retailersLinks);
+		this.links = lrr.ReadLinks(); 
 		Collection<PersonImpl> persons = controler.getPopulation().getPersons().values();
 		int n =3; // TODO: get this from the config file  
 		System.out.println("Number of retail zones = "+  n*n);
@@ -177,71 +187,43 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		ArrayList<Consumer> consumers = new ArrayList<Consumer>();
-		// TODO could try to use a double ""for" cycle in order to avoid to use the getIteration method
-		// the first is 0...n where n is the number of times the gravity model needs to 
-		// be computed, the second is 0...k, where k is the number of iterations needed 
-		// in order to obtain a relaxed state, or maybe use a while.
-		//int iter = controler.getIteration();
-		//if (controler.getIteration()>0 & controler.getIteration()%5==0){
+		Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+		ArrayList<ActivityFacility> retailersFacilities = new ArrayList<ActivityFacility>();
+		// works, but it is not nicely programmed. shouldn't be a global container, should be
+		// controlled by the controler (or actually added to the population)
+		
+		//Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
 		if (controler.getIteration()%5==0 && controler.getIteration()>0){
-			
-			log.info("matrix dimensions, rows (zones) = " + this.retailZones.getRetailZones().values().size());
-			log.info("matrix dimensions, columns (shops) = " + shops.size());
-			DenseDoubleMatrix2D prob_i_j = new DenseDoubleMatrix2D (this.retailZones.getRetailZones().values().size(),shops.size());
-			DenseDoubleMatrix1D avg_prob_i = new DenseDoubleMatrix1D (shops.size());
-			int consumer_count=0;
-			int j=0;
-			boolean first_shop = true;
-			for (ActivityFacility f:shops) {
+			for (Retailer r:retailers.getRetailers().values()) {
+				retailersFacilities.addAll(r.getFacilities().values());
+				log.info("facilities are: " + retailersFacilities );
+			}
+			GravityModelRetailerStrategy gmrs = new GravityModelRetailerStrategy (controler, retailZones, shops, retailersFacilities, links); 
+			gmrs.moveFacilities();
+		
+		
+			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
 				
-				double sum_prob =0;
-				double  zone_count =0;
-				
-				for (RetailZone rz : this.retailZones.getRetailZones().values()) {
-					zone_count++;
-					double counter = 0;
-					double prob = 0;
-					Collection<PersonImpl> persons = new ArrayList<PersonImpl> ();
-					rz.getPersonsQuadTree().get(rz.getPersonsQuadTree().getMinEasting(),rz.getPersonsQuadTree().getMinNorthing(), rz.getPersonsQuadTree().getMaxEasting(), rz.getPersonsQuadTree().getMaxNorthing(), persons );
-					log.info("In the retail zone " + rz.getId() + " " + persons.size() + " persons are living");
-					//log.info("minx_x = " + rz.getPersonsQuadTree().getMinEasting() + ", min_y = " + rz.getPersonsQuadTree().getMinNorthing() + ", max_x = " + rz.getPersonsQuadTree().getMaxEasting() + ", max_y" + rz.getPersonsQuadTree().getMaxNorthing());
-					for (PersonImpl p:persons) {
-						
-						if (first_shop) {
-							Consumer consumer = new Consumer (consumer_count, p, rz.getId());
-							consumers.add(consumer);
-							consumer_count++;
-						}
-						for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
-							
-							if (pe2 instanceof ActivityImpl) {
-								ActivityImpl act = (ActivityImpl) pe2;
-								
-								if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
-									counter++;
-									//log.info("The number of shop activities in the shop " + f.getId() + " is " + counter);
-									int i =Integer.parseInt(rz.getId().toString());
-									prob = counter/persons.size();
-									prob_i_j.set(i,j,prob);
-								}
+				PlanImpl plan = p.getSelectedPlan();
+					// fc: is it not possible anymore to use only the selected plan? 
+					// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
+					boolean routeIt = false;
+					for (PlanElement pe : plan.getPlanElements()) {
+						if (pe instanceof ActivityImpl) {
+							ActivityImpl act = (ActivityImpl) pe;
+							if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
+								// likely contains too much persons in it!!!!
+								act.setLink(act.getFacility().getLink());
+								routeIt = true;
 							}
 						}
 					}
-					//log.info("counter = " + counter);
-					//log.info("persons = " + ((Integer)persons.size()).doubleValue());
-					log.info(persons.size() + " persons are living in the retail zone " + rz.getId());
-				}
-				
-				first_shop=false;
-				log.info("number of zones = " + zone_count);
-				j=j+1;
+					if (routeIt) {
+						pcrl.run(plan);
+					}
+				log.info("The program is re-routing persons who were shopping in moved facilities");	
 			}
-			log.info("Number of potential consumers in the area = " + consumer_count);
-			log.info("Consumers in the area = " + consumers.size());
-			ComputeGravityModelParameters cgmp = new ComputeGravityModelParameters ();
-			cgmp.computeInitialParameters (controler, prob_i_j, consumers, shops);
-		}
+		}	
 	}
 }
 

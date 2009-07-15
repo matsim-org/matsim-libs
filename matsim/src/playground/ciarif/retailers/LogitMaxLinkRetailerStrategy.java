@@ -19,7 +19,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	private Controler controler;
 	private int alternatives;	
 	
-	public LogitMaxLinkRetailerStrategy (Controler controler, Object[] links) {
+	public LogitMaxLinkRetailerStrategy (Controler controler, ArrayList<LinkRetailersImpl> arrayList) {
 		this.controler = controler;
 		String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
 		int alternatives = Integer.parseInt(logitAlternatives);
@@ -79,6 +79,5 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	public void moveRetailersFacilities(
 			Map<Id, FacilityRetailersImpl> facilities) {
 		// TODO Auto-generated method stub
-		
 	}
 }

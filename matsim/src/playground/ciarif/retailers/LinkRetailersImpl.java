@@ -9,6 +9,10 @@ import org.matsim.core.utils.misc.Time;
 
 public class LinkRetailersImpl extends LinkImpl  { //AbstractLocation implements BasicLink {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected BasicNode from = null;
 	protected BasicNode to = null;
 

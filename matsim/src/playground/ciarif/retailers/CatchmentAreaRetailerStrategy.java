@@ -21,7 +21,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 	private Controler controler;
 	private int alternatives;	
 		
-	public CatchmentAreaRetailerStrategy (Controler controler, Object[] links) {
+	public CatchmentAreaRetailerStrategy (Controler controler, ArrayList<LinkRetailersImpl> arrayList) {
 		this.controler = controler;
 		String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
 		int alternatives = Integer.parseInt(logitAlternatives);

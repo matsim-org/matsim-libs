@@ -35,26 +35,6 @@ public class RetailersControler extends Controler {
 	@Override
 	protected void shutdown(final boolean unexpected) {
 		super.shutdown(unexpected);
-		
-		//ComputeGravityModelParameters cgmp = new ComputeGravityModelParameters ();// TODO modify this in a way that it is not necessary
-		// to override this method, but more simply, modify the method doIterations, and add a parameter which tells how many times the
-		// relaxed state should be reached (respectively how many times the gravity model should be computed)
-		// Basically the idea is that the number of iterations in the config file are multiplied for the number of time we want to perform
-		// the computation of the gravity model. It means that each time the number of iteration is reached instead of shut down the program 
-		// the gravity model is computed and than the same number of iterations is performed again.
-		//cgmp.computeInitialParameters (this);
-		/*for (Facility f:this.getFacilities().getFacilities().values()) {
-			for (Person p:this.getPopulation().getPersons().values()) {
-				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
-							
-						}
-					}	
-				}
-			}
-		}*/
 	}
 	
     public static void main (final String[] args) { 

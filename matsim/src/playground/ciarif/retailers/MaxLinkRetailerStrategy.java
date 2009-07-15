@@ -3,6 +3,7 @@ package playground.ciarif.retailers;
 
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -22,12 +23,12 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	public static final String NAME = "maxLinkRetailerStrategy";
 	private Controler controler;
 
-	private Object[] links;
+	private ArrayList<LinkRetailersImpl> links;
 	// TODO balmermi: do the same speed optimization here
 
-	public MaxLinkRetailerStrategy(Controler controler, Object [] links) {
+	public MaxLinkRetailerStrategy(Controler controler, ArrayList<LinkRetailersImpl> arrayList) {
 		this.controler = controler;
-		this.links = links;
+		this.links = arrayList;
 	}
 	
 	
@@ -42,8 +43,8 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 				// then the specific shop is moved only if it exceeds a given capacity. This allows for moving 
 				// only "interesting" facilities (large enough to notice differences in the customer data) 
 
-			int rd = MatsimRandom.getRandom().nextInt(this.links.length);
-			BasicLinkImpl link = (BasicLinkImpl)this.links[rd];
+			int rd = MatsimRandom.getRandom().nextInt(this.links.size());
+			BasicLinkImpl link = (BasicLinkImpl)this.links.get(rd);
 			log.info("The link " + link.getId() + " is proposed as new location for the facility " + f.getId());
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
