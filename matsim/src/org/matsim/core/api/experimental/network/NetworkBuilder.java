@@ -21,8 +21,6 @@ package org.matsim.core.api.experimental.network;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 
 /**
@@ -31,9 +29,9 @@ import org.matsim.core.network.NodeImpl;
  */
 public interface NetworkBuilder extends BasicNetworkBuilder {
 
-	public NodeImpl createNode(final Id id);
+	public Node createNode(final Id id);
 	
-	public LinkImpl createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId);
 	
 	
 }

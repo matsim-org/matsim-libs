@@ -87,7 +87,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		this.createFakeNetwork(sc, (NetworkLayer)sc.getNetwork());
 		
 		BasicPopulation pop = sc.getPopulation();
-		BasicPopulationBuilder builder = pop.getPopulationBuilder();
+		BasicPopulationBuilder builder = pop.getBuilder();
 		BasicPerson person;
 		BasicPlan plan;
 		BasicActivity activity;

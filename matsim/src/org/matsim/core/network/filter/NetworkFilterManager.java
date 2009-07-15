@@ -23,7 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -64,11 +67,11 @@ public class NetworkFilterManager {
 	 * Call this method to filter the network.
 	 * @return
 	 */
-	public BasicNetwork<NodeImpl, LinkImpl> applyFilters() {
+	public BasicNetwork<Node, Link> applyFilters() {
 		log.info("applying filters to network...");
 		int nodeCount = 0;
 		int linkCount = 0;
-		BasicNetwork<NodeImpl, LinkImpl> net = new NetworkLayer();
+		NetworkLayer net = new NetworkLayer();
 		if (!this.nodeFilters.isEmpty()) {
 			for (NodeImpl n : this.network.getNodes().values()) {
 				boolean add = true;

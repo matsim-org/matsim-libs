@@ -194,7 +194,7 @@ public class DaganzoScenarioGenerator {
 		int homeEndTime = firstHomeEndTime;
 		LinkImpl l1 = network.getLink(scenario.createId("1"));
 		LinkImpl l7 = network.getLink(scenario.createId("7"));
-		PopulationBuilder builder = population.getPopulationBuilder();
+		PopulationBuilder builder = population.getBuilder();
 
 		for (int i = 1; i <= 3600; i++) {
 			PersonImpl p = (PersonImpl) builder.createPerson(scenario.createId(Integer

@@ -43,7 +43,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Gbl.createWorld().setNetworkLayer(network);
 		
 		PopulationImpl pop = new PopulationImpl();
-		PopulationBuilder pb = pop.getPopulationBuilder();
+		PopulationBuilder pb = pop.getBuilder();
 		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
 		PlanImpl plan = (PlanImpl) pb.createPlan(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));

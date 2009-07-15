@@ -316,7 +316,7 @@ public class IVT2009ToGraphML {
 			throw new NullPointerException("Null coordinates are not allowed.");
 //		BasicActivityImpl act = new BasicActivityImpl("home");
 //		act.setCoord(coord);
-		BasicActivity act = population.getPopulationBuilder().createActivityFromCoord("home", coord);
+		BasicActivity act = population.getBuilder().createActivityFromCoord("home", coord);
 		
 		plan.addActivity(act);
 		person.addPlan(plan);

@@ -48,7 +48,7 @@ public class LatticeGenerator {
 				BasicPlan<?> plan = new BasicPlanImpl(person);
 //				BasicActivityImpl act = new BasicActivityImpl("home");
 //				act.setCoord(new CoordImpl(col, row));
-				BasicPopulationBuilder pb = population.getPopulationBuilder() ;
+				BasicPopulationBuilder pb = population.getBuilder() ;
 				BasicActivity act = pb.createActivityFromCoord("home", new CoordImpl(col,row) ); 
 				plan.addActivity(act);
 				person.addPlan( plan ) ;

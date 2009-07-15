@@ -140,7 +140,7 @@ public class AccessEgressDemo {
 
 	private void createPopulation() {
 		PopulationImpl population = this.scenario.getPopulation();
-		PopulationBuilder pb = population.getPopulationBuilder();
+		PopulationBuilder pb = population.getBuilder();
 		TransitStopFacility[] stops = this.schedule.getFacilities().values().toArray(new TransitStopFacility[this.schedule.getFacilities().size()]);
 		TransitLine tLine = this.schedule.getTransitLines().get(this.ids[1]);
 

@@ -135,7 +135,7 @@ ActivityStartEventHandler
 	
 	public void handlePlan(BasicPlan plan) {
 		
-		PopulationBuilder pb = pop.getPopulationBuilder() ; 
+		PopulationBuilder pb = pop.getBuilder() ; 
 		
 		try {
 			Id id = sc.createId("1") ; 

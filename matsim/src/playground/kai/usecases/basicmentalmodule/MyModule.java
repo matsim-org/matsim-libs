@@ -105,7 +105,7 @@ BasicActivityEndEventHandler
 	public void handlePlan(BasicPlan ppp) { // need handlePlan(BasicPlan) ??????
 		BasicPlan plan = ppp ;
 		
-		BasicPopulationBuilder pb = pop.getPopulationBuilder() ; 
+		BasicPopulationBuilder pb = pop.getBuilder() ; 
 		
 		try {
 			Id id = sc.createId("1") ; 

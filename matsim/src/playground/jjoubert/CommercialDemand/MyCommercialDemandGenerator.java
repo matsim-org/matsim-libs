@@ -66,7 +66,7 @@ public class MyCommercialDemandGenerator {
 		// Initiate the population builder
 		BasicScenario sc = new BasicScenarioImpl();		
 		BasicPopulation population = sc.getPopulation();
-		BasicPopulationBuilder pb = population.getPopulationBuilder();
+		BasicPopulationBuilder pb = population.getBuilder();
 
 		
 		// Read cumulative distribution function (CDF) for number of activities per chain

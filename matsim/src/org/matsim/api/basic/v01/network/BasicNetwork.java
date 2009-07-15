@@ -37,19 +37,19 @@ public interface BasicNetwork<N extends BasicNode, L extends BasicLink> extends 
 	
     /**
      * Returns a set of this network's nodes. This set might be empty, but it
-     * must not be <code>null</code>.
+     * should not be <code>null</code>.
      *
      * @return a set of this network's nodes
      */
-    public Map<Id, N> getNodes();
+    public Map<Id, ? extends N> getNodes();
 
     /**
      * Returns a set of this network's links. This set might be empty, but it
-     * must not be <code>null</code>.
+     * should not be <code>null</code>.
      *
      * @return a set of this network's links
      */
-    public Map<Id, L> getLinks();
+    public Map<Id, ? extends L> getLinks();
     
     /**
      * Returns the time period over which

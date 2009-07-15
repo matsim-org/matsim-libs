@@ -65,7 +65,7 @@ public interface BasicNode extends BasicLocation, Identifiable {
 
     /**
      * Returns this node's set of ingoing links. This set might be empty, but it
-     * must not be <code>null</code>.
+     * should not be <code>null</code>.
      *
      * @return this node's ingoing links
      */
@@ -73,7 +73,7 @@ public interface BasicNode extends BasicLocation, Identifiable {
 
     /**
      * Returns this node's set of outgoing links. This set might be empty, but
-     * it must not be <code>null</code>.
+     * it should not be <code>null</code>.
      *
      * @return this node's outgoing links
      */

@@ -102,11 +102,11 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 
 	private void createTestPopulation(ScenarioImpl scenario) {
 		PopulationImpl pop = scenario.getPopulation();
-		p23 = (PersonImpl) pop.getPopulationBuilder().createPerson(id23);
-		p42 = (PersonImpl) pop.getPopulationBuilder().createPerson(id42);
-		p43 = (PersonImpl) pop.getPopulationBuilder().createPerson(id43);
-		p44 = (PersonImpl) pop.getPopulationBuilder().createPerson(id44);
-		p45 = (PersonImpl) pop.getPopulationBuilder().createPerson(id45);
+		p23 = (PersonImpl) pop.getBuilder().createPerson(id23);
+		p42 = (PersonImpl) pop.getBuilder().createPerson(id42);
+		p43 = (PersonImpl) pop.getBuilder().createPerson(id43);
+		p44 = (PersonImpl) pop.getBuilder().createPerson(id44);
+		p45 = (PersonImpl) pop.getBuilder().createPerson(id45);
 		pop.getPersons().put(id23, p23);
 		pop.getPersons().put(id42, p42);
 		pop.getPersons().put(id43, p43);

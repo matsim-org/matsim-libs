@@ -20,10 +20,30 @@
 
 package org.matsim.core.api.experimental.network;
 
+import java.util.Map;
+
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
 
 public interface Node extends BasicNode
 //, Comparable<Node> 
 {
 
+    /**
+     * Returns this node's set of ingoing links. This set might be empty, but it
+     * should not be <code>null</code>.
+     *
+     * @return this node's ingoing links
+     */
+    public Map<Id, ? extends Link> getInLinks();
+
+    /**
+     * Returns this node's set of outgoing links. This set might be empty, but
+     * it should not be <code>null</code>.
+     *
+     * @return this node's outgoing links
+     */
+    public Map<Id, ? extends Link> getOutLinks();
+
+	
 }

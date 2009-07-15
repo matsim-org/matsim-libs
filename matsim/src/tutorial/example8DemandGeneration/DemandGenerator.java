@@ -106,7 +106,7 @@ public class DemandGenerator {
 
 	private static void createActivities(Scenario scenario, Random rnd,  Feature recreation, Feature commercial) {
 		Population pop =  scenario.getPopulation();
-		PopulationBuilder pb = pop.getPopulationBuilder(); //the population builder creates all we need 
+		PopulationBuilder pb = pop.getBuilder(); //the population builder creates all we need 
 		
 		for (Person pers : pop.getPersons().values()) { //this loop iterates over all persons
 			Plan plan = pers.getPlans().get(0); //each person has exactly one plan, that has been created in createPersons(...)
@@ -144,7 +144,7 @@ public class DemandGenerator {
 
 	private static void createPersons(Scenario scenario, Feature ft, Random rnd, int number) {
 		Population pop = scenario.getPopulation();
-		PopulationBuilder pb = pop.getPopulationBuilder();
+		PopulationBuilder pb = pop.getBuilder();
 		for (; number > 0; number--) {
 			Person pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
 			pop.addPerson( pers ) ;

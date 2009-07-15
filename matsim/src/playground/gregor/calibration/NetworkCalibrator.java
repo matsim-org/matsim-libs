@@ -95,7 +95,7 @@ public class NetworkCalibrator {
 		LinkImpl l2 = net.createLink(new IdImpl(3), n2, n3, 50, fs, 20000, PERSONS/(50/CELLSIZE));
 		
 		PopulationImpl pop = sc.getPopulation();
-		PopulationBuilder pb = pop.getPopulationBuilder();
+		PopulationBuilder pb = pop.getBuilder();
 		for (int i = 0; i < PERSONS; i++) {
 			PersonImpl p = (PersonImpl) pb.createPerson(new IdImpl(i));
 			PlanImpl plan = (PlanImpl) pb.createPlan(p);

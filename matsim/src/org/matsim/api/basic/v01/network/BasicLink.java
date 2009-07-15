@@ -62,15 +62,11 @@ public interface BasicLink extends Identifiable, Serializable {
 	public boolean setToNode(BasicNode node);
 
 	/**
-	 * Returns this link's upstream node. Must not return <code>null</code>.
-	 *
 	 * @return this link's upstream node
 	 */
 	public BasicNode getFromNode();
 
 	/**
-	 * Returns this link's downstream node. Must not return <code>null</code>.
-	 *
 	 * @return this link's downstream node
 	 */
 	public BasicNode getToNode();

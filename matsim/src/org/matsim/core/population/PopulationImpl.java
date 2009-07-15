@@ -188,8 +188,12 @@ public class PopulationImpl implements Population {
 		log.info(" person # " + this.counter);
 	}
 
-	public PopulationBuilder getPopulationBuilder() {
+	public PopulationBuilder getBuilder() {
 		return this.pb;
+	}
+	
+	public PopulationBuilder getPopulationBuilder() {
+		return this.getBuilder();
 	}
 	
 	private String name ;

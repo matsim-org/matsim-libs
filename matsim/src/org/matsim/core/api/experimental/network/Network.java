@@ -21,9 +21,9 @@
 package org.matsim.core.api.experimental.network;
 
 import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
-public interface Network extends BasicNetwork<NodeImpl, LinkImpl> {
+public interface Network extends BasicNetwork<Node, Link> {
+
+	public NetworkBuilder getBuilder();
 	
 }

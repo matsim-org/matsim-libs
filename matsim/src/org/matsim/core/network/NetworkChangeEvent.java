@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.matsim.core.api.experimental.network.Link;
+
 
 /**
  * A container class for events that represent time-variant changes for link
@@ -111,8 +113,8 @@ public class NetworkChangeEvent {
 	 * 
 	 * @param link a link that is affected by this event.
 	 */
-	public void addLink(LinkImpl link) {
-		links.add(link);
+	public void addLink(Link link) {
+		links.add((LinkImpl)link);
 	}
 	
 	/**

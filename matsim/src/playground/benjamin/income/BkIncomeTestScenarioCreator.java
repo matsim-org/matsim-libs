@@ -76,7 +76,7 @@ public class BkIncomeTestScenarioCreator {
 		BasicScenario scenario = new BasicScenarioImpl();
 		
 		BasicPopulation<BasicPerson<BasicPlan>> pop = scenario.getPopulation();
-		BasicPopulationBuilder builder = pop.getPopulationBuilder();
+		BasicPopulationBuilder builder = pop.getBuilder();
 		
 		for (int i = 1; i <= 2000; i++) {
 			BasicPerson p = builder.createPerson(scenario.createId(Integer.toString(i)));	

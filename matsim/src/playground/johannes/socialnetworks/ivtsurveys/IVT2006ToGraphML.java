@@ -154,7 +154,7 @@ public class IVT2006ToGraphML {
 //		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),
 //				Double.parseDouble(y))));
 		
-		BasicPopulationBuilder pb = population.getPopulationBuilder() ;
+		BasicPopulationBuilder pb = population.getBuilder() ;
 		BasicActivity act = pb.createActivityFromCoord(HOME_ACT_TYPE,new CoordImpl(Double.parseDouble(x),
 				Double.parseDouble(y))) ;
 		

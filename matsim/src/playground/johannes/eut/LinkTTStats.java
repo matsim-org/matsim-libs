@@ -28,8 +28,9 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -40,16 +41,16 @@ public class LinkTTStats {
 	
 	private Map<BasicLink, LinkAttributes> attributes;
 	
-	public LinkTTStats(BasicNetwork<NodeImpl, LinkImpl> network, TravelTime travelTimes, int binsize) {
+	public LinkTTStats(BasicNetwork<Node, Link> network, TravelTime travelTimes, int binsize) {
 		this(network, travelTimes, binsize, 0, 86400);
 	}
 	
-	public LinkTTStats(BasicNetwork<NodeImpl, LinkImpl> network, TravelTime travelTimes, int start, int end, int binsize) {
+	public LinkTTStats(BasicNetwork<Node,Link> network, TravelTime travelTimes, int start, int end, int binsize) {
 		attributes = new HashMap<BasicLink, LinkAttributes>();
 		analyze(network, travelTimes, start, end, binsize);
 	}
 	
-	private void analyze(BasicNetwork<NodeImpl, LinkImpl> network, TravelTime travelTimes, int start, int end, int binsize) {
+	private void analyze(BasicNetwork<Node,Link> network, TravelTime travelTimes, int start, int end, int binsize) {
 		for(BasicLink link : network.getLinks().values()) {
 			double min = Double.MAX_VALUE;
 			double max = Double.MIN_VALUE;

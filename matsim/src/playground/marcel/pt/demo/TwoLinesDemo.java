@@ -212,7 +212,7 @@ public class TwoLinesDemo {
 
 	private void createPopulation() {
 		PopulationImpl population = this.scenario.getPopulation();
-		PopulationBuilder pb = population.getPopulationBuilder();
+		PopulationBuilder pb = population.getBuilder();
 		
 		TransitLine tLine1 = this.schedule.getTransitLines().get(this.ids[1]);
 		TransitLine tLine2 = this.schedule.getTransitLines().get(this.ids[2]);

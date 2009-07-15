@@ -124,7 +124,7 @@ public class MyCommercialDemandGenerator3 {
 			// Initiate the population builder
 			ScenarioImpl sc = new ScenarioImpl();
 			PopulationImpl population = sc.getPopulation();
-			PopulationBuilder pb = population.getPopulationBuilder();
+			PopulationBuilder pb = population.getBuilder();
 
 			//TODO Check if it is 'better' to create 'i' truck agents, and split them into dummy agents
 			// if the duration is greater than 24 hours - thus probably ending with more than 'i' agents;

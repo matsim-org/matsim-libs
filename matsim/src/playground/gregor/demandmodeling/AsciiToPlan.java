@@ -69,7 +69,7 @@ public class AsciiToPlan {
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(NET_FILE);
 		org.matsim.core.population.PopulationImpl pop = sc.getPopulation();
-		PopulationBuilder pb = pop.getPopulationBuilder();
+		PopulationBuilder pb = pop.getBuilder();
 		
 		//Starte die Verarbeitung
 		do{

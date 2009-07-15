@@ -38,6 +38,9 @@ public interface BasicPopulation<T extends BasicPerson> extends Serializable {
 	public void addPerson(final T p); 
 	// yyyy resurrected.  move to BasicPopulation once certain that this is a good idea  
 
+	/** @deprecated use getBuilder() */
 	public BasicPopulationBuilder getPopulationBuilder();
+	
+	public BasicPopulationBuilder getBuilder() ;
 
 }
