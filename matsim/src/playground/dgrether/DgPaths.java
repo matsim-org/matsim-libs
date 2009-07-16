@@ -25,13 +25,15 @@ package playground.dgrether;
  */
 public interface DgPaths {
 	
-	final String WORKBASE = "/Volumes/data/work/";
+	final String DATA = "/media/data/";
+	
+	final String WORKBASE = DATA + "work/";
 
-	final String SCMWORKSPACE = "/Volumes/data/work/scmWorkspace/";
+	final String SCMWORKSPACE = DATA + "work/scmWorkspace/";
 	
-	final String WSBASE = "/Volumes/data/work/svnWorkspace/";
+	final String WSBASE = DATA + "work/svnWorkspace/";
 	
-	final String VSPCVSBASE = "/Volumes/data/work/cvsRep/vsp-cvs/";
+	final String VSPCVSBASE = DATA + "work/cvsRep/vsp-cvs/";
 	
 	final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
 
