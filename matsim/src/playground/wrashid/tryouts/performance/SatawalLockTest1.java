@@ -14,8 +14,14 @@ endTime = 10000;
 for (int i=0;i<5000;i++){
 totalNumberOfThreads=4;
 local: 22.5 seconds
-satawal: 46.9 seconds
+satawal: 61 ms
 
+================================
+endTime = 1000000; 
+for (int i=0;i<100;i++){
+totalNumberOfThreads=4;
+local: 9.1 seconds
+satawal: 
 
 
 
@@ -24,7 +30,7 @@ TODO: auf satawal same experiment...
  */
 public class SatawalLockTest1 {
 	public static void main(String[] args) {
-		int endTime = 10000;
+		int endTime = 1000000;
 		int totalNumberOfThreads=4;
 
 		Test2 test = new Test2();
@@ -59,7 +65,7 @@ public class SatawalLockTest1 {
 				}
 				
 				// some task to do (e.g. processing events).
-				for (int i=0;i<5000;i++){
+				for (int i=0;i<100;i++){
 					
 				}
 			}
