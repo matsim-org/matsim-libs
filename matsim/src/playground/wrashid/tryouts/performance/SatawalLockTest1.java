@@ -4,12 +4,11 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 
 /*
- * Local machine: endTime=1M, threads=4, time needed: 9313 seconds
- * =====================================
-10 - (number of times aquired the lock): 6099482
-9 - (number of times aquired the lock): 5298961
-8 - (number of times aquired the lock): 5918216
-7 - (number of times aquired the lock): 5690584
+ * 
+
+- this experiment performs good at satawal, if we increase the work after the synchronized block
+- the local machine performs better, if we decrease the size of the work.
+=> What kind of work do we have?
 
 
 TODO: auf satawal same experiment...
