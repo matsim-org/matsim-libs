@@ -33,8 +33,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.api.experimental.network.Node;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelCost;
@@ -84,7 +84,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	/**
 	 * The network on which we find routes.
 	 */
-	private final NetworkLayer network;
+	private final Network network;
 
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
@@ -137,7 +137,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param timeFunction
 	 *            Determines the travel time on links.
 	 */
-	public Dijkstra(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction) {
+	public Dijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
@@ -153,7 +153,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param preProcessData
 	 *            The pre processing data used during the routing phase.
 	 */
-	public Dijkstra(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction,
+	public Dijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 
 		this.network = network;
