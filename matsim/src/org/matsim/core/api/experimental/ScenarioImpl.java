@@ -40,6 +40,8 @@ import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.BasicVehiclesImpl;
 import org.matsim.world.World;
@@ -62,6 +64,7 @@ public class ScenarioImpl implements Scenario {
 	private BasicSignalSystems signalSystems;
 	private BasicSignalSystemConfigurations signalSystemConfigurations;
 	private RoadPricingScheme roadPricingScheme;
+	private TransitSchedule transitSchedule = null;
 	
 	private Households households;
   private BasicVehicles vehicles;
@@ -107,6 +110,9 @@ public class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseKnowledges()){
 			this.createKnowledges();
 		}
+		if (this.config.scenario().isUseTransit()) {
+			this.createTransit();
+		}
 	}
 	
 	protected void createVehicleContainer(){
@@ -132,6 +138,10 @@ public class ScenarioImpl implements Scenario {
 	protected void createSignalSystemsContainers(){
 		this.signalSystems = new BasicSignalSystemsImpl();
 		this.signalSystemConfigurations = new BasicSignalSystemConfigurationsImpl();
+	}
+	
+	protected void createTransit() {
+		this.transitSchedule = new TransitScheduleBuilderImpl().createTransitSchedule();
 	}
 	
 	@Deprecated
@@ -244,6 +254,13 @@ public class ScenarioImpl implements Scenario {
 			this.createKnowledges();
 		}
 		return this.knowledges;
+	}
+	
+	public TransitSchedule getTransitSchedule() {
+		if ((this.transitSchedule == null) && this.config.scenario().isUseTransit()){
+			this.createTransit();
+		}
+		return this.transitSchedule;
 	}
 
 }

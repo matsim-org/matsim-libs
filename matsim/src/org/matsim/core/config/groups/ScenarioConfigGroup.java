@@ -41,6 +41,7 @@ public class ScenarioConfigGroup extends Module {
 	private static final String USE_VEHICLES = "useVehicles";
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_KNOWLEDGE = "useKnowledge";
+	private static final String USE_TRANSIT = "useTransit";
 	
 	private boolean useLanes = false;
 	private boolean useSignalSystems = false;
@@ -48,6 +49,7 @@ public class ScenarioConfigGroup extends Module {
 	private boolean useHouseholds = false;
 	private boolean useVehicles = false;
 	private boolean useKnowledge = true;
+	private boolean useTransit = false;
 	
 	
 	public ScenarioConfigGroup() {
@@ -74,8 +76,11 @@ public class ScenarioConfigGroup extends Module {
 		else if (USE_KNOWLEDGE.equalsIgnoreCase(key)){
 			this.useKnowledge = Boolean.parseBoolean(value.trim());
 		}
+		else if (USE_TRANSIT.equalsIgnoreCase(key)){
+			this.useTransit = Boolean.parseBoolean(value.trim());
+		}
 		else {
-			throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + this.GROUP_NAME);
+			throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + GROUP_NAME);
 		}
 	}
 
@@ -88,6 +93,7 @@ public class ScenarioConfigGroup extends Module {
 		map.put(USE_KNOWLEDGE, "Set this parameter to true if knowledge should be used, false if not.");
 		map.put(USE_HOUSEHOLDS, "Set this parameter to true if households should be used, false if not.");
 		map.put(USE_VEHICLES, "Set this parameter to true if vehicles should be used, false if not.");
+		map.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
 		return map;
 	}
 
@@ -111,6 +117,9 @@ public class ScenarioConfigGroup extends Module {
 		else if (USE_HOUSEHOLDS.equalsIgnoreCase(key)){
 			return Boolean.toString(this.isUseHouseholds());
 		}
+		else if (USE_TRANSIT.equalsIgnoreCase(key)){
+			return Boolean.toString(this.isUseTransit());
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -125,6 +134,7 @@ public class ScenarioConfigGroup extends Module {
 		m.put(USE_VEHICLES, this.getValue(USE_VEHICLES));
 		m.put(USE_HOUSEHOLDS, this.getValue(USE_HOUSEHOLDS));
 		m.put(USE_KNOWLEDGE, this.getValue(USE_KNOWLEDGE));
+		m.put(USE_TRANSIT, this.getValue(USE_TRANSIT));
 		return m;
 	}
 	
@@ -136,21 +146,17 @@ public class ScenarioConfigGroup extends Module {
 		this.useLanes = useLanes;
 	}
 
-	
 	public boolean isUseSignalSystems() {
 		return useSignalSystems;
 	}
 
-	
 	public void setUseSignalSystems(boolean useSignalSystems) {
 		this.useSignalSystems = useSignalSystems;
 	}
-
 	
 	public boolean isUseRoadpricing() {
 		return useRoadpricing;
 	}
-
 	
 	public void setUseRoadpricing(boolean useRoadpricing) {
 		this.useRoadpricing = useRoadpricing;
@@ -168,15 +174,24 @@ public class ScenarioConfigGroup extends Module {
 		return this.useVehicles;
 	}
 
+	public boolean isUseTransit() {
+		return this.useTransit;
+	}
+
 	public void setUseHouseholds(boolean b) {
 		this.useHouseholds = b;
 	}
 	
-	public void setUseVehicles(boolean b){
+	public void setUseVehicles(boolean b) {
 		this.useVehicles = b;
 	}
 	
-	public void setUseKnowledge(boolean b){
+	public void setUseKnowledge(boolean b) {
 		this.useKnowledge = b;
 	}
+	
+	public void setUseTransit(boolean b) {
+		this.useTransit = b;
+	}
+	
 }
