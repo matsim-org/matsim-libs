@@ -8,7 +8,15 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 - this experiment performs good at satawal, if we increase the work after the synchronized block
 - the local machine performs better, if we decrease the size of the work.
-=> What kind of work do we have?
+=> What kind of work do we have in the simulation?
+===============================
+endTime = 10000; 
+for (int i=0;i<5000;i++){
+totalNumberOfThreads=4;
+local: 22.5 seconds
+satawal: 46.9 seconds
+
+
 
 
 TODO: auf satawal same experiment...
@@ -16,7 +24,7 @@ TODO: auf satawal same experiment...
  */
 public class SatawalLockTest1 {
 	public static void main(String[] args) {
-		int endTime = 10000000;
+		int endTime = 10000;
 		int totalNumberOfThreads=4;
 
 		Test2 test = new Test2();
