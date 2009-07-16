@@ -79,7 +79,7 @@ public class StrategyConfigGroup extends Module {
 			return Double.toString(settings.getProbability());
 		}
 		if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_PROBABILITY.length())), false);
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_DISABLE_AFTER_ITERATION.length())), false);
 			if (settings == null || settings.getDisableAfter() == -1) {
 				return null;
 			}
