@@ -17,7 +17,7 @@ TODO: auf satawal same experiment...
  */
 public class SatawalLockTest1 {
 	public static void main(String[] args) {
-		int endTime = 10000000;
+		int endTime = 1000000;
 		int totalNumberOfThreads=4;
 
 		Test2 test = new Test2();
@@ -52,10 +52,12 @@ public class SatawalLockTest1 {
 				}
 				
 				// some task to do (e.g. processing events).
-				Math.log(99);
-				Math.log(99);
-				Math.log(99);
-				Math.log(99);
+				try {
+					Thread.currentThread().sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			
