@@ -113,7 +113,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.scenario.getConfig().charyparNagelScoring().setMarginalUtlOfDistanceCar(0.0);
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : PlanomatConfigGroup.SimLegInterpretation.values()) {
-
+			
 			DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), TIME_BIN_SIZE);
 			TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), config.travelTimeCalculator());
 			TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, config.charyparNagelScoring());
@@ -125,6 +125,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					simLegInterpretation,
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					plansCalcRoute);
+			
+			testee.initPlanSpecificInformation(this.testPlan);
 			
 			Events events = new Events();
 			events.addHandler(tDepDelayCalc);
@@ -143,7 +145,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					originAct,
 					destinationAct,
 					testLeg,
-					null);
+					false);
 
 			double expectedLegEndTime = departureTime;
 
@@ -177,7 +179,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					originAct,
 					destinationAct,
 					testLeg,
-					null);
+					false);
 
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
@@ -194,6 +196,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			assertEquals(expectedLegEndTime, departureTime + legTravelTime, MatsimTestCase.EPSILON);
 			
 			// now let's add some travel events
+			// test a start time where all link departures will be in the first time bin
 			String[][] eventTimes = new String[][]{
 					new String[]{"06:05:00", "06:07:00", "06:09:00"},
 					new String[]{"06:16:00", "06:21:00", "06:26:00"}
@@ -215,7 +218,6 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				}
 			}
 
-			// test a start time where all link departures will be in the first time bin
 			departureTime = Time.parseTime("06:10:00");
 			legTravelTime = testee.getLegTravelTimeEstimation(
 					TEST_PERSON_ID,
@@ -223,14 +225,14 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					originAct,
 					destinationAct,
 					testLeg,
-					null);
+					false);
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				expectedLegEndTime = testee.processLink(originAct.getLink(), expectedLegEndTime);
 			}
-			expectedLegEndTime = testee.processRouteTravelTime(route, expectedLegEndTime);
+			expectedLegEndTime = testee.processRouteTravelTime(route.getLinks(), expectedLegEndTime);
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				expectedLegEndTime = testee.processLink(destinationAct.getLink(), expectedLegEndTime);
 			}
@@ -249,7 +251,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					originAct,
 					destinationAct,
 					ptLeg,
-					null);
+					false);
 			// the free speed travel time from h to w in equil-test, as simulated by Cetin, is 15 minutes
 			expectedLegEndTime = departureTime + (2 * Time.parseTime("00:15:00"));
 
@@ -377,29 +379,29 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		// test a start time where all link departures will be in the first time bin
 		double startTime = Time.parseTime("06:10:00");
-		double routeEndTime = testee.processRouteTravelTime(route, startTime);
+		double routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(Time.parseTime("06:14:00"), routeEndTime, EPSILON);
 
 		// test a start time where all link departures will be in the second time bin
 		startTime = Time.parseTime("06:20:00");
-		routeEndTime = testee.processRouteTravelTime(route, startTime);
+		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(Time.parseTime("06:30:00"), routeEndTime, EPSILON);
 
 		// test a start time in the first bin where one link departure is in the first bin, one in the second bin
 		startTime = Time.parseTime("06:13:00");
-		routeEndTime = testee.processRouteTravelTime(route, startTime);
+		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(Time.parseTime("06:20:00"), routeEndTime, EPSILON);
 
 		// test a start time in a free speed bin, having second departure in the first bin
 		startTime = Time.parseTime("05:59:00");
-		routeEndTime = testee.processRouteTravelTime(route, startTime);
+		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(
 				testee.processLink(links.get(1), startTime + this.scenario.getNetwork().getLink(links.get(0).getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
 				routeEndTime, EPSILON);
 
 		// test a start time in the second bin, having second departure in the free speed bin
 		startTime = Time.parseTime("06:28:00");
-		routeEndTime = testee.processRouteTravelTime(route, startTime);
+		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(
 				testee.processLink(links.get(0), startTime) + this.scenario.getNetwork().getLink(links.get(1).getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME),
 				routeEndTime, EPSILON);

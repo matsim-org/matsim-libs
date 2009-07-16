@@ -119,7 +119,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 		}
 		logger.info("");
 		
-		testee.reset();
+		testee.resetPlanSpecificInformation();
 		
 		// now let's repeat the same stuff with some events that indicate a very long travel time on the highway
 		// the result must be the free speed travel time of the alternate route

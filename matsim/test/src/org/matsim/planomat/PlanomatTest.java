@@ -106,17 +106,14 @@ public class PlanomatTest extends MatsimTestCase {
 
 	public void testRunCarPt() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
-		
-		this.modifyNetwork();
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
 
 	public void testRunCarPtWithEvents() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
-
-		this.modifyNetwork();
+//		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
+//
+//		this.modifyNetwork();
 		this.runATestRun(PlanomatTestRun.WITHEVENTS_CAR_PT);
 	}
 
@@ -307,6 +304,8 @@ public class PlanomatTest extends MatsimTestCase {
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
+		ltte.initPlanSpecificInformation(testPlan);
+		
 		// run the method
 		Planomat testee = new Planomat(ltte, null, this.scenario.getConfig().planomat());
 
@@ -328,18 +327,6 @@ public class PlanomatTest extends MatsimTestCase {
 		log.info("Actual checksum: " + Long.toString(actualChecksum));
 		assertEquals(expectedChecksum, actualChecksum);
 
-	}
-
-	private void modifyNetwork() {
-		
-		for (int linkId = 2; linkId <= 10; linkId++) {
-			
-			if (linkId != 6) {
-				this.scenario.getNetwork().getLink(new IdImpl(linkId)).setFreespeed(2.778);
-			}
-			
-		}
-		
 	}
 
 	private static final class ScenarioCreatePersonEventHandler implements BasicPersonEventHandler{

@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -65,33 +64,15 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		PlanomatConfigGroup expectedConfig = Gbl.getConfig().planomat();
 
 		assertEquals( 10, expectedConfig.getPopSize() );
-		
-		assertEquals(2, expectedConfig.getPossibleModes().toArray().length);
-		assertEquals(TransportMode.car, expectedConfig.getPossibleModes().toArray()[0]);
-		assertEquals(TransportMode.pt, expectedConfig.getPossibleModes().toArray()[1]);
+		assertEquals( 2, expectedConfig.getPossibleModes().toArray().length );
+		assertEquals( TransportMode.car, expectedConfig.getPossibleModes().toArray()[0] );
+		assertEquals( TransportMode.pt, expectedConfig.getPossibleModes().toArray()[1] );
 		assertEquals( PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, expectedConfig.getSimLegInterpretation() );
 		assertEquals( PlanomatConfigGroup.RoutingCapability.linearInterpolation, expectedConfig.getRoutingCapability() );
 		assertEquals( 1000, expectedConfig.getJgapMaxGenerations() );
 		assertEquals( 6, expectedConfig.getLevelOfTimeResolution() );
 		assertEquals( true, expectedConfig.isDoLogging() );
 		assertEquals( PlanomatConfigGroup.TripStructureAnalysisLayerOption.link, expectedConfig.getTripStructureAnalysisLayer());
-	}
-	
-	public void testCheckConsistency() {
-		
-		Config config = super.loadConfig(null);
-		
-		PlanomatConfigGroup testee = config.planomat();
-		testee.setPossibleModes("car,pt");
-		
-		try {
-			testee.checkConsistency();
-			fail("Expected to fail consistency check, but did not fail.");
-		} catch (RuntimeException e) {
-			logger.info("Caught RuntimeException, as expected. ");
-			e.printStackTrace();
-		}
-		
 	}
 	
 }

@@ -36,7 +36,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -93,6 +92,10 @@ public class Planomat implements PlanAlgorithm {
 		if (this.doLogging) {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
 		}
+		
+		// cache car routes in case route re not modified by the used implementation of the LegTravelTimeEstimator 
+		this.legTravelTimeEstimator.initPlanSpecificInformation(plan);
+		
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
 		TransportMode[] possibleModes = this.getPossibleModes(plan);
@@ -146,7 +149,7 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
 		}
 		// reset leg travel time estimator
-		this.legTravelTimeEstimator.reset();
+		this.legTravelTimeEstimator.resetPlanSpecificInformation();
 		// invalidate score information
 		plan.setScore(null);
 	}
@@ -199,7 +202,6 @@ public class Planomat implements PlanAlgorithm {
 		// TODO comment this
 		double positionInTimeInterval = 0.5;
 
-		RouteWRefs tempRoute = null;
 		LegImpl leg = null;
 		ActivityImpl origin = null;
 		ActivityImpl destination = null;
@@ -272,7 +274,7 @@ public class Planomat implements PlanAlgorithm {
 					origin,
 					destination,
 					leg,
-					(action.equals(StepThroughPlanAction.EVALUATE)) ? Boolean.FALSE : Boolean.TRUE));
+					(action.equals(StepThroughPlanAction.EVALUATE)) ? false : true));
 
 			now += anticipatedTravelTime;
 

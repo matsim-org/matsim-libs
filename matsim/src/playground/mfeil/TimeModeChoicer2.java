@@ -309,7 +309,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		this.cleanRoutes(basePlan);
 		
 		/* reset legEstimator (clear hash map) */
-		this.estimator.reset();
+		this.estimator.resetPlanSpecificInformation();
 	}
 	
 }

@@ -243,7 +243,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 		}
 		
 		/* reset legEstimator (clear hash map) */
-		this.estimator.reset();
+		this.estimator.resetPlanSpecificInformation();
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -426,7 +426,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 					now, (ActivityImpl)(plan.getPlanElements().get(i-1)), 
 					(ActivityImpl)(plan.getPlanElements().get(i+1)), 
 					(LegImpl)(plan.getPlanElements().get(i)),
-					null
+					true
 					);
 			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
@@ -488,7 +488,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 					(ActivityImpl)(actslegs.get(i-1)), 
 					(ActivityImpl)(actslegs.get(i+1)), 
 					(LegImpl)(actslegs.get(i)), 
-					null);
+					true);
 			((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(actslegs.get(i))).setTravelTime(travelTime);
 			now = java.lang.Math.max(now+travelTime+this.minimumTime.get(((ActivityImpl)(actslegs.get(i+1))).getType()), ((ActivityImpl)(actslegs.get(i+1))).getEndTime());
@@ -517,7 +517,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 					(ActivityImpl)(actslegs.get(i-1)), 
 					(ActivityImpl)(actslegs.get(i+1)), 
 					(LegImpl)(actslegs.get(i)),
-					null);
+					true);
 			((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(actslegs.get(i))).setTravelTime(travelTime);
 			now+=travelTime;
@@ -550,7 +550,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 								(ActivityImpl)(actslegs.get(i+1)), 
 								(ActivityImpl)(actslegs.get(i+3)), 
 								(LegImpl)(actslegs.get(i+2)),
-								null);
+								true);
 						((LegImpl)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
 						((LegImpl)(actslegs.get(i+2))).setTravelTime(travelTime);
 						now+=travelTime;
@@ -587,7 +587,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 						(ActivityImpl)(actslegs.get(i-1)), 
 						(ActivityImpl)(actslegs.get(i+1)), 
 						(LegImpl)(actslegs.get(i)), 
-						null);
+						true);
 				((LegImpl)(actslegs.get(i))).setArrivalTime(now+travelTime);
 				((LegImpl)(actslegs.get(i))).setTravelTime(travelTime);
 				now+=travelTime;
@@ -615,7 +615,7 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 								(ActivityImpl)(actslegs.get(i+1)), 
 								(ActivityImpl)(actslegs.get(i+3)), 
 								(LegImpl)(actslegs.get(i+2)), 
-								null);
+								true);
 						((LegImpl)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
 						((LegImpl)(actslegs.get(i+2))).setTravelTime(travelTime);
 						now+=travelTime;

@@ -25,18 +25,22 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 /**
- * Abstract class for <code>LegTravelTimeEstimator</code>s
- * that estimate the travel time of a fixed route.
+ * Implementation of <code>LegTravelTimeEstimator</code>
+ * which estimates the travel time of a fixed route.
  *
  * @author meisterk
  *
@@ -48,7 +52,6 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	private final PlansCalcRoute plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
-	private HashMap<RouteWRefs, List<LinkImpl>> linkRoutesCache = new HashMap<RouteWRefs, List<LinkImpl>>();
 	private HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
 
 	protected FixedRouteLegTravelTimeEstimator(
@@ -60,30 +63,48 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		this.linkTravelTimeEstimator = linkTravelTimeEstimator;
 		this.tDepDelayCalc = depDelayCalc;
 		this.plansCalcRoute = plansCalcRoute;
-		// TODO check
 		this.simLegInterpretation = simLegInterpretation;
 
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination,
-			LegImpl legIntermediate, Boolean doModifyLeg) {
+			LegImpl legIntermediate, boolean doModifyLeg) {
 
 		double legTravelTimeEstimation = 0.0;
 
 		if (legIntermediate.getMode().equals(TransportMode.car)) {
 
+			// if no fixed route is given, generate free speed route for that leg in a lazy manner
+			if (!this.fixedRoutes.containsKey(legIntermediate)) {
+				
+				// calculate free speed route and cache it
+				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
+						actOrigin.getLink().getToNode(), 
+						actDestination.getLink().getFromNode(), 
+						0.0);
+				this.fixedRoutes.put(legIntermediate, path.links);
+				
+			}
+			
 			double now = departureTime;
 			now = this.processDeparture(actOrigin.getLink(), now);
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				now = this.processRouteTravelTime((NetworkRoute) legIntermediate.getRoute(), now);
+				now = this.processRouteTravelTime(this.fixedRoutes.get(legIntermediate), now);
 				now = this.processLink(actDestination.getLink(), now);
 			} else if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				now = this.processLink(actOrigin.getLink(), now);
-				now = this.processRouteTravelTime((NetworkRoute) legIntermediate.getRoute(), now);
+				now = this.processRouteTravelTime(this.fixedRoutes.get(legIntermediate), now);
 			}
 
+			if (doModifyLeg) {
+				// TODO where do I know from the type of the NetworkRoute to be constructed? (node or link)
+				NodeNetworkRoute nodeNetworkRoute = new NodeNetworkRoute(actOrigin.getLink(), actDestination.getLink());
+				nodeNetworkRoute.setLinks(actOrigin.getLink(), this.fixedRoutes.get(legIntermediate), actDestination.getLink());
+				legIntermediate.setRoute(nodeNetworkRoute);
+			}
+			
 			legTravelTimeEstimation = now - departureTime;
 			
 		} else {
@@ -107,8 +128,6 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		return legTravelTimeEstimation;
 		
 	}
-
-
 	
 	protected double processDeparture(final LinkImpl link, final double start) {
 
@@ -117,19 +136,11 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	}
 
-	protected double processRouteTravelTime(final NetworkRoute route, final double start) {
+	protected double processRouteTravelTime(final List<LinkImpl> route, final double start) {
 
 		double now = start;
 
-		List<LinkImpl> links = null;
-		if (this.linkRoutesCache.containsKey(route)) {
-			links = this.linkRoutesCache.get(route);
-		} else {
-			links = route.getLinks();
-			this.linkRoutesCache.put(route, links);
-		}
-
-		for (LinkImpl link : links) {
+		for (LinkImpl link : route) {
 			now = this.processLink(link, now);
 		}
 		return now;
@@ -148,9 +159,28 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		return this.getClass().getSimpleName();
 	}
 
-	public void reset() {
-		this.linkRoutesCache.clear();
+	public void resetPlanSpecificInformation() {
 		this.travelTimeCache.clear();
+		this.fixedRoutes.clear();
+	}
+
+	private HashMap<LegImpl, List<LinkImpl>> fixedRoutes = new HashMap<LegImpl, List<LinkImpl>>();
+	
+	public void initPlanSpecificInformation(PlanImpl plan) {
+
+		for (PlanElement planElement : plan.getPlanElements()) {
+			
+			if (planElement instanceof BasicLeg) {
+				
+				LegImpl leg = (LegImpl) planElement;
+				if (leg.getMode().equals(TransportMode.car)) {
+					this.fixedRoutes.put(leg, ((NetworkRoute) leg.getRoute()).getLinks());
+				}
+				
+			}
+			
+		}
+		
 	}
 
 }

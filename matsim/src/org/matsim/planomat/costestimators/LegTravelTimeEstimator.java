@@ -23,6 +23,7 @@ package org.matsim.planomat.costestimators;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * Interface for the estimation of the travel time of a leg. Implement it
@@ -35,6 +36,13 @@ import org.matsim.core.population.LegImpl;
 public interface LegTravelTimeEstimator {
 
 	/**
+	 * Override this method to initialize plan specific information.
+	 * 
+	 * @param plan
+	 */
+	public void initPlanSpecificInformation(final PlanImpl plan);
+	
+	/**
 	 * Implement your assumption on travel time estimation here.
 	 * 
 	 * TODO don't have to pass a Leg-type object, a TransportMode object would be enough
@@ -45,7 +53,7 @@ public interface LegTravelTimeEstimator {
 	 * @param actOrigin the activity at the beginning of the leg
 	 * @param actDestination the activity at the end of the leg
 	 * @param legIntermediate the leg for which a travel time is estimated
-	 * @param doModifyLeg control parameter indicaticating whether it is allowed that the leg object is modified or not 
+	 * @param doModifyLeg control parameter indicating whether it is allowed that the leg object is modified or not 
 	 * @return a travel time estimation.
 	 */
 	public double getLegTravelTimeEstimation(
@@ -54,8 +62,13 @@ public interface LegTravelTimeEstimator {
 			ActivityImpl actOrigin,
 			ActivityImpl actDestination,
 			LegImpl legIntermediate,
-			Boolean doModifyLeg);
+			boolean doModifyLeg);
 	
-	public void reset();
+	/**
+	 * Override this method to reset plan specific information.
+	 * 
+	 * @param plan
+	 */
+	public void resetPlanSpecificInformation();
 	
 }

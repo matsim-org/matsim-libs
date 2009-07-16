@@ -72,8 +72,6 @@
 
 	<module name="planomat">
 		<param name="possibleModes" value="car,pt" />
-		<param name="routingCapability" value="linearInterpolation" />
-		<param name="jgapMaxGenerations" value="10" />
 	</module>
 
 </config>

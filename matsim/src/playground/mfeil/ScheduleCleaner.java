@@ -50,7 +50,7 @@ public class ScheduleCleaner {
 					(ActivityImpl)(plan.getPlanElements().get(i-1)), 
 					(ActivityImpl)(plan.getPlanElements().get(i+1)), 
 					(LegImpl)(plan.getPlanElements().get(i)),
-					null);
+					true);
 			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;

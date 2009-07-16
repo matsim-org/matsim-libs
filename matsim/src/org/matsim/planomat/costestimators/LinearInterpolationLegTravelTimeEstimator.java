@@ -31,11 +31,22 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Location;
 
+/**
+ * 
+ * Travel times for modes with variable travel times are approximated via a linear interpolation with sampling points at the full hours,
+ * based on the travel times approximated by a routing algorithm.
+ * 
+ * TODO simplify code, especially data structures
+ * 
+ * @author meisterk
+ *
+ */
 public class LinearInterpolationLegTravelTimeEstimator implements
 LegTravelTimeEstimator {
 
@@ -43,6 +54,8 @@ LegTravelTimeEstimator {
 	/**
 	 * Modes whose optimal routes and travel times are variable throughout the day, and therefore have to be approximated.
 	 * They are in opposite to modes whose optimal routes and travel times are constant can be computed once and be cached afterwards.
+	 * 
+	 * TODO possibly a MATSim config parameter
 	 */
 	public static final EnumSet<TransportMode> MODES_WITH_VARIABLE_TRAVEL_TIME = EnumSet.of(TransportMode.car);
 	
@@ -171,7 +184,7 @@ LegTravelTimeEstimator {
 		return m * departureTime + y_0;
 	}
 
-	public void reset() {
+	public void resetPlanSpecificInformation() {
 		this.dynamicODMatrix.clear();
 		this.travelTimeCache.clear();
 
@@ -214,49 +227,31 @@ LegTravelTimeEstimator {
 			
 		}
 		
-//		
-//		
-//		
-//		
-//		
-//		if (legIntermediate.getMode().equals(TransportMode.car)) {
-//			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-//				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actOrigin.getLink(), departureTime);
-//			}
-//		}
-//		legTravelTimeEstimation += this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
-//		if (legIntermediate.getMode().equals(TransportMode.car)) {
-//			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-//				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(actDestination.getLink(), departureTime + legTravelTimeEstimation);
-//			}
-//		}
-
 		return legTravelTimeEstimation;
 
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination,
-			LegImpl legIntermediate, Boolean doModifyLeg) {
+			LegImpl legIntermediate, boolean doModifyLeg) {
 
 		double legTravelTimeEstimation = 0.0;
 
-		if (doModifyLeg == null) {
-			throw new RuntimeException("Specify doModifyLeg with either true or false.");
-//			Gbl.errorMsg("Specify doModifyLeg with either true or false.");
-		}
-		
 		if (
-				doModifyLeg.equals(Boolean.TRUE) || 
+				doModifyLeg || 
 				(!MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode()))
 				) {
 			legTravelTimeEstimation = this.simulateLegAndGetTravelTime(departureTime, actOrigin, actDestination, legIntermediate);
-		} else if (doModifyLeg.equals(Boolean.FALSE)) {
+		} else if (!doModifyLeg) {
 			legTravelTimeEstimation = this.getInterpolation(departureTime, actOrigin, actDestination, legIntermediate);
 		}
 
 		return legTravelTimeEstimation;
 
+	}
+
+	public void initPlanSpecificInformation(PlanImpl plan) {
+		// not implemented here
 	}
 
 }
