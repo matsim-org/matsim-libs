@@ -1,19 +1,21 @@
 package playground.mmoyo.PTRouter;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
-import playground.mmoyo.input.transitconverters.ToTransitScheduleConverter;
-import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
+
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.StationValidator;
 import playground.mmoyo.input.PTLineAggregator;
+import playground.mmoyo.input.transitconverters.ToTransitScheduleConverter;
+import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
 
 /** 
  * Executable class to perform data input, validations and routing test according to timetable information
@@ -124,8 +126,8 @@ public class PTControler2 {
 				//Path path2 = pt.getPtRouter2().findRoute(nodeA, nodeB, 45386);
 				Path path2 = pt.getPtRouter().findPTPath (coord1, coord2, 24372, 300);
 				System.out.println(path2.links.size());
-				for (LinkImpl l : path2.links){
-					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + l.getType() + l.getToNode().getId() );
+				for (Link l : path2.links){
+					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + ((LinkImpl)l).getType() + l.getToNode().getId() );
 				}
 				break;
 

@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.api.experimental.population.Route;
@@ -105,8 +106,8 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 			throw new IllegalStateException("Cann't create Route with EndLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
 		}
 		NetworkRoute route = new LinkNetworkRoute(start, end);
-		List<LinkImpl> links = new ArrayList<LinkImpl>();
-		LinkImpl link;
+		List<Link> links = new ArrayList<Link>();
+		Link link;
 		for (Id id : currentRouteLinkIds) {
 			link = this.network.getLink(id);
 			if (link == null) {

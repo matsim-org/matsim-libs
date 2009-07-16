@@ -49,11 +49,12 @@ import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -337,7 +338,7 @@ public class EgoNetPlansMakeKML {
 			if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl) o;
 	
-				for (LinkImpl routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (Link routeLink : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
 	
 					boolean linkExists = false;
@@ -631,19 +632,19 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static PlacemarkType generateLinkPlacemark(LinkImpl link, StyleType style, CoordinateTransformation trafo) {
+	private static PlacemarkType generateLinkPlacemark(Link link, StyleType style, CoordinateTransformation trafo) {
 
 		PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
 		linkPlacemark.setName("link" + link.getId());
 
 		LineStringType lst = kmlObjectFactory.createLineStringType();
 
-		NodeImpl fromNode = link.getFromNode();
+		Node fromNode = link.getFromNode();
 		Coord fromNodeWorldCoord = fromNode.getCoord();
 		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(fromNodeGeometryCoord.getX()) + "," + Double.toString(fromNodeGeometryCoord.getY()) + ",0.0");
 
-		NodeImpl toNode = link.getToNode();
+		Node toNode = link.getToNode();
 		Coord toNodeWorldCoord = toNode.getCoord();
 		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(toNodeGeometryCoord.getX()) + "," + Double.toString(toNodeGeometryCoord.getY()) + ",0.0");

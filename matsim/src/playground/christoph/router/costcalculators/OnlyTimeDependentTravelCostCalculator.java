@@ -20,7 +20,7 @@
 
 package playground.christoph.router.costcalculators;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -33,7 +33,7 @@ public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost {
 		this.timeCalculator = timeCalculator;
 	}
 
-	public double getLinkTravelCost(final LinkImpl link, final double time) 
+	public double getLinkTravelCost(final Link link, final double time) 
 	{
 		if (timeCalculator != null)
 		{
@@ -42,11 +42,11 @@ public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost {
 		}
 		else
 		{
-			return link.getFreespeedTravelTime(time);
+			return link.getLength()/link.getFreespeed(time);
 		}
 	}
 
-	public double getLinkMinimumTravelCost(final LinkImpl link) 
+	public double getLinkMinimumTravelCost(final Link link) 
 	{
 		double TravelTime = this.timeCalculator.getLinkTravelTime(link, Time.UNDEFINED_TIME);
 		return TravelTime;

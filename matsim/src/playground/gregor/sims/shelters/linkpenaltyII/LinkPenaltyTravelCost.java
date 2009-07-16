@@ -1,6 +1,6 @@
 package playground.gregor.sims.shelters.linkpenaltyII;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -15,7 +15,7 @@ public class LinkPenaltyTravelCost implements TravelCost {
 		this.lp = lp;
 	}
 	
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 			return this.tt.getLinkTravelTime(link, time) + this.lp.getLinkTravelCost(link, time);
 	}
 

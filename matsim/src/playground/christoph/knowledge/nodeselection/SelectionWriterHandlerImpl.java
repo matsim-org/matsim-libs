@@ -25,19 +25,9 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.ActivitySpaceBean;
-import org.matsim.knowledges.ActivitySpaceCassini;
-import org.matsim.knowledges.ActivitySpaceEllipse;
-import org.matsim.knowledges.ActivitySpaceSuperEllipse;
-import org.matsim.knowledges.Knowledge;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 
@@ -124,14 +114,14 @@ public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 		out.write("\t\t\t\t<nodes>\n");
 	}
 
-	public void node(final NodeImpl node, final BufferedWriter out) throws IOException
+	public void node(final Node node, final BufferedWriter out) throws IOException
 	{
 		out.write("\t\t\t\t\t<node id=\"" + node.getId() + "\"/>\n");
 	}
 	
-	public void nodes(final Map<Id, NodeImpl> nodes, final BufferedWriter out) throws IOException
+	public void nodes(final Map<Id, Node> nodes, final BufferedWriter out) throws IOException
 	{
-		for(NodeImpl node:nodes.values())
+		for(Node node:nodes.values())
 		{
 			node(node, out);
 		}
@@ -151,14 +141,14 @@ public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 		out.write("\t\t\t\t<links>");
 	}
 	
-	public void link(final LinkImpl link, final BufferedWriter out) throws IOException
+	public void link(final Link link, final BufferedWriter out) throws IOException
 	{
 		out.write("\t\t\t\t\t<link id=\"" + link.getId() + "/>\n");
 	}
 	
-	public void links(final Map<Id, LinkImpl> links, final BufferedWriter out) throws IOException
+	public void links(final Map<Id, Link> links, final BufferedWriter out) throws IOException
 	{
-		for(LinkImpl link:links.values())
+		for(Link link:links.values())
 		{
 			link(link, out);
 		}

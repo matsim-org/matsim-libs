@@ -40,6 +40,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -49,7 +50,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -177,8 +177,8 @@ public class EgressAnalysis {
 			log.info("handle plans");
 			for (PersonImpl person : this.population.getPersons().values()) {
 				LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
-				List<NodeImpl> route = ((NetworkRoute) leg.getRoute()).getNodes();
-				NodeImpl node = route.get(route.size()-2);
+				List<Node> route = ((NetworkRoute) leg.getRoute()).getNodes();
+				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 				plan.addActivity(person.getSelectedPlan().getFirstActivity());
@@ -190,8 +190,8 @@ public class EgressAnalysis {
 				plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
 				this.router.run(plan);
 				LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
-				List<NodeImpl> route2 = ((NetworkRoute) leg2.getRoute()).getNodes();
-				NodeImpl node2 = route2.get(route2.size()-2);
+				List<Node> route2 = ((NetworkRoute) leg2.getRoute()).getNodes();
+				Node node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;
 
 			}

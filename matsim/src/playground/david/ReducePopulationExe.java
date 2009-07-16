@@ -28,6 +28,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -35,12 +36,9 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -69,7 +67,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	int count = 0;
 	public static int ptCount = 0;
 	
-	public Set<LinkImpl> usedlinkList = new HashSet<LinkImpl>();
+	public Set<Link> usedlinkList = new HashSet<Link>();
 
 	
 	public FilterPersons2() {
@@ -88,8 +86,8 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					LegImpl l = (LegImpl) actl.get(i);
 					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
 						
-						List<LinkImpl> ll = ((NetworkRoute) l.getRoute()).getLinks();
-						for(LinkImpl link : ll) {
+						List<Link> ll = ((NetworkRoute) l.getRoute()).getLinks();
+						for(Link link : ll) {
 							usedlinkList.add(link);
 						}
 					}

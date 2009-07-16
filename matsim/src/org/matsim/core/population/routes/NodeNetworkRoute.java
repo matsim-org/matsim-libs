@@ -25,13 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.utils.misc.Time;
 
 public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 
-	protected final ArrayList<NodeImpl> route = new ArrayList<NodeImpl>();
+	protected final ArrayList<Node> route = new ArrayList<Node>();
 
 	private double cost = Double.NaN;
 
@@ -44,7 +44,7 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 	@Deprecated
 	public NodeNetworkRoute(){}
 	
-	public NodeNetworkRoute(LinkImpl startLink, LinkImpl endLink) {
+	public NodeNetworkRoute(Link startLink, Link endLink) {
 		super(startLink, endLink);
 	}
 
@@ -63,11 +63,11 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 				"have to set the route by object references not by Ids.");
 	}
 
-	public List<NodeImpl> getNodes() {
+	public List<Node> getNodes() {
 		return this.route;
 	}
 
-	public void setLinks(final LinkImpl startLink, final List<LinkImpl> srcRoute, final LinkImpl endLink) {
+	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
 		setStartLink(startLink);
 		setEndLink(endLink);
@@ -83,7 +83,7 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 					this.route.add(startLink.getToNode());
 				}
 			} else {
-				LinkImpl l = srcRoute.get(0);
+				Link l = srcRoute.get(0);
 				this.route.add(l.getFromNode());
 				for (int i = 0; i < srcRoute.size(); i++) {
 					l = srcRoute.get(i);
@@ -95,11 +95,11 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 	}
 
 	@Deprecated
-	public void setNodes(final List<NodeImpl> srcRoute) {
+	public void setNodes(final List<Node> srcRoute) {
 		setNodes(null, srcRoute, null);
 	}
 
-	public void setNodes(final LinkImpl startLink, final List<NodeImpl> srcRoute, final LinkImpl endLink) {
+	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		setStartLink(startLink);
 		setEndLink(endLink);
 		if (srcRoute == null) {
@@ -129,30 +129,30 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	public List<Id> getLinkIds() {
 		List<Id> ret = new ArrayList<Id>(Math.max(0, this.route.size() - 1));
-		for (LinkImpl l : getLinks()) {
+		for (Link l : getLinks()) {
 			ret.add(l.getId());
 		}
 		return ret;
 	}
 
-	public final List<LinkImpl> getLinks() {
+	public final List<Link> getLinks() {
 		// marcel, 2006-09-05: added getLinkRoute
 		/* Nodes have proved to not be the best solution to store routes.
 		 * Thus it should be changed sooner or later to links instead of nodes
 		 * This function is a first step for this as it helps to create the
 		 * list of links the route leads through */
 		if (this.route.size() == 0) {
-			return new ArrayList<LinkImpl>(0);
+			return new ArrayList<Link>(0);
 		}
 
-		NodeImpl prevNode = null;
-		ArrayList<LinkImpl> links = new ArrayList<LinkImpl>(this.route.size() - 1);
-		for (NodeImpl node : this.route) {
+		Node prevNode = null;
+		ArrayList<Link> links = new ArrayList<Link>(this.route.size() - 1);
+		for (Node node : this.route) {
 			if (prevNode != null) {
 				// search link from prevNode to node
 				boolean linkFound = false;
-				for (Iterator<? extends LinkImpl> iter = prevNode.getOutLinks().values().iterator(); iter.hasNext() && !linkFound; ) {
-					LinkImpl link = iter.next();
+				for (Iterator<? extends Link> iter = prevNode.getOutLinks().values().iterator(); iter.hasNext() && !linkFound; ) {
+					Link link = iter.next();
 					if (link.getToNode() == node) {
 						links.add(link);
 						linkFound = true;
@@ -173,7 +173,7 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 		 * fix this somehow, but how?? MR, jan07
 		 */
 		double distance = 0;
-		for (LinkImpl link : getLinks()) {
+		for (Link link : getLinks()) {
 			distance += link.getLength();
 		}
 		return distance;
@@ -187,18 +187,18 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 	 * @return a route leading from <code>fromNode</code> to <code>toNode</code> along this route
 	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
-	public NetworkRoute getSubRoute(final NodeImpl fromNode, final NodeImpl toNode) {
-		LinkImpl fromLink = getStartLink();
-		LinkImpl toLink = getEndLink();
+	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
+		Link fromLink = getStartLink();
+		Link toLink = getEndLink();
 		int fromIndex = -1;
 		int toIndex = -1;
-		List<LinkImpl> links = getLinks();
+		List<Link> links = getLinks();
 		int max = links.size();
 		if (fromNode == toNode) {
 			if (this.route.size() > 1) {
 				for (int i = 0; i < max; i++) {
-					LinkImpl link = links.get(i);
-					NodeImpl node = link.getFromNode();
+					Link link = links.get(i);
+					Node node = link.getFromNode();
 					if (node.equals(fromNode)) {
 						fromIndex = i;
 						toIndex = i;
@@ -228,8 +228,8 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 			}
 		} else { // --> fromNode != toNode
 			for (int i = 0; i < max; i++) {
-				LinkImpl link = links.get(i);
-				NodeImpl node = link.getFromNode();
+				Link link = links.get(i);
+				Node node = link.getFromNode();
 				if (node.equals(fromNode)) {
 					fromIndex = i;
 					break;
@@ -240,12 +240,12 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 				throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
 			}
 			for (int i = fromIndex; i < max; i++) {
-				LinkImpl link = links.get(i);
+				Link link = links.get(i);
 				if (toIndex >= 0) {
 					toLink = link;
 					break;
 				}
-				NodeImpl node = link.getToNode();
+				Node node = link.getToNode();
 				if (node.equals(toNode)) {
 					toIndex = i + 1;
 				}

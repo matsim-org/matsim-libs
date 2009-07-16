@@ -1,15 +1,17 @@
 package playground.mmoyo;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.util.List;
+
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -29,9 +31,6 @@ import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-
-
-import org.matsim.api.basic.v01.TransportMode;
 
 /** makes tests with the transit router on the 5x5 scenario*/
 public class PTRouterTest extends MatsimTestCase {
@@ -66,7 +65,7 @@ public class PTRouterTest extends MatsimTestCase {
 		Coord coord1 = new CoordImpl(1010, 5010);
 		Coord coord2 = new CoordImpl(8950, 8950);
 		Path path = ptRouter.findPTPath (coord1, coord2, 2808, 400);   //07:48 , 400 walk distance
-		List<NodeImpl> plainPathNodes  = logicIntoPlainTranslator.convertNodesToPlain(path.nodes);
+		List<Node> plainPathNodes  = logicIntoPlainTranslator.convertNodesToPlain(path.nodes);
 		assertEquals( plainPathNodes.get(0).getId() , new IdImpl("10")); 
 		assertEquals( plainPathNodes.get(1).getId() , new IdImpl("15"));
 		assertEquals( plainPathNodes.get(2).getId() , new IdImpl("20"));  //transfer

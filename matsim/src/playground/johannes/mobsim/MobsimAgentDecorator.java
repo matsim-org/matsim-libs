@@ -25,7 +25,7 @@ package playground.johannes.mobsim;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 /**
  * A base-class for writing decorators of {@link MobsimAgent}.
@@ -60,7 +60,7 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements
 		agent.beforeSim();
 	}
 
-	public LinkImpl getLink() {
+	public Link getLink() {
 		return agent.getLink();
 	}
 
@@ -72,11 +72,11 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements
 		return agent.getMode(time);
 	}
 
-	public LinkImpl getNextLink(double time) {
+	public Link getNextLink(double time) {
 		return agent.getNextLink(time);
 	}
 
-	public LinkImpl getDestinationLink(double time) {
+	public Link getDestinationLink(double time) {
 		return agent.getDestinationLink(time);
 	}
 
@@ -92,7 +92,7 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements
 		agent.departure(time);
 	}
 
-	public void enterLink(LinkImpl link, double time) {
+	public void enterLink(Link link, double time) {
 		agent.enterLink(link, time);
 	}
 

@@ -1,6 +1,6 @@
 package playground.gregor.sims.run;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.evacuation.riskaversion.RiskCostCalculator;
@@ -23,7 +23,7 @@ public class ShelterLinkPenaltyRiskCostTravelCost implements TravelCost {
 		this.sc = sc;
 	}
 	
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 			return this.ttc.getLinkTravelTime(link, time) + this.slp.getLinkTravelCost(link, time) + this.rc.getLinkRisk(link); // + this.sc.getSocialCost(link, time);
 	}
 

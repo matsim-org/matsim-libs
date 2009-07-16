@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -348,7 +349,7 @@ public class TravelTimeHistogram {
 	}
 	private static double getPathLength(Path path) {
 		double sum = 0;
-		for(LinkImpl link : path.links)
+		for(Link link : path.links)
 			sum += link.getLength();
 		return sum;
 	}
@@ -379,11 +380,11 @@ public class TravelTimeHistogram {
 
 	private static class TravelDistanceCost implements TravelTime, TravelCost {
 
-		public double getLinkTravelTime(LinkImpl link, double time) {
+		public double getLinkTravelTime(Link link, double time) {
 			return link.getLength() / link.getFreespeed(time);
 		}
 
-		public double getLinkTravelCost(LinkImpl link, double time) {
+		public double getLinkTravelCost(Link link, double time) {
 			return link.getLength();
 		}
 		

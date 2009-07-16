@@ -20,7 +20,7 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 
 /**
@@ -28,7 +28,7 @@ import org.matsim.core.network.LinkImpl;
  */
 public class LinkNetworkRouteFactory implements RouteFactory {
 
-	public RouteWRefs createRoute(LinkImpl startLink, LinkImpl endLink) {
+	public RouteWRefs createRoute(Link startLink, Link endLink) {
 		return new LinkNetworkRoute(startLink, endLink);
 	}
 

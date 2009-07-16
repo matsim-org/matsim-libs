@@ -45,13 +45,10 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -61,7 +58,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -444,7 +440,7 @@ public class MyRuns {
 							final int hour = (int)time / 3600;
 							if ((hour > 30) || (hour < 0)) return;
 
-							for (final LinkImpl link : route.getLinks()) {
+							for (final Link link : route.getLinks()) {
 								final Id id = link.getId();
 								TreeMap<Id, Integer> hourValues = linkValues.get(hour);
 								if (hourValues == null) {

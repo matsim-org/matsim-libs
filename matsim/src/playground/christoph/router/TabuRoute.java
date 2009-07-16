@@ -25,9 +25,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -57,20 +58,20 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 	}
 
 	
-	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double startTime)
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected Path findRoute(NodeImpl fromNode, NodeImpl toNode)
+	protected Path findRoute(Node fromNode, Node toNode)
 	{
-		NodeImpl currentNode = fromNode;
-		LinkImpl currentLink;
+		Node currentNode = fromNode;
+		Link currentLink;
 		double routeLength = 0.0;
 		
-		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
-		ArrayList<LinkImpl> links = new ArrayList<LinkImpl>();
-		Map<Id, NodeImpl> knownNodesMap = null;
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		ArrayList<Link> links = new ArrayList<Link>();
+		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
 		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
@@ -78,7 +79,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		nodes.add(fromNode);
 	
 		// first loop -> there is no previous node
-		NodeImpl previousNode = null;
+		Node previousNode = null;
 		
 		while(!currentNode.equals(toNode))
 		{
@@ -90,7 +91,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 				break;
 			}
 			
-			LinkImpl[] linksArray = currentNode.getOutLinks().values().toArray(new LinkImpl[currentNode.getOutLinks().size()]);
+			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
 			linksArray = KnowledgeTools.getKnownLinks(linksArray, knownNodesMap);
@@ -105,7 +106,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			}
 			
 			// get Links, that do not return to the previous Node
-			LinkImpl[] newLinks = TabuSelector.getLinks(linksArray, previousNode);
+			Link[] newLinks = TabuSelector.getLinks(linksArray, previousNode);
 			
 			// choose link
 			int nextLink = MatsimRandom.getRandom().nextInt(newLinks.length);

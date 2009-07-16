@@ -20,8 +20,8 @@
 
 package org.matsim.core.population.routes;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.Route;
-import org.matsim.core.network.LinkImpl;
 
 /**
  * Defines the minimum amount of information a route in MATSim must provide.
@@ -30,10 +30,10 @@ import org.matsim.core.network.LinkImpl;
  */
 public interface RouteWRefs extends Route {
 
-	public LinkImpl getStartLink();
-	public void setStartLink(final LinkImpl link);
+	public Link getStartLink();
+	public void setStartLink(final Link link);
 
-	public LinkImpl getEndLink();
-	public void setEndLink(final LinkImpl link);
+	public Link getEndLink();
+	public void setEndLink(final Link link);
 	
 }

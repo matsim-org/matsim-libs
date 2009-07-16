@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -142,7 +142,7 @@ public class KSPPenalty {
 	 * @return a link of different paths. Can be empty if no paths have been
 	 *         identified. The first path in the list is always the best path!
 	 */
-	public List<Path> getPaths(NodeImpl departure, NodeImpl destination, double time,
+	public List<Path> getPaths(Node departure, Node destination, double time,
 			int count, TravelTime travelTimes) {
 		/*
 		 * (1) Set the plain linkcost object and set the extended linkcost
@@ -222,12 +222,12 @@ public class KSPPenalty {
 		/*
 		 * (1) Convert the path to a list of links.
 		 */
-		List<LinkImpl> links = path.links;
+		List<Link> links = path.links;
 		/*
 		 * (2) Get the total length of the route.
 		 */
 		double length = 0;
-		for (LinkImpl link : links)
+		for (Link link : links)
 			length += link.getLength();
 		/*
 		 * (3) Calculate the new impedance for each link in the route.
@@ -241,7 +241,7 @@ public class KSPPenalty {
 		 * (3b) Loop through all links and calculate the impedance increment.
 		 */
 		double s = 0;
-		for (LinkImpl link : links) {
+		for (Link link : links) {
 			s += link.getLength();
 			double increment = (this.alpha_1 - Math.abs(gradient * (shift_x - s)))
 					* length_factor;
@@ -265,7 +265,7 @@ public class KSPPenalty {
 
 		private TravelTime linkcost;
 
-		public double getLinkTravelTime(LinkImpl link, double time) {
+		public double getLinkTravelTime(Link link, double time) {
 			Double impedance = KSPPenalty.this.linkPenalties.get(link);
 			if(impedance != null)
 				return this.linkcost.getLinkTravelTime(link, time) * (1+impedance);
@@ -273,7 +273,7 @@ public class KSPPenalty {
 				return this.linkcost.getLinkTravelTime(link, time);
 		}
 
-		public double getLinkTravelCost(LinkImpl link, double time) {
+		public double getLinkTravelCost(Link link, double time) {
 			return getLinkTravelTime(link, time);
 		}
 

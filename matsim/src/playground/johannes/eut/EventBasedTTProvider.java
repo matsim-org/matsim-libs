@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
@@ -17,9 +18,7 @@ import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 
 
 /**
@@ -204,7 +203,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 		}
 	}
 
-	public double getLinkTravelTime(LinkImpl link, double time) {
+	public double getLinkTravelTime(Link link, double time) {
 		// TODO Auto-generated method stub
 		return getLinkTravelTime_s(link, (int) time);
 	}

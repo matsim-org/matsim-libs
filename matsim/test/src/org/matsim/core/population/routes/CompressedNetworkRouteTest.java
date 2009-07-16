@@ -25,10 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkIdComparator;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
@@ -38,7 +37,7 @@ import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getCarRouteInstance(final LinkImpl fromLink, final LinkImpl toLink, NetworkLayer network) {
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, NetworkLayer network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
 		return new CompressedNetworkRoute(fromLink, toLink, subsequent.getSubsequentLinks());
 	}
@@ -51,14 +50,14 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	public void testGetLinks_setLinks() {
 		NetworkLayer network = createTestNetwork();
-		LinkImpl link1 = network.getLink(new IdImpl("1"));
-		LinkImpl link22 = network.getLink(new IdImpl("22"));
-		LinkImpl link12 = network.getLink(new IdImpl("12"));
-		LinkImpl link13 = network.getLink(new IdImpl("13"));
-		LinkImpl linkM24 = network.getLink(new IdImpl("-24"));
-		LinkImpl link4 = network.getLink(new IdImpl("4"));
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link22 = network.getLink(new IdImpl("22"));
+		Link link12 = network.getLink(new IdImpl("12"));
+		Link link13 = network.getLink(new IdImpl("13"));
+		Link linkM24 = network.getLink(new IdImpl("-24"));
+		Link link4 = network.getLink(new IdImpl("4"));
 
-		List<LinkImpl> links = new ArrayList<LinkImpl>(5);
+		List<Link> links = new ArrayList<Link>(5);
 		links.add(link22);
 		links.add(link12);
 		links.add(link13);
@@ -66,7 +65,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		NetworkRoute route = getCarRouteInstance(link1, link4, network);
 		route.setLinks(link1, links, link4);
 
-		List<LinkImpl> links2 = route.getLinks();
+		List<Link> links2 = route.getLinks();
 		assertEquals("wrong number of links.", links.size(), links2.size());
 		for (int i = 0, n = links.size(); i < n; i++) {
 			assertEquals("different link at position " + i, links.get(i), links2.get(i));
@@ -75,18 +74,18 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	public void testGetLinks_onlySubsequentLinks() {
 		NetworkLayer network = createTestNetwork();
-		LinkImpl link0 = network.getLink(new IdImpl("0"));
-		LinkImpl link1 = network.getLink(new IdImpl("1"));
-		LinkImpl link2 = network.getLink(new IdImpl("2"));
-		LinkImpl link3 = network.getLink(new IdImpl("3"));
-		LinkImpl link4 = network.getLink(new IdImpl("4"));
+		Link link0 = network.getLink(new IdImpl("0"));
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link2 = network.getLink(new IdImpl("2"));
+		Link link3 = network.getLink(new IdImpl("3"));
+		Link link4 = network.getLink(new IdImpl("4"));
 
-		List<LinkImpl> links = new ArrayList<LinkImpl>(4);
+		List<Link> links = new ArrayList<Link>(4);
 		links.add(link1);
 		links.add(link2);
 		links.add(link3);
 
-		Map<LinkImpl, LinkImpl> subsequentLinks = new TreeMap<LinkImpl, LinkImpl>(new LinkIdComparator());
+		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
 		subsequentLinks.put(link0, link1);
 		subsequentLinks.put(link1, link2);
 		subsequentLinks.put(link2, link3);
@@ -95,7 +94,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		NetworkRoute route = new CompressedNetworkRoute(link0, link4, subsequentLinks);
 		route.setLinks(link0, links, link4);
 
-		List<LinkImpl> links2 = route.getLinks();
+		List<Link> links2 = route.getLinks();
 		assertEquals("wrong number of links.", links.size(), links2.size());
 		for (int i = 0, n = links.size(); i < n; i++) {
 			assertEquals("different link at position " + i, links.get(i), links2.get(i));
@@ -108,13 +107,13 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	public void testGetLinks_incompleteInitialization() {
 		NetworkLayer network = createTestNetwork();
-		LinkImpl link0 = network.getLink(new IdImpl("0"));
-		LinkImpl link1 = network.getLink(new IdImpl("1"));
-		LinkImpl link2 = network.getLink(new IdImpl("2"));
-		LinkImpl link3 = network.getLink(new IdImpl("3"));
-		LinkImpl link4 = network.getLink(new IdImpl("4"));
+		Link link0 = network.getLink(new IdImpl("0"));
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link2 = network.getLink(new IdImpl("2"));
+		Link link3 = network.getLink(new IdImpl("3"));
+		Link link4 = network.getLink(new IdImpl("4"));
 
-		Map<LinkImpl, LinkImpl> subsequentLinks = new TreeMap<LinkImpl, LinkImpl>(new LinkIdComparator());
+		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
 		subsequentLinks.put(link0, link1);
 		subsequentLinks.put(link1, link2);
 		subsequentLinks.put(link2, link3);
@@ -133,13 +132,13 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	public void testGetNodes_incompleteInitialization() {
 		NetworkLayer network = createTestNetwork();
-		LinkImpl link0 = network.getLink(new IdImpl("0"));
-		LinkImpl link1 = network.getLink(new IdImpl("1"));
-		LinkImpl link2 = network.getLink(new IdImpl("2"));
-		LinkImpl link3 = network.getLink(new IdImpl("3"));
-		LinkImpl link4 = network.getLink(new IdImpl("4"));
+		Link link0 = network.getLink(new IdImpl("0"));
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link2 = network.getLink(new IdImpl("2"));
+		Link link3 = network.getLink(new IdImpl("3"));
+		Link link4 = network.getLink(new IdImpl("4"));
 		
-		Map<LinkImpl, LinkImpl> subsequentLinks = new TreeMap<LinkImpl, LinkImpl>(new LinkIdComparator());
+		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
 		subsequentLinks.put(link0, link1);
 		subsequentLinks.put(link1, link2);
 		subsequentLinks.put(link2, link3);

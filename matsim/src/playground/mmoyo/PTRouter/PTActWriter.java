@@ -9,6 +9,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -133,7 +135,7 @@ public class PTActWriter {
 				System.out.println(" ");
 				System.out.println(leg.toString());
 				
-				for (NodeImpl node : networkRoute.getNodes()){
+				for (Node node : networkRoute.getNodes()){
 					if (node != null) System.out.print(" " + node.getId() + " " );
 				}
 			}
@@ -274,8 +276,8 @@ public class PTActWriter {
 	 * Cuts up the found path into acts and legs according to the type of links contained in the path
 	 */
 	public void insertLegActs(final Path path, double depTime, final PlanImpl newPlan){
-		List<LinkImpl> routeLinks = path.links;
-		List<LinkImpl> legRouteLinks = new ArrayList<LinkImpl>();
+		List<Link> routeLinks = path.links;
+		List<Link> legRouteLinks = new ArrayList<Link>();
 		double accumulatedTime=depTime;
 		double arrTime;
 		double legTravelTime=0;
@@ -287,7 +289,8 @@ public class PTActWriter {
 		boolean first=true;
 		LinkImpl lastLink = null;
 		
-		for(LinkImpl link: routeLinks){
+		for(Link link2: routeLinks){
+			LinkImpl link = (LinkImpl) link2;
 			linkTravelTime=this.ptRouter.ptTravelTime.getLinkTravelTime(link,accumulatedTime);
 			linkDistance = link.getLength();
 			
@@ -394,7 +397,7 @@ public class PTActWriter {
 		return ptAct;
 	}
 
-	private LegImpl newPTLeg(TransportMode mode, final List<LinkImpl> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private LegImpl newPTLeg(TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRoute legRoute = new LinkNetworkRoute(null, null); 
 		
 		if (mode!=TransportMode.walk){
@@ -418,7 +421,7 @@ public class PTActWriter {
 		double walkTravelTime = walk.walkTravelTime(distance);
 		double depTime = act1.getEndTime();
 		double arrTime = depTime + walkTravelTime;
-		return newPTLeg(TransportMode.walk, new ArrayList<LinkImpl>(), distance, depTime, walkTravelTime, arrTime);
+		return newPTLeg(TransportMode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
 	}
 	
 	private void createWlinks(final Coord coord1, Path path, final Coord coord2){
@@ -440,10 +443,10 @@ public class PTActWriter {
 		return node;
 	}
 	
-	public LinkImpl createPTLink(String strIdLink, NodeImpl fromNode, NodeImpl toNode, String type){
+	public LinkImpl createPTLink(String strIdLink, Node fromNode, Node toNode, String type){
 		//->use link factory
 		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-		return logicNet.createLink( new IdImpl(strIdLink), fromNode, toNode, length, 1, 1, 1, "0", type); 
+		return logicNet.createLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, length, 1, 1, 1, "0", type); 
 	}
 	
 	private void removeWlinks(){

@@ -38,6 +38,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -107,7 +108,7 @@ public class EstimReactiveLinkTT implements
 		f.leaveLink(personId, time);
 	}
 
-	public double getLinkTravelTime(LinkImpl link, double time) {
+	public double getLinkTravelTime(Link link, double time) {
 		int simtime = (int) SimulationTimer.getTime();
 		if ((simtime == this.lastQueryTime) && (link == this.lastQueriedLink))
 			return this.lastTravelTime;
@@ -117,7 +118,7 @@ public class EstimReactiveLinkTT implements
 
 			LinkTTCalculator f = this.linkTTCalculators.get(link.getId());
 			if (f == null)
-				this.lastTravelTime = link.getFreespeedTravelTime(simtime);
+				this.lastTravelTime = link.getLength()/link.getFreespeed(simtime);
 			else
 				/*
 				 * TODO: This is ugly!

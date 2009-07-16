@@ -25,6 +25,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
@@ -35,9 +37,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -178,16 +178,16 @@ import org.matsim.core.utils.misc.Time;
 		return population;
 	}
 
-	private static PersonImpl createPerson1(final int personId, final String startTime, final LinkImpl homeLink, final List<NodeImpl> routeNodes, final LinkImpl workLink) {
+	private static PersonImpl createPerson1(final int personId, final String startTime, final Link homeLink, final List<Node> routeNodes, final Link workLink) {
 		PersonImpl person = new PersonImpl(new IdImpl(personId));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
-		plan.createActivity("h", homeLink).setEndTime(Time.parseTime(startTime));
+		plan.createActivity("h", (LinkImpl)homeLink).setEndTime(Time.parseTime(startTime));
 		LegImpl leg = plan.createLeg(TransportMode.car);//"car", startTime, "00:01", null);
 		NetworkRoute route = new NodeNetworkRoute(homeLink, workLink);
 		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
-		plan.createActivity("w", workLink);//, null, "24:00", null, "yes");
+		plan.createActivity("w", (LinkImpl)workLink);//, null, "24:00", null, "yes");
 		return person;
 	}
 
@@ -224,7 +224,7 @@ import org.matsim.core.utils.misc.Time;
 
 	protected static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
 		StringBuilder strBuilder = new StringBuilder();
-		for (NodeImpl node : realRoute.getNodes()) {
+		for (Node node : realRoute.getNodes()) {
 			strBuilder.append(node.getId().toString());
 			strBuilder.append(' ');
 		}

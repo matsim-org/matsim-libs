@@ -38,7 +38,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
@@ -46,32 +47,32 @@ import org.matsim.core.population.PlanImpl;
 
 public class GetAllNodes {
 
-	public Map<Id, NodeImpl> getAllNodes(NetworkLayer n)
+	public Map<Id, Node> getAllNodes(NetworkLayer n)
 	{
 		return getNodes(n);
 	}
 	
-	public void getAllNodes(NetworkLayer n, Map<Id, NodeImpl> nodesMap)
+	public void getAllNodes(NetworkLayer n, Map<Id, Node> nodesMap)
 	{	
 		getNodes(n, nodesMap);
 	}
 	
-	public Map<Id, NodeImpl> getAllNodes(PersonImpl p)
+	public Map<Id, Node> getAllNodes(PersonImpl p)
 	{
 		return getNodes(new GetAllLinks().getAllLinks(p));
 	}
 	
-	public void getAllNodes(PersonImpl p, Map<Id, NodeImpl> nodesMap)
+	public void getAllNodes(PersonImpl p, Map<Id, Node> nodesMap)
 	{
 		getNodes(new GetAllLinks().getAllLinks(p), nodesMap);
 	}
 	
-	public Map<Id, NodeImpl> getAllNodes(PlanImpl p)
+	public Map<Id, Node> getAllNodes(PlanImpl p)
 	{
 		return getNodes(new GetAllLinks().getAllLinks(p));
 	}
 	
-	public void getAllNodes(PlanImpl p, Map<Id, NodeImpl> nodesMap)
+	public void getAllNodes(PlanImpl p, Map<Id, Node> nodesMap)
 	{
 		getNodes(new GetAllLinks().getAllLinks(p), nodesMap);
 	}
@@ -80,9 +81,9 @@ public class GetAllNodes {
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
 	// Da keine ArrayList mit bereits selektieren Nodes uebergeben wurde, wird diese neu erstellt. 
-	protected Map<Id, NodeImpl> getNodes(ArrayList<LinkImpl> links)
+	protected Map<Id, Node> getNodes(ArrayList<Link> links)
 	{
-		Map <Id, NodeImpl> nodesMap = new TreeMap<Id, NodeImpl>();
+		Map <Id, Node> nodesMap = new TreeMap<Id, Node>();
 		
 		getNodes(links, nodesMap);
 		
@@ -91,16 +92,16 @@ public class GetAllNodes {
 	
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
-	protected void getNodes(ArrayList<LinkImpl> links, Map<Id, NodeImpl> nodesMap)
+	protected void getNodes(ArrayList<Link> links, Map<Id, Node> nodesMap)
 	{
-		Iterator<LinkImpl> linksIterator = links.iterator();
+		Iterator<Link> linksIterator = links.iterator();
 		
 		while(linksIterator.hasNext())
 		{
-			LinkImpl link = linksIterator.next();
+			Link link = linksIterator.next();
 			
-			NodeImpl fromNode = link.getFromNode();
-			NodeImpl toNode = link.getToNode();
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getToNode();
 			
 			if (!nodesMap.containsKey(fromNode.getId())) nodesMap.put(fromNode.getId(), fromNode);
 			if (!nodesMap.containsKey(toNode.getId())) nodesMap.put(toNode.getId(), toNode);
@@ -109,9 +110,9 @@ public class GetAllNodes {
 	}
 	
 	
-	protected Map<Id, NodeImpl> getNodes(NetworkLayer n)
+	protected Map<Id, Node> getNodes(NetworkLayer n)
 	{
-		Map<Id, NodeImpl> nodesMap = new TreeMap<Id, NodeImpl>();
+		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 
 		getNodes(n, nodesMap);
 		
@@ -119,13 +120,13 @@ public class GetAllNodes {
 	} //getNodes(NetworkLayer n)
 	
 	
-	protected void getNodes(NetworkLayer n, Map<Id, NodeImpl> nodesMap)
+	protected void getNodes(NetworkLayer n, Map<Id, Node> nodesMap)
 	{
 		// get all nodes of the network
 		Map<Id, NodeImpl> networkNodesMap = n.getNodes();
 				
 		// iterate over Array or Iteratable
-		for (NodeImpl node : networkNodesMap.values()) 
+		for (Node node : networkNodesMap.values()) 
 		{
 			// Which one is faster / better?
 			if(!nodesMap.containsKey(node.getId())) nodesMap.put(node.getId(), node);

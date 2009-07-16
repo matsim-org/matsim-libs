@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.routeprovider;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -43,7 +43,7 @@ public interface RouteProvider {
 	 *         able to find an appropriate route or if the provider rejected
 	 *         the request.
 	 */
-	public NetworkRoute requestRoute(LinkImpl departureLink, LinkImpl destinationLink, double time);
+	public NetworkRoute requestRoute(Link departureLink, Link destinationLink, double time);
 
 	/**
 	 * Each RouteProvider instance has a priority which should be a value in 0 .. 10, where
@@ -58,7 +58,7 @@ public interface RouteProvider {
 	 */
 	public void setPriority(int p);
 
-	public boolean providesRoute(LinkImpl currentLink, NetworkRoute subRoute);
+	public boolean providesRoute(Link currentLink, NetworkRoute subRoute);
 
 
 }

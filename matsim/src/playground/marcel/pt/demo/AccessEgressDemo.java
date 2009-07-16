@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -116,7 +117,7 @@ public class AccessEgressDemo {
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<LinkImpl> linkList = new ArrayList<LinkImpl>(nOfLinks - 2);
+		ArrayList<Link> linkList = new ArrayList<Link>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}

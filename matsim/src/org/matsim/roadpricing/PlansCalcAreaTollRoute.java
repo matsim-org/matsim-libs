@@ -23,6 +23,7 @@ package org.matsim.roadpricing;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -270,7 +271,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		 */
 
 		// handle following links
-		for (LinkImpl link : route.links) {
+		for (Link link : route.links) {
 			if (isLinkTolled(link, time)) {
 				return true;
 			}
@@ -281,7 +282,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		return isLinkTolled(endLink, time);
 	}
 
-	private boolean isLinkTolled(final LinkImpl link, final double time) {
+	private boolean isLinkTolled(final Link link, final double time) {
 		return this.scheme.getLinkCost(link.getId(), time) != null;
 	}
 

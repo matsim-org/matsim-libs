@@ -30,9 +30,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -97,12 +97,12 @@ public class GeneratePathSets {
 				log.debug("done.");
 				// write least cost path
 				out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
-				for (LinkImpl l : paths.getFirst().links) { out.write("\t"+l.getId()); }
+				for (Link l : paths.getFirst().links) { out.write("\t"+l.getId()); }
 				out.write("\t-1\t1\t-1\n");
 				// write other paths
 				for (Path path : paths.getSecond()) {
 					out.write(id.toString()+"\t"+od.getFirst().getId()+"\t"+od.getSecond().getId());
-					for (LinkImpl l : path.links) { out.write("\t"+l.getId()); }
+					for (Link l : path.links) { out.write("\t"+l.getId()); }
 					out.write("\t-1\t0\t-1\n");
 				}
 				out.flush();

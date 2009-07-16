@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -44,15 +45,15 @@ public class TransitRouteFinder {
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
 
 		if (path!= null){
-			List <LinkImpl> linkList = new ArrayList<LinkImpl>();
+			List <Link> linkList = new ArrayList<Link>();
 			double depTime=fromAct.getEndTime();
 			double travTime= depTime;
 			
 			int i=1;
 			String linkType;
 			String lastLinkType= null;
-			for (LinkImpl link: path.links){
-				linkType = link.getType();
+			for (Link link: path.links){
+				linkType = ((LinkImpl)link).getType();
 				
 				if (i>1){
 					if (!linkType.equals(lastLinkType)){
@@ -61,7 +62,7 @@ public class TransitRouteFinder {
 							legList.add(newLeg);
 						}
 						depTime=travTime;
-						linkList = new ArrayList<LinkImpl>();
+						linkList = new ArrayList<Link>();
 					}
 					if (i == path.links.size()){
 						travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
@@ -89,13 +90,13 @@ public class TransitRouteFinder {
 		return mode;
 	}
 	
-	private LegImpl createLeg(TransportMode mode, final List<LinkImpl> routeLinks, final double depTime, final double arrivTime){
+	private LegImpl createLeg(TransportMode mode, final List<Link> routeLinks, final double depTime, final double arrivTime){
 		double travTime= arrivTime - depTime;  
-		List<NodeImpl> routeNodeList = new ArrayList<NodeImpl>();
+		List<Node> routeNodeList = new ArrayList<Node>();
 		
 		double distance=0;
 		if (routeLinks.size()>0) routeNodeList.add(routeLinks.get(0).getFromNode());
-		for(LinkImpl link : routeLinks) {
+		for(Link link : routeLinks) {
 			distance= distance + link.getLength();
 			routeNodeList.add(link.getToNode());
 		} 

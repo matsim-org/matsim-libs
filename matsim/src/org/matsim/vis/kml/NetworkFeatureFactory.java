@@ -29,8 +29,8 @@ import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -66,7 +66,7 @@ public class NetworkFeatureFactory {
 		this.coordTransform = coordTransform;
 	}
 
-	public AbstractFeatureType createLinkFeature(final LinkImpl l, StyleType networkStyle) {
+	public AbstractFeatureType createLinkFeature(final Link l, StyleType networkStyle) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		String description = this.createLinkDescription(l);
 		folder.setName(l.getId().toString());
@@ -97,7 +97,7 @@ public class NetworkFeatureFactory {
 		return folder;
 	}
 
-	public AbstractFeatureType createNodeFeature(final NodeImpl n, StyleType networkStyle) {
+	public AbstractFeatureType createNodeFeature(final Node n, StyleType networkStyle) {
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName(n.getId().toString());
 
@@ -130,7 +130,7 @@ public class NetworkFeatureFactory {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(leg.getMode().toString() + "_" + Time.writeTime(leg.getDepartureTime()));
 
-		for (LinkImpl l : ((NetworkRoute) leg.getRoute()).getLinks()) {
+		for (Link l : ((NetworkRoute) leg.getRoute()).getLinks()) {
 
 			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);
 			if (abstractFeature.getClass().equals(FolderType.class)) {
@@ -139,7 +139,7 @@ public class NetworkFeatureFactory {
 				log.warn("Not yet implemented: Adding link KML features of type" + abstractFeature.getClass());
 			}
 		}
-		for (NodeImpl n : ((NetworkRoute) leg.getRoute()).getNodes()) {
+		for (Node n : ((NetworkRoute) leg.getRoute()).getNodes()) {
 			
 			AbstractFeatureType abstractFeature = this.createNodeFeature(n, style);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
@@ -152,7 +152,7 @@ public class NetworkFeatureFactory {
 		return folder;
 	}
 
-	private String createLinkDescription(LinkImpl l) {
+	private String createLinkDescription(Link l) {
 		StringBuilder buffer = new StringBuilder(100);
 //		buffer.append(NetworkFeatureFactory.STARTCDATA);
 		buffer.append(NetworkFeatureFactory.STARTH2);
@@ -201,7 +201,7 @@ public class NetworkFeatureFactory {
 		return buffer.toString();
 	}
 
-	private String createNodeDescription(NodeImpl n) {
+	private String createNodeDescription(Node n) {
 		StringBuilder buffer = new StringBuilder(100);
 //		buffer.append(NetworkFeatureFactory.STARTCDATA);
 		buffer.append(NetworkFeatureFactory.STARTH2);
@@ -213,7 +213,7 @@ public class NetworkFeatureFactory {
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(STARTUL);
-		for (LinkImpl l : n.getInLinks().values()) {
+		for (Link l : n.getInLinks().values()) {
 			buffer.append(STARTLI);
 			buffer.append("Link: " );
 			buffer.append(l.getId());
@@ -228,7 +228,7 @@ public class NetworkFeatureFactory {
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(STARTUL);
-		for (LinkImpl l : n.getOutLinks().values()) {
+		for (Link l : n.getOutLinks().values()) {
 			buffer.append(STARTLI);
 			buffer.append("Link: " );
 			buffer.append(l.getId());

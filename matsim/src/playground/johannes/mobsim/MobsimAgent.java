@@ -22,7 +22,7 @@ package playground.johannes.mobsim;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 /**
  * @author illenberger
@@ -57,7 +57,7 @@ public interface MobsimAgent {
 	 * 
 	 * @return the current link.
 	 */
-	public LinkImpl getLink();
+	public Link getLink();
 
 	/**
 	 * Returns the next desired link the agent wishes to traverse.
@@ -68,7 +68,7 @@ public interface MobsimAgent {
 	 *         reached its destination link, i.e., {@link #getLink()} equals
 	 *         {@link #getDestinationLink(double)}.
 	 */
-	public LinkImpl getNextLink(double time);
+	public Link getNextLink(double time);
 
 	/**
 	 * Returns the desired destination link. If {@link #isDone()} returns
@@ -79,7 +79,7 @@ public interface MobsimAgent {
 	 *            the current simulation time.
 	 * @return the desired destination link.
 	 */
-	public LinkImpl getDestinationLink(double time);
+	public Link getDestinationLink(double time);
 
 	/**
 	 * Returns whether the agent intends to perform a further trip or not.
@@ -112,7 +112,7 @@ public interface MobsimAgent {
 	 * @param time
 	 *            the current simulation time.
 	 */
-	public void enterLink(LinkImpl link, double time);
+	public void enterLink(Link link, double time);
 
 	/**
 	 * Informs the agent that it has arrived.

@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Node;
 
 public abstract class LogitSelector {
 
@@ -73,7 +73,7 @@ public abstract class LogitSelector {
 
 
 
-	private LogitLink getDCLogitLink(final NodeImpl from, final NodeImpl to) {
+	private LogitLink getDCLogitLink(final Node from, final Node to) {
 		final String key =  from.getId().toString() +" " + to.getId().toString();
 		LogitLink d = this.pathTree.get(key);
 		if (d == null) {

@@ -1,6 +1,6 @@
 package playground.gregor.sims.confluent;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -14,7 +14,7 @@ public class CostCalculator implements TravelCost {
 		this.lpc = lpc;
 	}
 	
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		double tc = tt.getLinkTravelTime(link, time);
 		double penalty = this.lpc.getLinkCost(link);
 		return  tc + penalty; 

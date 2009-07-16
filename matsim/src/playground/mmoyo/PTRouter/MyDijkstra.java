@@ -21,7 +21,7 @@ public class MyDijkstra extends Dijkstra{
 
 	protected boolean canPassLink(final LinkImpl link) {
 		DijkstraNodeData fromNodeData= getData(link.getFromNode());
-		LinkImpl lastLink = fromNodeData.getPrevLink();
+		LinkImpl lastLink = (LinkImpl) fromNodeData.getPrevLink();
 		return pathVal.canPassLink(lastLink, link);	
 	}
 	

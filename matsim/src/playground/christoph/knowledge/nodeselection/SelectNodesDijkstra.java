@@ -25,8 +25,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
@@ -42,12 +42,12 @@ import playground.christoph.knowledge.utils.GetAllNodes;
  */
 public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 
-	NodeImpl startNode;
-	NodeImpl endNode;
+	Node startNode;
+	Node endNode;
 	double costFactor = Double.MAX_VALUE;	
 	TravelCost costCalculator = new FreespeedTravelTimeCost();	// CostCalculator
 	double time = Time.UNDEFINED_TIME;	// time for the CostCalculator
-	Map<Id, NodeImpl> networkNodesMap;
+	Map<Id, Node> networkNodesMap;
 	DijkstraForSelectNodes dijkstra;
 	
 	private static final Logger log = Logger.getLogger(SelectNodesDijkstra.class);
@@ -67,7 +67,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	 * For examples used when creating a clone. 
 	 * In general these maps are static, so it is no problem to share the map.
 	 */
-	public SelectNodesDijkstra(NetworkLayer network, Map<Id, NodeImpl> networkNodesMap)
+	public SelectNodesDijkstra(NetworkLayer network, Map<Id, Node> networkNodesMap)
 	{
 		this.network = network;
 
@@ -76,7 +76,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
 	}
 	
-	public SelectNodesDijkstra(NetworkLayer network, NodeImpl startNode, NodeImpl endNode, double costFactor)
+	public SelectNodesDijkstra(NetworkLayer network, Node startNode, Node endNode, double costFactor)
 	{
 		this.network = network;
 		this.startNode = startNode;
@@ -89,12 +89,12 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
 	}
 	
-	public void setStartNode(NodeImpl startNode)
+	public void setStartNode(Node startNode)
 	{
 		this.startNode = startNode;
 	}
 	
-	public void setEndNode(NodeImpl endNode)
+	public void setEndNode(Node endNode)
 	{
 		this.endNode = endNode;
 	}
@@ -128,28 +128,28 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	
 	@Override
 	//public ArrayList<Node> getNodes() {
-	public Map<Id, NodeImpl> getNodes() {
+	public Map<Id, Node> getNodes() {
 		
-		Map<Id, NodeImpl> nodesMap = new TreeMap<Id, NodeImpl>();
+		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 		addNodesToMap(nodesMap);
 		
 		return nodesMap;
 	}
 
 	@Override
-	public void addNodesToMap(Map<Id, NodeImpl> nodesMap)
+	public void addNodesToMap(Map<Id, Node> nodesMap)
 	{		
 		dijkstra.executeForwardNetwork(startNode);
-		Map<NodeImpl, Double> startMap = dijkstra.getMinDistances();
+		Map<Node, Double> startMap = dijkstra.getMinDistances();
 		
 		dijkstra.executeBackwardNetwork(endNode);
-		Map<NodeImpl, Double> endMap = dijkstra.getMinDistances();
+		Map<Node, Double> endMap = dijkstra.getMinDistances();
 		
 		// get the minimal costs to get from the start- to the endnode
 		double minCosts = startMap.get(endNode);
 
 		// iterate over Array or Iteratable 
-		for (NodeImpl node : networkNodesMap.values())
+		for (Node node : networkNodesMap.values())
 		{			
 			// if the node exists in start- and endMap
 			if (startMap.containsKey(node) && endMap.containsKey(node))

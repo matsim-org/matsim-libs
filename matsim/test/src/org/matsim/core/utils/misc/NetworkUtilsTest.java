@@ -23,12 +23,12 @@ package org.matsim.core.utils.misc;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -40,25 +40,25 @@ public class NetworkUtilsTest extends MatsimTestCase {
 
 	public void testGetNodes_Empty() {
 		NetworkLayer network = getTestNetwork();
-		List<NodeImpl> nodes = NetworkUtils.getNodes(network, "");
+		List<Node> nodes = NetworkUtils.getNodes(network, "");
 		assertEquals(0, nodes.size());
 
-		List<NodeImpl> nodes2 = NetworkUtils.getNodes(network, " ");
+		List<Node> nodes2 = NetworkUtils.getNodes(network, " ");
 		assertEquals(0, nodes2.size());
 
-		List<NodeImpl> nodes3 = NetworkUtils.getNodes(network, " \t\r\n \t  \t ");
+		List<Node> nodes3 = NetworkUtils.getNodes(network, " \t\r\n \t  \t ");
 		assertEquals(0, nodes3.size());
 	}
 
 	public void testGetNodes_Null() {
 		NetworkLayer network = getTestNetwork();
-		List<NodeImpl> nodes = NetworkUtils.getNodes(network, null);
+		List<Node> nodes = NetworkUtils.getNodes(network, null);
 		assertEquals(0, nodes.size());
 	}
 
 	public void testGetNodes_mixedDelimiters() {
 		NetworkLayer network = getTestNetwork();
-		List<NodeImpl> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
+		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
 		assertEquals(5, nodes.size());
 		assertEquals(network.getNode(new IdImpl(1)), nodes.get(0));
 		assertEquals(network.getNode(new IdImpl(2)), nodes.get(1));
@@ -79,25 +79,25 @@ public class NetworkUtilsTest extends MatsimTestCase {
 	
 	public void testGetLinks_Empty() {
 		NetworkLayer network = getTestNetwork();
-		List<LinkImpl> links = NetworkUtils.getLinks(network, "");
+		List<Link> links = NetworkUtils.getLinks(network, "");
 		assertEquals(0, links.size());
 		
-		List<LinkImpl> links2 = NetworkUtils.getLinks(network, " ");
+		List<Link> links2 = NetworkUtils.getLinks(network, " ");
 		assertEquals(0, links2.size());
 		
-		List<LinkImpl> links3 = NetworkUtils.getLinks(network, " \t\r\n \t  \t ");
+		List<Link> links3 = NetworkUtils.getLinks(network, " \t\r\n \t  \t ");
 		assertEquals(0, links3.size());
 	}
 	
 	public void testGetLinks_Null() {
 		NetworkLayer network = getTestNetwork();
-		List<LinkImpl> links = NetworkUtils.getLinks(network, null);
+		List<Link> links = NetworkUtils.getLinks(network, null);
 		assertEquals(0, links.size());
 	}
 	
 	public void testGetLinks_mixedDelimiters() {
 		NetworkLayer network = getTestNetwork();
-		List<LinkImpl> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
+		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
 		assertEquals(4, links.size());
 		assertEquals(network.getLink(new IdImpl(1)), links.get(0));
 		assertEquals(network.getLink(new IdImpl(2)), links.get(1));

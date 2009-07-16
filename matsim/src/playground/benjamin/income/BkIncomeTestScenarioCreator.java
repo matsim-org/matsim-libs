@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
@@ -35,6 +34,7 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -98,7 +98,7 @@ public class BkIncomeTestScenarioCreator {
 			linkidsCar.add(id3);
 //			routeCar.setLinkIds(linkidsCar);
 			// but this is reality
-			routeCar.setNodes(ListUtils.makeList(this.uselessNetwork.getNode(new IdImpl("2")), 
+			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNode(new IdImpl("2")), 
 					this.uselessNetwork.getNode(new IdImpl("3")), 
 					this.uselessNetwork.getNode(new IdImpl("4"))));
 			leg1Car.setRoute(routeCar);
@@ -121,7 +121,7 @@ public class BkIncomeTestScenarioCreator {
 			//but not with mankind
 			
 			
-			routeCar.setNodes(ListUtils.makeList(this.uselessNetwork.getNode(new IdImpl("5")),
+			routeCar.setNodes(ListUtils.<Node>makeList(this.uselessNetwork.getNode(new IdImpl("5")),
 					this.uselessNetwork.getNode(new IdImpl("6")),
 					this.uselessNetwork.getNode(new IdImpl("7")),
 					this.uselessNetwork.getNode(new IdImpl("8")),

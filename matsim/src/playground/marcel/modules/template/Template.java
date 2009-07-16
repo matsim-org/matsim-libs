@@ -20,13 +20,13 @@
 
 package playground.marcel.modules.template;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
@@ -130,7 +130,7 @@ public class Template implements MatsimModule {
 		// *** TravelCostCalculator *********************
 		
 		TravelCost travelCostCalculator = new TravelCost() {
-			public double getLinkTravelCost(LinkImpl link, double time) {
+			public double getLinkTravelCost(Link link, double time) {
 				return 0;
 			}
 		};

@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
 
@@ -38,20 +38,20 @@ import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
 public class NextLinkTravelTimePerception implements TravelTime, AgentPercepts {
 
 
-	Map<LinkImpl, Double> linkMap;
+	Map<Link, Double> linkMap;
 
 	private int sightDistance;
 
 
 	public NextLinkTravelTimePerception(final int agentVisibilityRange) {
-		this.linkMap = new HashMap<LinkImpl, Double>();
+		this.linkMap = new HashMap<Link, Double>();
 		this.sightDistance = agentVisibilityRange;
 	}
 
 	/**
-	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(org.matsim.core.network.LinkImpl, double)
+	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(Link, double)
 	 */
-	public double getLinkTravelTime(final LinkImpl link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time) {
 		Double travelTime = this.linkMap.get(link);
 		if (travelTime != null) {
 			return travelTime.doubleValue();
@@ -59,15 +59,15 @@ public class NextLinkTravelTimePerception implements TravelTime, AgentPercepts {
 		return 0;
 	}
 
-	public void updatedPercepts(final NodeImpl currentNode) {
+	public void updatedPercepts(final Node currentNode) {
 		this.linkMap.clear();
-		NodeImpl current;
-		List<NodeImpl> nodes = new LinkedList<NodeImpl>();
+		Node current;
+		List<Node> nodes = new LinkedList<Node>();
 		nodes.add(currentNode);
 		int depth = 0;
 		while (!nodes.isEmpty()) {
 			current = nodes.remove(0);
-			for (LinkImpl l : current.getOutLinks().values()) {
+			for (Link l : current.getOutLinks().values()) {
 				this.linkMap.put(l, LinkTravelTimeCounter.getInstance().getLastLinkTravelTime(l.getId()));
 				if (depth < this.sightDistance) {
 					nodes.add(l.getToNode());

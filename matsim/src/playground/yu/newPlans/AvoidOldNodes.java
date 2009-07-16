@@ -25,15 +25,14 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -69,7 +68,7 @@ public class AvoidOldNodes extends NewPopulation {
 					BasicLeg bl = (BasicLeg) pe;
 					NetworkRoute br = (NetworkRoute) bl.getRoute();
 					if (br != null) {
-						tag: for (final NodeImpl n : br.getNodes()) {
+						tag: for (final Node n : br.getNodes()) {
 							final String nId = n.getId().toString();
 							for (String nodeId : this.nodeIds) {
 								if (nId.equals(nodeId)) {

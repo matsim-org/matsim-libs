@@ -20,9 +20,9 @@
 
 package org.matsim.core.router.costcalculators;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -75,14 +75,14 @@ public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
 		this(Gbl.getConfig().charyparNagelScoring());
 	}
 
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		if (this.marginalUtlOfDistance == 0.0) {
 			return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor;
 		}
 		return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}
 
-	public double getLinkMinimumTravelCost(LinkImpl link) {
+	public double getLinkMinimumTravelCost(Link link) {
 		if (this.marginalUtlOfDistance == 0.0) {
 			return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor;
 		}
@@ -90,7 +90,7 @@ public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
 		- this.marginalUtlOfDistance * link.getLength();
 	}
 
-	public double getLinkTravelTime(LinkImpl link, double time) {
+	public double getLinkTravelTime(Link link, double time) {
 		return link.getLength() / link.getFreespeed(time);
 	}
 }

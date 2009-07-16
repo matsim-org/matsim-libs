@@ -25,17 +25,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.events.AgentReplanEvent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -114,9 +114,9 @@ public class WithindayAgent extends PersonAgent {
 			this.revisePercepts();
 			double replanningNeed = this.getReplanningNeed();
 			if (replanningNeed >= this.replanningThreshold) {
-				LinkImpl currentLink = this.getCurrentLink();
-				NodeImpl currentToNode = currentLink.getToNode();
-				NodeImpl currentDestinationNode = this.getDestinationLink().getFromNode();
+				Link currentLink = this.getCurrentLink();
+				Node currentToNode = currentLink.getToNode();
+				Node currentDestinationNode = this.getDestinationLink().getFromNode();
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
@@ -145,7 +145,7 @@ public class WithindayAgent extends PersonAgent {
 			int min = (int) ((SimulationTimer.getTime() - (hours * 60)) / 60);
 			log.trace("time: " + hours + ":" + min);
 		}
-		LinkImpl currentLink = this.getCurrentLink();
+		Link currentLink = this.getCurrentLink();
 		ActivityImpl nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
 		LinkImpl destinationLink = nextAct.getLink();
 		NetworkRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
@@ -155,12 +155,12 @@ public class WithindayAgent extends PersonAgent {
 
 		//create Route of already passed Nodes
 		//TODO dg use Route.getSubroute method
-		NodeImpl lastPassedNode = currentLink.getFromNode();
-		List<NodeImpl> oldRouteNodes = ((NetworkRoute) currentLeg.getRoute()).getNodes();
+		Node lastPassedNode = currentLink.getFromNode();
+		List<Node> oldRouteNodes = ((NetworkRoute) currentLeg.getRoute()).getNodes();
 		int lastPassedNodeIndex = oldRouteNodes.indexOf(lastPassedNode);
 		//this in fact a bit sophisticated construction is needed because Route.setNode(..) doesn't use the List interface and
 		//is bound to a ArrayList instead
-		List<NodeImpl> passedNodesList = new ArrayList<NodeImpl>();
+		List<Node> passedNodesList = new ArrayList<Node>();
 		if (lastPassedNodeIndex != -1) {
 			passedNodesList.addAll(oldRouteNodes.subList(0, lastPassedNodeIndex+1));
 		}
@@ -180,7 +180,7 @@ public class WithindayAgent extends PersonAgent {
     LegImpl oldLeg = (LegImpl) newPlan.getPlanElements().remove(currentLegIndex);
     LegImpl newLeg = new org.matsim.core.population.LegImpl(oldLeg);
     //concat the Route of already passed nodes with the new route
-    ArrayList<NodeImpl> newRouteConcatedList = new ArrayList<NodeImpl>(passedNodesList.size() + alternativeRoute.getNodes().size());
+    ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getNodes().size());
     newRouteConcatedList.addAll(passedNodesList);
     newRouteConcatedList.addAll(alternativeRoute.getNodes());
     NetworkRoute newRoute = (NetworkRoute) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(TransportMode.car, oldRoute.getStartLink(), oldRoute.getEndLink());
@@ -203,7 +203,7 @@ public class WithindayAgent extends PersonAgent {
     	if (log.isTraceEnabled()) {
 				log.trace("rerouting agent " + this.getPerson().getId() + " with ...");
 				StringBuffer buffer = new StringBuffer();
-				for (NodeImpl n : alternativeRoute.getNodes()) {
+				for (Node n : alternativeRoute.getNodes()) {
 					buffer.append(n.getId().toString());
 					buffer.append(" ");
 				}
@@ -252,10 +252,10 @@ public class WithindayAgent extends PersonAgent {
 	}
 
 	@Override
-	public LinkImpl chooseNextLink() {
+	public Link chooseNextLink() {
 		this.replan();
 //		this.cachedNextLink = null;
-		LinkImpl l = super.chooseNextLink();
+		Link l = super.chooseNextLink();
 		if (log.isTraceEnabled())
 			log.trace("vehicle : " + this.getPerson().getId() + " next choosen link:" + l.getId().toString());
 		return l;

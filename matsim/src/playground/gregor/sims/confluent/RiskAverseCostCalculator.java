@@ -1,6 +1,6 @@
 package playground.gregor.sims.confluent;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.evacuation.riskaversion.RiskCostCalculator;
@@ -18,7 +18,7 @@ public class RiskAverseCostCalculator implements TravelCost{
 		this.rc = rc;
 	}
 	
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		return this.rc.getLinkRisk(link) + this.lpc.getLinkCost(link) + this.tt.getLinkTravelTime(link, time);
 	}
 

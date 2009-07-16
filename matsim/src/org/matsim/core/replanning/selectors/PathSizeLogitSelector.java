@@ -26,9 +26,9 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -107,7 +107,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 					currentEndTime = leg.getDepartureTime();
 					NetworkRoute r = (NetworkRoute) leg.getRoute();
 					pathSize += r.getDistance();
-					for (LinkImpl link : r.getLinks()){
+					for (Link link : r.getLinks()){
 						ArrayList<Double> lit = linksInTime.get(link.getId());
 						if (lit == null){
 							lit = new ArrayList<Double>();
@@ -130,7 +130,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 					LegImpl leg = (LegImpl) pe;
 					double currentTime = leg.getDepartureTime();
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
-					for (LinkImpl link : route.getLinks()){
+					for (Link link : route.getLinks()){
 						double denominator = 0;
 						for (double dbl : linksInTime.get(link.getId())){
 							//TODO this is just for testing (those legs where the depature time differs more then 3600 seconds will not compared to each other) - need a

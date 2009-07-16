@@ -38,6 +38,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -48,45 +49,45 @@ import org.matsim.core.population.routes.NetworkRoute;
 
 public class GetAllLinks {
 	
-	public ArrayList<LinkImpl> getAllLinks(NetworkLayer n)
+	public ArrayList<Link> getAllLinks(NetworkLayer n)
 	{
 		return getLinks(n);
 	}
 		
-	public void getAllNodes(NetworkLayer n, ArrayList<LinkImpl> links)
+	public void getAllNodes(NetworkLayer n, ArrayList<Link> links)
 	{	
 		getLinks(n, links);
 	}
 	
-	public ArrayList<LinkImpl> getAllLinks(PersonImpl p)
+	public ArrayList<Link> getAllLinks(PersonImpl p)
 	{
 		return getLinks(p);
 	}
 	
-	public void getAllLinks(PersonImpl p, ArrayList<LinkImpl> links)
+	public void getAllLinks(PersonImpl p, ArrayList<Link> links)
 	{
 		getLinks(p, links);
 	}
 	
-	public ArrayList<LinkImpl> getAllLinks(PlanImpl p)
+	public ArrayList<Link> getAllLinks(PlanImpl p)
 	{
 		return getLinks(p);
 	}
 	
-	public void getAllLinks(PlanImpl p,  ArrayList<LinkImpl> links)
+	public void getAllLinks(PlanImpl p,  ArrayList<Link> links)
 	{
 		getLinks(p, links);
 	}
 	
 	
-	protected void getLinks(PersonImpl person, ArrayList<LinkImpl> links)
+	protected void getLinks(PersonImpl person, ArrayList<Link> links)
 	{
 		PlanImpl plan = person.getSelectedPlan();
 		getLinks(plan, links);
 	}
 	
 	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der uebergebenen Person sind.
-	protected ArrayList<LinkImpl> getLinks(PersonImpl person)
+	protected ArrayList<Link> getLinks(PersonImpl person)
 	{
 		PlanImpl plan = person.getSelectedPlan();
 
@@ -95,15 +96,15 @@ public class GetAllLinks {
 	
 	
 	// Liefert eine ArrayList aller Links, die Teil uebergebenen Plans sind.
-	protected ArrayList<LinkImpl> getLinks(PlanImpl plan)
+	protected ArrayList<Link> getLinks(PlanImpl plan)
 	{	
-		ArrayList<LinkImpl> links = new ArrayList<LinkImpl>();
+		ArrayList<Link> links = new ArrayList<Link>();
 		getLinks(plan, links);
 		
 		return links;
 	}
 	
-	protected void getLinks(PlanImpl plan, ArrayList<LinkImpl> links)
+	protected void getLinks(PlanImpl plan, ArrayList<Link> links)
 	{
 		// koennte kombiniert werden in eine for-schleife statt zwei
 
@@ -121,7 +122,7 @@ public class GetAllLinks {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl)pe;
 				NetworkRoute route = (NetworkRoute) leg.getRoute();
-				for (LinkImpl link : route.getLinks()) {
+				for (Link link : route.getLinks()) {
 					// Hinzufuegen, falls neues Element
 					if(!links.contains(link)) links.add(link);
 				}
@@ -130,15 +131,15 @@ public class GetAllLinks {
 	} // getLinks(Plan, ArrayList<Link>)
 		
 	
-	protected ArrayList<LinkImpl> getLinks(NetworkLayer n)
+	protected ArrayList<Link> getLinks(NetworkLayer n)
 	{
-		ArrayList<LinkImpl> links = new ArrayList<LinkImpl>();
+		ArrayList<Link> links = new ArrayList<Link>();
 		getLinks(n, links);
 		
 		return links;
 	} // getLinks(NetworkLayer)
 	
-	protected void getLinks(NetworkLayer n, ArrayList<LinkImpl> links)
+	protected void getLinks(NetworkLayer n, ArrayList<Link> links)
 	{
 		// Alle Links des Netzwerks holen
 		TreeMap<Id, LinkImpl> linkMap = (TreeMap<Id, LinkImpl>)n.getLinks();

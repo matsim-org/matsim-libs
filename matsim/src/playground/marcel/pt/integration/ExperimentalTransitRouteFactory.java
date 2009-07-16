@@ -20,13 +20,13 @@
 
 package playground.marcel.pt.integration;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 
 public class ExperimentalTransitRouteFactory implements RouteFactory {
 
-	public RouteWRefs createRoute(LinkImpl startLink, LinkImpl endLink) {
+	public RouteWRefs createRoute(Link startLink, Link endLink) {
 		return new ExperimentalTransitRoute(startLink, endLink);
 	}
 

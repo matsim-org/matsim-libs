@@ -23,8 +23,9 @@ package org.matsim.core.population.routes;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 
 /**
@@ -35,20 +36,20 @@ import org.matsim.core.network.NodeImpl;
  */
 public interface NetworkRoute extends RouteWRefs {
 	
-	public LinkImpl getStartLink();
+	public Link getStartLink();
 
-	public List<NodeImpl> getNodes();
+	public List<Node> getNodes();
 
-	public void setLinks(final LinkImpl startLink, final List<LinkImpl> srcRoute, final LinkImpl endLink);
+	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink);
 
 	/**
 	 * @param srcRoute
 	 * @deprecated please use method {@link #setNodes(LinkImpl, List, LinkImpl)} which also specifies start and end Link
 	 */
 	@Deprecated
-	public void setNodes(final List<NodeImpl> srcRoute);
+	public void setNodes(final List<Node> srcRoute);
 
-	public void setNodes(final LinkImpl startLink, final List<NodeImpl> srcRoute, final LinkImpl endLink);
+	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink);
 
 	public void setTravelCost(final double travelCost);
 
@@ -60,7 +61,7 @@ public interface NetworkRoute extends RouteWRefs {
 	 * included in the list.
 	 * @return a list containing the links the agents plans to travel along
 	 */
-	public List<LinkImpl> getLinks();
+	public List<Link> getLinks();
 
 	public List<Id> getLinkIds();
 	
@@ -71,6 +72,6 @@ public interface NetworkRoute extends RouteWRefs {
 	 * @param toNode
 	 * @return A flat copy of the original Route
 	 */
-	public NetworkRoute getSubRoute(final NodeImpl fromNode, final NodeImpl toNode);
+	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode);
 
 }

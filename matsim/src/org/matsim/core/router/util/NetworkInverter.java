@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
@@ -73,17 +74,17 @@ public class NetworkInverter {
 	}
 	
 	
-	public List<NodeImpl> convertInvertedLinksToNodes(List<LinkImpl> links) {
-		List<NodeImpl> ret = new ArrayList<NodeImpl>(links.size());
-		for (LinkImpl l : links){
+	public List<Node> convertInvertedLinksToNodes(List<Link> links) {
+		List<Node> ret = new ArrayList<Node>(links.size());
+		for (Link l : links){
 			ret.add(this.originalNetwork.getNode(l.getId()));
 		}
 		return ret;
 	}
 
-	public List<LinkImpl> convertInvertedNodesToLinks(List<NodeImpl> nodes) {
-		List<LinkImpl> ret = new ArrayList<LinkImpl>(nodes.size());
-		for (NodeImpl n : nodes){
+	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
+		List<Link> ret = new ArrayList<Link>(nodes.size());
+		for (Node n : nodes){
 			ret.add(this.originalNetwork.getLink(n.getId()));
 		}
 		return ret;

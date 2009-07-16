@@ -27,12 +27,12 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
@@ -94,14 +94,14 @@ public class CoopersRouteProviderTest extends TestCase {
 		controlInput.setNashTime(0);
 
 		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-		ArrayList<NodeImpl> list = new ArrayList<NodeImpl>();
+		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setNodes(null, list, null);
 		controlInput.setMainRoute(this.route1);
 		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-		list = new ArrayList<NodeImpl>();
+		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
@@ -129,7 +129,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	public void testProvidesRoute() {
 	  //create route which is driven by the person in the real simulated world
 		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-	  ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
+	  ArrayList<Node> nodes = new ArrayList<Node>();
 	  nodes.add(this.network.getNode("3"));
 	  nodes.add(this.network.getNode("32"));
 	  nodes.add(this.network.getNode("4"));
@@ -168,7 +168,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	public void testRequestRouteLinkLinkDouble() {
 	  //create route which is driven by the person in the real simulated world
 		NetworkRoute agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-	  ArrayList<NodeImpl> agentRouteNodes = new ArrayList<NodeImpl>();
+	  ArrayList<Node> agentRouteNodes = new ArrayList<Node>();
 	  agentRouteNodes.add(this.network.getNode("2"));
 	  agentRouteNodes.add(this.network.getNode("3"));
 	  agentRouteNodes.add(this.network.getNode("32"));
@@ -176,7 +176,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	  agentRoute.setNodes(null, agentRouteNodes, null);
 	  //create the route which should be returned by the provider
 	  NetworkRoute providerRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
-	  ArrayList<NodeImpl> providerRouteNodes = new ArrayList<NodeImpl>();
+	  ArrayList<Node> providerRouteNodes = new ArrayList<Node>();
 	  providerRouteNodes.add(this.network.getNode("2"));
 	  providerRouteNodes.add(this.network.getNode("3"));
 	  providerRouteNodes.add(this.network.getNode("31"));

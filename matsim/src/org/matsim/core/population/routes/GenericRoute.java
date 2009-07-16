@@ -20,7 +20,7 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 /**
  * A route for public transport trips.
@@ -29,7 +29,7 @@ import org.matsim.core.network.LinkImpl;
  */
 public interface GenericRoute extends RouteWRefs {
 
-	public void setRouteDescription(final LinkImpl startLink, final String routeDescription, final LinkImpl endLink);
+	public void setRouteDescription(final Link startLink, final String routeDescription, final Link endLink);
 	
 	public String getRouteDescription();
 

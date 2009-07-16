@@ -27,10 +27,9 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -89,7 +88,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 
 	private int intersectAOI(final LegImpl leg) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
-		for (LinkImpl link : route.getLinks()) {
+		for (Link link : route.getLinks()) {
 			if (this.aOI.contains(link.getId()))
 				return 1;
 		}

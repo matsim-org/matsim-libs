@@ -27,6 +27,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -136,18 +137,18 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	}
 
-	protected double processRouteTravelTime(final List<LinkImpl> route, final double start) {
+	protected double processRouteTravelTime(final List<Link> route, final double start) {
 
 		double now = start;
 
-		for (LinkImpl link : route) {
+		for (Link link : route) {
 			now = this.processLink(link, now);
 		}
 		return now;
 
 	}
 
-	protected double processLink(final LinkImpl link, final double start) {
+	protected double processLink(final Link link, final double start) {
 
 		double linkEnd = start + this.linkTravelTimeEstimator.getLinkTravelTime(link, start);
 		return linkEnd;
@@ -164,7 +165,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		this.fixedRoutes.clear();
 	}
 
-	private HashMap<LegImpl, List<LinkImpl>> fixedRoutes = new HashMap<LegImpl, List<LinkImpl>>();
+	private HashMap<LegImpl, List<Link>> fixedRoutes = new HashMap<LegImpl, List<Link>>();
 	
 	public void initPlanSpecificInformation(PlanImpl plan) {
 

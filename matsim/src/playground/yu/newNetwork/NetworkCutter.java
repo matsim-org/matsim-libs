@@ -30,6 +30,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -40,7 +41,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -149,7 +149,7 @@ public class NetworkCutter {
 		resetBoundary(route.getEndLink());
 	}
 
-	private void resetBoundary(LinkImpl link) {
+	private void resetBoundary(Link link) {
 		resetBoundary(link.getFromNode().getCoord());
 		resetBoundary(link.getToNode().getCoord());
 	}

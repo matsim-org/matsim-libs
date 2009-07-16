@@ -23,6 +23,7 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -208,7 +209,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 		
 		
-		List<NodeImpl> nodes = (path1 != null ? path1.nodes : new ArrayList<NodeImpl>());
+		List<Node> nodes = (path1 != null ? path1.nodes : new ArrayList<Node>());
 		if (!nodes.isEmpty()) { nodes.remove(nodes.size()-1); } // remove the via node
 		if (path2 != null) {
 			nodes.addAll(path2.nodes);

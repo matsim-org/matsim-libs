@@ -28,16 +28,15 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 
@@ -67,7 +66,7 @@ public class Flow {
 	/**
 	 * Edge representation of flow on the network  
 	 */
-	private HashMap<LinkImpl, EdgeIntervalls> _flow;
+	private HashMap<Link, EdgeIntervalls> _flow;
 	
 	/**
 	 * TimeExpandedTimeExpandedPath representation of flow on the network
@@ -77,22 +76,22 @@ public class Flow {
 	/**
 	 * list of all sources
 	 */
-	private final LinkedList<NodeImpl> _sources;
+	private final LinkedList<Node> _sources;
 	
 	/**
 	 * stores unsatisfied demands for each source
 	 */
-	private HashMap<NodeImpl,Integer> _demands;
+	private HashMap<Node,Integer> _demands;
 	
 	/**
 	 *stores for all nodes whether they are an non active source 
 	 */
-	private HashMap<NodeImpl,Boolean> _nonactives;
+	private HashMap<Node,Boolean> _nonactives;
 
 	/**
 	 * the sink, to which all flow is directed
 	 */
-	private final  NodeImpl _sink;
+	private final  Node _sink;
 	
 	/**
 	 * maximal time Horizon for the flow
@@ -124,18 +123,18 @@ public class Flow {
 	 * @param sink the sink for all the flow
 	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<NodeImpl, Integer> demands, final NodeImpl sink, final int horizon) {
+	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Node, Integer> demands, final Node sink, final int horizon) {
 		this._network = network;
 		this._lengths = lengths;
-		this._flow = new HashMap<LinkImpl,EdgeIntervalls>();
+		this._flow = new HashMap<Link,EdgeIntervalls>();
 		// initialize distances
-		for(LinkImpl link : network.getLinks().values()){
+		for(Link link : network.getLinks().values()){
 			int l = (int) _lengths.getLinkTravelCost(link, 1.);
 			this._flow.put(link, new EdgeIntervalls(l));
 		}
 		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
 		this._demands = demands;
-		this._sources = new LinkedList<NodeImpl>();
+		this._sources = new LinkedList<Node>();
 		this._sources.addAll(demands.keySet());
 		this._sink = sink;
 		_timeHorizon = horizon;
@@ -153,14 +152,14 @@ public class Flow {
 	 * @param sink the sink for all the flow
 	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<LinkImpl, EdgeIntervalls> flow,
-			HashMap<NodeImpl, Integer> demands,final NodeImpl sink,final int horizon) {
+	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Link, EdgeIntervalls> flow,
+			HashMap<Node, Integer> demands,final Node sink,final int horizon) {
 		this._network = network;
 		this._lengths = lengths;
 		this._flow = flow;
 		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
 		this._demands = demands;
-		this._sources = new LinkedList<NodeImpl>();
+		this._sources = new LinkedList<Node>();
 		this._sources.addAll(demands.keySet());
 		this._sink = sink;
 		_timeHorizon = horizon;
@@ -171,9 +170,9 @@ public class Flow {
 	/**
 	 * for all Nodes it is specified if the node is an non active source
 	 */
-	private HashMap<NodeImpl,Boolean> nonActives(){
-		HashMap<NodeImpl,Boolean> nonactives = new HashMap<NodeImpl,Boolean>();
-		for(NodeImpl node : this._network.getNodes().values()){
+	private HashMap<Node,Boolean> nonActives(){
+		HashMap<Node,Boolean> nonactives = new HashMap<Node,Boolean>();
+		for(Node node : this._network.getNodes().values()){
 			if(!this._sources.contains(node)){
 				nonactives.put(node, false);
 			}else{
@@ -195,7 +194,7 @@ public class Flow {
 	 * @param node Node that is checked
 	 * @return true iff Node is a Source and has positive demand
 	 */
-	public boolean isActiveSource(final NodeImpl node) {
+	public boolean isActiveSource(final Node node) {
 		Integer i = _demands.get(node);
 		if (i== null){
 			return false;
@@ -216,14 +215,14 @@ public class Flow {
 	 */
 	private int bottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
 		//check if first node is a source
-		NodeImpl source = TimeExpandedPath.getSource();
+		Node source = TimeExpandedPath.getSource();
 		if(!this._demands.containsKey(source)){
 			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
 		}
 		int result = this._demands.get(source);
 		//go through the pat edges
 		for(PathEdge edge : TimeExpandedPath.getPathEdges()){
-			LinkImpl link = edge.getEdge();
+			Link link = edge.getEdge();
 			int cap =(int) link.getCapacity(1.);
 			int time = edge.getTime();
 			//check forward capacity
@@ -265,7 +264,7 @@ public class Flow {
 		// no backward links
 		if(backwardLinks.isEmpty()){
 			for(PathEdge edge : timeExpandedPath.getPathEdges()){
-				LinkImpl link = edge.getEdge();
+				Link link = edge.getEdge();
 				int time = edge.getTime();
 				EdgeIntervalls flow = _flow.get(link);
 				if(edge.isForward()){
@@ -282,7 +281,7 @@ public class Flow {
 		// backward links
 		else{
 			for(PathEdge edge : timeExpandedPath.getPathEdges()){
-				LinkImpl link = edge.getEdge();
+				Link link = edge.getEdge();
 				int time = edge.getTime();
 				EdgeIntervalls flow = _flow.get(link);
 				if(edge.isForward()){
@@ -449,11 +448,11 @@ public class Flow {
 			return null;
 		}
 		else{
-			NodeImpl node = null;
+			Node node = null;
 			boolean first = true;
 			for(int i = 0; i < PathList.size(); i++){
 				for(int j = 0; j < PathList.get(i).length(); j++){
-					LinkImpl edge = PathList.get(i).getPathEdges().get(j).getEdge();
+					Link edge = PathList.get(i).getPathEdges().get(j).getEdge();
 					int time = PathList.get(i).getPathEdges().get(j).getTime();
 					boolean forward = PathList.get(i).getPathEdges().get(j).isForward();
 					if(first){
@@ -494,7 +493,7 @@ public class Flow {
 	 * @param TimeExpandedPath TimeExpandedPath used to determine flow and Source Node
 	 */
 	private void reduceDemand(final TimeExpandedPath TimeExpandedPath) {
-		NodeImpl source = TimeExpandedPath.getSource();
+		Node source = TimeExpandedPath.getSource();
 		if(!this._demands.containsKey(source)){
 			throw new IllegalArgumentException("Startnode is no source" + TimeExpandedPath);
 		}
@@ -514,7 +513,7 @@ public class Flow {
 	 * @param node Node to check for	
 	 * @return true iff node is a Source with demand 0
 	 */
-	public boolean isNonActiveSource(final NodeImpl node){
+	public boolean isNonActiveSource(final Node node){
 		return this._nonactives.get(node);
 	}
 	
@@ -644,7 +643,7 @@ public class Flow {
 					// normal case, write the routes!
 					LinkNetworkRoute route;
 					
-					NodeImpl firstnode  = _network.getLink(ids.get(0)).getFromNode();
+					Node firstnode  = _network.getLink(ids.get(0)).getFromNode();
 					
 					// for each unit of flow construct a Person
 					for (int i =1 ; i<= nofpersons;i++){
@@ -669,13 +668,13 @@ public class Flow {
 						//}
 						
 //						route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
-						LinkImpl startLink = _network.getLink(ids.get(0));
-						LinkImpl endLink = _network.getLink(ids.get(ids.size()-1));
+						Link startLink = _network.getLink(ids.get(0));
+						Link endLink = _network.getLink(ids.get(ids.size()-1));
 						route = new LinkNetworkRoute(startLink, endLink);
 						
-						List<LinkImpl> routeLinks = null;
+						List<Link> routeLinks = null;
 						if (ids.size() > 1) {
-							routeLinks = new ArrayList<LinkImpl>();
+							routeLinks = new ArrayList<Link>();
 //							route.setLinkIds(ids.subList(1, ids.size()-1));
 							for (Id iid : ids.subList(1, ids.size()-1)){
 								routeLinks.add(_network.getLink(iid));
@@ -687,11 +686,11 @@ public class Flow {
 						LegImpl leg = new LegImpl(TransportMode.car);
 						//Leg leg = new org.matsim.population.LegImpl(BasicLeg.Mode.car);
 						leg.setRoute(route);
-						LinkImpl fromlink =_network.getLink(ids.getFirst());
-						ActivityImpl home = new ActivityImpl("h", fromlink);
+						Link fromlink =_network.getLink(ids.getFirst());
+						ActivityImpl home = new ActivityImpl("h", (LinkImpl)fromlink);
 //						home.setLinkId(fromlink.getId());
-						LinkImpl tolink =_network.getLink(ids.getLast());
-						ActivityImpl work = new ActivityImpl("w", tolink);
+						Link tolink =_network.getLink(ids.getLast());
+						ActivityImpl work = new ActivityImpl("w", (LinkImpl)tolink);
 //						work.setLinkId(tolink.getId());
 						
 
@@ -792,7 +791,7 @@ public class Flow {
 	@Override
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
-		for(LinkImpl link : _flow.keySet()){
+		for(Link link : _flow.keySet()){
 			EdgeIntervalls edge =_flow.get(link);
 			strb.append(link.getId().toString()+ ": " + edge.toString()+ "\n");
 		}
@@ -802,42 +801,42 @@ public class Flow {
 	/**
 	 * @return the _demands
 	 */
-	public HashMap<NodeImpl, Integer> getDemands() {
+	public HashMap<Node, Integer> getDemands() {
 		return this._demands;
 	}
 
 	/**
 	 * @param demands the _demands to set
 	 */
-	public void setDemands(HashMap<NodeImpl, Integer> demands) {
+	public void setDemands(HashMap<Node, Integer> demands) {
 		this._demands = demands;
 	}
 
 	/**
 	 * @return the _flow
 	 */
-	public HashMap<LinkImpl, EdgeIntervalls> getFlow() {
+	public HashMap<Link, EdgeIntervalls> getFlow() {
 		return this._flow;
 	}
 
 	/**
 	 * @param flow the _flow to set
 	 */
-	public void setFlow(HashMap<LinkImpl, EdgeIntervalls> flow) {
+	public void setFlow(HashMap<Link, EdgeIntervalls> flow) {
 		this._flow = flow;
 	}
 
 	/**
 	 * @return the _sink
 	 */
-	public NodeImpl getSink() {
+	public Node getSink() {
 		return _sink;
 	}
 
 	/**
 	 * @return the _sources
 	 */
-	public LinkedList<NodeImpl> getSources() {
+	public LinkedList<Node> getSources() {
 		return this._sources;
 	}
 

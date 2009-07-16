@@ -21,6 +21,7 @@
 package org.matsim.withinday.beliefs;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
@@ -69,7 +70,7 @@ public class AgentLinkcostPercpetion implements TravelTime {
 		this.k_2 = k_2;
 	}
 
-	public double getLinkTravelTime(final LinkImpl link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time) {
 		if (link.equals(this.agent.getVehicle().getCurrentLink())) {
 			return t_star(link, time, this.phi_1, this.phi_2);
 		}
@@ -103,7 +104,7 @@ public class AgentLinkcostPercpetion implements TravelTime {
 		}
 	}
 
-	private int t_star(final LinkImpl link, final double time_s, final double phi_1, final double phi_2) {
+	private int t_star(final Link link, final double time_s, final double phi_1, final double phi_2) {
 		double t_r = this.reactProvider.getLinkTravelTime(link, time_s);
 		double t_h = this.histProvider.getLinkTravelTime(link, time_s);
 
@@ -114,7 +115,7 @@ public class AgentLinkcostPercpetion implements TravelTime {
 		return (int) t_star;
 	}
 
-	private double applyBoundary(final double c, final LinkImpl link) {
+	private double applyBoundary(final double c, final Link link) {
 		double c_0 = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 		c_0 = 0.9 * c_0;
 		return Math.max(c_0, c);

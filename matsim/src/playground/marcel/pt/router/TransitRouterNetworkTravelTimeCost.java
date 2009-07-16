@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.router;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
@@ -28,11 +28,11 @@ import playground.marcel.pt.router.TransitRouterNetworkWrapper.LinkWrapper;
 
 public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTime {
 
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		return getLinkTravelTime(link, time);
 	}
 
-	public double getLinkTravelTime(LinkImpl link, double time) {
+	public double getLinkTravelTime(Link link, double time) {
 		LinkWrapper wrapped = (LinkWrapper) link;
 		return wrapped.link.toNode.stop.getDepartureDelay() - wrapped.link.fromNode.stop.getDepartureDelay(); // does not yet respect departure time
 	}

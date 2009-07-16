@@ -20,22 +20,22 @@
 
 package playground.johannes.socialnetworks.ivtsurveys;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
 public class FreespeedTravelTime implements TravelMinCost, TravelTime {
 
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		return (link.getLength() / link.getFreespeed(time));
 	}
 
-	public double getLinkTravelTime(LinkImpl link, double time) {
+	public double getLinkTravelTime(Link link, double time) {
 		return link.getLength() / link.getFreespeed(time);
 	}
 
-	public double getLinkMinimumTravelCost(LinkImpl link) {
+	public double getLinkMinimumTravelCost(Link link) {
 		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
 	}
 

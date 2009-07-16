@@ -25,13 +25,13 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.Simulation;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.api.Departure;
@@ -126,7 +126,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		}
 	}
 	
-	public void agentDeparts(final DriverAgent agent, final LinkImpl link) {
+	public void agentDeparts(final DriverAgent agent, final Link link) {
 		LegImpl leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();

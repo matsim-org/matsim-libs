@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
@@ -15,7 +16,7 @@ public class CellNetworkMapping {
 	private final static Logger log = Logger.getLogger(TestCellKnowledge.class);
 	
 	private NetworkLayer network;
-	private Map <NodeImpl, Cell> nodesMapping;
+	private Map <Node, Cell> nodesMapping;
 	private Map <Integer, Cell> cells;
 	
 	private double xMin;
@@ -36,7 +37,7 @@ public class CellNetworkMapping {
 		createCoreMapping();
 	}
 	
-	public Cell getCell(NodeImpl node)
+	public Cell getCell(Node node)
 	{
 		return nodesMapping.get(node);
 	}
@@ -48,7 +49,7 @@ public class CellNetworkMapping {
 	
 	private void createCoreMapping()
 	{
-		nodesMapping = new HashMap<NodeImpl, Cell>();
+		nodesMapping = new HashMap<Node, Cell>();
 		
 		getNetworkDimensions();
 		
@@ -97,12 +98,12 @@ public class CellNetworkMapping {
 		// create Nodes Mapping
 		for (Cell cell : cells.values())
 		{
-			List<NodeImpl> nodes = cell.getNodes();
+			List<Node> nodes = cell.getNodes();
 			
 			// otherwise cell.getNodes() would return null
 			if (!cell.hasChildren())
 			{
-				for (NodeImpl node : nodes)
+				for (Node node : nodes)
 				{
 					nodesMapping.put(node, cell);
 				}
@@ -121,7 +122,7 @@ public class CellNetworkMapping {
 */
 	}
 	
-	private Cell getCoreCell(NodeImpl node)
+	private Cell getCoreCell(Node node)
 	{
 		//return nodesMapping.get(node);
 		for (Cell cell : cells.values())

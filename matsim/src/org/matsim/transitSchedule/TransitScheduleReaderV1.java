@@ -31,6 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -188,15 +189,15 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	}
 
 	private static class TempRoute {
-		/*package*/ List<LinkImpl> links = new ArrayList<LinkImpl>();
-		/*package*/ LinkImpl firstLink = null;
-		/*package*/ LinkImpl lastLink = null;
+		/*package*/ List<Link> links = new ArrayList<Link>();
+		/*package*/ Link firstLink = null;
+		/*package*/ Link lastLink = null;
 
 		protected TempRoute() {
 			// public constructor for private inner class
 		}
 
-		protected void addLink(final LinkImpl link) {
+		protected void addLink(final Link link) {
 			if (this.firstLink == null) {
 				this.firstLink = link;
 			} else if (this.lastLink == null) {

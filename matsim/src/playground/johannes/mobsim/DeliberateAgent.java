@@ -24,8 +24,7 @@
 package playground.johannes.mobsim;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -113,7 +112,7 @@ public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
 	 *            the current simulation time.
 	 */
 	@Override
-	public LinkImpl getNextLink(double time) {
+	public Link getNextLink(double time) {
 		replan(time);
 		return super.getNextLink(time);
 	}

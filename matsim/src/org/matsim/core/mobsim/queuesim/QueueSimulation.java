@@ -40,6 +40,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -547,12 +548,12 @@ public class QueueSimulation {
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		this.activityEndsList.clear();
 
@@ -650,11 +651,11 @@ public class QueueSimulation {
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
 				DriverAgent driver = entry.getSecond();
-				LinkImpl destinationLink = driver.getDestinationLink();
+				Link destinationLink = driver.getDestinationLink();
 				driver.teleportToLink(destinationLink);
 
 				getEvents().processEvent(new AgentArrivalEvent(now, driver.getPerson(),
-						destinationLink, driver.getCurrentLeg()));
+						(LinkImpl)destinationLink, driver.getCurrentLeg()));
 				driver.legEnds(now);
 			} else break;
 		}
@@ -700,12 +701,12 @@ public class QueueSimulation {
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	protected void agentDeparts(final DriverAgent agent, final LinkImpl link) {
+	protected void agentDeparts(final DriverAgent agent, final Link link) {
 		double now = SimulationTimer.getTime();
 
 		LegImpl leg = agent.getCurrentLeg();
 
-		events.processEvent(new AgentDepartureEvent(now, agent.getPerson(), link, leg));
+		events.processEvent(new AgentDepartureEvent(now, agent.getPerson(), (LinkImpl) link, leg));
 
 		if (leg.getMode().equals(TransportMode.car)) {
 			NetworkRoute route = (NetworkRoute) leg.getRoute();

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -54,7 +55,7 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 				if (leg.getRoute() == null) {
 					return false;
 				}
-				for (LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}
 				// test departure link

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEvent;
@@ -50,7 +51,7 @@ public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, Qu
 		this.population = population;
 	}
 	
-	public double getSocialCost(LinkImpl link, double time) {
+	public double getSocialCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
 			return 0.;

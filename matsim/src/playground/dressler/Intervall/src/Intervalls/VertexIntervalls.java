@@ -26,7 +26,7 @@ package playground.dressler.Intervall.src.Intervalls;
 
 import java.util.ArrayList;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
@@ -114,7 +114,7 @@ public class VertexIntervalls {
 	 * @param t time
 	 * @return flow at t
 	 */
-	public LinkImpl getPred(int t){
+	public Link getPred(int t){
 		return getIntervallAt(t).getPredecessor();
 	}
 	
@@ -274,7 +274,7 @@ public class VertexIntervalls {
 	 * @param arrive Intervalls at which node is reachable
 	 * @return true iff anything was changed
 	 */
-	public boolean setTrue(ArrayList<Intervall> arrive,LinkImpl link) {
+	public boolean setTrue(ArrayList<Intervall> arrive,Link link) {
 		boolean changed = false;
 		ArrayList<Intervall> arrivecondensed = new ArrayList<Intervall>();
 		if(!arrive.isEmpty()){
@@ -316,7 +316,7 @@ public class VertexIntervalls {
 	 * @param arrive Intervall at which node is reachable
 	 * @return true iff anything was changed
 	 */
-	public boolean setTrue(Intervall arrive,LinkImpl link){
+	public boolean setTrue(Intervall arrive,Link link){
 		boolean changed = false;
 		VertexIntervall test = this.getIntervallAt(arrive.getLowBound());
 		int t= test.getHighBound();

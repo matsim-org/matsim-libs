@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -64,16 +64,16 @@ public class PersonRouteFilter extends PersonFilterA {
 						LegImpl leg = (LegImpl) obj;
 						NetworkRoute route = (NetworkRoute) leg.getRoute();
 						if (route != null) {
-							List<LinkImpl> links = route.getLinks();
+							List<Link> links = route.getLinks();
 							if (links != null)
-								for (LinkImpl link : links) {
+								for (Link link : links) {
 									if (this.criterionLinkIds.contains(link
 											.getId()))
 										return false;
 								}
-							List<NodeImpl> nodes = route.getNodes();
+							List<Node> nodes = route.getNodes();
 							if (nodes != null)
-								for (NodeImpl node : nodes) {
+								for (Node node : nodes) {
 									if (this.criterionNodeIds.contains(node
 											.getId()))
 										return false;

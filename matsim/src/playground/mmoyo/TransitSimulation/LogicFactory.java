@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -45,8 +46,8 @@ public class LogicFactory{
 	private TransitSchedule logicTransitSchedule = builder.createTransitSchedule();
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
 	
-	private Map<Id,List<NodeImpl>> facilityNodeMap = new TreeMap<Id,List<NodeImpl>>(); /** <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
-	public Map<Id,NodeImpl> logicToPlanStopMap = new TreeMap<Id,NodeImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
+	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /* <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
+	public Map<Id,Node> logicToPlanStopMap = new TreeMap<Id,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
 	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();                  
 	
 	long newLinkId=0;
@@ -87,7 +88,7 @@ public class LogicFactory{
 					
 					//fills the facilityNodeMap to create transfer links later on
 					if (!facilityNodeMap.containsKey(idStopFacility)){
-						List<NodeImpl> nodeStationArray = new ArrayList<NodeImpl>();
+						List<Node> nodeStationArray = new ArrayList<Node>();
 						facilityNodeMap.put(idStopFacility, nodeStationArray);
 					}
 					facilityNodeMap.get(idStopFacility).add(logicNode);
@@ -131,13 +132,13 @@ public class LogicFactory{
 	}
 	
 	private void createTransferLinks(){
-		for (List<NodeImpl> chList : facilityNodeMap.values()) 
-			for (NodeImpl fromNode : chList) 
-				for (NodeImpl toNode : chList){ 
+		for (List<Node> chList : facilityNodeMap.values()) 
+			for (Node fromNode : chList) 
+				for (Node toNode : chList){ 
 					boolean belongToSameLine = nodeLineMap.get(fromNode.getId()) == nodeLineMap.get(toNode.getId());
-					if (!belongToSameLine && !fromNode.equals(toNode)  && willJoin2StandardLinks(fromNode, toNode)){
+					if (!belongToSameLine && !fromNode.equals(toNode)  && willJoin2StandardLinks((NodeImpl) fromNode, (NodeImpl) toNode)){
 						Id idNewLink = new IdImpl("T" + ++newLinkId);
-						createLogicLink(idNewLink, fromNode, toNode, "Transfer");
+						createLogicLink(idNewLink, (NodeImpl)fromNode, (NodeImpl) toNode, "Transfer");
 					}
 				}
 		facilityNodeMap = null;

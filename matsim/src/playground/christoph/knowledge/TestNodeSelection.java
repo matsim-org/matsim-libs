@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -37,7 +38,7 @@ import playground.christoph.knowledge.utils.GetAllIncludedLinks;
 public class TestNodeSelection {
 	
 	NetworkLayer network;
-	Map<Id, NodeImpl> selectedNodesMap;
+	Map<Id, Node> selectedNodesMap;
 	
 	final String networkFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
 	final String kmzFile = "kmzFile.kmz";
@@ -45,7 +46,7 @@ public class TestNodeSelection {
 	
 	protected void init()
 	{
-		selectedNodesMap = new TreeMap<Id, NodeImpl>();
+		selectedNodesMap = new TreeMap<Id, Node>();
 	}
 	
 	protected void loadNetwork()

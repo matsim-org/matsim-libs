@@ -25,14 +25,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.Intervall;
@@ -61,12 +58,12 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * data structure to to represent the flow on a network  
 	 */
-	private HashMap<LinkImpl, EdgeIntervalls> _flowlabels;
+	private HashMap<Link, EdgeIntervalls> _flowlabels;
 	
 	/**
 	 * data structure to keep distance labels on nodes during and after one Iteration of the shortest TimeExpandedPath Algorithm
 	 */
-	private HashMap<NodeImpl, VertexIntervalls> _labels;
+	private HashMap<Node, VertexIntervalls> _labels;
 	
 	/**
 	 * data structure to hold the present flow
@@ -81,7 +78,7 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * sink node to which TimeExpandedPaths are searched
 	 */
-	private final NodeImpl _sink;
+	private final Node _sink;
 	/**
 	 * 
 	 */
@@ -93,7 +90,7 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * 
 	 */
-	private LinkedList<NodeImpl> _warmstartlist;
+	private LinkedList<Node> _warmstartlist;
 	
 	/**
 	 * debug variable, the higher the value the more it tells
@@ -113,7 +110,7 @@ public class BellmanFordVertexIntervalls {
 		this._flowlabels = flow.getFlow();
 		this._timehorizon = flow.getTimeHorizon(); 
 		this._sink = flow.getSink();
-		this._labels = new HashMap<NodeImpl, VertexIntervalls>();
+		this._labels = new HashMap<Node, VertexIntervalls>();
 	}
 	
 	
@@ -138,9 +135,9 @@ public class BellmanFordVertexIntervalls {
 	 * refreshes all dist labels before one run of the algorithm
 	 * @return returns all active sources
 	 */
-	private LinkedList<NodeImpl> refreshLabels(){
-		LinkedList<NodeImpl> nodes = new LinkedList<NodeImpl>();
-		for(NodeImpl node: network.getNodes().values()){
+	private LinkedList<Node> refreshLabels(){
+		LinkedList<Node> nodes = new LinkedList<Node>();
+		for(Node node: network.getNodes().values()){
 			VertexIntervalls label = new VertexIntervalls();
 			_labels.put(node, label);
 			if(isActiveSource(node)){
@@ -156,7 +153,7 @@ public class BellmanFordVertexIntervalls {
 	 * @param node to be checked
 	 * @return true if there is still demand on the node
 	 */
-	private boolean isActiveSource(NodeImpl node) {
+	private boolean isActiveSource(Node node) {
 		if(_debug>3){
 			System.out.println(node.getId() + " active:" + this._flow.isActiveSource(node));
 		}
@@ -168,7 +165,7 @@ public class BellmanFordVertexIntervalls {
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
 	private TimeExpandedPath constructRoute()throws BFException{
-		NodeImpl to = _sink;
+		Node to = _sink;
 		VertexIntervalls tolabels = this._labels.get(to);
 		int totime = tolabels.firstPossibleTime();
 		//check if TimeExpandedPath can be constructed
@@ -184,7 +181,7 @@ public class BellmanFordVertexIntervalls {
 		TimeExpandedPath.setArrival(totime);
 		VertexIntervall tolabel = tolabels.getIntervallAt(totime);
 		while(tolabel.getPredecessor()!=null){
-			LinkImpl edge = tolabel.getPredecessor();
+			Link edge = tolabel.getPredecessor();
 			//find out weather forward or backwards edge is used
 			boolean forward;
 			if(edge.getFromNode().equals(to)){
@@ -225,7 +222,7 @@ public class BellmanFordVertexIntervalls {
 	 * @param forward indicates, weather we use a forward or backwards edge
 	 * @return true if any label of Node to has changed
 	 */
-	private boolean relabel(NodeImpl from, NodeImpl to, LinkImpl over,boolean forward){
+	private boolean relabel(Node from, Node to, Link over,boolean forward){
 		VertexIntervalls labelfrom = _labels.get(from);
 		VertexIntervalls labelto = _labels.get(to);
 		EdgeIntervalls	flowover = _flowlabels.get(over);
@@ -272,12 +269,12 @@ public class BellmanFordVertexIntervalls {
 	 */
 	public TimeExpandedPath doCalculations() {
 		// queue to save nodes we have to scan
-		Queue<NodeImpl> queue = new LinkedList<NodeImpl>();
+		Queue<Node> queue = new LinkedList<Node>();
 		//set the startLabels and add active sources to to the queue
-		LinkedList<NodeImpl> activesources = this.refreshLabels();
+		LinkedList<Node> activesources = this.refreshLabels();
 		if(_warmstart>0 && _warmstartlist!=null){
 			queue.addAll(_warmstartlist);					
-			/* for( NodeImpl node : activesources){
+			/* for( Node node : activesources){
 				if(!queue.contains(node)){
 					queue.add(node);
 				}
@@ -292,7 +289,7 @@ public class BellmanFordVertexIntervalls {
 		// v is first vertex in the queue
 		// w is the vertex we probably want to insert to the queue and 
 		// decrease its distance
-		NodeImpl v, w;
+		Node v, w;
 		// dist is the distance from the source to w over v
 
 		// main loop
@@ -309,7 +306,7 @@ public class BellmanFordVertexIntervalls {
 			// visit neighbors
 			
 			// link is outgoing edge of v => forward edge
-			for (LinkImpl link : v.getOutLinks().values()) {
+			for (Link link : v.getOutLinks().values()) {
 				w=link.getToNode();
 				boolean changed = relabel(v,w,link,true);
 				if (changed && !queue.contains(w)) {
@@ -317,7 +314,7 @@ public class BellmanFordVertexIntervalls {
 				}
 			}
 			// link is incoming edge of v => backward edge
-			for (LinkImpl link : v.getInLinks().values()) {
+			for (Link link : v.getInLinks().values()) {
 				w=link.getFromNode();
 				boolean changed = relabel(v,w,link,false);
 				if (changed && !queue.contains(w)) {
@@ -352,19 +349,19 @@ public class BellmanFordVertexIntervalls {
 	private void createwarmstartList() {
 		// use cases of _warmstart to decide what to do
 		if (_warmstart == 1) { // add the found path
-		  _warmstartlist = new LinkedList<NodeImpl>();
+		  _warmstartlist = new LinkedList<Node>();
 		  if (_timeexpandedpath != null)
 		  for (TimeExpandedPath.PathEdge edge : _timeexpandedpath.getPathEdges()) {
 			  _warmstartlist.add(edge.getEdge().getFromNode());
 			  //System.out.println(edge.getEdge().getFromNode().getId());
 		  }
 		} else if (_warmstart == 2) { // rebuild shortest path tree from last interval
-		  _warmstartlist = new LinkedList<NodeImpl>();
+		  _warmstartlist = new LinkedList<Node>();
 		 
 		  _warmstartlist.addAll(_labels.keySet());
 		  
-		  Collections.sort(_warmstartlist, new Comparator<NodeImpl>() {
-		          public int compare(NodeImpl n1, NodeImpl n2) {
+		  Collections.sort(_warmstartlist, new Comparator<Node>() {
+		          public int compare(Node n1, Node n2) {
 		        	   int v1 = _labels.get(n1).getLast().getLowBound();		        	   
 		        	   int v2 = _labels.get(n2).getLast().getLowBound();
 		        	   if (v1 > v2) {
@@ -383,12 +380,12 @@ public class BellmanFordVertexIntervalls {
 		  }*/
 		  
 		} else if (_warmstart == 3) { // rebuild shortest path tree from firstPossibleTime
-			  _warmstartlist = new LinkedList<NodeImpl>();
+			  _warmstartlist = new LinkedList<Node>();
 				 
 			  _warmstartlist.addAll(_labels.keySet());
 			  
-			  Collections.sort(_warmstartlist, new Comparator<NodeImpl>() {
-			          public int compare(NodeImpl n1, NodeImpl n2) {
+			  Collections.sort(_warmstartlist, new Comparator<Node>() {
+			          public int compare(Node n1, Node n2) {
 			        	   int v1 = _labels.get(n1).firstPossibleTime();		        	   
 			        	   int v2 = _labels.get(n2).firstPossibleTime();
 			        	   if (v1 > v2) {
@@ -418,7 +415,7 @@ public class BellmanFordVertexIntervalls {
 	 */
 	private void printStatus() {
 		StringBuilder print = new StringBuilder();
-		for(NodeImpl node : network.getNodes().values()){
+		for(Node node : network.getNodes().values()){
 			VertexIntervalls inter =_labels.get(node);
 			int t =  inter.firstPossibleTime();
 			if(t==Integer.MAX_VALUE){

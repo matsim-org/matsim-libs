@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
@@ -76,8 +77,8 @@ public class Main {
 				NodeImpl nodeB = plainNetwork.getNode("8503309");
 				Path path = ptRouter.findPTPath (coord1, coord2, 37075, 400);
 				System.out.println(path.links.size());
-				for (LinkImpl l : path.links){
-					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + l.getType() + " " + l.getToNode().getId() );
+				for (Link l : path.links){
+					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + ((LinkImpl)l).getType() + " " + l.getToNode().getId() );
 				}
 				System.out.println(path.travelTime);
 				break;

@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -110,7 +111,7 @@ public class BlockingStopDemo {
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<LinkImpl> linkList = new ArrayList<LinkImpl>(nOfLinks);
+		ArrayList<Link> linkList = new ArrayList<Link>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
@@ -135,7 +136,7 @@ public class BlockingStopDemo {
 		startLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks]);
 		endLink = this.scenario.getNetwork().getLinks().get(this.ids[2*nOfLinks-1]);
 		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
-		linkList = new ArrayList<LinkImpl>(nOfLinks);
+		linkList = new ArrayList<Link>(nOfLinks);
 		for (int i = nOfLinks+1; i < (2*nOfLinks - 1); i++) {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
@@ -203,8 +204,8 @@ public class BlockingStopDemo {
 		NetworkLayer network = this.scenario.getNetwork();
 		NetworkRoute carRoute1 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[0]), network.getLinks().get(this.ids[nOfLinks-1]));
 		NetworkRoute carRoute2 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[nOfLinks]), network.getLinks().get(this.ids[2*nOfLinks-1]));
-		List<LinkImpl> links1 = new ArrayList<LinkImpl>(nOfLinks-2);
-		List<LinkImpl> links2 = new ArrayList<LinkImpl>(nOfLinks-2);
+		List<Link> links1 = new ArrayList<Link>(nOfLinks-2);
+		List<Link> links2 = new ArrayList<Link>(nOfLinks-2);
 		for (int i = 1; i<nOfLinks-1; i++) {
 			links1.add(network.getLinks().get(this.ids[i]));
 			links2.add(network.getLinks().get(this.ids[i+nOfLinks]));

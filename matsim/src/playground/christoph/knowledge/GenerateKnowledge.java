@@ -27,6 +27,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -60,7 +62,7 @@ public class GenerateKnowledge {
 		{
 			PersonImpl person = PersonIterator.next();
 			
-			ArrayList<LinkImpl> links = new GetAllLinks().getAllLinks(person);
+			ArrayList<Link> links = new GetAllLinks().getAllLinks(person);
 			
 			setKnowledge(person, links);
 			
@@ -72,21 +74,21 @@ public class GenerateKnowledge {
 	
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
-	protected ArrayList<NodeImpl> getNodes(ArrayList<LinkImpl> links)
+	protected ArrayList<Node> getNodes(ArrayList<Link> links)
 	{
-		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
+		ArrayList<Node> nodes = new ArrayList<Node>();
 		
-		Iterator<LinkImpl> linksIterator = links.iterator();
+		Iterator<Link> linksIterator = links.iterator();
 		
 		while(linksIterator.hasNext())
 		{
-			LinkImpl link = linksIterator.next();
+			Link link = linksIterator.next();
 
 			//nodes.add(link.getFromNode());
 			//nodes.add(link.getToNode());
 			
-			NodeImpl fromNode = link.getFromNode();
-			NodeImpl toNode = link.getToNode();
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getToNode();
 			
 			if (!nodes.contains(fromNode)) nodes.add(fromNode);
 			if (!nodes.contains(toNode)) nodes.add(toNode);
@@ -97,16 +99,16 @@ public class GenerateKnowledge {
 	
 	
 	// Beschraenkt die Kenntnis der Umgebung der uebergebenen Person.
-	protected void setKnowledge(PersonImpl person, ArrayList<LinkImpl> links)
+	protected void setKnowledge(PersonImpl person, ArrayList<Link> links)
 	{		
 		
 		ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getCustomAttributes().get("IncludedLinkIDs");
 		
 		// Nodes innerhalb der vorgegebenen Distanz holen...
-		ArrayList<NodeImpl> includedNodes = getIncludedNodes(links);
+		ArrayList<Node> includedNodes = getIncludedNodes(links);
 			
 		// ... und daraus die Links innerhalb der vorgegebenen Distanz generieren.
-		ArrayList<LinkImpl> includedLinks = getIncludedLinks(includedNodes);
+		ArrayList<Link> includedLinks = getIncludedLinks(includedNodes);
 		
 		// Links zum Knowledge der Person hinzufuegen
 		for(int i = 0; i < includedLinks.size(); i++)
@@ -120,21 +122,21 @@ public class GenerateKnowledge {
 	
 	// Gibt eine ArrayList mit Knoten zurueck, die innerhalb eines vorgegebenen
 	// Abstands zu einer vorgeggebenen Route liegen.
-	protected ArrayList<NodeImpl> getIncludedNodes(ArrayList<LinkImpl> links)
+	protected ArrayList<Node> getIncludedNodes(ArrayList<Link> links)
 	{
-		ArrayList<NodeImpl> includedNodes = new ArrayList<NodeImpl>();
+		ArrayList<Node> includedNodes = new ArrayList<Node>();
 		
 		// Alle Knoten des Netzwerks holen
-		TreeMap<Id, NodeImpl> nodeMap = (TreeMap<Id, NodeImpl>)network.getNodes();
+		TreeMap<Id, NodeImpl> nodeMap = (TreeMap<Id, NodeImpl>) network.getNodes();
 		
 		Iterator nodeIterator = nodeMap.entrySet().iterator();
 		
 		while(nodeIterator.hasNext())
 		{
 			// Wir wissen ja, was fuer Elemente zurueckgegeben werden :)
-			Map.Entry<Id, NodeImpl> nextLink = (Map.Entry<Id, NodeImpl>)nodeIterator.next();
+			Map.Entry<Id, Node> nextLink = (Map.Entry<Id, Node>)nodeIterator.next();
 			//Id id = nextLink.getKey();
-			NodeImpl node = nextLink.getValue();
+			Node node = nextLink.getValue();
 			
 			Coord coord = node.getCoord();
 			
@@ -161,9 +163,9 @@ public class GenerateKnowledge {
 	
 	// Gibt eine ArrayList mit Links zurueck, die innerhalb eines vorgegebenen
 	// Abstands zu einer vorgeggebenen Route liegen.
-	protected ArrayList<LinkImpl> getIncludedLinks(ArrayList<NodeImpl> includedNodes)
+	protected ArrayList<Link> getIncludedLinks(ArrayList<Node> includedNodes)
 	{
-		ArrayList<LinkImpl> includedLinks = new ArrayList<LinkImpl>();
+		ArrayList<Link> includedLinks = new ArrayList<Link>();
 		
 		// Alle Links des Netzwerks holen
 		TreeMap<Id, LinkImpl> linkMap = (TreeMap<Id, LinkImpl>)network.getLinks();
@@ -175,10 +177,10 @@ public class GenerateKnowledge {
 			// Wir wissen ja, was fuer Elemente zurueckgegeben werden :)
 			Map.Entry<Id, LinkImpl> nextLink = linkIterator.next();
 			//Id id = nextLink.getKey();
-			LinkImpl link = nextLink.getValue();
+			Link link = nextLink.getValue();
 			
-			NodeImpl fromNode = link.getFromNode();
-			NodeImpl toNode = link.getToNode();
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getToNode();
 			
 			// Pruefen, ob der Node in der uebergebenen Liste enthalten ist
 			if(includedNodes.contains(fromNode) && includedNodes.contains(toNode))

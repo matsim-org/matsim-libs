@@ -38,9 +38,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -191,7 +190,7 @@ public class SelectedPlans2ESRIShape {
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDistance();
 
-		List<LinkImpl> links = ((NetworkRoute) leg.getRoute()).getLinks();
+		List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 		Coordinate [] coords = new Coordinate[links.size() + 1];
 		for (int i = 0; i < links.size(); i++) {
 			Coord c = links.get(i).getFromNode().getCoord();

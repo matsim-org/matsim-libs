@@ -24,11 +24,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * Pre-processes a given network, gathering information which
@@ -45,7 +47,7 @@ public class PreProcessDijkstra {
 
 	private boolean containsData = false;
 
-	protected Map<NodeImpl, DeadEndData> nodeData = null;
+	protected Map<Node, DeadEndData> nodeData = null;
 	
 	public void run(final NetworkLayer network) {
 		markDeadEnds(network);
@@ -59,15 +61,15 @@ public class PreProcessDijkstra {
 	private void markDeadEnds(final NetworkLayer network) {
 		long now = System.currentTimeMillis();
 
-		this.nodeData = new HashMap<NodeImpl, DeadEndData>(network.getNodes().size());
+		this.nodeData = new HashMap<Node, DeadEndData>(network.getNodes().size());
 		
 		DeadEndData role;
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			role = getNodeData(node);
 
-			Map<Id, ? extends NodeImpl> incidentNodes = node.getIncidentNodes();
+			Map<Id, Node> incidentNodes = getIncidentNodes(node);
 			if (incidentNodes.size() == 1) {
-				ArrayList<NodeImpl> deadEndNodes = new ArrayList<NodeImpl>();
+				ArrayList<Node> deadEndNodes = new ArrayList<Node>();
 
 				while (role.getInDeadEndCount() == incidentNodes.size() - 1) {
 
@@ -80,14 +82,14 @@ public class PreProcessDijkstra {
 					// whether we already processed this node.
 					role.setDeadEndEntryNode(node);
 
-					Iterator<? extends NodeImpl> it = incidentNodes.values().iterator();
+					Iterator<? extends Node> it = incidentNodes.values().iterator();
 					while (role.getDeadEndEntryNode() != null && it.hasNext()) {
 						node = it.next();
 						role = getNodeData(node);
 					}
 					if (role.getDeadEndEntryNode() == null) {
 						role.incrementInDeadEndCount();
-						incidentNodes = node.getIncidentNodes();
+						incidentNodes = getIncidentNodes(node);
 					} else {
 						log.error("All " + incidentNodes.size() + " incident nodes of node " + node.getId() + " are dead ends!");
 						return;
@@ -99,9 +101,9 @@ public class PreProcessDijkstra {
 
 		// Now set the proper deadEndEntryNode for each node
 		int deadEndNodeCount = 0;
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			role = getNodeData(node);
-			for (NodeImpl n : role.getDeadEndNodes()) {
+			for (Node n : role.getDeadEndNodes()) {
 				DeadEndData r = getNodeData(n);
 				r.setDeadEndEntryNode(node);
 				deadEndNodeCount++;
@@ -112,13 +114,24 @@ public class PreProcessDijkstra {
 				+ " (total nodes: " + network.getNodes().size() + "). Done in "
 				+ (System.currentTimeMillis() - now) + " ms");
 	}
+	
+	private static Map<Id, Node> getIncidentNodes(Node node) {
+		Map<Id, Node> nodes = new TreeMap<Id, Node>();
+		for (Link link : node.getInLinks().values()) {
+			nodes.put(link.getFromNode().getId(), node);
+		}
+		for (Link link : node.getOutLinks().values()) {
+			nodes.put(link.getToNode().getId(), node);
+		}
+		return nodes;
+	}
 
 	/**
 	 * Returns the role for the given Node. Creates a new Role if none exists yet.
 	 * @param n The Node for which to create a role.
 	 * @return The role for the given Node
 	 */
-	public DeadEndData getNodeData(final NodeImpl n) {
+	public DeadEndData getNodeData(final Node n) {
 		DeadEndData r = this.nodeData.get(n);
 		if (null == r) {
 			r = new DeadEndData();
@@ -132,13 +145,13 @@ public class PreProcessDijkstra {
 	 * @author lnicolas
 	 */
 	public class DeadEndData {
-		private NodeImpl deadEndEntryNode = null;
+		private Node deadEndEntryNode = null;
 
 		private int inDeadEndCount = 0;
 
-		private ArrayList<NodeImpl> deadEndNodes = new ArrayList<NodeImpl>(2);
+		private ArrayList<Node> deadEndNodes = new ArrayList<Node>(2);
 
-		ArrayList<NodeImpl> getDeadEndNodes() {
+		ArrayList<Node> getDeadEndNodes() {
 			return this.deadEndNodes;
 		}
 
@@ -164,11 +177,11 @@ public class PreProcessDijkstra {
 		 * node would not be connected to the network) and null otherwise
 		 * (i.e. if the associated node is not in a dead end).
 		 */
-		public NodeImpl getDeadEndEntryNode() {
+		public Node getDeadEndEntryNode() {
 			return this.deadEndEntryNode;
 		}
 
-		/*package*/ void setDeadEndEntryNode(final NodeImpl node) {
+		/*package*/ void setDeadEndEntryNode(final Node node) {
 			this.deadEndEntryNode = node;
 		}
 	}

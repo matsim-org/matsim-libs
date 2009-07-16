@@ -33,11 +33,11 @@
 package playground.christoph.knowledge.utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -52,9 +52,9 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<LinkImpl> getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes)
+	public ArrayList<Link> getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes)
 	{
-		ArrayList<LinkImpl> includedLinks = new ArrayList<LinkImpl>();
+		ArrayList<Link> includedLinks = new ArrayList<Link>();
 		getAllLinks(network, includedNodes, includedLinks);
 		return includedLinks;
 	}
@@ -67,9 +67,9 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<LinkImpl> getAllLinks(NetworkLayer network, Map<Id, NodeImpl> includedNodesMap)
+	public ArrayList<Link> getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap)
 	{
-		ArrayList<LinkImpl> includedLinks = new ArrayList<LinkImpl>();
+		ArrayList<Link> includedLinks = new ArrayList<Link>();
 		getAllLinks(network, includedNodesMap, includedLinks);
 		return includedLinks;
 	}
@@ -82,7 +82,7 @@ public class GetAllIncludedLinks {
 	 * @param ArrayList< Node > includedNodes
 	 * @param ArrayList< Link > includedLinks
 	 */
-	public void getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes, ArrayList<LinkImpl> includedLinks)
+	public void getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes, ArrayList<Link> includedLinks)
 	{		
 		// get all links of the network
 		Map<Id, LinkImpl> linkMap = network.getLinks();
@@ -111,7 +111,7 @@ public class GetAllIncludedLinks {
 	 * @param Map< Id, Node > includedNodesMap
 	 * @param ArrayList< Link > includedLinks
 	 */
-	public void getAllLinks(NetworkLayer network, Map<Id, NodeImpl> includedNodesMap, ArrayList<LinkImpl> includedLinks)
+	public void getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap, ArrayList<Link> includedLinks)
 	{	
 		// get all links of the network
 		Map<Id, LinkImpl> linkMap = network.getLinks();

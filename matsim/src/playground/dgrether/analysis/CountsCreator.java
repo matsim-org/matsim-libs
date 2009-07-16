@@ -22,11 +22,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -88,9 +87,9 @@ public class CountsCreator {
 		routes.add(r3);
 		routes.add(r4);
 
-		Set<LinkImpl> links = new HashSet<LinkImpl>(r2.getNodes().size() + r1.getNodes().size());
+		Set<Link> links = new HashSet<Link>(r2.getNodes().size() + r1.getNodes().size());
 		for (NetworkRoute r : routes) {
-			for (LinkImpl l : r.getLinks()) {
+			for (Link l : r.getLinks()) {
 				if (!links.contains(l))
 					links.add(l);
 			}
@@ -98,7 +97,7 @@ public class CountsCreator {
 		createCounts(links);
 	}
 
-	public void createCounts(Set<LinkImpl> links) {
+	public void createCounts(Set<Link> links) {
 		Counts counts = new Counts();
 		Count c;
 		counts.setLayer("superLayer");

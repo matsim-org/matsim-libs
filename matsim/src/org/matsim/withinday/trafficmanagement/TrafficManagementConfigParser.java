@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.LinkImpl;
@@ -117,7 +118,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private VDSSign vdsSign;
 
-	private ArrayList<NodeImpl> currentRouteNodes;
+	private ArrayList<Node> currentRouteNodes;
 
 	private NetworkLayer network;
 
@@ -146,7 +147,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.vdsSign = new VDSSign();
 		}
 		else if (name.equalsIgnoreCase(MAINROUTE) || name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			this.currentRouteNodes = new ArrayList<NodeImpl>();
+			this.currentRouteNodes = new ArrayList<Node>();
 		}
 		else if (name.equalsIgnoreCase(NODE)) {
 			String id = atts.getValue(ID);

@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
@@ -36,11 +37,8 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -96,17 +94,17 @@ public class WithindayAgentTest extends MatsimTestCase {
 		this.route1 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
 		this.route2 = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
 		this.agentRoute = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, startLink, endLink);
-		ArrayList<NodeImpl> list = new ArrayList<NodeImpl>();
+		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setNodes(startLink, list, endLink);
-		list = new ArrayList<NodeImpl>();
+		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
 		this.route2.setNodes(startLink, list, endLink);
-		list = new ArrayList<NodeImpl>();
+		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
@@ -199,19 +197,19 @@ public class WithindayAgentTest extends MatsimTestCase {
 		//going into the details
 	  // first testing the plan of the person
 		LegImpl newPlansLeg = (LegImpl) agent.getPerson().getSelectedPlan().getPlanElements().get(1);
-		List<NodeImpl> newPlansRoute = ((NetworkRoute) newPlansLeg.getRoute()).getNodes();
+		List<Node> newPlansRoute = ((NetworkRoute) newPlansLeg.getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newPlansRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newPlansRoute.get(newPlansRoute.size()-1));
 		//second testing the vehicle
 		assertNotSame("The current leg should be exchanged by a new one", this.leg, agent.getCurrentLeg());
-		List<NodeImpl> newLegsRoute = ((NetworkRoute) agent.getCurrentLeg().getRoute()).getNodes();
+		List<Node> newLegsRoute = ((NetworkRoute) agent.getCurrentLeg().getRoute()).getNodes();
 		assertEquals("the agent's new route should have the same size as the old one", this.agentRoute.getNodes().size(), newLegsRoute.size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newLegsRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newLegsRoute.get(newLegsRoute.size()-1));
 
 		//enlarge scenario
-		List<NodeImpl> list = new ArrayList<NodeImpl>();
+		List<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("2"));
 		list.addAll(this.agentRoute.getNodes());
 		this.agentRoute.setNodes(link1, list, link7);
@@ -234,7 +232,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 
 		//again enlarge scenario
 		LinkImpl link8 = this.network.getLink("8");
-		list = new ArrayList<NodeImpl>();
+		list = new ArrayList<Node>();
 		list.addAll(this.agentRoute.getNodes());
 		list.add(this.network.getNode("5"));
 		this.agentRoute.setNodes(link1, list, link8);

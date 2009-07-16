@@ -28,13 +28,13 @@
 
 package playground.christoph.knowledge.nodeselection;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -44,8 +44,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class SelectNodesCircular extends BasicSelectNodesImpl{
 
 	double distance;
-	NodeImpl centerNode;
-	LinkImpl centerLink;
+	Node centerNode;
+	Link centerLink;
 	
 	public SelectNodesCircular(NetworkLayer net)
 	{
@@ -53,7 +53,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		distance = 0.0;
 	}
 	
-	public Map<Id, NodeImpl> getNodes(NodeImpl center, double dist)
+	public Map<Id, Node> getNodes(Node center, double dist)
 	{
 		distance = dist;
 		centerNode = center;
@@ -61,7 +61,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		return getNodes();
 	}
 	
-	public void getNodes(NodeImpl center, double dist, Map<Id, NodeImpl> nodesMap)
+	public void getNodes(Node center, double dist, Map<Id, Node> nodesMap)
 	{
 		distance = dist;
 		centerNode = center;
@@ -69,7 +69,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		addNodesToMap(nodesMap);
 	}
 	
-	public Map<Id, NodeImpl> getNodes(LinkImpl link, double dist)
+	public Map<Id, Node> getNodes(Link link, double dist)
 	{
 		distance = dist;
 		centerLink = link;
@@ -77,7 +77,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		return getNodes();
 	}
 	
-	public void getNodes(LinkImpl link, double dist, Map<Id, NodeImpl> nodesMap)
+	public void getNodes(LinkImpl link, double dist, Map<Id, Node> nodesMap)
 	{
 		distance = dist;
 		centerLink = link;
@@ -86,20 +86,20 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 	}
 	
 	@Override
-	public Map<Id, NodeImpl> getNodes()
+	public Map<Id, Node> getNodes()
 	{
-		Map<Id, NodeImpl> nodesMap = new TreeMap<Id, NodeImpl>();
+		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 		addNodesToMap(nodesMap);
 		
 		return nodesMap;
 	}
 	
 	@Override
-	public void addNodesToMap(Map<Id, NodeImpl> nodesMap) 
+	public void addNodesToMap(Map<Id, Node> nodesMap) 
 	{	
 		if(centerNode != null || centerLink != null)
 		{
-			if(nodesMap == null) nodesMap = new TreeMap<Id, NodeImpl>();
+			if(nodesMap == null) nodesMap = new TreeMap<Id, Node>();
 			
 			// get all nodes of the network
 			Map<Id, NodeImpl> networkNodesMap = network.getNodes();
@@ -134,7 +134,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		this.distance = distance;
 	}
 
-	public NodeImpl getNode() {
+	public Node getNode() {
 		return centerNode;
 	}
 
@@ -143,7 +143,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		this.centerNode = centerNode;
 	}
 
-	public LinkImpl getLink() {
+	public Link getLink() {
 		return centerLink;
 	}
 

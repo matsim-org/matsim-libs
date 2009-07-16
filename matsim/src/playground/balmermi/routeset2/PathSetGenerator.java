@@ -31,6 +31,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -325,7 +327,7 @@ public class PathSetGenerator {
 				// no matter if the path already exists in the path list, that element of the recursion tree needs to be expanded.
 				// Therefore, add new excluding link set for the NEXT tree level
 				// TODO balmermi: set the right street segments
-				for (LinkImpl l : path.links) {
+				for (Link l : path.links) {
 					Set<StreetSegment> newExcludingStreetSegmentSet = new HashSet<StreetSegment>(streetSegmentSet.size()+1);
 					newExcludingStreetSegmentSet.addAll(streetSegmentSet);
 					StreetSegment s = l2sMapping.get(l.getId());
@@ -367,13 +369,14 @@ public class PathSetGenerator {
 				(d.getCoord().getX()-o.getCoord().getX())*(d.getCoord().getX()-o.getCoord().getX())+
 				(d.getCoord().getY()-o.getCoord().getY())*(d.getCoord().getY()-o.getCoord().getY()));
 		double distLCP = 0.0;
-		for (LinkImpl l : leastCostPath.links) { distLCP += l.getLength(); }
+		for (Link l : leastCostPath.links) { distLCP += l.getLength(); }
 		int nofNonePassNodesLCP = 0;
 		double avLinkDensityPerNodeLCP = 0.0;
 		double avIncidentNodeDensityPerNodeLCP = 0.0;
 		double avLinkDensityPerNonePassNodeLCP = 0.0;
 		double avIncidentNodeDensityPerNonePassNodeLCP = 0.0;
-		for (NodeImpl n : leastCostPath.nodes) {
+		for (Node n2 : leastCostPath.nodes) {
+			NodeImpl n = (NodeImpl) n2;
 			if ((n.getIncidentNodes().size() == 2) &&
 			    (((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) ||
 			     ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)))) {

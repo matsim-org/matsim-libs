@@ -26,9 +26,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -73,11 +74,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 */
 	final TravelTime timeFunction;
 
-	private HashMap<LinkImpl, EdgeIntervalls> flow;
+	private HashMap<Link, EdgeIntervalls> flow;
 
 	private Distances Dists;
 
-	private LinkedList<LinkImpl> pathToRoute;
+	private LinkedList<Link> pathToRoute;
 
 	private int timeHorizon;
 
@@ -85,9 +86,9 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 	final FakeTravelTimeCost length = new FakeTravelTimeCost();
 
-	private HashMap<NodeImpl, LinkImpl> pred = new HashMap<NodeImpl, LinkImpl>();
+	private HashMap<Node, Link> pred = new HashMap<Node, Link>();
 
-	private HashMap<NodeImpl, Integer> waited = new HashMap<NodeImpl, Integer>();
+	private HashMap<Node, Integer> waited = new HashMap<Node, Integer>();
 
 	/**
 	 * Default constructor.
@@ -103,7 +104,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 */
 	public MooreBellmanFordMoreDynamic(final NetworkLayer network,
 			final TravelCost costFunction, final TravelTime timeFunction,
-			HashMap<LinkImpl, EdgeIntervalls> flow) {
+			HashMap<Link, EdgeIntervalls> flow) {
 
 		this.network = network;
 		this.costFunction = costFunction;
@@ -113,10 +114,10 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		Dists = new Distances(network);
 		timeHorizon = Integer.MAX_VALUE;
 
-		pathToRoute = new LinkedList<LinkImpl>();
+		pathToRoute = new LinkedList<Link>();
 		gamma = Integer.MAX_VALUE;
 
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			pred.put(node, null);
 			waited.put(node, 0);
 		}
@@ -136,7 +137,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 */
 	public MooreBellmanFordMoreDynamic(final NetworkLayer network,
 			final TravelCost costFunction, final TravelTime timeFunction,
-			HashMap<LinkImpl, EdgeIntervalls> flow, int timeHorizon) {
+			HashMap<Link, EdgeIntervalls> flow, int timeHorizon) {
 
 		this.network = network;
 		this.costFunction = costFunction;
@@ -146,10 +147,10 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		this.timeHorizon = timeHorizon;
 		Dists = new Distances(network);
 
-		pathToRoute = new LinkedList<LinkImpl>();
+		pathToRoute = new LinkedList<Link>();
 		gamma = Integer.MAX_VALUE;
 
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			pred.put(node, null);
 			waited.put(node, 0);
 		}
@@ -166,10 +167,10 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
-	 *      org.matsim.core.network.NodeImpl, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
+	 *      org.matsim.core.network.Node, double)
 	 */
-	public Path calcLeastCostPath(final NodeImpl fromNode, final NodeImpl toNode,
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode,
 			final double startTime) {
 
 		// run the algorithm
@@ -192,8 +193,8 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		}
 
 		// now reconstruct the route
-		ArrayList<NodeImpl> routeNodes = new ArrayList<NodeImpl>();
-		NodeImpl tmpNode = fromNode;
+		ArrayList<Node> routeNodes = new ArrayList<Node>();
+		Node tmpNode = fromNode;
 		routeNodes.add(tmpNode);
 		if (pathToRoute.peek().getFromNode().equals(fromNode)
 				|| pathToRoute.peek().getToNode().equals(fromNode)) {
@@ -235,11 +236,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
-	 *      org.matsim.core.network.NodeImpl, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
+	 *      org.matsim.core.network.Node, double)
 	 */
-	public NetworkRoute calcLeastCostPath(final NodeImpl fromNode, final NodeImpl toNode,
-			final double startTime, HashMap<LinkImpl, EdgeIntervalls> flow) {
+	public NetworkRoute calcLeastCostPath(final Node fromNode, final Node toNode,
+			final double startTime, HashMap<Link, EdgeIntervalls> flow) {
 
 		this.flow = flow;
 
@@ -263,8 +264,8 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		}
 
 		// now reconstruct the route
-		ArrayList<NodeImpl> routeNodes = new ArrayList<NodeImpl>();
-		NodeImpl tmpNode = fromNode;
+		ArrayList<Node> routeNodes = new ArrayList<Node>();
+		Node tmpNode = fromNode;
 		routeNodes.add(tmpNode);
 		if (pathToRoute.peek().getFromNode().equals(fromNode)
 				|| pathToRoute.peek().getToNode().equals(fromNode)) {
@@ -309,11 +310,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
-	 *      org.matsim.core.network.NodeImpl, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
+	 *      org.matsim.core.network.Node, double)
 	 */
-	public ArrayList<LinkImpl> calcLeastCostLinkRoute(final NodeImpl fromNode,
-			final NodeImpl toNode, final double startTime) {
+	public ArrayList<Link> calcLeastCostLinkRoute(final Node fromNode,
+			final Node toNode, final double startTime) {
 
 		// run the algorithm
 		boolean found = false;
@@ -333,7 +334,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		}
 
 		// now reconstruct the route
-		ArrayList<LinkImpl> routeLinks = new ArrayList<LinkImpl>();
+		ArrayList<Link> routeLinks = new ArrayList<Link>();
 		if (pathToRoute.peek().getFromNode().equals(fromNode)
 				|| pathToRoute.peek().getToNode().equals(fromNode)) {
 			for (int i = 0; i < pathToRoute.size(); i++) {
@@ -359,12 +360,12 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
-	 *      org.matsim.core.network.NodeImpl, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
+	 *      org.matsim.core.network.Node, double)
 	 */
-	public ArrayList<LinkImpl> calcLeastCostLinkRoute(final NodeImpl fromNode,
-			final NodeImpl toNode, final double startTime,
-			HashMap<LinkImpl, EdgeIntervalls> flow) {
+	public ArrayList<Link> calcLeastCostLinkRoute(final Node fromNode,
+			final Node toNode, final double startTime,
+			HashMap<Link, EdgeIntervalls> flow) {
 		this.flow = flow;
 		// run the algorithm
 		boolean found = false;
@@ -381,7 +382,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			return null;
 		}
 		// now reconstruct the route
-		ArrayList<LinkImpl> routeLinks = new ArrayList<LinkImpl>();
+		ArrayList<Link> routeLinks = new ArrayList<Link>();
 		if (pathToRoute.peek().getFromNode().equals(fromNode)
 				|| pathToRoute.peek().getToNode().equals(fromNode)) {
 			for (int i = 0; i < pathToRoute.size(); i++) {
@@ -406,11 +407,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
-	 *      org.matsim.core.network.NodeImpl, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
+	 *      org.matsim.core.network.Node, double)
 	 */
-	public HashMap<LinkImpl, EdgeIntervalls> calcLeastCostFlow(final NodeImpl fromNode,
-			final NodeImpl toNode, final double startTime) {
+	public HashMap<Link, EdgeIntervalls> calcLeastCostFlow(final Node fromNode,
+			final Node toNode, final double startTime) {
 
 		// run the algorithm
 		boolean found = false;
@@ -441,11 +442,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		}
 
 		// augment flow
-		NodeImpl tmpNode = fromNode;
-		LinkImpl tmpLink;
-		NodeImpl node = tmpNode;
+		Node tmpNode = fromNode;
+		Link tmpLink;
+		Node node = tmpNode;
 		int dist;
-		HashMap<LinkImpl, EdgeIntervalls> newFlow = flow;
+		HashMap<Link, EdgeIntervalls> newFlow = flow;
 		while (!pathToRoute.isEmpty()) {
 			tmpLink = pathToRoute.poll();
 			dist = Dists.getDistance(tmpLink.getFromNode());
@@ -478,12 +479,12 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            The Node at which the route should end.
 	 * @param startTime
 	 *            ignored
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.NodeImpl,
-	 *      org.matsim.core.network.NodeImpl, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
+	 *      org.matsim.core.network.Node, double)
 	 */
-	public HashMap<LinkImpl, EdgeIntervalls> calcLeastCostFlow(final NodeImpl fromNode,
-			final NodeImpl toNode, final double startTime,
-			HashMap<LinkImpl, EdgeIntervalls> flow) {
+	public HashMap<Link, EdgeIntervalls> calcLeastCostFlow(final Node fromNode,
+			final Node toNode, final double startTime,
+			HashMap<Link, EdgeIntervalls> flow) {
 
 		this.flow = flow;
 
@@ -536,11 +537,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		}
 		
 		// augment flow
-		NodeImpl tmpNode = fromNode;
-		LinkImpl tmpLink;
-		NodeImpl node = tmpNode;
+		Node tmpNode = fromNode;
+		Link tmpLink;
+		Node node = tmpNode;
 		int dist;
-		HashMap<LinkImpl, EdgeIntervalls> newFlow = flow;
+		HashMap<Link, EdgeIntervalls> newFlow = flow;
 		int tmp = 0;
 		//System.out.println("pathToRoute empty (augment flow)? " + pathToRoute.isEmpty());
 		while (!pathToRoute.isEmpty()) {
@@ -576,8 +577,8 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * flow
 	 * 
 	 */
-	private boolean doCalculations(final NodeImpl fromNode, final NodeImpl toNode,
-			final double startTime, final HashMap<LinkImpl, EdgeIntervalls> flow) {
+	private boolean doCalculations(final Node fromNode, final Node toNode,
+			final double startTime, final HashMap<Link, EdgeIntervalls> flow) {
 		// outprints
 		/*
 		 * for (Link link : network.getLinks().values()) {
@@ -590,13 +591,13 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		init(fromNode);
 
 		// queue to save nodes we have to scan
-		Queue<NodeImpl> queue = new LinkedList<NodeImpl>();
+		Queue<Node> queue = new LinkedList<Node>();
 		queue.add(fromNode);
 
 		// v is first vertex in the queue
 		// w is the vertex we probably want to insert to the queue or to
 		// decrease the distance
-		NodeImpl v, w;
+		Node v, w;
 		// dist is the distance from the source to w over v
 		int dist;
 
@@ -607,7 +608,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 
 			// visit neighbors
 			// link is outgoing edge of v => forward edge
-			for (LinkImpl link : v.getOutLinks().values()) {
+			for (Link link : v.getOutLinks().values()) {
 				w = link.getToNode();
 
 				// compute new distance to neighbor
@@ -686,7 +687,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				}
 			}
 			// link is incomming edge of v => backward edge
-			for (LinkImpl link : v.getInLinks().values()) {
+			for (Link link : v.getInLinks().values()) {
 				w = link.getFromNode();
 
 				// compute new distance to neighbor
@@ -785,10 +786,10 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * @param fromNode
 	 *            The starting node
 	 */
-	void init(final NodeImpl fromNode) {
+	void init(final Node fromNode) {
 		// Distances
 		Dists = new Distances(network);
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			if (node.equals(fromNode)) {
 				Dists.setDistance(node, 0);
 			} else {
@@ -800,14 +801,14 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			pathToRoute.clear();
 		}
 		gamma = Integer.MAX_VALUE;
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			pred.put(node, null);
 			waited.put(node, 0);
 		}
 	}
 
 	// with arrivesAt
-	void visitNode(final NodeImpl fromNode, final NodeImpl toNode, int arrivesAt) {
+	void visitNode(final Node fromNode, final Node toNode, int arrivesAt) {
 		int tmpTime = Dists.getMinTime(toNode);
 		if (arrivesAt < tmpTime) {
 			Dists.setDistance(toNode, arrivesAt);
@@ -815,15 +816,15 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	}
 
 	// try to use visitNode without arrivesAt
-	boolean visitNode(final NodeImpl fromNode, final NodeImpl toNode) {
+	boolean visitNode(final Node fromNode, final Node toNode) {
 		int tmpTime = Dists.getMinTime(toNode);
 		boolean found = false;
-		LinkImpl thisLink = network.getLink("1");
+		Link thisLink = network.getLink("1");
 		// try to find link from fromNode to toNode
 		boolean forward, backward, flowPossibleForward, flowPossibleBackward;
 
 		// TODO use getInLinks() and getOutLinks() oder auch nicht
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			forward = (link.getFromNode().equals(fromNode))
 					&& (link.getToNode().equals(toNode));
 			backward = (link.getFromNode().equals(toNode))
@@ -841,7 +842,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		// see above with arrivesAt
 		if (found == true) {
 			int arrivesAt = Dists.getDistance(fromNode)
-					+ (int) (Math.ceil(thisLink.getEuklideanDistance()));
+					+ (int) (Math.ceil(((LinkImpl)thisLink).getEuklideanDistance()));
 			if (arrivesAt < tmpTime) {
 				Dists.setDistance(toNode, arrivesAt);
 			}
@@ -854,11 +855,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	// distance labels and send flow on it
 	// LinkedList<Link> findShortestPath(final Node fromNode, final Node toNode)
 	// {
-	LinkedList<LinkImpl> findPath(final NodeImpl fromNode, final NodeImpl toNode) {
-		LinkedList<LinkImpl> path = new LinkedList<LinkImpl>();
-		NodeImpl tmpNode = toNode;
-		NodeImpl node = tmpNode;
-		LinkImpl tmpLink;
+	LinkedList<Link> findPath(final Node fromNode, final Node toNode) {
+		LinkedList<Link> path = new LinkedList<Link>();
+		Node tmpNode = toNode;
+		Node node = tmpNode;
+		Link tmpLink;
 		while (!tmpNode.equals(fromNode)) {
 			tmpLink = pred.get(tmpNode);
 			if (tmpLink.getFromNode().equals(tmpNode)) {
@@ -888,9 +889,9 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		Dists.printAll();
 	}
 
-	void printPath(LinkedList<LinkImpl> path) {
+	void printPath(LinkedList<Link> path) {
 		System.out.print("Path: ");
-		for (LinkImpl link : path) {
+		for (Link link : path) {
 			System.out.print("(" + link.getFromNode().getId() + ","
 					+ link.getToNode().getId() + ") ");
 		}
@@ -898,11 +899,11 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	}
 
 	// TODO
-	void printWaitPath(LinkedList<LinkImpl> path, NodeImpl fromNode) {
+	void printWaitPath(LinkedList<Link> path, Node fromNode) {
 		System.out.print("Path: ");
-		NodeImpl tmpNode = fromNode;
-		LinkImpl tmpLink;
-		NodeImpl node = fromNode;
+		Node tmpNode = fromNode;
+		Link tmpLink;
+		Node node = fromNode;
 		for (int i = 0; i < path.size(); i++) {
 			tmpLink = path.get(i);
 			if(tmpLink.getFromNode().equals(tmpNode)){
@@ -929,13 +930,13 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 		System.out.println();
 	}
 
-	int calculateGamma(NodeImpl fromNode, NodeImpl toNode, LinkedList<LinkImpl> pathToRoute) {
+	int calculateGamma(Node fromNode, Node toNode, LinkedList<Link> pathToRoute) {
 		gamma = Integer.MAX_VALUE;
 		//System.out.println("pathToRoute empty (calculateGamma)? " + pathToRoute.isEmpty());
-		LinkedList<LinkImpl> path =  pathToRoute;
-		NodeImpl tmpNode = fromNode;
-		LinkImpl tmpLink;
-		NodeImpl node = fromNode;
+		LinkedList<Link> path =  pathToRoute;
+		Node tmpNode = fromNode;
+		Link tmpLink;
+		Node node = fromNode;
 		int dist;
 		int tmp = 0;
 		for(int i = 0; i < path.size(); i++){

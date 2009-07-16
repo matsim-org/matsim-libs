@@ -31,13 +31,12 @@ import javax.media.opengl.GL;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.population.Population;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -95,7 +94,7 @@ public class QueryAgentPlan implements OTFQuery {
 				LegImpl leg = (LegImpl)o;
 
 				if (leg.getMode().equals(TransportMode.car)) {
-					List<LinkImpl> route = ((NetworkRoute) leg.getRoute()).getLinks();
+					List<Link> route = ((NetworkRoute) leg.getRoute()).getLinks();
 					count += route.size();
 					if(route.size() != 0) count++; //add last position if there is a path
 				}
@@ -140,9 +139,9 @@ public class QueryAgentPlan implements OTFQuery {
 				LegImpl leg = (LegImpl)o;
 
 				if (leg.getMode().equals(TransportMode.car)) {
-					NodeImpl last = null;
-					for (LinkImpl driven : ((NetworkRoute) leg.getRoute()).getLinks()) {
-						NodeImpl node = driven.getFromNode();
+					Node last = null;
+					for (Link driven : ((NetworkRoute) leg.getRoute()).getLinks()) {
+						Node node = driven.getFromNode();
 						last = driven.getToNode();
 						setCoord(pos++, node.getCoord(), carColor);
 					}

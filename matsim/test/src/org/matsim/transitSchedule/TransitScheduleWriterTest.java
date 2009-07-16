@@ -27,6 +27,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -36,9 +37,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -107,7 +105,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 
 		// now add route info to the schedule
 		NetworkRoute route = new LinkNetworkRoute(l1, l4);
-		List<LinkImpl> links = new ArrayList<LinkImpl>(2);
+		List<Link> links = new ArrayList<Link>(2);
 		links.add(l2);
 		links.add(l3);
 		route.setLinks(l1, links, l4);
@@ -164,8 +162,8 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 					assertNotNull("bad network route, must not be null.", netRouteA);
 					assertEquals("wrong start link.", netRouteE.getStartLink(), netRouteA.getStartLink());
 					assertEquals("wrong end link.", netRouteE.getEndLink(), netRouteA.getEndLink());
-					List<LinkImpl> linksE = netRouteE.getLinks();
-					List<LinkImpl> linksA = netRouteA.getLinks();
+					List<Link> linksE = netRouteE.getLinks();
+					List<Link> linksA = netRouteA.getLinks();
 					for (int i = 0, n = linksE.size(); i < n; i++) {
 						assertEquals("wrong link in network route", linksE.get(i), linksA.get(i));
 					}

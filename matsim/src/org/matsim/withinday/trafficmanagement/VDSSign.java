@@ -26,10 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
@@ -282,9 +283,9 @@ public class VDSSign {
 
 	private NetworkRoute completeRoute(final NetworkRoute r) {
 		NetworkRoute ret = new NodeNetworkRoute();
-		ArrayList<NodeImpl> rNodes = new ArrayList<NodeImpl>(r.getNodes());
+		ArrayList<Node> rNodes = new ArrayList<Node>(r.getNodes());
 		if (!this.signLink.getToNode().equals(rNodes.get(0))) {
-			for (NodeImpl n : calculateInLinks(this.signLink, rNodes.get(0))) {
+			for (Node n : calculateInLinks(this.signLink, rNodes.get(0))) {
 				rNodes.add(0, n);
 			}
 		}
@@ -296,10 +297,10 @@ public class VDSSign {
 		return ret;
 	}
 
-	private List<NodeImpl> calculateInLinks(final LinkImpl signLink,
-			final NodeImpl firstRouteNode) {
-		List<NodeImpl> ret = new LinkedList<NodeImpl>();
-		for (LinkImpl l : firstRouteNode.getInLinks().values()) {
+	private List<Node> calculateInLinks(final Link signLink,
+			final Node firstRouteNode) {
+		List<Node> ret = new LinkedList<Node>();
+		for (Link l : firstRouteNode.getInLinks().values()) {
 			if (l.getFromNode().equals(signLink.getToNode())) {
 				ret.add(l.getFromNode());
 			}
@@ -311,13 +312,13 @@ public class VDSSign {
 		return ret;
 	}
 
-	private List<NodeImpl> calculateOutLinks(final LinkImpl destLink,
-			final NodeImpl lastRouteNode) {
-		List<NodeImpl> ret = new LinkedList<NodeImpl>();
+	private List<Node> calculateOutLinks(final Link destLink,
+			final Node lastRouteNode) {
+		List<Node> ret = new LinkedList<Node>();
 		if (destLink.getFromNode().equals(lastRouteNode)) {
 			return ret;
 		}
-		for (LinkImpl l : this.directionLink.getFromNode().getInLinks().values()) {
+		for (Link l : this.directionLink.getFromNode().getInLinks().values()) {
 			if (l.getFromNode().equals(lastRouteNode)) {
 				ret.add(l.getToNode());
 			}

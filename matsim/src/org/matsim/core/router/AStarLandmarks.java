@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -64,7 +64,7 @@ public class AStarLandmarks extends AStarEuclidean {
 
 	private int[] activeLandmarkIndexes;
 
-	private final NodeImpl[] landmarks;
+	private final Node[] landmarks;
 
 	private static final int controlInterval = 40;
 	private int controlCounter = 0;
@@ -112,7 +112,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	@Override
-	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double startTime) {
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 		if (this.landmarks.length >= 2) {
 			initializeActiveLandmarks(fromNode, toNode, 2);
 		} else {
@@ -122,7 +122,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	@Override
-	void relaxNode(final NodeImpl outNode, final NodeImpl toNode, final PriorityQueue<NodeImpl> pendingNodes) {
+	void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
 		this.controlCounter++;
 		if (this.controlCounter == controlInterval) {
 			int newLandmarkIndex = checkToAddLandmark(outNode, toNode);
@@ -144,7 +144,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param actLandmarkCount The number of active landmarks landmarks to
 	 * set.
 	 */
-	private void initializeActiveLandmarks(final NodeImpl fromNode, final NodeImpl toNode,
+	private void initializeActiveLandmarks(final Node fromNode, final Node toNode,
 			final int actLandmarkCount) {
 		final PreProcessLandmarks.LandmarksData fromData = getPreProcessData(fromNode);
 		final PreProcessLandmarks.LandmarksData toData = getPreProcessData(toNode);
@@ -174,10 +174,10 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	/**
-	 * @see org.matsim.core.router.Dijkstra#getPreProcessData(org.matsim.core.network.NodeImpl)
+	 * @see org.matsim.core.router.Dijkstra#getPreProcessData(org.matsim.core.network.Node)
 	 */
 	@Override
-	PreProcessLandmarks.LandmarksData getPreProcessData(NodeImpl n) {
+	PreProcessLandmarks.LandmarksData getPreProcessData(Node n) {
 		return (PreProcessLandmarks.LandmarksData) super.getPreProcessData(n);
 	}
 
@@ -189,7 +189,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
 	@Override
-	double estimateRemainingTravelCost(NodeImpl fromNode, NodeImpl toNode) {
+	double estimateRemainingTravelCost(Node fromNode, Node toNode) {
 
 		PreProcessLandmarks.LandmarksData fromRole = getPreProcessData(fromNode);
 		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
@@ -221,13 +221,13 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param pendingNodes The nodes visited so far.
 	 */
 	private void updatePendingNodes(final int newLandmarkIndex,
-			final NodeImpl toNode, final PriorityQueue<NodeImpl> pendingNodes) {
-		Iterator<NodeImpl> it = pendingNodes.iterator();
+			final Node toNode, final PriorityQueue<Node> pendingNodes) {
+		Iterator<Node> it = pendingNodes.iterator();
 		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
 		ArrayList<Double> newEstRemTravCosts = new ArrayList<Double>();
-		ArrayList<NodeImpl> nodesToBeUpdated = new ArrayList<NodeImpl>();
+		ArrayList<Node> nodesToBeUpdated = new ArrayList<Node>();
 		while (it.hasNext()) {
-			NodeImpl node = it.next();
+			Node node = it.next();
 			AStarNodeData role = getData(node);
 			PreProcessLandmarks.LandmarksData ppRole
 				= getPreProcessData(node);
@@ -239,11 +239,11 @@ public class AStarLandmarks extends AStarEuclidean {
 				newEstRemTravCosts.add(newEstRemTravCost);
 			}
 		}
-		for (NodeImpl node : nodesToBeUpdated) {
+		for (Node node : nodesToBeUpdated) {
 			pendingNodes.remove(node);
 		}
 		for (int i = 0; i < nodesToBeUpdated.size(); i++) {
-			NodeImpl node = nodesToBeUpdated.get(i);
+			Node node = nodesToBeUpdated.get(i);
 			AStarNodeData data = getData(node);
 			data.setExpectedRemainingCost(newEstRemTravCosts.get(i));
 			pendingNodes.add(node);
@@ -261,7 +261,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @return The index of the landmark that has been added to the set of
 	 * active landmarks, or -1 if no landmark was added.
 	 */
-	private int checkToAddLandmark(NodeImpl fromNode, NodeImpl toNode) {
+	private int checkToAddLandmark(Node fromNode, Node toNode) {
 		double bestTravCostEst = estimateRemainingTravelCost(fromNode, toNode);
 		PreProcessLandmarks.LandmarksData fromRole
 			= getPreProcessData(fromNode);

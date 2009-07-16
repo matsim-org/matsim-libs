@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -136,7 +137,7 @@ public class Vehicle extends SimUnit {
 	public void setCurrentLeg(LegImpl currentLeg) {
 		this.currentLeg = currentLeg;
 		if (currentLeg.getRoute() instanceof NetworkRoute) {
-			List<LinkImpl> links = ((NetworkRoute) currentLeg.getRoute()).getLinks();
+			List<Link> links = ((NetworkRoute) currentLeg.getRoute()).getLinks();
 			currentLinkRoute = links.toArray(new LinkImpl[links.size()]);
 		} else {
 			currentLinkRoute = null;

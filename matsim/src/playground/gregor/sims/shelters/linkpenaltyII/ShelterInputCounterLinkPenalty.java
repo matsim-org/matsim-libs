@@ -1,10 +1,10 @@
 package playground.gregor.sims.shelters.linkpenaltyII;
 
 import java.util.HashMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.events.AgentMoneyEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkLeaveEvent;
@@ -40,7 +40,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler {
 	}
 
 	
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId()); 
 		if (li != null) {
 			if (time > li.blockingTime) {

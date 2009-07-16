@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -95,8 +96,8 @@ public class QueueNode {
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
 	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
-		LinkImpl nextLink = veh.getDriver().chooseNextLink();
-		LinkImpl currentLink = currentLane.queueLink.getLink();
+		Link nextLink = veh.getDriver().chooseNextLink();
+		Link currentLink = currentLane.queueLink.getLink();
 
 		// veh has to move over node
 		if (nextLink != null) {
@@ -127,7 +128,7 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEvent(now, veh.getDriver().getPerson(), currentLink, veh.getDriver().getCurrentLeg()));
+							new AgentStuckEvent(now, veh.getDriver().getPerson(), (LinkImpl)currentLink, veh.getDriver().getCurrentLeg()));
 				} else {
 					currentLane.popFirstFromBuffer();
 					veh.getDriver().moveOverNode();

@@ -21,8 +21,8 @@
 package playground.marcel.pt.integration;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -36,7 +36,7 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	private Id lineId = null;
 	private String description = null;
 	
-	public ExperimentalTransitRoute(LinkImpl startLink, LinkImpl endLink) {
+	public ExperimentalTransitRoute(Link startLink, Link endLink) {
 		super(startLink, endLink);
 	}
 	
@@ -60,7 +60,7 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	}
 	
 	@Override
-	public void setRouteDescription(LinkImpl startLink, String routeDescription, LinkImpl endLink) {
+	public void setRouteDescription(Link startLink, String routeDescription, Link endLink) {
 		super.setRouteDescription(startLink, routeDescription, endLink);
 		if (routeDescription.startsWith("PT1 ")) {
 			String[] parts = StringUtils.explode(routeDescription, ' ', 5);

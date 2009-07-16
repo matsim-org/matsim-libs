@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -174,7 +175,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	@Override
-	public DeadEndData getNodeData(final NodeImpl n) {
+	public DeadEndData getNodeData(final Node n) {
 		DeadEndData r = this.nodeData.get(n);
 		if (r == null) {
 			r = new LandmarksData(this.landmarkCount);
@@ -247,16 +248,16 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 *
 	 * @author lnicolas
 	 */
-	static class LandmarksTravelTimeComparator implements Comparator<NodeImpl> {
-		private final Map<NodeImpl, DeadEndData> roleData;
+	static class LandmarksTravelTimeComparator implements Comparator<Node> {
+		private final Map<Node, DeadEndData> roleData;
 		private final int landmarkIndex;
 
-		protected LandmarksTravelTimeComparator(final Map<NodeImpl, DeadEndData> roleData, final int landmarkIndex) {
+		protected LandmarksTravelTimeComparator(final Map<Node, DeadEndData> roleData, final int landmarkIndex) {
 			this.roleData = roleData;
 			this.landmarkIndex = landmarkIndex;
 		}
 
-		public int compare(final NodeImpl n1, final NodeImpl n2) {
+		public int compare(final Node n1, final Node n2) {
 
 			double c1 = ((LandmarksData) this.roleData.get(n1)).getToLandmarkTravelTime(this.landmarkIndex);
 			double c2 = ((LandmarksData) this.roleData.get(n2)).getToLandmarkTravelTime(this.landmarkIndex);
@@ -267,7 +268,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			if (c1 > c2) {
 				return +1;
 			}
-			return n1.compareTo(n2);
+			return n1.getId().compareTo(n2.getId());
 		}
 	}
 

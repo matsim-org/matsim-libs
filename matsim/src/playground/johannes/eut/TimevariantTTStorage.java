@@ -24,7 +24,7 @@
 package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;
@@ -57,7 +57,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		}
 	}
 
-	public double getLinkTravelTime(LinkImpl link, double time) {
+	public double getLinkTravelTime(Link link, double time) {
 		try {
 			return getValue(link, (int) time);
 		} catch (IndexOutOfBoundsException e) {
@@ -81,7 +81,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		}
 	}
 
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		return getLinkTravelTime(link, time);
 	}
 }

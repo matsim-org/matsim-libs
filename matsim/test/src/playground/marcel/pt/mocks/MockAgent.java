@@ -21,6 +21,7 @@
 package playground.marcel.pt.mocks;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -76,7 +77,7 @@ public class MockAgent implements DriverAgent, PassengerAgent {
 	public void moveOverNode() {
 	}
 
-	public void teleportToLink(LinkImpl link) {
+	public void teleportToLink(Link link) {
 	}
 
 	public boolean arriveAtStop(final TransitStopFacility stop) {

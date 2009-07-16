@@ -20,7 +20,8 @@
 
 package org.matsim.withinday.percepts;
 
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Node;
+
 
 
 /**
@@ -29,6 +30,6 @@ import org.matsim.core.network.NodeImpl;
  */
 public interface AgentPercepts {
 	
-	public void updatedPercepts(NodeImpl currentNode);
+	public void updatedPercepts(Node currentNode);
 	
 }

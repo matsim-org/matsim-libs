@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -120,8 +121,8 @@ public class PathSetGenerator {
 		log.debug(" measurement started at "+startTimeMilliseconds+" with timeout "+timeout+"...");
 		
 		// setup and run the recursion
-		List<Set<LinkImpl>> excludingLinkSets = new LinkedList<Set<LinkImpl>>();
-		excludingLinkSets.add(new HashSet<LinkImpl>());
+		List<Set<Link>> excludingLinkSets = new LinkedList<Set<Link>>();
+		excludingLinkSets.add(new HashSet<Link>());
 		Set<Path> paths = new HashSet<Path>();
 		routeCnt = 0;
 		generate(0,excludingLinkSets,paths);
@@ -143,14 +144,14 @@ public class PathSetGenerator {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private void addLinkToNetwork(LinkImpl link) {
+	private void addLinkToNetwork(Link link) {
 		link.getFromNode().addOutLink(link);
 		link.getToNode().addInLink(link);
 	}
 
-	private void removeLinkFromNetwork(LinkImpl link) {
-		link.getFromNode().removeOutLink(link);
-		link.getToNode().removeInLink(link);
+	private void removeLinkFromNetwork(Link link) {
+		((NodeImpl)link.getFromNode()).removeOutLink((LinkImpl)link);
+		((NodeImpl)link.getToNode()).removeInLink((LinkImpl)link);
 	}
 
 	private final boolean containsPath(Set<Path> paths, Path path) {
@@ -160,32 +161,32 @@ public class PathSetGenerator {
 		return false;
 	}
 	
-	private final boolean containsLinkIdSet(List<Set<LinkImpl>> linkSets, Set<LinkImpl> linkSet) {
-		for (Set<LinkImpl> set : linkSets) {
+	private final boolean containsLinkIdSet(List<Set<Link>> linkSets, Set<Link> linkSet) {
+		for (Set<Link> set : linkSets) {
 			if (set.equals(linkSet)) { return true; }
 		}
 		return false;
 	}
 
-	private final void generate(int level, List<Set<LinkImpl>> excludingLinkSets, Set<Path> paths) {
+	private final void generate(int level, List<Set<Link>> excludingLinkSets, Set<Path> paths) {
 		log.debug("start level "+level);
 		
 		// for EARLY ABORT: shuffle the excludingLinkSets
 		Collections.shuffle(excludingLinkSets,MatsimRandom.getRandom());
 
 		// the set of excluding link sets for the NEXT tree level
-		List<Set<LinkImpl>> newExcludingLinkSets = new LinkedList<Set<LinkImpl>>();
+		List<Set<Link>> newExcludingLinkSets = new LinkedList<Set<Link>>();
 		
 		// go through all given link sets for THIS level
 		int setCnt = 0;
-		for (Set<LinkImpl> linkSet : excludingLinkSets) {
+		for (Set<Link> linkSet : excludingLinkSets) {
 			setCnt++;
 			
 			// remove the links from the network, calculate the least cost path and put the links back where they were
-			for (LinkImpl l : linkSet) { removeLinkFromNetwork(l); }
+			for (Link l : linkSet) { removeLinkFromNetwork(l); }
 			Path path = router.calcLeastCostPath(origin,destination,depTime);
 			routeCnt++;
-			for (LinkImpl l : linkSet) { addLinkToNetwork(l); }
+			for (Link l : linkSet) { addLinkToNetwork(l); }
 			
 			// check if there is a path from O to D (if not, that part of the recursion tree does not have to be expanded)
 			if (path != null) {
@@ -221,8 +222,8 @@ public class PathSetGenerator {
 				
 				// no matter if the path already exists in the path list, that element of the recursion tree needs to be expanded.
 				// Therefore, add new excluding link set for the NEXT tree level
-				for (LinkImpl l : path.links) {
-					Set<LinkImpl> newExcludingLinkSet = new HashSet<LinkImpl>(linkSet.size()+1);
+				for (Link l : path.links) {
+					Set<Link> newExcludingLinkSet = new HashSet<Link>(linkSet.size()+1);
 					newExcludingLinkSet.addAll(linkSet);
 					newExcludingLinkSet.add(l);
 					if (!containsLinkIdSet(newExcludingLinkSets,newExcludingLinkSet)) {

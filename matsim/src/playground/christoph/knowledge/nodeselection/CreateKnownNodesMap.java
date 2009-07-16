@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -74,11 +75,11 @@ public class CreateKnownNodesMap {
 		PlanImpl plan = p.getSelectedPlan();
 		
 		// get Nodes from the Person's Knowledge
-		Map<Id, NodeImpl> nodesMap = null;
+		Map<Id, Node> nodesMap = null;
 		
 		if (p.getCustomAttributes().get("NodeKnowledge") == null)
 		{
-			nodesMap = new TreeMap<Id, NodeImpl>();
+			nodesMap = new TreeMap<Id, Node>();
 			
 			NodeKnowledge nodeKnowledge = new MapKnowledge(nodesMap);
 			nodeKnowledge.setPerson(p);

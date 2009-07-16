@@ -29,9 +29,9 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -271,7 +271,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 		out.write("\t\t\t\t<route>");
 
 		if (route instanceof NetworkRoute) {
-			for (NodeImpl n : ((NetworkRoute) route).getNodes()) {
+			for (Node n : ((NetworkRoute) route).getNodes()) {
 				out.write(n.getId() + " ");
 			}
 		} else if (route instanceof GenericRoute) {

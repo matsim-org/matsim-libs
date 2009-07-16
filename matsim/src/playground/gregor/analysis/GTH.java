@@ -22,7 +22,7 @@ package playground.gregor.analysis;
 
 import java.util.List;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -62,7 +62,7 @@ public class GTH {
 	
 	public Polygon getPolygonFromRoute(NetworkRoute r) {
 		
-		List<LinkImpl> linkRoute = r.getLinks();
+		List<Link> linkRoute = r.getLinks();
 		Coordinate [] edges = new Coordinate [linkRoute.size() * 4] ;
 		
 		int pos = 0;
@@ -79,7 +79,7 @@ public class GTH {
 		return this.geofac.createPolygon(lr,null);		
 		
 	}
-	public Polygon getPolygonFromLink(LinkImpl l) {
+	public Polygon getPolygonFromLink(Link l) {
 		Coordinate [] edges = new Coordinate [4];
 		edges[0] = MGC.coord2Coordinate(l.getFromNode().getCoord());
 		edges[1] = MGC.coord2Coordinate(l.getToNode().getCoord());

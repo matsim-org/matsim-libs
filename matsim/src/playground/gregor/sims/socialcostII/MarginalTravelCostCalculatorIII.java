@@ -1,6 +1,6 @@
 package playground.gregor.sims.socialcostII;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
@@ -19,7 +19,7 @@ public class MarginalTravelCostCalculatorIII implements TravelCost {
 		this.binSize = binSize;
 	}
 
-	public double getLinkTravelCost(final LinkImpl link, double time) {
+	public double getLinkTravelCost(final Link link, double time) {
 //		double t2, t1;
 //		Integer k1;
 //		double diff = time % this.binSize;

@@ -20,8 +20,8 @@
 package playground.benjamin.income;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.households.basic.BasicIncome;
@@ -58,7 +58,7 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelCost {
 	/**
 	 * @see org.matsim.core.router.util.TravelCost#getLinkTravelCost(org.matsim.core.network.LinkImpl, double)
 	 */
-	public double getLinkTravelCost(LinkImpl link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;

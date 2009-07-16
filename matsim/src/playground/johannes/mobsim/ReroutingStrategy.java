@@ -23,7 +23,7 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -77,7 +77,7 @@ public class ReroutingStrategy implements IntradayStrategy {
 		}
 	}
 
-	protected NetworkRoute getRoute(LinkImpl origin, LinkImpl destination, double time) {
+	protected NetworkRoute getRoute(Link origin, Link destination, double time) {
 		return router.requestRoute(origin, destination, time);
 	}
 	

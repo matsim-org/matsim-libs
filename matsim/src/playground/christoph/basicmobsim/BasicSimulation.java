@@ -35,8 +35,8 @@ import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
@@ -91,7 +91,7 @@ public class BasicSimulation {
 			if (pe instanceof ActivityImpl) {
 				act = (ActivityImpl) pe;
 			} else if (pe instanceof LegImpl) {
-				ArrayList<NodeImpl> routeNodes = new ArrayList<NodeImpl>();
+				ArrayList<Node> routeNodes = new ArrayList<Node>();
 				LegImpl leg = (LegImpl) pe;
 				ActivityImpl nextAct = plan.getNextActivity(leg);
 				

@@ -21,14 +21,13 @@
 package playground.dressler.util;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -98,8 +97,8 @@ public class DDcontroller {
 					continue;
 				}
 
-				NodeImpl node2 = route.getStartLink().getToNode();
-				NodeImpl node1 = null;
+				Node node2 = route.getStartLink().getToNode();
+				Node node1 = null;
 				for (int n = 1; n < route.getLinkIds().size(); n++) {
 					node1 = network.getLink(route.getLinkIds().get(n)).getFromNode();
 					if (node1.getId() != node2.getId()) {

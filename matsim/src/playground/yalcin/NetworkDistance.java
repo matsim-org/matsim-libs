@@ -31,10 +31,10 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -161,7 +161,7 @@ public class NetworkDistance {
 
 				writer.write("\t" + fromNode.getId().toString());
 				writer.write("\t" + toNode.getId().toString());
-				for (LinkImpl link : path.links) {
+				for (Link link : path.links) {
 					writer.write("\t" + link.getId().toString());
 				}
 
@@ -182,7 +182,7 @@ public class NetworkDistance {
 
 	private static double getPathDistance(final Path path) {
 		double dist = 0;
-		for (LinkImpl link : path.links) {
+		for (Link link : path.links) {
 			dist += link.getLength();
 		}
 		return dist;

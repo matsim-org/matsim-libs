@@ -27,7 +27,8 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.TravelCost;
@@ -104,7 +105,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	
 	abstract void initSelector();
 
-	public Path calcLeastCostPath(final NodeImpl fromNode, final NodeImpl toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		final PriorityQueue<NodeData> pendingNodes = new PriorityQueue<NodeData>(500, this.comparator);
 
 		double minCost = Double.MAX_VALUE;
@@ -188,8 +189,8 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		final double currTime = outNodeD.getTime();
 		final double currCost = outNodeD.getCost();
 
-		for (final LinkImpl l : outNodeD.getMatsimNode().getOutLinks().values()) {
-			final NodeImpl n = l.getToNode();
+		for (final Link l : outNodeD.getMatsimNode().getOutLinks().values()) {
+			final Node n = l.getToNode();
 
 			//prevent u-turn exploration
 			if (outNodeD.isUTurn(n)) {
@@ -214,8 +215,8 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		final double currTime = outNodeD.getTime();
 		final double currCost = outNodeD.getCost();
 
-		for (final LinkImpl l : outNodeD.getMatsimNode().getOutLinks().values()) {
-			final NodeImpl n = l.getToNode();
+		for (final Link l : outNodeD.getMatsimNode().getOutLinks().values()) {
+			final Node n = l.getToNode();
 
 			//prevent u-turn exploration
 			if (outNodeD.isUTurn(n)) {
@@ -244,7 +245,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 * @param fromNodeData
 	 *            The NodeData from which we came to n.
 	 */
-	private void addToPendingNodes(final LinkImpl l, final NodeImpl n, final PriorityQueue<NodeData> pendingNodes, final double currTime, final double currCost, final NodeData fromNodeData) {
+	private void addToPendingNodes(final Link l, final Node n, final PriorityQueue<NodeData> pendingNodes, final double currTime, final double currCost, final NodeData fromNodeData) {
 
 		final double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		final double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
@@ -289,7 +290,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 * @param fromNodeData
 	 *            The NodeData from which we came to n.
 	 */
-	private void addShadowToPendingNodes(final LinkImpl l, final NodeImpl n,	final PriorityQueue<NodeData> pendingNodes, final double currTime, final double currCost, final NodeData fromNodeData) {
+	private void addShadowToPendingNodes(final Link l, final Node n,	final PriorityQueue<NodeData> pendingNodes, final double currTime, final double currCost, final NodeData fromNodeData) {
 		final double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		final double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
 
@@ -465,7 +466,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 * @param pendingNodes
 	 *            The pending nodes so far.
 	 */
-	void initFromNode(final NodeImpl fromNode, final NodeImpl toNode, final double startTime,
+	void initFromNode(final Node fromNode, final Node toNode, final double startTime,
 			final PriorityQueue<NodeData> pendingNodes) {
 		final NodeData data = getData(fromNode);
 		data.reset();
@@ -506,7 +507,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 *            The Node for which to return the data.
 	 * @return The data for the given Node
 	 */
-	protected NodeData getData(final NodeImpl n) {
+	protected NodeData getData(final Node n) {
 		NodeData r = this.nodeData.get(n.getId());
 		if (null == r) {
 			r = new NodeData(n, false);
@@ -518,7 +519,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	
 	//RouterVis - stuff
 	
-	private void colorizePaths(final ArrayList<NodeData> toNodes, final NodeImpl fromNode) {
+	private void colorizePaths(final ArrayList<NodeData> toNodes, final Node fromNode) {
 		
 		log.info("found " + toNodes.size() + " paths!");
 		this.netStateWriter.reset();
@@ -527,7 +528,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 			for (NodeData node : toNodes) {
 				final double prob = node.getProb();
 				while (node.getId() != fromNode.getId()) {
-					for (final LinkImpl l : node.getMatsimNode().getInLinks().values()) {
+					for (final Link l : node.getMatsimNode().getInLinks().values()) {
 						if (l.getFromNode().getId() == node.getPrev().getId()) {
 							this.netStateWriter.setLinkColor(l.getId(), color);
 							this.netStateWriter.setLinkMsg(l.getId(), getString(prob));

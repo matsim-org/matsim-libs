@@ -31,6 +31,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
@@ -49,9 +50,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -198,7 +197,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link1);
-		route.setNodes(f.link1, new ArrayList<NodeImpl>(0), f.link1);
+		route.setNodes(f.link1, new ArrayList<Node>(0), f.link1);
 		leg.setRoute(route);
 		plan.createActivity("w", f.link1);
 		f.plans.getPersons().put(person.getId(), person);
@@ -803,8 +802,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		final LinkImpl link2;
 		final LinkImpl link3;
 		final PopulationImpl plans;
-		final ArrayList<NodeImpl> nodes3;
-		final ArrayList<NodeImpl> nodes23;
+		final ArrayList<Node> nodes3;
+		final ArrayList<Node> nodes23;
 
 		public Fixture() {
 			this.config = Gbl.createConfig(null);
@@ -825,10 +824,10 @@ public class QueueSimulationTest extends MatsimTestCase {
 			/* build plans */
 			this.plans = new PopulationImpl();
 			
-			this.nodes3 = new ArrayList<NodeImpl>();
+			this.nodes3 = new ArrayList<Node>();
 			this.nodes3.add(this.node3);
 
-			this.nodes23 = new ArrayList<NodeImpl>();
+			this.nodes23 = new ArrayList<Node>();
 			this.nodes23.add(this.node2);
 			this.nodes23.add(this.node3);
 		}

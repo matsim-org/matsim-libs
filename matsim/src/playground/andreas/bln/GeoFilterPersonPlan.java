@@ -2,15 +2,14 @@ package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -58,7 +57,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if(planElement instanceof LegImpl){
-					for (NodeImpl node : ((NetworkRoute)((LegImpl) planElement).getRoute()).getNodes()) {
+					for (Node node : ((NetworkRoute)((LegImpl) planElement).getRoute()).getNodes()) {
 						if(this.targetNet.getNodes().containsValue(node)){
 							keepPlan = true;
 							break;

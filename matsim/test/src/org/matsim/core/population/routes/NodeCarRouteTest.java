@@ -20,16 +20,15 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NodeNetworkRoute;
 
 /**
  * @author mrieser
  */
 public class NodeCarRouteTest extends AbstractNetworkRouteTest {
 
-	public NetworkRoute getCarRouteInstance(final LinkImpl fromLink, final LinkImpl toLink, NetworkLayer network) {
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, NetworkLayer network) {
 		return new NodeNetworkRoute(fromLink, toLink);
 	}
 	

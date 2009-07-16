@@ -35,6 +35,7 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.OrPredicate;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -139,7 +140,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
-					for(LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					for(Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 						if(link.equals(predicateLink))
 							return true;
 					}

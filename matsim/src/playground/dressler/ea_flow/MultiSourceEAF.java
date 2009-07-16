@@ -30,13 +30,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.util.TravelCost;
@@ -71,13 +71,13 @@ public class MultiSourceEAF {
 	 * @return A HashMap<Node,Integer> containing the demands for every node in the file
 	 * @throws IOException if file reading fails
 	 */
-	private static HashMap<NodeImpl,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
+	private static HashMap<Node,Integer> readDemands(final NetworkLayer network, final String filename) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(filename));
-		HashMap<NodeImpl,Integer> demands = new HashMap<NodeImpl,Integer>();
+		HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
 		String inline = null;
 		while ((inline = in.readLine()) != null) {
 			String[] line = inline.split(";");
-			NodeImpl node = network.getNode(line[0].trim());
+			Node node = network.getNode(line[0].trim());
 			Integer d = Integer.valueOf(line[1].trim());
 			demands.put(node, d);
 		}
@@ -92,11 +92,11 @@ public class MultiSourceEAF {
 	 * @param filename path of the Population file
 	 * @return
 	 */
-	private static HashMap<NodeImpl,Integer> readPopulation(final NetworkLayer network, final String filename){
+	private static HashMap<Node,Integer> readPopulation(final NetworkLayer network, final String filename){
 		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population,network).readFile(filename);
 		network.connect();
-		HashMap<NodeImpl,Integer> allnodes = new HashMap<NodeImpl,Integer>();
+		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 
 		for(PersonImpl person : population.getPersons().values() ){
 
@@ -105,7 +105,7 @@ public class MultiSourceEAF {
 				continue;
 			}
 
-			NodeImpl node = network.getLink(plan.getFirstActivity().getLinkId()).getToNode();
+			Node node = network.getLink(plan.getFirstActivity().getLinkId()).getToNode();
 			if(allnodes.containsKey(node)){
 				int temp = allnodes.get(node);
 				allnodes.put(node, temp + 1);
@@ -190,10 +190,10 @@ public class MultiSourceEAF {
 		NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
-		NodeImpl sink = network.getNode(sinkid);		
+		Node sink = network.getNode(sinkid);		
 
 		//read demands
-		HashMap<NodeImpl, Integer> demands;
+		HashMap<Node, Integer> demands;
 		if(plansfile!=null){
 			demands = readPopulation(network, plansfile);			
 		}else if (demandsfile != null){
@@ -205,7 +205,7 @@ public class MultiSourceEAF {
 			}
 		} else {
 			// uniform demands
-			demands = new HashMap<NodeImpl, Integer>();
+			demands = new HashMap<Node, Integer>();
 			for (NodeImpl node : network.getNodes().values()) {
 				if (!node.getId().equals(sink.getId())) {
 					demands.put(node, Math.max(uniformDemands,0));
@@ -300,7 +300,7 @@ public class MultiSourceEAF {
 				System.out.println(fluss.arrivalsToString());
 				System.out.println(fluss.arrivalPatternToString());
 				System.out.println("unsatisfied demands:");
-				for (NodeImpl node : demands.keySet()){
+				for (Node node : demands.keySet()){
 					if (demands.get(node) > 0) {
 						System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
 					}

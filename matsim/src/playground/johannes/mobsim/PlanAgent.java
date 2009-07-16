@@ -25,7 +25,7 @@ package playground.johannes.mobsim;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -52,7 +52,7 @@ public class PlanAgent implements MobsimAgent {
 
 	private int currentRouteIndex;
 
-	private LinkImpl currentLink;
+	private Link currentLink;
 
 	// =======================================================
 	// constructor
@@ -78,7 +78,7 @@ public class PlanAgent implements MobsimAgent {
 	/**
 	 * @see {@link MobsimAgent}
 	 */
-	public LinkImpl getLink() {
+	public Link getLink() {
 		return currentLink;
 	}
 
@@ -132,7 +132,7 @@ public class PlanAgent implements MobsimAgent {
 	/**
 	 * @see {@link MobsimAgent#getNextLink(double)}
 	 */
-	public LinkImpl getNextLink(double time) {
+	public Link getNextLink(double time) {
 		/*
 		 * TODO: We need the link-based route implementation here!
 		 */
@@ -147,7 +147,7 @@ public class PlanAgent implements MobsimAgent {
 	 *            the current simulation time.
 	 * @return the desired destination link.
 	 */
-	public LinkImpl getDestinationLink(double time) {
+	public Link getDestinationLink(double time) {
 		if (currentPlanIndex % 2 == 0)
 			if (isDone())
 				return getLink();
@@ -261,10 +261,10 @@ public class PlanAgent implements MobsimAgent {
 	 *             if the agent has been set to a new link, although it has
 	 *             already reached its destination.
 	 */
-	public void enterLink(LinkImpl link, double time) {
+	public void enterLink(Link link, double time) {
 		currentLink = link;
 		currentRouteIndex++;
-		LinkImpl desiredLink = ((NetworkRoute) ((LegImpl) person.getSelectedPlan().getPlanElements().get(
+		Link desiredLink = ((NetworkRoute) ((LegImpl) person.getSelectedPlan().getPlanElements().get(
 				currentPlanIndex)).getRoute()).getLinks().get(currentRouteIndex);
 		if (currentLink != desiredLink)
 			currentRouteIndex--;

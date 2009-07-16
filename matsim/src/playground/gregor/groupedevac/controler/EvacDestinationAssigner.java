@@ -27,6 +27,8 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
@@ -89,7 +91,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		for (LinksScoreGroup group : this.linksScoreGroups) {
 			LinkImpl link = group.getBestLink();
 			PlanImpl plan = getBestLinkPlan(link);
-			ArrayList<NodeImpl> evacRoute = new ArrayList<NodeImpl>(((NetworkRoute) ((LegImpl) plan.getPlanElements().get(1)).getRoute()).getNodes());
+			ArrayList<Node> evacRoute = new ArrayList<Node>(((NetworkRoute) ((LegImpl) plan.getPlanElements().get(1)).getRoute()).getNodes());
 			if (isOutLink(link, group.getNode())){
 				evacRoute.add(0, group.getNode());
 			}
@@ -108,7 +110,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 					continue;
 				}
 				if (this.linkColor.get(l) != color) {
-					ArrayList<NodeImpl> tmpEvacRoute = new ArrayList<NodeImpl>(evacRoute);
+					ArrayList<Node> tmpEvacRoute = new ArrayList<Node>(evacRoute);
 					if (isOutLink(l,group.getNode())) {
 						tmpEvacRoute.add(0, l.getToNode());	
 					}
@@ -141,14 +143,14 @@ public class EvacDestinationAssigner implements ScoringListener {
 	}
 
 
-	private void modifyPlans(final LinkImpl dest, final ArrayList<NodeImpl> evacRoute, final LinkImpl origin, final ArrayList<PlanImpl> plans) {
+	private void modifyPlans(final Link dest, final ArrayList<Node> evacRoute, final Link origin, final ArrayList<PlanImpl> plans) {
 		
 		for (PlanImpl plan : plans) {
 			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 			NetworkRoute route = new NodeNetworkRoute();
 			route.setNodes(evacRoute);
 			leg.setRoute(route);
-			ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",dest);
+			ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",(LinkImpl)dest);
 			try {
 				route.getLinks();
 			} catch (Exception e) {

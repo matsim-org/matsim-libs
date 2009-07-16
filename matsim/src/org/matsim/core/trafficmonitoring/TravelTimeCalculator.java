@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
@@ -164,7 +164,7 @@ public class TravelTimeCalculator
 		return data;
 	}
 
-	public double getLinkTravelTime(final LinkImpl link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
 			DataContainer data = getTravelTimeData(link.getId(), true);
 			if (data.needsConsolidation) {
@@ -176,7 +176,7 @@ public class TravelTimeCalculator
 				"if calculation is switched off by config option!");
 	}
 	
-	public double getLinkToLinkTravelTime(LinkImpl fromLink, LinkImpl toLink, double time) {
+	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
 			"if calculation is switched off by config option!");			

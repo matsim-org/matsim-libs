@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -42,9 +42,9 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static Map<Id, NodeImpl> getKnownNodes(PersonImpl person)
+	public static Map<Id, Node> getKnownNodes(PersonImpl person)
 	{
-		Map<Id, NodeImpl> knownNodesMap = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)
@@ -103,12 +103,12 @@ public class KnowledgeTools {
 	 * Returns only those links, where Start- and Endnode are contained in the Map.
 	 * If no Nodes are known, all links are returned.
 	 */
-	public static LinkImpl[] getKnownLinks(LinkImpl[] links, Map<Id, NodeImpl> knownNodesMap)
+	public static Link[] getKnownLinks(Link[] links, Map<Id, Node> knownNodesMap)
 	{	
 		// If the current Person has knowledge about known Nodes (Map exists and has Elements)
 		if((knownNodesMap != null) && (knownNodesMap.size() != 0))
 		{
-			ArrayList<LinkImpl> knownLinks = new ArrayList<LinkImpl>();
+			ArrayList<Link> knownLinks = new ArrayList<Link>();
 			
 			for(int i = 0; i < links.length; i++)
 			{
@@ -121,7 +121,7 @@ public class KnowledgeTools {
 //			if (links.length != knownLinks.size())
 //				log.info("Reduced possible Links! Old linkcount: " + links.length + " new linkcout: " + knownLinks.size());
 			
-			links = new LinkImpl[knownLinks.size()];
+			links = new Link[knownLinks.size()];
 			for(int i = 0; i < links.length; i++) links[i] = knownLinks.get(i);
 			
 			knownLinks = null;
@@ -154,7 +154,7 @@ public class KnowledgeTools {
 	 */ 
 	public static void removeKnowledge(PersonImpl person)
 	{
-		Map<Id, NodeImpl> knownNodesMap = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)

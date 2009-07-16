@@ -5,6 +5,7 @@ import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEvent;
@@ -88,7 +89,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 		
 	}
 
-	public double getLinkPenalty(LinkImpl link, double time) {
+	public double getLinkPenalty(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link);
 		if (li == null) {
 			return 0.;

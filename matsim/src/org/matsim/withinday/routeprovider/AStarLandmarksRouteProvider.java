@@ -21,7 +21,7 @@
 package org.matsim.withinday.routeprovider;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
@@ -58,7 +58,7 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 		super.setPriority(priority);
 	}
 
-	public NetworkRoute requestRoute(final LinkImpl departureLink, final LinkImpl destinationLink,
+	public NetworkRoute requestRoute(final Link departureLink, final Link destinationLink,
 			final double time) {
 		Path path = this.landmarksAStar.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
 		NetworkRoute route = (NetworkRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
@@ -66,7 +66,7 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 		return route;
 	}
 
-	public boolean providesRoute(final LinkImpl currentLink, final NetworkRoute subRoute) {
+	public boolean providesRoute(final Link currentLink, final NetworkRoute subRoute) {
 		return true;
 	}
 }

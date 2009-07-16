@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -54,9 +54,9 @@ public class BestFitTimeRouter extends CMCFRouter {
 	public void route() {
 		Set<PersonImpl> unroutedPersons = new HashSet<PersonImpl>(this.population.getPersons().values());
 		
-		Map<List<LinkImpl>, Double> flowValues = new HashMap<List<LinkImpl>, Double>();
-		for(Commodity<NodeImpl> c: this.pathFlow.getCommodities()){
-			for(List<LinkImpl> path: this.pathFlow.getFlowPaths(c))
+		Map<List<Link>, Double> flowValues = new HashMap<List<Link>, Double>();
+		for(Commodity<Node> c: this.pathFlow.getCommodities()){
+			for(List<Link> path: this.pathFlow.getFlowPaths(c))
 				flowValues.put(path, 0.);
 		}
 		
@@ -71,13 +71,13 @@ public class BestFitTimeRouter extends CMCFRouter {
 			 */
 			
 			//add flow value
-			for(Commodity<NodeImpl> c: this.pathFlow.getCommodities()){
-				for(List<LinkImpl> path: this.pathFlow.getFlowPaths(c))
+			for(Commodity<Node> c: this.pathFlow.getCommodities()){
+				for(List<Link> path: this.pathFlow.getFlowPaths(c))
 					flowValues.put(path, flowValues.get(path)+this.pathFlow.getFlowValue(c, path));
 			}
 			
 			//look for a path with value >= 1
-			for(List<LinkImpl> path: flowValues.keySet()){
+			for(List<Link> path: flowValues.keySet()){
 				double flow = flowValues.get(path); 
 				while (flow > 0.99) //0.99 because of rounding errors
 				{	//look for unrouted person with the same start and target
@@ -85,7 +85,7 @@ public class BestFitTimeRouter extends CMCFRouter {
 					LegImpl leg = null;
 					for(PersonImpl p: unroutedPersons){
 						leg = p.getSelectedPlan().getNextLeg(p.getSelectedPlan().getFirstActivity());
-						NodeImpl 	from = leg.getRoute().getStartLink().getToNode(),
+						Node from = leg.getRoute().getStartLink().getToNode(),
 								to = leg.getRoute().getEndLink().getFromNode();
 						if(path.get(0).getFromNode() == from
 								&& path.get(path.size()-1).getToNode() == to){

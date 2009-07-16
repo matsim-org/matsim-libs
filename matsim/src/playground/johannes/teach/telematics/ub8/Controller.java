@@ -46,6 +46,7 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -57,7 +58,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
@@ -186,7 +186,7 @@ public class Controller extends Controler {
 			
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			LinkNetworkRoute route = (LinkNetworkRoute) factory.createRoute(network.getLink("1"), network.getLink("6"));
-			List<LinkImpl> links = new ArrayList<LinkImpl>();
+			List<Link> links = new ArrayList<Link>();
 			links.add(network.getLink("1.2"));
 			links.add(network.getLink("3"));
 			links.add(network.getLink("5"));

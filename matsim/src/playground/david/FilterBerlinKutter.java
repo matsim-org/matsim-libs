@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -34,7 +35,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -72,9 +72,9 @@ class FilterPersons extends AbstractPersonAlgorithm{
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(jj);
 				// route
 				if (leg.getRoute() != null) {
-					List<NodeImpl> nodes = ((NetworkRoute) leg.getRoute()).getNodes();
+					List<Node> nodes = ((NetworkRoute) leg.getRoute()).getNodes();
 					int count = 0;
-					for (NodeImpl node : nodes) {
+					for (Node node : nodes) {
 						if (relevantFromNodes.contains(node)) count++;
 						else if (relevantToNodes.contains(node)) count++;
 					}

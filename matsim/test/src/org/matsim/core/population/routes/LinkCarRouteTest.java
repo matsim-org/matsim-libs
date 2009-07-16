@@ -23,12 +23,12 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.LinkNetworkRoute;
 
 /**
  * @author mrieser
@@ -36,7 +36,7 @@ import org.matsim.core.population.routes.LinkNetworkRoute;
 public class LinkCarRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getCarRouteInstance(final LinkImpl fromLink, final LinkImpl toLink, NetworkLayer network) {
+	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, NetworkLayer network) {
 		return new LinkNetworkRoute(fromLink, toLink);
 	}
 
@@ -58,7 +58,7 @@ public class LinkCarRouteTest extends AbstractNetworkRouteTest {
 		LinkImpl link1 = network.getLink(new IdImpl("1"));
 		LinkImpl link2 = network.getLink(new IdImpl("2"));
 		NodeImpl node2 = network.getNode(new IdImpl("2"));
-		List<NodeImpl> nodes = new ArrayList<NodeImpl>();
+		List<Node> nodes = new ArrayList<Node>();
 		nodes.add(node2);
 
 		NetworkRoute route = new LinkNetworkRoute(link1, link2);

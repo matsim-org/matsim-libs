@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 
 
@@ -44,6 +44,6 @@ public interface LinkToLinkTravelTime extends TravelTime {
 	 * 		<code>fromLink</code> and enter the toLink <code>toLink</code>, 
 	 * departing at time <code>time</code>.
 	 */
-	public double getLinkToLinkTravelTime(LinkImpl fromLink, LinkImpl toLink, double time);
+	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time);
 
 }

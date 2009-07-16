@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -68,8 +69,8 @@ public class RouterTest extends MatsimTestCase {
 		Coord coord2 = new CoordImpl(685862, 254136);
 		Path path2 = pt.getPtRouter().findPTPath (coord1, coord2, 24372, 300);
 		System.out.println(path2.links.size());
-		for (LinkImpl link : path2.links){
-			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + link.getType() + link.getToNode().getId() );
+		for (Link link : path2.links){
+			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + ((LinkImpl)link).getType() + link.getToNode().getId() );
 		}
 
 		assertEquals( 31, path2.links.size() ) ;

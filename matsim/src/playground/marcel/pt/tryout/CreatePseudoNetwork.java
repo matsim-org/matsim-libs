@@ -26,9 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
@@ -80,12 +80,12 @@ public class CreatePseudoNetwork {
 		
 		for (TransitLine tLine : schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
-				ArrayList<LinkImpl> routeLinks = new ArrayList<LinkImpl>();
+				ArrayList<Link> routeLinks = new ArrayList<Link>();
 				TransitStopFacility prevFacility = null;
 				for (TransitRouteStop stop : tRoute.getStops()) {
 					TransitStopFacility facility = stop.getStopFacility();
 					if (prevFacility != null) {
-						LinkImpl link = getNetworkLink(prevFacility, facility);
+						Link link = getNetworkLink(prevFacility, facility);
 						// add link to route
 						routeLinks.add(link);
 					}
@@ -93,9 +93,9 @@ public class CreatePseudoNetwork {
 				}
 
 				if (routeLinks.size() > 0) {
-					LinkImpl startLink = routeLinks.get(0);
-					List<LinkImpl> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<LinkImpl>(0);
-					LinkImpl endLink = routeLinks.get(routeLinks.size() - 1);
+					Link startLink = routeLinks.get(0);
+					List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
+					Link endLink = routeLinks.get(routeLinks.size() - 1);
 					NetworkRoute route = new LinkNetworkRoute(startLink, endLink);
 					route.setLinks(startLink, linksBetween, endLink);
 					tRoute.setRoute(route);

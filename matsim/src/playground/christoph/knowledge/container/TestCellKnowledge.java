@@ -8,20 +8,18 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.population.Activity;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
@@ -37,7 +35,7 @@ public class TestCellKnowledge {
 	private Config config;
 	private PersonImpl person;
 	private SelectNodesDijkstra selectNodesDijkstra;
-	private Map<Id, NodeImpl> nodesMap;
+	private Map<Id, Node> nodesMap;
 	private CellKnowledge cellKnowledge;
 	private CellNetworkMapping cellNetworkMapping;
 	private CellKnowledgeCreator createCellKnowledge;
@@ -104,7 +102,7 @@ public class TestCellKnowledge {
 	{
 		PlanImpl plan = person.getSelectedPlan();
 		
-		nodesMap = new TreeMap<Id, NodeImpl>();
+		nodesMap = new TreeMap<Id, Node>();
 		
 		// get all acts of the selected plan
 		ArrayList<ActivityImpl> acts = new ArrayList<ActivityImpl>();					

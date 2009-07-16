@@ -20,9 +20,7 @@
 
 
 package playground.dressler.Intervall.src.Intervalls;
-import org.matsim.core.network.LinkImpl;
-
-import java.util.Collection;
+import org.matsim.core.api.experimental.network.Link;
 
 
 /**
@@ -44,7 +42,7 @@ public class VertexIntervall extends Intervall {
 	 * predecessor in a shortest path
 	 */
 	//TODO predecessor
-	private LinkImpl _predecessor=null;
+	private Link _predecessor=null;
 	
 
 //---------------------------METHODS----------------------------//
@@ -93,7 +91,7 @@ public class VertexIntervall extends Intervall {
 	 * @param d distance
 	 * @param pred Predecessor in a shortest path
 	 */
-	public VertexIntervall(int l, int r, boolean d, LinkImpl pred) {
+	public VertexIntervall(int l, int r, boolean d, Link pred) {
 		super(l, r);
 		this.setDist(d);
 		this.setPredecessor(pred);
@@ -135,7 +133,7 @@ public class VertexIntervall extends Intervall {
 	 * Setter for the predecessor in a shortest path
 	 * @param pred predesessor vertex
 	 */
-	public void setPredecessor(LinkImpl pred){
+	public void setPredecessor(Link pred){
 		this._predecessor=pred;
 	}
 	
@@ -143,7 +141,7 @@ public class VertexIntervall extends Intervall {
 	 * Getter for the predecessor in a shortest path
 	 * @return predecessor vertex 
 	 */
-	public LinkImpl getPredecessor(){
+	public Link getPredecessor(){
 		return this._predecessor;
 	}
 	

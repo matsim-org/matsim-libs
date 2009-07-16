@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -112,9 +113,9 @@ public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements Pl
 				out_routes.write(person.getId() + "\t\t" + l.getMode() + "\t");
 				out_types.write(person.getId() + "\t\t" + l.getMode() + "\t");
 				out_length.write(person.getId() + "\t\t" + l.getMode() + "\t");
-				for (LinkImpl link : ((NetworkRoute) l.getRoute()).getLinks()) {
+				for (Link link : ((NetworkRoute) l.getRoute()).getLinks()) {
 					out_routes.write(link.getId() + "\t");
-					out_types.write(link.getType() + "\t");
+					out_types.write(((LinkImpl)link).getType() + "\t");
 					out_length.write(link.getLength() + "\t");
 				}
 				out_routes.write(arr_link.getId() + "\n");

@@ -24,8 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
@@ -71,19 +72,19 @@ public class NetworkUtils {
 	 * @return list containing the specified nodes.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<NodeImpl> getNodes(final NetworkLayer network, final String nodes) {
+	public static List<Node> getNodes(final NetworkLayer network, final String nodes) {
 		if (nodes == null) {
-			return new ArrayList<NodeImpl>(0);
+			return new ArrayList<Node>(0);
 		}
 		String trimmed = nodes.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<NodeImpl>(0);
+			return new ArrayList<Node>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<NodeImpl> nodesList = new ArrayList<NodeImpl>(parts.length);
+		final List<Node> nodesList = new ArrayList<Node>(parts.length);
 
 		for (String id : parts) {
-			NodeImpl node = network.getNode(new IdImpl(id));
+			Node node = network.getNode(new IdImpl(id));
 			if (node == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}
@@ -98,19 +99,19 @@ public class NetworkUtils {
 	 * @return list containing the specified links.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<LinkImpl> getLinks(final NetworkLayer network, final String links) {
+	public static List<Link> getLinks(final NetworkLayer network, final String links) {
 		if (links == null) {
-			return new ArrayList<LinkImpl>(0);
+			return new ArrayList<Link>(0);
 		}
 		String trimmed = links.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<LinkImpl>(0);
+			return new ArrayList<Link>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<LinkImpl> linksList = new ArrayList<LinkImpl>(parts.length);
+		final List<Link> linksList = new ArrayList<Link>(parts.length);
 		
 		for (String id : parts) {
-			LinkImpl link = network.getLink(new IdImpl(id));
+			Link link = network.getLink(new IdImpl(id));
 			if (link == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}

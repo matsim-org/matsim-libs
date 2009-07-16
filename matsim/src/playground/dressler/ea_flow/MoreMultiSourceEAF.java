@@ -22,20 +22,18 @@
 package playground.dressler.ea_flow;
 
 // java imports
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
-//import java.util.Map;
 
-// matsim imports
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.*;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-//import org.matsim.utils.identifiers.IdI;
 
-// other imports
-import playground.dressler.Intervall.src.Intervalls.*;
+import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 
 
 public class MoreMultiSourceEAF {
@@ -49,10 +47,10 @@ public class MoreMultiSourceEAF {
 		 NetworkLayer network = new NetworkLayer();
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
 		 
-		 HashMap<LinkImpl, EdgeIntervalls> flow;
+		 HashMap<Link, EdgeIntervalls> flow;
 		 int timeHorizon = 6;
-		 ArrayList<LinkImpl> routeLinks = new ArrayList<LinkImpl>();
-		 LinkedList<ArrayList<LinkImpl>> routeLinksList = new LinkedList<ArrayList<LinkImpl>>();
+		 ArrayList<Link> routeLinks = new ArrayList<Link>();
+		 LinkedList<ArrayList<Link>> routeLinksList = new LinkedList<ArrayList<Link>>();
 
 		 //TODO choose the one you need
 		 //networkReader.readFile("/homes/combi/olthoff/.eclipse/Matsim/examples/equil/network.xml");
@@ -64,8 +62,8 @@ public class MoreMultiSourceEAF {
 		 networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");		 
 		 
 		// CODE
-		flow = new HashMap<LinkImpl, EdgeIntervalls>();
-		for(LinkImpl link : network.getLinks().values()){
+		flow = new HashMap<Link, EdgeIntervalls>();
+		for(Link link : network.getLinks().values()){
 			flow.put(link, new EdgeIntervalls((int)link.getFreespeed(1.)));
 			//TODO achtung cast von double auf int
 		}

@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -77,7 +78,7 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 		this.network = network;
 	}
 	
-	public double getSocialCost(final LinkImpl link, final double time) {
+	public double getSocialCost(final Link link, final double time) {
 		SocialCostRole sc = this.socCosts.get(link.getId().toString());
 		if (sc == null) {
 			return 0;

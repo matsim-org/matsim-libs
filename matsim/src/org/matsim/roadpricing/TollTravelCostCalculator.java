@@ -20,7 +20,7 @@
 
 package org.matsim.roadpricing;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
@@ -48,18 +48,18 @@ public class TollTravelCostCalculator implements TravelCost {
 
 	}
 
-	public double getLinkTravelCost(final LinkImpl link, final double time) {
+	public double getLinkTravelCost(final Link link, final double time) {
 		double baseCost = this.costHandler.getLinkTravelCost(link, time);
 		double tollCost = this.tollCostHandler.getTollCost(link, time);
 		return baseCost + tollCost;
 	}
 
 	private interface TollRouterBehaviour {
-		public double getTollCost(LinkImpl link, double time);
+		public double getTollCost(Link link, double time);
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
-		public double getTollCost(final LinkImpl link, final double time) {
+		public double getTollCost(final Link link, final double time) {
 			Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
@@ -69,7 +69,7 @@ public class TollTravelCostCalculator implements TravelCost {
 	}
 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
-		public double getTollCost(final LinkImpl link, final double time) {
+		public double getTollCost(final Link link, final double time) {
 			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
@@ -82,7 +82,7 @@ public class TollTravelCostCalculator implements TravelCost {
 	}
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
-		public double getTollCost(final LinkImpl link, final double time) {
+		public double getTollCost(final Link link, final double time) {
 			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
 				return 0.0;

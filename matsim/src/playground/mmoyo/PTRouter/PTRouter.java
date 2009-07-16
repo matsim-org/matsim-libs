@@ -6,19 +6,18 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordUtils;
-
-import playground.mmoyo.PTRouter.MyDijkstra;
-import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.geometry.CoordUtils;
+
+import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 /** 
  * Second version of Router using Matsims Class Dijkstra  
  * We avoid the relationship with the city network and use coordinate search instead
@@ -148,7 +147,7 @@ public class PTRouter{
 			//}
 		
 			Id idPTLine = new IdImpl("");
-			for (NodeImpl node : path.nodes){
+			for (Node node : path.nodes){
 				PTNode ptNode= (PTNode)node;
 				if(ptNode.getIdPTLine()==idPTLine){
 					System.out.print(ptNode.getId().toString() + " ");

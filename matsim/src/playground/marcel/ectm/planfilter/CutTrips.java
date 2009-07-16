@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -59,10 +60,10 @@ public class CutTrips implements PersonAlgorithm {
 		 */
 
 		int firstInsideLeg = -1;
-		LinkImpl firstInsideLink = null;
-		LinkImpl lastInsideLink = null;
+		Link firstInsideLink = null;
+		Link lastInsideLink = null;
 		int firstOutsideLeg = -1;
-		LinkImpl firstOutsideLink = null;
+		Link firstOutsideLink = null;
 
 		boolean startInside = this.aoi.containsKey(((ActivityImpl) plan.getPlanElements().get(0)).getLink().getId());
 
@@ -90,7 +91,7 @@ public class CutTrips implements PersonAlgorithm {
 			}
 
 			// test links of route
-			for (LinkImpl link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+			for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
 				if (this.aoi.containsKey(link.getId())) {
 					if (firstInsideLink == null) {
 						firstInsideLink = link;
@@ -156,8 +157,8 @@ public class CutTrips implements PersonAlgorithm {
 			LegImpl leg = (LegImpl) plan.getPlanElements().get(firstInsideLeg);
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			double traveltime = 0.0;
-			for (LinkImpl link : route.getLinks()) {
-				traveltime += link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
+			for (Link link : route.getLinks()) {
+				traveltime += link.getLength()/link.getFreespeed(Time.UNDEFINED_TIME);
 				if (link.equals(firstInsideLink)) {
 					break;
 				}
@@ -174,10 +175,10 @@ public class CutTrips implements PersonAlgorithm {
 			}
 
 			// adapt route of the leg that leads into the AOI
-			List<NodeImpl> nodes = route.getNodes();
-			Iterator<NodeImpl> iter = nodes.iterator();
+			List<Node> nodes = route.getNodes();
+			Iterator<Node> iter = nodes.iterator();
 			while (iter.hasNext()) {
-				NodeImpl node = iter.next();
+				Node node = iter.next();
 				if (node.equals(firstInsideLink.getToNode())) {
 					break;
 				}
@@ -202,10 +203,10 @@ public class CutTrips implements PersonAlgorithm {
 			boolean removing = false;
 			LegImpl leg = (LegImpl) plan.getPlanElements().get(firstOutsideLeg);
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
-			List<NodeImpl> nodes = route.getNodes();
-			Iterator<NodeImpl> iter = nodes.iterator();
+			List<Node> nodes = route.getNodes();
+			Iterator<Node> iter = nodes.iterator();
 			while (iter.hasNext()) {
-				NodeImpl node = iter.next();
+				Node node = iter.next();
 				if (node.equals(firstOutsideLink.getFromNode())) {
 					removing = true;
 				}

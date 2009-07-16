@@ -38,12 +38,12 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -62,10 +62,10 @@ public class KMLPersonWriter {
 	protected String kmzFileName;
 	protected String outputDirectory;
 	protected PersonImpl person;
-	protected ArrayList<LinkImpl> activityLinks;
-	protected ArrayList<NodeImpl> routeNodes;
+	protected ArrayList<Link> activityLinks;
+	protected ArrayList<Node> routeNodes;
 	protected NetworkLayer network;
-	protected Map<Id, NodeImpl> nodes;
+	protected Map<Id, Node> nodes;
 	protected NetworkRoute route;
 	
 	protected boolean writeKnownNodes = true;
@@ -197,7 +197,7 @@ public class KMLPersonWriter {
 		nodeFolder.setName("Activity Room");
 
 //		linkFolder.addStyle(this.networkNodeStyle);
-		for (NodeImpl node : this.nodes.values())
+		for (Node node : this.nodes.values())
 		{
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(node, this.networkNodeStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
@@ -233,7 +233,7 @@ public class KMLPersonWriter {
 		nodeFolder.setName("Route");
 
 //		linkFolder.addStyle(this.networkNodeStyle);
-		for (NodeImpl  node : routeNodes)
+		for (Node node : routeNodes)
 		{
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(node, this.networkNodeStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
@@ -267,7 +267,7 @@ public class KMLPersonWriter {
 		FolderType linkFolder = kmlObjectFactory.createFolderType();
 		linkFolder.setName("Activity Links");
 //		linkFolder.addStyle(this.networkLinkStyle);
-		for (LinkImpl link : activityLinks) 
+		for (Link link : activityLinks) 
 		{
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(link, this.networkLinkStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
@@ -286,7 +286,7 @@ public class KMLPersonWriter {
 	
 	private void createRouteNodes()
 	{
-		this.routeNodes = new ArrayList<NodeImpl>();
+		this.routeNodes = new ArrayList<Node>();
 		
 		if (this.person != null)
 		{
@@ -300,7 +300,7 @@ public class KMLPersonWriter {
 						if (leg.getRoute() instanceof NetworkRoute)
 						{
 							NetworkRoute route = (NetworkRoute)leg.getRoute();
-							for(NodeImpl node : route.getNodes())
+							for(Node node : route.getNodes())
 							{
 								routeNodes.add(node);
 							}
@@ -319,7 +319,7 @@ public class KMLPersonWriter {
 	
 	private void createActivityLinks()
 	{
-		this.activityLinks = new ArrayList<LinkImpl>();
+		this.activityLinks = new ArrayList<Link>();
 		
 		if (this.person != null)
 		{
@@ -352,7 +352,7 @@ public class KMLPersonWriter {
 				{
 					if (customAttributes.containsKey("Nodes"))
 					{
-						nodes = (Map<Id, NodeImpl>)customAttributes.get("Nodes");
+						nodes = (Map<Id, Node>)customAttributes.get("Nodes");
 						
 					}	// if (customAttributes.containsKey("Nodes");
 					else nodes = null;

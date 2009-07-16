@@ -21,8 +21,8 @@
 package playground.christoph.router.costcalculators;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -51,7 +51,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistanceCar();
 	}
 	
-	public double getLinkTravelCost(final LinkImpl link, final double time) 
+	public double getLinkTravelCost(final Link link, final double time) 
 	{		
 		// try getting NodeKnowledge from the Persons Knowledge
 		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);

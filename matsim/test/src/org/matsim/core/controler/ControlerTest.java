@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -35,9 +36,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
@@ -72,7 +71,7 @@ public class ControlerTest extends MatsimTestCase {
 		LegImpl leg1 = plan1.createLeg(TransportMode.car);
 		NetworkRoute route1 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg1.setRoute(route1);
-		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
+		ArrayList<Node> nodes = new ArrayList<Node>();
 		nodes.add(f.node2);
 		nodes.add(f.node3);
 		route1.setNodes(f.link1, nodes, f.link3);

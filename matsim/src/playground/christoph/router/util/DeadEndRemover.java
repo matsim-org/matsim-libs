@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -43,7 +44,7 @@ public class DeadEndRemover {
 	
 	public static void removeDeadEnds(PersonImpl person)
 	{
-		Map<Id, NodeImpl> knownNodesMap;
+		Map<Id, Node> knownNodesMap;
 		
 		/*
 		 * Try getting Nodes from the Persons NodeKnowledge.
@@ -57,15 +58,15 @@ public class DeadEndRemover {
 		if(knownNodesMap != null)
 		{
 			// Nodes that must not be Dead Ends because they are parts of the Persons Activities.
-			Map<Id, NodeImpl> activityNodesMap = getActivityNodesMap(person);
+			Map<Id, Node> activityNodesMap = getActivityNodesMap(person);
 			
-			Map<Id, NodeImpl> deadEndsMap = new HashMap<Id, NodeImpl>();
-			Map<Id, NodeImpl> possibleDeadEndsMap = new HashMap<Id, NodeImpl>();
+			Map<Id, Node> deadEndsMap = new HashMap<Id, Node>();
+			Map<Id, Node> possibleDeadEndsMap = new HashMap<Id, Node>();
 
 			int previousNodeCount = knownNodesMap.size();
 
 			// initially put all known Nodes in the possibleDeadEnds
-			for(NodeImpl node : knownNodesMap.values())
+			for(Node node : knownNodesMap.values())
 			{
 				possibleDeadEndsMap.put(node.getId(), node);
 			}
@@ -77,7 +78,7 @@ public class DeadEndRemover {
 				deadEndsMap.clear();
 				
 				// find real Dead Ends within the possible Dead Ends and remove them 
-				for(NodeImpl node : possibleDeadEndsMap.values())
+				for(Node node : possibleDeadEndsMap.values())
 				{				
 					if(!activityNodesMap.containsKey(node.getId()) && isDeadEnd(knownNodesMap, node))
 					{
@@ -90,12 +91,12 @@ public class DeadEndRemover {
 				possibleDeadEndsMap.clear();
 	
 				// Find possible Dead Ends to check in the next Loop.
-				for(NodeImpl node : deadEndsMap.values())
+				for(Node node : deadEndsMap.values())
 				{				
 					// get inNodes to the Dead End Node that are Part of the Activity Map of the Person
-					Map<Id, NodeImpl> inNodesMap = getInNodesMap(knownNodesMap, node);
+					Map<Id, Node> inNodesMap = getInNodesMap(knownNodesMap, node);
 					
-					for(NodeImpl inNode : inNodesMap.values())
+					for(Node inNode : inNodesMap.values())
 					{
 						// If the inNodes isn't already contained in the ArrayList -> add it.
 						if(!possibleDeadEndsMap.containsKey(inNode.getId())) possibleDeadEndsMap.put(inNode.getId(), inNode);
@@ -117,14 +118,14 @@ public class DeadEndRemover {
 	/*
 	 * Returns false, if there is at least one outgoing Link known.
 	 */
-	public static boolean isDeadEnd(Map<Id, NodeImpl> knownNodesMap, NodeImpl node)
+	public static boolean isDeadEnd(Map<Id, Node> knownNodesMap, Node node)
 	{
 		// If the Node is not contained in the ArrayList, it should be removed...
 		if (!knownNodesMap.containsKey(node.getId())) return true;
 		
-		Map<Id, NodeImpl> myMap = (Map<Id, NodeImpl>)node.getOutNodes();
+		Map<Id, Node> myMap = (Map<Id, Node>)((NodeImpl)node).getOutNodes();
 
-		for(NodeImpl outNode : myMap.values())
+		for(Node outNode : myMap.values())
 		{
 			// If the OutNode is contained in the Activity Map the current Node is no Dead End -> stop searching.
 			if(knownNodesMap.containsKey(outNode.getId())) return false;
@@ -138,9 +139,9 @@ public class DeadEndRemover {
 	 * Returns a Map with the Start- and Endnodes of the Activities of the selected Plan of a Person.
 	 */
 	//public static ArrayList<Node> getActivityNodes(Person person)
-	public static Map<Id, NodeImpl> getActivityNodesMap(PersonImpl person)
+	public static Map<Id, Node> getActivityNodesMap(PersonImpl person)
 	{
-		Map<Id, NodeImpl> activityNodesMap = new HashMap<Id, NodeImpl>();
+		Map<Id, Node> activityNodesMap = new HashMap<Id, Node>();
 		
 		PlanImpl plan = person.getSelectedPlan();
 		
@@ -148,8 +149,8 @@ public class DeadEndRemover {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				
-				NodeImpl fromNode = act.getLink().getFromNode();
-				NodeImpl toNode = act.getLink().getToNode();
+				Node fromNode = act.getLink().getFromNode();
+				Node toNode = act.getLink().getToNode();
 				
 				if(!activityNodesMap.containsKey(fromNode.getId())) activityNodesMap.put(fromNode.getId(), fromNode);
 				if(!activityNodesMap.containsKey(toNode.getId())) activityNodesMap.put(toNode.getId(), toNode);
@@ -162,13 +163,13 @@ public class DeadEndRemover {
 	/*
 	 * Returns the Startnodes of those incoming Links that are contained in the Map. 
 	 */
-	protected static Map<Id, NodeImpl> getInNodesMap(Map<Id, NodeImpl> knownNodesMap, NodeImpl node)
+	protected static Map<Id, Node> getInNodesMap(Map<Id, Node> knownNodesMap, Node node)
 	{
-		Map<Id, NodeImpl> inNodesMap = new HashMap<Id, NodeImpl>();
+		Map<Id, Node> inNodesMap = new HashMap<Id, Node>();
 		
-		Map<Id, NodeImpl> myMap = (Map<Id, NodeImpl>)node.getInNodes();
+		Map<Id, Node> myMap = (Map<Id, Node>)((NodeImpl)node).getInNodes();
 		
-		for(NodeImpl inNode : myMap.values())
+		for(Node inNode : myMap.values())
 		{
 			// If the InNode is contained in the Activity Map and not already in the ArrayList -> add it.	 
 			if(knownNodesMap.containsKey(inNode.getId()) && !inNodesMap.containsKey(inNode.getId())) inNodesMap.put(inNode.getId(), inNode);

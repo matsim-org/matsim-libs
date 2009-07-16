@@ -27,6 +27,7 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -41,8 +42,8 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.PTRouter.PTTimeTable;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
 import playground.mmoyo.input.PTNetworkFactory;
+import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
 
 public class PlansCalcPtRoute extends PlansCalcRoute {
 
@@ -125,7 +126,7 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 							planElements.set(i, leg2);
 						} else {
 							i++;
-							planElements.add(i, new ActivityImpl("pt interaction", leg2.getRoute().getStartLink()));
+							planElements.add(i, new ActivityImpl("pt interaction", (LinkImpl)(leg2.getRoute().getStartLink())));
 							i++;
 							planElements.add(i, leg2);
 						}

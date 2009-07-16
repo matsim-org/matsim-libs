@@ -24,16 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
@@ -158,10 +157,10 @@ public class LeaveLinkReplanner {
 		//newFromAct.setDuration(0);
 		
 		// Create a copy of the ArrayList - don't edit the ArrayList itself! 
-		ArrayList<NodeImpl> nodesRoute = new ArrayList<NodeImpl>();
+		ArrayList<Node> nodesRoute = new ArrayList<Node>();
 		nodesRoute.addAll(route.getNodes());
 
-		ArrayList<NodeImpl> nodeBuffer = new ArrayList<NodeImpl>();
+		ArrayList<Node> nodeBuffer = new ArrayList<Node>();
 		
 		/*
 		 *  Remove all Nodes from the Route that have already been passed.
@@ -170,7 +169,7 @@ public class LeaveLinkReplanner {
 		 */
 		for (int i = 0; i < currentNodeIndex - 1; i++)
 		{
-			NodeImpl node = nodesRoute.get(0);
+			Node node = nodesRoute.get(0);
 			
 			nodeBuffer.add(node);
 			nodesRoute.remove(0);
@@ -260,12 +259,12 @@ public class LeaveLinkReplanner {
 	 */
 	protected boolean checkRoute(NetworkRoute route)
 	{
-		List<NodeImpl> nodes = route.getNodes();
+		List<Node> nodes = route.getNodes();
 		
 		if(nodes.size() == 0) return true;
 	
-		NodeImpl currentNode;
-		NodeImpl nextNode;
+		Node currentNode;
+		Node nextNode;
 		
 		for (int i = 1; i < nodes.size() - 1; i++)
 		{
@@ -274,7 +273,7 @@ public class LeaveLinkReplanner {
 
 			boolean foundLink = false;
 			
-			for (LinkImpl link : currentNode.getOutLinks().values())
+			for (Link link : currentNode.getOutLinks().values())
 			{
 				if (link.getToNode() == nextNode)
 				{

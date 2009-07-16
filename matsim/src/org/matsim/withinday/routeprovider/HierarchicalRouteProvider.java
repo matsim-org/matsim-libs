@@ -27,9 +27,9 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 
@@ -52,10 +52,10 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	}
 
 	@Override
-	public NetworkRoute requestRoute(LinkImpl departureLink, final LinkImpl destinationLink, final double time) {
+	public NetworkRoute requestRoute(Link departureLink, final Link destinationLink, final double time) {
 		NetworkRoute subRoute;
 		NetworkRoute returnRoute = (NetworkRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(TransportMode.car, departureLink, destinationLink);
-		ArrayList<NodeImpl> routeNodes = new ArrayList<NodeImpl>();
+		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		for (RouteProvider rp : this.providers) {
 			if (log.isTraceEnabled()) {
 				log.trace("Used RouteProvider class: " + rp.getClass());
@@ -73,14 +73,14 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 			if (isCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}
-			List<LinkImpl> returnRouteLinks = returnRoute.getLinks();
+			List<Link> returnRouteLinks = returnRoute.getLinks();
 			departureLink = returnRouteLinks.get(returnRouteLinks.size()-1);
 		}
 		return null;
 	}
 
-	private boolean isCompleteRoute(final NetworkRoute subRoute, final LinkImpl destinationLink) {
-		NodeImpl endNode = subRoute.getNodes().get(subRoute.getNodes().size() - 1);
+	private boolean isCompleteRoute(final NetworkRoute subRoute, final Link destinationLink) {
+		Node endNode = subRoute.getNodes().get(subRoute.getNodes().size() - 1);
 		if (endNode.getOutLinks().containsKey(destinationLink.getId())) {
 			return true;
 		}
@@ -105,7 +105,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 	 * As this implementation is backed by a AStarRouter the class provides Routes from everywhere to everywhere
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.core.network.LinkImpl, org.matsim.core.population.routes.NetworkRoute)
 	 */
-	public boolean providesRoute(final LinkImpl currentLink, final NetworkRoute subRoute) {
+	public boolean providesRoute(final Link currentLink, final NetworkRoute subRoute) {
 		return true;
 	}
 

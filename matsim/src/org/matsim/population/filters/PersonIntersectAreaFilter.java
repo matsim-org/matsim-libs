@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -87,18 +88,18 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 					}
 				}
 				else if (leg.getRoute() instanceof NetworkRoute) {
-					List<LinkImpl> links = ((NetworkRoute) leg.getRoute()).getLinks();
+					List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 					if (links.size() == 0) {
 						if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
 							return true;
 						}
 					}
 					else {
-						for (LinkImpl link : links) {
+						for (Link link : links) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}
 						// test departure link
-						LinkImpl link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
+						Link link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
 						if (link != null) {
 							if (this.areaOfInterest.containsKey(link.getId())) return true;
 						}

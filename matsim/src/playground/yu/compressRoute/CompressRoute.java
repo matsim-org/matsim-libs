@@ -30,15 +30,14 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -93,10 +92,10 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 		for (int planId = 0; planId < nofPlans; planId++) {
 			PlanImpl plan = person.getPlans().get(planId);
 			List actsLegs = plan.getPlanElements();
-			Stack<LinkImpl> newLinks = new Stack<LinkImpl>();
+			Stack<Link> newLinks = new Stack<Link>();
 			for (int legId = 1; legId < actsLegs.size(); legId += 2) {
 				LegImpl leg = (LegImpl) actsLegs.get(legId);
-				List<LinkImpl> links = ((NetworkRoute) leg.getRoute()).getLinks();
+				List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
 				int linksLength = links.size();
 				this.oldLinksNr += linksLength;
 				try {
@@ -119,7 +118,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 				}
 				newLinks.clear();
 				for (int i = linksLength - 1; i > 0; i--) {
-					LinkImpl ssl = links.get(i);
+					Link ssl = links.get(i);
 					String sslId = ssl.getId().toString();
 					if (this.ssLinks.containsKey(sslId)) {
 						if (!links.get(i - 1).getId().toString().equals(

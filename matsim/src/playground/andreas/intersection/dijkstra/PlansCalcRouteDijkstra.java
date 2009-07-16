@@ -2,8 +2,8 @@ package playground.andreas.intersection.dijkstra;
 
 import java.util.ArrayList;
 
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -66,9 +66,9 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			path = this.getLeastCostPathCalculator().calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			
-			ArrayList<NodeImpl> realRouteNodeList = new ArrayList<NodeImpl>();
+			ArrayList<Node> realRouteNodeList = new ArrayList<Node>();
 			
-			for (NodeImpl node : path.nodes) {
+			for (Node node : path.nodes) {
 				realRouteNodeList.add(originalNetwork.getLinks().get(node.getId()).getToNode());
 			}
 			

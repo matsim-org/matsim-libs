@@ -22,19 +22,19 @@ package org.matsim.core.router.util;
 
 import java.util.List;
 
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 
 public interface LeastCostPathCalculator {
-	public Path calcLeastCostPath(NodeImpl fromNode, NodeImpl toNode, double starttime);
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime);
 	
 	public class Path {
-		public final List<NodeImpl> nodes;
-		public final List<LinkImpl> links;
+		public final List<Node> nodes;
+		public final List<Link> links;
 		public final double travelTime;
 		public final double travelCost;
 		
-		public Path(final List<NodeImpl> nodes, final List<LinkImpl> links, final double travelTime, final double travelCost) {
+		public Path(final List<Node> nodes, final List<Link> links, final double travelTime, final double travelCost) {
 			this.nodes = nodes;
 			this.links = links;
 			this.travelTime = travelTime;

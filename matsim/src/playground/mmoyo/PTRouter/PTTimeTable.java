@@ -5,10 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
+
 import playground.mmoyo.input.PTLinesReader;
 
 /**
@@ -75,13 +78,13 @@ public class PTTimeTable{
 		}
 	}
 	
-	public double getTravelTime(LinkImpl link){
+	public double getTravelTime(Link link){
 		return linkTravelTimeMap.get(link.getId())*60; // stored in minutes, returned in seconds
 	}
 
 	/**
 	 * Returns the waiting time in a transfer link head node after a given time //minutes */
-	public double getTransferTime(LinkImpl link, double time){
+	public double getTransferTime(Link link, double time){
 	 	double nextDeparture = nextDepartureB(link.getToNode().getId(),time); 
 		double transferTime= 0;
 		if (nextDeparture>=time){

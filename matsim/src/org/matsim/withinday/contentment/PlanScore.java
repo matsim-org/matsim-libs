@@ -23,6 +23,7 @@ package org.matsim.withinday.contentment;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -133,7 +134,7 @@ public class PlanScore implements AgentContentment {
 		double totalDistance = 0;
 		double length = 0;
 
-		List<LinkImpl> route = ((NetworkRoute) leg.getRoute()).getLinks();
+		List<Link> route = ((NetworkRoute) leg.getRoute()).getLinks();
 		int posInRoute = 0;
 		//determine the actual position in the route
 		for (int j = 0; j < route.size(); j++) {

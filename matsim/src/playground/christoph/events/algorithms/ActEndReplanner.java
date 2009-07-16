@@ -24,12 +24,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -224,13 +222,13 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 //		System.out.println("Do Replanning...");
 		
 
-		String newRouteString = "PersonId: " + person.getId();
-		newRouteString = newRouteString + "; LinkCount: " + ((NetworkRoute)betweenLeg.getRoute()).getLinks().size() + ";";
-		for (LinkImpl link : ((NetworkRoute)betweenLeg.getRoute()).getLinks())
-		{
-			newRouteString = newRouteString + " " + link.getId();
-		}
-		
+//		String newRouteString = "PersonId: " + person.getId();
+//		newRouteString = newRouteString + "; LinkCount: " + ((NetworkRoute)betweenLeg.getRoute()).getLinks().size() + ";";
+//		for (Link link : ((NetworkRoute)betweenLeg.getRoute()).getLinks())
+//		{
+//			newRouteString = newRouteString + " " + link.getId();
+//		}
+//		
 //		log.info(newRouteString);
 	}
 	

@@ -21,8 +21,7 @@
 package playground.christoph.router.costcalculators;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.router.util.KnowledgeTravelTime;
@@ -47,12 +46,12 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	}
 	
 	// return travel time without account for the actual traffic
-	public double getLinkTravelTime(LinkImpl link, double time)
+	public double getLinkTravelTime(Link link, double time)
 	{
 		if(myQueueNetwork == null)
 		{
 			log.info("No MyQueueNetwork found - FreeSpeedTravelTime is calculated and returned!");
-			return link.getFreespeedTravelTime(time);
+			return link.getLength()/link.getFreespeed(time);
 		}
 			
 		double vehicles = getVehiclesOnLink(link);
@@ -60,10 +59,12 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	}
 	
 	// calculate "real" travel time on the link and return it
-	public double getLinkTravelTime(LinkImpl link, double time, double vehicles)
+	public double getLinkTravelTime(Link link, double time, double vehicles)
 	{
 		// if there are currently no vehicles on the link -> return the freespeed travel time
-		if(vehicles == 0.0) return link.getFreespeedTravelTime(time);
+		if(vehicles == 0.0) {
+			return link.getLength()/link.getFreespeed(time);
+		}
 		
 		// normalize link to one lane
 		vehicles = vehicles / link.getNumberOfLanes(time);
@@ -98,16 +99,17 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		}	
 */	
 		// check results
-		if(travelTime < link.getFreespeedTravelTime(time))
+		double freespeedTravelTime = link.getLength()/link.getFreespeed(time);
+		if(travelTime < freespeedTravelTime)
 		{
 			log.warn("TravelTime is shorter than FreeSpeedTravelTime - looks like something is wrong here. Using FreeSpeedTravelTime instead!");
-			return link.getFreespeedTravelTime(time);
+			return freespeedTravelTime;
 		}
 		
 		return travelTime;
 	}
 
-	protected double getVehiclesOnLink(LinkImpl link)
+	protected double getVehiclesOnLink(Link link)
 	{
 //		QueueLink queueLink = myQueueNetwork.getQueueLink(link.getId());
 				

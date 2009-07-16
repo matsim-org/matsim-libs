@@ -5,9 +5,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkIdComparator;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelCost;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -17,7 +18,7 @@ import playground.christoph.router.util.KnowledgeTravelCost;
 public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	
 	protected TravelCost travelCostcalculator;
-	protected Map<LinkImpl, Double> linkTravelCosts;
+	protected Map<Link, Double> linkTravelCosts;
 	protected boolean useLookupTable = true;
 	protected boolean updateLookupTable = false;
 	
@@ -38,7 +39,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		return this.travelCostcalculator;
 	}
 	
-	public double getLinkTravelCost(final LinkImpl link, final double time) 
+	public double getLinkTravelCost(final Link link, final double time) 
 	{
 		// try getting NodeKnowledge from the Persons Knowledge
 		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
@@ -67,9 +68,9 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 
 	private void createLookupTable(double time)
 	{
-//		log.info("Creating LookupTable f�r LinkTravelTimes. Time = " + time);
+//		log.info("Creating LookupTable fuer LinkTravelTimes. Time = " + time);
 		LinkIdComparator linkComparator = new LinkIdComparator();
-		linkTravelCosts = new TreeMap<LinkImpl, Double>(linkComparator);
+		linkTravelCosts = new TreeMap<Link, Double>(linkComparator);
 		
 		for (QueueLink queueLink : myQueueNetwork.getLinks().values())
 		{

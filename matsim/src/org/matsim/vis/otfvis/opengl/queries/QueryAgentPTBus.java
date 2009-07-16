@@ -27,12 +27,12 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -82,7 +82,7 @@ public class QueryAgentPTBus implements OTFQuery {
 
 	private static float[] buildRoute(PlanImpl plan) {
 		float[] vertex = null;
-		List<LinkImpl> drivenLinks = new LinkedList<LinkImpl> ();
+		List<Link> drivenLinks = new LinkedList<Link> ();
 		
 		List actslegs = plan.getPlanElements();
 		for (int i= 0; i< actslegs.size(); i++) {
@@ -95,7 +95,7 @@ public class QueryAgentPTBus implements OTFQuery {
 				LegImpl leg = (LegImpl)actslegs.get(i);
 				
 				//if (!leg.getMode().equals("car")) continue;
-				for (LinkImpl driven : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (Link driven : ((NetworkRoute) leg.getRoute()).getLinks()) {
 					drivenLinks.add(driven);
 				}
 			}
@@ -106,8 +106,8 @@ public class QueryAgentPTBus implements OTFQuery {
 		// convert this to drawable info
 		vertex = new float[drivenLinks.size()*2];
 		int pos = 0;
-		for(LinkImpl qlink : drivenLinks) {
-			NodeImpl node = qlink.getFromNode();
+		for(Link qlink : drivenLinks) {
+			Node node = qlink.getFromNode();
 			vertex[pos++] = (float)node.getCoord().getX();
 			vertex[pos++] = (float)node.getCoord().getY();
 		}

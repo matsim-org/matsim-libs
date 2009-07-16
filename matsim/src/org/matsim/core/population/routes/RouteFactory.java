@@ -22,7 +22,7 @@ package org.matsim.core.population.routes;
 
 import java.io.Serializable;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 /**
  * Provides a simple factory method to create new Route-objects.
@@ -31,6 +31,6 @@ import org.matsim.core.network.LinkImpl;
  *
  * @author mrieser
  */
-public interface RouteFactory extends Serializable{
-	public RouteWRefs createRoute(LinkImpl startLink, LinkImpl endLink);
+public interface RouteFactory extends Serializable {
+	public RouteWRefs createRoute(Link startLink, Link endLink);
 }

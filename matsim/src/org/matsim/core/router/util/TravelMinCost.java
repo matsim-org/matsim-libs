@@ -20,7 +20,7 @@
 
 package org.matsim.core.router.util;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 
 /**
  * @author lnicolas
@@ -32,5 +32,5 @@ public interface TravelMinCost extends TravelCost {
 	 * @param link the link for which the minimal travel cost over all time slots is calculated
 	 * @return Minimal costs to travel over the link <pre>link</pre>, departing at time <pre>time</pre>
 	 */
-	public double getLinkMinimumTravelCost(LinkImpl link);
+	public double getLinkMinimumTravelCost(Link link);
 }

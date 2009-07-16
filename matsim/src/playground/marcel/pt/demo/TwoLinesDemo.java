@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -159,7 +160,7 @@ public class TwoLinesDemo {
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
-		ArrayList<LinkImpl> linkList = new ArrayList<LinkImpl>(6);
+		ArrayList<Link> linkList = new ArrayList<Link>(6);
 		linkList.add(link3);
 		linkList.add(link5);
 		linkList.add(link7);
@@ -186,7 +187,7 @@ public class TwoLinesDemo {
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
 		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
-		linkList = new ArrayList<LinkImpl>(6);
+		linkList = new ArrayList<Link>(6);
 		linkList.add(link4);
 		linkList.add(link6);
 		linkList.add(link7);
