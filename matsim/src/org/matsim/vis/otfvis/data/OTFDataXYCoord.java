@@ -21,6 +21,13 @@
 package org.matsim.vis.otfvis.data;
 
 
+/**
+ * OTFDataXYCoord sends a pair of x,y coords to the client.
+ * This class is not used yet.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFDataXYCoord implements OTFData{
 	public static interface Receiver extends OTFData.Receiver{
 		public void setXYCoord(float x, float y);

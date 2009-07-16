@@ -30,6 +30,12 @@ import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
+/**
+ * This class shows how the controler is overloaded to run a "live" simulation.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFVisController extends Controler {
 
 	private OnTheFlyServer myOTFServer;

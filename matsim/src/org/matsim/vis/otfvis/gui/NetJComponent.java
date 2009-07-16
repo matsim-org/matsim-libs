@@ -73,6 +73,13 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFData.Receiver{
 	}
 }
 
+/**
+ * The class implementaing the Component for SWING based drawing of the OTFVis.
+ * This version of the OTFVis does not support all possible features implemented in the OpenGL-based version.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	public static interface NetVisResizable {

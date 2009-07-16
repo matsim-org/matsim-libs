@@ -28,9 +28,15 @@ import javax.swing.JScrollPane;
 
 
 
+/**
+ * A helper class for implementing the pane for the SWING-based OTFVis.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class NetVisScrollPane extends JScrollPane{
 
-	private NetJComponent networkComponent;
+	private final NetJComponent networkComponent;
 	
 	public NetVisScrollPane(NetJComponent networkComponent) {
 		super(networkComponent);

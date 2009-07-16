@@ -36,6 +36,13 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
 
 
+/**
+ * OTFServerQuad is the quad representation of all elements of the network on the server
+ * side. This QuadTree is mirrored on the client side by OTFClientQuad.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();

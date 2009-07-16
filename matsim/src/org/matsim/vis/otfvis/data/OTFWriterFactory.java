@@ -20,6 +20,13 @@
 
 package org.matsim.vis.otfvis.data;
 
+/**
+ * OTFWriterFactory is responsible to create Writer instances for an QueueLink or QueueNode object.
+ * 
+ * @author dstrippgen
+ *
+ * @param <SrcClass> should be QueueLink or QueueNode right now.
+ */
 public interface OTFWriterFactory<SrcClass> {
 
 	public OTFDataWriter<SrcClass> getWriter();

@@ -31,6 +31,13 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
 
 
+/**
+ * A Thread implementation responsible for showing the "MobSim running to ..." Dialog when the user selects 
+ * a new time in the input field for the time.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFAbortGoto extends Thread  {
 	public boolean terminate = false;
 	private final OTFServerRemote host;

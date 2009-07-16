@@ -89,6 +89,16 @@ implements MouseWheelListener{
 		this.clickHandler = clickHandler;
 	}
 
+	public VisGUIMouseHandler(VisGUIMouseHandler other) {
+		this.clickHandler = other.clickHandler;
+		this.bounds = other.bounds;
+		this.camera.setLocation(other.cameraStart);
+		this.camera.setTarget(other.cameraTarget);
+		this.cameraStart = other.cameraStart;
+		this.cameraTarget = other.cameraTarget;
+		this.currentRect = other.currentRect;
+	}
+
 	private void invalidateHandler() {
 		try {
 			clickHandler.invalidate(-1);

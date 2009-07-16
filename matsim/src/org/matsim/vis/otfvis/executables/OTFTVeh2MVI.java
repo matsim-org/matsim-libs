@@ -36,6 +36,12 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
+/**
+ * This is a standalone executable to convert T.veh.gz files to .mvi files.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 	private  String vehFileName = "";
 
@@ -142,10 +148,10 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 //		String vehFileName = "../../tmp/studies/ivtch/T.veh";
 //		String outFileName = "output/testSWI2.mvi.gz";
 
-		String netFileName = "./networks/padang_net_dynStorageCap.xml";
-		String vehFileName = "./output/colorizedT.veh.txt.gz";
-//		String vehFileName = "../runs/run301/output/100.T.veh.gz";
-		String outFileName = "../OnTheFlyVis/test/testPadabang1.3.mvi";
+		String netFileName = "../../tmp/studies/padang/padang_net.xml";
+//		String vehFileName = "./output/colorizedT.veh.txt.gz";
+		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz";
+		String outFileName = "./output/testrun301.mvi";
 		int intervall_s = 60;
 
 		Gbl.createConfig(null);

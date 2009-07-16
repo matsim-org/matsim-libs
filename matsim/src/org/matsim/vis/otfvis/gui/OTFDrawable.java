@@ -22,6 +22,13 @@ package org.matsim.vis.otfvis.gui;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
+/**
+ * Any object that can be drawn on screen will have to implement this interface.
+ * Normally these classes will additionally implement OTFData.Recevier.
+ * 
+ * @author dstrippgen
+ *
+ */
 public interface OTFDrawable {
 	public void draw();
 	public void invalidate(SceneGraph graph);

@@ -22,6 +22,13 @@ package org.matsim.vis.otfvis.caching;
 
 import org.matsim.vis.otfvis.data.OTFData;
 
+/**
+ * The interface SceneLayer has to be implemented from each class the will be added to the SceneGraph as a Layer.
+ * The SceneLayer can take OTFData.Recevier elements. It Is also responsible for creating the Receivers associated with this Layer.
+ * 
+ * @author dstrippgen
+ *
+ */
 public interface SceneLayer {
 	public void init(SceneGraph graph, boolean initConstData);
 	public void finish();

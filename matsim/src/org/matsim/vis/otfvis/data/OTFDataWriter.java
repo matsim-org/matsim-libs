@@ -27,6 +27,14 @@ import java.nio.ByteBuffer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 
+/**
+ * OTFDataWriter<SrcData> is the base of all Writer classes. SrcData is most likely a
+ * QueueLink, QueueNode or likewise.
+ * 
+ * @author dstrippgen
+ *
+ * @param <SrcData>
+ */
 public abstract class OTFDataWriter<SrcData> implements Serializable {
 
 	private static final long serialVersionUID = 7593448140900220038L;

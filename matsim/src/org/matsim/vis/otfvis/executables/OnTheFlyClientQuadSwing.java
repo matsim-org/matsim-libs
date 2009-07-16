@@ -33,7 +33,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
 import org.matsim.vis.otfvis.gui.NetJComponent;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -43,11 +42,17 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 
 
+/**
+ * This Client is capable of running on SWING only computers. It does not need OpenGL acceleration.
+ * But it does not feature the whole set of operations possible with the OpenGL client.
+ * It is also very slow, but for small networks it should work.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OnTheFlyClientQuadSwing{
 
 	private static OTFConnectionManager connect2 = new OTFConnectionManager();

@@ -31,6 +31,13 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
+/**
+ * This is a standalone executable class for converting a event-file to a .mvi file.
+ * This is called by org.matsim.run.otfvis.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 	private final String eventFileName;
 

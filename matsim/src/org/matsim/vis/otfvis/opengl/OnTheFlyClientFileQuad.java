@@ -129,6 +129,8 @@ public class OnTheFlyClientFileQuad extends Thread {
 	protected String filename;
 	private boolean splitLayout = true;
 	protected JSplitPane pane = null;
+	protected OTFDrawer leftComp = null;
+	protected OTFDrawer rightComp = null;
 
 	protected OTFConnectionManager connect = new OTFConnectionManager();
 
@@ -235,6 +237,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 			if (this.splitLayout) {
 				OTFDrawer drawer = getLeftDrawerComponent(frame);
+				this.leftComp = drawer;
 				drawer.invalidate((int)hostControl.getTime());
 				this.hostControl.addHandler("test", drawer);
 				pane.setLeftComponent(drawer.getComponent());
@@ -242,6 +245,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 			}
 
 			OTFDrawer drawer2 = getRightDrawerComponent(frame);
+			this.rightComp = drawer2;
 			pane.setRightComponent(drawer2.getComponent());
 			this.hostControl.addHandler("test2", drawer2);
 			drawer2.invalidate((int)hostControl.getTime());

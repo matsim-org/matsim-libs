@@ -69,6 +69,14 @@ import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.otfvis.server.OTFTVehServer;
 
 
+/**
+ * This class is most important for the OTFVis client. It serves as the connector to the actual server.
+ * Additionally it is responsible for all actions assosiated with the control bar on top of the OTFVis' screen.
+ * Any communication with the server will run through this class.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
 //	private static final String CONNECT = "connect";
@@ -422,7 +430,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		stopMovie();
 		if(host.isLive()) {
 			liveHost.requestControllerStatus(OTFVisController.CANCEL);
-			
 			//requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
 			simTime = 0;
 			updateTimeLabel();

@@ -491,7 +491,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private Component canvas = null;
 	private JFrame  frame = null;
 
-	private OTFScaleBarDrawer scaleBar;
+	private final OTFScaleBarDrawer scaleBar;
 	
 	public Insets getInsets() {
 		return this.frame.getInsets();
@@ -546,6 +546,28 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 		this.overlayItems.add(new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false));
 		this.scaleBar = new OTFScaleBarDrawer();
+	}
+
+	public void replaceMouseHandler(VisGUIMouseHandler newHandler) {
+		if(newHandler == null) {
+			// replace with a copy that is autark
+			this.canvas.removeMouseListener(this.mouseMan);
+			this.canvas.removeMouseMotionListener(this.mouseMan);
+			this.canvas.removeMouseWheelListener(this.mouseMan);
+			
+			this.mouseMan = new VisGUIMouseHandler(this.mouseMan);
+		} else {
+			this.mouseMan = newHandler;
+		}
+		
+		this.canvas.addMouseListener(this.mouseMan);
+		this.canvas.addMouseMotionListener(this.mouseMan);
+		this.canvas.addMouseWheelListener(this.mouseMan);
+
+	}
+	
+	public VisGUIMouseHandler getMouseHandler() {
+		return this.mouseMan;
 	}
 
 //	public static GLContext getMotherContext() {

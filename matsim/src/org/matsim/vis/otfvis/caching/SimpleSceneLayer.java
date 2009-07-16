@@ -27,6 +27,13 @@ import org.matsim.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
 
 
+/**
+ *  * The SimpleSceneLayer is the one SceneLayer that is guaranteed to be present in the OTFVis.
+ * Every element that is not mapped to a specific layer is added to this layer.
+
+ * @author dstrippgen
+ *
+ */
 public class SimpleSceneLayer extends DefaultSceneLayer {
 	protected final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
 

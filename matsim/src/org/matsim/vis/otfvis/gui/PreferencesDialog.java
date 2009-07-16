@@ -51,6 +51,13 @@ import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 
+/**
+ * The class responsible for drawing the PreferencesDialog.
+ * This class is not used anymore, but the PreferencesDialog2 that inherits from this class.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener {
 
 	public static Class preDialogClass = PreferencesDialog2.class;

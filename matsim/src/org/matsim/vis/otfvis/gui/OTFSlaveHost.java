@@ -25,6 +25,14 @@ import java.rmi.RemoteException;
 
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 
+/**
+ * An OTFSlaveHost is like an OTFHostControlBar, therefore responsible for the connection to a particular server.
+ * But it lacks a GUI and is added to another instance of OTFHostControlbar  via the addSlave() method. It will be in time sync wioth the parent Host.
+ * This is used in OTFDoubleMVI to display two movies in synch.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFSlaveHost extends OTFHostControlBar {
 
 	public OTFSlaveHost(String address) throws RemoteException,

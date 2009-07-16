@@ -35,6 +35,14 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 
 
 
+/**
+ * 
+ * The LayerDrawingOrderComparator is used to order the layers in ascending order
+ * by their getDrawOrder() method
+ *  
+ * @author dstrippgen
+ *
+ */
 class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializable {
 
 	/**
@@ -51,6 +59,14 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
 }
 
 
+/**
+ * The SceneGraph is responsible for holding all information necessary to draw a particular timestep.
+ * Once a SceneGraph is constructed, the Reader/Writer and the QuadTree will not be asked for information any longer.
+ * Instead the SceneGraph's draw() method will be called.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class SceneGraph {
 	private Rect rect;
 	private final Map<Class, SceneLayer> layers = new LinkedHashMap<Class, SceneLayer>();

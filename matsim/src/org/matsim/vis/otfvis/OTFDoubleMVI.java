@@ -30,7 +30,6 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFSlaveHost;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
@@ -65,8 +64,9 @@ public class OTFDoubleMVI extends OnTheFlyClientFileQuad {
 			connectR.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 
 			OTFClientQuad clientQ2 = hostControl2.createNewView(null, connectR);
-			OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
+			OTFOGLDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 			drawer2.invalidate((int)hostControl.getTime());
+			drawer2.replaceMouseHandler(((OTFOGLDrawer)rightComp).getMouseHandler());
 			this.hostControl.addHandler("test", drawer2);
 			this.pane.setLeftComponent(drawer2.getComponent());
 			pane.setDividerLocation(0.5);
@@ -96,8 +96,8 @@ public class OTFDoubleMVI extends OnTheFlyClientFileQuad {
 			filename2 = args[1];
 		} else {
 //			filename = "../MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi.gz";
-			filename2 = "output/OTFQuadfile10p.mvi";
-			filename = "testCUDA10p.mvi";
+			filename2 = "output/testrun301.mvi";
+			filename = "output/testrun301_2.mvi";
 //			filename = "../../tmp/1000.events.mvi";
 //			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
 //			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";

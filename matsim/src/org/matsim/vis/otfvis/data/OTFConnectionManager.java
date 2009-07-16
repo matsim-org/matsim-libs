@@ -35,6 +35,23 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 
 
+/**
+ * The OTFConnectionManager is the most important class when building an OTFVis instance.
+ * It holds pairs of classes. Each of this class-pairs yields as a "From" -> "To" connection between classes.
+ * The whole from-to conncetions established in a OTFConnectionManager describe the route all data has to 
+ * take from the source (normally a QueueLink/Node, etc.) to the actual display on screen.
+ * It is the programmer's responsibility to define a complete chain of responsible objects for all data sent.
+ * 
+ *  A chain of responsibility normally consists of 
+ *  a DataSource (e.g. QueueLink), 
+ *  a DataWriter (e.g. OTFDefaultLinkHandler.Writer)
+ *  a DataReader (e.g. OTFDefaultLinkHandler)
+ *  a Visualizer class (e.g. SimpleStaticNetLayer.QuadDrawer)
+ *  and possibly a layer this Drawer belongs to (e.g. SimpleStaticNetLayer)
+ *  
+ * @author dstrippgen
+ *
+ */
 public class OTFConnectionManager implements Cloneable, Serializable {
 
 	/**

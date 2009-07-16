@@ -46,6 +46,14 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
+/**
+ * The OTFClientQuad is a QuadTree holding OTFDataReads objects.
+ * It mirrors the OTFServerQuad on the server side of the OTFVis exactly.
+ * It has several Executor classes defined for invalidating reading and creading the Quad.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final double minEasting;
 	private final double maxEasting;
@@ -350,7 +358,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 	
 	private static class CollectExecutor implements Executor<OTFDataReader> {
-		private Class class_old;
+		private final Class class_old;
 		static class Item {
 			public double x;
 			public double y;

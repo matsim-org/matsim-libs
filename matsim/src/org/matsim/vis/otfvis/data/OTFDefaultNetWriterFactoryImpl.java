@@ -26,6 +26,11 @@ import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 
 
+/**
+ * @author dstrippgen
+ *
+ */
+@Deprecated
 public class OTFDefaultNetWriterFactoryImpl implements Serializable, OTFNetWriterFactory {
 
 	/**
@@ -37,27 +42,33 @@ public class OTFDefaultNetWriterFactoryImpl implements Serializable, OTFNetWrite
 	private  OTFWriterFactory nodeWriterFac = new OTFDefaultNodeHandler.Writer();
 	private  OTFWriterFactory linkWriterFac = new OTFLinkLanesAgentsNoParkingHandler.Writer();
 	
+	@Deprecated
 	public OTFDataWriter getAgentWriter() {
 		if(agentWriterFac != null) return agentWriterFac.getWriter();
 		return null;
 	}
 
+	@Deprecated
 	public OTFDataWriter getLinkWriter() {
 		return linkWriterFac.getWriter();
 	}
 
+	@Deprecated
 	public OTFDataWriter getNodeWriter() {
 		return nodeWriterFac.getWriter();
 	}
 
+	@Deprecated
 	public void setAgentWriterFac(OTFWriterFactory agentWriterFac) {
 		this.agentWriterFac = agentWriterFac;
 	}
 
+	@Deprecated
 	public void setNodeWriterFac(OTFWriterFactory nodeWriterFac) {
 		this.nodeWriterFac = nodeWriterFac;
 	}
 
+	@Deprecated
 	public void setLinkWriterFac(OTFWriterFactory linkWriterFac) {
 		this.linkWriterFac = linkWriterFac;
 	}

@@ -24,6 +24,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A class for holding a pool of object of type ObjectType for later re-usage.
+ * This class is not used anywhere yet.
+ * 
+ * @author dstrippgen
+ *
+ * @param <ObjectType>
+ * 
+ */
+@Deprecated
 public class PoolFactory<ObjectType> {
 	private static Map<Class, PoolFactory> allFactories = new HashMap<Class, PoolFactory>();
 	

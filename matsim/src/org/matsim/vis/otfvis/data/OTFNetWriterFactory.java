@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis.data;
 
 
+@Deprecated
 public interface OTFNetWriterFactory {
 	OTFDataWriter getLinkWriter();
 	OTFDataWriter getNodeWriter();

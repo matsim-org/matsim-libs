@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.Provider {
+public class OTFDefaultLinkHandler extends OTFDataReader {
 	static {
 		OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
 	}

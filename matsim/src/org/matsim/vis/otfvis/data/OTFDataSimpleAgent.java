@@ -20,6 +20,11 @@
 
 package org.matsim.vis.otfvis.data;
 
+/**
+ * OTFDataSimpleAgent transferres the agent data to the visualizer, user and color are free to be defined by the actual Writer class. 
+ * @author dstrippgen
+ *
+ */
 public interface OTFDataSimpleAgent extends OTFData{
 	
 	public static interface Receiver extends OTFData.Receiver{

@@ -61,6 +61,13 @@ import org.matsim.vis.otfvis.opengl.queries.QueryLinkId;
 import org.matsim.vis.otfvis.opengl.queries.QuerySpinne;
 import org.matsim.vis.otfvis.opengl.queries.QuerySpinneNOW;
 
+/**
+ * This class is only used with the "live" OTFVis. It represents th Query issuing GUI element on the lower part of the screen.
+ * Alls queries are initiated and managed here.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFQueryControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener, OTFQueryHandler {
 
 	private static class QueryEntry {

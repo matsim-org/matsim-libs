@@ -20,6 +20,12 @@
 
 package org.matsim.vis.otfvis.data;
 
+/**
+ * OTFDataQuad is the interface for transferring the data of a quad.
+ * This is used for link drawing
+ * @author dstrippgen
+ *
+ */
 public interface OTFDataQuad extends OTFData{
 	
 	public static interface Receiver extends OTFData.Receiver{

@@ -35,6 +35,12 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
 
+/**
+ * A config module holding all preferences for the OTFVis.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFVisConfig extends Module {
 	private static final long serialVersionUID = 1L;
 
