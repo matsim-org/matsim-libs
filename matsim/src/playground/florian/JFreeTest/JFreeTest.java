@@ -12,18 +12,36 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.xml.DatasetReader;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 
 public class JFreeTest extends ApplicationFrame{
 	
 	public JFreeTest(String title){
 		super(title);
-		CategoryDataset dataset = null;
-		
+	}
+	
+	public void createChartFromFile(String file){
 		//Read the File
-		URL url = getClass().getResource("/playground/florian/JFreeTest/test2.xml");
+		URL url = getClass().getResource(file);
 		try {
 			InputStream in = url.openStream();
+			createChart(in);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void createChartFromStream(InputStream in){
+		createChart(in);
+	}
+	
+//	public void createChartFromStream(OutputStream out){
+//		
+//	}
+	
+	private void createChart(InputStream in){
+		CategoryDataset dataset = null;
+		try{
 			dataset = DatasetReader.readCategoryDatasetFromXML(in);
 		}
 			catch (IOException ioe) {
@@ -39,14 +57,6 @@ public class JFreeTest extends ApplicationFrame{
 		chartPanel.setPreferredSize(new java.awt.Dimension(500,270));
 		setContentPane(chartPanel);
 		
-		//Create the Output to File
-		
-	}
-	
-	public static void main(String[] args) {
-		JFreeTest demo = new JFreeTest("JFreeTest");
-		demo.pack();
-		RefineryUtilities.centerFrameOnScreen(demo);
-		demo.setVisible(true);
+		//Create the Output to File		
 	}
 }
