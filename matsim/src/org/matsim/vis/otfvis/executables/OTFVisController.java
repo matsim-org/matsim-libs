@@ -77,7 +77,7 @@ public class OTFVisController extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		OnTheFlyQueueSimQuad sim = new OnTheFlyQueueSimQuad(this.network, this.population, this.events);
+		OnTheFlyQueueSimQuad sim = new OnTheFlyQueueSimQuad(this.scenarioData, this.events);
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);
 		sim.setServer(myOTFServer);

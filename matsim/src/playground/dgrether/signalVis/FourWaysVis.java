@@ -20,11 +20,9 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 
 
 public class FourWaysVis {
@@ -46,10 +44,10 @@ public class FourWaysVis {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFile);
-		PopulationImpl population = scenario.getPopulation();
+//		PopulationImpl population = scenario.getPopulation();
 		Events events = new Events();
 		
-		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(network, population, events);
+		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
 		client.run();
 		
 		

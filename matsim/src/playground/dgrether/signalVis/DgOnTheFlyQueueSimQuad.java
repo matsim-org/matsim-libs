@@ -22,9 +22,8 @@ package playground.dgrether.signalVis;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
@@ -42,8 +41,8 @@ public class DgOnTheFlyQueueSimQuad extends OnTheFlyQueueSimQuad {
 	 * @param plans
 	 * @param events
 	 */
-	public DgOnTheFlyQueueSimQuad(NetworkLayer net, PopulationImpl plans, Events events) {
-		super(net, plans, events);
+	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, Events events) {
+		super(scenario, events);
 	}
 
 	@Override
