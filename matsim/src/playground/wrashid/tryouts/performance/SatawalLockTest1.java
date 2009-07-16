@@ -17,7 +17,7 @@ TODO: auf satawal same experiment...
  */
 public class SatawalLockTest1 {
 	public static void main(String[] args) {
-		int endTime = 1000000;
+		int endTime = 10000;
 		int totalNumberOfThreads=4;
 
 		Test2 test = new Test2();
@@ -52,7 +52,7 @@ public class SatawalLockTest1 {
 				}
 				
 				// some task to do (e.g. processing events).
-				for (int i=0;i<500;i++){
+				for (int i=0;i<5000;i++){
 					
 				}
 			}
