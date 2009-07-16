@@ -52,11 +52,8 @@ public class SatawalLockTest1 {
 				}
 				
 				// some task to do (e.g. processing events).
-				try {
-					Thread.currentThread().sleep(10);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				for (int i=0;i<100;i++){
+					
 				}
 			}
 			
