@@ -32,10 +32,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.run.OTFVis;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
@@ -72,8 +70,7 @@ public class TestIntegration {
 
 		sl.loadScenario();	
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-		TransitSchedule schedule = builder.createTransitSchedule();
+		TransitSchedule schedule = sl.getScenario().getTransitSchedule();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
@@ -81,9 +78,8 @@ public class TestIntegration {
 		try {
 //			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 			new TransitScheduleReaderV1(schedule, network).parse("../thesis-data/examples/berta/pseudoSchedule.xml");
-			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
+			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 			sim.startOTFServer(SERVERNAME);
-			sim.setTransitSchedule(schedule);
 			OTFDemo.ptConnect(SERVERNAME);
 			sim.run();
 			OTFVis.playMVI(new String[] {"./otfvis.mvi"});
@@ -104,7 +100,7 @@ public class TestIntegration {
 
 		final Events events = new Events();
 		
-		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
+		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
@@ -120,18 +116,17 @@ public class TestIntegration {
 		sl.loadScenario();
 		
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
+		scenario.getConfig().scenario().setUseTransit(true);
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-		TransitSchedule schedule = builder.createTransitSchedule();
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 		
 		try {
-			new TransitScheduleReaderV1(schedule, network).parse("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
-			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario.getNetwork(), scenario.getPopulation(), events);
+			new TransitScheduleReaderV1(schedule, network).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
+			final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 			sim.startOTFServer(SERVERNAME);
-			sim.setTransitSchedule(schedule);
 			OTFDemo.ptConnect(SERVERNAME);
 			sim.run();
 		} catch (SAXException e) {

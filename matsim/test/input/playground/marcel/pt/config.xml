@@ -8,7 +8,7 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/input/playground/marcel/pt/transitSchedule/network.xml" />
+		<param name="inputNetworkFile" value="test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml" />
 	</module>
 
 	<module name="plans">

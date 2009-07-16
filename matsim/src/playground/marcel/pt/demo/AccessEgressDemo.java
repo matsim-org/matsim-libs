@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -38,7 +37,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -68,8 +66,6 @@ public class AccessEgressDemo {
 	private static final String SERVERNAME = "access_egress_demo";
 	
 	private final ScenarioImpl scenario = new ScenarioImpl();
-	private final TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-	private final TransitSchedule schedule = this.builder.createTransitSchedule();
 	public final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];
 
 	private void createIds() {
@@ -80,6 +76,7 @@ public class AccessEgressDemo {
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
+		config.scenario().setUseTransit(true);
 		config.simulation().setSnapshotStyle("queue");
 		config.simulation().setEndTime(24.0*3600);
 	}
@@ -105,13 +102,15 @@ public class AccessEgressDemo {
 	}
 
 	private void createTransitSchedule() {
+		TransitSchedule schedule = this.scenario.getTransitSchedule();
+		TransitScheduleBuilder builder = schedule.getBuilder();
 		TransitStopFacility[] stops = new TransitStopFacility[nOfLinks];
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(nOfLinks);
 		for (int i = 0; i < nOfLinks; i++) {
-			stops[i] = this.builder.createTransitStopFacility(this.ids[i], this.scenario.createCoord((i+1)*500, 0), stopsBlockLane);
+			stops[i] = builder.createTransitStopFacility(this.ids[i], this.scenario.createCoord((i+1)*500, 0), stopsBlockLane);
 			stops[i].setLink(this.scenario.getNetwork().getLinks().get(this.ids[i]));
-			this.schedule.addStopFacility(stops[i]);
-			TransitRouteStop stop = this.builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
+			schedule.addStopFacility(stops[i]);
+			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
 			stopList.add(stop);
 		}
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
@@ -122,14 +121,14 @@ public class AccessEgressDemo {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));
 		}
 		networkRoute.setLinks(startLink, linkList, endLink);
-		TransitRoute tRoute = this.builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		TransitRoute tRoute = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
 
-		TransitLine tLine = this.builder.createTransitLine(this.ids[1]);
+		TransitLine tLine = builder.createTransitLine(this.ids[1]);
 		tLine.addRoute(tRoute);
-		this.schedule.addTransitLine(tLine);
+		schedule.addTransitLine(tLine);
 
 		for (int i = 0; i < nOfBuses; i++	) {
-			tRoute.addDeparture(this.builder.createDeparture(this.ids[i], departureTime + i*heading + (i == delayedBus ? delay : 0)));
+			tRoute.addDeparture(builder.createDeparture(this.ids[i], departureTime + i*heading + (i == delayedBus ? delay : 0)));
 		}
 //		try {
 //			new TransitScheduleWriterV1(this.schedule).write("accessEgressSchedule.xml");
@@ -139,12 +138,13 @@ public class AccessEgressDemo {
 	}
 
 	private void createPopulation() {
+		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		PopulationImpl population = this.scenario.getPopulation();
 		PopulationBuilder pb = population.getBuilder();
-		TransitStopFacility[] stops = this.schedule.getFacilities().values().toArray(new TransitStopFacility[this.schedule.getFacilities().size()]);
-		TransitLine tLine = this.schedule.getTransitLines().get(this.ids[1]);
+		TransitStopFacility[] stops = schedule.getFacilities().values().toArray(new TransitStopFacility[schedule.getFacilities().size()]);
+		TransitLine tLine = schedule.getTransitLines().get(this.ids[1]);
 
-		TransitStopFacility lastStop = this.schedule.getFacilities().get(this.ids[stops.length - 1]);
+		TransitStopFacility lastStop = schedule.getFacilities().get(this.ids[stops.length - 1]);
 		for (int i = 0; i < stops.length; i++) {
 			TransitStopFacility stop = stops[i];
 			if (stop == lastStop) {
@@ -152,7 +152,7 @@ public class AccessEgressDemo {
 			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
 				PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
-				PlanImpl plan = (PlanImpl) pb.createPlan(person);
+				PlanImpl plan = (PlanImpl) pb.createPlan();
 				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[i]);
 				act1.setEndTime(departureTime + j * agentInterval);
 				LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
@@ -160,7 +160,7 @@ public class AccessEgressDemo {
 				ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks - 1]);
 
 				population.getPersons().put(person.getId(), person);
-				person.getPlans().add(plan);
+				person.addPlan(plan);
 				person.setSelectedPlan(plan);
 				plan.addActivity(act1);
 				plan.addLeg(leg);
@@ -174,12 +174,11 @@ public class AccessEgressDemo {
 
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
-		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(this.schedule.getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]), vehTracker);
+		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]), vehTracker);
 		events.addHandler(analysis);
 
-		final TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario.getNetwork(), this.scenario.getPopulation(), events);
+		final TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer(SERVERNAME);
-		sim.setTransitSchedule(this.schedule);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
 

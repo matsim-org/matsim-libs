@@ -26,7 +26,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.api.experimental.population.Person;
@@ -39,10 +38,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
@@ -60,14 +57,14 @@ public class PseudoNetworkDemo {
 		if (args.length == 1) {
 			transitScheduleFile = args[0]	;
 		} else {
-//			networkFile = "test/input/playground/marcel/pt/transitSchedule/network.xml";
-//			transitScheduleFile = "test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml";
+			networkFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml";
+			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
 //			transitScheduleFile = "../thesis-data/examples/berta/schedule.xml";
-			transitScheduleFile = "/Users/cello/Desktop/Mohit/berlinSchedule.xml";
+//			transitScheduleFile = "/Users/cello/Desktop/Mohit/berlinSchedule.xml";
 		}
 		
 		ScenarioImpl scenario = new ScenarioImpl();
-		
+		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		
 		NetworkLayer network = scenario.getNetwork();
@@ -84,8 +81,7 @@ public class PseudoNetworkDemo {
 			}
 		}
 		
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-		TransitSchedule schedule = builder.createTransitSchedule();
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		try {
 			new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 		} catch (SAXException e1) {
@@ -107,7 +103,7 @@ public class PseudoNetworkDemo {
 		PopulationImpl population = scenario.getPopulation();
 		Person person = population.getBuilder().createPerson(new IdImpl(1));
 		population.getPersons().put(person.getId(), (PersonImpl) person);
-		Plan plan = population.getBuilder().createPlan(person);
+		Plan plan = population.getBuilder().createPlan();
 		person.addPlan(plan);
 		Activity act = population.getBuilder().createActivityFromLinkId("home", link1.getId());
 		act.setEndTime(4*3600.0);
@@ -122,8 +118,7 @@ public class PseudoNetworkDemo {
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 		
-		final TransitQueueSimulation sim = new TransitQueueSimulation(network, population, events);
-		sim.setTransitSchedule(schedule);
+		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();

@@ -27,21 +27,21 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderTest;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
@@ -63,15 +63,16 @@ public class TransitDriverTest extends MatsimTestCase {
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
 	public void testPersonsLeavingBus() throws SAXException, ParserConfigurationException, IOException {
-		loadConfig(null);
+		Config config = loadConfig(null);
+		config.scenario().setUseTransit(true);
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader((NetworkLayer) network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-		TransitSchedule schedule = builder.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		new TransitScheduleReaderV1(schedule, (NetworkLayer) network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
 //		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
@@ -81,7 +82,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);
+		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 
 		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
 
@@ -138,15 +139,17 @@ public class TransitDriverTest extends MatsimTestCase {
 	}
 
 	public void testPersonsEnteringBus() throws SAXException, ParserConfigurationException, IOException {
-		loadConfig(null);
+		Config config = loadConfig(null);
+		config.scenario().setUseTransit(true);
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		
+		NetworkLayer network = scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-		TransitSchedule schedule = builder.createTransitSchedule();
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
@@ -157,8 +160,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		Map<Id, Departure> departures = route1.getDepartures();
 
 		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(network, new PopulationImpl(), events);
-		sim.setTransitSchedule(schedule);
+		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 
 		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
 

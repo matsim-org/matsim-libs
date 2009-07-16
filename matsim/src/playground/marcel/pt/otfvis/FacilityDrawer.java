@@ -32,6 +32,7 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
@@ -58,8 +59,8 @@ public class FacilityDrawer {
 			out.putInt(this.schedule.getFacilities().size());
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				ByteBufferUtils.putString(out, facility.getId().toString());
-				out.putDouble(facility.getCoord().getX());
-				out.putDouble(facility.getCoord().getY());
+				out.putDouble(facility.getCoord().getX() - OTFServerQuad.offsetEast);
+				out.putDouble(facility.getCoord().getY() - OTFServerQuad.offsetNorth);
 			}
 
 		}

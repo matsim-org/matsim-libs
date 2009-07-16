@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -39,7 +38,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -54,8 +52,6 @@ import playground.marcel.pt.integration.TransitQueueSimulation;
 public class TwoLinesDemo {
 	
 	private final ScenarioImpl scenario = new ScenarioImpl();
-	private final TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-	private final TransitSchedule schedule = this.builder.createTransitSchedule();
 	private final Id[] ids = new Id[15];
 
 	private void createIds() {
@@ -66,6 +62,7 @@ public class TwoLinesDemo {
 	
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
+		config.scenario().setUseTransit(true);
 		config.simulation().setSnapshotStyle("queue");
 		config.simulation().setEndTime(24.0*3600);
 	}
@@ -122,12 +119,14 @@ public class TwoLinesDemo {
 	}
 	
 	private void createTransitSchedule() {
-		TransitStopFacility stop1 = this.builder.createTransitStopFacility(this.ids[1], this.scenario.createCoord(-100, -50));
-		TransitStopFacility stop2 = this.builder.createTransitStopFacility(this.ids[2], this.scenario.createCoord(-100, 850));
-		TransitStopFacility stop3 = this.builder.createTransitStopFacility(this.ids[3], this.scenario.createCoord(1400, 450));
-		TransitStopFacility stop4 = this.builder.createTransitStopFacility(this.ids[4], this.scenario.createCoord(3400, 450));
-		TransitStopFacility stop5 = this.builder.createTransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50));
-		TransitStopFacility stop6 = this.builder.createTransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850));
+		TransitSchedule schedule = this.scenario.getTransitSchedule();
+		TransitScheduleBuilder builder = schedule.getBuilder();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(this.ids[1], this.scenario.createCoord(-100, -50));
+		TransitStopFacility stop2 = builder.createTransitStopFacility(this.ids[2], this.scenario.createCoord(-100, 850));
+		TransitStopFacility stop3 = builder.createTransitStopFacility(this.ids[3], this.scenario.createCoord(1400, 450));
+		TransitStopFacility stop4 = builder.createTransitStopFacility(this.ids[4], this.scenario.createCoord(3400, 450));
+		TransitStopFacility stop5 = builder.createTransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50));
+		TransitStopFacility stop6 = builder.createTransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850));
 		
 		LinkImpl link1 = this.scenario.getNetwork().getLinks().get(this.ids[1]);
 		LinkImpl link2 = this.scenario.getNetwork().getLinks().get(this.ids[2]);
@@ -150,15 +149,15 @@ public class TwoLinesDemo {
 		stop5.setLink(link11);
 		stop6.setLink(link10);
 
-		this.schedule.addStopFacility(stop1);
-		this.schedule.addStopFacility(stop2);
-		this.schedule.addStopFacility(stop3);
-		this.schedule.addStopFacility(stop4);
-		this.schedule.addStopFacility(stop5);
-		this.schedule.addStopFacility(stop6);
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+		schedule.addStopFacility(stop4);
+		schedule.addStopFacility(stop5);
+		schedule.addStopFacility(stop6);
 
 
-		TransitLine tLine1 = this.builder.createTransitLine(this.ids[1]);
+		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
 		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
 		ArrayList<LinkImpl> linkList = new ArrayList<LinkImpl>(6);
 		linkList.add(link3);
@@ -169,23 +168,23 @@ public class TwoLinesDemo {
 		linkList.add(link11);
 		networkRoute.setLinks(link1, linkList, link13);
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(4);
-		stopList.add(this.builder.createTransitRouteStop(stop1, 0, 0));
-		stopList.add(this.builder.createTransitRouteStop(stop3, 90, 100));
-		stopList.add(this.builder.createTransitRouteStop(stop4, 290, 300));
-		stopList.add(this.builder.createTransitRouteStop(stop5, 390, Time.UNDEFINED_TIME));
-		TransitRoute tRoute1 = this.builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		stopList.add(builder.createTransitRouteStop(stop1, 0, 0));
+		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
+		stopList.add(builder.createTransitRouteStop(stop4, 290, 300));
+		stopList.add(builder.createTransitRouteStop(stop5, 390, Time.UNDEFINED_TIME));
+		TransitRoute tRoute1 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
 		tLine1.addRoute(tRoute1);
 		
-		tRoute1.addDeparture(this.builder.createDeparture(this.ids[1], Time.parseTime("07:00:00")));
-		tRoute1.addDeparture(this.builder.createDeparture(this.ids[2], Time.parseTime("07:05:00")));
-		tRoute1.addDeparture(this.builder.createDeparture(this.ids[3], Time.parseTime("07:10:00")));
-		tRoute1.addDeparture(this.builder.createDeparture(this.ids[4], Time.parseTime("07:15:00")));
-		tRoute1.addDeparture(this.builder.createDeparture(this.ids[5], Time.parseTime("07:20:00")));
-		tRoute1.addDeparture(this.builder.createDeparture(this.ids[6], Time.parseTime("07:25:00")));
+		tRoute1.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:00:00")));
+		tRoute1.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:05:00")));
+		tRoute1.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:10:00")));
+		tRoute1.addDeparture(builder.createDeparture(this.ids[4], Time.parseTime("07:15:00")));
+		tRoute1.addDeparture(builder.createDeparture(this.ids[5], Time.parseTime("07:20:00")));
+		tRoute1.addDeparture(builder.createDeparture(this.ids[6], Time.parseTime("07:25:00")));
 		
-		this.schedule.addTransitLine(tLine1);
+		schedule.addTransitLine(tLine1);
 
-		TransitLine tLine2 = this.builder.createTransitLine(this.ids[2]);
+		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
 		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
 		linkList = new ArrayList<LinkImpl>(6);
 		linkList.add(link4);
@@ -196,37 +195,38 @@ public class TwoLinesDemo {
 		linkList.add(link10);
 		networkRoute.setLinks(link2, linkList, link12);
 		stopList = new ArrayList<TransitRouteStop>(4);
-		stopList.add(this.builder.createTransitRouteStop(stop2, 0, 0));
-		stopList.add(this.builder.createTransitRouteStop(stop3, 90, 100));
-		stopList.add(this.builder.createTransitRouteStop(stop4, 290, 300));
-		stopList.add(this.builder.createTransitRouteStop(stop6, 390, Time.UNDEFINED_TIME));
-		TransitRoute tRoute2 = this.builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
+		stopList.add(builder.createTransitRouteStop(stop2, 0, 0));
+		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
+		stopList.add(builder.createTransitRouteStop(stop4, 290, 300));
+		stopList.add(builder.createTransitRouteStop(stop6, 390, Time.UNDEFINED_TIME));
+		TransitRoute tRoute2 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
 		tLine2.addRoute(tRoute2);
 
-		tRoute2.addDeparture(this.builder.createDeparture(this.ids[1], Time.parseTime("07:02:00")));
-		tRoute2.addDeparture(this.builder.createDeparture(this.ids[2], Time.parseTime("07:12:00")));
-		tRoute2.addDeparture(this.builder.createDeparture(this.ids[3], Time.parseTime("07:22:00")));
+		tRoute2.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:02:00")));
+		tRoute2.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:12:00")));
+		tRoute2.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:22:00")));
 		
-		this.schedule.addTransitLine(tLine2);
+		schedule.addTransitLine(tLine2);
 	}
 
 	private void createPopulation() {
+		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		PopulationImpl population = this.scenario.getPopulation();
 		PopulationBuilder pb = population.getBuilder();
 		
-		TransitLine tLine1 = this.schedule.getTransitLines().get(this.ids[1]);
-		TransitLine tLine2 = this.schedule.getTransitLines().get(this.ids[2]);
+		TransitLine tLine1 = schedule.getTransitLines().get(this.ids[1]);
+		TransitLine tLine2 = schedule.getTransitLines().get(this.ids[2]);
 		
-		TransitStopFacility stop1 = this.schedule.getFacilities().get(this.ids[1]);
-		TransitStopFacility stop2 = this.schedule.getFacilities().get(this.ids[2]);
-		TransitStopFacility stop3 = this.schedule.getFacilities().get(this.ids[3]);
-		TransitStopFacility stop4 = this.schedule.getFacilities().get(this.ids[4]);
-		TransitStopFacility stop5 = this.schedule.getFacilities().get(this.ids[5]);
-		TransitStopFacility stop6 = this.schedule.getFacilities().get(this.ids[6]);
+		TransitStopFacility stop1 = schedule.getFacilities().get(this.ids[1]);
+		/*TransitStopFacility stop2 =*/ schedule.getFacilities().get(this.ids[2]);
+		TransitStopFacility stop3 = schedule.getFacilities().get(this.ids[3]);
+		/*TransitStopFacility stop4 =*/ schedule.getFacilities().get(this.ids[4]);
+		TransitStopFacility stop5 = schedule.getFacilities().get(this.ids[5]);
+		/*TransitStopFacility stop6 =*/ schedule.getFacilities().get(this.ids[6]);
 		
 		{ // person 1
 			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[1]);
-			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
@@ -242,14 +242,14 @@ public class TwoLinesDemo {
 			plan.addActivity(act2);
 			plan.addLeg(leg2);
 			plan.addActivity(act3);
-			person.getPlans().add(plan);
+			person.addPlan(plan);
 			person.setSelectedPlan(plan);
 			population.getPersons().put(person.getId(), person);
 		}
 
 		{ // person 2
 			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[2]);
-			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
@@ -265,14 +265,14 @@ public class TwoLinesDemo {
 			plan.addActivity(act2);
 			plan.addLeg(leg2);
 			plan.addActivity(act3);
-			person.getPlans().add(plan);
+			person.addPlan(plan);
 			person.setSelectedPlan(plan);
 			population.getPersons().put(person.getId(), person);
 		}
 
 		{ // person 3
 			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[3]);
-			PlanImpl plan = (PlanImpl) pb.createPlan(person);
+			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
@@ -288,7 +288,7 @@ public class TwoLinesDemo {
 			plan.addActivity(act2);
 			plan.addLeg(leg2);
 			plan.addActivity(act3);
-			person.getPlans().add(plan);
+			person.addPlan(plan);
 			person.setSelectedPlan(plan);
 			population.getPersons().put(person.getId(), person);
 		}
@@ -297,9 +297,8 @@ public class TwoLinesDemo {
 	private void runSim() {
 		Events events = new Events();
 		
-		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario.getNetwork(), this.scenario.getPopulation(), events);
+		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer("two_lines_demo");
-		sim.setTransitSchedule(this.schedule);
 		
 		OTFDemo.ptConnect("two_lines_demo");
 		

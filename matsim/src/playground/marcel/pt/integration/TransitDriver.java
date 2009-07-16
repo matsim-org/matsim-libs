@@ -150,7 +150,6 @@ public class TransitDriver implements TransitDriverAgent {
 					this.vehicle.removePassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
 					events.processEvent(new PersonLeavesVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
-					System.out.println("passenger exit: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 					agent.teleportToLink(stop.getLink());
 					agent.legEnds(now);
 				}
@@ -159,7 +158,6 @@ public class TransitDriver implements TransitDriverAgent {
 					this.vehicle.addPassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
 					events.processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
-					System.out.println("passenger enter: agent=" + agent.getPerson().getId() + " facility=" + stop.getId());
 				}
 
 				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now + stopTime, this.vehicle.getBasicVehicle().getId(), stop.getId()));

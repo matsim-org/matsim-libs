@@ -24,6 +24,7 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -31,10 +32,8 @@ import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -57,15 +56,17 @@ public class TransitQueueSimulation extends QueueSimulation {
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
 
-	public TransitQueueSimulation(final NetworkLayer network, final PopulationImpl population, final Events events) {
-		super(network, population, events);
-	
+	public TransitQueueSimulation(final ScenarioImpl scenario, final Events events) {
+		super(scenario, events);
+
+		this.schedule = scenario.getTransitSchedule();
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
 		this.agentTracker = new TransitStopAgentTracker();
 	}
 
 	public void startOTFServer(final String serverName) {
 		this.otfServer = OnTheFlyServer.createInstance(serverName, this.network, this.plans, getEvents(), false);
+		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
 		try {
 			this.otfServer.pause();
 		} catch (RemoteException e) {
@@ -86,13 +87,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 		super.afterSimStep(time);
 		if (this.otfServer != null) {
 			this.otfServer.updateStatus(time);
-		}
-	}
-
-	public void setTransitSchedule(final TransitSchedule schedule) {
-		this.schedule = schedule;
-		if (this.otfServer != null) {
-			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
 		}
 	}
 
