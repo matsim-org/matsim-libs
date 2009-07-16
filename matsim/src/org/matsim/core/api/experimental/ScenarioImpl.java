@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.api.experimental;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -53,6 +54,10 @@ import org.matsim.world.World;
  */
 public class ScenarioImpl implements Scenario {
 
+	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
+	
+	private static final String NON_ENABLED_ATTRIBUTE_WARNING = "Trying to retrieve not enabled scenario feature, have you enabled the feature in ScenarioConfigGroup?";
+	
 	//mandatory attributes 
 	private Config config;
 	private NetworkLayer network;
@@ -151,21 +156,21 @@ public class ScenarioImpl implements Scenario {
 	
 	
 	/**
-	 * @see org.matsim.core.api.experimental.ScenarioImpl#getActivityFacilities()
+	 * @see org.matsim.core.api.experimental.Scenario#getActivityFacilities()
 	 */
 	public ActivityFacilities getActivityFacilities() {
 		return this.facilities;
 	}
 
 	/**
-	 * @see org.matsim.core.api.experimental.ScenarioImpl#getNetwork()
+	 * @see org.matsim.core.api.experimental.Scenario#getNetwork()
 	 */
 	public NetworkLayer getNetwork() {
 		return this.network;
 	}
 
 	/**
-	 * @see org.matsim.core.api.experimental.ScenarioImpl#getPopulation()
+	 * @see org.matsim.core.api.experimental.Scenario#getPopulation()
 	 */
 	public PopulationImpl getPopulation() {
 		return this.population;
@@ -198,6 +203,9 @@ public class ScenarioImpl implements Scenario {
 		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}
+		else if (!this.config.scenario().isUseLanes()){
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+		}
 		return laneDefinitions;
 	}
 
@@ -205,6 +213,9 @@ public class ScenarioImpl implements Scenario {
 	public BasicSignalSystems getSignalSystems() {
 		if ((this.signalSystems == null) && this.config.scenario().isUseSignalSystems()){
 			this.createSignalSystemsContainers();
+		}
+		else if (!this.config.scenario().isUseSignalSystems()){
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return signalSystems;
 	}
@@ -214,6 +225,9 @@ public class ScenarioImpl implements Scenario {
 		if ((this.signalSystemConfigurations == null) && this.config.scenario().isUseSignalSystems()){
 			this.createSignalSystemsContainers();
 		}
+		else if (!this.config.scenario().isUseSignalSystems()){
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+		}
 		return signalSystemConfigurations;
 	}
 
@@ -221,6 +235,9 @@ public class ScenarioImpl implements Scenario {
 	public RoadPricingScheme getRoadPricingScheme() {
 		if ((this.roadPricingScheme == null) && this.config.scenario().isUseRoadpricing()){
 			this.createRoadPricingScheme();
+		}
+		else if (!this.config.scenario().isUseRoadpricing()){
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return roadPricingScheme;
 	}
@@ -239,12 +256,18 @@ public class ScenarioImpl implements Scenario {
 		if ((this.households == null) && this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
 		}
+		else if (!this.config.scenario().isUseHouseholds()){
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+		}
 		return this.households;
 	}
 	
 	public BasicVehicles getVehicles(){
 		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
 			this.createVehicleContainer();
+		}
+		else if (!this.config.scenario().isUseVehicles()){
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return this.vehicles;
 	}
@@ -253,12 +276,18 @@ public class ScenarioImpl implements Scenario {
 		if ((this.knowledges == null) && this.config.scenario().isUseKnowledges()){
 			this.createKnowledges();
 		}
+		else if (!this.config.scenario().isUseKnowledges()){
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
+		}
 		return this.knowledges;
 	}
-	
+
 	public TransitSchedule getTransitSchedule() {
 		if ((this.transitSchedule == null) && this.config.scenario().isUseTransit()){
 			this.createTransit();
+		}
+		else if (!this.config.scenario().isUseTransit()) {
+			log.warn(NON_ENABLED_ATTRIBUTE_WARNING);
 		}
 		return this.transitSchedule;
 	}
