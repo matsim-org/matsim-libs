@@ -4,7 +4,7 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 
 /*
- * Local machine: endTime=10M, threads=4, time needed: 79.4 seconds
+ * Local machine: endTime=1M, threads=4, time needed: 9313 seconds
  * =====================================
 10 - (number of times aquired the lock): 6099482
 9 - (number of times aquired the lock): 5298961
@@ -52,7 +52,7 @@ public class SatawalLockTest1 {
 				}
 				
 				// some task to do (e.g. processing events).
-				for (int i=0;i<100;i++){
+				for (int i=0;i<500;i++){
 					
 				}
 			}
