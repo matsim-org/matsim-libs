@@ -444,14 +444,14 @@ class DijkstraNode
 	{
 		ArrayList<DijkstraNode> ingoingNodes = new ArrayList<DijkstraNode>();
 		
-		Map<Id, Node> myMap = (Map<Id, Node>)((NodeImpl)node).getInNodes();
+		Map<Id, ? extends NodeImpl> myMap = ((NodeImpl)node).getInNodes();
 		
 		Iterator nodeIterator = myMap.values().iterator();
 		while(nodeIterator.hasNext())
 		{
 			Node node = (Node)nodeIterator.next();
 
-			// zugeh�rigen DijsktraNode aus der Map holen
+			// zugehoerigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			ingoingNodes.add(dijkstraNode);
 		}
@@ -462,7 +462,7 @@ class DijkstraNode
 	{
 		ArrayList<DijkstraNode> outgoingNodes = new ArrayList<DijkstraNode>();
 		
-		Map<Id, Node> myMap = (Map<Id, Node>)((NodeImpl)node).getOutNodes();
+		Map<Id, ? extends NodeImpl> myMap = ((NodeImpl)node).getOutNodes();
 		
 		Iterator nodeIterator = myMap.values().iterator();
 		while(nodeIterator.hasNext())

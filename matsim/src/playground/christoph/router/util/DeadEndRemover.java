@@ -123,7 +123,7 @@ public class DeadEndRemover {
 		// If the Node is not contained in the ArrayList, it should be removed...
 		if (!knownNodesMap.containsKey(node.getId())) return true;
 		
-		Map<Id, Node> myMap = (Map<Id, Node>)((NodeImpl)node).getOutNodes();
+		Map<Id, ? extends NodeImpl> myMap = ((NodeImpl)node).getOutNodes();
 
 		for(Node outNode : myMap.values())
 		{
@@ -167,7 +167,7 @@ public class DeadEndRemover {
 	{
 		Map<Id, Node> inNodesMap = new HashMap<Id, Node>();
 		
-		Map<Id, Node> myMap = (Map<Id, Node>)((NodeImpl)node).getInNodes();
+		Map<Id, ? extends NodeImpl> myMap = ((NodeImpl)node).getInNodes();
 		
 		for(Node inNode : myMap.values())
 		{
