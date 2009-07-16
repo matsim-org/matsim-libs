@@ -60,6 +60,7 @@ public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsNoParking
 			out.putInt(this.src.getQueueLanes().size());
 			for (QueueLane l : this.src.getQueueLanes()){
 				ByteBufferUtils.putString(out, l.getLaneId().toString());
+				log.debug("writing meter from link end : " + l.getMeterFromLinkEnd());
 				out.putDouble(l.getMeterFromLinkEnd());
 			}
 		}

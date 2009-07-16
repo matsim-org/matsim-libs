@@ -22,38 +22,46 @@ package playground.dgrether.signalVis;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 /**
+ * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because the important
+ * command, i.e. new OnTheFlyClientQuad(..., MyConncetionManager) is not accessible even in case
+ * of an overwritten prepareSim() that has to call QueueSimulation.prepareSim() in any case;-).
  * @author dgrether
  * 
  */
-public class DgOnTheFlyQueueSimQuad extends OnTheFlyQueueSimQuad {
+public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
 
+	protected OnTheFlyServer myOTFServer = null;
+	
 	/**
 	 * @param net
 	 * @param plans
 	 * @param events
+	 * @param laneDefs 
 	 */
 	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, Events events) {
 		super(scenario, events);
+		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+		if (isMac) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+		}
 	}
 
 	@Override
 	protected void prepareSim() {
-
+		super.prepareSim();
 		UUID idOne = UUID.randomUUID();
 		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans,
 				getEvents(), false);
 
 		DgOTFConnectionManager connectionManager = new DgOTFConnectionManager();
-		
 		
 		// FOR TESTING ONLY!
 		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
@@ -63,10 +71,21 @@ public class DgOnTheFlyQueueSimQuad extends OnTheFlyQueueSimQuad {
 		try {
 			this.myOTFServer.pause();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	protected void cleanupSim() {
+		this.myOTFServer.cleanup();
+		this.myOTFServer = null;
+		super.cleanupSim();
+	}
 
+	@Override
+	protected void afterSimStep(final double time) {
+		super.afterSimStep(time);
+		this.myOTFServer.updateStatus(time);
 	}
 
 }

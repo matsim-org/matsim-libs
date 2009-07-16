@@ -20,7 +20,7 @@
 package playground.dgrether.signalVis;
 
 import java.awt.geom.Point2D;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.media.opengl.GL;
@@ -45,7 +45,7 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 	private Map<String, Double> laneData;
 	
 	public DgSimpleQuadDrawer() {
-		log.debug("using DgSimpleQuadDrawer");
+//		log.debug("using DgSimpleQuadDrawer");
 	}
 	static float cellWidth_m = 30.f;
 	
@@ -68,14 +68,45 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		//Draw quad
 		TextureCoords co = new TextureCoords(0,0,1,1);
 		if(SimpleStaticNetLayer.marktex != null) co =  SimpleStaticNetLayer.marktex.getImageTexCoords();
-		gl.glBegin(GL.GL_QUADS);
-		gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
-		gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
-		gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
-		gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
-		gl.glEnd();
+//		gl.glBegin(GL.GL_QUADS);
+//		gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
+//		gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
+//		gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
+//		gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
+//		gl.glEnd();
 		
 		gl.glColor3d(1.0, 0, 0);
+		
+			
+		double dx = this.endX - this.startX;
+		double dy = this.endY - this.startY;
+		double sqrt = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+		double dxNorm = dx / sqrt;
+		double dyNorm = dy / sqrt;
+		
+		Double branchPoint = null;
+		if (this.laneData != null){
+			for (String key : this.laneData.keySet()) {
+				branchPoint = this.laneData.get(key);
+				log.debug("lane data not null, meter from linkend: " + branchPoint);
+				
+				double branchPointX = (sqrt - branchPoint) * dxNorm;
+				double branchPointY = (sqrt - branchPoint) * dyNorm;
+				double offset = 2.0;
+				gl.glBegin(GL.GL_QUADS);
+//			gl.glTexCoord2f(co.right(),co.bottom()); 
+					gl.glVertex3d(branchPointX - offset, branchPointY - offset, 0.1);
+//			gl.glTexCoord2f(co.right(),co.top()); 
+					gl.glVertex3d(branchPointX - offset, branchPointY + offset, 0.1);
+//			gl.glTexCoord2f(co.left(), co.top()); 
+					gl.glVertex3d(branchPointX + offset, branchPointY + offset, 0.1);
+//			gl.glTexCoord2f(co.left(),co.bottom()); 
+					gl.glVertex3d(branchPointX + offset, branchPointY - offset, 0.1);
+				gl.glEnd();
+			}
+		}
+		
+		
 		
 		
 		//draw lines between coordinates of nodes(?)
@@ -143,7 +174,7 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 	
 	public void addQueueLaneData(String id, double meterfromlinkend){
 		if (this.laneData == null) {
-			this.laneData = new HashMap<String, Double>();
+			this.laneData = new LinkedHashMap<String, Double>();
 		}
 		this.laneData.put(id, meterfromlinkend);
 	}

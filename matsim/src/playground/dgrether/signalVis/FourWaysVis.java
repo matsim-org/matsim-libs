@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
 
 
 public class FourWaysVis {
@@ -35,6 +36,8 @@ public class FourWaysVis {
 	public static void main(String[] args) {
 
 		String netFile = TESTINPUTDIR + "network.xml.gz";
+		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
+		
 		
 		String[] netArray = {netFile};
 		
@@ -47,7 +50,14 @@ public class FourWaysVis {
 //		PopulationImpl population = scenario.getPopulation();
 		Events events = new Events();
 		
+		scenario.getConfig().scenario().setUseLanes(true);
+		BasicLaneDefinitions laneDefs = scenario.getLaneDefinitions();
+		
+		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
+		lanesReader.readFile(lanesFile);
+		
 		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
+		client.setLaneDefinitions(laneDefs);
 		client.run();
 		
 		
