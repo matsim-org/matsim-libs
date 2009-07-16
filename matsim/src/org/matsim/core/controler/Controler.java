@@ -46,7 +46,6 @@ import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -810,7 +809,7 @@ public class Controler {
 				JDEQSimulation sim = new JDEQSimulation(this.network, this.population, this.events);
 				sim.run();
 			} else {
-				QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
+				QueueSimulation sim = new QueueSimulation(this.scenarioData, this.events);
 				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
 				if (this.config.scenario().isUseLanes()) {
 					if (this.scenarioData.getLaneDefinitions() == null) {
