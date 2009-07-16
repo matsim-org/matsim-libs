@@ -38,6 +38,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -51,7 +52,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
@@ -156,6 +156,8 @@ public class QueueSimulation {
 	
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
+	protected Scenario scenario = null;
+	
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
 	private int cntTeleportVehicle = 0;
@@ -167,6 +169,7 @@ public class QueueSimulation {
 	 * @param events
 	 */
 	public QueueSimulation(final NetworkLayer network, final PopulationImpl plans, final Events events) {
+		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
 		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
@@ -188,6 +191,7 @@ public class QueueSimulation {
 	 */
 	public QueueSimulation(final ScenarioImpl scenario, final Events events) {
 		this(scenario.getNetwork(), scenario.getPopulation(), events);
+		this.scenario = scenario;
 	}
 
 	/**
@@ -787,6 +791,10 @@ public class QueueSimulation {
 
 	public QueueNetwork getQueueNetwork() {
 		return this.network;
+	}
+	
+	public Scenario getScenario() {
+		return this.scenario;
 	}
 	
 }
