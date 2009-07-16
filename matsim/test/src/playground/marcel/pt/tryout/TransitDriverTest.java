@@ -35,6 +35,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleReaderTest;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -55,7 +56,6 @@ import playground.marcel.pt.integration.TransitQueueSimulation;
 import playground.marcel.pt.integration.TransitQueueVehicle;
 import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.mocks.MockAgent;
-import playground.marcel.pt.transitSchedule.TransitScheduleReaderTest;
 
 public class TransitDriverTest extends MatsimTestCase {
 
@@ -64,7 +64,7 @@ public class TransitDriverTest extends MatsimTestCase {
 
 	public void testPersonsLeavingBus() throws SAXException, ParserConfigurationException, IOException {
 		loadConfig(null);
-		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
+		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
@@ -139,7 +139,7 @@ public class TransitDriverTest extends MatsimTestCase {
 
 	public void testPersonsEnteringBus() throws SAXException, ParserConfigurationException, IOException {
 		loadConfig(null);
-		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getPackage().getName().replace('.', '/') + "/";
+		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
 
 		NetworkLayer network = new NetworkLayer();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());

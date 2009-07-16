@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package org.matsim.transitSchedule;
 
 import java.io.IOException;
 import java.util.ArrayList;

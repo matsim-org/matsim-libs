@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule;
+package org.matsim.transitSchedule;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,8 +32,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -49,7 +47,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
 	public void testReadFile_General() throws SAXException, ParserConfigurationException, IOException {
-		final String inputDir = getPackageInputDirectory();
+		final String inputDir = getClassInputDirectory();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
