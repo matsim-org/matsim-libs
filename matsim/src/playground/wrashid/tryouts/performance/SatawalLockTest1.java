@@ -17,7 +17,7 @@ TODO: auf satawal same experiment...
  */
 public class SatawalLockTest1 {
 	public static void main(String[] args) {
-		int endTime = 10000;
+		int endTime = 100000;
 		int totalNumberOfThreads=4;
 
 		Test2 test = new Test2();
