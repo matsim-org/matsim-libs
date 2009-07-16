@@ -27,7 +27,6 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.Time;
@@ -50,7 +49,7 @@ public class TransitRouter {
 		this.schedule = schedule;
 		this.transitNetwork = buildNetwork();
 		this.wrappedNetwork = new TransitRouterNetworkWrapper(this.transitNetwork);
-		new NetworkWriter(this.wrappedNetwork, "wrappedNetwork.xml").write();
+//		new NetworkWriter(this.wrappedNetwork, "wrappedNetwork.xml").write();
 	}
 
 	public List<Id> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
