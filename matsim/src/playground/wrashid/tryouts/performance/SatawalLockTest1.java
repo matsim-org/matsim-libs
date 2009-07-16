@@ -21,7 +21,7 @@ endTime = 1000000;
 for (int i=0;i<100;i++){
 totalNumberOfThreads=4;
 local: 9.1 seconds
-satawal: 
+satawal: 23.4 seconds
 
 
 
