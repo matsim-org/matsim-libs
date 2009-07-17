@@ -52,6 +52,8 @@ public class MatsimTestCase extends TestCase {
 	 */
 	private String packageInputDirectory;
 
+	private boolean outputDirCreated = false;
+	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -61,8 +63,6 @@ public class MatsimTestCase extends TestCase {
 		this.packageInputDirectory = this.classInputDirectory.substring(0, this.classInputDirectory.lastIndexOf("/") + 1);
 		this.classInputDirectory = this.classInputDirectory + "/";
 		this.inputDirectory = this.classInputDirectory + getName() + "/";
-
-		createOutputDirectory();
 		Gbl.reset(); // make sure we start with a clean environment
 	}
 
@@ -80,17 +80,20 @@ public class MatsimTestCase extends TestCase {
 		} else {
 			config = Gbl.createConfig(new String[0]);
 		}
+		createOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
 	private void createOutputDirectory() {
-		File directory = new File(this.outputDirectory);
-		if (directory.exists()) {
-			IOUtils.deleteDirectory(directory);
+		if ((!this.outputDirCreated) && (this.outputDirectory != null)) {
+			File directory = new File(this.outputDirectory);
+			if (directory.exists()) {
+				IOUtils.deleteDirectory(directory);
+			}
+			this.outputDirCreated = directory.mkdirs();
+			assertTrue("Could not create the output directory " + this.outputDirectory, this.outputDirCreated);
 		}
-		boolean success = directory.mkdirs();
-		assertTrue("Could not create the output directory " + this.outputDirectory, success);
 	}
 
 	/**
@@ -99,6 +102,7 @@ public class MatsimTestCase extends TestCase {
 	 * @return path to the output directory for this test
 	 */
 	public String getOutputDirectory() {
+		createOutputDirectory();
 		return this.outputDirectory;
 	}
 

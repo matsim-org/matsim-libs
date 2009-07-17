@@ -1,12 +1,10 @@
 package org.matsim.evacuation.base;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -17,7 +15,7 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 
 	public void testEvacuationPlansGeneratorAndNetworkTrimmer() {
 		String config = getInputDirectory() + "config.xml";
-		Config c = Gbl.createConfig(new String [] {config});
+		Config c = super.loadConfig(config);
 		String refPlans = getInputDirectory() + "evacuationplans.xml";
 		String refNet = getInputDirectory() + "evacuationnetwork.xml";
 		
