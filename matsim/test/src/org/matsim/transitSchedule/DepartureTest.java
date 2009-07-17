@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * DepartureTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,24 +20,45 @@
 
 package org.matsim.transitSchedule;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.vehicles.BasicVehicle;
+import org.matsim.vehicles.BasicVehicleImpl;
 
-public class AllTests {
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+/**
+ * @author mrieser
+ */
+public class DepartureTest extends MatsimTestCase {
 
-		suite.addTestSuite(DepartureTest.class);
-		suite.addTestSuite(TransitLineTest.class);
-		suite.addTestSuite(TransitRouteTest.class);
-		suite.addTestSuite(TransitRouteStopTest.class);
-		suite.addTestSuite(TransitStopFacilityTest.class);
-		suite.addTestSuite(TransitScheduleTest.class);
-		suite.addTestSuite(TransitScheduleBuilderTest.class);
-		suite.addTestSuite(TransitScheduleReaderTest.class);
-		suite.addTestSuite(TransitScheduleWriterTest.class);
+	/**
+	 * In case we once should have more than one implementation of
+	 * {@link Departure}, simply inherit from this test and overwrite
+	 * this method to return your own implementation.
+	 *
+	 * @param id
+	 * @param time
+	 * @return a new instance of a Departure with the given attributes
+	 */
+	protected Departure createDeparture(final Id id, final double time) {
+		return new DepartureImpl(id, time);
+	}
 
-		return suite;
+	public void testInitialization() {
+		Id id = new IdImpl(1591);
+		double time = 11.0 * 3600;
+		Departure dep = createDeparture(id, time);
+		assertEquals(id, dep.getId());
+		assertEquals(time, dep.getDepartureTime(), EPSILON);
+	}
+
+	public void testVehicle() {
+		Departure dep = createDeparture(new IdImpl(6791), 7.0*3600);
+		assertNull(dep.getVehicle());
+		BasicVehicle veh = new BasicVehicleImpl(new IdImpl(2491), null);
+		dep.setVehicle(veh);
+		assertEquals(veh, dep.getVehicle());
 	}
 
 }

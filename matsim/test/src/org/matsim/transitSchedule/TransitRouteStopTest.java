@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * TransitRouteStopTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,24 +20,29 @@
 
 package org.matsim.transitSchedule;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
-public class AllTests {
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+/**
+ * @author mrieser
+ */
+public class TransitRouteStopTest extends MatsimTestCase {
 
-		suite.addTestSuite(DepartureTest.class);
-		suite.addTestSuite(TransitLineTest.class);
-		suite.addTestSuite(TransitRouteTest.class);
-		suite.addTestSuite(TransitRouteStopTest.class);
-		suite.addTestSuite(TransitStopFacilityTest.class);
-		suite.addTestSuite(TransitScheduleTest.class);
-		suite.addTestSuite(TransitScheduleBuilderTest.class);
-		suite.addTestSuite(TransitScheduleReaderTest.class);
-		suite.addTestSuite(TransitScheduleWriterTest.class);
+	protected TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
+		return new TransitRouteStopImpl(stop, arrivalDelay, departureDelay);
+	}
 
-		return suite;
+	public void testInitialization() {
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3));
+		double arrivalDelay = 4;
+		double departureDelay = 5;
+		TransitRouteStop routeStop = createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
+		assertEquals(stopFacility, routeStop.getStopFacility());
+		assertEquals(arrivalDelay, routeStop.getArrivalDelay(), EPSILON);
+		assertEquals(departureDelay, routeStop.getDepartureDelay(), EPSILON);
 	}
 
 }

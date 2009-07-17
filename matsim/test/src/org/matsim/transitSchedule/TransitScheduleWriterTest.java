@@ -47,6 +47,9 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
 
+/**
+ * @author mrieser
+ */
 public class TransitScheduleWriterTest extends MatsimTestCase {
 
 	public void testWrite() throws IOException, SAXException, ParserConfigurationException {
@@ -111,6 +114,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		route.setLinks(l1, links, l4);
 		TransitRoute route2 = builder.createTransitRoute(new IdImpl(2), route, stops, TransportMode.bus);
 		line1.addRoute(route2);
+		stop1.setLink(l1);
 
 		// write and read version with network-route
 		filename = getOutputDirectory() + "scheduleWithRoute.xml";
@@ -123,7 +127,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 	}
 
 	private static void assertEquals(final TransitSchedule expected, final TransitSchedule actual) {
-		
+
 		assertEquals("different number of stopFacilities.", expected.getFacilities().size(), actual.getFacilities().size());
 		for (TransitStopFacility stopE : expected.getFacilities().values()) {
 			TransitStopFacility stopA = actual.getFacilities().get(stopE.getId());
@@ -132,7 +136,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), EPSILON);
 			assertEquals("different link information.", stopE.getLink(), stopA.getLink());
 		}
-		
+
 		assertEquals("different number of transitLines.", expected.getTransitLines().size(), actual.getTransitLines().size());
 		for (TransitLine lineE : expected.getTransitLines().values()) {
 			// *E = expected, *A = actual
