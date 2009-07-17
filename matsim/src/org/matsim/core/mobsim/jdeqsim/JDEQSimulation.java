@@ -41,9 +41,9 @@ import org.matsim.core.utils.misc.Time;
  */
 public class JDEQSimulation {
 
-	private static final Logger log = Logger.getLogger(JDEQSimulation.class);
-	PopulationImpl population;
-	NetworkLayer network;
+	protected static Logger log = null;
+	protected PopulationImpl population;
+	protected NetworkLayer network;
 	
 
 	public JDEQSimulation(final NetworkLayer network, final PopulationImpl population, final Events events) {
@@ -125,6 +125,8 @@ public class JDEQSimulation {
 					+ SimulationParameters.getSimulationEndTime());
 		}
 
+		
+		log = Logger.getLogger(JDEQSimulation.class);
 	}
 
 	public void run() {
