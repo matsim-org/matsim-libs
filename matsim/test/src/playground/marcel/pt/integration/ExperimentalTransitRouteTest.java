@@ -22,6 +22,8 @@ package playground.marcel.pt.integration;
 
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.marcel.pt.routes.ExperimentalTransitRoute;
+
 public class ExperimentalTransitRouteTest extends MatsimTestCase {
 
 	public void testSetRouteDescription_PtRoute() {

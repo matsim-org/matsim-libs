@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -18,11 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.routes;
 
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
+
 
 public class ExperimentalTransitRouteFactory implements RouteFactory {
 

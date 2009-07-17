@@ -47,8 +47,8 @@ import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
-import playground.marcel.pt.integration.ExperimentalTransitRoute;
-import playground.marcel.pt.integration.TransitQueueSimulation;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class TwoLinesDemo {
 	

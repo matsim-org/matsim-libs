@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.core.facilities.ActivityFacility;
 
-import playground.marcel.pt.interfaces.TransitFares;
+import playground.marcel.pt.fares.api.TransitFares;
 
 public class MultipleFareSystems implements TransitFares {
 

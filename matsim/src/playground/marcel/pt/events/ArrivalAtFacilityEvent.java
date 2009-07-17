@@ -22,7 +22,7 @@ package playground.marcel.pt.events;
 
 import org.matsim.core.facilities.ActivityFacility;
 
-import playground.marcel.pt.interfaces.TransitVehicle;
+import playground.marcel.pt.queuesim.TransitVehicle;
 
 public class ArrivalAtFacilityEvent extends VehicleEvent {
 

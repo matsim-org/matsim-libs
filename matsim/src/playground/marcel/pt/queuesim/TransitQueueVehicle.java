@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.queuesim;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,8 +29,6 @@ import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicleCapacity;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.interfaces.TransitVehicle;
 
 public class TransitQueueVehicle extends QueueVehicleImpl implements TransitVehicle {
 
@@ -60,8 +58,6 @@ public class TransitQueueVehicle extends QueueVehicleImpl implements TransitVehi
 
 	public boolean removePassenger(final PassengerAgent passenger) {
 		boolean removed = this.passengers.remove(passenger);
-		if (removed) {
-		}
 		return removed;
 	}
 

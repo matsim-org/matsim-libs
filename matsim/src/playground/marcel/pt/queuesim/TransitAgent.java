@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MockPassengerAgent.java
+ * TransitAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,28 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.mocks;
+package playground.marcel.pt.queuesim;
 
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
+import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
-public class MockPassengerAgent implements PassengerAgent {
+public class TransitAgent extends PersonAgent implements PassengerAgent {
 
-	private final ActivityFacility exitStop;
-	
-	public MockPassengerAgent(final ActivityFacility exitStop) {
-		this.exitStop = exitStop;
+	public TransitAgent(final PersonImpl p, final QueueSimulation simulation) {
+		super(p, simulation);
 	}
-	
+
 	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return stop == exitStop;
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		return route.getEgressStopId().equals(stop.getId());
 	}
 
-	public boolean ptLineAvailable(final TransitLine line) {
-		return true;
+	public boolean ptLineAvailable(TransitLine line) {
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		return line.getId().equals(route.getLineId());
 	}
 
 }

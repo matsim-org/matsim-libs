@@ -22,7 +22,7 @@ package playground.marcel.pt.fares;
 
 import org.matsim.core.facilities.ActivityFacility;
 
-import playground.marcel.pt.interfaces.TransitFares;
+import playground.marcel.pt.fares.api.TransitFares;
 
 public class BeelineDistanceBasedFares implements TransitFares {
 

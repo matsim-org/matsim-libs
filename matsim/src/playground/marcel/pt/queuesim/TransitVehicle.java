@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitAgentFactory.java
+ * Vehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.queuesim;
 
-import java.util.Map;
+import java.util.Collection;
 
-import org.matsim.core.mobsim.queuesim.AgentFactory;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.vehicles.BasicVehicle;
 
-public class TransitAgentFactory extends AgentFactory {
 
-	private final Map<PersonImpl, DriverAgent> agentsMap;
+public interface TransitVehicle {
 
-	public TransitAgentFactory(final QueueSimulation simulation, final Map<PersonImpl, DriverAgent> agents) {
-		super(simulation);
-		this.agentsMap = agents;
-	}
+	/**
+	 * Adds a passenger to this vehicle.
+	 *
+	 * @param passenger
+	 * @return <tt>true</tt> when the agent was added as a passenger (as per the general contract of the Collection.add method).
+	 */
+	public boolean addPassenger(final PassengerAgent passenger);
 
-	@Override
-	public PersonAgent createPersonAgent(final PersonImpl p) {
-		PersonAgent agent = new TransitAgent(p, this.simulation);
-		this.agentsMap.put(p, agent);
-		return agent;
-	}
+	/**
+	 * Removes the passenger from this vehicle.
+	 *
+	 * @param passenger
+	 * @return <tt>true</tt> when the agent was removed as a passenger, <tt>false</tt> if the agent was not a passenger of this vehicle or could not be removed for other reasons
+	 */
+	public boolean removePassenger(final PassengerAgent passenger);
+
+	/**
+	 * @return an immutable Collection of all passengers in this vehicle
+	 */
+	public Collection<PassengerAgent> getPassengers();
+
+	/**
+	 * @return number of passengers this vehicle can transport
+	 */
+	public int getPassengerCapacity();
+
+	/**
+	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 */
+	public BasicVehicle getBasicVehicle();
 
 }

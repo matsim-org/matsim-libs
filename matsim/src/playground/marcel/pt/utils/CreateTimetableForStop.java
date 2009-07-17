@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitStop.java
+ * CreateTimetableForStop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.utils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
-public class TransitStopAgentTracker {
+public class CreateTimetableForStop {
 
-	private final Map<TransitStopFacility, List<DriverAgent>> agentsAtStops = new HashMap<TransitStopFacility, List<DriverAgent>>();
-	private final List<DriverAgent> emptyList = new LinkedList<DriverAgent>();
-	
-	public void addAgentToStop(final DriverAgent agent, final TransitStopFacility stop) {
-		List<DriverAgent> agents = this.agentsAtStops.get(stop);
-		if (agents == null) {
-			agents = new LinkedList<DriverAgent>();
-			this.agentsAtStops.put(stop, agents);
-		}
-		agents.add(agent);
+	private final TransitLine line;
+
+	public CreateTimetableForStop(final TransitLine line) {
+		this.line = line;
 	}
-	
-	public List<DriverAgent> getAgentsAtStop(final TransitStopFacility stop) {
-		List<DriverAgent> agents = this.agentsAtStops.get(stop);
-		if (agents == null) {
-			return this.emptyList;
+
+	public double[] getDeparturesAtStop(final TransitStopFacility stop) {
+		int numOfDepartures = 0;
+		Collection<TransitRoute> routes = this.line.getRoutes().values();
+		for (TransitRoute route : routes) {
+			numOfDepartures += route.getDepartures().size();
 		}
-		return agents;
+		double[] departures = new double[numOfDepartures];
+		int index = 0;
+		for (TransitRoute route : routes) {
+			TransitRouteStop trStop = route.getStop(stop);
+			double delay = trStop.getDepartureDelay();
+			for (Departure dep : route.getDepartures().values()) {
+				departures[index] = dep.getDepartureTime() + delay;
+				index++;
+			}
+		}
+		Arrays.sort(departures);
+		return departures;
 	}
+
 }

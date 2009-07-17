@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
-import playground.marcel.pt.integration.TransitStopAgentTracker;
+import playground.marcel.pt.queuesim.TransitStopAgentTracker;
 
 public class FacilityDrawer {
 	

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PassengerAgent.java
+ * Kilometer2MeterTransformation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,38 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.interfaces;
+package playground.marcel;
 
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+public class Kilometer2MeterTransformation implements CoordinateTransformation {
 
-/**
- * @author mrieser
- */
-public interface PassengerAgent {
-
-	/**
-	 * Informs a passenger waiting at a stop that a transit line
-	 * has arrived and is ready to be boarded.
-	 *
-	 * @param line the line that is available
-	 *
-	 * TODO [MR] find better name for method
-	 *
-	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
-	 */
-	public boolean ptLineAvailable(final TransitLine line);
-
-	/**
-	 * Informs a passenger in a transit vehicle that the vehicle has
-	 * arrived at the specified stop.
-	 *
-	 * TODO [MR] find better name for method
-	 * @param stop the stop the vehicle arrived
-	 *
-	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
-	 */
-	public boolean arriveAtStop(final TransitStopFacility stop);
+	public Coord transform(Coord coord) {
+		return new CoordImpl(coord.getX() * 1000.0, coord.getY() * 1000.0);
+	}
 
 }

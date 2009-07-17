@@ -31,8 +31,8 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.integration.ExperimentalTransitRoute;
-import playground.marcel.pt.interfaces.PassengerAgent;
+import playground.marcel.pt.queuesim.PassengerAgent;
+import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class MockAgent implements DriverAgent, PassengerAgent {
 

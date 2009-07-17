@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateTimetableForStop.java
+ * PassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,44 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.modules;
+package playground.marcel.pt.queuesim;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
-public class CreateTimetableForStop {
+/**
+ * @author mrieser
+ */
+public interface PassengerAgent {
 
-	private final TransitLine line;
+	/**
+	 * Informs a passenger waiting at a stop that a transit line
+	 * has arrived and is ready to be boarded.
+	 *
+	 * @param line the line that is available
+	 *
+	 * TODO [MR] find better name for method
+	 *
+	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
+	 */
+	public boolean ptLineAvailable(final TransitLine line);
 
-	public CreateTimetableForStop(final TransitLine line) {
-		this.line = line;
-	}
-
-	public double[] getDeparturesAtStop(final TransitStopFacility stop) {
-		int numOfDepartures = 0;
-		Collection<TransitRoute> routes = this.line.getRoutes().values();
-		for (TransitRoute route : routes) {
-			numOfDepartures += route.getDepartures().size();
-		}
-		double[] departures = new double[numOfDepartures];
-		int index = 0;
-		for (TransitRoute route : routes) {
-			TransitRouteStop trStop = route.getStop(stop);
-			double delay = trStop.getDepartureDelay();
-			for (Departure dep : route.getDepartures().values()) {
-				departures[index] = dep.getDepartureTime() + delay;
-				index++;
-			}
-		}
-		Arrays.sort(departures);
-		return departures;
-	}
+	/**
+	 * Informs a passenger in a transit vehicle that the vehicle has
+	 * arrived at the specified stop.
+	 *
+	 * TODO [MR] find better name for method
+	 * @param stop the stop the vehicle arrived
+	 *
+	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
+	 */
+	public boolean arriveAtStop(final TransitStopFacility stop);
 
 }

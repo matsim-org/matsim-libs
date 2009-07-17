@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.marcel.pt.interfaces.TransitFares;
+import playground.marcel.pt.fares.api.TransitFares;
 
 public class TableLookupFares implements TransitFares {
 

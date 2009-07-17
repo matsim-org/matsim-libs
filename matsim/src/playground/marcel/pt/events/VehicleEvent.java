@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.core.events.BasicEventImpl;
 
-import playground.marcel.pt.interfaces.TransitVehicle;
+import playground.marcel.pt.queuesim.TransitVehicle;
 
 public abstract class VehicleEvent extends BasicEventImpl {
 

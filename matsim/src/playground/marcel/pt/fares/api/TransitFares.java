@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * TransitFares.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,46 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.interfaces;
+package playground.marcel.pt.fares.api;
 
-import java.util.Collection;
+import org.matsim.core.facilities.ActivityFacility;
 
-import org.matsim.vehicles.BasicVehicle;
-
-public interface TransitVehicle {
-//
-//	public void setDriver(final DriverAgent driver);
-//
-//	public DriverAgent getDriver();
+public interface TransitFares {
 
 	/**
-	 * Adds a passenger to this vehicle.
-	 * 
-	 * @param passenger
-	 * @return <tt>true</tt> when the agent was added as a passenger (as per the general contract of the Collection.add method).
-	 */
-	public boolean addPassenger(final PassengerAgent passenger);
-
-	/**
-	 * Removes the passenger from this vehicle.
-	 * 
-	 * @param passenger
-	 * @return <tt>true</tt> when the agent was removed as a passenger, <tt>false</tt> if the agent was not a passenger of this vehicle or could not be removed for other reasons
-	 */
-	public boolean removePassenger(final PassengerAgent passenger);
-
-	public Collection<PassengerAgent> getPassengers();
-
-	/**
-	 * TODO [MR] not sure if passengerCapacity or general capacity (including driver) is better
+	 * Returns the cost for a single trip from one stop to another stop.
 	 *
-	 * @return number of passengers this vehicle can transport
+	 * @param fromStop
+	 * @param toStop
+	 * @return cost for single trip
 	 */
-	public int getPassengerCapacity();
+	public double getSingleTripCost(final ActivityFacility fromStop, final ActivityFacility toStop); // TODO [MR] how to handle different paths between from/to? and what about time of day?
 
 	/**
-	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 * Returns the total cost for multiple trips. This could allow the agents to choose a ticket
+	 * that's valid the whole day (instead of only a single trip).
+	 *
+	 * @return combined cost for multiple trips.
 	 */
-	public BasicVehicle getBasicVehicle();
+//	public double getCombinedTripCost(); // TODO_ [MR] define arguments required for this.
 
 }

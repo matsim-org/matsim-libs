@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.routes;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;

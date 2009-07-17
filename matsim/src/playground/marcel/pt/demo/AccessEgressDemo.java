@@ -48,8 +48,8 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.analysis.VehicleTracker;
-import playground.marcel.pt.integration.ExperimentalTransitRoute;
-import playground.marcel.pt.integration.TransitQueueSimulation;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import playground.marcel.pt.routes.ExperimentalTransitRoute;
 import playground.mohit.pt.agentGraph;
 
 public class AccessEgressDemo {

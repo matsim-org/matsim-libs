@@ -28,15 +28,15 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 
-import playground.marcel.pt.integration.TransitQueueVehicle;
-import playground.marcel.pt.interfaces.TransitVehicle;
-import playground.marcel.pt.mocks.MockPassengerAgent;
+import playground.marcel.pt.mocks.FakePassengerAgent;
+import playground.marcel.pt.queuesim.TransitQueueVehicle;
+import playground.marcel.pt.queuesim.TransitVehicle;
 
 public class VehicleImplTest extends MatsimTestCase {
 
 	public void testAddPassenger() {
-		MockPassengerAgent passenger1 = new MockPassengerAgent(null);
-		MockPassengerAgent passenger2 = new MockPassengerAgent(null);
+		FakePassengerAgent passenger1 = new FakePassengerAgent(null);
+		FakePassengerAgent passenger2 = new FakePassengerAgent(null);
 		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(4));
@@ -55,9 +55,9 @@ public class VehicleImplTest extends MatsimTestCase {
 	}
 
 	public void testRemovePassenger() {
-		MockPassengerAgent passenger1 = new MockPassengerAgent(null);
-		MockPassengerAgent passenger2 = new MockPassengerAgent(null);
-		MockPassengerAgent passenger3 = new MockPassengerAgent(null);
+		FakePassengerAgent passenger1 = new FakePassengerAgent(null);
+		FakePassengerAgent passenger2 = new FakePassengerAgent(null);
+		FakePassengerAgent passenger3 = new FakePassengerAgent(null);
 		
 		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();

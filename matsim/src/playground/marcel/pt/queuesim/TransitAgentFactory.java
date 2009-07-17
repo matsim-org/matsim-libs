@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitFares.java
+ * TransitAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,27 +18,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.interfaces;
+package playground.marcel.pt.queuesim;
 
-import org.matsim.core.facilities.ActivityFacility;
+import java.util.Map;
 
-public interface TransitFares {
+import org.matsim.core.mobsim.queuesim.AgentFactory;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.population.PersonImpl;
 
-	/**
-	 * Returns the cost for a single trip from one stop to another stop.
-	 *
-	 * @param fromStop
-	 * @param toStop
-	 * @return cost for single trip
-	 */
-	public double getSingleTripCost(final ActivityFacility fromStop, final ActivityFacility toStop); // TODO [MR] how to handle different paths between from/to? and what about time of day?
 
-	/**
-	 * Returns the total cost for multiple trips. This could allow the agents to choose a ticket
-	 * that's valid the whole day (instead of only a single trip).
-	 *
-	 * @return combined cost for multiple trips.
-	 */
-//	public double getCombinedTripCost(); // TODO_ [MR] define arguments required for this.
+public class TransitAgentFactory extends AgentFactory {
+
+	private final Map<PersonImpl, DriverAgent> agentsMap;
+
+	public TransitAgentFactory(final QueueSimulation simulation, final Map<PersonImpl, DriverAgent> agents) {
+		super(simulation);
+		this.agentsMap = agents;
+	}
+
+	@Override
+	public PersonAgent createPersonAgent(final PersonImpl p) {
+		PersonAgent agent = new TransitAgent(p, this.simulation);
+		this.agentsMap.put(p, agent);
+		return agent;
+	}
 
 }

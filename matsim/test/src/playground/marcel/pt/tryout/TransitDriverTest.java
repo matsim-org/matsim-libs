@@ -50,12 +50,12 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
-import playground.marcel.pt.integration.TransitDriver;
-import playground.marcel.pt.integration.TransitQueueSimulation;
-import playground.marcel.pt.integration.TransitQueueVehicle;
-import playground.marcel.pt.interfaces.TransitVehicle;
 import playground.marcel.pt.mocks.MockAgent;
+import playground.marcel.pt.queuesim.TransitDriver;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import playground.marcel.pt.queuesim.TransitQueueVehicle;
+import playground.marcel.pt.queuesim.TransitVehicle;
+import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 
 public class TransitDriverTest extends MatsimTestCase {
 

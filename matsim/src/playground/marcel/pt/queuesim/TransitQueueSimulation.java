@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.queuesim;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -47,6 +47,7 @@ import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.marcel.pt.otfvis.FacilityDrawer;
+import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class TransitQueueSimulation extends QueueSimulation {
 	

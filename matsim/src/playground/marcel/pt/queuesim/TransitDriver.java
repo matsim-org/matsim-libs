@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.queuesim;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,8 +43,6 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
-import playground.marcel.pt.interfaces.TransitVehicle;
 
 public class TransitDriver implements TransitDriverAgent {
 

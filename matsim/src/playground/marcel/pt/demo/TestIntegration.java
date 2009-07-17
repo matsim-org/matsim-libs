@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.demo;
 
 import java.io.IOException;
 
@@ -37,6 +37,8 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 import playground.marcel.pt.transitSchedule.TransitScheduleReaderBerta;
 
 

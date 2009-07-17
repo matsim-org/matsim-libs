@@ -43,9 +43,9 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
-import playground.marcel.pt.integration.ExperimentalTransitRouteFactory;
-import playground.marcel.pt.integration.TransitQueueSimulation;
-import playground.marcel.pt.tryout.CreatePseudoNetwork;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
+import playground.marcel.pt.utils.CreatePseudoNetwork;
 
 public class PseudoNetworkDemo {
 
@@ -57,10 +57,11 @@ public class PseudoNetworkDemo {
 		if (args.length == 1) {
 			transitScheduleFile = args[0]	;
 		} else {
-			networkFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml";
-			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
+//			networkFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml";
+//			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
 //			transitScheduleFile = "../thesis-data/examples/berta/schedule.xml";
 //			transitScheduleFile = "/Users/cello/Desktop/Mohit/berlinSchedule.xml";
+			transitScheduleFile = "/Users/cello/Desktop/Mohit/zuerichSchedule.xml";
 		}
 		
 		ScenarioImpl scenario = new ScenarioImpl();

@@ -37,6 +37,8 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
+import playground.marcel.pt.utils.CreateTimetableForStop;
+
 
 public class CreateTimetableForStopTest extends MatsimTestCase {
 

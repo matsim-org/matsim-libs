@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusPassenger.java
+ * MockPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.mocks;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.interfaces.PassengerAgent;
+import playground.marcel.pt.queuesim.PassengerAgent;
 
-public class BusPassenger extends PersonImpl implements PassengerAgent {
+/**
+ * A very simple implementation of the interface {@link PassengerAgent} for
+ * use in tests.
+ *
+ * @author mrieser
+ */
+public class FakePassengerAgent implements PassengerAgent {
 
-	private final TransitStopFacility exitStop;
+	private final ActivityFacility exitStop;
 
-	public BusPassenger(final Id id, final TransitStopFacility exitStop) {
-		super(id);
+	public FakePassengerAgent(final ActivityFacility exitStop) {
 		this.exitStop = exitStop;
 	}
 
 	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return this.exitStop == stop;
+		return stop == this.exitStop;
 	}
 
 	public boolean ptLineAvailable(final TransitLine line) {
-		// TODO [MR] Auto-generated method stub
 		return true;
 	}
 
