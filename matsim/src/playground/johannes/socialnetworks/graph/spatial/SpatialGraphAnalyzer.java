@@ -36,6 +36,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Correlations;
@@ -113,10 +114,15 @@ public class SpatialGraphAnalyzer {
 				 * edge length histogram
 				 */
 				Distribution.writeHistogram(edgeLengthDistr.absoluteDistribution(binsize), output + "edgelength.hist.txt");
+//				Distribution.writeHistogram(SpatialGraphStatistics.normalizedEdgeLengthDistribution(graph.getVertices(), binsize).absoluteDistribution(binsize), output + "edgelength.norm.hist.txt");
 				/*
-				 * edge length degree correlation
+				 * degree correlation
 				 */
 				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(graph), output + "edgelength_k.txt", "k", "edgelength");
+				Correlations.writeToFile(GraphStatistics.clusteringDegreeCorrelation(graph), output + "c_k.txt", "k", "c");
+				Correlations.writeToFile(SpatialGraphStatistics.degreeCenterDistanceCorrelation(graph.getVertices(), binsize), output + "k_center.txt", "dx", "k");
+				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthCenterDistanceCorrelation(graph.getVertices(), binsize), output + "d_center.txt", "dx", "c");
+				Correlations.writeToFile(SpatialGraphStatistics.clusteringCenterDistanceCorrelation(graph.getVertices(), binsize), output + "c_center.txt", "dx", "d");
 				/*
 				 * density correlations
 				 */

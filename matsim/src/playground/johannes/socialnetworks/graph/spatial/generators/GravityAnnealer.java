@@ -37,11 +37,11 @@ import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
-import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitcher;
+import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
+import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityGenerator.Handler;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 
 /**
@@ -71,8 +71,9 @@ public class GravityAnnealer {
 		generator.thetaDensity = Double.parseDouble(config.getParam(MODULE_NAME, "theta_density"));
 		generator.thetaTriangle = Double.parseDouble(config.getParam(MODULE_NAME, "theta_triangle"));
 		generator.burnin = (long)Double.parseDouble(config.getParam(MODULE_NAME, "burnin"));
-		generator.sampleSize = Integer.parseInt(config.getParam(MODULE_NAME, "samplesize"));
-		generator.sampleInterval = Integer.parseInt(config.getParam(MODULE_NAME, "sampleinterval"));
+//		generator.sampleSize = Integer.parseInt(config.getParam(MODULE_NAME, "samplesize"));
+		generator.logInterval = (long)Double.parseDouble(config.getParam(MODULE_NAME, "loginterval"));
+		generator.sampleInterval = (long)Double.parseDouble(config.getParam(MODULE_NAME, "sampleinterval"));
 		generator.outputDir = config.getParam(MODULE_NAME, "output");
 		generator.descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
@@ -88,9 +89,11 @@ public class GravityAnnealer {
 	
 	private long burnin;
 	
-	private int sampleSize;
+//	private int sampleSize;
 	
-	private int sampleInterval;
+	private long sampleInterval;
+	
+	private long logInterval;
 	
 	private String outputDir;
 	
@@ -126,14 +129,17 @@ public class GravityAnnealer {
 		/*
 		 * Setup gibbs sampler.
 		 */
-		GibbsEdgeSwitcher sampler = new GibbsEdgeSwitcher();
+//		GibbsEdgeSwitcher sampler = new GibbsEdgeSwitcher();
+		GibbsEdgeSwitch sampler = new GibbsEdgeSwitch();
 		sampler.setInterval(1000000);
-		Handler handler = new Handler(outputDir, densityGrid);
-		handler.setSampleSize(sampleSize);
-		handler.setSampleInterval(sampleInterval);
+		
+		DumpHandler handler = new DumpHandler(outputDir, densityGrid);
+		handler.setBurnin(burnin);
+		handler.setDumpInterval(sampleInterval);
+		handler.setLogInterval(logInterval);
 		
 		logger.info(String.format("Starting gibbs sampler. Burnin time: %1$s iterations.", burnin));
-		sampler.sample(matrix, ergm, burnin, handler);
+		sampler.sample(matrix, ergm, handler);
 		logger.info("Gibbs sampler terminated.");
 		logger.info(handler.toString());
 	}

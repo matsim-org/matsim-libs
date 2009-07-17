@@ -385,21 +385,6 @@ public class GraphStatistics {
 		}
 		
 		return Correlations.correlationMean(values1, values2);
-//		TIntIntHashMap k_distr = new TIntIntHashMap();
-//		TDoubleDoubleHashMap val_k = new TDoubleDoubleHashMap();
-//		for(Object v : values.keys()) {
-//			double val = values.get((V)v);
-//			int k = ((Vertex)v).getNeighbours().size();
-//			val_k.adjustOrPutValue(k, val, val);
-//			k_distr.adjustOrPutValue(k, 1, 1);
-//		}
-//		
-//		TDoubleDoubleHashMap mean_k = new TDoubleDoubleHashMap();
-//		for(int k : k_distr.keys()) {
-//			double sum = val_k.get(k);
-//			mean_k.put(k, sum/(double)k_distr.get(k));
-//		}
-//		return mean_k;
 	}
 	
 	private static class CentralityGraph<V extends Vertex> extends GraphProjection<Graph, V, Edge> {

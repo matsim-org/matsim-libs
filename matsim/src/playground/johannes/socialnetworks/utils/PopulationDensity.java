@@ -21,20 +21,17 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.ivtsurveys;
+package playground.johannes.socialnetworks.utils;
 
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoader;
-import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 
@@ -42,23 +39,20 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
  * @author illenberger
  *
  */
-public class PopDensityGrid {
+public class PopulationDensity {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
+	private static final String MODULE_NAME = "densityGrid";
+	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoader loader = new ScenarioLoader(args[0]);
 		loader.loadScenario();
-		ScenarioImpl data = loader.getScenario();
-
-		/*
-		 * Make grid...
-		 */
-		PopulationImpl population = data.getPopulation();
+		Scenario data = loader.getScenario();
+		Config config = data.getConfig();
+		
+		double resolution = Double.parseDouble(config.getParam(MODULE_NAME, "resolution"));
+		String output = config.getParam(MODULE_NAME, "output");
+		
+		PopulationImpl population = (PopulationImpl) data.getPopulation();//FIXME
 				
 		double maxX = 0;
 		double maxY = 0;
@@ -72,31 +66,10 @@ public class PopDensityGrid {
 			minY = Math.min(minY, homeLoc.getY());
 		}
 		
-		BufferedWriter popWriter = IOUtils.getBufferedWriter("/Users/fearonni/vsp-work/socialnets/data-analysis/pop.txt");
-		
-		double resolution = Double.parseDouble(args[1]);
-		minX = minX - 200;
-		maxX = maxX - 200;
 		SpatialGrid<Double> grid = new SpatialGrid<Double>(minX, minY, maxX, maxY, resolution);
-		
-		BufferedWriter gridWriter = IOUtils.getBufferedWriter("/Users/fearonni/vsp-work/socialnets/data-analysis/grid.txt");
-		for(int x = (int) minX; x < maxX; x+=resolution) {
-			for(int y = (int) minY; y < maxY; y+=resolution) {
-				gridWriter.write(String.valueOf(x));
-				gridWriter.write("\t");
-				gridWriter.write(String.valueOf(y));
-				gridWriter.newLine();
-			}
-		}
-		gridWriter.close();
 		
 		for(PersonImpl person : population.getPersons().values()) {
 			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
-			
-			popWriter.write(String.valueOf(homeLoc.getX()));
-			popWriter.write("\t");
-			popWriter.write(String.valueOf(homeLoc.getY()));
-			popWriter.newLine();
 			
 			Double count = grid.getValue(homeLoc);
 			if(count == null)
@@ -104,8 +77,8 @@ public class PopDensityGrid {
 			count++;
 			grid.setValue(count, homeLoc);
 		}
-		popWriter.close();
-		grid.toFile(args[2]);
+
+		grid.toFile(output);
 		
 	}
 

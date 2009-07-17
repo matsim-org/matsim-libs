@@ -21,15 +21,14 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.ivtsurveys;
+package playground.johannes.socialnetworks.utils;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -40,29 +39,38 @@ import org.matsim.core.scenario.ScenarioLoader;
  * @author illenberger
  *
  */
-public class SimplifyPersons {
+public class PopulationClipping {
 
-	/**
-	 * @param args
-	 */
+	private static final String MODULE_NAME = "populationClipping";
+	
 	public static void main(String[] args) {
-		Config config = Gbl.createConfig(new String[]{args[0]});
-		
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoader loader = new ScenarioLoader(args[0]);
 		loader.loadScenario();
-		ScenarioImpl data = loader.getScenario();
+		Scenario data = loader.getScenario();
+		Config config = data.getConfig();
 		
-		double centerX = 683000;
-		double centerY = 247000;
-		double radius = Double.parseDouble(args[2]);
+		String outputDir = config.getParam(MODULE_NAME, "output");
+		double x = Double.parseDouble(config.getParam(MODULE_NAME, "x"));
+		double y = Double.parseDouble(config.getParam(MODULE_NAME, "y"));
 		
-		double halfradius = (radius/2.0);
-		double minX = centerX - halfradius;
-		double maxX = centerX + halfradius;
-		double minY = centerY - halfradius;
-		double maxY = centerY + halfradius;
+		double r = 0;
+		double width = 0;
+		double height = 0;
 		
-		PopulationImpl pop = data.getPopulation();
+		String radius = config.findParam(MODULE_NAME, "radius");
+		if(radius != null) {
+			r = Double.parseDouble(radius);
+		} else {
+			width = Double.parseDouble(config.getParam(MODULE_NAME, "width"));
+			height = Double.parseDouble(config.getParam(MODULE_NAME, "height"));
+		}
+		
+		double minX = x;
+		double maxX = x + width;
+		double minY = y;
+		double maxY = y + height;
+		
+		PopulationImpl pop = (PopulationImpl) data.getPopulation();//FIXME
 		List<PersonImpl> remove = new LinkedList<PersonImpl>();
 		for(PersonImpl p : pop.getPersons().values()) {
 			for(int i = 1; i < p.getPlans().size(); i = 1)
@@ -73,39 +81,33 @@ public class SimplifyPersons {
 				selected.getPlanElements().remove(i);
 			}
 			Coord c = p.getPlans().get(0).getFirstActivity().getCoord();
-			if(!((c.getX() >= minX) && (c.getX() <= maxX) && (c.getY() >= minY) && (c.getY() <= maxY)))
-				remove.add(p);
+			
+			if(r > 0) {
+				double dx = Math.abs(c.getX() - x);
+				double dy = Math.abs(c.getY() - y);
+				if(Math.sqrt(dx*dx + dy*dy) > r)
+					remove.add(p);
+			} else {
+				if(!((c.getX() >= minX) && (c.getX() <= maxX) && (c.getY() >= minY) && (c.getY() <= maxY)))
+					remove.add(p);
+			}
 		}
 		
 		for(PersonImpl p : remove)
 			pop.getPersons().remove(p.getId());
 		
-		PopulationWriter writer = new PopulationWriter(pop, args[1] + "plans.09.xml", "v4", 0.009);
+		PopulationWriter writer = new PopulationWriter(pop, outputDir + "plans.xml", "v4", 1);
 		writer.write();
 		
-		writer = new PopulationWriter(pop, args[1] + "plans.08.xml", "v4", 0.008);
-		writer.write();
+		for(double f = 0.001; f < 0.01; f += 0.001) {
+			writer = new PopulationWriter(pop, outputDir+ "plans." + f + ".xml", "v4", f);
+			writer.write();
+		}
 		
-		writer = new PopulationWriter(pop, args[1] + "plans.07.xml", "v4", 0.007);
-		writer.write();
-		
-		writer = new PopulationWriter(pop, args[1] + "plans.06.xml", "v4", 0.006);
-		writer.write();
-		
-		writer = new PopulationWriter(pop, args[1] + "plans.05.xml", "v4", 0.005);
-		writer.write();
-		
-		writer = new PopulationWriter(pop, args[1] + "plans.04.xml", "v4", 0.004);
-		writer.write();
-		
-		writer = new PopulationWriter(pop, args[1] + "plans.03.xml", "v4", 0.003);
-		writer.write();
-		
-		writer = new PopulationWriter(pop, args[1] + "plans.02.xml", "v4", 0.002);
-		writer.write();
-		
-		writer = new PopulationWriter(pop, args[1] + "plans.01.xml", "v4", 0.001);
-		writer.write();
+		for(double f = 0.01; f <= 0.1; f += 0.01) {
+			writer = new PopulationWriter(pop, outputDir + "plans." + f + ".xml", "v4", f);
+			writer.write();
+		}
 	}
 
 }

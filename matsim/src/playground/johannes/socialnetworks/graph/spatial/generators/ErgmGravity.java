@@ -24,7 +24,6 @@
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TIntObjectHashMap;
 
 import org.apache.log4j.Logger;
@@ -47,71 +46,114 @@ public class ErgmGravity extends ErgmTerm {
 	
 	private TIntObjectHashMap<TDoubleDoubleHashMap> normConstants;
 	
+//	private TDoubleIntHashMap edges;
+	
+//	private TIntDoubleHashMap max_length;
+	
 	public ErgmGravity(SpatialAdjacencyMatrix m, double descretization) {
+//		try {
+//		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/fearonni/Desktop/normval.txt"));
+		
 		this.descretization = descretization;
 		logger.info("Initializing ERGM gravity term...");
 		int n = m.getVertexCount();
 		normConstants = new TIntObjectHashMap<TDoubleDoubleHashMap>();
+//		edges = new TDoubleIntHashMap();
+//		max_length = new TIntDoubleHashMap();
 		
-		double xmin = Double.MAX_VALUE;
-		double ymin = Double.MAX_VALUE;
-		double xmax = - Double.MAX_VALUE;
-		double ymax = - Double.MAX_VALUE;
-		for(int i = 0; i < n; i++) {
-			Coord c_i = m.getVertex(i).getCoordinate();
-			xmin = Math.min(xmin, c_i.getX());
-			ymin = Math.min(ymin, c_i.getY());
-			xmax = Math.max(xmax, c_i.getX());
-			ymax = Math.max(ymax, c_i.getY());
-		}
+//		double xmin = Double.MAX_VALUE;
+//		double ymin = Double.MAX_VALUE;
+//		double xmax = - Double.MAX_VALUE;
+//		double ymax = - Double.MAX_VALUE;
+//		for(int i = 0; i < n; i++) {
+//			Coord c_i = m.getVertex(i).getCoordinate();
+//			xmin = Math.min(xmin, c_i.getX());
+//			ymin = Math.min(ymin, c_i.getY());
+//			xmax = Math.max(xmax, c_i.getX());
+//			ymax = Math.max(ymax, c_i.getY());
+//		}
+//		
+//		double xcenter = (xmax - xmin)/2.0 + xmin;
+//		double ycenter = (ymax - ymin)/2.0 + ymin;
+		
 		
 		for(int i = 0; i < n; i++) {
 			TDoubleDoubleHashMap norm_i = new TDoubleDoubleHashMap();
-			
+//			double maxlen = 0;
 			Coord c_i = m.getVertex(i).getCoordinate();
 			for(int j = 0; j < n; j++) {
+				
 				if(j != i) {
 					Coord c_j = m.getVertex(j).getCoordinate();
 					double d = CoordUtils.calcDistance(c_i, c_j);
 					double bin = getBin(d);
+//					edges.adjustOrPutValue(bin, 1, 1);
 					norm_i.adjustOrPutValue(bin, 1, 1);
+					
+//					maxlen = Math.max(d, maxlen);
 				}
-			}
-			
-			TDoubleDoubleIterator it = norm_i.iterator();
-			for(int k = 0; k < norm_i.size(); k++) {
-				it.advance();
-				double r = it.key();
 				
-				double dx1 = (c_i.getX() - xmin) / descretization;
-				double dx2 = (xmax - c_i.getX()) / descretization;
-				double dy1 = (c_i.getY() - ymin) / descretization;
-				double dy2 = (ymax - c_i.getY()) / descretization;
-
-				double b = calculateCircleSegment(dx2, dy2, r);
-				b += calculateCircleSegment(dy1, dx2, r);
-				b += calculateCircleSegment(dx1, dy1, r);
-				b += calculateCircleSegment(dy2, dx1, r);
-
-				if (Double.isNaN(b)) {
-					throw new IllegalArgumentException();
-
-				}
-				double a = b * r - b / 2.0;				
 				
-				double count = it.value();
-				if(count == 0) {
-					count = 1;
-					logger.warn(String.format("No sample in d=%1$s.", it.key()));
-				}
-				it.setValue(count/a);
 			}
+//			max_length.put(i, maxlen);
+//			double dx = Math.abs(xcenter - c_i.getX());
+//			double dy = Math.abs(ycenter - c_i.getY());
+//			double d = Math.sqrt(dx * dx + dy * dy);
+//			TDoubleDoubleIterator it = norm_i.iterator();
+//			for(int k = 0; k < norm_i.size(); k++) {
+//				it.advance();
+//				double r = it.key();
+//				double count = it.value();
+//				
+////				if(count > 200 && r > 25)
+////					System.err.println();
+//				
+//				double dx1 = (c_i.getX() - xmin) / descretization;
+//				double dx2 = (xmax - c_i.getX()) / descretization;
+//				double dy1 = (c_i.getY() - ymin) / descretization;
+//				double dy2 = (ymax - c_i.getY()) / descretization;
+//
+//				double b = calculateCircleSegment(dx2, dy2, r);
+//				b += calculateCircleSegment(dy1, dx2, r);
+//				b += calculateCircleSegment(dx1, dy1, r);
+//				b += calculateCircleSegment(dy2, dx1, r);
+//
+//				if (Double.isNaN(b)) {
+//					throw new IllegalArgumentException();
+//
+//				}
+//				double a = b * r - b / 2.0;				
+////				if(b==0)
+////					throw new IllegalArgumentException();
+//				
+//				
+//				if(count == 0) {
+//					count = 1;
+//					logger.warn(String.format("No sample in d=%1$s.", it.key()));
+//				}
+////				it.setValue(count/a);
+////				if(count > 300 && a < 10)
+////					throw new IllegalArgumentException();
+////		
+//				if(a==0)
+//					a=1;
+//				
+//				if(Math.random() < 0.3) {
+//				writer.write(String.format("%1$s\t%2$s\t%3$s\t%4$s\t%5$s\t%6$s", r, a, count, count/a, d, r/a));
+//				writer.newLine();
+//				}
+//			}
 			
 			if(i % 1000 == 0)
 				logger.info((i/(float)n * 100) + " %...");
 			
 			normConstants.put(i, norm_i);
 		}
+//		writer.close();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+		
 	}
 	
 	public double calculateCircleSegment(double dx, double dy, double r) {
@@ -124,12 +166,12 @@ public class ErgmGravity extends ErgmTerm {
 			if(dx < r)
 				alpha1 = Math.acos(dx/r);
 			
-			double alpha2 = 0;
+			double alpha2 = Math.PI/2.0;
 			if(dy < r)
 				alpha2 = Math.asin(dy/r);
 			
-			double alpha = Math.abs(alpha2 - alpha1);
-			return Math.PI * alpha / 180.0;
+			return Math.abs(alpha2 - alpha1);
+//			return Math.PI * alpha / 180.0;
 		}
 	}
 	
@@ -154,11 +196,15 @@ public class ErgmGravity extends ErgmTerm {
 		
 		
 		double norm_i = normConstants.get(i).get(d);
+//		double norm_j = normConstants.get(j).get(d);
+//		double n_edges = edges.get(d);
+		
 		if(norm_i == 0) {
 			throw new IllegalArgumentException(String.format("Norm must no be zero! i=%1$s, d=%2$s", i, d));
 		}
 		
-		return - getTheta() * (Math.log(1 / (d * d * norm_i)));
+		return - getTheta() * (Math.log(1 / (d * norm_i)));
+//		return - getTheta() * (Math.log(1 / (d * n_edges)));
 	}
 
 }

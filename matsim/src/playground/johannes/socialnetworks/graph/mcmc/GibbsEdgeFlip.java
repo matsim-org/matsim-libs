@@ -28,19 +28,19 @@ package playground.johannes.socialnetworks.graph.mcmc;
  * @author illenberger
  *
  */
-public class GibbsEdgeSwitcher extends GibbsSampler {
+public class GibbsEdgeFlip extends GibbsSampler {
 
-	private int[][] edges;
+	protected int[][] edges;
 	
-	public GibbsEdgeSwitcher() {
+	public GibbsEdgeFlip() {
 		super();
 	}
 
-	public GibbsEdgeSwitcher(long seed) {
+	public GibbsEdgeFlip(long seed) {
 		super(seed);
 	}
 
-	public void sample(AdjacencyMatrix y, ConditionalDistribution d, long burninTime, MCMCSampleDelegate handler) {
+	public void sample(AdjacencyMatrix y, ConditionalDistribution d, SampleHandler handler) {
 		int N = y.getVertexCount();
 		int M = y.getEdgeCount();
 		edges = new int[M][2];
@@ -54,7 +54,8 @@ public class GibbsEdgeSwitcher extends GibbsSampler {
 				}
 			}
 		}
-		super.sample(y, d, burninTime, handler);
+//		super.sample(y, d, burninTime, handler);
+		super.sample(y, d, handler);
 	}
 	
 	public boolean step(AdjacencyMatrix y, ConditionalDistribution d) {
