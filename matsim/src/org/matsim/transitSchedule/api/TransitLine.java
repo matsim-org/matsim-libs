@@ -32,10 +32,25 @@ import org.matsim.api.basic.v01.Identifiable;
  */
 public interface TransitLine extends Identifiable {
 
+	/**
+	 * Adds the specified transit route to this line.
+	 * 
+	 * @param transitRoute
+	 * @throws IllegalArgumentException if there is already a route with the same Id
+	 */
 	public abstract void addRoute(final TransitRoute transitRoute);
 
+	
+	/**
+	 * @return immutable Map containing all transit routes assigned to this transit line
+	 */
 	public abstract Map<Id, TransitRoute> getRoutes();
 
-	public abstract void removeRoute(final TransitRoute route);
+	/**
+	 * Removes the specified transit route from this transit line.
+	 * @param route
+	 * @return <code>true</code> if this line contained the specified route.
+	 */
+	public abstract boolean removeRoute(final TransitRoute route);
 
 }

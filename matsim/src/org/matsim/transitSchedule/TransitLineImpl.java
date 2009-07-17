@@ -59,8 +59,8 @@ public class TransitLineImpl implements TransitLine {
 		return Collections.unmodifiableMap(this.transitRoutes);
 	}
 
-	public void removeRoute(final TransitRoute route) {
-		this.transitRoutes.remove(route.getId());
+	public boolean removeRoute(final TransitRoute route) {
+		return null != this.transitRoutes.remove(route.getId());
 	}
 
 }

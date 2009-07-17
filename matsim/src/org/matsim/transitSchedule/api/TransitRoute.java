@@ -51,14 +51,28 @@ public interface TransitRoute extends Identifiable {
 
 	public abstract void addDeparture(final Departure departure);
 
+	public abstract boolean removeDeparture(final Departure departure);
+	
+	/**
+	 * @return an immutable Map of all departures assigned to this route
+	 */
 	public abstract Map<Id, Departure> getDepartures();
 
 	public abstract NetworkRoute getRoute();
 
 	public abstract void setRoute(final NetworkRoute route);
 
+	/**
+	 * @return an immutable list of all stops of this route in the order along the route
+	 */
 	public abstract List<TransitRouteStop> getStops();
 
+	/**
+	 * @param stop
+	 * @return the {@link TransitRouteStop} of this route that stops at the specified
+	 * {@link TransitStopFacility}. <code>null</code> if this route does not stop at the
+	 * specified location.
+	 */
 	public abstract TransitRouteStop getStop(final TransitStopFacility stop);
 
 }

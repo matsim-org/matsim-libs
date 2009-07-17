@@ -90,6 +90,10 @@ public class TransitRouteImpl implements TransitRoute {
 		this.departures.put(id, departure);
 	}
 
+	public boolean removeDeparture(final Departure departure) {
+		return null != this.departures.remove(departure.getId());
+	}
+	
 	public Map<Id, Departure> getDepartures() {
 		return Collections.unmodifiableMap(this.departures);
 	}
@@ -103,9 +107,6 @@ public class TransitRouteImpl implements TransitRoute {
 	}
 
 	public List<TransitRouteStop> getStops() {
-		if (this.stops == null) {
-			return Collections.unmodifiableList(new ArrayList<TransitRouteStop>(0));
-		}
 		return Collections.unmodifiableList(this.stops);
 	}
 
