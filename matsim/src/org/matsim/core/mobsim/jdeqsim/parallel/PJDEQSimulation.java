@@ -16,6 +16,13 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.population.ActivityImpl;
 
+
+/*
+ * TODO: (next steps):
+ * - compare the simulations (jdeqsim and p-jdeqsim) => only continue, if it is really faster...
+ * - write tests
+ * - events handling => how to deal with that?
+ */
 public class PJDEQSimulation extends JDEQSimulation {
 
 	private int numOfThreads;
