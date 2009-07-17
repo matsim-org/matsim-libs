@@ -144,7 +144,7 @@ public class Vehicle extends SimUnit {
 		}
 	}
 
-	private LinkImpl[] getCurrentLinkRoute() {
+	protected LinkImpl[] getCurrentLinkRoute() {
 		return currentLinkRoute;
 	}
 
