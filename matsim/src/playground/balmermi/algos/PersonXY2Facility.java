@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -165,7 +165,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 				ActivityFacility f = qt.get(coord.getX(),coord.getY());
 				if (f == null) { throw new RuntimeException("Coordinates == null; something is wrong!"); }
 				
-				LinkImpl l = f.getLink();
+				Link l = f.getLink();
 				if (l == null) { throw new RuntimeException("Link == null; something is wrong!"); }
 				
 				act.setFacility(f);

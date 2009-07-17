@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
@@ -44,7 +45,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				
 				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 				double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
-				ArrayList<LinkImpl> newLinks = new ArrayList<LinkImpl>(); 
+				ArrayList<Link> newLinks = new ArrayList<Link>(); 
 				newLinks.add(f.getLink());
 				double currentlink_volume =0;
 				for (int j=0; j<currentlink_volumes.length;j=j+1) {

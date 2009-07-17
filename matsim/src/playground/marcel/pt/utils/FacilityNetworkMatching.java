@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
@@ -72,7 +73,7 @@ public class FacilityNetworkMatching {
 	}
 	
 	public static void facilitySetLink(final ActivityFacility f, final LinkImpl l, final World world) {
-		LinkImpl oldL = f.getLink();
+		Link oldL = f.getLink();
 		if (oldL != null) {
 			world.removeMapping(f, oldL);
 		}
