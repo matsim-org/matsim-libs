@@ -48,6 +48,8 @@ public class JDEQSimulation {
 
 	public JDEQSimulation(final NetworkLayer network, final PopulationImpl population, final Events events) {
 		// constructor
+		
+		log = Logger.getLogger(JDEQSimulation.class);
 
 		this.population = population;
 		this.network = network;
@@ -125,8 +127,6 @@ public class JDEQSimulation {
 					+ SimulationParameters.getSimulationEndTime());
 		}
 
-		
-		log = Logger.getLogger(JDEQSimulation.class);
 	}
 
 	public void run() {
