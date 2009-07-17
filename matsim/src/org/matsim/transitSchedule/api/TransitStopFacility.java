@@ -20,8 +20,8 @@
 
 package org.matsim.transitSchedule.api;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.facilities.Facility;
-import org.matsim.core.network.LinkImpl;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
@@ -31,7 +31,7 @@ import org.matsim.core.network.LinkImpl;
 public interface TransitStopFacility extends Facility {
 
 	boolean getIsBlockingLane();
-	
-	public void setLink(final LinkImpl link);
+
+	public void setLink(final Link link);
 
 }

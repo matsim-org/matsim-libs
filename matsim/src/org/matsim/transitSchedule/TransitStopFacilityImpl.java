@@ -22,7 +22,7 @@ package org.matsim.transitSchedule;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -34,7 +34,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 
 	private final Id id;
 	private final Coord coord;
-	private LinkImpl link = null;
+	private Link link = null;
 	private final boolean isBlockingLane;
 
 	protected TransitStopFacilityImpl(final Id id, final Coord coord) {
@@ -47,11 +47,11 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 		this.isBlockingLane = isBlockingLane;
 	}
 
-	public LinkImpl getLink() {
+	public Link getLink() {
 		return this.link;
 	}
 
-	public void setLink(final LinkImpl link) {
+	public void setLink(final Link link) {
 		this.link = link;
 	}
 
@@ -64,10 +64,6 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 
 	public Coord getCoord() {
 		return this.coord;
-	}
-
-	public void setCoord(final Coord coord) {
-		this.coord.setXY(coord.getX(), coord.getY());
 	}
 
 	public Id getId() {
