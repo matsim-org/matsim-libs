@@ -31,9 +31,14 @@ public class Scheduler {
 	
 	private static final Logger log = Logger.getLogger(Scheduler.class);
 	private double simTime = 0;
-	private MessageQueue queue = new MessageQueue();
+	protected MessageQueue queue = null;
 	private double simulationStartTime = System.currentTimeMillis();
 	private double hourlyLogTime = 3600;
+
+	public Scheduler(MessageQueue queue) {
+		super();
+		this.queue = queue;
+	}
 
 	public void schedule(Message m) {
 		queue.putMessage(m);

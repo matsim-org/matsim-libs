@@ -9,15 +9,12 @@ import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
 
-public class PMessageQueue {
+public class PMessageQueue extends MessageQueue {
 	// private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 	private PriorityQueue<Message> queueThread1 = new PriorityQueue<Message>();
 	private PriorityQueue<Message> queueThread2 = new PriorityQueue<Message>();
 	public long idOfLowerThread = 0;
 	// private int queueSize = 0;
-	// public long queueSizeThread1 = 0;
-	// public long queueSizeThread2 = 0;
-	private Scheduler scheduler;
 
 	// the maximum time difference two threads are allowed to have in [s] (for
 	// message time stamp)

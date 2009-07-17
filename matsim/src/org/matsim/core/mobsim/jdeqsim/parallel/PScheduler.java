@@ -10,8 +10,12 @@ import EDU.oswego.cs.dl.util.concurrent.BrokenBarrierException;
 
 
 public class PScheduler extends Scheduler {
+
 	
-	private PMessageQueue queue = new PMessageQueue();
+	public PScheduler(PMessageQueue queue) {
+		super(queue);
+		// TODO Auto-generated constructor stub
+	}
 
 	public void startSimulation() {
 		CyclicBarrier cb = new CyclicBarrier(3);
@@ -19,9 +23,9 @@ public class PScheduler extends Scheduler {
 		messageExecutors[0] = new MessageExecutor(0, this, cb);
 		messageExecutors[1] = new MessageExecutor(1, this, cb);
 		if (messageExecutors[0].getId() < messageExecutors[1].getId()) {
-			queue.idOfLowerThread = messageExecutors[0].getId();
+			getQueue().idOfLowerThread = messageExecutors[0].getId();
 		} else {
-			queue.idOfLowerThread = messageExecutors[1].getId();
+			getQueue().idOfLowerThread = messageExecutors[1].getId();
 		}
 
 		messageExecutors[0].start();
@@ -43,6 +47,6 @@ public class PScheduler extends Scheduler {
 	}
 
 	public PMessageQueue getQueue() {
-		return queue;
+		return (PMessageQueue) queue;
 	}
 }

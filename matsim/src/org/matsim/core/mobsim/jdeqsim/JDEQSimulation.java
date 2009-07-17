@@ -133,7 +133,7 @@ public class JDEQSimulation {
 		Timer t = new Timer();
 		t.startTimer();
 
-		Scheduler scheduler = new Scheduler();
+		Scheduler scheduler = new Scheduler(new MessageQueue());
 		SimulationParameters.setAllRoads(new HashMap<String, Road>());
 
 		// initialize network

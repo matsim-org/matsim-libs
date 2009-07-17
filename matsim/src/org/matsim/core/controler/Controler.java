@@ -77,6 +77,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.mobsim.jdeqsim.parallel.PJDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
@@ -559,7 +560,7 @@ public class Controler {
 		// use writeEventsInterval from config file, only if not already
 		// initialized programmatically
 		if (writeEventsInterval == -1) {
-			this.writeEventsInterval=config.controler().getWriteEventsInterval();
+			this.writeEventsInterval = config.controler().getWriteEventsInterval();
 		}
 	}
 
@@ -640,7 +641,8 @@ public class Controler {
 	 * {@link #Controler(Config, QueueNetwork, PopulationImpl) Constructor}.
 	 * 
 	 * @deprecated Use the constructor
-	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)} instead.
+	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)}
+	 *             instead.
 	 * @return The network to be used for the simulation.
 	 */
 	@Deprecated
@@ -658,7 +660,8 @@ public class Controler {
 	 * {@link #Controler(Config, QueueNetwork, PopulationImpl) Constructor}.
 	 * 
 	 * @deprecated Use the constructor
-	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)} instead.
+	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)}
+	 *             instead.
 	 * @return The population to be used for the simulation.
 	 */
 	@Deprecated
@@ -805,7 +808,18 @@ public class Controler {
 		 */
 		if (this.externalMobsim == null) {
 			final String JDEQ_SIM = "JDEQSim";
-			if (this.config.getModule(JDEQ_SIM) != null) {
+			final String NUMBER_OF_THREADS = "numberOfThreads";
+			String numberOfThreads = Gbl.getConfig().findParam(JDEQ_SIM, NUMBER_OF_THREADS);
+			int numOfThreads = 0;
+
+			if (numberOfThreads != null) {
+				numOfThreads = Integer.parseInt(numberOfThreads);
+			}
+
+			if (this.config.getModule(JDEQ_SIM) != null && numOfThreads > 1) {
+				PJDEQSimulation sim = new PJDEQSimulation(this.network, this.population, this.events,numOfThreads);
+				sim.run();
+			} else if (this.config.getModule(JDEQ_SIM) != null) {
 				JDEQSimulation sim = new JDEQSimulation(this.network, this.population, this.events);
 				sim.run();
 			} else {
