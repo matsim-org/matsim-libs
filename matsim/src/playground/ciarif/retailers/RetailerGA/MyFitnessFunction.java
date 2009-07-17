@@ -23,9 +23,11 @@ package playground.ciarif.retailers.RetailerGA;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.ciarif.retailers.GravityModel;
+import playground.ciarif.retailers.RetailersSequentialLocationListener;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -35,7 +37,8 @@ public class MyFitnessFunction {
 	private final boolean max;
 	private ArrayList<Integer> precedenceVector;
 	private GravityModel gm;
-
+	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
+	
 	public MyFitnessFunction(boolean isMax, int number){
 		this.max = isMax;
 		this.numberOfPoints = number;
@@ -54,7 +57,7 @@ public class MyFitnessFunction {
 	public Double evaluate(ArrayList<Integer> solution){
 		Double fitness = 0.0;
 		
-		gm.computePotential(solution);
+		this.gm.computePotential(solution);
 		
 //		for(int i = 0; i < solution.size()-1; i++){
 //			fitness += this.points.get(solution.get(i)-1).distance(this.points.get(solution.get(i+1)-1));
@@ -64,7 +67,8 @@ public class MyFitnessFunction {
 //		if(fitness == null){
 //			System.err.println("Could not evaluate solution!");
 //			System.exit(0);
-//		} 
+//		}
+		fitness = Double.valueOf(this.gm.computePotential(solution));
 		return fitness;
 	}
 

@@ -99,6 +99,7 @@ public class GravityModelRetailerStrategy {
 		GravityModel gm = new GravityModel(controler, b, facilities, consumers, shops);
 		ArrayList<Integer> solution = rrGA.runGA(this.createInitialLocationsForGA(),gm);
 		log.info("The optimized solution is: " + solution);
+		//TODO here the facilities should be moved
 	}
 	
 	private ArrayList<Integer> createInitialLocationsForGA () {
@@ -118,6 +119,13 @@ public class GravityModelRetailerStrategy {
 		
 		log.info("Initial Locations = " + locations);
 		return locations;
+		
+	}
+
+
+
+	public void getMovedFacilities() {
+		// TODO Auto-generated method stub
 		
 	}
 }

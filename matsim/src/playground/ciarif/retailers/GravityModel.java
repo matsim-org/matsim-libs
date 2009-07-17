@@ -12,7 +12,7 @@ public class GravityModel
   private static final Logger log = Logger.getLogger(GravityModel.class);
   private double[] betas;
   private Controler controler;
-  private ArrayList<ActivityFacility> retailers_shops = new ArrayList();
+  private ArrayList<ActivityFacility> retailers_shops = new ArrayList<ActivityFacility>();
   private ArrayList<ActivityFacility> shops;
   private ArrayList<Consumer> consumers;
 
@@ -75,7 +75,7 @@ public class GravityModel
 
       global_likelihood += loc_likelihood;
     }
-
     return global_likelihood;
+    
   }
 }

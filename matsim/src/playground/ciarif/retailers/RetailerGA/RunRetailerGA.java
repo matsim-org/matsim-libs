@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
+//import java.io.PrintStream;
 import java.util.ArrayList;
 import playground.ciarif.retailers.GravityModel;
 import playground.jjoubert.DateString;
@@ -16,17 +16,17 @@ public class RunRetailerGA
     int genomeLength = first.size();
     int populationSize = 10;
     int numberOfGenerations = 10;
-    double elites = 0.1D;
-    double mutants = 0.05D;
+    double elites = 0.1;
+    double mutants = 0.05;
 
     int crossoverType = 3;
-    ArrayList solutionProgress = new ArrayList(numberOfGenerations);
+    ArrayList<ArrayList<Double>> solutionProgress = new ArrayList<ArrayList<Double>>(numberOfGenerations);
 
     MyFitnessFunction ff = new MyFitnessFunction(true, genomeLength, gm);
     RetailerGA ga = new RetailerGA(populationSize, genomeLength, ff, first);
     solutionProgress.add(ga.getStats());
-    long tNow = 0L;
-    long total = 0L;
+    long tNow = 0;
+    long total = 0;
     for (int i = 0; i < numberOfGenerations; ++i) {
       tNow = System.currentTimeMillis();
       ga.evolve(elites, mutants, crossoverType, ff.getPrecedenceVector());
@@ -48,7 +48,7 @@ public class RunRetailerGA
     String fileName = "C:/Documents and Settings/ciarif/My Documents/Francesco/Projects/Agent Based Retailers/Runs/GA-Progress-" + ds.toString() + ".txt";
 
     writeSolutionProgressToFile(solutionProgress, fileName);
-    ArrayList solution = ga.getIncumbent().getGenome();
+    ArrayList<Integer> solution = ga.getIncumbent().getGenome();
     return solution;
   }
 
@@ -61,7 +61,7 @@ public class RunRetailerGA
         output.write("Iteration,Best,Average,Worst");
         output.newLine();
         int iteration = 0;
-        for (ArrayList solution : solutionProgress) {
+        for (ArrayList<Double> solution : solutionProgress) {
           output.write(String.valueOf(iteration));
           output.write(",");
           output.write(String.valueOf(solution.get(0)));

@@ -110,28 +110,43 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				BufferedReader br = new BufferedReader(fr);
 				// Skip header
 				String curr_line = br.readLine();
+				int notFoundFacilities = 0;
 				while ((curr_line = br.readLine()) != null) {
 					String[] entries = curr_line.split("\t", -1);
-					// header: r_id  f_id  strategy
-					// index:     0     1      2
+					// header: r_id  f_id  strategy linkId capacity
+					// index:     0     1      2	   3	  4
 					Id rId = new IdImpl(entries[0]);
-					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
-						Id fId = new IdImpl (entries[1]);
-						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
-						this.retailers.getRetailers().get(rId).addFacility(f);
-						retailersLinks.add(f.getLink().getId());
+					Id fId = new IdImpl (entries[1]);
+					Map<Id,ActivityFacility> controlerFacilities = controler.getFacilities().getFacilities();
+					
+ 					if (controlerFacilities.get(fId) != null) {
+						if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
+							
+							ActivityFacility f = controlerFacilities.get(fId);
+							log.info("The added facility is = " + f.getId());
+							this.retailers.getRetailers().get(rId).addFacility(f);
+							log.info("The added facility is on the link number = " + f.getLink().getId());
+							retailersLinks.add(f.getLink().getId());
+
+						}	
+						else { // retailer does not exists yet
+							
+							Retailer r = new Retailer(rId, null);
+							System.out.println("The strategy " + entries[2] + " will be added to the retailer = " + rId);
+							//r.addSequentialStrategy(controler, entries[2], this.links);
+							ActivityFacility f = controlerFacilities.get(fId);
+							r.addFacility(f);
+							retailersLinks.add(f.getLink().getId());
+							log.info("The added facility is on the link number = " + f.getLink().getId());
+							this.retailers.addRetailer(r);
+						}
 					}
-					else { // retailer does not exists yet
-						Retailer r = new Retailer(rId, null);
-						System.out.println("The strategy " + entries[2] + " will be added to the retailer = " + rId);
-						//r.addSequentialStrategy(controler, entries[2], this.links);
-						Id fId = new IdImpl (entries[1]);
-						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
-						r.addFacility(f);
-						retailersLinks.add(f.getLink().getId());
-						this.retailers.addRetailer(r);
+					else {
+						notFoundFacilities = notFoundFacilities+1;
+						log.warn("The facility " + fId + " has not been found" );
 					}
 				}
+				log.warn(notFoundFacilities + " facilities have not been found");
 			} 
 			catch (IOException e) {
 				Gbl.errorMsg(e);
@@ -200,28 +215,27 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			}
 			GravityModelRetailerStrategy gmrs = new GravityModelRetailerStrategy (controler, retailZones, shops, retailersFacilities, links); 
 			gmrs.moveFacilities();
-		
+			gmrs.getMovedFacilities();
 		
 			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
 				
 				PlanImpl plan = p.getSelectedPlan();
-					// fc: is it not possible anymore to use only the selected plan? 
-					// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
-					boolean routeIt = false;
-					for (PlanElement pe : plan.getPlanElements()) {
-						if (pe instanceof ActivityImpl) {
-							ActivityImpl act = (ActivityImpl) pe;
-							if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
-								// likely contains too much persons in it!!!!
-								act.setLink(act.getFacility().getLink());
-								routeIt = true;
-							}
+				// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
+				boolean routeIt = false;
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof ActivityImpl) {
+						ActivityImpl act = (ActivityImpl) pe;
+						if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
+							// likely contains too much persons in it!!!!
+							act.setLink(act.getFacility().getLink());
+							routeIt = true;
 						}
 					}
-					if (routeIt) {
-						pcrl.run(plan);
-					}
-				log.info("The program is re-routing persons who were shopping in moved facilities");	
+				}
+				if (routeIt) {
+					pcrl.run(plan);
+					log.info("The program is re-routing persons who were shopping in moved facilities");
+				}
 			}
 		}	
 	}

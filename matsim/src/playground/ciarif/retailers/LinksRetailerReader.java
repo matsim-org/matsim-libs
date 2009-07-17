@@ -70,7 +70,7 @@ public class LinksRetailerReader {
 				Gbl.errorMsg(e);
 			}
 		}
-		else {//Francesco: if no file stating which links are allowed is defined, any link is allowed.
+		else {//Francesco: if no file stating which links are allowed is defined
 			Integer linksMax = Integer.parseInt(String.valueOf(Math.round(actualLinks.size()*4)));
 			log.info("links max= " + linksMax);
 			log.info("actual Links= " + actualLinks);
