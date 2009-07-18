@@ -5,6 +5,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.events.parallelEventsHandler.ConcurrentListSPSC;
+import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
 import org.matsim.core.mobsim.jdeqsim.EventMessage;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.Road;
@@ -56,8 +57,10 @@ public class MessageExecutor extends Thread {
 	private void processMessages() {
 		Message m;
 		LinkedList<Message> list = new LinkedList<Message>();
-		while (!(scheduler.getQueue().isEmpty() && scheduler.getQueue().isEmptySync())
-				&& scheduler.getSimTime() < SimulationParameters.getSimulationEndTime()) {
+		while (!(scheduler.getQueue().isEmpty() && scheduler.getQueue()
+				.isEmptySync())
+				&& scheduler.getSimTime() < SimulationParameters
+						.getSimulationEndTime()) {
 			list = scheduler.getQueue().getNextMessages(list);
 			// m=scheduler.queue.getNextMessage();
 
@@ -70,7 +73,8 @@ public class MessageExecutor extends Thread {
 				// computer it makes performance much better
 
 				// just wait for some time...
-				// this is really some option, with which one can play with... => it really gives improvement...
+				// this is really some option, with which one can play with...
+				// => it really gives improvement...
 				for (int i = 0; i < 100000; i++) {
 
 				}
@@ -101,86 +105,100 @@ public class MessageExecutor extends Thread {
 				// TODO: do fair partitioning of network (at the moment most
 				// events are in the same area...)
 				Vehicle vehicle = ((EventMessage) m).vehicle;
-				Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+				Road road = Road.getRoad(vehicle.getCurrentLink().getId()
+						.toString());
 				synchronized (m.getReceivingUnit()) {
 					// synchronized (road) {
-					synchronized (m) {
-						if (m.isAlive()) {
 
-							//LinkImpl nextLink = vehicle.getNextLinkInLeg();
-							// LinkImpl previousLink =
-							// vehicle.getPreviousLinkInLeg();
-
-							// if next link exists for this route, than also
-							// lock
-							// that
-							// link
-							
-							// attention...
-							// turn this on again, if this does not work...
-							//if (nextLink != null) {
-								//Road nextRoad = Road.getRoad(nextLink.getId().toString());
-								// TODO: if this functions, then try if it
-								// functions
-								// also, if we do this only EndRoadMessage
-								// TODO: can we just lock only receiving
-								// unit
-								// and
-								// not
-								// road?
-
-								// TODO: perhaps we only need to lock the
-								// road,
-								// if
-								// we
-								// are in the border area...
-
-								// TODO: many of the locks might be removed,
-								// because the main problem was the locking
-								// of
-								// deadlock messages,
-								// which causeed problems, for which many of
-								// these locks were introduced...
-
-								// Notes: we need to lock the receiving
-								// unit,
-								// because else there is a race condition
-								// because
-								// of deadlock prevention message...
-							//	synchronized (nextRoad) {
-									// lock road
-
-									// lock next road
-									// lock vehicle
-									// synchronized (vehicle) {
-
-									// synchronized (previousLink) {
-							//		m.handleMessage();
-									// }
-
-									// }
-
-							//	}
-
-							//} else {
-								// lock road
-
-								// lock vehicle
-								// synchronized (vehicle) {
-
+					// TODO: probably it is faster to just synchronize, rather than checking fist => check with bigger scenario
+					// perhaps satawal reacts differently on this....
+					if (m instanceof DeadlockPreventionMessage) {
+						synchronized (m) {
+							if (m.isAlive()) {
 								m.handleMessage();
-
-								// }
-
-						//	}
+							}
 						}
+					} else {
+						m.handleMessage();
 					}
 
-					numberOfMessagesProcessed++;
-					// }
 				}
+				numberOfMessagesProcessed++;
+
+				// synchronized (m) {
+				// if (m.isAlive()) {
+
+				// LinkImpl nextLink = vehicle.getNextLinkInLeg();
+				// LinkImpl previousLink =
+				// vehicle.getPreviousLinkInLeg();
+
+				// if next link exists for this route, than also
+				// lock
+				// that
+				// link
+
+				// attention...
+				// turn this on again, if this does not work...
+				// if (nextLink != null) {
+				// Road nextRoad = Road.getRoad(nextLink.getId().toString());
+				// TODO: if this functions, then try if it
+				// functions
+				// also, if we do this only EndRoadMessage
+				// TODO: can we just lock only receiving
+				// unit
+				// and
+				// not
+				// road?
+
+				// TODO: perhaps we only need to lock the
+				// road,
+				// if
+				// we
+				// are in the border area...
+
+				// TODO: many of the locks might be removed,
+				// because the main problem was the locking
+				// of
+				// deadlock messages,
+				// which causeed problems, for which many of
+				// these locks were introduced...
+
+				// Notes: we need to lock the receiving
+				// unit,
+				// because else there is a race condition
+				// because
+				// of deadlock prevention message...
+				// synchronized (nextRoad) {
+				// lock road
+
+				// lock next road
+				// lock vehicle
+				// synchronized (vehicle) {
+
+				// synchronized (previousLink) {
+				// m.handleMessage();
+				// }
+
+				// }
+
+				// }
+
+				// } else {
+				// lock road
+
+				// lock vehicle
+				// synchronized (vehicle) {
+
+				// m.handleMessage();
+
+				// }
+
+				// }
+				// }
 			}
 
+			// }
 		}
 	}
+
 }
