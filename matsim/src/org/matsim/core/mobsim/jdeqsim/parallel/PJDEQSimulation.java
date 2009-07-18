@@ -1,10 +1,15 @@
 package org.matsim.core.mobsim.jdeqsim.parallel;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.Activity;
+import org.matsim.core.api.experimental.population.Route;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.*;
@@ -15,7 +20,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.population.ActivityImpl;
-
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.api.experimental.population.Leg;
 
 /*
  * TODO: (next steps):
@@ -27,7 +34,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 	private int numOfThreads;
 
-	public PJDEQSimulation(NetworkLayer network, PopulationImpl population, Events events, int numOfThreads) {
+	public PJDEQSimulation(NetworkLayer network, PopulationImpl population,
+			Events events, int numOfThreads) {
 		super(network, population, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
 		log = Logger.getLogger(JDEQSimulation.class);
@@ -47,17 +55,43 @@ public class PJDEQSimulation extends JDEQSimulation {
 		double sumXCoord = 0;
 		for (PersonImpl person : this.population.getPersons().values()) {
 			// estimate, where to cut the map
-			numberOfLinks++;
+
 			// System.out.println(((Activity)
 			// (person.getSelectedPlan().getPlanElements().get(0))).getCoord().getX());
-			sumXCoord += ((Activity) (person.getSelectedPlan().getPlanElements().get(0))).getCoord().getX();
+
+			List<? extends BasicPlanElement> actsLegs = person
+					.getSelectedPlan().getPlanElements();
+
+			// count each link of each route...
+			int i = 1;
+			while (i < actsLegs.size()) {
+				sumXCoord += ((Activity) (actsLegs.get(i - 1))).getCoord()
+						.getX();
+				numberOfLinks++;
+
+				Leg leg = ((Leg) actsLegs.get(i));
+				if (leg.getRoute() instanceof NetworkRoute) {
+					List<Link> links = ((NetworkRoute) leg.getRoute())
+							.getLinks();
+					Link[] currentLinkRoute = links.toArray(new LinkImpl[links
+							.size()]);
+
+					for (int j = 0; j < currentLinkRoute.length; j++) {
+						sumXCoord += currentLinkRoute[j].getCoord().getX();
+						numberOfLinks++;
+					}
+				}
+				i += 2;
+			}
+
 		}
 
 		// estimate, where to cut the map
 		double networkXMedian = sumXCoord / numberOfLinks;
 
 		System.out.println();
-		System.out.println("SimulationParameters.networkXMedian:" + networkXMedian);
+		System.out.println("SimulationParameters.networkXMedian:"
+				+ networkXMedian);
 		System.out.println();
 
 		// initialize network
@@ -71,7 +105,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 				road.setThreadZoneId(1);
 			}
 
-			SimulationParameters.getAllRoads().put(link.getId().toString(), road);
+			SimulationParameters.getAllRoads().put(link.getId().toString(),
+					road);
 		}
 
 		// define border roads
@@ -81,8 +116,10 @@ public class PJDEQSimulation extends JDEQSimulation {
 			road = (ExtendedRoad) Road.getRoad(link.getId().toString());
 
 			// mark border roads (adjacent to road in different zone)
-			for (LinkImpl inLink : road.getLink().getFromNode().getInLinks().values()) {
-				outRoad = (ExtendedRoad) Road.getRoad(inLink.getId().toString());
+			for (LinkImpl inLink : road.getLink().getFromNode().getInLinks()
+					.values()) {
+				outRoad = (ExtendedRoad) Road
+						.getRoad(inLink.getId().toString());
 				if (road.getThreadZoneId() != outRoad.getThreadZoneId()) {
 					road.setBorderZone(true);
 					outRoad.setBorderZone(true);
@@ -90,8 +127,10 @@ public class PJDEQSimulation extends JDEQSimulation {
 			}
 
 			// mark roads, which go away from border roads
-			for (LinkImpl outLink : road.getLink().getToNode().getOutLinks().values()) {
-				outRoad = (ExtendedRoad) Road.getRoad(outLink.getId().toString());
+			for (LinkImpl outLink : road.getLink().getToNode().getOutLinks()
+					.values()) {
+				outRoad = (ExtendedRoad) Road.getRoad(outLink.getId()
+						.toString());
 				;
 				if (road.isBorderZone()) {
 					outRoad.setBorderZone(true);
@@ -113,7 +152,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 		scheduler.startSimulation();
 
 		t.endTimer();
-		log.info("Time needed for one iteration (only Parallel JDEQSimulation part): " + t.getMeasuredTime() + "[ms]");
+		log
+				.info("Time needed for one iteration (only Parallel JDEQSimulation part): "
+						+ t.getMeasuredTime() + "[ms]");
 	}
-
 }
