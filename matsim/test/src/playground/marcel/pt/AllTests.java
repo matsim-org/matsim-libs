@@ -26,15 +26,14 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
 		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
-		suite.addTest(playground.marcel.pt.integration.AllTests.suite());
+		suite.addTest(playground.marcel.pt.routes.AllTests.suite());
 		suite.addTest(playground.marcel.pt.router.AllTests.suite());
-		suite.addTest(playground.marcel.pt.transitSchedule.AllTests.suite());
-		suite.addTest(playground.marcel.pt.tryout.AllTests.suite());
+		suite.addTest(playground.marcel.pt.queuesim.AllTests.suite());
+		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
 
 		return suite;
 	}

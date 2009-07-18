@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * MockPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.events;
+package playground.marcel.pt.fakes;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
-public class AllTests {
+import playground.marcel.pt.queuesim.PassengerAgent;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt.events");
+/**
+ * A very simple implementation of the interface {@link PassengerAgent} for
+ * use in tests.
+ *
+ * @author mrieser
+ */
+public class FakePassengerAgent implements PassengerAgent {
 
-//		suite.addTestSuite(ArrivalAtFacilityEventTest.class);
-//		suite.addTestSuite(DepartureAtFacilityEventTest.class);
+	private final ActivityFacility exitStop;
 
-		return suite;
+	public FakePassengerAgent(final ActivityFacility exitStop) {
+		this.exitStop = exitStop;
+	}
+
+	public boolean arriveAtStop(final TransitStopFacility stop) {
+		return stop == this.exitStop;
+	}
+
+	public boolean ptLineAvailable(final TransitLine line) {
+		return true;
 	}
 
 }

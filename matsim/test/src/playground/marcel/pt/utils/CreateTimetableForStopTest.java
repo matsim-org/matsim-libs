@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.transitSchedule.modules;
+package playground.marcel.pt.utils;
 
 import java.io.IOException;
 

@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel");
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTest(playground.marcel.pt.AllTests.suite());
 

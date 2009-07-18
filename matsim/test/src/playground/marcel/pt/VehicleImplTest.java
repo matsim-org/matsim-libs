@@ -28,7 +28,7 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 
-import playground.marcel.pt.mocks.FakePassengerAgent;
+import playground.marcel.pt.fakes.FakePassengerAgent;
 import playground.marcel.pt.queuesim.TransitQueueVehicle;
 import playground.marcel.pt.queuesim.TransitVehicle;
 

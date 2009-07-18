@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.mocks;
+package playground.marcel.pt.fakes;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.network.Link;
@@ -34,13 +34,13 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import playground.marcel.pt.queuesim.PassengerAgent;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
-public class MockAgent implements DriverAgent, PassengerAgent {
+public class FakeAgent implements DriverAgent, PassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final LegImpl dummyLeg;
 	private final PersonImpl dummyPerson = new PersonImpl(new IdImpl(1));
 	
-	public MockAgent(final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
+	public FakeAgent(final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
 		this.exitStop = exitStop;
 		this.dummyLeg = new LegImpl(TransportMode.pt);
 		GenericRoute route = new ExperimentalTransitRoute(enterStop.getLink(), exitStop.getLink());

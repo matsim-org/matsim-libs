@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.tryout;
+package playground.marcel.pt.queuesim;
 
 import java.io.IOException;
 import java.util.Map;
@@ -50,7 +50,7 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.mocks.MockAgent;
+import playground.marcel.pt.fakes.FakeAgent;
 import playground.marcel.pt.queuesim.TransitDriver;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.queuesim.TransitQueueVehicle;
@@ -100,11 +100,11 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopFacility stop4 = schedule.getFacilities().get(new IdImpl("stop4"));
 		TransitStopFacility stop6 = schedule.getFacilities().get(new IdImpl("stop6"));
 
-		MockAgent agent1 = new MockAgent(home, stop2);
-		MockAgent agent2 = new MockAgent(home, stop3);
-		MockAgent agent3 = new MockAgent(home, stop4);
-		MockAgent agent4 = new MockAgent(home, stop3);
-		MockAgent agent5 = new MockAgent(home, stop6);
+		FakeAgent agent1 = new FakeAgent(home, stop2);
+		FakeAgent agent2 = new FakeAgent(home, stop3);
+		FakeAgent agent3 = new FakeAgent(home, stop4);
+		FakeAgent agent4 = new FakeAgent(home, stop3);
+		FakeAgent agent5 = new FakeAgent(home, stop6);
 		bus.addPassenger(agent1);
 		bus.addPassenger(agent2);
 		bus.addPassenger(agent3);
@@ -178,11 +178,11 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopFacility stop4 = schedule.getFacilities().get(new IdImpl("stop4"));
 		TransitStopFacility stop6 = schedule.getFacilities().get(new IdImpl("stop6"));
 
-		MockAgent agent1 = new MockAgent(stop2, work);
-		MockAgent agent2 = new MockAgent(stop3, work);
-		MockAgent agent3 = new MockAgent(stop4, work);
-		MockAgent agent4 = new MockAgent(stop3, work);
-		MockAgent agent5 = new MockAgent(stop6, work);
+		FakeAgent agent1 = new FakeAgent(stop2, work);
+		FakeAgent agent2 = new FakeAgent(stop3, work);
+		FakeAgent agent3 = new FakeAgent(stop4, work);
+		FakeAgent agent4 = new FakeAgent(stop3, work);
+		FakeAgent agent5 = new FakeAgent(stop6, work);
 		sim.agentDeparts(agent1, stop2.getLink());
 		sim.agentDeparts(agent2, stop3.getLink());
 		sim.agentDeparts(agent3, stop4.getLink());

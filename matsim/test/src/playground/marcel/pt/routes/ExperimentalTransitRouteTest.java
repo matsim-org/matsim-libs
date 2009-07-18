@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.integration;
+package playground.marcel.pt.routes;
 
 import org.matsim.testcases.MatsimTestCase;
 
