@@ -33,7 +33,7 @@ import playground.jjoubert.DateString;
 
 public class ProcessVehicles {
 	private static String delimiter = ","; 
-	private static String root = "/home/jjoubert/DigiCore/";
+	private static String root = "/home/jjoubert/data/DigiCore/";
 	private static long startLine = 0;
 	private static long numberOfLinesToRead = Long.MAX_VALUE;
 	
