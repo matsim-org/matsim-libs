@@ -85,7 +85,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	public void testMessageFactory5(){
 		MessageFactory.GC_ALL_MESSAGES();
 		SimulationParameters.setGC_MESSAGES(true);
-		Scheduler scheduler=new Scheduler();
+		Scheduler scheduler=new Scheduler(new MessageQueue());
 		PersonImpl person= new PersonImpl(new IdImpl("abc"));
 		Vehicle vehicle=new Vehicle(scheduler, person );
 		
@@ -108,7 +108,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	public void testMessageFactory6(){
 		MessageFactory.GC_ALL_MESSAGES();
 		SimulationParameters.setGC_MESSAGES(false);
-		Scheduler scheduler=new Scheduler();
+		Scheduler scheduler=new Scheduler(new MessageQueue());
 		PersonImpl person= new PersonImpl(new IdImpl("abc"));
 		Vehicle vehicle=new Vehicle(scheduler, person );
 		
