@@ -107,22 +107,37 @@ public class MessageExecutor extends Thread {
 				Vehicle vehicle = ((EventMessage) m).vehicle;
 				Road road = Road.getRoad(vehicle.getCurrentLink().getId()
 						.toString());
-				synchronized (m.getReceivingUnit()) {
-					// synchronized (road) {
 
-					// TODO: probably it is faster to just synchronize, rather than checking fist => check with bigger scenario
-					// perhaps satawal reacts differently on this....
-					if (m instanceof DeadlockPreventionMessage) {
+				// Note: synchronizing over the message is needed both for the
+				// DeadlockPreventionMessage and LeaveRoadMessage
+
+				if (((ExtendedRoad) m.getReceivingUnit()).isBorderZone()) {
+					synchronized (m.getReceivingUnit()) {
+						// synchronized (road) {
+
+						// TODO: probably it is faster to just synchronize,
+						// rather than checking fist => check with bigger
+						// scenario
+						// perhaps satawal reacts differently on this....
+
 						synchronized (m) {
 							if (m.isAlive()) {
 								m.handleMessage();
 							}
 						}
-					} else {
-						m.handleMessage();
-					}
 
+					}
+				} else {
+					// TODO: probably it is faster to just synchronize, rather
+					// than checking fist => check with bigger scenario
+					// perhaps satawal reacts differently on this....
+					synchronized (m) {
+						if (m.isAlive()) {
+							m.handleMessage();
+						}
+					}
 				}
+
 				numberOfMessagesProcessed++;
 
 				// synchronized (m) {
