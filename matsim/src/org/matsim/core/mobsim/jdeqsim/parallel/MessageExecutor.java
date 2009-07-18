@@ -58,7 +58,7 @@ public class MessageExecutor extends Thread {
 		Message m;
 		LinkedList<Message> list = new LinkedList<Message>();
 		while (!(scheduler.getQueue().isEmpty() && scheduler.getQueue()
-				.isEmptySync())
+				.isListEmptyWitnessedByAll())
 				&& scheduler.getSimTime() < SimulationParameters
 						.getSimulationEndTime()) {
 			list = scheduler.getQueue().getNextMessages(list);

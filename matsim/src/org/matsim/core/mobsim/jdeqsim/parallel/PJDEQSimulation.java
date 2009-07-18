@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.population.Leg;
 /*
  * TODO: (next steps):
  * - compare the simulations (jdeqsim and p-jdeqsim) => only continue, if it is really faster...
+ * - try bigger scenario...
  * - write tests
  * - events handling => how to deal with that?
  */
@@ -48,6 +49,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 		t.startTimer();
 
 		PScheduler scheduler = new PScheduler(new PMessageQueue());
+		scheduler.getQueue().idOfMainThread=Thread.currentThread().getId();
 		SimulationParameters.setAllRoads(new HashMap<String, Road>());
 
 		// find out networkXMedian
@@ -111,31 +113,35 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// define border roads
 		// just one layer long
-		ExtendedRoad outRoad = null;
+		ExtendedRoad tempRoad = null;
+		boolean realBorderRoad=false;
 		for (LinkImpl link : this.network.getLinks().values()) {
 			road = (ExtendedRoad) Road.getRoad(link.getId().toString());
+			realBorderRoad=false; // real means: has adjacent nodes in other zone
 
 			// mark border roads (adjacent to road in different zone)
 			for (LinkImpl inLink : road.getLink().getFromNode().getInLinks()
 					.values()) {
-				outRoad = (ExtendedRoad) Road
+				tempRoad = (ExtendedRoad) Road
 						.getRoad(inLink.getId().toString());
-				if (road.getThreadZoneId() != outRoad.getThreadZoneId()) {
+				if (road.getThreadZoneId() != tempRoad.getThreadZoneId()) {
 					road.setBorderZone(true);
-					outRoad.setBorderZone(true);
+					tempRoad.setBorderZone(true);
 				}
 			}
-
+			
 			// mark roads, which go away from border roads
 			for (LinkImpl outLink : road.getLink().getToNode().getOutLinks()
 					.values()) {
-				outRoad = (ExtendedRoad) Road.getRoad(outLink.getId()
+				tempRoad = (ExtendedRoad) Road.getRoad(outLink.getId()
 						.toString());
-				;
-				if (road.isBorderZone()) {
-					outRoad.setBorderZone(true);
+				
+				if (realBorderRoad) {
+					tempRoad.setBorderZone(true);
 				}
 			}
+
+			
 		}
 
 		// initialize vehicles

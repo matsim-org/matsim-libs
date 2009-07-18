@@ -27,6 +27,7 @@ public class PScheduler extends Scheduler {
 		} else {
 			getQueue().idOfLowerThread = messageExecutors[1].getId();
 		}
+		
 
 		messageExecutors[0].start();
 		messageExecutors[1].start();

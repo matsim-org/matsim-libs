@@ -14,11 +14,12 @@ public class PMessageQueue extends MessageQueue {
 	private PriorityQueue<Message> queueThread1 = new PriorityQueue<Message>();
 	private PriorityQueue<Message> queueThread2 = new PriorityQueue<Message>();
 	public long idOfLowerThread = 0;
+	public long idOfMainThread = 0;
 	// private int queueSize = 0;
 
 	// the maximum time difference two threads are allowed to have in [s] (for
 	// message time stamp)
-	private double maxTimeDelta = 100;
+	private double maxTimeDelta = 10;
 
 	public boolean lowerThreadWitnessedEmptyQueue = false;
 	public boolean higherThreadWitnessedEmptyQueue = false;
@@ -33,19 +34,48 @@ public class PMessageQueue extends MessageQueue {
 		// TODO: this should function also during initialization of the
 		// simulation!!!
 
-		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true : false;
-		ExtendedRoad curRoad = (ExtendedRoad) Road.getRoad(((EventMessage) m).vehicle.getCurrentLink().getId().toString());
-		boolean roadBelongsToLowerThreadZone = curRoad.getThreadZoneId() == 0 ? true : false;
+		long idOfCurrentThread = Thread.currentThread().getId();
+		boolean inLowerThreadCurrently = idOfCurrentThread == idOfLowerThread ? true
+				: false;
+		ExtendedRoad curRoad = (ExtendedRoad) Road
+				.getRoad(((EventMessage) m).vehicle.getCurrentLink().getId()
+						.toString());
+		boolean roadBelongsToLowerThreadZone = curRoad.getThreadZoneId() == 0 ? true
+				: false;
 
-		synchronized (this) {
-			if (roadBelongsToLowerThreadZone) {
+		boolean messageForDifferentZone = (curRoad.getThreadZoneId() == 1
+				&& inLowerThreadCurrently || curRoad.getThreadZoneId() == 0
+				&& inLowerThreadCurrently) ? true : false;
+
+		if (roadBelongsToLowerThreadZone) {
+			synchronized (queueThread1) {
 				queueThread1.add(m);
-				// queueSizeThread1++;
-			} else if (!roadBelongsToLowerThreadZone) {
+			}
+		} else {
+			synchronized (queueThread2) {
 				queueThread2.add(m);
-				// queueSizeThread2++;
 			}
 		}
+
+		/*
+		 * if (curRoad.isBorderZone() || messageForDifferentZone || true) {
+		 * synchronized (this) { if (roadBelongsToLowerThreadZone) {
+		 * queueThread1.add(m); // queueSizeThread1++; } else if
+		 * (!roadBelongsToLowerThreadZone) { queueThread2.add(m); //
+		 * queueSizeThread2++; } } } else if (idOfCurrentThread ==
+		 * idOfMainThread) { // during initialization if
+		 * (roadBelongsToLowerThreadZone) { queueThread1.add(m); //
+		 * queueSizeThread1++; } else if (!roadBelongsToLowerThreadZone) {
+		 * queueThread2.add(m); // queueSizeThread2++; } } else { if
+		 * (roadBelongsToLowerThreadZone && inLowerThreadCurrently) {
+		 * queueThread1.add(m); // queueSizeThread1++; } else if
+		 * (!roadBelongsToLowerThreadZone && !inLowerThreadCurrently) {
+		 * queueThread2.add(m); // queueSizeThread2++; } else { assert (false) :
+		 * "Inconsitency in logic!!! => the border area is not setup in the right way..."
+		 * ; }
+		 * 
+		 * }
+		 */
 	}
 
 	/**
@@ -61,7 +91,8 @@ public class PMessageQueue extends MessageQueue {
 	 * @param m
 	 */
 	public void removeMessage(Message m) {
-		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true : false;
+		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
+				: false;
 
 		synchronized (m) {
 			m.killMessage();
@@ -76,25 +107,32 @@ public class PMessageQueue extends MessageQueue {
 	 * @return
 	 */
 	public Message getNextMessage() {
-		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true : false;
+		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
+				: false;
 		Message m = null;
-		synchronized (this) {
 
-			// don't allow one thread to advance too much (not more then
-			// 'maxTimeDelta'
-			if (queueThread1.peek() != null && queueThread2.peek() != null) {
-				double delta = queueThread1.peek().getMessageArrivalTime() - queueThread2.peek().getMessageArrivalTime();
-				if (Math.abs(delta) > maxTimeDelta) {
-					if ((inLowerThreadCurrently && delta > 0) || (!inLowerThreadCurrently && delta < 0)) {
-						return null;
-					}
+		// don't allow one thread to advance too much (not more then
+		// 'maxTimeDelta'
+		// this operation should be synchronized (queueThread1 and
+		// queueThread2), but it is not
+		// for performance reasons...
+		if (queueThread1.peek() != null && queueThread2.peek() != null) {
+			double delta = queueThread1.peek().getMessageArrivalTime()
+					- queueThread2.peek().getMessageArrivalTime();
+			if (Math.abs(delta) > maxTimeDelta) {
+				if ((inLowerThreadCurrently && delta > 0)
+						|| (!inLowerThreadCurrently && delta < 0)) {
+					return null;
 				}
 			}
+		}
 
-			if (inLowerThreadCurrently) {
+		if (inLowerThreadCurrently) {
+			synchronized (queueThread1) {
 				if (queueThread1.peek() != null) {
 					// skip over dead messages
-					// synchronization needed, because deadlock message might
+					// synchronization needed, because deadlock message
+					// might
 					// have been manupulated
 
 					while ((m = queueThread1.poll()) != null) {
@@ -105,10 +143,13 @@ public class PMessageQueue extends MessageQueue {
 						}
 					}
 				}
-			} else {
+			}
+		} else {
+			synchronized (queueThread2) {
 				if (queueThread2.peek() != null) {
 					// skip over dead messages
-					// synchronization needed, because deadlock message might
+					// synchronization needed, because deadlock message
+					// might
 					// have been manupulated
 					while ((m = queueThread2.poll()) != null) {
 						synchronized (m) {
@@ -119,7 +160,6 @@ public class PMessageQueue extends MessageQueue {
 					}
 				}
 			}
-
 		}
 
 		return m;
@@ -131,51 +171,57 @@ public class PMessageQueue extends MessageQueue {
 	 * 
 	 * As input give an empty list and get the same list back with messages in
 	 * it.
-	 * 
 	 */
 	public LinkedList<Message> getNextMessages(LinkedList<Message> list) {
-		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true : false;
+		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
+				: false;
 		Message m = null;
 
-		synchronized (this) {
+		// find out how far we can max go in time...
+		// this operation should be synchronized (queueThread1 and
+		// queueThread2), but it is not
+		// for performance reasons...
+		double maxTimeStampAllowed = -1;
+		double myMinTimeStamp = -1;
+		double otherThreadMinTimeStamp = -1;
 
-			// find out how far we can max go in time...
-			double maxTimeStampAllowed = -1;
-			double myMinTimeStamp = -1;
-			double otherThreadMinTimeStamp = -1;
-
-			if (inLowerThreadCurrently) {
-				if (queueThread1.peek() != null) {
-					myMinTimeStamp = queueThread1.peek().getMessageArrivalTime();
-				}
-				if (queueThread2.peek() != null) {
-					otherThreadMinTimeStamp = queueThread2.peek().getMessageArrivalTime();
-				}
-			} else {
-				if (queueThread2.peek() != null) {
-					myMinTimeStamp = queueThread2.peek().getMessageArrivalTime();
-				}
-				if (queueThread1.peek() != null) {
-					otherThreadMinTimeStamp = queueThread1.peek().getMessageArrivalTime();
-				}
+		if (inLowerThreadCurrently) {
+			if (queueThread1.peek() != null) {
+				myMinTimeStamp = queueThread1.peek().getMessageArrivalTime();
 			}
-
-			if (otherThreadMinTimeStamp == -1) {
-				maxTimeStampAllowed = myMinTimeStamp + maxTimeDelta;
-			} else {
-				maxTimeStampAllowed = otherThreadMinTimeStamp + maxTimeDelta;
+			if (queueThread2.peek() != null) {
+				otherThreadMinTimeStamp = queueThread2.peek()
+						.getMessageArrivalTime();
 			}
+		} else {
+			if (queueThread2.peek() != null) {
+				myMinTimeStamp = queueThread2.peek().getMessageArrivalTime();
+			}
+			if (queueThread1.peek() != null) {
+				otherThreadMinTimeStamp = queueThread1.peek()
+						.getMessageArrivalTime();
+			}
+		}
 
-			if (inLowerThreadCurrently) {
-				// just give back all messages which are in the allowed time
-				// (stamp) range
+		if (otherThreadMinTimeStamp == -1) {
+			maxTimeStampAllowed = myMinTimeStamp + maxTimeDelta;
+		} else {
+			maxTimeStampAllowed = otherThreadMinTimeStamp + maxTimeDelta;
+		}
 
-				while (queueThread1.peek() != null && queueThread1.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
+		if (inLowerThreadCurrently) {
+			// just give back all messages which are in the allowed time
+			// (stamp) range
+			synchronized (queueThread1) {
+				while (queueThread1.peek() != null
+						&& queueThread1.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
 					list.add(queueThread1.poll());
 				}
-
-			} else {
-				while (queueThread2.peek() != null && queueThread2.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
+			}
+		} else {
+			synchronized (queueThread2) {
+				while (queueThread2.peek() != null
+						&& queueThread2.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
 					list.add(queueThread2.poll());
 				}
 			}
@@ -193,11 +239,16 @@ public class PMessageQueue extends MessageQueue {
 		return queueThread1.size() + queueThread2.size() == 0;
 		// }
 	}
+	
+	
+	
 
 	// finds out, if all threads have witnessed the empty queue or not
-	public boolean isEmptySync() {
-		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true : false;
-		synchronized (this) {
+	public boolean isListEmptyWitnessedByAll() {
+		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
+				: false;
+		synchronized (queueThread1) {
+			 synchronized (queueThread2) {
 			// just for debugging => change that afterwards to just one line
 			if (isEmpty()) {
 				// emptiness witnessed
@@ -213,7 +264,8 @@ public class PMessageQueue extends MessageQueue {
 					higherThreadWitnessedEmptyQueue = false;
 				}
 			}
-			return lowerThreadWitnessedEmptyQueue && higherThreadWitnessedEmptyQueue;
-		}
+			return lowerThreadWitnessedEmptyQueue
+					&& higherThreadWitnessedEmptyQueue;
+		}}
 	}
 }
