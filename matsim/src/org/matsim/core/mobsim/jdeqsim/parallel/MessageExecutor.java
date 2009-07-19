@@ -24,7 +24,7 @@ import org.matsim.core.network.LinkImpl;
  * The locking dependencies of each type of message for ROADS (does road change):
  * - DeadlockPreventionMessage: m.getReceivingUnit()
  * - EnterRoadMessage: vehicle.currentLink
- * - EndLegMessage: nothing
+ * - EndLegMessage: nothing (getCurrentLink: for finding out, which thread this message should be assigned to)
  * - EndRoadMessage: nextLink
  * - LeaveRoadMessage: m.getReceivingUnit()
  * - StartingLegMessage: vehicle.currentLink or nextLink
@@ -165,6 +165,7 @@ public class MessageExecutor extends Thread {
 					// they?)
 					// some of them can be left out (only some are really needed
 					// for each type of message).
+					/*
 					ExtendedRoad currentRoad = receivingRoad;
 					ExtendedRoad nextRoad = receivingRoad;
 					ExtendedRoad prevRoad = receivingRoad;
@@ -247,7 +248,25 @@ public class MessageExecutor extends Thread {
 						// here...
 						assert (false);
 					}
-
+*/
+					// WE MUST LOCK THE VEHICLE ALWAYS DURING CROSSING THE BORDER
+					// ONE TIME ON THIS SIDE OF THE BORDER AND THE SECOND TIME ON THE
+					// OTHER SIDE OF THE BORDER
+					if (m instanceof DeadlockPreventionMessage) {
+						synchronized (vehicle) {
+							synchronized (m) {
+								if (m.isAlive()) {
+									m.handleMessage();
+								}
+							}
+						}
+					} else {
+						synchronized (vehicle) {
+							m.handleMessage();
+						}
+					}
+					
+					
 				} else {
 
 					if (m.isAlive()) {

@@ -3,11 +3,19 @@ package org.matsim.core.mobsim.jdeqsim.parallel;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
+import org.matsim.core.mobsim.jdeqsim.EndLegMessage;
+import org.matsim.core.mobsim.jdeqsim.EndRoadMessage;
+import org.matsim.core.mobsim.jdeqsim.EnterRoadMessage;
 import org.matsim.core.mobsim.jdeqsim.EventMessage;
+import org.matsim.core.mobsim.jdeqsim.LeaveRoadMessage;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
+import org.matsim.core.mobsim.jdeqsim.StartingLegMessage;
 
 public class PMessageQueue extends MessageQueue {
 	// private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
@@ -37,15 +45,81 @@ public class PMessageQueue extends MessageQueue {
 		long idOfCurrentThread = Thread.currentThread().getId();
 		boolean inLowerThreadCurrently = idOfCurrentThread == idOfLowerThread ? true
 				: false;
-		ExtendedRoad curRoad = (ExtendedRoad) Road
-				.getRoad(((EventMessage) m).vehicle.getCurrentLink().getId()
-						.toString());
-		boolean roadBelongsToLowerThreadZone = curRoad.getThreadZoneId() == 0 ? true
-				: false;
+		ExtendedRoad messageTargetRoad = null;
+		
+		
+		PVehicle vehicle = (PVehicle) ((EventMessage) m).vehicle;
 
-		boolean messageForDifferentZone = (curRoad.getThreadZoneId() == 1
-				&& inLowerThreadCurrently || curRoad.getThreadZoneId() == 0
-				&& inLowerThreadCurrently) ? true : false;
+		ExtendedRoad receivingRoad = (ExtendedRoad) m
+				.getReceivingUnit();
+		
+		ExtendedRoad currentRoad = receivingRoad;
+		ExtendedRoad nextRoad = receivingRoad;
+		Link tempLink = null;
+
+		// the ordering of this sequence is according to the
+		// frequency of the messages
+		if (m instanceof EnterRoadMessage) {
+
+			tempLink = vehicle.getCurrentLink();
+			if (tempLink != null) {
+				currentRoad = (ExtendedRoad) Road.getRoad(tempLink
+						.getId().toString());
+			}
+
+			messageTargetRoad=currentRoad;
+
+		} else if (m instanceof LeaveRoadMessage) {
+
+			messageTargetRoad=receivingRoad;
+
+		} else if (m instanceof EndRoadMessage) {
+
+			
+
+			tempLink = vehicle.getNextLinkInLeg();
+			if (tempLink != null) {
+				nextRoad = (ExtendedRoad) Road.getRoad(tempLink
+						.getId().toString());
+			}
+
+			messageTargetRoad=nextRoad;
+		} else if (m instanceof DeadlockPreventionMessage) {
+			messageTargetRoad=receivingRoad;
+		} else if (m instanceof StartingLegMessage) {
+			
+			if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)) {
+				tempLink = vehicle.getCurrentLink();
+				if (tempLink != null) {
+					currentRoad = (ExtendedRoad) Road.getRoad(tempLink
+							.getId().toString());
+				}
+				
+				messageTargetRoad=currentRoad;
+			} else {
+				// TODO: we need the first link in the next leg. if this does not function
+				// then we need to do this manually.
+				tempLink = vehicle.getNextLinkInLeg();
+				if (tempLink != null) {
+					nextRoad = (ExtendedRoad) Road.getRoad(tempLink
+							.getId().toString());
+				}
+				messageTargetRoad=nextRoad;
+			}
+		} else if (m instanceof EndLegMessage) {
+			messageTargetRoad=currentRoad;
+		} else {
+			// there are no other type of messages which can come
+			// here...
+			assert (false);
+		}
+		
+		
+		
+		
+		
+		boolean roadBelongsToLowerThreadZone = messageTargetRoad.getThreadZoneId() == 0 ? true
+				: false;
 
 		if (roadBelongsToLowerThreadZone) {
 			synchronized (queueThread1) {
