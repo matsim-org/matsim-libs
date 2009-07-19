@@ -25,9 +25,9 @@ import org.matsim.core.network.LinkImpl;
  * - DeadlockPreventionMessage: m.getReceivingUnit()
  * - EnterRoadMessage: vehicle.currentLink
  * - EndLegMessage: nothing
- * - EndRoadMessage: vehicle.currentLink and/or nextLink
+ * - EndRoadMessage: nextLink
  * - LeaveRoadMessage: m.getReceivingUnit()
- * - StartingLegMessage: vehicle.currentLink
+ * - StartingLegMessage: vehicle.currentLink or nextLink
  */
 
 /*
@@ -203,14 +203,10 @@ public class MessageExecutor extends Thread {
 							nextRoad = (ExtendedRoad) Road.getRoad(tempLink
 									.getId().toString());
 						}
-						// TODO: small optimization possible: either current or
-						// next road is really needed to be locked => is it
-						// worth finding it out here?
-						synchronized (currentRoad) {
-							synchronized (nextRoad) {
-								synchronized (vehicle) {
-									m.handleMessage();
-								}
+
+						synchronized (nextRoad) {
+							synchronized (vehicle) {
+								m.handleMessage();
 							}
 
 						}
@@ -229,9 +225,17 @@ public class MessageExecutor extends Thread {
 									.getId().toString());
 						}
 
+						tempLink = vehicle.getNextLinkInLeg();
+						if (tempLink != null) {
+							nextRoad = (ExtendedRoad) Road.getRoad(tempLink
+									.getId().toString());
+						}
+
 						synchronized (currentRoad) {
-							synchronized (vehicle) {
-								m.handleMessage();
+							synchronized (nextRoad) {
+								synchronized (vehicle) {
+									m.handleMessage();
+								}
 							}
 						}
 					} else if (m instanceof EndLegMessage) {

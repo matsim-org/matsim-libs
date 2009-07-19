@@ -46,6 +46,19 @@ import org.matsim.core.api.experimental.population.Leg;
  * => -XX:PreBlockSpin=10 has an influence on the application. A good value found for my local machine was: 10,
  *    but this might be vm/machine dependent... 
  */
+
+
+/*
+ * Some first performance experiments:
+ * (100% Zürich, on home compi)
+ * - parallel JDEQSim: 
+ * - JDEQSim:
+ * 
+ * (10% Zürich, on home compi)
+ * - parallel JDEQSim: 22sec./20sec. (we need to find the best cut position...)
+ * - JDEQSim: 25sec.
+ * 
+ */
 public class PJDEQSimulation extends JDEQSimulation {
 
 	private int numOfThreads;
