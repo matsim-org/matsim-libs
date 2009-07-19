@@ -54,20 +54,23 @@ public class TransitDriver implements TransitDriverAgent {
 
 		private int nextLinkIndex = 0;
 		private final TransitQueueSimulation sim;
+		private final TransitStopAgentTracker agentTracker;
 
 		private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 		private final PersonImpl dummyPerson;
 
 		private final Iterator<TransitRouteStop> stopIterator;
 		private TransitRouteStop nextStop;
+		private TransitStopFacility lastHandledStop = null;
 
 		private final TransitLine transitLine;
 
-		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitQueueSimulation sim) {
+		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final TransitQueueSimulation sim) {
 			this.transitLine = line;
 			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 			this.stopIterator = route.getStops().iterator();
-			this.nextStop = this.stopIterator.next();
+			this.nextStop = (this.stopIterator.hasNext() ? this.stopIterator.next() : null);
+			this.agentTracker = agentTracker;
 			this.sim = sim;
 			this.departureTime = departure.getDepartureTime();
 			this.carRoute = route.getRoute();
@@ -105,12 +108,7 @@ public class TransitDriver implements TransitDriverAgent {
 			if (stop != this.nextStop.getStopFacility()) {
 				throw new RuntimeException("Expected different stop.");
 			}
-			if (this.stopIterator.hasNext()) {
-				this.nextStop = this.stopIterator.next();
-			} else {
-				this.nextStop = null;
-			}
-			
+
 			int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size();
 			// find out who wants to get out
 			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
@@ -122,14 +120,12 @@ public class TransitDriver implements TransitDriverAgent {
 			freeCapacity += passengersLeaving.size();
 			// find out who wants to get in
 			ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
-			for (Iterator<DriverAgent> iter = this.sim.agentTracker.getAgentsAtStop(stop).iterator(); iter.hasNext(); ) {
+			for (PassengerAgent agent : this.agentTracker.getAgentsAtStop(stop)) {
 				if (freeCapacity == 0) {
 					break;
 				}
-				DriverAgent agent = iter.next();
-				PassengerAgent passenger = (PassengerAgent) agent;
+				PassengerAgent passenger = agent;
 				if (passenger.ptLineAvailable(this.transitLine)) {
-					iter.remove();
 					passengersEntering.add(passenger);
 					freeCapacity--;
 				}
@@ -141,7 +137,10 @@ public class TransitDriver implements TransitDriverAgent {
 			int cntAccess = passengersEntering.size();
 			if (cntAccess > 0 || cntEgress > 0) {
 				Events events = TransitQueueSimulation.getEvents();
-				stopTime = 10.0 + cntAccess * 5 + cntEgress * 3;
+				stopTime = cntAccess * 5 + cntEgress * 3;
+				if (this.lastHandledStop != stop) {
+					stopTime += 10.0; // add fixed amount of time for door-operations and similar stuff
+				}
 				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 
 				for (PassengerAgent passenger : passengersLeaving) {
@@ -153,12 +152,21 @@ public class TransitDriver implements TransitDriverAgent {
 				}
 
 				for (PassengerAgent passenger : passengersEntering) {
+					this.agentTracker.removeAgentFromStop(passenger, stop);
 					this.vehicle.addPassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
 					events.processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 				}
 
 				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now + stopTime, this.vehicle.getBasicVehicle().getId(), stop.getId()));
+			}
+			this.lastHandledStop = stop;
+			if (stopTime == 0.0) {
+				if (this.stopIterator.hasNext()) {
+					this.nextStop = this.stopIterator.next();
+				} else {
+					this.nextStop = null;
+				}
 			}
 			return stopTime;
 		}

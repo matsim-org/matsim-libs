@@ -28,6 +28,9 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
+/**
+ * @author mrieser
+ */
 public class TransitAgent extends PersonAgent implements PassengerAgent {
 
 	public TransitAgent(final PersonImpl p, final QueueSimulation simulation) {
@@ -39,7 +42,7 @@ public class TransitAgent extends PersonAgent implements PassengerAgent {
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
-	public boolean ptLineAvailable(TransitLine line) {
+	public boolean ptLineAvailable(final TransitLine line) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		return line.getId().equals(route.getLineId());
 	}

@@ -50,7 +50,7 @@ import playground.marcel.pt.otfvis.FacilityDrawer;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class TransitQueueSimulation extends QueueSimulation {
-	
+
 	private OnTheFlyServer otfServer = null;
 
 	private TransitSchedule schedule = null;
@@ -74,15 +74,15 @@ public class TransitQueueSimulation extends QueueSimulation {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	protected void cleanupSim() {
-		if (otfServer != null) {
+		if (this.otfServer != null) {
 			this.otfServer.cleanup();
 		}
 		super.cleanupSim();
 	}
-	
+
 	@Override
 	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
@@ -106,11 +106,11 @@ public class TransitQueueSimulation extends QueueSimulation {
 			capacity.setSeats(Integer.valueOf(101));
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
-			
+
 			for (TransitLine line : this.schedule.getTransitLines().values()) {
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (Departure departure : route.getDepartures().values()) {
-						TransitDriver driver = new TransitDriver(line, route, departure, this);
+						TransitDriver driver = new TransitDriver(line, route, departure, this.agentTracker, this);
 
 						TransitQueueVehicle veh = new TransitQueueVehicle(new BasicVehicleImpl(driver.getPerson().getId(), vehicleType), 5);
 						veh.setDriver(driver);
@@ -126,13 +126,14 @@ public class TransitQueueSimulation extends QueueSimulation {
 			}
 		}
 	}
-	
+
+	@Override
 	public void agentDeparts(final DriverAgent agent, final Link link) {
 		LegImpl leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 			TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
-			this.agentTracker.addAgentToStop(agent, stop);
+			this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
 		} else {
 			super.agentDeparts(agent, link);
 		}
