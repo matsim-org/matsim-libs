@@ -134,7 +134,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// TODO: remove this line...
 		// just for finding out how a perfect distribution would work
-		networkXMedian += 3000;
+		// for 10% Zh: networkXMedian=682997.8204694573
+		//networkXMedian += 3000;
 
 		System.out.println();
 		System.out.println("SimulationParameters.networkXMedian:"
