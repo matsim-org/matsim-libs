@@ -49,7 +49,7 @@ public class PersonAgent implements DriverAgent {
 	private final QueueSimulation simulation;
 
 	private double activityDepartureTime = Time.UNDEFINED_TIME;
-	
+
 	private Link currentLink = null;
 
 	/**
@@ -80,7 +80,7 @@ public class PersonAgent implements DriverAgent {
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
 	 */
-	public List<? extends PlanElement> getPlanElements() {
+	private List<? extends PlanElement> getPlanElements() {
 		return this.person.getSelectedPlan().getPlanElements();
 	}
 
@@ -99,7 +99,7 @@ public class PersonAgent implements DriverAgent {
 	private void setDepartureTime(final double seconds) {
 		this.activityDepartureTime = seconds;
 	}
-	
+
 	protected Link getCurrentLink() {
 		return this.currentLink;
 	}
@@ -112,7 +112,7 @@ public class PersonAgent implements DriverAgent {
 		this.currentLeg  = leg;
 		this.cacheRouteNodes = null;
 	}
-	
+
 	public int getCurrentNodeIndex() {
 		return this.currentNodeIndex;
 	}
@@ -138,7 +138,7 @@ public class PersonAgent implements DriverAgent {
 			SimulationTimer.updateSimStartTime(departureTime);
 			this.simulation.scheduleActivityEnd(this);
 			Simulation.incLiving();
-			return true;			
+			return true;
 		}
 		return false; // the agent has no leg, so nothing more to do
 	}
@@ -152,8 +152,8 @@ public class PersonAgent implements DriverAgent {
 		this.currentNodeIndex = 1;
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
-		
-		this.simulation.agentDeparts(this, (LinkImpl) this.currentLink);
+
+		this.simulation.agentDeparts(this, this.currentLink);
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class PersonAgent implements DriverAgent {
 		}
 		advancePlanElement(now);
 	}
-	
+
 	public void teleportToLink(final Link link) {
 		this.currentLink = link;
 	}
