@@ -146,30 +146,17 @@ public class PJDEQSimulation extends JDEQSimulation {
 		// define border roads
 		// just one layer long
 		ExtendedRoad tempRoad = null;
-		boolean realBorderRoad = false;
 		for (LinkImpl link : this.network.getLinks().values()) {
 			road = (ExtendedRoad) Road.getRoad(link.getId().toString());
-			realBorderRoad = false; // real means: has adjacent nodes in other
-									// zone
-
-			// mark border roads (adjacent to road in different zone)
-			for (LinkImpl inLink : road.getLink().getFromNode().getInLinks()
-					.values()) {
-				tempRoad = (ExtendedRoad) Road.getRoad(inLink.getId()
-						.toString());
-				if (road.getThreadZoneId() != tempRoad.getThreadZoneId()) {
-					road.setBorderZone(true);
-					tempRoad.setBorderZone(true);
-				}
-			}
-
+			
 			// mark roads, which go away from border roads
 			for (LinkImpl outLink : road.getLink().getToNode().getOutLinks()
 					.values()) {
 				tempRoad = (ExtendedRoad) Road.getRoad(outLink.getId()
 						.toString());
 
-				if (realBorderRoad) {
+				if (road.getThreadZoneId()!=tempRoad.getThreadZoneId()) {
+					road.setBorderZone(true);
 					tempRoad.setBorderZone(true);
 				}
 			}
