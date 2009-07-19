@@ -22,7 +22,6 @@ package org.matsim.testcases.fakes;
 
 import java.util.EnumSet;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -31,15 +30,14 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.world.Layer;
-import org.matsim.world.MappedLocation;
 
 /**
  * A very simple Mock for {@link Link} to be used in tests.
- * Only stores an Id and from- and toNode (which both can be 
+ * Only stores an Id and from- and toNode (which both can be
  * <code>null</code>). Some getters return hard-coded defaults,
- * while all remaining methods just throw 
+ * while all remaining methods just throw
  * {@link UnsupportedOperationException}s.
- * 
+ *
  * @author mrieser
  */
 public class FakeLink implements Link {
@@ -49,13 +47,24 @@ public class FakeLink implements Link {
 	private final Id id;
 	private final Node fromNode;
 	private final Node toNode;
-	
+
+
+	/**
+	 * Creates a new link with the specified id and <code>null</code> for the
+	 * fromNode and toNode
+	 *
+	 * @param id
+	 */
+	public FakeLink(final Id id) {
+		this(id, null, null);
+	}
+
 	public FakeLink(final Id id, final Node fromNode, final Node toNode) {
 		this.id = id;
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 	}
-	
+
 	public Node getFromNode() {
 		return this.fromNode;
 	}
@@ -113,31 +122,7 @@ public class FakeLink implements Link {
 	}
 
 	public Id getId() {
-		return id;
-	}
-
-	@Deprecated
-	public void addDownMapping(final MappedLocation other) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public void addUpMapping(final MappedLocation other) {
-		throw new UnsupportedOperationException();
-	}
-
-	public double calcDistance(final Coord coord) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public MappedLocation downLocation(final Id id2) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public TreeMap<Id, MappedLocation> getDownMapping() {
-		throw new UnsupportedOperationException();
+		return this.id;
 	}
 
 	@Deprecated
@@ -145,33 +130,12 @@ public class FakeLink implements Link {
 		throw new UnsupportedOperationException();
 	}
 
-	@Deprecated
-	public MappedLocation getUpLocation(final Id locId) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public TreeMap<Id, MappedLocation> getUpMapping() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public boolean removeAllDownMappings() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public boolean removeAllUpMappings() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public void setId(final Id id) {
-		throw new UnsupportedOperationException();
-	}
-
 	public Coord getCoord() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public String toString() {
+		return "FakeLink_" + this.id.toString();
+	}
 }
