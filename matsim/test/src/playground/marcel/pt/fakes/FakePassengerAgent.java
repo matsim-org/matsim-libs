@@ -28,7 +28,7 @@ import playground.marcel.pt.queuesim.PassengerAgent;
 
 /**
  * A very simple implementation of the interface {@link PassengerAgent} for
- * use in tests.
+ * use in tests. Enters every available line and exits at the specified stop.
  *
  * @author mrieser
  */
@@ -36,6 +36,9 @@ public class FakePassengerAgent implements PassengerAgent {
 
 	private final ActivityFacility exitStop;
 
+	/**
+	 * @param exitStop can be <code>null</code>
+	 */
 	public FakePassengerAgent(final ActivityFacility exitStop) {
 		this.exitStop = exitStop;
 	}

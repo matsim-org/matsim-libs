@@ -34,20 +34,32 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import playground.marcel.pt.queuesim.PassengerAgent;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
+/**
+ * @author mrieser
+ */
 public class FakeAgent implements DriverAgent, PassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final LegImpl dummyLeg;
 	private final PersonImpl dummyPerson = new PersonImpl(new IdImpl(1));
-	
+
+	/**
+	 * Creates a new fake Agent. If enterStop or exitStop are <code>null</code>,
+	 * the leg will have no route.
+	 *
+	 * @param enterStop may be <code>null</code>
+	 * @param exitStop may be <code>null</code>
+	 */
 	public FakeAgent(final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
 		this.exitStop = exitStop;
 		this.dummyLeg = new LegImpl(TransportMode.pt);
-		GenericRoute route = new ExperimentalTransitRoute(enterStop.getLink(), exitStop.getLink());
-		route.setRouteDescription(enterStop.getLink(), "PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString(), exitStop.getLink());
-		this.dummyLeg.setRoute(route);
+		if ((enterStop != null) && (exitStop != null)) {
+			GenericRoute route = new ExperimentalTransitRoute(enterStop.getLink(), exitStop.getLink());
+			route.setRouteDescription(enterStop.getLink(), "PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString(), exitStop.getLink());
+			this.dummyLeg.setRoute(route);
+		}
 	}
-	
+
 	public void activityEnds(final double now) {
 	}
 
@@ -77,11 +89,11 @@ public class FakeAgent implements DriverAgent, PassengerAgent {
 	public void moveOverNode() {
 	}
 
-	public void teleportToLink(Link link) {
+	public void teleportToLink(final Link link) {
 	}
 
 	public boolean arriveAtStop(final TransitStopFacility stop) {
-		return stop == exitStop;
+		return stop == this.exitStop;
 	}
 
 	public boolean ptLineAvailable(final TransitLine line) {
