@@ -74,4 +74,9 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 		return this.isBlockingLane;
 	}
 
+	@Override
+	public String toString() {
+		return "TransitStopFacilityImpl_" + this.id;
+	}
+
 }
