@@ -117,6 +117,7 @@ public class Road extends SimUnit {
 
 	public void leaveRoad(Vehicle vehicle, double simTime) {
 		assert (carsOnTheRoad.getFirst() == vehicle);
+		assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size());
 
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
@@ -207,6 +208,7 @@ public class Road extends SimUnit {
 	}
 
 	public void enterRequest(Vehicle vehicle, double simTime) {
+		assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size());
 		/*
 		 * assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are
 		 * more cars on the road, than its capacity!"; assert
@@ -279,6 +281,7 @@ public class Road extends SimUnit {
 						+ SimulationParameters.getSqueezeTime(), this));
 			}
 
+			assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size()) :interestedInEnteringRoad.size() + " - " + deadlockPreventionMessages.size();
 		}
 	}
 
@@ -306,6 +309,7 @@ public class Road extends SimUnit {
 
 	public void removeFromInterestedInEnteringRoad() {
 		interestedInEnteringRoad.removeFirst();
+		assert (interestedInEnteringRoad.size()==deadlockPreventionMessages.size());
 	}
 
 	public static Road getRoad(String linkId) {
