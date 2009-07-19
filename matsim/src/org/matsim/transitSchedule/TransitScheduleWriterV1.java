@@ -41,7 +41,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
  * Writes a transit schedule to a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
- * 
+ *
  * @author mrieser
  */
 public class TransitScheduleWriterV1 extends MatsimXmlWriter {
@@ -84,10 +84,10 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(TRANSIT_SCHEDULE);
 		this.close();
 	}
-	
+
 	private void writeTransitStops() throws IOException {
 		this.writeStartTag(TRANSIT_STOPS, null);
-		
+
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(4);
 		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
 			attributes.clear();
@@ -99,7 +99,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 			}
 			this.writeStartTag(STOP_FACILITY, attributes, true);
 		}
-		
+
 		this.writeEndTag(TRANSIT_STOPS);
 	}
 
@@ -126,7 +126,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 			this.writeContent(route.getDescription(), false);
 			this.writeEndTag(DESCRIPTION);
 		}
-		
+
 		this.writeStartTag(TRANSPORT_MODE, null);
 		this.writeContent(route.getTransportMode().toString(), false);
 		this.writeEndTag(TRANSPORT_MODE);
@@ -139,25 +139,23 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 	}
 
 	private void writeRouteProfile(final List<TransitRouteStop> stops) throws IOException {
-		if (stops != null) {
-			this.writeStartTag(ROUTE_PROFILE, null);
+		this.writeStartTag(ROUTE_PROFILE, null);
 
-			// optimization: only create one List for multiple departures
-			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(3);
-			for (TransitRouteStop stop : stops) {
-				attributes.clear();
-				attributes.add(this.createTuple(REF_ID, stop.getStopFacility().getId().toString()));
-				if (stop.getArrivalDelay() != Time.UNDEFINED_TIME) {
-					attributes.add(this.createTimeTuple(ARRIVAL_OFFSET, stop.getArrivalDelay()));
-				}
-				if (stop.getDepartureDelay() != Time.UNDEFINED_TIME) {
-					attributes.add(this.createTimeTuple(DEPARTURE_OFFSET, stop.getDepartureDelay()));
-				}
-				this.writeStartTag(STOP, attributes, true);
+		// optimization: only create one List for multiple departures
+		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(3);
+		for (TransitRouteStop stop : stops) {
+			attributes.clear();
+			attributes.add(this.createTuple(REF_ID, stop.getStopFacility().getId().toString()));
+			if (stop.getArrivalDelay() != Time.UNDEFINED_TIME) {
+				attributes.add(this.createTimeTuple(ARRIVAL_OFFSET, stop.getArrivalDelay()));
 			}
-
-			this.writeEndTag(ROUTE_PROFILE);
+			if (stop.getDepartureDelay() != Time.UNDEFINED_TIME) {
+				attributes.add(this.createTimeTuple(DEPARTURE_OFFSET, stop.getDepartureDelay()));
+			}
+			this.writeStartTag(STOP, attributes, true);
 		}
+
+		this.writeEndTag(ROUTE_PROFILE);
 	}
 
 	private void writeRoute(final NetworkRoute route) throws IOException {
@@ -184,20 +182,18 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 	}
 
 	private void writeDepartures(final Map<Id, Departure> departures) throws IOException {
-		if (departures != null) {
-			this.writeStartTag(DEPARTURES, null);
+		this.writeStartTag(DEPARTURES, null);
 
-			// optimization: only create one List for multiple departures
-			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(2);
+		// optimization: only create one List for multiple departures
+		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(2);
 
-			for (Departure dep : departures.values()) {
-				attributes.clear();
-				attributes.add(this.createTuple(ID, dep.getId().toString()));
-				attributes.add(this.createTimeTuple(DEPARTURE_TIME, dep.getDepartureTime()));
-				this.writeStartTag(DEPARTURE, attributes, true);
-			}
-
-			this.writeEndTag(DEPARTURES);
+		for (Departure dep : departures.values()) {
+			attributes.clear();
+			attributes.add(this.createTuple(ID, dep.getId().toString()));
+			attributes.add(this.createTimeTuple(DEPARTURE_TIME, dep.getDepartureTime()));
+			this.writeStartTag(DEPARTURE, attributes, true);
 		}
+
+		this.writeEndTag(DEPARTURES);
 	}
 }
