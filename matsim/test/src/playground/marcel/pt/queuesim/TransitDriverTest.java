@@ -20,201 +20,292 @@
 
 package playground.marcel.pt.queuesim;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleReaderTest;
-import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.xml.sax.SAXException;
 
 import playground.marcel.pt.fakes.FakeAgent;
-import playground.marcel.pt.queuesim.TransitDriver;
-import playground.marcel.pt.queuesim.TransitQueueSimulation;
-import playground.marcel.pt.queuesim.TransitQueueVehicle;
-import playground.marcel.pt.queuesim.TransitVehicle;
-import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 
+/**
+ * @author mrieser
+ */
 public class TransitDriverTest extends MatsimTestCase {
 
-	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
-	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
+	public void testInitializationNetworkRoute() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		ArrayList<Link> links = new ArrayList<Link>();
 
-	public void testPersonsLeavingBus() throws SAXException, ParserConfigurationException, IOException {
-		Config config = loadConfig(null);
-		config.scenario().setUseTransit(true);
-		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
+		NetworkLayer network = new NetworkLayer();
+		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(   0, 0));
+		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(2000, 0));
+		NodeImpl node4 = network.createNode(new IdImpl("4"), new CoordImpl(3000, 0));
+		NodeImpl node5 = network.createNode(new IdImpl("5"), new CoordImpl(4000, 0));
+		NodeImpl node6 = network.createNode(new IdImpl("6"), new CoordImpl(5000, 0));
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);
+		Link link4 = network.createLink(new IdImpl("4"), node4, node5, 1000.0, 10.0, 3600.0, 1);
+		Link link5 = network.createLink(new IdImpl("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader((NetworkLayer) network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
+		Collections.addAll(links, link2, link3, link4);
+		NetworkRoute route = new NodeNetworkRoute(link1, link5);
+		route.setLinks(link1, links, link5);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitStopAgentTracker tracker = null;
+		TransitQueueSimulation tqsim = null;
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, (NetworkLayer) network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		assertEquals(route, driver.getCurrentLeg().getRoute());
 
-		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
-//		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
-		assertNotNull("could not get transit line.", lineT1);
-
-		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
-		Map<Id, Departure> departures = route1.getDepartures();
-
-		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-
-		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
-
-		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
-		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(20));
-		capacity.setStandingRoom(Integer.valueOf(0));
-		vehicleType.setCapacity(capacity);
-		TransitVehicle bus = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(5), vehicleType), 5);
-		driver.setVehicle(bus);
-
-		TransitStopFacility home  = schedule.getFacilities().get(new IdImpl("home"));
-		TransitStopFacility stop2 = schedule.getFacilities().get(new IdImpl("stop2"));
-		TransitStopFacility stop3 = schedule.getFacilities().get(new IdImpl("stop3"));
-		TransitStopFacility stop4 = schedule.getFacilities().get(new IdImpl("stop4"));
-		TransitStopFacility stop6 = schedule.getFacilities().get(new IdImpl("stop6"));
-
-		FakeAgent agent1 = new FakeAgent(home, stop2);
-		FakeAgent agent2 = new FakeAgent(home, stop3);
-		FakeAgent agent3 = new FakeAgent(home, stop4);
-		FakeAgent agent4 = new FakeAgent(home, stop3);
-		FakeAgent agent5 = new FakeAgent(home, stop6);
-		bus.addPassenger(agent1);
-		bus.addPassenger(agent2);
-		bus.addPassenger(agent3);
-		bus.addPassenger(agent4);
-		bus.addPassenger(agent5);
-
-		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
-		Link link = driver.getCurrentLeg().getRoute().getStartLink();
-		// handle first link
-		if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
-			driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
-		}
-		// handle all other links
-		link = driver.chooseNextLink();
+		assertEquals(link5, driver.getDestinationLink());
+		assertEquals(link2, driver.chooseNextLink());
 		driver.moveOverNode();
-		while (link != null) {
-			if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
-				driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
-				continue;
-			}
-			Link nextLink = driver.chooseNextLink();
-			if (nextLink != null) {
-				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
-			}
-			link = nextLink;
-			if (link != null) {
-				driver.moveOverNode();
-			}
-		}
-
-		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
+		assertEquals(link3, driver.chooseNextLink());
+		driver.moveOverNode();
+		assertEquals(link4, driver.chooseNextLink());
+		driver.moveOverNode();
+		assertEquals(link5, driver.chooseNextLink());
+		driver.moveOverNode();
+		assertEquals(null, driver.chooseNextLink());
 	}
 
-	public void testPersonsEnteringBus() throws SAXException, ParserConfigurationException, IOException {
-		Config config = loadConfig(null);
-		config.scenario().setUseTransit(true);
-		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
+	public void testInitializationDeparture() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		NetworkRoute route = new NodeNetworkRoute(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
+		double depTime = 9876.5;
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
+		TransitStopAgentTracker tracker = null;
+		TransitQueueSimulation tqsim = null;
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		assertEquals(depTime, driver.getDepartureTime(), MatsimTestCase.EPSILON);
+	}
 
-		ScenarioImpl scenario = new ScenarioImpl(config);
-		
-		NetworkLayer network = scenario.getNetwork();
-		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
+	public void testInitializationStops() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		NetworkRoute route = new NodeNetworkRoute(null, null);
 
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0));
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(2500, 0));
+		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("4"), new CoordImpl(3500, 0));
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
+		stops.add(builder.createTransitRouteStop(stop4, 350, 360));
 
-		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
-//		CreateTimetableForStop timetable = new CreateTimetableForStop(lineT1);
-		assertNotNull("could not get transit line.", lineT1);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		TransitQueueSimulation tqsim = null;
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 
-		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
-		Map<Id, Departure> departures = route1.getDepartures();
-
-		Events events = new Events();
-		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-
-		TransitDriver driver = new TransitDriver(lineT1, route1, departures.values().iterator().next(), sim);
-
-		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
+		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(20));
-		capacity.setStandingRoom(Integer.valueOf(0));
-		vehicleType.setCapacity(capacity);
-		TransitVehicle bus = new TransitQueueVehicle(new BasicVehicleImpl(new IdImpl(11), vehicleType), 5);
-		driver.setVehicle(bus);
+		capacity.setSeats(Integer.valueOf(5));
+		vehType.setCapacity(capacity);
+		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+		driver.setVehicle(new TransitQueueVehicle(vehicle, 3.0));
 
-		TransitStopFacility work  = schedule.getFacilities().get(new IdImpl("work"));
-		TransitStopFacility stop2 = schedule.getFacilities().get(new IdImpl("stop2"));
-		TransitStopFacility stop3 = schedule.getFacilities().get(new IdImpl("stop3"));
-		TransitStopFacility stop4 = schedule.getFacilities().get(new IdImpl("stop4"));
-		TransitStopFacility stop6 = schedule.getFacilities().get(new IdImpl("stop6"));
+		assertEquals(stop1, driver.getNextTransitStop());
+		assertEquals(0, driver.handleTransitStop(stop1, 60), EPSILON);
+		assertEquals(stop2, driver.getNextTransitStop());
+		assertEquals(0, driver.handleTransitStop(stop2, 160), EPSILON);
+		assertEquals(stop3, driver.getNextTransitStop());
+		assertEquals(0, driver.handleTransitStop(stop3, 260), EPSILON);
+		assertEquals(stop4, driver.getNextTransitStop());
+		assertEquals(0, driver.handleTransitStop(stop4, 360), EPSILON);
+		assertEquals(null, driver.getNextTransitStop());
+	}
 
-		FakeAgent agent1 = new FakeAgent(stop2, work);
-		FakeAgent agent2 = new FakeAgent(stop3, work);
-		FakeAgent agent3 = new FakeAgent(stop4, work);
-		FakeAgent agent4 = new FakeAgent(stop3, work);
-		FakeAgent agent5 = new FakeAgent(stop6, work);
-		sim.agentDeparts(agent1, stop2.getLink());
-		sim.agentDeparts(agent2, stop3.getLink());
-		sim.agentDeparts(agent3, stop4.getLink());
-		sim.agentDeparts(agent4, stop3.getLink());
-		sim.agentDeparts(agent5, stop6.getLink());
+	public void testHandleStop_EnterPassengers() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
-		assertEquals("wrong number of passengers.", 0, bus.getPassengers().size());
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0));
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		NetworkRoute route = new NodeNetworkRoute(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		TransitQueueSimulation tqsim = new TransitQueueSimulation(new ScenarioImpl(), new Events());
 
-		Link link = driver.getCurrentLeg().getRoute().getStartLink();
-		// handle first link
-		if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
-			driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
+		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(5));
+		vehType.setCapacity(capacity);
+		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
+		driver.setVehicle(queueVehicle);
+
+		PassengerAgent agent1 = new FakeAgent(null, null);
+		PassengerAgent agent2 = new FakeAgent(null, null);
+		PassengerAgent agent3 = new FakeAgent(null, null);
+		PassengerAgent agent4 = new FakeAgent(null, null);
+		PassengerAgent agent5 = new FakeAgent(null, null);
+
+		tracker.addAgentToStop(agent1, stop1);
+		tracker.addAgentToStop(agent2, stop1);
+		assertEquals(0, queueVehicle.getPassengers().size());
+		assertEquals(stop1, driver.getNextTransitStop());
+		assertTrue(driver.handleTransitStop(stop1, 50) > 0);
+		assertEquals(2, queueVehicle.getPassengers().size());
+		assertEquals("driver must not proceed in stop list when persons entered.",
+				stop1, driver.getNextTransitStop());
+		assertEquals(0, tracker.getAgentsAtStop(stop1).size());
+		assertEquals("stop time must be 0 when nobody enters or leaves",
+				0.0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
+		assertEquals(2, queueVehicle.getPassengers().size());
+		assertEquals("driver must proceed in stop list when no persons entered.",
+				stop2, driver.getNextTransitStop());
+		assertEquals("driver must return same stop again when queried again without handling stop.",
+				stop2, driver.getNextTransitStop());
+
+		tracker.addAgentToStop(agent3, stop2);
+		double stoptime1 = driver.handleTransitStop(stop2, 150);
+		assertTrue(stoptime1 > 0);
+		assertEquals(3, queueVehicle.getPassengers().size());
+		assertEquals(0, tracker.getAgentsAtStop(stop2).size());
+		tracker.addAgentToStop(agent4, stop2);
+		double stoptime2 = driver.handleTransitStop(stop2, 160);
+		assertTrue(stoptime2 > 0);
+		assertEquals(4, queueVehicle.getPassengers().size());
+		assertTrue("The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2,
+				stoptime1 > stoptime2);
+		tracker.addAgentToStop(agent5, stop2);
+		assertEquals("vehicle should have reached capacity, so not more passenger can enter.",
+				0.0, driver.handleTransitStop(stop2, 170), MatsimTestCase.EPSILON);
+	}
+
+	public void testHandleStop_ExitPassengers() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0));
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		NetworkRoute route = new NodeNetworkRoute(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		TransitQueueSimulation tqsim = new TransitQueueSimulation(new ScenarioImpl(), new Events());
+
+		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(5));
+		vehType.setCapacity(capacity);
+		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
+		driver.setVehicle(queueVehicle);
+
+		PassengerAgent agent1 = new FakeAgent(null, stop1);
+		PassengerAgent agent2 = new FakeAgent(null, stop1);
+		PassengerAgent agent3 = new FakeAgent(null, stop2);
+		PassengerAgent agent4 = new FakeAgent(null, stop2);
+
+		queueVehicle.addPassenger(agent1);
+		queueVehicle.addPassenger(agent2);
+		queueVehicle.addPassenger(agent3);
+		queueVehicle.addPassenger(agent4);
+
+		assertEquals(4, queueVehicle.getPassengers().size());
+		assertEquals(stop1, driver.getNextTransitStop());
+		assertTrue(driver.handleTransitStop(stop1, 50) > 0);
+		assertEquals("driver must not proceed in stop list when persons entered.",
+				stop1, driver.getNextTransitStop());
+		assertEquals(2, queueVehicle.getPassengers().size());
+		assertEquals("stop time must be 0 when nobody enters or leaves",
+				0.0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
+		assertEquals("driver must proceed in stop list when no persons entered.",
+				stop2, driver.getNextTransitStop());
+		assertEquals("driver must return same stop again when queried again without handling stop.",
+				stop2, driver.getNextTransitStop());
+
+		assertTrue(driver.handleTransitStop(stop2, 150) > 0);
+		assertEquals(0, queueVehicle.getPassengers().size());
+		assertEquals(0.0, driver.handleTransitStop(stop2, 160), MatsimTestCase.EPSILON);
+	}
+
+	public void testHandleStop_CorrectIdentification() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		NetworkRoute route = new NodeNetworkRoute(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		TransitQueueSimulation tqsim = new TransitQueueSimulation(new ScenarioImpl(), new Events());
+
+		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(5));
+		vehType.setCapacity(capacity);
+		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
+		driver.setVehicle(queueVehicle);
+
+		SpyAgent agent = new SpyAgent();
+		tracker.addAgentToStop(agent, stop1);
+		driver.handleTransitStop(stop1, 50);
+		assertEquals(tLine, agent.offeredLine);
+	}
+
+	protected static class SpyAgent implements PassengerAgent {
+		public TransitLine offeredLine;
+
+		public boolean arriveAtStop(final TransitStopFacility stop) {
+			throw new UnsupportedOperationException();
 		}
-		// handle all other links
-		link = driver.chooseNextLink();
-		driver.moveOverNode();
-		while (link != null) {
-			if (driver.getNextTransitStop() != null && driver.getNextTransitStop().getLink() == link) {
-				driver.handleTransitStop(driver.getNextTransitStop(), 7.0 * 3600);
-				continue;
-			}
-			Link nextLink = driver.chooseNextLink();
-			if (nextLink != null) {
-				assertEquals("current link and next link must have common node.", link.getToNode(), nextLink.getFromNode());
-			}
-			link = nextLink;
-			if (link != null) {
-				driver.moveOverNode();
-			}
-		}
 
-		assertEquals("wrong number of passengers.", 5, bus.getPassengers().size());
+		public boolean ptLineAvailable(final TransitLine tLine) {
+			this.offeredLine = tLine;
+			return false;
+		}
 	}
 
 }
