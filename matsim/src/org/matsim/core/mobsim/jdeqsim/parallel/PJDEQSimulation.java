@@ -31,6 +31,21 @@ import org.matsim.core.api.experimental.population.Leg;
  * - write tests
  * - events handling => how to deal with that?
  */
+
+/*
+ * - both halfs of the simulation should have arround the same number of events for best performance (as expected)
+ * => but this is not the case yet => need to make the algorithm better
+ * 
+ * 
+ */
+
+/*
+ * JVM options
+ * ============
+ * => -XX:+UseSpinning is useful for this application
+ * => -XX:PreBlockSpin=10 has an influence on the application. A good value found for my local machine was: 10,
+ *    but this might be vm/machine dependent... 
+ */
 public class PJDEQSimulation extends JDEQSimulation {
 
 	private int numOfThreads;
@@ -49,7 +64,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 		t.startTimer();
 
 		PScheduler scheduler = new PScheduler(new PMessageQueue());
-		scheduler.getQueue().idOfMainThread=Thread.currentThread().getId();
+		scheduler.getQueue().idOfMainThread = Thread.currentThread().getId();
 		SimulationParameters.setAllRoads(new HashMap<String, Road>());
 
 		// find out networkXMedian
@@ -67,9 +82,14 @@ public class PJDEQSimulation extends JDEQSimulation {
 			// count each link of each route...
 			int i = 1;
 			while (i < actsLegs.size()) {
-				sumXCoord += ((Activity) (actsLegs.get(i - 1))).getCoord()
-						.getX();
-				numberOfLinks++;
+				// because home activity gets to little attention
+				// because the leg gives the activities on the path enough
+				// attention
+				// sumXCoord += ((Activity) (actsLegs.get(0))).getCoord()
+				// .getX();
+				// sumXCoord += ((Activity) (actsLegs.get(0))).getCoord()
+				// .getX();
+				// numberOfLinks++;
 
 				Leg leg = ((Leg) actsLegs.get(i));
 				if (leg.getRoute() instanceof NetworkRoute) {
@@ -79,7 +99,15 @@ public class PJDEQSimulation extends JDEQSimulation {
 							.size()]);
 
 					for (int j = 0; j < currentLinkRoute.length; j++) {
+
+						// because at each road there are many messages
+						// enterReq, enter, end, leave, deadlock...
 						sumXCoord += currentLinkRoute[j].getCoord().getX();
+						// sumXCoord += currentLinkRoute[j].getCoord().getX();
+						// sumXCoord += currentLinkRoute[j].getCoord().getX();
+						// sumXCoord += currentLinkRoute[j].getCoord().getX();
+						// sumXCoord += currentLinkRoute[j].getCoord().getX();
+
 						numberOfLinks++;
 					}
 				}
@@ -90,6 +118,10 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// estimate, where to cut the map
 		double networkXMedian = sumXCoord / numberOfLinks;
+
+		// TODO: remove this line...
+		// just for finding out how a perfect distribution would work
+		networkXMedian += 3000;
 
 		System.out.println();
 		System.out.println("SimulationParameters.networkXMedian:"
@@ -114,41 +146,41 @@ public class PJDEQSimulation extends JDEQSimulation {
 		// define border roads
 		// just one layer long
 		ExtendedRoad tempRoad = null;
-		boolean realBorderRoad=false;
+		boolean realBorderRoad = false;
 		for (LinkImpl link : this.network.getLinks().values()) {
 			road = (ExtendedRoad) Road.getRoad(link.getId().toString());
-			realBorderRoad=false; // real means: has adjacent nodes in other zone
+			realBorderRoad = false; // real means: has adjacent nodes in other
+									// zone
 
 			// mark border roads (adjacent to road in different zone)
 			for (LinkImpl inLink : road.getLink().getFromNode().getInLinks()
 					.values()) {
-				tempRoad = (ExtendedRoad) Road
-						.getRoad(inLink.getId().toString());
+				tempRoad = (ExtendedRoad) Road.getRoad(inLink.getId()
+						.toString());
 				if (road.getThreadZoneId() != tempRoad.getThreadZoneId()) {
 					road.setBorderZone(true);
 					tempRoad.setBorderZone(true);
 				}
 			}
-			
+
 			// mark roads, which go away from border roads
 			for (LinkImpl outLink : road.getLink().getToNode().getOutLinks()
 					.values()) {
 				tempRoad = (ExtendedRoad) Road.getRoad(outLink.getId()
 						.toString());
-				
+
 				if (realBorderRoad) {
 					tempRoad.setBorderZone(true);
 				}
 			}
 
-			
 		}
 
 		// initialize vehicles
-		Vehicle vehicle = null;
+		PVehicle vehicle = null;
 		// the vehicle has registered itself to the scheduler
 		for (PersonImpl person : this.population.getPersons().values()) {
-			vehicle = new Vehicle(scheduler, person);
+			vehicle = new PVehicle(scheduler, person);
 		}
 
 		// just inserted to remove message in bug analysis, that vehicle

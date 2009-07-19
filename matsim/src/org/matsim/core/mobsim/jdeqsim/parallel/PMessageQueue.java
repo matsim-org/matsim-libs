@@ -18,7 +18,7 @@ public class PMessageQueue extends MessageQueue {
 	// private int queueSize = 0;
 
 	// the maximum time difference two threads are allowed to have in [s] (for
-	// message time stamp)
+	// message time stamp) => with this parameter the number of locks can be reduced...
 	private double maxTimeDelta = 10;
 
 	public boolean lowerThreadWitnessedEmptyQueue = false;
@@ -185,22 +185,29 @@ public class PMessageQueue extends MessageQueue {
 		double myMinTimeStamp = -1;
 		double otherThreadMinTimeStamp = -1;
 
-		if (inLowerThreadCurrently) {
-			if (queueThread1.peek() != null) {
-				myMinTimeStamp = queueThread1.peek().getMessageArrivalTime();
+		// as we are not using syncrhonization, a null pointer exception might happen...
+		try {
+			if (inLowerThreadCurrently) {
+				if (queueThread1.peek() != null) {
+					myMinTimeStamp = queueThread1.peek()
+							.getMessageArrivalTime();
+				}
+				if (queueThread2.peek() != null) {
+					otherThreadMinTimeStamp = queueThread2.peek()
+							.getMessageArrivalTime();
+				}
+			} else {
+				if (queueThread2.peek() != null) {
+					myMinTimeStamp = queueThread2.peek()
+							.getMessageArrivalTime();
+				}
+				if (queueThread1.peek() != null) {
+					otherThreadMinTimeStamp = queueThread1.peek()
+							.getMessageArrivalTime();
+				}
 			}
-			if (queueThread2.peek() != null) {
-				otherThreadMinTimeStamp = queueThread2.peek()
-						.getMessageArrivalTime();
-			}
-		} else {
-			if (queueThread2.peek() != null) {
-				myMinTimeStamp = queueThread2.peek().getMessageArrivalTime();
-			}
-			if (queueThread1.peek() != null) {
-				otherThreadMinTimeStamp = queueThread1.peek()
-						.getMessageArrivalTime();
-			}
+		} catch (Exception e) {
+			// just continue with the current values...
 		}
 
 		if (otherThreadMinTimeStamp == -1) {
@@ -239,33 +246,31 @@ public class PMessageQueue extends MessageQueue {
 		return queueThread1.size() + queueThread2.size() == 0;
 		// }
 	}
-	
-	
-	
 
 	// finds out, if all threads have witnessed the empty queue or not
 	public boolean isListEmptyWitnessedByAll() {
 		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
 				: false;
 		synchronized (queueThread1) {
-			 synchronized (queueThread2) {
-			// just for debugging => change that afterwards to just one line
-			if (isEmpty()) {
-				// emptiness witnessed
-				if (inLowerThreadCurrently) {
-					lowerThreadWitnessedEmptyQueue = true;
+			synchronized (queueThread2) {
+				// just for debugging => change that afterwards to just one line
+				if (isEmpty()) {
+					// emptiness witnessed
+					if (inLowerThreadCurrently) {
+						lowerThreadWitnessedEmptyQueue = true;
+					} else {
+						higherThreadWitnessedEmptyQueue = true;
+					}
 				} else {
-					higherThreadWitnessedEmptyQueue = true;
+					if (inLowerThreadCurrently) {
+						lowerThreadWitnessedEmptyQueue = false;
+					} else {
+						higherThreadWitnessedEmptyQueue = false;
+					}
 				}
-			} else {
-				if (inLowerThreadCurrently) {
-					lowerThreadWitnessedEmptyQueue = false;
-				} else {
-					higherThreadWitnessedEmptyQueue = false;
-				}
+				return lowerThreadWitnessedEmptyQueue
+						&& higherThreadWitnessedEmptyQueue;
 			}
-			return lowerThreadWitnessedEmptyQueue
-					&& higherThreadWitnessedEmptyQueue;
-		}}
+		}
 	}
 }

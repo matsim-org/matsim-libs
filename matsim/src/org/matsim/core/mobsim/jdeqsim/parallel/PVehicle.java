@@ -11,8 +11,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 
-// TODO: only start using this class in parallel jdeqsim if the following methods are really
-// needed ...
+
 public class PVehicle extends Vehicle {
 
 	public PVehicle(Scheduler scheduler, PersonImpl ownerPerson) {

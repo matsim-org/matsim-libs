@@ -4,16 +4,46 @@ import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.events.parallelEventsHandler.ConcurrentListSPSC;
 import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
+import org.matsim.core.mobsim.jdeqsim.EndLegMessage;
+import org.matsim.core.mobsim.jdeqsim.EndRoadMessage;
+import org.matsim.core.mobsim.jdeqsim.EnterRoadMessage;
 import org.matsim.core.mobsim.jdeqsim.EventMessage;
+import org.matsim.core.mobsim.jdeqsim.LeaveRoadMessage;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.core.mobsim.jdeqsim.StartingLegMessage;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.LinkImpl;
 
+/*
+ * The locking dependencies of each type of message for ROADS (does road change):
+ * - DeadlockPreventionMessage: m.getReceivingUnit()
+ * - EnterRoadMessage: vehicle.currentLink
+ * - EndLegMessage: nothing
+ * - EndRoadMessage: vehicle.currentLink and/or nextLink
+ * - LeaveRoadMessage: m.getReceivingUnit()
+ * - StartingLegMessage: vehicle.currentLink
+ */
+
+/*
+ * For which cases locking the VEHICLE is required when crossing the boundry:
+ * (TODO: need to lock the vehicle for that type of Message in boundry region)
+ * - DeadlockPreventionMessage: no
+ * - EnterRoadMessage: no
+ * - EndLegMessage: yes
+ * - EndRoadMessage: yes
+ * - LeaveRoadMessage: no
+ * - StartingLegMessage: yes
+ */
+
+/*
+ * Message locking only needed for DeadlockPreventionMessage (and check if alive).
+ */
 public class MessageExecutor extends Thread {
 
 	PScheduler scheduler = null;
@@ -75,9 +105,15 @@ public class MessageExecutor extends Thread {
 				// just wait for some time...
 				// this is really some option, with which one can play with...
 				// => it really gives improvement...
-				for (int i = 0; i < 100000; i++) {
 
-				}
+				// => this parameter can reduce the number of unnecessary locks
+				// but as with the new implementation with two separate locks
+				// instead of just
+				// one in the queue, the advantage of this is not given
+				// anymore...
+				// for (int i = 0; i < 10000; i++) {
+				//
+				// }
 
 				missedNumberOfLocks++;
 
@@ -104,38 +140,116 @@ public class MessageExecutor extends Thread {
 
 				// TODO: do fair partitioning of network (at the moment most
 				// events are in the same area...)
-				Vehicle vehicle = ((EventMessage) m).vehicle;
-				Road road = Road.getRoad(vehicle.getCurrentLink().getId()
-						.toString());
+				PVehicle vehicle = (PVehicle) ((EventMessage) m).vehicle;
+
+				ExtendedRoad receivingRoad = (ExtendedRoad) m
+						.getReceivingUnit();
 
 				// Note: synchronizing over the message is needed both for the
 				// DeadlockPreventionMessage and LeaveRoadMessage
 
-				if (((ExtendedRoad) m.getReceivingUnit()).isBorderZone()) {
-					synchronized (m.getReceivingUnit()) {
-						// synchronized (road) {
+				// the deadlock message must lock the road before starting
+				// processing, because
+				// else a leave road message might remove it (or the other way
+				// arround: deadlock message has been processed
+				// while someone sees concurrent old state...
 
-						// TODO: probably it is faster to just synchronize,
-						// rather than checking fist => check with bigger
-						// scenario
-						// perhaps satawal reacts differently on this....
+				// we need to synchronize on currentRoad, nextRoad and previous
+				// road, because
+				// not in all handlers just the receivingUnit/road is
+				// manupulated
 
-						synchronized (m) {
-							if (m.isAlive()) {
+				if (receivingRoad.isBorderZone()) {
+
+					// TODO: the following are quite expensive operations (are
+					// they?)
+					// some of them can be left out (only some are really needed
+					// for each type of message).
+					ExtendedRoad currentRoad = receivingRoad;
+					ExtendedRoad nextRoad = receivingRoad;
+					ExtendedRoad prevRoad = receivingRoad;
+					Link tempLink = null;
+
+					// the ordering of this sequence is according to the
+					// frequency of the messages
+					if (m instanceof EnterRoadMessage) {
+
+						tempLink = vehicle.getCurrentLink();
+						if (tempLink != null) {
+							currentRoad = (ExtendedRoad) Road.getRoad(tempLink
+									.getId().toString());
+						}
+
+						synchronized (currentRoad) {
+							m.handleMessage();
+						}
+
+					} else if (m instanceof LeaveRoadMessage) {
+
+						synchronized (receivingRoad) {
+							m.handleMessage();
+						}
+
+					} else if (m instanceof EndRoadMessage) {
+
+						tempLink = vehicle.getCurrentLink();
+						if (tempLink != null) {
+							currentRoad = (ExtendedRoad) Road.getRoad(tempLink
+									.getId().toString());
+						}
+
+						tempLink = vehicle.getNextLinkInLeg();
+						if (tempLink != null) {
+							nextRoad = (ExtendedRoad) Road.getRoad(tempLink
+									.getId().toString());
+						}
+						// TODO: small optimization possible: either current or
+						// next road is really needed to be locked => is it
+						// worth finding it out here?
+						synchronized (currentRoad) {
+							synchronized (nextRoad) {
+								synchronized (vehicle) {
+									m.handleMessage();
+								}
+							}
+
+						}
+					} else if (m instanceof DeadlockPreventionMessage) {
+						synchronized (receivingRoad) {
+							synchronized (m) {
+								if (m.isAlive()) {
+									m.handleMessage();
+								}
+							}
+						}
+					} else if (m instanceof StartingLegMessage) {
+						tempLink = vehicle.getCurrentLink();
+						if (tempLink != null) {
+							currentRoad = (ExtendedRoad) Road.getRoad(tempLink
+									.getId().toString());
+						}
+
+						synchronized (currentRoad) {
+							synchronized (vehicle) {
 								m.handleMessage();
 							}
 						}
-
-					}
-				} else {
-					// TODO: probably it is faster to just synchronize, rather
-					// than checking fist => check with bigger scenario
-					// perhaps satawal reacts differently on this....
-					synchronized (m) {
-						if (m.isAlive()) {
+					} else if (m instanceof EndLegMessage) {
+						synchronized (vehicle) {
 							m.handleMessage();
 						}
+					} else {
+						// there are no other type of messages which can come
+						// here...
+						assert (false);
 					}
+
+				} else {
+
+					if (m.isAlive()) {
+						m.handleMessage();
+					}
+
 				}
 
 				numberOfMessagesProcessed++;
@@ -215,5 +329,4 @@ public class MessageExecutor extends Thread {
 			// }
 		}
 	}
-
 }
