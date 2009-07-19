@@ -29,7 +29,7 @@ public class PMessageQueue extends MessageQueue {
 
 	// the maximum time difference two threads are allowed to have in [s] (for
 	// message time stamp) => with this parameter the number of locks can be
-	// reduced...
+	// reduced... => we need to find out, how much effect it has...
 	private double maxTimeDelta = 10;
 
 	public boolean lowerThreadWitnessedEmptyQueue = false;
