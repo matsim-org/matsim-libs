@@ -33,7 +33,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -108,7 +108,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 			log.info("  removed "+up_mapping.size()+" up-mappings (zone).");
 			removeAllUpMappings();
 			ZoneLayer zones = (ZoneLayer)layer.getUpRule().getUpLayer();
-			ArrayList<Location> nearestZones = zones.getNearestLocations(center);
+			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(center);
 			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
 			else {
 				// choose the first of the list (The list is generated via a defined order of the zones,

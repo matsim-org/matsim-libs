@@ -70,9 +70,9 @@ public abstract class WorldUtils {
 		// min is not defined --> place the random point within a circle around the center
 		// first, determine radius of circle. for this, search the nearest (neighbor) zone
 		Coord center = zone.getCoord();
-		ArrayList<Location> nearestZones = layer.getNearestLocations(center, zone);
+		ArrayList<MappedLocation> nearestZones = layer.getNearestLocations(center, zone);
 		double shortestDistance = Double.MAX_VALUE;
-		Iterator<Location> zoneIter = nearestZones.iterator();
+		Iterator<MappedLocation> zoneIter = nearestZones.iterator();
 		while (zoneIter.hasNext()) {
 			Zone aZone = (Zone)zoneIter.next();
 			Coord zoneMin = aZone.getMin();

@@ -36,7 +36,7 @@ import org.matsim.core.network.LinkImpl;
  * @see Zone
  * @author Michael Balmer
  */
-public abstract class AbstractLocation implements Location {
+public abstract class AbstractLocation implements MappedLocation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -50,10 +50,10 @@ public abstract class AbstractLocation implements Location {
 	protected final Coord center;
 
 	// points to the zones of the lower resolution layer
-	protected final TreeMap<Id,Location> up_mapping = new TreeMap<Id,Location>();
+	protected final TreeMap<Id,MappedLocation> up_mapping = new TreeMap<Id,MappedLocation>();
 
 	// points to the zones of the higher resolution layer
-	protected final TreeMap<Id,Location> down_mapping = new TreeMap<Id,Location>();
+	protected final TreeMap<Id,MappedLocation> down_mapping = new TreeMap<Id,MappedLocation>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -88,7 +88,7 @@ public abstract class AbstractLocation implements Location {
 	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated
-	public final void addUpMapping(final Location other) {
+	public final void addUpMapping(final MappedLocation other) {
 		if (this.layer.getUpRule() == null) {
 			Gbl.errorMsg(this.toString() + "[other=" + other + " has no up_rule]");
 		}
@@ -105,7 +105,7 @@ public abstract class AbstractLocation implements Location {
 	 * @see org.matsim.world.Location#addDownMapping(org.matsim.world.Location)
 	 */
 	@Deprecated
-	public final void addDownMapping(final Location other) {
+	public final void addDownMapping(final MappedLocation other) {
 		if (this.layer.getDownRule() == null) {
 			Gbl.errorMsg(this.toString() + "[other=" + other + " has no down_rule]");
 		}
@@ -203,7 +203,7 @@ public abstract class AbstractLocation implements Location {
 	 * @see org.matsim.world.Location#getUpLocation(org.matsim.utils.identifiers.IdI)
 	 */
 	@Deprecated
-	public final Location getUpLocation(final Id id) {
+	public final MappedLocation getUpLocation(final Id id) {
 		return this.up_mapping.get(id);
 	}
 
@@ -211,7 +211,7 @@ public abstract class AbstractLocation implements Location {
 	 * @see org.matsim.world.Location#downLocation(org.matsim.utils.identifiers.IdI)
 	 */
 	@Deprecated
-	public final Location downLocation(final Id id) {
+	public final MappedLocation downLocation(final Id id) {
 		return this.down_mapping.get(id);
 	}
 
@@ -219,7 +219,7 @@ public abstract class AbstractLocation implements Location {
 	 * @see org.matsim.world.Location#getUpMapping()
 	 */
 	@Deprecated
-	public final TreeMap<Id,Location> getUpMapping() {
+	public final TreeMap<Id,MappedLocation> getUpMapping() {
 		return this.up_mapping;
 	}
 
@@ -227,7 +227,7 @@ public abstract class AbstractLocation implements Location {
 	 * @see org.matsim.world.Location#getDownMapping()
 	 */
 	@Deprecated
-	public final TreeMap<Id, Location> getDownMapping() {
+	public final TreeMap<Id, MappedLocation> getDownMapping() {
 		return this.down_mapping;
 	}
 

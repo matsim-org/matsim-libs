@@ -23,12 +23,13 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.ToplevelContainer;
 
 
 /**
  * A topological network representation.
  */
-public interface BasicNetwork<N extends BasicNode, L extends BasicLink> extends Serializable{
+public interface BasicNetwork<N extends BasicNode, L extends BasicLink> extends ToplevelContainer,Serializable{
 		/**
 		 * Returns the builder for network elements
 		 * @return

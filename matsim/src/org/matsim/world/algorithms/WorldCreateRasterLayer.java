@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -117,10 +117,10 @@ public class WorldCreateRasterLayer {
 		System.out.println("      done.");
 
 		System.out.println("      setting up and down mappings...");
-		for (Location upper : zonelayer.getLocations().values()) {
-			ArrayList<Location> lowers = new ArrayList<Location>();
+		for (MappedLocation upper : zonelayer.getLocations().values()) {
+			ArrayList<MappedLocation> lowers = new ArrayList<MappedLocation>();
 			boolean found = false;
-			for (Location lower : layer.getLocations().values()) {
+			for (MappedLocation lower : layer.getLocations().values()) {
 				if (upper.calcDistance(lower.getCoord()) == 0.0) {
 					lowers.add(lower);
 					if (lower.getUpMapping().isEmpty()) {
@@ -132,8 +132,8 @@ public class WorldCreateRasterLayer {
 			}
 			if (!found) {
 				System.out.println("        upper zone id: " + upper.getId() + " no down_zone found yet. Try to steal from another up_zone...");
-				for (Location lower : lowers) {
-					Location other_upper = lower.getUpMapping().get(lower.getUpMapping().firstKey());
+				for (MappedLocation lower : lowers) {
+					MappedLocation other_upper = lower.getUpMapping().get(lower.getUpMapping().firstKey());
 					if (other_upper.getDownMapping().size() > 1) {
 						other_upper.getDownMapping().remove(lower.getId());
 						lower.getUpMapping().remove(other_upper.getId());

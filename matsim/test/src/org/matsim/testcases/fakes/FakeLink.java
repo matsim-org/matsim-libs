@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 
 /**
  * A very simple Mock for {@link Link} to be used in tests.
@@ -117,12 +117,12 @@ public class FakeLink implements Link {
 	}
 
 	@Deprecated
-	public void addDownMapping(final Location other) {
+	public void addDownMapping(final MappedLocation other) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Deprecated
-	public void addUpMapping(final Location other) {
+	public void addUpMapping(final MappedLocation other) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -131,12 +131,12 @@ public class FakeLink implements Link {
 	}
 
 	@Deprecated
-	public Location downLocation(final Id id2) {
+	public MappedLocation downLocation(final Id id2) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Deprecated
-	public TreeMap<Id, Location> getDownMapping() {
+	public TreeMap<Id, MappedLocation> getDownMapping() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -146,12 +146,12 @@ public class FakeLink implements Link {
 	}
 
 	@Deprecated
-	public Location getUpLocation(final Id locId) {
+	public MappedLocation getUpLocation(final Id locId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Deprecated
-	public TreeMap<Id, Location> getUpMapping() {
+	public TreeMap<Id, MappedLocation> getUpMapping() {
 		throw new UnsupportedOperationException();
 	}
 

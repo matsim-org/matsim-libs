@@ -31,7 +31,7 @@ import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 
 public class WorldWriteFacilityZoneMapping {
@@ -70,7 +70,7 @@ public class WorldWriteFacilityZoneMapping {
 			BufferedWriter out = new BufferedWriter(fw);
 			out.write("f_id\tz_id\n");
 			out.flush();
-			for (Location f : world.getLayer(ActivityFacilities.LAYER_TYPE).getLocations().values()) {
+			for (MappedLocation f : world.getLayer(ActivityFacilities.LAYER_TYPE).getLocations().values()) {
 				if (f.getUpMapping().size() == 0) {
 					Collection<ActivityOption> acts = ((ActivityFacility)f).getActivityOptions().values();
 					if (acts.size() != 1) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen!"); }

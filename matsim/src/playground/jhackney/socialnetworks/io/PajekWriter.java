@@ -41,6 +41,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.Zone;
 
 import playground.jhackney.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
@@ -189,7 +190,7 @@ public class PajekWriter {
 			pjnet.write("*Vertices " + numVertices+"\r\n");
 
 			Iterator<Vertex> iVert = g.getVertices().iterator();
-			LinkedHashMap<Vertex,Location> vertLoc = gstat.getVertexLoc();
+			LinkedHashMap<Vertex,MappedLocation> vertLoc = gstat.getVertexLoc();
 
 			int vertexcounter = 1;
 			while (iVert.hasNext()) {

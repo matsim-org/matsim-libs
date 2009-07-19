@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.MappingRule;
 import org.matsim.world.World;
 
@@ -63,9 +63,9 @@ public class WorldMappingInfo {
 		String range = down_layer.getType().toString();
 		int minmap = Integer.MAX_VALUE;
 		int maxmap = Integer.MIN_VALUE;
-		Iterator<? extends Location> ul_it = up_layer.getLocations().values().iterator();
+		Iterator<? extends MappedLocation> ul_it = up_layer.getLocations().values().iterator();
 		while (ul_it.hasNext()) {
-			Location ul = ul_it.next();
+			MappedLocation ul = ul_it.next();
 			int map = ul.getDownMapping().size();
 			if (minmap > map) { minmap = map; }
 			if (maxmap < map) { maxmap = map; }
@@ -85,9 +85,9 @@ public class WorldMappingInfo {
 		// calculate current up cardinality
 		minmap = Integer.MAX_VALUE;
 		maxmap = Integer.MIN_VALUE;
-		Iterator<? extends Location> dl_it = down_layer.getLocations().values().iterator();
+		Iterator<? extends MappedLocation> dl_it = down_layer.getLocations().values().iterator();
 		while (dl_it.hasNext()) {
-			Location dl = dl_it.next();
+			MappedLocation dl = dl_it.next();
 			int map = dl.getUpMapping().size();
 			if (minmap > map) { minmap = map; }
 			if (maxmap < map) { maxmap = map; }

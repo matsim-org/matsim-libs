@@ -25,10 +25,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
+import org.matsim.world.Layer;
 
 public class Matrix {
 
@@ -121,10 +122,10 @@ public class Matrix {
 	// set/add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Entry setEntry(final Location fromLocation, final Location toLocation, final double value) {
-		Entry e = getEntry(fromLocation, toLocation);
+	public final Entry setEntry(final Location fromLoc, final Location toLoc, final double value) {
+		Entry e = getEntry(fromLoc, toLoc);
 		if (e == null) {
-			return createEntry(fromLocation, toLocation, value);
+			return createEntry(fromLoc, toLoc, value);
 		}
 		e.setValue(value);
 		return e;
@@ -228,8 +229,8 @@ public class Matrix {
 		return this.toLocs.get(toLocation.getId());
 	}
 
-	public final Entry getEntry(final Location fromLocation, final Location toLocation) {
-		return this.getEntry(fromLocation.getId(),toLocation.getId());
+	public final Entry getEntry(final Location fromLoc, final Location toLoc) {
+		return this.getEntry(fromLoc.getId(),toLoc.getId());
 	}
 
 	public final Entry getEntry(final Id from, final Id to) {

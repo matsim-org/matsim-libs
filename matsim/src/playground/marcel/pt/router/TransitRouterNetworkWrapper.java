@@ -42,7 +42,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 
 public class TransitRouterNetworkWrapper implements Network { //implements BasicNetwork<TransitRouterNetworkWrapper.NodeWrapper, TransitRouterNetworkWrapper.LinkWrapper> {
 
@@ -356,19 +356,19 @@ public class TransitRouterNetworkWrapper implements Network { //implements Basic
 			throw new UnsupportedOperationException();
 		}
 
-		public void addDownMapping(final Location other) {
+		public void addDownMapping(final MappedLocation other) {
 			throw new UnsupportedOperationException();
 		}
 
-		public void addUpMapping(final Location other) {
+		public void addUpMapping(final MappedLocation other) {
 			throw new UnsupportedOperationException();
 		}
 
-		public Location downLocation(final Id id) {
+		public MappedLocation downLocation(final Id id) {
 			throw new UnsupportedOperationException();
 		}
 
-		public TreeMap<Id, Location> getDownMapping() {
+		public TreeMap<Id, MappedLocation> getDownMapping() {
 			throw new UnsupportedOperationException();
 		}
 
@@ -376,11 +376,11 @@ public class TransitRouterNetworkWrapper implements Network { //implements Basic
 			throw new UnsupportedOperationException();
 		}
 
-		public Location getUpLocation(final Id id) {
+		public MappedLocation getUpLocation(final Id id) {
 			throw new UnsupportedOperationException();
 		}
 
-		public TreeMap<Id, Location> getUpMapping() {
+		public TreeMap<Id, MappedLocation> getUpMapping() {
 			throw new UnsupportedOperationException();
 		}
 

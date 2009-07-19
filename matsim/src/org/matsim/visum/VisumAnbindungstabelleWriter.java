@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.ZoneLayer;
 
 /**
@@ -68,7 +68,7 @@ public class VisumAnbindungstabelleWriter {
 			for (NodeImpl node : network.getNodes().values()) {
 				String visum = "";
 				// ANBINDUNG:BEZNR
-				ArrayList<Location> locs = zones.getNearestLocations(node.getCoord(), null);
+				ArrayList<MappedLocation> locs = zones.getNearestLocations(node.getCoord(), null);
 				if (locs.size() > 0) {
 					visum += locs.get(0).getId() + ";";
 				} else {

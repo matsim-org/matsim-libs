@@ -27,11 +27,11 @@ import org.matsim.core.basic.v01.facilities.BasicActivityFacility;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
 
-public interface ActivityFacility extends BasicActivityFacility, Location, Facility {
+public interface ActivityFacility extends BasicActivityFacility, MappedLocation, Facility {
 
 	public ActivityOption createActivityOption(final String type);
 	// TODO [MR] move to Builder

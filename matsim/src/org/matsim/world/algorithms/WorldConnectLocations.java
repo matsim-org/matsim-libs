@@ -39,7 +39,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -145,7 +145,7 @@ public class WorldConnectLocations {
 				Id fid = new IdImpl(entries[0].trim());
 				Id lid = new IdImpl(entries[1].trim());
 				ActivityFacility f = facilities.getFacilities().get(fid);
-				Location l = network.getLink(lid);
+				MappedLocation l = network.getLink(lid);
 				if ((f != null) && (l != null)) {
 					// add the nearest right entry link mapping to the facility f
 					// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
@@ -222,7 +222,7 @@ public class WorldConnectLocations {
 			ActivityFacility f = facilities.getFacilities().get(fid);
 			// add the nearest right entry link mapping to the facility f
 			// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
-			Location l = network.getNearestRightEntryLink(f.getCoord());
+			MappedLocation l = network.getNearestRightEntryLink(f.getCoord());
 			l = world.getLayer(NetworkLayer.LAYER_TYPE).getLocation(l.getId());
 			if (!world.addMapping(f,l)) { throw new RuntimeException("could not add nearest right entry factivity<-->link mappings"); }
 		}
@@ -257,7 +257,7 @@ public class WorldConnectLocations {
 			// remove previous mappings for facility f
 			if (!f.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->facility mappings"); }
 			// add the zone mapping to facility f
-			ArrayList<Location> nearestZones = zones.getNearestLocations(f.getCoord());
+			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(f.getCoord());
 			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
 			else {
 				// choose the first of the list (The list is generated via a defined order of the zones,
@@ -291,7 +291,7 @@ public class WorldConnectLocations {
 			// remove previous mappings for link l
 			if (!l.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->link mappings");  }
 			// add the zone mapping to link l
-			ArrayList<Location> nearestZones = zones.getNearestLocations(l.getCoord());
+			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(l.getCoord());
 			if (nearestZones.isEmpty()) { /* link does not belong to a zone */ }
 			else {
 				// choose the first of the list (The list is generated via a defined order of the zone,

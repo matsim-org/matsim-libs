@@ -38,8 +38,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
+import org.matsim.world.Layer;
+import org.matsim.world.MappedLocation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -192,7 +193,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 //			if (rd4<.30) {udeg=5;}
 					
 			
-			ArrayList<Location> locs = municipalityLayer.getNearestLocations(sub.getStart_coord());
+			ArrayList<MappedLocation> locs = municipalityLayer.getNearestLocations(sub.getStart_coord());
 			Location loc = locs.get(MatsimRandom.getRandom().nextInt(locs.size()));
 			Municipality m = municipalities.getMunicipality(loc.getId());
 			int udeg = m.getRegType();

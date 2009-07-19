@@ -37,8 +37,9 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
+import org.matsim.world.Layer;
+import org.matsim.world.MappedLocation;
 
 public class PlansCalcRouteKti extends PlansCalcRoute {
 
@@ -79,8 +80,8 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		Coord fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
 		Coord toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
 
-		final List<Location> froms = this.municipalities.getNearestLocations(fromStop);
-		final List<Location> tos = this.municipalities.getNearestLocations(toStop);
+		final List<MappedLocation> froms = this.municipalities.getNearestLocations(fromStop);
+		final List<MappedLocation> tos = this.municipalities.getNearestLocations(toStop);
 		Location from = froms.get(0);
 		Location to = tos.get(0);
 		Entry traveltime = this.ptTravelTimes.getEntry(from, to);

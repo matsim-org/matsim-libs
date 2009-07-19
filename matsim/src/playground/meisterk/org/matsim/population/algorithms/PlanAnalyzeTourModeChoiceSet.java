@@ -33,7 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 
@@ -76,7 +76,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 	public void run(PlanImpl plan) {
 
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
-		Location currentLocation = null, requiredLocation = null, nextLocation = null;
+		MappedLocation currentLocation = null, requiredLocation = null, nextLocation = null;
 		
 		// how many mode combinations are possible?
 		int numLegs = plan.getPlanElements().size() / 2;
@@ -88,7 +88,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		for (int numCombination = 0; numCombination < numCombinations; numCombination++) {
 
 			// setup the trackers for all chain-based modes, set all chain-based modes starting at the first location (usually home)
-			HashMap<TransportMode, Location> modeTracker = new HashMap<TransportMode, Location>();
+			HashMap<TransportMode, MappedLocation> modeTracker = new HashMap<TransportMode, MappedLocation>();
 			for (TransportMode mode : this.modeSet) {
 				if (meisterk.getChainBasedModes().contains(mode)) {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
@@ -143,7 +143,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				}
 			}
 			// chain-based modes must finish at the location of the last activity of the plan
-			HashSet<Location> allowedLocations = new HashSet<Location>();
+			HashSet<MappedLocation> allowedLocations = new HashSet<MappedLocation>();
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
 				allowedLocations.add(plan.getFirstActivity().getFacility());
 				allowedLocations.add(plan.getLastActivity().getFacility());

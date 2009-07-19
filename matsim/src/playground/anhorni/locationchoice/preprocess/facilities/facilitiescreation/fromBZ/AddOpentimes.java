@@ -36,7 +36,7 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 
 import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.FacilitiesProductionKTI;
 
@@ -72,7 +72,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
-		List<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
+		List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
 		ActivityOption shopsOf2005ShopAct = ((ActivityFacility) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();

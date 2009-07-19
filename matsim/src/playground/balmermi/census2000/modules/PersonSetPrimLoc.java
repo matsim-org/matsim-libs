@@ -39,7 +39,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -148,7 +148,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	public final void buildZoneFacilityMapping(ZoneLayer layer) {
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			ArrayList<Zone> zones = new ArrayList<Zone>();
-			Iterator<? extends Location> z_it = layer.getLocations().values().iterator();
+			Iterator<? extends MappedLocation> z_it = layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
 				Zone z = (Zone)z_it.next();
 				if (z.contains(f.getCoord())) { zones.add(z); }

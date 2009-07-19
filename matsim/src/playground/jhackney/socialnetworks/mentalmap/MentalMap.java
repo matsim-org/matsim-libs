@@ -42,7 +42,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledge;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 
 import playground.jhackney.socialnetworks.algorithms.SortHashMapByValue;
 import playground.jhackney.socialnetworks.io.ActivityActReader;
@@ -110,7 +110,7 @@ public class MentalMap {
 					// Else the activity is null and we choose an activity to assign to the act
 					LinkImpl myLink = myAct.getLink();
 					// These Locations are facilities by the new convention
-					Collection<Location> locations = myLink.getUpMapping().values();
+					Collection<MappedLocation> locations = myLink.getUpMapping().values();
 					// These Objects are facilities by convention
 					Object[] facs =  locations.toArray();
 					// Assign a random activity (a facility) on the link to the act

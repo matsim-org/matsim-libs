@@ -143,7 +143,7 @@ public class GenerateKnowledge {
 			// Abstand zu allen Links der uebergebenen Person untersuchen
 			for (int i = 0; i < links.size(); i++)
 			{
-				double dist = links.get(i).calcDistance(coord);
+				double dist = ((LinkImpl) (links.get(i))).calcDistance(coord);
 				
 				// Innerhalb des Bereichs?
 				if (dist <= distance)

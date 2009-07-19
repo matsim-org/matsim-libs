@@ -42,8 +42,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
+import org.matsim.world.Layer;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 

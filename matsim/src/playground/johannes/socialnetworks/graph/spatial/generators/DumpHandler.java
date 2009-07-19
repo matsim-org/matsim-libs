@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
@@ -112,7 +113,7 @@ public class DumpHandler implements SampleHandler {
 		this.logInterval = logInterval;
 	}
 
-	@Override
+//	@Override // this is java 1.6
 	public boolean handle(AdjacencyMatrix y, long iteration) {
 		if(iteration % logInterval == 0) {
 			log(y, iteration);

@@ -36,7 +36,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -110,7 +110,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 	private final void initHash() {
 		int z_cnt = this.layer.getLocations().size();
 		int att_cnt = this.heads.length-1; // Note: muni_id is not part of the array
-		Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
+		Iterator<? extends MappedLocation> z_it = this.layer.getLocations().values().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)z_it.next();
 			int[] atts = new int[att_cnt];

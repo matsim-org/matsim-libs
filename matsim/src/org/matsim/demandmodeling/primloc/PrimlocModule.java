@@ -77,7 +77,7 @@ import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -249,7 +249,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 		// We store the zones in a given way so that
 		// we do not rely on the order in the collection
-		Collection<? extends Location> listloc = zoneLayer.getLocations().values();
+		Collection<? extends MappedLocation> listloc = zoneLayer.getLocations().values();
 		int internalID=0;
 		core.numZ = listloc.size();
 		zones = new Zone[ core.numZ ];
@@ -298,7 +298,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		for (PersonImpl guy : population.getPersons().values()) 
 			if( agentHasPrimaryActivityInPlan( guy ) ){
 				ActivityFacility homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
-				ArrayList<Location> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
+				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
 				Zone homezone = (Zone) list.get(0);
 				if( homezone == null )
 					log.warn("Homeless employed person (poor guy)" );
@@ -328,7 +328,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		for( ActivityFacility facility : facilities.getFacilities().values() ){
 			ActivityOption act = facility.getActivityOption( primaryActivityName );
 			if( act != null ){
-				ArrayList<Location> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
+				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
 				Zone zone = (Zone) list.get(0);
 				core.J[ zoneids.get(zone) ] += act.getCapacity();
 				primActFacilitiesPerZone.get( zone ).add( facility );

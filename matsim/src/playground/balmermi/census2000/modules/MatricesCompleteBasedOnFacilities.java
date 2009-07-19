@@ -32,7 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -116,13 +116,13 @@ public class MatricesCompleteBasedOnFacilities {
 		int f_cnt = 0;
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			ArrayList<Zone> zones = new ArrayList<Zone>();
-			Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
+			Iterator<? extends MappedLocation> z_it = this.layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
 				Zone z = (Zone)z_it.next();
 				if (z.contains(f.getCoord())) { zones.add(z); }
 			}
 			if (zones.isEmpty()) {
-				ArrayList<Location> zs = this.layer.getNearestLocations(f.getCoord(),null);
+				ArrayList<MappedLocation> zs = this.layer.getNearestLocations(f.getCoord(),null);
 				for (int i=0; i<zs.size(); i++) {
 					zones.add((Zone)zs.get(i));
 				}
@@ -266,7 +266,7 @@ public class MatricesCompleteBasedOnFacilities {
 		Matrix educ_m = matrices.getMatrix(EDUCATION);
 
 		// removing entries ending at zone z
-		Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
+		Iterator<? extends MappedLocation> z_it = this.layer.getLocations().values().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)z_it.next();
 

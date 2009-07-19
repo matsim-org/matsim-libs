@@ -21,6 +21,7 @@
 package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
@@ -90,6 +91,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 
 	@Override
 	public final double calcDistance(final Coord coord) {
+		// yyyy should, in my view, call the generalized utils method. kai, jul09
 		Coord fc = this.from.getCoord();
 		Coord tc =  this.to.getCoord();
 		double tx = tc.getX();    double ty = tc.getY();

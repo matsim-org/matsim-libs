@@ -40,18 +40,13 @@ import org.matsim.core.network.NetworkLayer;
  * @author Michael Balmer
  */
 public abstract class Layer implements Serializable {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	protected final Id type;
 	protected String name;
 
 	protected MappingRule up_rule = null; // to aggregate
 	protected MappingRule down_rule = null; // to disaggregate
 
-	protected final TreeMap<Id, Location> locations = new TreeMap<Id,Location>();
+	protected final TreeMap<Id, MappedLocation> locations = new TreeMap<Id,MappedLocation>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -95,7 +90,7 @@ public abstract class Layer implements Serializable {
 		if (this.up_rule == null) { return true; }
 		if (this.up_rule.getUpLayer().down_rule == null) { Gbl.errorMsg("This should never happen!"); }
 
-		Iterator<Location> l_it = this.locations.values().iterator();
+		Iterator<MappedLocation> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllUpMappings(); }
 
 		l_it = this.up_rule.getUpLayer().locations.values().iterator();
@@ -111,7 +106,7 @@ public abstract class Layer implements Serializable {
 		if (this.down_rule == null) { return true; }
 		if (this.down_rule.getDownLayer().up_rule == null) { Gbl.errorMsg("This should never happen!"); }
 
-		Iterator<Location> l_it = this.locations.values().iterator();
+		Iterator<MappedLocation> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllDownMappings(); }
 
 		l_it = this.down_rule.getDownLayer().locations.values().iterator();
@@ -145,7 +140,7 @@ public abstract class Layer implements Serializable {
 		return this.down_rule;
 	}
 
-	public final Location getLocation(final Id location_id) {
+	public final MappedLocation getLocation(final Id location_id) {
 		return this.locations.get(location_id);
 	}
 
@@ -163,7 +158,7 @@ public abstract class Layer implements Serializable {
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
 	 */
-	public final ArrayList<Location> getNearestLocations(final Coord coord) {
+	public final ArrayList<MappedLocation> getNearestLocations(final Coord coord) {
 		return getNearestLocations(coord, null);
 	}
 
@@ -179,12 +174,12 @@ public abstract class Layer implements Serializable {
 	 * the same minimal distance, all of them are returned.
 	 * 
 	 */
-	public final ArrayList<Location> getNearestLocations(final Coord coord, final Location excludeLocation) {
-		ArrayList<Location> locs = new ArrayList<Location>();
+	public final ArrayList<MappedLocation> getNearestLocations(final Coord coord, final Location excludeLocation) {
+		ArrayList<MappedLocation> locs = new ArrayList<MappedLocation>();
 		double shortestDistance = Double.MAX_VALUE;
-		Iterator<Location> loc_it = this.locations.values().iterator();
+		Iterator<MappedLocation> loc_it = this.locations.values().iterator();
 		while (loc_it.hasNext()) {
-			Location loc = loc_it.next();
+			MappedLocation loc = loc_it.next();
 			if (loc != excludeLocation) {
 				double distance = loc.calcDistance(coord);
 				if (distance == shortestDistance) { locs.add(loc); }
@@ -194,7 +189,7 @@ public abstract class Layer implements Serializable {
 		return locs;
 	}
 
-	public final TreeMap<Id, ? extends Location> getLocations() {
+	public final TreeMap<Id, ? extends MappedLocation> getLocations() {
 		return this.locations;
 	}
 

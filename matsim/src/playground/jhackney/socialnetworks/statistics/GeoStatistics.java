@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
@@ -30,8 +30,8 @@ public class GeoStatistics {
 	Graph gg;
 	PopulationImpl plans;
 	SocialNetwork snet;
-	LinkedHashMap<Location, Vertex> locVertex = new LinkedHashMap<Location, Vertex>();
-	LinkedHashMap<Vertex, Location> vertexLoc = new LinkedHashMap<Vertex,Location>();
+	LinkedHashMap<MappedLocation, Vertex> locVertex = new LinkedHashMap<MappedLocation, Vertex>();
+	LinkedHashMap<Vertex, MappedLocation> vertexLoc = new LinkedHashMap<Vertex,MappedLocation>();
 	LinkedHashMap<Edge, Double> edgeStrength = new LinkedHashMap<Edge,Double>();
 //	Collection<Location> locations;
 
@@ -54,7 +54,7 @@ public class GeoStatistics {
 
 			ActivityFacility aHome = aPerson.getSelectedPlan().getFirstActivity().getFacility();
 			//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
-			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
+			MappedLocation aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			if(this.locVertex.containsKey(aLoc)){
 				v=this.locVertex.get(aLoc);
 //				System.out.println("  ### GEOSTAT: Graph contains vertex "+ v+" "+aLoc.getId());
@@ -83,8 +83,8 @@ public class GeoStatistics {
 
 			ActivityFacility aHome=personA.getSelectedPlan().getFirstActivity().getFacility();
 			ActivityFacility bHome=personB.getSelectedPlan().getFirstActivity().getFacility();
-			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
-			Location bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
+			MappedLocation aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
+			MappedLocation bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
 
 			Vertex aVertex = this.locVertex.get(aLoc);
 			Vertex bVertex = this.locVertex.get(bLoc);
@@ -125,10 +125,10 @@ public class GeoStatistics {
 		return g;
 	}
 
-	public LinkedHashMap<Location,Vertex> getLocVertex(){
+	public LinkedHashMap<MappedLocation,Vertex> getLocVertex(){
 		return this.locVertex;
 	}
-	public LinkedHashMap<Vertex, Location> getVertexLoc(){
+	public LinkedHashMap<Vertex, MappedLocation> getVertexLoc(){
 		return this.vertexLoc;
 	}
 	public LinkedHashMap<Edge,Double> getEdgeStrength(){

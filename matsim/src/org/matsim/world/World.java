@@ -169,7 +169,7 @@ public class World {
 	}
 
 	@Deprecated
-	public final boolean removeMapping(Location loc1, Location loc2) {
+	public final boolean removeMapping(MappedLocation loc1, MappedLocation loc2) {
 		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
 			// loc1 = down_loc; loc2 = up_loc
 			if (loc1.getUpMapping().containsKey(loc2.getId()) && loc2.getDownMapping().containsKey(loc1.getId())) {
@@ -269,7 +269,7 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 	
 	@Deprecated
-	public final boolean addMapping(Location loc1, Location loc2) {
+	public final boolean addMapping(MappedLocation loc1, MappedLocation loc2) {
 		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
 			// loc1 = down_loc; loc2 = up_loc
 			loc1.addUpMapping(loc2);

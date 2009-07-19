@@ -75,7 +75,7 @@ public class WorldWriter extends Writer {
 		if (l instanceof ZoneLayer) {
 			try {
 				this.writerhandler.startLayer((ZoneLayer)l, this.out);
-				Iterator<? extends Location> z_it = l.getLocations().values().iterator();
+				Iterator<? extends MappedLocation> z_it = l.getLocations().values().iterator();
 				while (z_it.hasNext()) {
 					Zone z = (Zone)z_it.next();
 					this.writerhandler.startZone(z, this.out);
@@ -98,10 +98,10 @@ public class WorldWriter extends Writer {
 		if ((m.getDownLayer() instanceof ZoneLayer)) {
 			try {
 				this.writerhandler.startMapping(m, this.out);
-				Iterator<? extends Location> dz_it = m.getDownLayer().getLocations().values().iterator();
+				Iterator<? extends MappedLocation> dz_it = m.getDownLayer().getLocations().values().iterator();
 				while (dz_it.hasNext()) {
 					Zone dz = (Zone)dz_it.next();
-					Iterator<Location> uz_it = dz.getUpMapping().values().iterator();
+					Iterator<MappedLocation> uz_it = dz.getUpMapping().values().iterator();
 					while (uz_it.hasNext()) {
 						Zone uz = (Zone)uz_it.next();
 						this.writerhandler.startRef(dz, uz, this.out);

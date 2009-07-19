@@ -34,6 +34,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.ZoneLayer;
 
 public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler {
@@ -109,7 +110,7 @@ public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgent
 	private Location getLocation(final Id linkId) {
 		LinkImpl link = this.network.getLinks().get(linkId);
 
-		ArrayList<Location> locs = this.tvzLayer.getNearestLocations(link.getCoord(), null);
+		ArrayList<MappedLocation> locs = this.tvzLayer.getNearestLocations(link.getCoord(), null);
 		if (locs.size() > 0) {
 			return locs.get(0);
 		}

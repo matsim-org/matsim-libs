@@ -46,7 +46,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.Zone;
 
 import playground.balmermi.census2000v2.data.CAtts;
@@ -206,10 +206,10 @@ public class PlansCreateFromCensus2000 {
 		
 		// 3. gathering the educ actvity
 		int sgde = Integer.parseInt(entries[CAtts.I_SGDE]);
-		Location zone = municipalityLayer.getLocation(new IdImpl(sgde));
+		MappedLocation zone = municipalityLayer.getLocation(new IdImpl(sgde));
 		if (zone != null) {
 			List<ActivityOption> acts = new ArrayList<ActivityOption>();
-			for (Location l : zone.getDownMapping().values()) {
+			for (MappedLocation l : zone.getDownMapping().values()) {
 				ActivityOption a = ((ActivityFacility)l).getActivityOption(act_type);
 				if (a != null) { acts.add(a); }
 			}
@@ -296,7 +296,7 @@ public class PlansCreateFromCensus2000 {
 		
 		// 3. gathering the work zone
 		int i_agde = Integer.parseInt(agde);
-		Location zone = municipalityLayer.getLocation(new IdImpl(agde));
+		MappedLocation zone = municipalityLayer.getLocation(new IdImpl(agde));
 		if (zone == null) {
 			if ((i_agde == -7) || (i_agde > 8100)) {
 				log.info("        pid="+p.getId()+", jobnr="+job+": no work muni defined");
@@ -310,7 +310,7 @@ public class PlansCreateFromCensus2000 {
 
 		// 4. try to get work facilities in the given zone with other suitable activity types (i.e. teacher --> work & education facility)
 		List<ActivityFacility> facs = new ArrayList<ActivityFacility>();
-		for (Location l : zone.getDownMapping().values()) {
+		for (MappedLocation l : zone.getDownMapping().values()) {
 			ActivityFacility f = (ActivityFacility)l;
 			Set<String> f_acts = f.getActivityOptions().keySet();
 			boolean has_work = false; for (String w_act : w_acts) { if (f_acts.contains(w_act)) { has_work = true; } }
@@ -322,7 +322,7 @@ public class PlansCreateFromCensus2000 {
 		if (facs.isEmpty()) {
 			log.trace("        pid="+p.getId()+", jobnr="+job+": no facilities for work with additional acts found!");
 			// getting all possible work facilities with additional other act type
-			for (Location l : zone.getDownMapping().values()) {
+			for (MappedLocation l : zone.getDownMapping().values()) {
 				ActivityFacility f = (ActivityFacility)l;
 				Set<String> f_acts = f.getActivityOptions().keySet();
 				boolean has_work = false; for (String w_act : w_acts) { if (f_acts.contains(w_act)) { has_work = true; } }

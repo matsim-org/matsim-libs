@@ -112,7 +112,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 				double dist;
 				
 				if(centerNode != null) dist = CoordUtils.calcDistance(centerNode.getCoord(), coord);
-				else dist = centerLink.calcDistance(coord);
+				else dist = ((LinkImpl)centerLink).calcDistance(coord);
 					
 				// within the distance?
 				if (dist <= distance)

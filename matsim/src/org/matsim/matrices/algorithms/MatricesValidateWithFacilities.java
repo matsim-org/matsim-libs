@@ -29,7 +29,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 
 public class MatricesValidateWithFacilities {
@@ -55,11 +55,11 @@ public class MatricesValidateWithFacilities {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final boolean hasFacility(final Location loc, final String act_type) {
+	private final boolean hasFacility(final MappedLocation loc, final String act_type) {
 		if (loc.getDownMapping().isEmpty()) { return false; }
-		Iterator<Location> dl_it = loc.getDownMapping().values().iterator();
+		Iterator<MappedLocation> dl_it = loc.getDownMapping().values().iterator();
 		while (dl_it.hasNext()) {
-			Location dl = dl_it.next();
+			MappedLocation dl = dl_it.next();
 			ActivityFacility f = this.facilities.getFacilities().get(dl.getId());
 			if (f == null) { 
 				throw new RuntimeException("SOMETHING IS WRONG!!!");
@@ -71,7 +71,7 @@ public class MatricesValidateWithFacilities {
 		return false;
 	}
 
-	private final Location findNearestLocation(final Location location, final String act_type) {
+	private final MappedLocation findNearestLocation(final MappedLocation location, final String act_type) {
 		ActivityFacility nearest_facility = null;
 		double distance = Double.MAX_VALUE;
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
@@ -86,11 +86,11 @@ public class MatricesValidateWithFacilities {
 		if (nearest_facility == null) {
 			throw new RuntimeException("No facility with act_type = " + act_type + "exists");
 		}
-		Location dl = this.world.getLayer(ActivityFacilities.LAYER_TYPE).getLocation(nearest_facility.getId());
+		MappedLocation dl = this.world.getLayer(ActivityFacilities.LAYER_TYPE).getLocation(nearest_facility.getId());
 		if (dl.getUpMapping().size() != 1) {
 			Gbl.errorMsg("down location id=" + dl.getId() + " has " + dl.getUpMapping().size() + "up mappings");
 		}
-		Location nearest_location = dl.getUpMapping().get(dl.getUpMapping().firstKey());
+		MappedLocation nearest_location = dl.getUpMapping().get(dl.getUpMapping().firstKey());
 		return nearest_location;
 	}
 
@@ -111,9 +111,9 @@ public class MatricesValidateWithFacilities {
 			System.out.println("      checking matrix " + m.toString() + "...");
 
 			System.out.println("        finding locs without any downmapping and remove all from- and to-trips...");
-			Iterator<? extends Location> loc_it = m_l.getLocations().values().iterator();
+			Iterator<? extends MappedLocation> loc_it = m_l.getLocations().values().iterator();
 			while (loc_it.hasNext()) {
-				Location loc = loc_it.next();
+				MappedLocation loc = loc_it.next();
 				if (loc.getDownMapping().isEmpty()) {
 					System.out.println("          remove from- and to-trips of location id=" + loc.getId());
 					m.removeFromLocEntries(loc);
@@ -123,12 +123,12 @@ public class MatricesValidateWithFacilities {
 			System.out.println("        done.");
 
 			System.out.println("        remove all trips with no 'home' facility at 'from' and no '" + act_type + "' facility at 'to'...");
-			Iterator<? extends Location> from_loc_it = m_l.getLocations().values().iterator();
+			Iterator<? extends MappedLocation> from_loc_it = m_l.getLocations().values().iterator();
 			while (from_loc_it.hasNext()) {
-				Location from_loc = from_loc_it.next();
-				Iterator<? extends Location> to_loc_it = m_l.getLocations().values().iterator();
+				MappedLocation from_loc = from_loc_it.next();
+				Iterator<? extends MappedLocation> to_loc_it = m_l.getLocations().values().iterator();
 				while (to_loc_it.hasNext()) {
-					Location to_loc = to_loc_it.next();
+					MappedLocation to_loc = to_loc_it.next();
 
 					Entry e = m.getEntry(from_loc,to_loc);
 					if (e != null) {
@@ -143,10 +143,10 @@ public class MatricesValidateWithFacilities {
 			System.out.println("        adding trips to locations which have no 'from' entries but consists of 'home' facilities...");
 			from_loc_it = m_l.getLocations().values().iterator();
 			while (from_loc_it.hasNext()) {
-				Location from_loc = from_loc_it.next();
+				MappedLocation from_loc = from_loc_it.next();
 				if (this.hasFacility(from_loc,"home")) {
 					if (m.getFromLocEntries(from_loc) == null) {
-						Location to_loc = this.findNearestLocation(from_loc,act_type);
+						MappedLocation to_loc = this.findNearestLocation(from_loc,act_type);
 						Entry e = m.setEntry(from_loc,to_loc, 1);
 						System.out.println("          create entry: " + e.toString());
 					}

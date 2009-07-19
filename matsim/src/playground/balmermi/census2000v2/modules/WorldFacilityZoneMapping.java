@@ -23,11 +23,12 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.world.Location;
+import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -87,10 +88,10 @@ public class WorldFacilityZoneMapping {
 		for (ActivityFacility f : fs.getFacilities().values()) {
 			if (f.getUpMapping().size() == 0) {
 				if (f.getActivityOption(CAtts.ACT_HOME) != null) { Gbl.errorMsg("That should not happen!"); }
-				ArrayList<Location> locs = new ArrayList<Location>();
-				Location nearest_loc = null;
+				ArrayList<MappedLocation> locs = new ArrayList<MappedLocation>();
+				MappedLocation nearest_loc = null;
 				double min_dist = Double.MAX_VALUE;
-				for (Location z : ms.getLocations().values()) {
+				for (MappedLocation z : ms.getLocations().values()) {
 					double dist = z.calcDistance(f.getCoord());
 					if (dist == 0.0) { locs.add(z); }
 					if (min_dist > dist) { min_dist = dist; nearest_loc = z; }
@@ -100,7 +101,7 @@ public class WorldFacilityZoneMapping {
 					log.warn("      no zone for f_id="+f.getId()+". assigning nearest zone_id="+nearest_loc.getId()+" with dist(f->z)="+min_dist);
 				}
 				else {
-					Location z = locs.get(MatsimRandom.getRandom().nextInt(locs.size()));
+					MappedLocation z = locs.get(MatsimRandom.getRandom().nextInt(locs.size()));
 					world.addMapping(z,f);
 				}
 			}
