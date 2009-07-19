@@ -23,10 +23,13 @@ public class PMessageQueue extends MessageQueue {
 	private PriorityQueue<Message> queueThread2 = new PriorityQueue<Message>();
 	public long idOfLowerThread = 0;
 	public long idOfMainThread = 0;
+	private LinkedList<Message> bufferThread1 = new LinkedList<Message>();
+	private LinkedList<Message> bufferThread2 = new LinkedList<Message>();
 	// private int queueSize = 0;
 
 	// the maximum time difference two threads are allowed to have in [s] (for
-	// message time stamp) => with this parameter the number of locks can be reduced...
+	// message time stamp) => with this parameter the number of locks can be
+	// reduced...
 	private double maxTimeDelta = 10;
 
 	public boolean lowerThreadWitnessedEmptyQueue = false;
@@ -46,13 +49,11 @@ public class PMessageQueue extends MessageQueue {
 		boolean inLowerThreadCurrently = idOfCurrentThread == idOfLowerThread ? true
 				: false;
 		ExtendedRoad messageTargetRoad = null;
-		
-		
+
 		PVehicle vehicle = (PVehicle) ((EventMessage) m).vehicle;
 
-		ExtendedRoad receivingRoad = (ExtendedRoad) m
-				.getReceivingUnit();
-		
+		ExtendedRoad receivingRoad = (ExtendedRoad) m.getReceivingUnit();
+
 		ExtendedRoad currentRoad = receivingRoad;
 		ExtendedRoad nextRoad = receivingRoad;
 		Link tempLink = null;
@@ -63,71 +64,77 @@ public class PMessageQueue extends MessageQueue {
 
 			tempLink = vehicle.getCurrentLink();
 			if (tempLink != null) {
-				currentRoad = (ExtendedRoad) Road.getRoad(tempLink
-						.getId().toString());
+				currentRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
+						.toString());
 			}
 
-			messageTargetRoad=currentRoad;
+			messageTargetRoad = currentRoad;
 
 		} else if (m instanceof LeaveRoadMessage) {
 
-			messageTargetRoad=receivingRoad;
+			messageTargetRoad = receivingRoad;
 
 		} else if (m instanceof EndRoadMessage) {
 
-			
-
 			tempLink = vehicle.getNextLinkInLeg();
 			if (tempLink != null) {
-				nextRoad = (ExtendedRoad) Road.getRoad(tempLink
-						.getId().toString());
+				nextRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
+						.toString());
 			}
 
-			messageTargetRoad=nextRoad;
+			messageTargetRoad = nextRoad;
 		} else if (m instanceof DeadlockPreventionMessage) {
-			messageTargetRoad=receivingRoad;
+			messageTargetRoad = receivingRoad;
 		} else if (m instanceof StartingLegMessage) {
-			
+
 			if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)) {
 				tempLink = vehicle.getCurrentLink();
 				if (tempLink != null) {
-					currentRoad = (ExtendedRoad) Road.getRoad(tempLink
-							.getId().toString());
+					currentRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
+							.toString());
 				}
-				
-				messageTargetRoad=currentRoad;
+
+				messageTargetRoad = currentRoad;
 			} else {
-				// TODO: we need the first link in the next leg. if this does not function
+				// TODO: we need the first link in the next leg. if this does
+				// not function
 				// then we need to do this manually.
 				tempLink = vehicle.getNextLinkInLeg();
 				if (tempLink != null) {
-					nextRoad = (ExtendedRoad) Road.getRoad(tempLink
-							.getId().toString());
+					nextRoad = (ExtendedRoad) Road.getRoad(tempLink.getId()
+							.toString());
 				}
-				messageTargetRoad=nextRoad;
+				messageTargetRoad = nextRoad;
 			}
 		} else if (m instanceof EndLegMessage) {
-			messageTargetRoad=currentRoad;
+			messageTargetRoad = currentRoad;
 		} else {
 			// there are no other type of messages which can come
 			// here...
 			assert (false);
 		}
-		
-		
-		
-		
-		
-		boolean roadBelongsToLowerThreadZone = messageTargetRoad.getThreadZoneId() == 0 ? true
-				: false;
 
+		boolean roadBelongsToLowerThreadZone = messageTargetRoad
+				.getThreadZoneId() == 0 ? true : false;
+
+		// a thread should put messages of his zone directly into his zone queue
+		// but messages for other zone should be put into a buffer
+		// Profiling shows: This strategy really removes blocking of the threads...
 		if (roadBelongsToLowerThreadZone) {
-			synchronized (queueThread1) {
+			if (inLowerThreadCurrently) {
 				queueThread1.add(m);
+			} else {
+				synchronized (bufferThread1) {
+					bufferThread1.add(m);
+				}
 			}
 		} else {
-			synchronized (queueThread2) {
+			if (!inLowerThreadCurrently) {
 				queueThread2.add(m);
+			} else {
+				synchronized (bufferThread2) {
+					bufferThread2.add(m);
+				}
 			}
 		}
 
@@ -190,53 +197,55 @@ public class PMessageQueue extends MessageQueue {
 		// this operation should be synchronized (queueThread1 and
 		// queueThread2), but it is not
 		// for performance reasons...
-		if (queueThread1.peek() != null && queueThread2.peek() != null) {
-			double delta = queueThread1.peek().getMessageArrivalTime()
-					- queueThread2.peek().getMessageArrivalTime();
-			if (Math.abs(delta) > maxTimeDelta) {
-				if ((inLowerThreadCurrently && delta > 0)
-						|| (!inLowerThreadCurrently && delta < 0)) {
-					return null;
-				}
-			}
-		}
 
-		if (inLowerThreadCurrently) {
-			synchronized (queueThread1) {
-				if (queueThread1.peek() != null) {
-					// skip over dead messages
-					// synchronization needed, because deadlock message
-					// might
-					// have been manupulated
-
-					while ((m = queueThread1.poll()) != null) {
-						synchronized (m) {
-							if (m.isAlive()) {
-								break;
-							}
-						}
-					}
-				}
-			}
-		} else {
-			synchronized (queueThread2) {
-				if (queueThread2.peek() != null) {
-					// skip over dead messages
-					// synchronization needed, because deadlock message
-					// might
-					// have been manupulated
-					while ((m = queueThread2.poll()) != null) {
-						synchronized (m) {
-							if (m.isAlive()) {
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
+		// if (queueThread1.peek() != null && queueThread2.peek() != null) {
+		// double delta = queueThread1.peek().getMessageArrivalTime()
+		// - queueThread2.peek().getMessageArrivalTime();
+		// if (Math.abs(delta) > maxTimeDelta) {
+		// if ((inLowerThreadCurrently && delta > 0)
+		// || (!inLowerThreadCurrently && delta < 0)) {
+		// return null;
+		// }
+		// }
+		// }
+		//
+		// if (inLowerThreadCurrently) {
+		// synchronized (queueThread1) {
+		// if (queueThread1.peek() != null) {
+		// // skip over dead messages
+		// // synchronization needed, because deadlock message
+		// // might
+		// // have been manupulated
+		//
+		// while ((m = queueThread1.poll()) != null) {
+		// synchronized (m) {
+		// if (m.isAlive()) {
+		// break;
+		// }
+		// }
+		// }
+		// }
+		// }
+		// } else {
+		// synchronized (queueThread2) {
+		// if (queueThread2.peek() != null) {
+		// // skip over dead messages
+		// // synchronization needed, because deadlock message
+		// // might
+		// // have been manupulated
+		// while ((m = queueThread2.poll()) != null) {
+		// synchronized (m) {
+		// if (m.isAlive()) {
+		// break;
+		// }
+		// }
+		// }
+		// }
+		// }
+		// }
 
 		return m;
+
 	}
 
 	/*
@@ -246,10 +255,26 @@ public class PMessageQueue extends MessageQueue {
 	 * As input give an empty list and get the same list back with messages in
 	 * it.
 	 */
+	/**
+	 * TODO: Probably we could switch back to getNextMessage now, as the locking logic has changed now...
+	 * => not really oder?
+	 */
 	public LinkedList<Message> getNextMessages(LinkedList<Message> list) {
 		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
 				: false;
 		Message m = null;
+
+		if (inLowerThreadCurrently) {
+			synchronized (bufferThread1) {
+				queueThread1.addAll(bufferThread1);
+				bufferThread1.clear();
+			}
+		} else {
+			synchronized (bufferThread2) {
+				queueThread2.addAll(bufferThread2);
+				bufferThread2.clear();
+			}
+		}
 
 		// find out how far we can max go in time...
 		// this operation should be synchronized (queueThread1 and
@@ -259,7 +284,8 @@ public class PMessageQueue extends MessageQueue {
 		double myMinTimeStamp = -1;
 		double otherThreadMinTimeStamp = -1;
 
-		// as we are not using syncrhonization, a null pointer exception might happen...
+		// as we are not using syncrhonization, a null pointer exception might
+		// happen...
 		try {
 			if (inLowerThreadCurrently) {
 				if (queueThread1.peek() != null) {
@@ -293,19 +319,19 @@ public class PMessageQueue extends MessageQueue {
 		if (inLowerThreadCurrently) {
 			// just give back all messages which are in the allowed time
 			// (stamp) range
-			synchronized (queueThread1) {
-				while (queueThread1.peek() != null
-						&& queueThread1.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
-					list.add(queueThread1.poll());
-				}
+
+			while (queueThread1.peek() != null
+					&& queueThread1.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
+				list.add(queueThread1.poll());
 			}
+
 		} else {
-			synchronized (queueThread2) {
-				while (queueThread2.peek() != null
-						&& queueThread2.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
-					list.add(queueThread2.poll());
-				}
+
+			while (queueThread2.peek() != null
+					&& queueThread2.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
+				list.add(queueThread2.poll());
 			}
+
 		}
 
 		return list;

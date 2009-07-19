@@ -111,9 +111,10 @@ public class MessageExecutor extends Thread {
 				// instead of just
 				// one in the queue, the advantage of this is not given
 				// anymore...
-				// for (int i = 0; i < 10000; i++) {
-				//
-				// }
+				// some small improvements are possible with this...
+				 for (int i = 0; i < 10000; i++) {
+				
+				 }
 
 				missedNumberOfLocks++;
 

@@ -51,12 +51,17 @@ import org.matsim.core.api.experimental.population.Leg;
 /*
  * Some first performance experiments:
  * (100% Zürich, on home compi)
- * - parallel JDEQSim: 
- * - JDEQSim:
+ * - parallel JDEQSim (optimal division - manual): 
+ * - JDEQSim: 181.4sec.
+ * - parallel JDEQSim (without optimal devision): 153.2 sec./ 136.3 sec. (not yet optimal, as not fifty fifty devision of events).
  * 
  * (10% Zürich, on home compi)
- * - parallel JDEQSim: 22sec./20sec. (we need to find the best cut position...)
+ * - parallel JDEQSim (optimal division - manual): 19.4 sec. / 17.1 sec.
  * - JDEQSim: 25sec.
+ * - parallel JDEQSim (without optimal devision): 21.9 sec. / 19.490 sec.
+ * 
+ * 
+ * for parallel JDEQSim: (time including initialization / time just of the simulation)
  * 
  */
 public class PJDEQSimulation extends JDEQSimulation {
@@ -134,7 +139,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// TODO: remove this line...
 		// just for finding out how a perfect distribution would work
-		// for 10% Zh: networkXMedian=682997.8204694573
+		// for 10% Zh: 
+		//networkXMedian=682997.8204694573;
 		//networkXMedian += 3000;
 
 		System.out.println();
