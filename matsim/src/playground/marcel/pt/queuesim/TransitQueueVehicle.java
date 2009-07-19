@@ -38,7 +38,11 @@ public class TransitQueueVehicle extends QueueVehicleImpl implements TransitVehi
 	public TransitQueueVehicle(final BasicVehicle basicVehicle, final double sizeInEquivalents) {
 		super(basicVehicle, sizeInEquivalents);
 		BasicVehicleCapacity capacity = basicVehicle.getType().getCapacity();
-		this.passengerCapacity = capacity.getSeats().intValue() + capacity.getStandingRoom().intValue() - 1; // the driver also takes on seat
+		if (capacity == null) {
+			throw new NullPointerException("No capacity set in vehicle type.");
+		}
+		this.passengerCapacity = capacity.getSeats().intValue() +
+				(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue()) - 1; // the driver also takes on seat
 	}
 
 	public boolean addPassenger(final PassengerAgent passenger) {
