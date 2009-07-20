@@ -1,9 +1,10 @@
 /**
- * 
+ *
  */
 package playground.yu.test;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -14,19 +15,18 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithWalk;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	private static class LegChainModesListener1 implements
 			IterationEndsListener {
-		public void notifyIterationEnds(IterationEndsEvent event) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			int itr = event.getIteration();
 			String criterion = "";
@@ -81,7 +81,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	private static class LegChainModesListener2 implements
 			IterationEndsListener {
-		public void notifyIterationEnds(IterationEndsEvent event) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			int itr = event.getIteration();
 			String criterion = "";
@@ -136,7 +136,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	private static class LegChainModesListener3 implements
 			IterationEndsListener {
-		public void notifyIterationEnds(IterationEndsEvent event) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			int itr = event.getIteration();
 			String criterion = "";
@@ -197,52 +197,47 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes1() {
 		// the agent in the initial plan has only "walk" legs.
-		String[] args = new String[] { getInputDirectory() + "config1.xml" };
-		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
+		Config config = loadConfig(getInputDirectory() + "config1.xml");
+		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener1());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						new ScenarioLoader(args[0]).loadScenario().getConfig()
-								.charyparNagelScoring()));
+		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring()));
 		ctl.run();
 	}
 
 	public void testLegChainModes2() {
 		// the agent in the initial plan has only "car" legs.
-		String[] args = new String[] { getInputDirectory() + "config2.xml" };
-		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
+		Config config = loadConfig(getInputDirectory() + "config2.xml" );
+		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener2());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						new ScenarioLoader(args[0]).loadScenario().getConfig()
-								.charyparNagelScoring()));
+		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring()));
 		ctl.run();
 	}
 
 	public void testLegChainModes3() {
 		// the agent in the initial plan has only "pt" legs.
-		String[] args = new String[] { getInputDirectory() + "config3.xml" };
-		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
+		Config config = loadConfig(getInputDirectory() + "config3.xml");
+		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener3());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
-		ctl
-				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						new ScenarioLoader(args[0]).loadScenario().getConfig()
-								.charyparNagelScoring()));
+		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
+						config.charyparNagelScoring()));
 		ctl.run();
 	}
 
 	private static class ChangeLegModeWithParkLocationControler extends
 			Controler {
-		public ChangeLegModeWithParkLocationControler(String[] args) {
-			super(args);
+		public ChangeLegModeWithParkLocationControler(final Config config) {
+			super(config);
 		}
 
+		@Override
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
 			StrategyManagerConfigLoader.load(this, this.config, manager);
