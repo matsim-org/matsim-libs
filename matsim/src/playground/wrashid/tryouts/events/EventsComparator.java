@@ -41,6 +41,7 @@ public class EventsComparator {
 		
 		//System.out.println(EventStatistics.compareAgentTripDuration(new IdImpl("104581"), eventStatistics, eventStatistics2));
 		
+		// TODO: This does not work yet...
 		EventStatistics.printTotalTraveTimesAll(eventStatistics, eventStatistics2);
 	}
 	
