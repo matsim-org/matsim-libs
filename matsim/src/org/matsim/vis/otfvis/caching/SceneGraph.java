@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFData;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 
 
@@ -118,7 +118,7 @@ public class SceneGraph {
 		return layer.newInstance(clazz);
 	}
 
-	public void addItem(OTFData.Receiver item) {
+	public void addItem(OTFDataReceiver item) {
 		SceneLayer layer = layers.get(item.getClass());
 		if (layer == null)layer = layers.get(Object.class); //DS must exist: default handling
 		

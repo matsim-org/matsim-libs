@@ -25,15 +25,15 @@ import java.nio.ByteBuffer;
 
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFData;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFDataXYCoord;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.OTFDataXYCoordReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCoord.Provider  {
-	private OTFDataXYCoord.Receiver xyReceiver = null;
+public class OTFDefaultNodeHandler extends OTFDataReader   {
+	private OTFDataXYCoordReceiver xyReceiver = null;
 
 	static public class Writer extends  OTFDataWriter<QueueNode> implements OTFWriterFactory<QueueNode> {
 
@@ -69,9 +69,9 @@ public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCo
 	}
 
 	@Override
-	public void connect(OTFData.Receiver receiver) {
-		if (receiver instanceof OTFDataXYCoord.Receiver) {
-			this.xyReceiver = (OTFDataXYCoord.Receiver) receiver;
+	public void connect(OTFDataReceiver receiver) {
+		if (receiver instanceof OTFDataXYCoordReceiver) {
+			this.xyReceiver = (OTFDataXYCoordReceiver) receiver;
 		}
 	}
 

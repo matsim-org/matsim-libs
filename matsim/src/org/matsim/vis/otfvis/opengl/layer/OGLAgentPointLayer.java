@@ -35,7 +35,7 @@ import javax.media.opengl.GL;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
+import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -210,7 +210,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 	}
 	
-	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver {
+	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
 	
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			if (user != 2) {
@@ -270,7 +270,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 	}
 
-	public static class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver  {
+	public static class NoAgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver  {
 		
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color){
 		}

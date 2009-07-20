@@ -87,7 +87,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.renderers.ValueColorizer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
+import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFClientQuad.ClassCountExecutor;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.OTFVisConfig.ZoomEntry;
@@ -390,7 +390,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 	}
 
-	public static class AgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver {
+	public static class AgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgentReceiver {
 		//Anything above 50km/h should be yellow!
 		private final static FastColorizer colorizer = new FastColorizer(
 				new double[] { 0.0, 25, 50, 75}, new Color[] {

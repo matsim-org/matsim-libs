@@ -48,9 +48,9 @@ import javax.swing.event.MouseInputAdapter;
 import org.matsim.vis.netvis.renderers.ValueColorizer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFData;
-import org.matsim.vis.otfvis.data.OTFDataQuad;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
+import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 
 
@@ -58,7 +58,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
  * @author david
  *
  */
-abstract class OTFSwingDrawable implements OTFDrawable, OTFData.Receiver{
+abstract class OTFSwingDrawable implements OTFDrawable, OTFDataReceiver{
 	static Graphics2D g2d = null;
 	//static AffineTransform boxTransform = null;
 
@@ -353,7 +353,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	/***
 	 * Drawer class for drawing simple quads
 	 */
-	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuad.Receiver{
+	public static class SimpleQuadDrawer extends OTFSwingDrawable implements OTFDataQuadReceiver{
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
 //		protected float coloridx = 0;
 		
@@ -411,7 +411,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	 * Drawer class for drawing agents 
 	 */
 	
-	public static class AgentDrawer extends OTFSwingDrawable implements OTFDataSimpleAgent.Receiver{
+	public static class AgentDrawer extends OTFSwingDrawable implements OTFDataSimpleAgentReceiver{
 		//Anything above 50km/h should be yellow!
 		private final static ValueColorizer colorizer = new ValueColorizer(
 				new double[] { 0.0, 30., 50.}, new Color[] {

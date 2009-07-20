@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 import playground.gregor.otf.drawer.OTFInundationDrawer;
 import playground.gregor.otf.drawer.OTFSheltersDrawer;
@@ -20,7 +20,7 @@ public class SheltersReader extends OTFDataReader {
 	private TimeDependentTrigger receiver;
 
 	@Override
-	public void connect(Receiver receiver) {
+	public void connect(OTFDataReceiver receiver) {
 		this.receiver = (TimeDependentTrigger) receiver;
 		
 		

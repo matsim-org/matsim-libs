@@ -33,7 +33,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
@@ -79,7 +79,7 @@ public class FacilityDrawer {
 		private DataDrawer drawer = null;
 		
 		@Override
-		public void connect(Receiver receiver) {
+		public void connect(OTFDataReceiver receiver) {
 			if (receiver instanceof DataDrawer) {
 				this.drawer = (DataDrawer) receiver;
 			}

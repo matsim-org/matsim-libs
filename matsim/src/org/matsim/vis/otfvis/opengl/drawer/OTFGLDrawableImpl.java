@@ -23,10 +23,10 @@ package org.matsim.vis.otfvis.opengl.drawer;
 import javax.media.opengl.GL;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFData;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 
-public abstract class OTFGLDrawableImpl implements OTFGLDrawable, OTFData.Receiver {
+public abstract class OTFGLDrawableImpl implements OTFGLDrawable, OTFDataReceiver {
 	boolean isValid = true;
 	static public GL gl;
 

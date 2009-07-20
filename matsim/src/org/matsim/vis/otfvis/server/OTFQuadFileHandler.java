@@ -64,7 +64,7 @@ public class OTFQuadFileHandler {
 	// the version number should be increased to imply a compatibility break
 	public static final int VERSION = 1;
 	// minor version increase does not break compatibility
-	public static final int MINORVERSION = 4;
+	public static final int MINORVERSION = 5;
 
 	public static class Writer implements SimStateWriterI, SnapshotWriter {
 		protected final QueueNetwork net;
@@ -244,6 +244,10 @@ public class OTFQuadFileHandler {
 
 		TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
 
+		// TODO [DS] This is not safe when opening more than one file concurrently 
+		public static int version = 0;
+		public static int minorversion = 0;
+
 		private void scanZIPFile(ZipFile zipFile) {
 			this.nextTime = -1;
 			// Create an enumeration of the entries in the zip file
@@ -300,8 +304,8 @@ public class OTFQuadFileHandler {
 				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
 				ZipEntry infoEntry = zipFile.getEntry("info.bin");
 				this.inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
-				int version = this.inFile.readInt();
-				int minorversion = this.inFile.readInt();
+				version = this.inFile.readInt();
+				minorversion = this.inFile.readInt();
 				this.intervall_s = this.inFile.readDouble();
 				OTFVisConfig config = (OTFVisConfig) Gbl.getConfig().getModule(
 						OTFVisConfig.GROUP_NAME);
@@ -335,6 +339,8 @@ public class OTFQuadFileHandler {
 			@Override
 			protected Class resolveClass(final ObjectStreamClass desc)
 					throws IOException, ClassNotFoundException {
+				if((version >= 1) && (minorversion >=5))super.resolveClass(desc);
+				// these remappings only happen with older file versions
 				String name = desc.getName();
 				System.out.println("try to resolve " + name);
 				//org.matsim.core.utils.collections

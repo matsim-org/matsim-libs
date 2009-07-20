@@ -11,7 +11,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
+import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
@@ -35,7 +35,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 			new double[] { 0.0, 50.}, new Color[] {	Color.BLUE, Color.YELLOW});
 	private static AgentArrayDrawer drawer = new AgentArrayDrawer();
 
-	public class AgentPointDrawerBlue implements OTFGLDrawable, OTFDataSimpleAgent.Receiver {
+	public class AgentPointDrawerBlue implements OTFGLDrawable, OTFDataSimpleAgentReceiver {
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 				drawer.addAgent(id, startX, startY, colorizerBlue.getColor(0.1 + 0.9*color), true);
 		}

@@ -30,10 +30,10 @@ import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
@@ -46,7 +46,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	protected Class agentReceiverClass = null;
 
-	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
+	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 	public static class ExtendedPositionInfo extends PositionInfo {
 
 		int type = 0;
@@ -108,9 +108,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		// Convert to km/h
 		float speed = in.getFloat()*3.6f;
 
-			OTFDataSimpleAgent.Receiver drawer = null;
+			OTFDataSimpleAgentReceiver drawer = null;
 			try {
-				drawer = (OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
+				drawer = (OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
 				drawer.setAgent(id.toCharArray(), x, y, type, user, speed);
 				agents.add(drawer);
 			} catch (InstantiationException e) {
@@ -137,9 +137,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 
 	@Override
-	public void connect(Receiver receiver) {
+	public void connect(OTFDataReceiver receiver) {
 		//connect agent receivers
-		if (receiver  instanceof OTFDataSimpleAgent.Receiver) {
+		if (receiver  instanceof OTFDataSimpleAgentReceiver) {
 			this.agentReceiverClass = receiver.getClass();
 		}
 
@@ -149,7 +149,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	@Override
 	public void invalidate(SceneGraph graph) {
 		// invalidate agent receivers
-		for(OTFDataSimpleAgent.Receiver agent : agents) agent.invalidate(graph);
+		for(OTFDataSimpleAgentReceiver agent : agents) agent.invalidate(graph);
 	}
 
 
@@ -169,9 +169,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			// Convert to km/h
 			float color = in.getFloat()*3.6f;
 
-				OTFDataSimpleAgent.Receiver drawer = null;
+				OTFDataSimpleAgentReceiver drawer = null;
 				try {
-					drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
+					drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
 					drawer.setAgent(id.toCharArray(), x, y, 0, state, color);
 					agents.add(drawer);
 				} catch (InstantiationException e) {

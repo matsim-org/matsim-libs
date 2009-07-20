@@ -35,10 +35,10 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
@@ -55,7 +55,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	public static boolean showParked = false;
 	
-	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
+	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 	
 	static public class Writer extends  OTFDefaultLinkHandler.Writer {
 
@@ -153,9 +153,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		// No agent receiver given, then we are finished
 		if (agentReceiverClass == null) return;
 
-		OTFDataSimpleAgent.Receiver drawer = null;
+		OTFDataSimpleAgentReceiver drawer = null;
 		try {
-			drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
+			drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
 			drawer.setAgent(id.toCharArray(), x, y, 0, state, color);
 			agents.add(drawer);
 		} catch (InstantiationException e) {
@@ -177,10 +177,10 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	}
 
 	@Override
-	public void connect(Receiver receiver) {
+	public void connect(OTFDataReceiver receiver) {
 		super.connect(receiver);
 		//connect agent receivers
-		if (receiver  instanceof OTFDataSimpleAgent.Receiver) {
+		if (receiver  instanceof OTFDataSimpleAgentReceiver) {
 			this.agentReceiverClass = receiver.getClass();
 		}
 
@@ -190,7 +190,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	public void invalidate(SceneGraph graph) {
 		super.invalidate(graph);
 		// invalidate agent receivers
-		for(OTFDataSimpleAgent.Receiver agent : agents) agent.invalidate(graph);
+		for(OTFDataSimpleAgentReceiver agent : agents) agent.invalidate(graph);
 	}
 
 	

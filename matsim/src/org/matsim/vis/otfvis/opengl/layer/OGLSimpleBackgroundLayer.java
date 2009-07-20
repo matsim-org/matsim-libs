@@ -27,7 +27,7 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
 
@@ -51,7 +51,7 @@ public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {
 	}
 
 	@Override
-	public void addItem(final Receiver item) {
+	public void addItem(final OTFDataReceiver item) {
 		final AbstractBackgroundDrawer drawer = (AbstractBackgroundDrawer)item;
 		items.add(drawer);
 	}

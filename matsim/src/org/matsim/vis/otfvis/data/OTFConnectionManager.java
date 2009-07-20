@@ -156,13 +156,13 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		return Object.class;
 	}
 
-	public Collection<OTFData.Receiver> getReceivers(Class srcClass, SceneGraph graph) {
+	public Collection<OTFDataReceiver> getReceivers(Class srcClass, SceneGraph graph) {
 		Collection<Class> classList = getEntries(srcClass);
-		List<OTFData.Receiver> receiverList = new LinkedList<OTFData.Receiver>();
+		List<OTFDataReceiver> receiverList = new LinkedList<OTFDataReceiver>();
 		
 		for(Class entry : classList) {
 			try {
-				receiverList.add((OTFData.Receiver)(graph.newInstance(entry)));
+				receiverList.add((OTFDataReceiver)(graph.newInstance(entry)));
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

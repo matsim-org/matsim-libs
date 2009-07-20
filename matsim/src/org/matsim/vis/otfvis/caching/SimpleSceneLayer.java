@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.caching;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
 
 
@@ -38,7 +38,7 @@ public class SimpleSceneLayer extends DefaultSceneLayer {
 	protected final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
 
 	@Override
-	public void addItem(Receiver item) {
+	public void addItem(OTFDataReceiver item) {
 		items.add((OTFDrawable)item);
 	}
 

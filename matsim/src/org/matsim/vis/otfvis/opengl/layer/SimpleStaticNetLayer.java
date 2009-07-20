@@ -33,8 +33,8 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
-import org.matsim.vis.otfvis.data.OTFDataQuad;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
@@ -47,7 +47,7 @@ import com.sun.opengl.util.texture.TextureCoords;
 
 public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 
-	public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuad.Receiver{
+	public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuadReceiver{
 
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
 		protected float coloridx = 0;
@@ -146,7 +146,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	/*package*/ static float cellWidth_m = 30.f;
 
 	@Override
-	public void addItem(Receiver item) {
+	public void addItem(OTFDataReceiver item) {
 		// only add items in initial run
 		if (netDisplList < 0) items.add((OTFDrawable)item);
 	}

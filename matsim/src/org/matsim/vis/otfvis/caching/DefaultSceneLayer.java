@@ -20,7 +20,7 @@
 
 package org.matsim.vis.otfvis.caching;
 
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 /**
  * The DefaultSceneLayer is an empty SceneLayer that implements all interface methods as empty methods.
@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.data.OTFData.Receiver;
  */
 public abstract class DefaultSceneLayer implements SceneLayer {
 
-	public void addItem(Receiver item) {
+	public void addItem(OTFDataReceiver item) {
 	}
 
 	public void draw() {

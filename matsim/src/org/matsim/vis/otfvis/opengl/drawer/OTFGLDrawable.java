@@ -22,11 +22,11 @@ package org.matsim.vis.otfvis.opengl.drawer;
 
 import javax.media.opengl.GL;
 
-import org.matsim.vis.otfvis.data.OTFData;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
 
 
-public interface OTFGLDrawable extends OTFDrawable , OTFData.Receiver{
+public interface OTFGLDrawable extends OTFDrawable , OTFDataReceiver{
 	public void onDraw(GL gl);
 }
 

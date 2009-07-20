@@ -6,7 +6,7 @@ import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
@@ -14,7 +14,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 public class PolygonDataReader extends OTFDataReader{
 
 	@Override
-	public void connect(Receiver receiver) {
+	public void connect(OTFDataReceiver receiver) {
 		// TODO Auto-generated method stub
 		
 	}

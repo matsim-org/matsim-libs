@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFData;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 
 public abstract class  OTFDataReader {
@@ -53,7 +53,7 @@ public abstract class  OTFDataReader {
 	}
 	public abstract void readConstData(ByteBuffer in) throws IOException;
 	public abstract void readDynData(ByteBuffer in, SceneGraph graph) throws IOException;
-	public abstract void connect(OTFData.Receiver receiver);
+	public abstract void connect(OTFDataReceiver receiver);
 	public abstract void invalidate(SceneGraph graph);
 }
 

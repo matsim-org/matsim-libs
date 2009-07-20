@@ -80,8 +80,8 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 
 		public void execute(final double x, final double y, final OTFDataReader reader) {
-			Collection<OTFData.Receiver> drawers = this.connect.getReceivers(reader.getClass(), this.graph);
-			for (OTFData.Receiver drawer : drawers) reader.connect(drawer);
+			Collection<OTFDataReceiver> drawers = this.connect.getReceivers(reader.getClass(), this.graph);
+			for (OTFDataReceiver drawer : drawers) reader.connect(drawer);
 		}
 	}
 
@@ -163,8 +163,8 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		this.execute(this.top.getBounds(),
 				new CreateReceiverExecutor(connect, graph));
 		for(OTFDataReader element : this.additionalElements) {
-			Collection<OTFData.Receiver> drawers = connect.getReceivers(element.getClass(), graph);
-			for (OTFData.Receiver drawer : drawers) element.connect(drawer);
+			Collection<OTFDataReceiver> drawers = connect.getReceivers(element.getClass(), graph);
+			for (OTFDataReceiver drawer : drawers) element.connect(drawer);
 		}
 	}
 
@@ -401,8 +401,8 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 					OTFDataReader reader = (OTFDataReader) class_new.newInstance();
 					leafvalues.remove(index);
 					leafvalues.add(index, reader);
-					Collection<OTFData.Receiver> drawers = this.connect.getReceivers(reader.getClass(), graph);
-					for (OTFData.Receiver drawer : drawers) reader.connect(drawer);
+					Collection<OTFDataReceiver> drawers = this.connect.getReceivers(reader.getClass(), graph);
+					for (OTFDataReceiver drawer : drawers) reader.connect(drawer);
 					((OTFLiveServerRemote)host).replace(id, item.x, item.y, index, class_src);
 				} catch (InstantiationException e) {
 					// TODO Auto-generated catch block

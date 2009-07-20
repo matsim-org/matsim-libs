@@ -25,11 +25,11 @@ import java.nio.ByteBuffer;
 
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataQuad;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
-import org.matsim.vis.otfvis.data.OTFData.Receiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 public class OTFDefaultLinkHandler extends OTFDataReader {
@@ -37,9 +37,9 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 		OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
 	}
 
-	protected OTFDataQuad.Receiver quadReceiver = null;
+	protected OTFDataQuadReceiver quadReceiver = null;
 
-	public OTFDataQuad.Receiver getQuadReceiver() {
+	public OTFDataQuadReceiver getQuadReceiver() {
 		return quadReceiver;
 	}
 
@@ -77,9 +77,9 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 	}
 
 	@Override
-	public void connect(Receiver receiver) {
-		if (receiver  instanceof OTFDataQuad.Receiver) {
-			this.quadReceiver = (OTFDataQuad.Receiver)receiver;
+	public void connect(OTFDataReceiver receiver) {
+		if (receiver  instanceof OTFDataQuadReceiver) {
+			this.quadReceiver = (OTFDataQuadReceiver)receiver;
 		}
 	}
 
