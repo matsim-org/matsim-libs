@@ -30,6 +30,13 @@ import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 
+/**
+ * OTFLinkAgentsNoParkingHandler transmits the number of lanes as const data
+ * I do not think this is used.
+ * 
+ * @author david
+ *
+ */
 public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	static {
 		OTFDataReader.setPreviousVersion(OTFLinkLanesAgentsNoParkingHandler.class.getCanonicalName() + "V1.3", ReaderV1_3.class);

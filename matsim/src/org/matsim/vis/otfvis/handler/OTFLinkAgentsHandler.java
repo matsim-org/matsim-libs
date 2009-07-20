@@ -43,6 +43,14 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
 
+/**
+ * OTFLinkAgentsHandler transfers basic agent data as well as the default data for links.
+ * It is not commonly used, but some older mvi files might contain it.
+ * 
+ * 
+ * @author david
+ *
+ */
 public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	
 	static {

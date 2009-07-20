@@ -28,6 +28,13 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
 
 
+/**
+ * OTFLinkAgentsNoParkingHandler enables the user (per preferences) to select whether she/he wants to
+ * see parked vehicles or not.
+ * 
+ * @author david
+ *
+ */
 public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {

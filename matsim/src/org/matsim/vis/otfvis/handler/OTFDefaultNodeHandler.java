@@ -32,6 +32,13 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataXYCoordReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
+/**
+ * OTFDefaultNodeHandler IOs the coordinates of a node. 
+ * It is not used yet.
+ * 
+ * @author david
+ *
+ */
 public class OTFDefaultNodeHandler extends OTFDataReader   {
 	private OTFDataXYCoordReceiver xyReceiver = null;
 

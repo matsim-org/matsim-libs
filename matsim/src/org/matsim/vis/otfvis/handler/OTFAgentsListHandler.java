@@ -37,6 +37,13 @@ import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
+/**
+ * OTFAgentsListHandler is responsible for the IO of the 
+ * agent's data in case of a mvi file converted from an events-file.
+ * 
+ * @author david
+ *
+ */
 public class OTFAgentsListHandler extends OTFDataReader {
 
 	static {

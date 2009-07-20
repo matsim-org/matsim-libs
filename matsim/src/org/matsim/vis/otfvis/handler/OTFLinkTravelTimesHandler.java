@@ -29,6 +29,13 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 
+/**
+ * OTFLinkTravelTimesHandler behaves like the DefulatHandler but transfers the link's free speed
+ * as dynamic data. That does not make much sense, as the free speed will not change
+ * @author david
+ *
+ */
+@Deprecated
 public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 
 	private static transient LinkTravelTimeCounter count =null;

@@ -32,6 +32,14 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
+/**
+ * OTFDefaultLinkHandler handles the basic IO of a link.
+ * It can send the link's coords as static data and the
+ * QueueLink.getVisData().getDisplayableTimeCapValue()as dynamic data in float format.
+ * 
+ * @author david
+ *
+ */
 public class OTFDefaultLinkHandler extends OTFDataReader {
 	static {
 		OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
