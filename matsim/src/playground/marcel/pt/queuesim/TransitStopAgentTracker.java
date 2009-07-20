@@ -34,6 +34,9 @@ public class TransitStopAgentTracker {
 	private final Map<TransitStopFacility, List<PassengerAgent>> agentsAtStops = new HashMap<TransitStopFacility, List<PassengerAgent>>();
 
 	public void addAgentToStop(final PassengerAgent agent, final TransitStopFacility stop) {
+		if (stop == null) {
+			throw new NullPointerException("stop must not be null.");
+		}
 		List<PassengerAgent> agents = this.agentsAtStops.get(stop);
 		if (agents == null) {
 			agents = new LinkedList<PassengerAgent>();
@@ -43,6 +46,9 @@ public class TransitStopAgentTracker {
 	}
 
 	public void removeAgentFromStop(final PassengerAgent agent, final TransitStopFacility stop) {
+		if (stop == null) {
+			throw new NullPointerException("stop must not be null.");
+		}
 		List<PassengerAgent> agents = this.agentsAtStops.get(stop);
 		if (agents != null) {
 			agents.remove(agent);
