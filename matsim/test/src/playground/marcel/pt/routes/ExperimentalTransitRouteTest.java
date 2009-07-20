@@ -20,11 +20,78 @@
 
 package playground.marcel.pt.routes;
 
+import junit.framework.TestCase;
+
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.fakes.FakeLink;
+import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.routes.ExperimentalTransitRoute;
+public class ExperimentalTransitRouteTest extends TestCase {
 
-public class ExperimentalTransitRouteTest extends MatsimTestCase {
+	public void testInitializationLinks() {
+		Link link1 = new FakeLink(new IdImpl(1));
+		Link link2 = new FakeLink(new IdImpl(2));
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1, link2);
+		assertEquals(link1, route.getStartLink());
+		assertEquals(link2, route.getEndLink());
+		assertNull(route.getAccessStopId());
+		assertNull(route.getLineId());
+		assertNull(route.getEgressStopId());
+	}
+
+	public void testInitializationStops() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(5, 11));
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(18, 7));
+		Link link1 = new FakeLink(new IdImpl(3));
+		Link link2 = new FakeLink(new IdImpl(4));
+		stop1.setLink(link1);
+		stop2.setLink(link2);
+		TransitLine line = builder.createTransitLine(new IdImpl(5));
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(stop1, line, stop2);
+		assertEquals(stop1.getId(), route.getAccessStopId());
+		assertEquals(line.getId(), route.getLineId());
+		assertEquals(stop2.getId(), route.getEgressStopId());
+		assertEquals(link1, route.getStartLink());
+		assertEquals(link2, route.getEndLink());
+	}
+
+	public void testLinks() {
+		Link link1 = new FakeLink(new IdImpl(1));
+		Link link2 = new FakeLink(new IdImpl(2));
+		Link link3 = new FakeLink(new IdImpl(3));
+		Link link4 = new FakeLink(new IdImpl(4));
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1, link2);
+		assertEquals(link1, route.getStartLink());
+		assertEquals(link2, route.getEndLink());
+		route.setStartLink(link3);
+		route.setEndLink(link4);
+		assertEquals(link3, route.getStartLink());
+		assertEquals(link4, route.getEndLink());
+	}
+
+	public void testTravelTime() {
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
+		assertEquals(Time.UNDEFINED_TIME, route.getTravelTime(), MatsimTestCase.EPSILON);
+		double traveltime = 987.65;
+		route.setTravelTime(traveltime);
+		assertEquals(traveltime, route.getTravelTime(), MatsimTestCase.EPSILON);
+	}
+
+	public void testDistance() {
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
+		assertTrue(Double.isNaN(route.getDistance()));
+		double distance = 123.45;
+		route.setDistance(distance);
+		assertEquals(distance, route.getDistance(), MatsimTestCase.EPSILON);
+	}
 
 	public void testSetRouteDescription_PtRoute() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
