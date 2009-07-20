@@ -294,7 +294,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * would be faster to recalculate the TravelTimes for all Links in the Map
 	 * without check.
 	 */
-	private void filterChangedLinks() {
+	private synchronized void filterChangedLinks() {
 		for (Iterator<Id> iterator = countChangedMap.keySet().iterator(); iterator
 				.hasNext();) {
 			Id id = iterator.next();
@@ -331,7 +331,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	}
 
 	
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
+	public synchronized void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
 //		checkVehicleCount(e);
 		filterChangedLinks();
 	}

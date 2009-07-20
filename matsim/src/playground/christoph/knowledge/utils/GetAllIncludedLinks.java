@@ -52,7 +52,7 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<Link> getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes)
+	public ArrayList<Link> getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes)
 	{
 		ArrayList<Link> includedLinks = new ArrayList<Link>();
 		getAllLinks(network, includedNodes, includedLinks);
@@ -82,7 +82,7 @@ public class GetAllIncludedLinks {
 	 * @param ArrayList< Node > includedNodes
 	 * @param ArrayList< Link > includedLinks
 	 */
-	public void getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes, ArrayList<Link> includedLinks)
+	public void getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes, ArrayList<Link> includedLinks)
 	{		
 		// get all links of the network
 		Map<Id, LinkImpl> linkMap = network.getLinks();

@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -35,7 +34,7 @@ public class TestCellKnowledge {
 	private Config config;
 	private PersonImpl person;
 	private SelectNodesDijkstra selectNodesDijkstra;
-	private Map<Id, Node> nodesMap;
+	private Map<Id, NodeImpl> nodesMap;
 	private CellKnowledge cellKnowledge;
 	private CellNetworkMapping cellNetworkMapping;
 	private CellKnowledgeCreator createCellKnowledge;
@@ -102,7 +101,7 @@ public class TestCellKnowledge {
 	{
 		PlanImpl plan = person.getSelectedPlan();
 		
-		nodesMap = new TreeMap<Id, Node>();
+		nodesMap = new TreeMap<Id, NodeImpl>();
 		
 		// get all acts of the selected plan
 		ArrayList<ActivityImpl> acts = new ArrayList<ActivityImpl>();					

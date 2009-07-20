@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.WriterHandler;
 
@@ -72,9 +73,9 @@ public interface SelectionWriterHandler extends WriterHandler {
 
 	public void startNodes(final BufferedWriter out) throws IOException;
 
-	public void node(final Node node, final BufferedWriter out) throws IOException;
+	public void node(final NodeImpl node, final BufferedWriter out) throws IOException;
 	
-	public void nodes(final Map<Id, Node> nodes, final BufferedWriter out) throws IOException;
+	public void nodes(final Map<Id, NodeImpl> nodes, final BufferedWriter out) throws IOException;
 	
 	public void endNodes(final BufferedWriter out) throws IOException;
 	

@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -66,7 +67,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, Node> knownNodesMap = null;
+		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
 		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);

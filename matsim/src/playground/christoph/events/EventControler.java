@@ -45,14 +45,12 @@ import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.analysis.ActTimesCollector;
-import playground.christoph.analysis.Wardrop;
+import playground.christoph.analysis.wardrop.ActTimesCollector;
+import playground.christoph.analysis.wardrop.Wardrop;
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.KMLPersonWriter;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
-import playground.christoph.knowledge.container.NodeKnowledge;
-import playground.christoph.knowledge.nodeselection.CreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -68,7 +66,6 @@ import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
-import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
@@ -136,15 +133,18 @@ public class EventControler extends Controler{
 	public EventControler(String[] args)
 	{
 		super(args);
+		config.global().setNumberOfThreads(4);
 		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 
 		knowledgeTravelTime = new KnowledgeTravelTimeCalculator();
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(knowledgeTravelTime);
+
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
-		this.setTravelCostCalculator(travelCost);
+		this.setTravelCostCalculator(travelCost);	
+		
 	}
 	
 	
@@ -153,6 +153,8 @@ public class EventControler extends Controler{
 	{
 		super(config);
 		
+		config.global().setNumberOfThreads(4);
+		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 
@@ -161,6 +163,7 @@ public class EventControler extends Controler{
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
 		this.setTravelCostCalculator(travelCost);
+
 	}
 	
 	
@@ -225,6 +228,7 @@ public class EventControler extends Controler{
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		dijkstraRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		
 		replanners.add(dijkstraRouter);
 		
 	}
@@ -240,7 +244,7 @@ public class EventControler extends Controler{
 	protected void initParallelReplanningModules()
 	{
 		ParallelReplanner.init(replanners);
-		ParallelReplanner.setNumberOfThreads(2);
+		ParallelReplanner.setNumberOfThreads(3);
 
 	/*
 		ParallelLeaveLinkReplanner.init(replanners);
@@ -261,11 +265,15 @@ public class EventControler extends Controler{
 	{
 		nodeSelectors = new ArrayList<SelectNodes>();
 		
-		nodeSelectors.add(new SelectNodesCircular(this.network));
+		SelectNodesCircular snc = new SelectNodesCircular(this.network);
+		snc.setDistance(5000);
+		nodeSelectors.add(snc);
 		
 		SelectNodesDijkstra selectNodesDijkstra = new SelectNodesDijkstra(this.network);
 		selectNodesDijkstra.setCostCalculator(new OnlyTimeDependentTravelCostCalculator(null));
-		selectNodesDijkstra.setCostFactor(5.00);
+		//selectNodesDijkstra.setCostCalculator(new OnlyDistanceDependentTravelCostCalculator(null));
+		
+		selectNodesDijkstra.setCostFactor(1.50);
 		nodeSelectors.add(selectNodesDijkstra);
 	}
 
@@ -292,8 +300,8 @@ public class EventControler extends Controler{
 		log.info("Remove not selected Plans");
 		clearPlans();
 		
-		log.info("Read known Nodes Maps from a File");
-		readKnownNodesMap();
+//		log.info("Read known Nodes Maps from a File");
+//		readKnownNodesMap();
 		
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
@@ -319,11 +327,11 @@ public class EventControler extends Controler{
 		log.info("Set Knowledge Data Handler");
 		setKnowledgeStorageHandler();
 		
-		log.info("Create known Nodes Maps");
-		createKnownNodes();
+//		log.info("Create known Nodes Maps");
+//		createKnownNodes();
 
-		log.info("Write known Nodes Maps to a File");
-		writeKownNodesMap();
+//		log.info("Write known Nodes Maps to a File");
+//		writeKownNodesMap();
 		
 		/* 
 		 * Could be done before or after the creation of the activity rooms -
@@ -524,10 +532,10 @@ public class EventControler extends Controler{
 			
 			ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)customAttributes.get("NodeSelectors");
 		
-	//		personNodeSelectors.add(nodeSelectors.get(1));	// Circular NodeSelector
+	//		personNodeSelectors.add(nodeSelectors.get(0));	// Circular NodeSelector
 			personNodeSelectors.add(nodeSelectors.get(1));	// Dijkstra NodeSelector
 			
-			if (counter >= 1000) break;
+//			if (counter >= 1000) break;
 		}
 	}
 	
@@ -582,7 +590,7 @@ public class EventControler extends Controler{
 	{
 		MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
 		mapKnowledgeDB.createTable();
-		mapKnowledgeDB.clearTable();
+		//mapKnowledgeDB.clearTable();
 	}
 		
 	protected void setKnowledgeStorageHandler()
@@ -597,6 +605,12 @@ public class EventControler extends Controler{
 			NodeKnowledge nodeKnowledge = new CellKnowledge(cellNetworkMapping);
 */			
 			customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());
+			
+			MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
+			mapKnowledgeDB.setPerson(person);
+			mapKnowledgeDB.setNetwork(network);
+			
+			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 		}
 	}
 	
@@ -607,7 +621,7 @@ public class EventControler extends Controler{
 	protected void createKnownNodes()
 	{
 		// create Known Nodes Maps on multiple Threads
-		ParallelCreateKnownNodesMap.run(this.population, this.network, nodeSelectors, 2);
+		ParallelCreateKnownNodesMap.run(this.population, this.network, nodeSelectors, 4);
 		
 //		writePersonKML(this.population.getPerson("100139"));
 		

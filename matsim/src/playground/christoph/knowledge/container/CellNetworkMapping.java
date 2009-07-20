@@ -98,12 +98,12 @@ public class CellNetworkMapping {
 		// create Nodes Mapping
 		for (Cell cell : cells.values())
 		{
-			List<Node> nodes = cell.getNodes();
+			List<NodeImpl> nodes = cell.getNodes();
 			
 			// otherwise cell.getNodes() would return null
 			if (!cell.hasChildren())
 			{
-				for (Node node : nodes)
+				for (NodeImpl node : nodes)
 				{
 					nodesMapping.put(node, cell);
 				}

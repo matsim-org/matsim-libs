@@ -40,6 +40,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
@@ -81,7 +82,7 @@ public class GetAllNodes {
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
 	// Da keine ArrayList mit bereits selektieren Nodes uebergeben wurde, wird diese neu erstellt. 
-	protected Map<Id, Node> getNodes(ArrayList<Link> links)
+	protected Map<Id, Node> getNodes(ArrayList<LinkImpl> links)
 	{
 		Map <Id, Node> nodesMap = new TreeMap<Id, Node>();
 		
@@ -92,9 +93,9 @@ public class GetAllNodes {
 	
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
-	protected void getNodes(ArrayList<Link> links, Map<Id, Node> nodesMap)
+	protected void getNodes(ArrayList<LinkImpl> links, Map<Id, Node> nodesMap)
 	{
-		Iterator<Link> linksIterator = links.iterator();
+		Iterator<LinkImpl> linksIterator = links.iterator();
 		
 		while(linksIterator.hasNext())
 		{

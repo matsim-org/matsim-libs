@@ -62,7 +62,7 @@ public class GenerateKnowledge {
 		{
 			PersonImpl person = PersonIterator.next();
 			
-			ArrayList<Link> links = new GetAllLinks().getAllLinks(person);
+			ArrayList<LinkImpl> links = new GetAllLinks().getAllLinks(person);
 			
 			setKnowledge(person, links);
 			
@@ -74,15 +74,15 @@ public class GenerateKnowledge {
 	
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der uebergebenen Links sind.
-	protected ArrayList<Node> getNodes(ArrayList<Link> links)
+	protected ArrayList<Node> getNodes(ArrayList<LinkImpl> links)
 	{
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		
-		Iterator<Link> linksIterator = links.iterator();
+		Iterator<LinkImpl> linksIterator = links.iterator();
 		
 		while(linksIterator.hasNext())
 		{
-			Link link = linksIterator.next();
+			LinkImpl link = linksIterator.next();
 
 			//nodes.add(link.getFromNode());
 			//nodes.add(link.getToNode());
@@ -99,7 +99,7 @@ public class GenerateKnowledge {
 	
 	
 	// Beschraenkt die Kenntnis der Umgebung der uebergebenen Person.
-	protected void setKnowledge(PersonImpl person, ArrayList<Link> links)
+	protected void setKnowledge(PersonImpl person, ArrayList<LinkImpl> links)
 	{		
 		
 		ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getCustomAttributes().get("IncludedLinkIDs");
@@ -122,7 +122,7 @@ public class GenerateKnowledge {
 	
 	// Gibt eine ArrayList mit Knoten zurueck, die innerhalb eines vorgegebenen
 	// Abstands zu einer vorgeggebenen Route liegen.
-	protected ArrayList<Node> getIncludedNodes(ArrayList<Link> links)
+	protected ArrayList<Node> getIncludedNodes(ArrayList<LinkImpl> links)
 	{
 		ArrayList<Node> includedNodes = new ArrayList<Node>();
 		
@@ -143,7 +143,7 @@ public class GenerateKnowledge {
 			// Abstand zu allen Links der uebergebenen Person untersuchen
 			for (int i = 0; i < links.size(); i++)
 			{
-				double dist = ((LinkImpl) (links.get(i))).calcDistance(coord);
+				double dist = links.get(i).calcDistance(coord);
 				
 				// Innerhalb des Bereichs?
 				if (dist <= distance)

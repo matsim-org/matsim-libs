@@ -6,9 +6,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
@@ -23,24 +23,29 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	private boolean localKnowledge;
 	private DBConnectionTool dbConnectionTool = new DBConnectionTool();
 	
-	private String separator = "@";
-	private String tableName = "MapKnowledge";
+	private static String separator = "@";
+	//private static String tableName = "MapKnowledge";
+	private static String tableName = "batchtable10_0";
 	
 	public MapKnowledgeDB()
 	{
 		super();
-		localKnowledge = true;
+		localKnowledge = false;
 	}
-
-	public MapKnowledgeDB(Map<Id, Node> nodes)
+/*
+	public MapKnowledgeDB(Map<Id, NodeImpl> nodes)
 	{
 		super(nodes);
 		localKnowledge = true;
 	}
-	
+*/	
+	public static void setTableName(String name)
+	{
+		tableName = name;
+	}
 	
 	@Override
-	public boolean knowsNode(Node node)
+	public boolean knowsNode(NodeImpl node)
 	{
 		readFromDB();
 		
@@ -49,7 +54,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public boolean knowsLink(Link link)
+	public boolean knowsLink(LinkImpl link)
 	{
 		readFromDB();
 		
@@ -58,13 +63,20 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public Map<Id, Node> getKnownNodes()
+	public Map<Id, NodeImpl> getKnownNodes()
 	{
 		readFromDB();
 		
 		return super.getKnownNodes();
 	}
 	
+	@Override
+	public void setKnownNodes(Map<Id, NodeImpl> nodes)
+	{
+		super.setKnownNodes(nodes);
+		
+		this.writeToDB();
+	}
 	
 	public synchronized void readFromDB()
 	{	
@@ -78,12 +90,16 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 			try 
 			{			
 				while (rs.next())
-				{			
+				{	
+					boolean listType = Boolean.valueOf(rs.getString("WhiteList"));
+					this.isWhiteList = listType;
+					
 					String[] nodeIds = rs.getString("NodeIds").split(this.separator);
 			
 					for (String id : nodeIds)
 					{								
-						NodeImpl node = this.network.getNode(new IdImpl(id));
+						//NodeImpl node = this.network.getNode(new IdImpl(id));
+						NodeImpl node = this.network.getNodes().get(new IdImpl(id));
 						super.getKnownNodes().put(node.getId(), node);
 					}
 				}
@@ -100,12 +116,12 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	public synchronized void writeToDB()
 	{		
-		Map<Id, Node> nodes = super.getKnownNodes();
+		Map<Id, NodeImpl> nodes = super.getKnownNodes();
 		
 		String nodesString = createNodesString(nodes);
 //		Insert Into MapKnowledge SET NodeId='2', PersonId='12'
-		String query = "INSERT INTO " + tableName + " SET PersonId='"+ person.getId() + "', NodeIds='" + nodesString + "'";
-				
+		String query = "INSERT INTO " + tableName + " SET PersonId='"+ person.getId() + "', WhiteList=" + isWhiteList + ", NodeIds='" + nodesString + "'";
+		
 		dbConnectionTool.connect();
 		dbConnectionTool.executeUpdate(query);
 		dbConnectionTool.disconnect();
@@ -134,7 +150,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	public void createTable()
 	{
-		String createTable = "CREATE TABLE " + tableName + " (PersonId INTEGER, NodeIds LONGTEXT, PRIMARY KEY (PersonId))";
+		String createTable = "CREATE TABLE " + tableName + " (PersonId INTEGER, WhiteList BOOLEAN, NodeIds LONGTEXT, PRIMARY KEY (PersonId))";
 		//CREATE TABLE Customer (SID integer, Last_Name varchar(30), First_Name varchar(30), PRIMARY KEY (SID));
 		//String createTable = "CREATE TABLE " + tableName + " (NodeId integer, PRIMARY KEY (NodeId))";
 		
@@ -188,7 +204,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		return false;
 	}
 	
-	private String createNodesString(Map<Id, Node> nodes)
+	private String createNodesString(Map<Id, NodeImpl> nodes)
 	{
 		// if no Nodes are known -> just return a separator
 		if (nodes.values().size() == 0) return this.separator;

@@ -47,7 +47,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	 * @param population
 	 * @param time
 	 */	
-	public static void run(ArrayList<PersonImpl> persons, double time)
+	public static void run(List<PersonImpl> persons, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];

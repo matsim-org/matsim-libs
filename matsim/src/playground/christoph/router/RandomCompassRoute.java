@@ -29,6 +29,7 @@ import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -71,7 +72,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 		//ArrayList<Node> knownNodes = null;
-		Map<Id, Node> knownNodesMap = null;
+		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		nodes.add(fromNode);
 		

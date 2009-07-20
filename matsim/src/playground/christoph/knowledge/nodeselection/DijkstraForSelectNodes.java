@@ -33,25 +33,22 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
-
-
 
 public class DijkstraForSelectNodes {
 	
 	private static final Logger log = Logger.getLogger(DijkstraForSelectNodes.class);
 	
 	// Traffic network
-	NetworkLayer network;
+	Network network;
 	
 	// mapping between nodes and dijkstraNodes
-	HashMap<Node, DijkstraNode> dijkstraNodeMap;
+	HashMap<NodeImpl, DijkstraNode> dijkstraNodeMap;
 	
 	// CostCalculator for the Dijkstra Algorithm
 	TravelCost costCalculator = new FreespeedTravelTimeCost();
@@ -63,7 +60,7 @@ public class DijkstraForSelectNodes {
 	private static final int INITIAL_CAPACITY = 500;
 	
 	// all nodes of the network
-	Map<Id, Node> networkNodesMap;
+	Map<Id, NodeImpl> networkNodesMap;
 	
 	
 	// List of nodes, sorted by their distance to the startnode.
@@ -90,30 +87,30 @@ public class DijkstraForSelectNodes {
 	private final PriorityQueue<DijkstraNode> unvisitedNodes = new PriorityQueue<DijkstraNode>(INITIAL_CAPACITY, shortestDistanceComparator);
 	
 	
-	public DijkstraForSelectNodes(Map<Id, Node> networkNodesMap)
+	public DijkstraForSelectNodes(Map<Id, NodeImpl> networkNodesMap)
 	{
 		this.networkNodesMap = networkNodesMap;
 		
-		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
+		dijkstraNodeMap = new HashMap<NodeImpl, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 	}
 	
-	public DijkstraForSelectNodes(NetworkLayer network, Map<Id, Node> networkNodesMap)
+	public DijkstraForSelectNodes(Network network, Map<Id, NodeImpl> networkNodesMap)
 	{
 		this.network = network;
 		this.networkNodesMap = networkNodesMap;
 		
-		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
+		dijkstraNodeMap = new HashMap<NodeImpl, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 		initDijkstraNodes();	
 	}
 	
-	public void setNetwork(NetworkLayer network)
+	public void setNetwork(Network network)
 	{
 		this.network = network;
 	}
 	
-	public void setNetworkNodes(Map<Id, Node> networkNodesMap)
+	public void setNetworkNodes(Map<Id, NodeImpl> networkNodesMap)
 	{
 		this.networkNodesMap = networkNodesMap;
 	}
@@ -124,7 +121,7 @@ public class DijkstraForSelectNodes {
 		dijkstraNodeMap.clear();
 		
 		// iterate over Array or Iteratable 
-		for (Node node : networkNodesMap.values())
+		for (NodeImpl node : networkNodesMap.values())
 		{		
 			DijkstraNode dijkstraNode = new DijkstraNode(node);
 			
@@ -149,7 +146,7 @@ public class DijkstraForSelectNodes {
 	   
 	
 	// Search shortest Path for a Route. Break if distance has been found.
-	public void executeRoute(Node start, Node end)
+	public void executeRoute(NodeImpl start, NodeImpl end)
 	{	
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
@@ -175,7 +172,7 @@ public class DijkstraForSelectNodes {
 	}
 
 	// Search shortest Fowardpaths to all nodes within the network.
-	public void executeForwardNetwork(Node start)
+	public void executeForwardNetwork(NodeImpl start)
 	{		
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
@@ -196,7 +193,7 @@ public class DijkstraForSelectNodes {
 	}
 	
 	// Search shortest Backwardpaths to all nodes within the network.
-	public void executeBackwardNetwork(Node start)
+	public void executeBackwardNetwork(NodeImpl start)
 	{		
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
@@ -221,9 +218,9 @@ public class DijkstraForSelectNodes {
 	 * Is called from outside this class, so return nodes instead of
 	 * DijkstraNodes.
 	 */
-	public Map<Node, Double> getMinDistances()
+	public Map<NodeImpl, Double> getMinDistances()
 	{
-		Map<Node, Double> minDistances = new HashMap<Node, Double>();
+		Map<NodeImpl, Double> minDistances = new HashMap<NodeImpl, Double>();
 		
 		for (DijkstraNode node : dijkstraNodeMap.values()) 
 		{
@@ -383,25 +380,25 @@ public class DijkstraForSelectNodes {
  */
 class DijkstraNode
 {
-	static private HashMap<Node, DijkstraNode> dijkstraNodeMap;
+	static private HashMap<NodeImpl, DijkstraNode> dijkstraNodeMap;
 	
-	Node node = null;
+	NodeImpl node = null;
 	DijkstraNode prevNode = null;
 	boolean visited;
 	double minDist;
 
-	static void setNodeMap(HashMap<Node, DijkstraNode> map)
+	static void setNodeMap(HashMap<NodeImpl, DijkstraNode> map)
 	{
 		dijkstraNodeMap = map;
 	}
 	
-	protected DijkstraNode(Node node) 
+	protected DijkstraNode(NodeImpl node) 
 	{
 		this.node = node;
 		reset();
 	}
 	
-	protected Node getNode()
+	protected NodeImpl getNode()
 	{
 		return node;
 	}
@@ -444,14 +441,14 @@ class DijkstraNode
 	{
 		ArrayList<DijkstraNode> ingoingNodes = new ArrayList<DijkstraNode>();
 		
-		Map<Id, ? extends NodeImpl> myMap = ((NodeImpl)node).getInNodes();
+		Map<Id, NodeImpl> myMap = (Map<Id, NodeImpl>)node.getInNodes();
 		
 		Iterator nodeIterator = myMap.values().iterator();
 		while(nodeIterator.hasNext())
 		{
-			Node node = (Node)nodeIterator.next();
+			NodeImpl node = (NodeImpl)nodeIterator.next();
 
-			// zugehoerigen DijsktraNode aus der Map holen
+			// zugeh�rigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			ingoingNodes.add(dijkstraNode);
 		}
@@ -462,14 +459,14 @@ class DijkstraNode
 	{
 		ArrayList<DijkstraNode> outgoingNodes = new ArrayList<DijkstraNode>();
 		
-		Map<Id, ? extends NodeImpl> myMap = ((NodeImpl)node).getOutNodes();
+		Map<Id, NodeImpl> myMap = (Map<Id, NodeImpl>)node.getOutNodes();
 		
 		Iterator nodeIterator = myMap.values().iterator();
 		while(nodeIterator.hasNext())
 		{
-			Node node = (Node)nodeIterator.next();
+			NodeImpl node = (NodeImpl)nodeIterator.next();
 
-			// zugehoerigen DijsktraNode aus der Map holen
+			// zugeh�rigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			outgoingNodes.add(dijkstraNode);
 		}

@@ -66,11 +66,17 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 			
 			if(nodeKnowledge instanceof DBStorage)
 			{
-				/*
-				 *  The NodeKnowledge Class decides, whether reading the
-				 *  Knowledge from the Database is really neccessary or not.
-				 */
-				((DBStorage) nodeKnowledge).readFromDB();
+				boolean leaveLinkReplanning = (Boolean)person.getCustomAttributes().get("leaveLinkReplanning");
+				boolean actEndReplanning = (Boolean)person.getCustomAttributes().get("endActivityReplanning");
+				
+				if (leaveLinkReplanning || actEndReplanning)
+				{
+					/*
+					 *  The NodeKnowledge Class decides, whether reading the
+					 *  Knowledge from the Database is really neccessary or not.
+					 */
+					((DBStorage) nodeKnowledge).readFromDB();					
+				}				
 			}
 		}
 		running = false;

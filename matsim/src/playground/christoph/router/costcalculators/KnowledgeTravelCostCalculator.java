@@ -23,6 +23,7 @@ package playground.christoph.router.costcalculators;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -57,7 +58,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
 		
 		// if the Person doesn't know the link -> return max costs 
-		if (!nodeKnowledge.knowsLink(link))
+		if (!nodeKnowledge.knowsLink((LinkImpl)link))
 		{
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;

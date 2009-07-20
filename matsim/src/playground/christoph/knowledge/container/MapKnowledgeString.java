@@ -4,9 +4,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 
 /*
@@ -27,15 +26,16 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 		localKnowledge = true;
 	}
 
-	public MapKnowledgeString(Map<Id, Node> nodes)
+/*
+	public MapKnowledgeString(Map<Id, NodeImpl> nodes)
 	{
 		super(nodes);
 		localKnowledge = true;
 	}
-	
+*/	
 	
 	@Override
-	public boolean knowsNode(Node node)
+	public boolean knowsNode(NodeImpl node)
 	{
 		readFromDB();
 		
@@ -44,7 +44,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public boolean knowsLink(Link link)
+	public boolean knowsLink(LinkImpl link)
 	{
 		readFromDB();
 		
@@ -53,13 +53,20 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public Map<Id, Node> getKnownNodes()
+	public Map<Id, NodeImpl> getKnownNodes()
 	{
 		readFromDB();
 		
 		return super.getKnownNodes();
 	}
 	
+	@Override
+	public void setKnownNodes(Map<Id, NodeImpl> nodes)
+	{
+		super.setKnownNodes(nodes);
+		
+		this.writeToDB();
+	}
 	
 	public synchronized void readFromDB()
 	{	
@@ -74,7 +81,8 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 			
 			for (String id : nodeIds)
 			{					
-				NodeImpl node = this.network.getNode(new IdImpl(id));
+				//NodeImpl node = this.network.getNode(new IdImpl(id));
+				NodeImpl node = this.network.getNodes().get(new IdImpl(id));
 				super.getKnownNodes().put(node.getId(), node);
 			}
 		}
@@ -83,7 +91,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	
 	public synchronized void writeToDB()
 	{
-		Map<Id, Node> nodes = super.getKnownNodes();
+		Map<Id, NodeImpl> nodes = super.getKnownNodes();
 		
 		nodesString = createNodesString(nodes);
 	}
@@ -100,14 +108,14 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	{
 	}
 		
-	private String createNodesString(Map<Id, Node> nodes)
+	private String createNodesString(Map<Id, NodeImpl> nodes)
 	{
 		// if no Nodes are known -> just return a separator
 		if (nodes.values().size() == 0) return this.separator;
 		
 		String string = "";
 		
-		for (Node node : nodes.values())
+		for (NodeImpl node : nodes.values())
 		{
 			string = string + node.getId() + this.separator;
 		}

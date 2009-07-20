@@ -26,7 +26,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -42,9 +42,9 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static Map<Id, Node> getKnownNodes(PersonImpl person)
+	public static Map<Id, NodeImpl> getKnownNodes(PersonImpl person)
 	{
-		Map<Id, Node> knownNodesMap = null;
+		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)
@@ -103,7 +103,7 @@ public class KnowledgeTools {
 	 * Returns only those links, where Start- and Endnode are contained in the Map.
 	 * If no Nodes are known, all links are returned.
 	 */
-	public static Link[] getKnownLinks(Link[] links, Map<Id, Node> knownNodesMap)
+	public static Link[] getKnownLinks(Link[] links, Map<Id, NodeImpl> knownNodesMap)
 	{	
 		// If the current Person has knowledge about known Nodes (Map exists and has Elements)
 		if((knownNodesMap != null) && (knownNodesMap.size() != 0))
@@ -154,7 +154,7 @@ public class KnowledgeTools {
 	 */ 
 	public static void removeKnowledge(PersonImpl person)
 	{
-		Map<Id, Node> knownNodesMap = null;
+		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)

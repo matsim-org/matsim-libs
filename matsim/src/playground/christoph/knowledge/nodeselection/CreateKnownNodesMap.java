@@ -21,12 +21,14 @@
 package playground.christoph.knowledge.nodeselection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -45,7 +47,8 @@ public class CreateKnownNodesMap {
 	
 	private final static Logger log = Logger.getLogger(CreateKnownNodesMap.class);
 	
-	public static void collectAllSelectedNodes(PopulationImpl population, NetworkLayer network)
+/*	
+	public void collectAllSelectedNodes(PopulationImpl population, Network network)
 	{
 		for (PersonImpl person : population.getPersons().values()) 
 		{
@@ -53,7 +56,8 @@ public class CreateKnownNodesMap {
 		}
 	}
 	
-	private static void collectAllSelectedNodes(PersonImpl person, NetworkLayer network)
+
+	private void collectAllSelectedNodes(PersonImpl person, Network network)
 	{					
 		ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)person.getCustomAttributes().get("NodeSelectors");
 		
@@ -65,25 +69,47 @@ public class CreateKnownNodesMap {
 		// if Flag is set, remove Dead Ends from the Person's Activity Room
 		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
 	}
-	
+*/	
 	/*
 	 * The handling of the nodeSelectors should probably be outsourced...
 	 * Implementing them direct in the nodeSelectors could be a good solution...
 	 */
+
 	public static void collectSelectedNodes(PersonImpl p, NetworkLayer network, SelectNodes nodeSelector)
 	{		
 		PlanImpl plan = p.getSelectedPlan();
+/*		
+		ArrayList<Leg> legs = new ArrayList<Leg>();					
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				legs.add((Leg) pe);
+			}
+		}
 		
+		int count = 0;
+		for (Leg leg : legs)
+		{
+			NodeNetworkRoute route = (NodeNetworkRoute) leg.getRoute();
+			
+			count = count + route.getNodes().size();
+		}
+
+		if (count == 0)
+		{
+			log.error("No Nodes found in Persons Routes..." + p.getId());
+		}
+*/		
 		// get Nodes from the Person's Knowledge
-		Map<Id, Node> nodesMap = null;
+		Map<Id, NodeImpl> nodesMap = null;
 		
 		if (p.getCustomAttributes().get("NodeKnowledge") == null)
 		{
-			nodesMap = new TreeMap<Id, Node>();
+			nodesMap = new TreeMap<Id, NodeImpl>();
 			
-			NodeKnowledge nodeKnowledge = new MapKnowledge(nodesMap);
+			NodeKnowledge nodeKnowledge = new MapKnowledge();
 			nodeKnowledge.setPerson(p);
 			nodeKnowledge.setNetwork(network);
+			nodeKnowledge.setKnownNodes(nodesMap);
 			
 			p.getCustomAttributes().put("NodeKnowledge", nodeKnowledge);
 		}
@@ -104,20 +130,42 @@ public class CreateKnownNodesMap {
 			}
 			
 			for(int j = 1; j < acts.size(); j++)
-			{						
-				NodeImpl startNode = acts.get(j-1).getLink().getToNode();
-				NodeImpl endNode = acts.get(j).getLink().getFromNode();
-					
+			{	
+				//Node startNode = acts.get(j-1).getLink().getToNode();
+				NodeImpl startNode = acts.get(j-1).getLink().getFromNode();
+				//Node endNode = acts.get(j).getLink().getFromNode();
+				NodeImpl endNode = acts.get(j).getLink().getToNode();
+				
 				((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
 				((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);
 
-				nodeSelector.addNodesToMap(nodesMap);
+				Map<Id, NodeImpl> newNodes = new HashMap<Id, NodeImpl>();
+				
+				nodeSelector.addNodesToMap(newNodes);
+				
+				if (newNodes.size() == 0) log.error("No new known Nodes found?!");
+				
+				nodesMap.putAll(newNodes);
 			}
 		}	//if instanceof SelectNodesDijkstra
 			
 		else if(nodeSelector instanceof SelectNodesCircular)
 		{
 			// do something else here...
+			
+			// get all acts of the selected plan
+			ArrayList<ActivityImpl> acts = new ArrayList<ActivityImpl>();					
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof ActivityImpl) {
+					acts.add((ActivityImpl) pe);
+				}
+			}
+			
+			for (ActivityImpl activityImpl : acts)
+			{
+				((SelectNodesCircular)nodeSelector).setLink(activityImpl.getLink());
+				((SelectNodesCircular)nodeSelector).addNodesToMap(nodesMap);
+			}
 		}
 			
 		else
@@ -125,6 +173,9 @@ public class CreateKnownNodesMap {
 			log.error("Unkown NodeSelector!");
 		}
 	
+//		if (nodesMap.size() == 0) log.error("No known Nodes found?!");
+		
+		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(p);
 	}
 	
 	public static void setRemoveDeadEnds(boolean value)

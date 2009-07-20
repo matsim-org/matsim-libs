@@ -20,11 +20,11 @@
 
 package playground.christoph.knowledge;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -38,15 +38,16 @@ import playground.christoph.knowledge.utils.GetAllIncludedLinks;
 public class TestNodeSelection {
 	
 	NetworkLayer network;
-	Map<Id, Node> selectedNodesMap;
+	Map<Id, NodeImpl> selectedNodesMap;
 	
-	final String networkFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
+	//final String networkFile = "C:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
+	final String networkFile = "C:/Master_Thesis_HLI/Workspace/myMATSIM/mysimulations/kt-zurich/input/network.xml";
 	final String kmzFile = "kmzFile.kmz";
-	final String outputDirectory = "D:/Master_Thesis_HLI/Workspace/TestNetz"; 
-	
+	final String outputDirectory = "C:/Master_Thesis_HLI/Workspace/TestNetz"; 
+		
 	protected void init()
 	{
-		selectedNodesMap = new TreeMap<Id, Node>();
+		selectedNodesMap = new TreeMap<Id, NodeImpl>();
 	}
 	
 	protected void loadNetwork()
@@ -58,8 +59,8 @@ public class TestNodeSelection {
 	protected void testDijkstraSelector()
 	{
 		// FreespeedTravelTimeCost als Massstab
-		SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 1.1);
-		
+		SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 1.0);
+			
 		// Fahrzeit als Massstab
 		//SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 10000);
 
@@ -101,7 +102,9 @@ public class TestNodeSelection {
 	protected void getIncludedLinks()
 	{
 		GetAllIncludedLinks gail = new GetAllIncludedLinks();
-		gail.getAllLinks(network, selectedNodesMap);
+		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
+		nodes.addAll(selectedNodesMap.values());
+		gail.getAllLinks(network, nodes);
 	}
 	
 	protected void createKMLFile()

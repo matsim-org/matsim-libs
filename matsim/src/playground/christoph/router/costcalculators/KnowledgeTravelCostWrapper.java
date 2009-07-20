@@ -45,7 +45,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
 		
 		// if the Person doesn't know the link -> return max costs 
-		if (!nodeKnowledge.knowsLink(link))
+		if (!nodeKnowledge.knowsLink((LinkImpl)link))
 		{
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;

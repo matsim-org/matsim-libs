@@ -15,7 +15,7 @@ public class BatchRun {
 	private static final Logger log = Logger.getLogger(BatchRun.class);
 	
 	//protected static String[] knowledgeFactors = {"1.05", "1.10", "1.15", "1.20", "1.25", "1.50", "1.75", "2.00", "2.50", "3.00", "full"}; 
-	protected static String[] knowledgeFactors = {"full"};
+	protected static String[] knowledgeFactors = {"2.0"};
 	//protected static double[] probabilityFactors = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
 	protected static double[] probabilityFactors = { 0.65};
 	
@@ -61,19 +61,22 @@ public class BatchRun {
 											 {9, 1, 0, 0},
 											 {10, 0, 0, 0}};
 */	
-	protected static int[][] Versuchsplan = {{0, 10, 0, 0}};
+	protected static int[][] Versuchsplan = {{0, 0, 10, 0}};
 		
-	protected static String outbase = "mysimulations/kt-zurich/output";
-	protected static String inbase = "mysimulations/kt-zurich/input";
+	protected static String outbase = "G:/mysimulations/kt-zurich/output";
+	protected static String inbase = "G:/mysimulations/kt-zurich/input";
+//	protected static String outbase = "mysimulations/zurich-cut/output";
+//	protected static String inbase = "mysimulations/zurich-cut/input";
 //	protected static String outbase = "mysimulations/berlin/output";
 //	protected static String inbase = "mysimulations/berlin";
 	
 	protected static String outputDirectory;
 	protected static String inputDirectory;
 	
-	protected static String configFilePath = "mysimulations/kt-zurich";
-//	protected static String configFileName = "config10pct_factor_0.10_long_replanning.xml";
+//	protected static String configFilePath = "mysimulations/zurich-cut";
 	protected static String configFileName = "config.xml";
+	protected static String configFilePath = "G:/mysimulations/kt-zurich";
+//	protected static String configFileName = "config10pct_factor_0.10_long_replanning.xml";
 //	protected static String configFilePath = "mysimulations/berlin";
 //	protected static String configFileName = "config.xml";
 	
