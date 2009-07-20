@@ -65,7 +65,7 @@ public class AccessEgressDemo {
 	private static final boolean stopsBlockLane = true;
 
 	private static final String SERVERNAME = "access_egress_demo";
-	
+
 	private final ScenarioImpl scenario = new ScenarioImpl();
 	public final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];
 
@@ -91,14 +91,6 @@ public class AccessEgressDemo {
 		}
 		for (int i = 0; i < nOfLinks; i++) {
 			network.createLink(this.ids[i], nodes[i], nodes[i+1], 500.0, 10.0, 1000.0, 1);
-//			Link link = network.getBuilder().createLink(this.ids[i], nodes[i].getId(), nodes[i+1].getId());
-//			network.getLinks().put(link.getId(), link);
-//			nodes[i].addOutLink(link);
-//			nodes[i+1].addInLink(link);
-//			link.setLength(500.0);
-//			link.setFreespeed(10.0);
-//			link.setCapacity(1000.0);
-//			link.setNumberOfLanes(1.0);
 		}
 	}
 
@@ -131,11 +123,6 @@ public class AccessEgressDemo {
 		for (int i = 0; i < nOfBuses; i++	) {
 			tRoute.addDeparture(builder.createDeparture(this.ids[i], departureTime + i*heading + (i == delayedBus ? delay : 0)));
 		}
-//		try {
-//			new TransitScheduleWriterV1(this.schedule).write("accessEgressSchedule.xml");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 	}
 
 	private void createPopulation() {
@@ -194,13 +181,10 @@ public class AccessEgressDemo {
 		createTransitSchedule();
 		createPopulation();
 		runSim();
-		
 	}
 
 	public static void main(final String[] args) {
-		
-		AccessEgressDemo a = new AccessEgressDemo();
-		a.run();
+		new AccessEgressDemo().run();
 	}
 
 }

@@ -51,7 +51,7 @@ import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class TwoLinesDemo {
-	
+
 	private final ScenarioImpl scenario = new ScenarioImpl();
 	private final Id[] ids = new Id[15];
 
@@ -60,14 +60,14 @@ public class TwoLinesDemo {
 			this.ids[i] = this.scenario.createId(Integer.toString(i));
 		}
 	}
-	
+
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseTransit(true);
 		config.simulation().setSnapshotStyle("queue");
 		config.simulation().setEndTime(24.0*3600);
 	}
-	
+
 	private void createNetwork() {
 		/*
 		 * (2)---2---(4)---4---(6)                                       (12)---12---(14)
@@ -85,7 +85,7 @@ public class TwoLinesDemo {
 		 * (1)---1---(3)---3---(5)                                     5 (11)---13---(13)
 		 *                    o
 		 *                    1
-		 * 
+		 *
 		 */
 		NetworkLayer network = this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -99,11 +99,11 @@ public class TwoLinesDemo {
 		NodeImpl node8 = network.createNode(this.ids[8], this.scenario.createCoord(1500, 500));
 		NodeImpl node9 = network.createNode(this.ids[9], this.scenario.createCoord(2500, 500));
 		NodeImpl node10 = network.createNode(this.ids[10], this.scenario.createCoord(3500, 500));
-		NodeImpl node11 = network.createNode(this.ids[11], this.scenario.createCoord(4000, 1000));
-		NodeImpl node12 = network.createNode(this.ids[12], this.scenario.createCoord(4000, 0));
-		NodeImpl node13 = network.createNode(this.ids[13], this.scenario.createCoord(5000, 1000));
-		NodeImpl node14 = network.createNode(this.ids[14], this.scenario.createCoord(5000, 0));
-		
+		NodeImpl node11 = network.createNode(this.ids[11], this.scenario.createCoord(4000, 0));
+		NodeImpl node12 = network.createNode(this.ids[12], this.scenario.createCoord(4000, 1000));
+		NodeImpl node13 = network.createNode(this.ids[13], this.scenario.createCoord(5000, 0));
+		NodeImpl node14 = network.createNode(this.ids[14], this.scenario.createCoord(5000, 1000));
+
 		network.createLink(this.ids[1], node1, node3, 1000.0, 10.0, 3600.0, 1);
 		network.createLink(this.ids[2], node2, node4, 1000.0, 10.0, 3600.0, 1);
 		network.createLink(this.ids[3], node3, node5, 1000.0, 10.0, 3600.0, 1);
@@ -118,7 +118,7 @@ public class TwoLinesDemo {
 		network.createLink(this.ids[12], node12, node14, 1000.0, 10.0, 3600.0, 1);
 		network.createLink(this.ids[13], node11, node13, 1000.0, 10.0, 3600.0, 1);
 	}
-	
+
 	private void createTransitSchedule() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleBuilder builder = schedule.getBuilder();
@@ -128,7 +128,7 @@ public class TwoLinesDemo {
 		TransitStopFacility stop4 = builder.createTransitStopFacility(this.ids[4], this.scenario.createCoord(3400, 450));
 		TransitStopFacility stop5 = builder.createTransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50));
 		TransitStopFacility stop6 = builder.createTransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850));
-		
+
 		LinkImpl link1 = this.scenario.getNetwork().getLinks().get(this.ids[1]);
 		LinkImpl link2 = this.scenario.getNetwork().getLinks().get(this.ids[2]);
 		LinkImpl link3 = this.scenario.getNetwork().getLinks().get(this.ids[3]);
@@ -175,14 +175,14 @@ public class TwoLinesDemo {
 		stopList.add(builder.createTransitRouteStop(stop5, 390, Time.UNDEFINED_TIME));
 		TransitRoute tRoute1 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, TransportMode.bus);
 		tLine1.addRoute(tRoute1);
-		
+
 		tRoute1.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:00:00")));
 		tRoute1.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:05:00")));
 		tRoute1.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:10:00")));
 		tRoute1.addDeparture(builder.createDeparture(this.ids[4], Time.parseTime("07:15:00")));
 		tRoute1.addDeparture(builder.createDeparture(this.ids[5], Time.parseTime("07:20:00")));
 		tRoute1.addDeparture(builder.createDeparture(this.ids[6], Time.parseTime("07:25:00")));
-		
+
 		schedule.addTransitLine(tLine1);
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
@@ -206,7 +206,7 @@ public class TwoLinesDemo {
 		tRoute2.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:02:00")));
 		tRoute2.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:12:00")));
 		tRoute2.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:22:00")));
-		
+
 		schedule.addTransitLine(tLine2);
 	}
 
@@ -214,17 +214,17 @@ public class TwoLinesDemo {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		PopulationImpl population = this.scenario.getPopulation();
 		PopulationBuilder pb = population.getBuilder();
-		
+
 		TransitLine tLine1 = schedule.getTransitLines().get(this.ids[1]);
 		TransitLine tLine2 = schedule.getTransitLines().get(this.ids[2]);
-		
+
 		TransitStopFacility stop1 = schedule.getFacilities().get(this.ids[1]);
 		/*TransitStopFacility stop2 =*/ schedule.getFacilities().get(this.ids[2]);
 		TransitStopFacility stop3 = schedule.getFacilities().get(this.ids[3]);
-		/*TransitStopFacility stop4 =*/ schedule.getFacilities().get(this.ids[4]);
-		TransitStopFacility stop5 = schedule.getFacilities().get(this.ids[5]);
-		/*TransitStopFacility stop6 =*/ schedule.getFacilities().get(this.ids[6]);
-		
+		TransitStopFacility stop4 = schedule.getFacilities().get(this.ids[4]);
+		/*TransitStopFacility stop5 =*/ schedule.getFacilities().get(this.ids[5]);
+		TransitStopFacility stop6 = schedule.getFacilities().get(this.ids[6]);
+
 		{ // person 1
 			PersonImpl person = (PersonImpl) pb.createPerson(this.ids[1]);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
@@ -235,9 +235,9 @@ public class TwoLinesDemo {
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:01:00"));
 			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
+			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop6));
 			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
-			
+
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
 			plan.addActivity(act2);
@@ -258,9 +258,9 @@ public class TwoLinesDemo {
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:06:00"));
 			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
+			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop6));
 			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
-			
+
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
 			plan.addActivity(act2);
@@ -277,13 +277,13 @@ public class TwoLinesDemo {
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
+			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop4));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:11:00"));
 			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop5));
+			leg2.setRoute(new ExperimentalTransitRoute(stop4, tLine2, stop6));
 			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
-			
+
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
 			plan.addActivity(act2);
@@ -297,12 +297,12 @@ public class TwoLinesDemo {
 
 	private void runSim() {
 		Events events = new Events();
-		
+
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer("two_lines_demo");
-		
+
 		OTFDemo.ptConnect("two_lines_demo");
-		
+
 		sim.run();
 	}
 
@@ -314,7 +314,7 @@ public class TwoLinesDemo {
 		createPopulation();
 		runSim();
 	}
-	
+
 	public static void main(final String[] args) {
 		new TwoLinesDemo().run();
 	}
