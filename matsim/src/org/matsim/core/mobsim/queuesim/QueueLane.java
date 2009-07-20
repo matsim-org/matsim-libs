@@ -416,15 +416,15 @@ public class QueueLane {
 					double delay = driver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
 						veh.setEarliestLinkExitTime(now + delay);
+						if (!stop.getIsBlockingLane()) {
+							this.vehQueue.poll(); // remove the bus from the queue
+							this.transitVehicleStopQueue.add(veh); // and add it to the stop queue
+						}
+						/* start over: either this veh is still first in line,
+						 * but has another stop on this link, or on another link, then it is moved on
+						 */
+						continue;
 					}
-					if (!stop.getIsBlockingLane()) {
-						this.vehQueue.poll(); // remove the bus from the queue
-						this.transitVehicleStopQueue.add(veh); // and add it to the stop queue
-					}
-					/* start over: either this veh is still first in line,
-					 * but has another stop on this link, or on another link, then it is moved on
-					 */
-					continue;
 				}
 			}
 
