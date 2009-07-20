@@ -128,13 +128,13 @@ public class MultiSourceEAF {
 		//set debuging modes
 		MultiSourceEAF.debug(true);
 		BellmanFordVertexIntervalls.debug(0);
-		
 		VertexIntervalls.debug(false);
 		//VertexIntervall.debug(false);
 		EdgeIntervalls.debug(false);
 		//EdgeIntervall.debug(false);
 		Flow.debug(0);
-
+		BellmanFordVertexIntervalls.warmstart(3);
+		System.out.println("Warmstart: 3");
 
 		if(_debug){
 			System.out.println("starting to read input");
@@ -151,15 +151,16 @@ public class MultiSourceEAF {
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
 		//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
-		networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
+		//networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
+		networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
 		
 		String plansfile = null;		
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
 		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
-		plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
-
+		//plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
+		plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
 
 
 		String demandsfile = null;
@@ -174,9 +175,9 @@ public class MultiSourceEAF {
 		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
 		//outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
 		//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
-		outputplansfile = "/Users/manuel/testdata/testoutput.xml";
+		outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
 		
-		int uniformDemands = 1;
+		int uniformDemands = 5;
 
 		//set parameters
 		int timeHorizon = 200000;
@@ -272,10 +273,12 @@ public class MultiSourceEAF {
 
 					timeAugment += timer3 - timer2;
 					if (_debug) {
-						if (i % 10 == 0) {
+						if (i % 100 == 0) {
 							System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-							System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-							System.out.println("last " + tempstr);
+							//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+							//System.out.println("last " + tempstr);
+							System.out.println(routingAlgo.measure());
+							System.out.println("");
 						}
 					}
 				}

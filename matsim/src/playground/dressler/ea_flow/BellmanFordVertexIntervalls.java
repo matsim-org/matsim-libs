@@ -98,6 +98,21 @@ public class BellmanFordVertexIntervalls {
 	private static int _debug=0;
 
 	int gain = 0;
+	
+	private long _totalpolls=0L;
+	
+	private int _roundpolls=0;
+	
+	private long _prepstart=0;
+	private long _prepend=0;
+	private long _totalpreptime=0;
+	
+	private long _calcstart=0;
+	private long _calcend=0;
+	private long _totalcalctime=0;
+	
+	
+	
 	//--------------------CONSTRUCTORS-------------------------------------//
 	
 	/**
@@ -294,10 +309,13 @@ public class BellmanFordVertexIntervalls {
 
 		// main loop
 		//int gain = 0;
+		this._roundpolls=0;
+		this._calcstart=System.currentTimeMillis();
 		while (!queue.isEmpty()) {
 			// gets the first vertex in the queue
 			v = queue.poll();
-			
+			this._roundpolls++;
+			this._totalpolls++;
 			// Clean Up before we do anything!
 			//System.out.println("cleanupnode:"+v.getId().toString()+"\n old: \n"+_labels.get(v).toString());
 			gain += _labels.get(v).cleanup();
@@ -325,6 +343,8 @@ public class BellmanFordVertexIntervalls {
 				printStatus();
 			}
 		}
+		this._calcend= System.currentTimeMillis();
+		this._totalcalctime+=(this._calcend-this._calcstart);
 		if (_debug>3) {
 		  System.out.println("Removed " + gain + " intervals.");
 		}
@@ -337,7 +357,10 @@ public class BellmanFordVertexIntervalls {
 			System.out.println("stop reason: " + e.getMessage());
 		}
 		if(_warmstart>0){
+			this._prepstart= System.currentTimeMillis();
 			createwarmstartList();
+			this._prepend= System.currentTimeMillis();
+			this._totalpreptime+=(this._prepend-this._prepstart);
 		}
 		return this._timeexpandedpath;
 		
@@ -432,6 +455,19 @@ public class BellmanFordVertexIntervalls {
 		}
 		print.append("\n");
 		System.out.println(print.toString());	
+	}
+
+
+
+	public String measure() {
+		String result=
+		"              Polls: "+this._roundpolls+
+		"\n      Preptime (ms): "+(this._prepend-this._prepstart)+
+		"\n      Calctime (ms): "+(this._calcend-this._calcstart)+
+		"\n         Totalpolls: "+(this._totalpolls)+
+		"\n  Totalpreptime (s): "+(this._totalpreptime/1000)+
+		"\n  Totalcalctime (s): "+(this._totalcalctime/1000);
+		return result;
 	}
 	
 
