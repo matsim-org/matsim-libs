@@ -341,17 +341,26 @@ public class QueueLane {
 				return;
 			}
 
+			boolean addToBuffer = true;
 			if (veh.getDriver() instanceof TransitDriverAgent) {
 				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 				TransitStopFacility stop = driver.getNextTransitStop();
 				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
 				/* ignore delay from handleTransitStop, obviously, the transit
 				 * vehicle was parked here, so everybody should have border by now */
-					driver.handleTransitStop(stop, now);
+					double delay = driver.handleTransitStop(stop, now);
+					if (delay > 0.0) {
+						veh.setEarliestLinkExitTime(now + delay);
+						// add it to the stop queue, can do this as the waitQueue is also non-blocking anyway
+						this.transitVehicleStopQueue.add(veh);
+						addToBuffer = false;
+					}
 				}
 			}
 
-			addToBuffer(veh, now);
+			if (addToBuffer) {
+				addToBuffer(veh, now);
+			}
 			QueueSimulation.getEvents().processEvent(
 					new AgentWait2LinkEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
 		}
@@ -368,7 +377,7 @@ public class QueueLane {
 	protected void moveLaneToBuffer(final double now) {
 		QueueVehicle veh;
 
-		// handle transit traffic
+		// handle transit traffic in stop queue
 		List<QueueVehicle> departingTransitVehicles = null;
 		while ((veh = this.transitVehicleStopQueue.peek()) != null) {
 			// there is a transit vehicle.
@@ -399,22 +408,14 @@ public class QueueLane {
 				return;
 			}
 
-			// Check if veh has reached destination:
-			if (veh.getDriver().getDestinationLink() == this.queueLink.getLink()) {
-				this.queueLink.processVehicleArrival(now, veh);
-				// remove _after_ processing the arrival to keep link active
-				this.vehQueue.poll();
-				this.usedStorageCapacity -= veh.getSizeInEquivalents();
-				continue;
-			}
-
+			// handle transit driver if necessary
 			if (veh.getDriver() instanceof TransitDriverAgent) {
 				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 				TransitStopFacility stop = driver.getNextTransitStop();
 				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
 					double delay = driver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
-						veh.setEarliestLinkExitTime(veh.getEarliestLinkExitTime() + delay);
+						veh.setEarliestLinkExitTime(now + delay);
 					}
 					if (!stop.getIsBlockingLane()) {
 						this.vehQueue.poll(); // remove the bus from the queue
@@ -425,6 +426,15 @@ public class QueueLane {
 					 */
 					continue;
 				}
+			}
+
+			// Check if veh has reached destination:
+			if (veh.getDriver().getDestinationLink() == this.queueLink.getLink()) {
+				this.queueLink.processVehicleArrival(now, veh);
+				// remove _after_ processing the arrival to keep link active
+				this.vehQueue.poll();
+				this.usedStorageCapacity -= veh.getSizeInEquivalents();
+				continue;
 			}
 
 			/* is there still room left in the buffer, or is it overcrowded from the
