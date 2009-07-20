@@ -307,7 +307,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// run simulation
 		Events events = new Events();
-		TestSimulation simulation = new TestSimulation(scenario, events, line, tRoute, departure);
+		TestHandleStopSimulation simulation = new TestHandleStopSimulation(scenario, events, line, tRoute, departure);
 		simulation.run();
 
 		// check everything
@@ -353,13 +353,13 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
 	}
 
-	protected static class TestSimulation extends TransitQueueSimulation {
+	protected static class TestHandleStopSimulation extends TransitQueueSimulation {
 		protected SpyDriver driver = null;
 		private final TransitLine line;
 		private final TransitRoute route;
 		private final Departure departure;
 
-		protected TestSimulation(final ScenarioImpl scenario, final Events events,
+		protected TestHandleStopSimulation(final ScenarioImpl scenario, final Events events,
 				final TransitLine line, final TransitRoute route, final Departure departure) {
 			super(scenario, events);
 			this.line = line;
