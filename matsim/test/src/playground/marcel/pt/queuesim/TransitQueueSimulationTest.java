@@ -38,8 +38,10 @@ import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -64,6 +66,103 @@ import playground.marcel.pt.routes.ExperimentalTransitRoute;
  * @author mrieser
  */
 public class TransitQueueSimulationTest extends TestCase {
+
+	/**
+	 * Ensure that for each departure an agent is created and departs
+	 */
+	public void testCreateAgents() {
+		// setup: config
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().simulation().setEndTime(8.0*3600);
+
+		// setup: network
+		NetworkLayer network = scenario.getNetwork();
+		NodeImpl node1 = network.createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		NodeImpl node2 = network.createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		NodeImpl node3 = network.createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+		Link link1 = network.createLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		Link link2 = network.createLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+
+		// setup: transit schedule
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleBuilder builder = schedule.getBuilder();
+
+		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0));
+		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0));
+		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("stop3"), scenario.createCoord(0, 0));
+		TransitStopFacility stop4 = builder.createTransitStopFacility(scenario.createId("stop4"), scenario.createCoord(0, 0));
+		ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
+		stops.add(builder.createTransitRouteStop(stop4, 350, 360));
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+		schedule.addStopFacility(stop4);
+		stop1.setLink(link1);
+		stop2.setLink(link1);
+		stop3.setLink(link2);
+		stop4.setLink(link2);
+
+		NetworkRoute route = new NodeNetworkRoute(link1, link2);
+		ArrayList<Link> links = new ArrayList<Link>();
+		route.setLinks(link1, links, link2);
+
+		{ // line 1, 1 route, 2 departures
+			TransitLine line = builder.createTransitLine(scenario.createId("1"));
+			TransitRoute tRoute = builder.createTransitRoute(scenario.createId(">"), route, stops, TransportMode.pt);
+			tRoute.addDeparture(builder.createDeparture(scenario.createId("dep1"), 6.0*3600));
+			tRoute.addDeparture(builder.createDeparture(scenario.createId("dep2"), 7.0*3600));
+			line.addRoute(tRoute);
+			schedule.addTransitLine(line);
+		}
+
+		{ // line 2, 3 routes, each 1 departure
+			TransitLine line = builder.createTransitLine(scenario.createId("2"));
+			{ // route 1
+				TransitRoute tRoute = builder.createTransitRoute(scenario.createId("A"), route, stops, TransportMode.pt);
+				tRoute.addDeparture(builder.createDeparture(scenario.createId("dep3"), 8.0*3600));
+				line.addRoute(tRoute);
+			}
+			{ // route 2
+				TransitRoute tRoute = builder.createTransitRoute(scenario.createId("B"), route, stops, TransportMode.pt);
+				tRoute.addDeparture(builder.createDeparture(scenario.createId("dep4"), 8.5*3600));
+				line.addRoute(tRoute);
+			}
+			{ // route 3
+				TransitRoute tRoute = builder.createTransitRoute(scenario.createId("C"), route, stops, TransportMode.pt);
+				tRoute.addDeparture(builder.createDeparture(scenario.createId("dep5"), 9.0*3600));
+				line.addRoute(tRoute);
+			}
+			schedule.addTransitLine(line);
+		}
+
+		scenario.getConfig().simulation().setEndTime(1.0*3600); // prevent running the actual simulation
+		TestCreateAgentsSimulation sim = new TestCreateAgentsSimulation(scenario, new Events());
+		sim.run();
+		List<DriverAgent> agents = sim.createdAgents;
+		assertEquals(5, agents.size());
+		assertTrue(agents.get(0) instanceof TransitDriverAgent);
+		assertEquals(6.0*3600, ((TransitDriverAgent) agents.get(0)).getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(7.0*3600, ((TransitDriverAgent) agents.get(1)).getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(8.0*3600, ((TransitDriverAgent) agents.get(2)).getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(8.5*3600, ((TransitDriverAgent) agents.get(3)).getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(9.0*3600, ((TransitDriverAgent) agents.get(4)).getDepartureTime(), MatsimTestCase.EPSILON);
+	}
+
+	protected static class TestCreateAgentsSimulation extends TransitQueueSimulation {
+		public final List<DriverAgent> createdAgents = new ArrayList<DriverAgent>();
+		public TestCreateAgentsSimulation(final ScenarioImpl scenario, final Events events) {
+			super(scenario, events);
+		}
+		@Override
+		protected void createAgents() {
+			super.createAgents();
+			this.createdAgents.addAll(super.activityEndsList);
+		}
+	}
 
 	/**
 	 * Tests that the simulation is adding an agent correctly to the transit stop
@@ -125,7 +224,6 @@ public class TransitQueueSimulationTest extends TestCase {
 	 * link of the network route, or any intermediary link.
 	 */
 	public void testHandleStop() {
-		// TEST SETUP
 		// setup: config
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
