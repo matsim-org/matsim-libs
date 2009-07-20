@@ -31,6 +31,7 @@ public abstract class AllTests {
 		suite.addTestSuite(TransitAgentTest.class);
 		suite.addTestSuite(TransitDriverTest.class);
 		suite.addTestSuite(TransitQueueVehicleTest.class);
+		suite.addTestSuite(TransitQueueSimulationTest.class);
 		suite.addTestSuite(TransitStopAgentTrackerTest.class);
 
 		return suite;
