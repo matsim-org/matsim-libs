@@ -18,13 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.analysis;
+package playground.christoph.analysis.wardrop;
 
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -32,6 +31,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
+
 
 public class WardropTest {
 

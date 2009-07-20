@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.analysis;
+package playground.christoph.analysis.wardrop;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -33,18 +33,13 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.BasicLegImpl;
-import org.matsim.core.basic.v01.BasicRouteImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -56,6 +51,7 @@ public class Wardrop {
 	protected NetworkLayer network;
 	protected PopulationImpl population;
 	
+	protected WardropZones wardropZones;
 	protected ActTimesCollector actTimesCollector;
 	
 	protected boolean useLengthCorrection = false;
@@ -63,12 +59,7 @@ public class Wardrop {
 	// Trips[from Zone][to Zone]
 	// Zones are numbered from the top left to the bottom right
 	protected Trips[][] zoneMatrix;
-	
-	protected double xMin;
-	protected double xMax;
-	protected double yMin;
-	protected double yMax;
-	
+		
 	// parameters for getResults()
 	int timeStep = 60 * 60;	// [sec]
 	int minTrips = 5;
@@ -76,32 +67,19 @@ public class Wardrop {
 	double endTime = 3600*36; // [sec]
 	double minCellDistance = 30000.0; // [m]
 	
-	// 5000 x 5000
-//	protected int zonesX = 148;
-//	protected int zonesY = 62;
-	
-	// 6000 x 6000
-	protected int zonesX = 123;
-	protected int zonesY = 51;
-	
-	// max...	
-//	protected int zonesX = 140;
-//	protected int zonesY = 70;
-
-
-	//public Wardrop(NetworkLayer network, Population population)
 	public Wardrop(NetworkLayer network, PopulationImpl population)
 	{
 		this.network = network;
 		this.population = population;
 		
-		getNetworkRange();
+		this.wardropZones = new CircularWardropZones(network);
+		this.wardropZones.createMapping();
 	}
 	
 	public void createZoneMatrix()
 	{
 		// create new ZoneMatrix
-		int zones = zonesX*zonesY;
+		int zones = wardropZones.getZonesCount();
 		
 //		log.info("Zone size: " + (xMax - xMin)/zonesX + "x" + (yMax - yMin)/zonesY);
 		
@@ -121,7 +99,7 @@ public class Wardrop {
 	{
 		if (zoneMatrix != null)
 		{		
-			int zones = zonesX*zonesY;
+			int zones = wardropZones.getZonesCount();
 		
 			for(int i = 0; i < zones; i++)
 			{
@@ -190,88 +168,30 @@ public class Wardrop {
 				double startTime = startAct.getEndTime();
 				double endTime = endAct.getStartTime();
 				
+				List<Integer> startZones = wardropZones.getZones(startCoord);
+				List<Integer> endZones = wardropZones.getZones(endCoord);
+				
+				for (int startZone : startZones)
+				{
+					for (int endZone : endZones)
+					{
+						Trips trip = zoneMatrix[startZone][endZone];
+						trip.addTrip(startTime, endTime, startCoord, endCoord);
+					}
+				}
+				
+				/*
 				int startZone = getZone(startCoord);
 				int endZone = getZone(endCoord);
 				
 				Trips trip = zoneMatrix[startZone][endZone];
 
-				trip.addTrip(startTime, endTime, startCoord, endCoord);		
+				trip.addTrip(startTime, endTime, startCoord, endCoord);
+				*/		
 			}
 			
 		}
 	}
-	
-	protected void getNetworkRange()
-	{
-		if (network != null)
-		{
-			for(NodeImpl node:network.getNodes().values())
-			{
-				Coord coord = node.getCoord();
-				double xcoord = coord.getX();
-				double ycoord = coord.getY();
-				
-				if (xcoord < xMin) xMin = xcoord;
-				if (xcoord > xMax) xMax = xcoord;
-				if (ycoord < yMin) yMin = ycoord;
-				if (ycoord > yMax) yMax = ycoord;
-			}
-		}
-	}
-	
-	public int getZone(LinkImpl link)
-	{
-		return getZone(link.getCoord());
-	}
-	
-	public int getZone(NodeImpl node)
-	{
-		return getZone(node.getCoord());
-	}
-	
-	public int getZone(Coord coord)
-	{
-		double dx = (xMax - xMin) / zonesX;
-		double dy = (yMax - yMin) / zonesY;
-
-		int xZone = 0;
-		while(coord.getX() > xMin + dx*(xZone + 1))
-		{
-			xZone++;
-		}
-		
-		int yZone = 0;
-		while(coord.getY() < yMax - dy*(yZone + 1))
-		{
-			yZone++;
-		}
-		
-		return (xZone + yZone*zonesX);
-	}
-
-	// returns the coordinates of the centre of the given zone
-	protected Coord getZoneCentre(int zone)
-	{
-		double dx = (xMax - xMin) / zonesX;
-		double dy = (yMax - yMin) / zonesY;
-		
-		int xIndex = zone;
-		int yIndex = 0;
-		
-		while (xIndex >= zonesX)
-		{
-			yIndex++;
-			xIndex = xIndex - zonesX;
-		}
-		
-		double xCoord = xMin + (xIndex * dx + dx/2);
-		double yCoord = yMax - (yIndex * dy + dy/2);
-		
-		Coord coord = new CoordImpl(xCoord, yCoord);
-		
-		return coord;
-	}
-	
 	
 	// gets all ActStart- and ActEndEvents from a given Eventsfile
 	protected void processEvents(String file)
@@ -339,9 +259,38 @@ public class Wardrop {
 					correct++;
 					for(int i = 0; i < startTimes.size(); i++)
 					{
-						tripcounter++;
+						List<Integer> startZones = wardropZones.getZones(startCoords.get(i));
+						List<Integer> endZones = wardropZones.getZones(endCoords.get(i));
 						
-						//int startZone = getZone(startCoords.get(i + 1));
+						for (int startZone : startZones)
+						{
+							for (int endZone : endZones)
+							{
+								tripcounter++;
+								
+								Trips trips = zoneMatrix[startZone][endZone];
+
+								double tripDuration = startTimes.get(i) - endTimes.get(i);
+								
+								sum = sum + tripDuration;
+								
+								// without length correction
+								if (!useLengthCorrection)
+								{
+									trips.addTrip(endTimes.get(i), startTimes.get(i), endCoords.get(i), startCoords.get(i));
+								}
+
+								// with correction
+								else
+								{
+									double correctedDuration = distanceCorrection(endCoords.get(i), startCoords.get(i), endZone, startZone, tripDuration);
+									trips.addTrip(endTimes.get(i), endTimes.get(i) + correctedDuration, endCoords.get(i), startCoords.get(i));
+								}
+							}
+						}
+/*						
+						tripcounter++;
+											
 						int startZone = getZone(startCoords.get(i));
 						int endZone = getZone(endCoords.get(i));
 						
@@ -363,6 +312,7 @@ public class Wardrop {
 							double correctedDuration = distanceCorrection(endCoords.get(i), startCoords.get(i), endZone, startZone, tripDuration);
 							trips.addTrip(endTimes.get(i), endTimes.get(i) + correctedDuration, endCoords.get(i), startCoords.get(i));
 						}
+*/						
 					}	// for int i
 				}	// if correct
 			}	// for every Person
@@ -375,8 +325,8 @@ public class Wardrop {
 			log.info("Correct: " + correct);
 			log.info("Wrong: " + wrong);
 			
-			log.info("Zone length in x direction: " + (xMax - xMin) / zonesX);
-			log.info("Zone length in y direction: " + (yMax - yMin) / zonesY);
+//			log.info("Zone length in x direction: " + (xMax - xMin) / zonesX);
+//			log.info("Zone length in y direction: " + (yMax - yMin) / zonesY);
 			
 		}	// if (actTimesCollector != null
 		
@@ -391,8 +341,10 @@ public class Wardrop {
 	{	
 		if (startZone == endZone) return tripDuration;
 		
-		Coord startCentre = getZoneCentre(startZone);
-		Coord endCentre = getZoneCentre(endZone);
+		Coord startCentre = wardropZones.getZoneCentre(startZone);
+		Coord endCentre = wardropZones.getZoneCentre(endZone);
+		//Coord startCentre = getZoneCentre(startZone);
+		//Coord endCentre = getZoneCentre(endZone);
 		
 		// distance between the centres of the traffic cells
 		double referenceLength = ((CoordImpl)startCentre).calcDistance(endCentre);
@@ -425,8 +377,8 @@ public class Wardrop {
 		log.info("Minimum Disctance between two Traffic Cells: " + minCellDistance);
 		log.info("Start Time of Analysis: " + Time.writeTime(startTime));
 		log.info("End Time of Analysis: " + Time.writeTime(endTime));
-		log.info("Number of Zones in X Direction: " + zonesX);
-		log.info("Number of Zones in Y Direction: " + zonesY);
+//		log.info("Number of Zones in X Direction: " + zonesX);
+//		log.info("Number of Zones in Y Direction: " + zonesY);
 		
 		if (useLengthCorrection) log.info("Use Trip Length Correction");
 		else log.info("Don't use Trip Length Correction");
@@ -467,7 +419,8 @@ public class Wardrop {
 					 *  Check if the distance between the centres of the current cells is big enough.
 					 *  If not - skip it!
 					 */
-					double cellDistance = ((CoordImpl)getZoneCentre(i)).calcDistance(getZoneCentre(j));
+					//double cellDistance = ((CoordImpl)getZoneCentre(i)).calcDistance(getZoneCentre(j));
+					double cellDistance = ((CoordImpl)wardropZones.getZoneCentre(i)).calcDistance(wardropZones.getZoneCentre(j));
 					if (calcTripResults &&  cellDistance < minCellDistance)
 					{
 						calcTripResults = false;
@@ -599,7 +552,7 @@ public class Wardrop {
 		{
 			PlanImpl plan = person.getSelectedPlan();
 						
-			ArrayList<BasicLegImpl> legs = new ArrayList<BasicLegImpl>();
+			//ArrayList<BasicLegImpl> legs = new ArrayList<BasicLegImpl>();
 
 			for (PlanElement planElement : plan.getPlanElements())
 			{
@@ -620,15 +573,7 @@ public class Wardrop {
 					}
 				}
 			}
-			/*
-			Iterator<BasicLegImpl> legIter = plan.getIteratorLeg();
-			while (legIter.hasNext())
-			{
-				BasicLegImpl leg = legIter.next();
-				linkCounter = linkCounter + leg.getRoute().getLinkIds().size();
-				legCounter++;
-			}
-			*/
+
 			PersonCounter++;
 		}
 		

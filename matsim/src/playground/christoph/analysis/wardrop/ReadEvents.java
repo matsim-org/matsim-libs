@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.analysis;
+package playground.christoph.analysis.wardrop;
 
 import org.matsim.core.events.Events;
 import org.matsim.core.events.EventsReaderTXTv1;

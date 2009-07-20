@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.analysis;
+package playground.christoph.analysis.wardrop;
 
 import java.util.ArrayList;
 import java.util.List;
