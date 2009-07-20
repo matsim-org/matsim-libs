@@ -22,6 +22,9 @@ public class SAZone extends MultiPolygon{
 	private Integer[] minorActivityDurationDetail;
 	private Integer[] majorActivityCountDetail;
 	private Integer[] majorActivityDurationDetail;
+	private Double[] speedDetail;
+	private Integer[] speedCount;
+
 	private static final int TIME_BINS = 24;
 	private int timeBins;
 
@@ -39,11 +42,19 @@ public class SAZone extends MultiPolygon{
 		this.minorActivityDurationDetail = new Integer[this.timeBins];
 		this.majorActivityCountDetail = new Integer[this.timeBins];
 		this.majorActivityDurationDetail = new Integer[this.timeBins];
+		this.speedDetail = new Double[this.timeBins];
+		this.speedCount = new Integer[this.timeBins];
+		
+		// TODO Check if this is fine
+		this.speedDetail = new Double[this.timeBins];
+		
 		for(int i = 0; i < this.timeBins; i++ ){
 			this.minorActivityCountDetail[i] = 0;
 			this.minorActivityDurationDetail[i] = 0;
 			this.majorActivityCountDetail[i] = 0;
 			this.majorActivityDurationDetail[i] = 0;
+			this.speedDetail[i] = 0.0;
+			this.speedCount[i] = 0;
 		}	
 	}
 	
@@ -77,7 +88,6 @@ public class SAZone extends MultiPolygon{
 	public void setMinorActivityCountDetail(int hour, int value){
 		this.minorActivityCountDetail[hour] = value;
 	}
-
 
 	public int getMinorActivityDurationDetail(int hour){
 		return this.minorActivityDurationDetail[hour];
@@ -117,8 +127,19 @@ public class SAZone extends MultiPolygon{
 	public int getMajorActivityDurationDetail(int hour){
 		return this.majorActivityDurationDetail[hour];
 	}
+	
+	// Private vehicle speed details
+	public Double getPrivateVehicleSpeedDetail(int i) {
+		return this.speedDetail[i];
+	}
 
-	/*
+	public void setPrivateVehicleSpeedDetail(int i, double d) {
+		this.speedDetail[i] = d;
+	}
+
+	
+
+	/**
 	 * The {@code activityDuration} field previously merely
 	 * contained the sum of the activity durations. This method
 	 * thus divides the 'total' duration by the number of
@@ -199,10 +220,37 @@ public class SAZone extends MultiPolygon{
 			this.minorActivityDurationDetail[i] = 0;
 			this.majorActivityCountDetail[i] = 0;
 			this.majorActivityDurationDetail[i] = 0;
+			this.speedDetail[i] = 0.0;
+			this.speedCount[i] = 0;
 		}
 		// Also, clear the polygon container
 		this.polygonContainer = new ArrayList<SAZone>();
 	}
+	
+	public void incrementSpeedCount(int i){
+		this.speedCount[i]++;
+	}
+	
+	public void addToSpeedDetail(int i, Double d){
+		this.speedDetail[i] += d;
+	}
+	
+	public void calculateAverageSpeed(){
+		for(int i = 0; i < this.timeBins; i++){
+			if(this.speedCount[i] > 0){
+				this.speedDetail[i] /= ((double) this.speedCount[i]);
+			}
+		}
+	}
+
+	public Double[] getSpeedDetail() {
+		return speedDetail;
+	}
+
+	public Integer[] getSpeedCount() {
+		return speedCount;
+	}
+	
 	
 	
 	
