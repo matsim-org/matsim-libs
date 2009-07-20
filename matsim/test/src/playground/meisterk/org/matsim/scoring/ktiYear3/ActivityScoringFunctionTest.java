@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
@@ -46,7 +47,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -64,6 +64,8 @@ import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory.KTIScoringParameters;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
 
@@ -93,8 +95,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		scoring.setWaiting(0.0);
 		
 		this.config.planomat().setDoLogging(false);
-//		this.config.planomat().setJgapMaxGenerations(10000);
-		
+
 		// generate person
 		this.population = new PopulationImpl();
 //		Id personId = new IdImpl("123");
@@ -183,6 +184,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("1020"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("04:00:00"));
+		leg.setTravelTime(Time.parseTime("04:00:00"));
 
 		act = plan.createActivity("shop", facilityShop);
 		link = this.network.getLink("1020");
@@ -192,6 +194,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("1020"), this.network.getLink("2030"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("04:00:00"));
+		leg.setTravelTime(Time.parseTime("04:00:00"));
 
 		act = plan.createActivity("home", facilityHome);
 		link = this.network.getLink("2030");
@@ -227,7 +230,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				this.config.charyparNagelScoring(), facilityPenalties);
+				this.config.charyparNagelScoring(), 
+				facilityPenalties,
+				this.config.getModule(KTIScoringParameters.CONST_BIKE));
 		// init Planomat, which loads config!
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.config.planomat());
 
@@ -372,7 +377,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 			String[] expectedNegativeDurationsSequence) {
 		
 		TreeMap<Id, FacilityPenalty> emptyFacilityPenalties = new TreeMap<Id, FacilityPenalty>();
-		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(config.charyparNagelScoring(), emptyFacilityPenalties);
+		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
+				this.config.charyparNagelScoring(), 
+				emptyFacilityPenalties,
+				null);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
 		testee.endActivity(Time.parseTime("08:00:00"));
@@ -493,6 +501,17 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 				// check zero utility durations
 				assertEquals(zeroUtilityDuration, factory.getActivities().getZeroUtilityDurations().get(actType), MatsimTestCase.EPSILON);
 				
+			}
+		}
+		
+		// score legs
+		KTIScoringParameters ktiScoringParameters = factory.getKtiScoringParameters();
+		for (PlanElement pe : this.plan.getPlanElements()) {
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
+				if (leg.getMode().equals(TransportMode.bike)) {
+					expectedScore += ktiScoringParameters.getConstBike();
+				}
 			}
 		}
 		assertEquals(expectedScore, testee.getScore());

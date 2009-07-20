@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * LegScoringFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,19 +20,44 @@
 
 package playground.meisterk.org.matsim.scoring.ktiYear3;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
-public class AllTests {
+import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory.KTIScoringParameters;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk.scoring.ktiYear3");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(ActivityScoringFunctionTest.class);
-		suite.addTestSuite(KTIYear3ScoringFunctionFactoryTest.class);
-		//$JUnit-END$
-		return suite;
+
+/**
+ * This class contains modifications of the standard leg scoring function for the KTI project.
+ * 
+ * @author meisterk
+ *
+ */
+public class LegScoringFunction extends
+		org.matsim.core.scoring.charyparNagel.LegScoringFunction {
+
+	private final KTIScoringParameters ktiScoringParameters;
+
+	public LegScoringFunction(PlanImpl plan,
+			CharyparNagelScoringParameters params,
+			KTIScoringParameters ktiScoringParameters) {
+		super(plan, params);
+		this.ktiScoringParameters = ktiScoringParameters;
 	}
 
+	@Override
+	protected double calcLegScore(double departureTime, double arrivalTime,
+			LegImpl leg) {
 
+		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
+		
+		if (leg.getMode().equals(TransportMode.bike)) {
+			legScore += ktiScoringParameters.getConstBike();
+		}
+		
+		return legScore;
+	}
+	
+	
 }

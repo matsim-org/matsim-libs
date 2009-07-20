@@ -15,6 +15,7 @@ import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 import playground.marcel.kti.router.SwissHaltestellen;
+import playground.meisterk.org.matsim.run.ktiYear3.KTIControler;
 
 
 public class PTRoutingInfo {
@@ -26,14 +27,15 @@ public class PTRoutingInfo {
 	
 	public void prepareKTIRouter(Controler c) {
 		
-		boolean usePlansCalcRouteKti = Boolean.parseBoolean(c.getConfig().getModule("kti").getValue("usePlansCalcRouteKti"));
+		boolean usePlansCalcRouteKti = Boolean.parseBoolean(
+				c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("usePlansCalcRouteKti"));
 		if (!usePlansCalcRouteKti) {
 			log.error("The kti module is missing.");
 		}
 
 		// municipality layer from world file
 		this.localWorld = new World();
-		String worldFilename = c.getConfig().getModule("kti").getValue("worldInputFilename");
+		String worldFilename = c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("worldInputFilename");
 		try {
 			new MatsimWorldReader(localWorld).parse(worldFilename);
 		} catch (SAXException e) {
@@ -48,13 +50,13 @@ public class PTRoutingInfo {
 		Matrices matrices = new Matrices();
 		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", localWorld.getLayer("municipality"), null);
 		VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
-		reader.readFile(c.getConfig().getModule("kti").getValue("pt_traveltime_matrix_filename"));
+		reader.readFile(c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("pt_traveltime_matrix_filename"));
 		log.info("Reading traveltime matrix...done.");
 
 		log.info("Reading haltestellen...");
 		this.haltestellen = new SwissHaltestellen(c.getNetwork());
 		try {
-			haltestellen.readFile(c.getConfig().getModule("kti").getValue("pt_haltestellen_filename"));
+			haltestellen.readFile(c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("pt_haltestellen_filename"));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {

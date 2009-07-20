@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * KTIYear3ScoringFunctionFactoryTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,19 +20,38 @@
 
 package playground.meisterk.org.matsim.scoring.ktiYear3;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
+import playground.meisterk.org.matsim.run.ktiYear3.KTIControler;
+import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory.KTIScoringParameters;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk.scoring.ktiYear3");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(ActivityScoringFunctionTest.class);
-		suite.addTestSuite(KTIYear3ScoringFunctionFactoryTest.class);
-		//$JUnit-END$
-		return suite;
+public class KTIYear3ScoringFunctionFactoryTest extends MatsimTestCase {
+
+	private Config config;
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+		this.config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		this.config = null;
+	}
 
+	public void testKTIYear3ScoringFunctionFactory() {
+		
+		Module ktiConfigModule = this.config.getModule(KTIControler.KTI_CONFIG_MODULE_NAME);
+		
+		KTIYear3ScoringFunctionFactory testee = new KTIYear3ScoringFunctionFactory(this.config.charyparNagelScoring(), null, ktiConfigModule);
+		
+		KTIScoringParameters ktiScoringParameters = testee.getKtiScoringParameters();
+		
+		assertEquals(999.9, ktiScoringParameters.getConstBike());
+		
+	}
+	
 }

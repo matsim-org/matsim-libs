@@ -1,6 +1,7 @@
 package playground.meisterk.org.matsim.run.ktiYear3;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -21,6 +22,8 @@ import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFa
 
 public class KTIControler extends Controler {
 
+	public static final String KTI_CONFIG_MODULE_NAME = "kti";
+	
 	private PreProcessLandmarks commonRoutingData = null;
 	private PTRoutingInfo ptRoutingInfo=null;
 	private static boolean firstTime=true;
@@ -35,8 +38,12 @@ public class KTIControler extends Controler {
 
 	public void run() {
 
-		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(Gbl.getConfig()
-				.charyparNagelScoring(), this.getFacilityPenalties());
+		Module ktiConfigGroup = super.config.getModule(KTIControler.KTI_CONFIG_MODULE_NAME);
+		
+		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+				super.config.charyparNagelScoring(), 
+				this.getFacilityPenalties(),
+				ktiConfigGroup);
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		this.ptRoutingInfo = new PTRoutingInfo();
@@ -63,7 +70,8 @@ public class KTIControler extends Controler {
 
 		PlanAlgorithm router = null;
 
-		boolean usePlansCalcRouteKti = Boolean.parseBoolean(Gbl.getConfig().getModule("kti").getValue("usePlansCalcRouteKti"));
+		boolean usePlansCalcRouteKti = Boolean.parseBoolean(
+				Gbl.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("usePlansCalcRouteKti"));
 		if (!usePlansCalcRouteKti) {
 			router = super.getRoutingAlgorithm(travelCosts, travelTimes);
 		} else {
