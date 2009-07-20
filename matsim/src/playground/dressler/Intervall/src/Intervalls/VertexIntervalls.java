@@ -59,7 +59,7 @@ public class VertexIntervalls {
 //-----------------------METHODS----------------------------------//
 //****************************************************************//
 	
-	
+	 
 //----------------------CONSTRUCTORS------------------------------//	
 	
 	/**
@@ -169,7 +169,12 @@ public class VertexIntervalls {
 		StringBuilder str = new StringBuilder();
 		for(_tree.reset();!_tree.isAtEnd();_tree.increment()){
 			VertexIntervall i= (VertexIntervall) _tree._curr.obj;
-			str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getDist()+"\n");
+			if(i.getPredecessor() != null){
+				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getDist()+" pred:"+i.getPredecessor().getId().toString() +"\n");
+			}else{
+				
+				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getDist()+" pred: null"+"\n");
+			}
 		}
 			
 		return str.toString();
@@ -293,7 +298,9 @@ public class VertexIntervalls {
 			if(arrivecondensed.size()!=arrive.size()){
 				//System.out.println("new: "+arrivecondensed.size()+" old: "+arrive.size());
 			}
+			//arrivecondensed=arrive;
 			rem+=arrive.size()-arrivecondensed.size();
+			
 			for(int i=0; i< arrivecondensed.size(); i++){
 				boolean temp=setTrue(arrivecondensed.get(i),link);
 				if(temp){
@@ -306,6 +313,7 @@ public class VertexIntervalls {
 					changed=true;
 				}
 			}*/
+			
 		}
 		return changed;
 	}
@@ -421,6 +429,7 @@ public class VertexIntervalls {
 		  
 		  if ((i.getHighBound() == j.getLowBound()) && (i.getDist() == j.getDist()) &&
 				  (i.getPredecessor() == j.getPredecessor())) {
+			  
 			  VertexIntervall ni = new VertexIntervall(i.getLowBound(),j.getHighBound(),i.getDist(), i.getPredecessor());
 			  _tree.remove(i);
 			  _tree.remove(j);
@@ -428,11 +437,13 @@ public class VertexIntervalls {
 			  i = ni;
 			  gain++;
 
+
 		  } else {
 			  i = j;
 		  }		 		 
 		}
 		_last = (VertexIntervall) _tree._getLast().obj;
+		
 		return gain;
 	}
 	

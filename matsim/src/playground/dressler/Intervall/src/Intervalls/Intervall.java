@@ -531,7 +531,7 @@ implements Comparable<Intervall>
 	//TODO comment
 	public Intervall shiftPositive(int tau){
 		int l,r;
-		if(Integer.MAX_VALUE!=this._r ){
+		if(Integer.MAX_VALUE/2>this._r ){
 			r=this._r+tau;
 		}else{
 			r=this._r;

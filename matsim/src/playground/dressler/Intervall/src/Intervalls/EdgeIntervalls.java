@@ -48,7 +48,7 @@ public class EdgeIntervalls {
 	@SuppressWarnings("unused")
 	private static boolean _debug =false;
 	
-	
+	 
 	
 //-----------------------METHODS----------------------------------//
 //****************************************************************//
