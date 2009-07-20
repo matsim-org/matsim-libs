@@ -27,7 +27,9 @@ import org.matsim.core.population.routes.RouteWRefs;
 
 public class ExperimentalTransitRouteFactory implements RouteFactory {
 
-	public RouteWRefs createRoute(Link startLink, Link endLink) {
+	private static final long serialVersionUID = 1L;
+
+	public RouteWRefs createRoute(final Link startLink, final Link endLink) {
 		return new ExperimentalTransitRoute(startLink, endLink);
 	}
 
