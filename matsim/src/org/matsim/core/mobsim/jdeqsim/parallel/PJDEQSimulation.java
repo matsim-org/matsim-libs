@@ -83,7 +83,22 @@ public class PJDEQSimulation extends JDEQSimulation {
 		Timer t = new Timer();
 		t.startTimer();
 
-		PScheduler scheduler = new PScheduler(new PMessageQueue());
+		
+		
+		PMessageQueue queue=new PMessageQueue();
+		
+		// set the maxTimeDelta
+		String JDEQ_SIM="JDEQSim";
+		String MAX_TIME_DELTA="maxTimeDelta";
+		String maxTimeDelta=Gbl.getConfig().findParam(JDEQ_SIM, MAX_TIME_DELTA);
+		
+		if (maxTimeDelta!=null){
+			queue.setMaxTimeDelta(Integer.parseInt(maxTimeDelta));
+		}
+		
+		
+		
+		PScheduler scheduler = new PScheduler(queue);
 		scheduler.getQueue().idOfMainThread = Thread.currentThread().getId();
 		SimulationParameters.setAllRoads(new HashMap<String, Road>());
 

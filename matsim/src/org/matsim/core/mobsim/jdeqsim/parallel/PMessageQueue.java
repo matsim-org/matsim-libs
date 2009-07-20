@@ -432,4 +432,12 @@ public class PMessageQueue extends MessageQueue {
 			}
 		}
 	}
+
+	public double getMaxTimeDelta() {
+		return maxTimeDelta;
+	}
+
+	public void setMaxTimeDelta(double maxTimeDelta) {
+		this.maxTimeDelta = maxTimeDelta;
+	}
 }

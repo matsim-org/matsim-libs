@@ -239,12 +239,14 @@ public class MessageExecutor extends Thread {
 						synchronized (vehicle) {
 							synchronized (m) {
 								if (m.isAlive()) {
+									//m.processEvent();
 									m.handleMessage();
 								}
 							}
 						}
 					} else {
 						synchronized (vehicle) {
+							//m.processEvent();
 							m.handleMessage();
 						}
 					}
@@ -253,6 +255,7 @@ public class MessageExecutor extends Thread {
 				} else {
 
 					if (m.isAlive()) {
+						//m.processEvent();
 						m.handleMessage();
 					}
 
