@@ -30,10 +30,40 @@ public class PMessageQueue extends MessageQueue {
 	// the maximum time difference two threads are allowed to have in [s] (for
 	// message time stamp) => with this parameter the number of locks can be
 	// reduced... => we need to find out, how much effect it has...
+	// this is quite optimal, not much more optimization possible...
+	// THIS PARAMETER CAN BE TUNED, but no tuning needed at the moment.
+	// good value (at least for home compi): 10 seconds
+	// E.g. making this parameter 100000 would make the simulation extremly fast
+	// (fully parallel)
+	// but the results are a bit of rubish probably...
+	
+	// in my personal opinion, a randomness within 1 to 5/10 minutes shouldn't be a problem,
+	// if we think about the rest of MATSim (we can't model each person anyway that he is first and 
+	// the other is second - why it didn't happen as due to randomness?).
+	
+	// already putting it to 10min/600sec gives very good performance...
+	
+	// question: how does the output look in the case when we put it that high? does correction happen automatically
+	// along the links (it should because of the congestions, because the time for that is given by the vehicle in front)
+	// so it might be, this has even a smaller effect.
+	// in the empty network a big delta doesn't anyway cause problems....
+	
+	// along the border it could cause some bad influence...
 	private double maxTimeDelta = 10;
+
+	// all events after 24 hours should be process in a faster way
+	// (take maxTimeDelta effect away)
+	private boolean secondDayStarted = false;
 
 	public boolean lowerThreadWitnessedEmptyQueue = false;
 	public boolean higherThreadWitnessedEmptyQueue = false;
+	
+	// THIS gives also some improvement in time...
+	private static final int SECONDS_IN_DAY=86400;
+	
+	// how many times is it the case, that the process can't progress
+	// although, it has messages in the queue (but it does not return them).
+	private int thread1_TimesCantProgressBecauseOfMaxDelta=0;
 
 	/**
 	 * 
@@ -119,7 +149,8 @@ public class PMessageQueue extends MessageQueue {
 
 		// a thread should put messages of his zone directly into his zone queue
 		// but messages for other zone should be put into a buffer
-		// Profiling shows: This strategy really removes blocking of the threads...
+		// Profiling shows: This strategy really removes blocking of the
+		// threads...
 		if (roadBelongsToLowerThreadZone) {
 			if (inLowerThreadCurrently) {
 				queueThread1.add(m);
@@ -256,8 +287,12 @@ public class PMessageQueue extends MessageQueue {
 	 * it.
 	 */
 	/**
-	 * TODO: Probably we could switch back to getNextMessage now, as the locking logic has changed now...
-	 * => not really oder?
+	 * TODO: Probably we could switch back to getNextMessage now, as the locking
+	 * logic has changed now... => not really oder?
+	 */
+	/**
+	 * Especially if the network is almost empty, the simulation might slow down
+	 * because of small max time delta. TODO: make this better.
 	 */
 	public LinkedList<Message> getNextMessages(LinkedList<Message> list) {
 		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
@@ -283,37 +318,49 @@ public class PMessageQueue extends MessageQueue {
 		double maxTimeStampAllowed = -1;
 		double myMinTimeStamp = -1;
 		double otherThreadMinTimeStamp = -1;
+		
+		if (!secondDayStarted) {
 
-		// as we are not using syncrhonization, a null pointer exception might
-		// happen...
-		try {
-			if (inLowerThreadCurrently) {
-				if (queueThread1.peek() != null) {
-					myMinTimeStamp = queueThread1.peek()
-							.getMessageArrivalTime();
+			// as we are not using syncrhonization, a null pointer exception
+			// might
+			// happen...
+			try {
+				if (inLowerThreadCurrently) {
+					if (queueThread1.peek() != null) {
+						myMinTimeStamp = queueThread1.peek()
+								.getMessageArrivalTime();
+					}
+					if (queueThread2.peek() != null) {
+						otherThreadMinTimeStamp = queueThread2.peek()
+								.getMessageArrivalTime();
+					}
+				} else {
+					if (queueThread2.peek() != null) {
+						myMinTimeStamp = queueThread2.peek()
+								.getMessageArrivalTime();
+					}
+					if (queueThread1.peek() != null) {
+						otherThreadMinTimeStamp = queueThread1.peek()
+								.getMessageArrivalTime();
+					}
 				}
-				if (queueThread2.peek() != null) {
-					otherThreadMinTimeStamp = queueThread2.peek()
-							.getMessageArrivalTime();
-				}
-			} else {
-				if (queueThread2.peek() != null) {
-					myMinTimeStamp = queueThread2.peek()
-							.getMessageArrivalTime();
-				}
-				if (queueThread1.peek() != null) {
-					otherThreadMinTimeStamp = queueThread1.peek()
-							.getMessageArrivalTime();
-				}
+			} catch (Exception e) {
+				// just continue with the current values...
 			}
-		} catch (Exception e) {
-			// just continue with the current values...
-		}
 
-		if (otherThreadMinTimeStamp == -1) {
-			maxTimeStampAllowed = myMinTimeStamp + maxTimeDelta;
+			if (otherThreadMinTimeStamp == -1) {
+				maxTimeStampAllowed = myMinTimeStamp + maxTimeDelta;
+			} else {
+				maxTimeStampAllowed = otherThreadMinTimeStamp + maxTimeDelta;
+			}
+			
+			// allow each process to operate separatly now...
+			// THIS gives also some improvement
+			if (maxTimeStampAllowed>SECONDS_IN_DAY){
+				secondDayStarted=true;
+			}
 		} else {
-			maxTimeStampAllowed = otherThreadMinTimeStamp + maxTimeDelta;
+			maxTimeStampAllowed=Integer.MAX_VALUE;
 		}
 
 		if (inLowerThreadCurrently) {
@@ -324,6 +371,16 @@ public class PMessageQueue extends MessageQueue {
 					&& queueThread1.peek().getMessageArrivalTime() <= maxTimeStampAllowed) {
 				list.add(queueThread1.poll());
 			}
+			
+			if (list.size()==0 && queueThread1.size()!=0){
+				thread1_TimesCantProgressBecauseOfMaxDelta++;
+				
+				if (thread1_TimesCantProgressBecauseOfMaxDelta>1000){
+					//System.out.println();
+					// this is really often the case...
+				}
+			}
+			
 
 		} else {
 
@@ -333,6 +390,8 @@ public class PMessageQueue extends MessageQueue {
 			}
 
 		}
+		
+		
 
 		return list;
 	}

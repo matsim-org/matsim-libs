@@ -98,25 +98,7 @@ public class MessageExecutor extends Thread {
 
 			if (list.size() == 0) {
 
-				// TODO: probably needed later again for satawal
-				// This is extremly important!!!!!!!!!!!! => even on local
-				// computer it makes performance much better
-
-				// just wait for some time...
-				// this is really some option, with which one can play with...
-				// => it really gives improvement...
-
-				// => this parameter can reduce the number of unnecessary locks
-				// but as with the new implementation with two separate locks
-				// instead of just
-				// one in the queue, the advantage of this is not given
-				// anymore...
-				// some small improvements are possible with this...
-				 for (int i = 0; i < 10000; i++) {
-				
-				 }
-
-				missedNumberOfLocks++;
+				waitingOnMessages();
 
 			}
 
@@ -352,5 +334,43 @@ public class MessageExecutor extends Thread {
 
 			// }
 		}
+		
+		
+	}
+	
+	private void waitingOnMessages(){
+		// TODO: probably needed later again for satawal
+		// This is extremly important!!!!!!!!!!!! => even on local
+		// computer it makes performance much better
+
+		// just wait for some time...
+		// this is really some option, with which one can play with...
+		// => it really gives improvement...
+
+		// => this parameter can reduce the number of unnecessary locks
+		// but as with the new implementation with two separate locks
+		// instead of just
+		// one in the queue, the advantage of this is not given
+		// anymore...
+		// 
+		// even with new form of locking, this is quite important!!!!
+		// changing the computation size has huge effect!!!
+		// TUNING NEEDED of this parameter...
+		// both too low and two high parameter cause lots of empty lists back. make it optimal, so that you have 
+		// a minimum of missed locks/empty lists...
+		for (int i = 0; i < 8000; i++) {
+		
+		}
+		// experiments on local compi of the parameter:
+		// timing of 10% zh.
+		// value: 1000, time: 17.6 sec.
+		// value: 5000, time: 16.7 sec.
+		// value: 10000, time: 17.1 sec.
+		// value: 20000, time: 16.6 sec.
+		// value: 30000, time: 17.3 sec.
+		// it is not fully correlated with the number of missed locks... (good time does not imply automatically low number of missed locks...)
+		
+
+		missedNumberOfLocks++;
 	}
 }
