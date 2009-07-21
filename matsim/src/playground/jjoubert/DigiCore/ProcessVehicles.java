@@ -44,7 +44,7 @@ public class ProcessVehicles {
 	 * delimited fields in the following order:
 	 * 
 	 * <nl>
-	 * 	<li> <em>VehicleId</em>, a unique vehicle identifier sending the GPS log entry; 
+	 * 	<li> <em>VehicleId</em>, a unique vehicle identifier from the vehicle sending the GPS log entry; 
 	 * 	<li> <em>Time</em>, a UNIX-based time stamp (in seconds);
 	 * 	<li> <em>Longitude</em>, the x-coordinate of the GPS log (in decimal degrees);
 	 * 	<li> <em>Latitude</em>, the y-coordinate of the GPS log (in decimal degrees); 
@@ -57,12 +57,25 @@ public class ProcessVehicles {
 	 * <h4>
 	 * Process
 	 * </h4>
-	 * A single line is read from the input file (comma delimited), and die vehicle ID is 
+	 * <p>A single line is read from the input file (comma delimited), and die vehicle ID is 
 	 * determined. The associated vehicle file is opened (with amending privileges), and the 
 	 * line is added (again comma delimited) to the vehicle file. In an attempt to save time,
 	 * I've implemented the reading such that the next line is also read. If the new line
 	 * relates to the same vehicle, the vehicle file is kept open. Otherwise, the file is closed,
-	 * and the new vehicle file is opened. 
+	 * and the new vehicle file is opened.</p> 
+	 * 
+	 * <br>Since the process runs over multiple days, and interruptions during the process can
+	 * lead to lost time, a <i>safety mechanism</i> has been employed: after every line read, 
+	 * the total number of lines read (and processed) is written to a text file named
+	 * <code>logRecordsRead_*.txt</code> where <code>`*'</code> denotes the time stamp (in seconds)
+	 * when the process started. This allows the user to set two parameters. This gives the user
+	 * flexibility in terms of which line of the input files should be processed first, and how
+	 * many lines should be processed. An interrupted job can then be easily <i>continued</i> by
+	 * just checking what the last line was that was processed.   
+	 * @param startLine the first line in the input file to be read. If the whole file is to be 
+	 * 		  processed, then this value should be zero;
+	 * @param numberOfLinesToRead the total number of lines to be read. If the whole is to be
+	 * 	   	  processed, then this value should be <code>Long.MAX_VALUE</code>.
 	 * 
 	 * @author jwjoubert
 	 */
@@ -170,6 +183,8 @@ public class ProcessVehicles {
 										output.newLine();
 
 										linesRead++;
+										logRecords.write(String.valueOf(linesRead));
+										logRecords.newLine();
 
 										vehID = inputString[0];
 
