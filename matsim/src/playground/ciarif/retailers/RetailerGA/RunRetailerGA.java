@@ -7,7 +7,7 @@ import java.io.IOException;
 //import java.io.PrintStream;
 import java.util.ArrayList;
 import playground.ciarif.retailers.GravityModel;
-import playground.jjoubert.DateString;
+import playground.jjoubert.Utilities.DateString;
 
 public class RunRetailerGA
 {
