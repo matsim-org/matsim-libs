@@ -41,7 +41,7 @@ public class ActivityLocations {
 	private static String sourceFolderName = ROOT + "DigiCore/SortedVehicles/";
 	private static String destinationFolderName = ROOT + studyAreaName+ "/Activities/";
 	private static String vehicleFolderName = ROOT + studyAreaName + "/XML/";
-	private static String shapeFileSource = ROOT + "ShapeFiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
+	private static String shapeFileSource = ROOT + "Shapefiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
 
 	// Geographic transformation strings.
 	private static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
