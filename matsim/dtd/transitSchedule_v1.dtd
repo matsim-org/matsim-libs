@@ -9,7 +9,9 @@
           id               CDATA   #REQUIRED
           x                CDATA   #REQUIRED
           y                CDATA   #REQUIRED
-          linkRefId        CDATA   #IMPLIED>
+          linkRefId        CDATA   #IMPLIED
+          name             CDATA   #IMPLIED
+          isBlocking       (true|false)  "false">
 
 <!ELEMENT transitLine      (transitRoute)*>
 <!ATTLIST transitLine
@@ -31,7 +33,8 @@
 <!ATTLIST stop
           refId            CDATA   #REQUIRED
           departureOffset  CDATA   #IMPLIED
-          arrivalOffset    CDATA   #IMPLIED>
+          arrivalOffset    CDATA   #IMPLIED
+          awaitDeparture   (true|false)  "false">
 <!--
  * stop.departureOffset is required for all stops but the last.
    The offsets are to be added to the departure times of the single
@@ -50,5 +53,6 @@
 <!ELEMENT departure        EMPTY>
 <!ATTLIST departure
           id               CDATA   #REQUIRED
-          departureTime    CDATA   #REQUIRED>
+          departureTime    CDATA   #REQUIRED
+          vehicleRefId     CDATA   #IMPLIED>
 <!-- the departure.id must be unique within a transitLine only -->
