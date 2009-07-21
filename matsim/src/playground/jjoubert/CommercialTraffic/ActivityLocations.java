@@ -101,9 +101,9 @@ public class ActivityLocations {
 		
 		try {
 			File outFolder = new File( destinationFolderName );
-			outFolder.mkdir();
+			outFolder.mkdirs();
 			File vehFolder = new File( vehicleFolderName );
-			vehFolder.mkdir();
+			vehFolder.mkdirs();
 			
 			// Create all the output file writers, and write each's header.
 			BufferedWriter vehicleStats = new BufferedWriter(new FileWriter(new File(destinationFolderName + studyAreaName + "VehicleStats.txt")));
