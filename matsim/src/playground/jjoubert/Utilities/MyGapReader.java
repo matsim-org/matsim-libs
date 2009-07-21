@@ -45,13 +45,13 @@ public class MyGapReader {
 	private String shapefile;
 	private ArrayList<SAZone> zones;
 	private final static Logger LOG = Logger.getLogger(MyCommercialControlerV01.class);
+	private QuadTree<SAZone> gapQuadTree;
 
 	private double xMin = Double.POSITIVE_INFINITY;
 	private double xMax = Double.NEGATIVE_INFINITY;
 	private double yMin = Double.POSITIVE_INFINITY;
 	private double yMax = Double.NEGATIVE_INFINITY;
 	
-	private QuadTree<SAZone> gapQuadTree;
 	
 	public MyGapReader(String area, String file){
 		this.areaName = area;

@@ -40,12 +40,11 @@ public class SortVehicleLogs {
 	 * @param args
 	 */
 	public static void main (String args[] ){
+		System.out.println();
 		System.out.println("========================================================");
 		System.out.println("Sorting DigiCore vehicle files after they've been split.");
 		System.out.println("========================================================");
 		System.out.println();
-		ProgressBar pb = new ProgressBar('*');
-		pb.printProgressBar();
 		
 		File outFolder = new File(DESTFOLDER);
 		outFolder.mkdir();
@@ -54,6 +53,8 @@ public class SortVehicleLogs {
 		File vehicleFiles[] = files.listFiles();
 		int numFiles = vehicleFiles.length;
 		
+		ProgressBar pb = new ProgressBar('*', numFiles);
+		pb.printProgressBar();
 		
 		if(vehicleFiles.length > 0){
 			int filesSorted = 0;
@@ -76,7 +77,7 @@ public class SortVehicleLogs {
 						}
 				}	
 				if(filesSorted%100 == 0){
-					pb.updateProgress(filesSorted, numFiles);
+					pb.updateProgress(filesSorted);
 				}
 				filesSorted++;
 			}

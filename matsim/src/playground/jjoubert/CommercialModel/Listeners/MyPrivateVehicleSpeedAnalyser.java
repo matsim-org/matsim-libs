@@ -20,6 +20,7 @@
 
 package playground.jjoubert.CommercialModel.Listeners;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -38,17 +39,31 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 													  BasicLinkLeaveEventHandler, 
 													  BasicAgentArrivalEventHandler{
 	private Map<Id, SAZone> map;
+	private Map<Id, ArrayList<ArrayList<Double>>> linkSpeeds;
 	private Map<Id, Double> eventMap;
 	private NetworkLayer networkLayer;
-	private Integer lowerId;
-	private Integer upperId;
+	private Integer lowerAgentId;
+	private Integer upperAgentId;
+	private boolean weighLinksByUse = false;
 	
-	public MyPrivateVehicleSpeedAnalyser(Map<Id, SAZone> map, NetworkLayer nl, int lowerId, int upperId){
+	public MyPrivateVehicleSpeedAnalyser(Map<Id, SAZone> map, NetworkLayer nl, int lowerAgentId, int upperAgentId, int hours){
 		this.map = map;
 		this.networkLayer = nl;
-		this.lowerId = lowerId;
-		this.upperId = upperId;
+		this.lowerAgentId = lowerAgentId;
+		this.upperAgentId = upperAgentId;
 		this.eventMap = new TreeMap<Id, Double>();
+		
+		linkSpeeds = new TreeMap<Id, ArrayList<ArrayList<Double>>>();
+		ArrayList<ArrayList<Double>> linkSpeedArray;
+		for (Id key : this.map.keySet()) {
+			linkSpeedArray = new ArrayList<ArrayList<Double>>(hours);
+			ArrayList<Double> hourArray;
+			for(int i = 0; i < hours; i++){
+				hourArray = new ArrayList<Double>();
+				linkSpeedArray.add(hourArray);				
+			}
+			linkSpeeds.put(key, linkSpeedArray);			
+		}
 	}
 
 	public void handleEvent(BasicLinkEnterEvent event) {
@@ -56,7 +71,7 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 		Id linkId = event.getLinkId();
 		if(map.containsKey(linkId)){
 			int thisPersonNumber = Integer.parseInt(event.getPersonId().toString());
-			if( thisPersonNumber >= lowerId && thisPersonNumber <= upperId ){
+			if( thisPersonNumber >= lowerAgentId && thisPersonNumber <= upperAgentId ){
 				Id personId = event.getPersonId();
 				eventMap.put(personId, event.getTime());				
 			}
@@ -65,30 +80,109 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
 		
 	}
 
+	/**
+	 * When handling the link-leave event, two implementations are done:
+	 * <ul>
+	 * 		<li> The speed across the link is calculated and added to the associated <b><i>zone</i></b>. 
+	 * 			 This has the implication that the more a link is used, the more it's speed will 
+	 * 			 impact the associated zone's average speed. So, if we are interested to weigh
+	 * 			 the links according to their use - the appropriate method would be 
+	 * 			 <code>addSpeedToZone</code>.
+	 * 		<li> The speed across the link is calculated and added to the <b><i>link</i></b>. Once all
+	 * 			 events are processed, the average speed for each link is determined. If no activities
+	 * 			 occurred on the specific link, the free speed of the link is used. The average speed
+	 * 			 for the zone is then calculated as the average speed of all the links associated with
+	 * 			 the zone. Each link hence is weighed equally. If this is what we want then us the 
+	 * 			 method <code>addSpeedToLink</code>. <i>(I still foresee a bias here: even if a link
+	 * 			 has only <b>one</b> event, it will be used to calculate the average speed. Maybe this
+	 * 			 is not an issue since then event's speed will probably be the free speed anyway.)</i>  
+	 * </ul> 
+	 */
 	public void handleEvent(BasicLinkLeaveEvent event) {
+		if(this.weighLinksByUse){
+			addSpeedToZone(event);			
+		} else{
+			addSpeedToLink(event);
+		}
+	}
+	
+	
+	public void handleEvent(BasicAgentArrivalEvent event) {
+		eventMap.remove(event.getPersonId());		
+	}
+
+	
+	private void addSpeedToZone(BasicLinkLeaveEvent event){
 		if(eventMap.containsKey(event.getPersonId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
 			Double speed = (this.networkLayer.getLink(event.getLinkId()).getLength() / 	// in meters 
-						   (event.getTime() - eventMap.get(event.getPersonId()))) *		// in seconds
-						   (3600/1000);													// convert m/s -> km/h 
+					(event.getTime() - eventMap.get(event.getPersonId()))) *			// in seconds
+					(3600/1000);														// convert m/s -> km/h 
 			
 			SAZone theZone = map.get(event.getLinkId());
 			theZone.addToSpeedDetail(hour, speed);
 			theZone.incrementSpeedCount(hour);
 			
 			eventMap.remove(event.getPersonId());
+		}		
+	}
+
+	
+	public void addSpeedToLink(BasicLinkLeaveEvent event) {
+		if(eventMap.containsKey(event.getPersonId())){
+			int hour = (int) Math.floor((event.getTime()) / 3600);
+			Double speed = (this.networkLayer.getLink(event.getLinkId()).getLength() / 	// in meters 
+					(event.getTime() - eventMap.get(event.getPersonId()))) *			// in seconds
+					(3600/1000);														// convert m/s -> km/h 
+			
+			linkSpeeds.get(event.getLinkId()).get(hour).add(speed);
+			
+			eventMap.remove(event.getPersonId());
 		}
 		
 	}
+	
+	public void doAnalysis(){
+		/*
+		 * TODO Calculate the average speed for each link during every hour. If a link does not have 
+		 * ANY speed entries for a given hour, use the free speed of the link for that hour. Once all
+		 * hours has an average speed, calculate an average speed for the link over the day.
+		 * 
+		 * TODO Maybe consider also keeping track of the min, median, and max? But that might be a 
+		 * separate analysis for select zones.
+		 */
+		if(this.weighLinksByUse){
+			//TODO Must rewrite the addSpeedToZone method so that analysis can be done HERE.
+		} else{
+			//TODO Calculate the average speed, or assign free speed if no events were recorded.
+			for (Id linkKey : linkSpeeds.keySet()) {
+				SAZone theZone = map.get(linkKey);
+				ArrayList<ArrayList<Double>> link = linkSpeeds.get(linkKey);
+				for (int hour = 0; hour < link.size(); hour++) {
+					ArrayList<Double> speeds = link.get(hour);
+					double total = 0;
+					double avgSpeed = 0;
+					if(speeds.size() > 0){
+						for (Double speed : speeds) {
+							total += speed;
+						}
+						avgSpeed = total / speeds.size();
+					} else{
+						
+						avgSpeed = this.networkLayer.getLink(linkKey).getFreespeed(System.currentTimeMillis()) * (3600/1000);
+					}
+					theZone.addToSpeedDetail(hour, avgSpeed);
+					theZone.incrementSpeedCount(hour);
+				}
+			}
+			
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
-		eventMap.remove(event.getPersonId());		
+		}
+		
 	}
-
 
 
 }

@@ -36,9 +36,9 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 
-import playground.jjoubert.DateString;
 import playground.jjoubert.CommercialModel.Listeners.MyPrivateVehicleSpeedAnalyser;
 import playground.jjoubert.CommercialTraffic.SAZone;
+import playground.jjoubert.Utilities.DateString;
 import playground.jjoubert.Utilities.MyGapReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -63,7 +63,7 @@ public class PrivateVehicleSpeedEvaluator {
 	private static int upperId = 99999;
 	private static String delimiter = ",";
 	private static int numberOfHourBins = 24;
-	private static boolean simulated = false;
+	private static boolean simulated = true;
 
 
 	/**
@@ -163,7 +163,7 @@ public class PrivateVehicleSpeedEvaluator {
 					log.warn("Could not find the events file for Run" + run + "!");
 				} else{
 					Events events = new Events();
-					MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId);
+					MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId, numberOfHourBins);
 					events.addHandler(handler);
 
 					/*
@@ -172,6 +172,7 @@ public class PrivateVehicleSpeedEvaluator {
 					MatsimEventsReader mer = new MatsimEventsReader(events);
 					log.info("Reading events, this may take a while.");
 					mer.readFile(inputFolder.getAbsolutePath() + "/100.events.txt.gz");
+					handler.doAnalysis();
 
 					/*
 					 * TODO Add the results to some aggregated list.
@@ -184,6 +185,10 @@ public class PrivateVehicleSpeedEvaluator {
 						for(int i = 0; i < statsList.length; i++){
 							statsList[i] += zone.getSpeedDetail()[i];						
 						}
+						/*
+						 * Clear the SAZone's speed details, otherwise it just keeps adding up across the multiple runs. 
+						 */
+						zone.clearSAZone();
 					}
 				}
 			}
@@ -193,7 +198,7 @@ public class PrivateVehicleSpeedEvaluator {
 
 			String fileName = root + "Commercial/Input/PrivateOnlyEvents.txt.gz";
 			Events events = new Events();
-			MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId);
+			MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId, numberOfHourBins);
 			events.addHandler(handler);
 	
 			/*
@@ -202,6 +207,7 @@ public class PrivateVehicleSpeedEvaluator {
 			MatsimEventsReader mer = new MatsimEventsReader(events);
 			log.info("Reading events, this may take a while.");
 			mer.readFile(fileName);
+			handler.doAnalysis();
 
 			/*
 			 * TODO Add the results to some aggregated list.
@@ -214,6 +220,10 @@ public class PrivateVehicleSpeedEvaluator {
 				for(int i = 0; i < statsList.length; i++){
 					statsList[i] += zone.getSpeedDetail()[i];						
 				}
+				/*
+				 * Clear the SAZone's speed details, otherwise it just keeps adding up across the multiple runs. 
+				 */
+				zone.clearSAZone();
 			}
 
 			

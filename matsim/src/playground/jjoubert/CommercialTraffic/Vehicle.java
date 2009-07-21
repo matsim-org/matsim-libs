@@ -3,48 +3,50 @@ package playground.jjoubert.CommercialTraffic;
 import java.util.ArrayList;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 /**
- * A vehicle class for the commercial vehicle study in South Africa. 
- * Each vehicle contains major activity locations, minor activity 
- * locations, and a list of all minor activities in the given study
- * area.
+ * A vehicle container class for the commercial vehicle study in South Africa. Each 
+ * vehicle contains major activity locations, minor activity locations, and a list of 
+ * all minor activities in the given study area.
  *  
- * @author johanwjoubert
- *
+ * @author jwjoubert
  */
 public class Vehicle {
-	private int vehID;
+	private int vehId;
 	private ArrayList<Activity> homeLocation;
 	private ArrayList<Chain> chains;
-	//TODO Must generalize to cover ANY study area
 	private ArrayList<Activity> studyAreaActivities;
-	private int avgActivitesPerChain;
-	private int avgChainDuration;
-	private int avgChainDistance; 
+	private int averageActivitesPerChain;
+	private int averageChainDuration;
+	private int averageChainDistance; 
 	private int numberOfStudyAreaActivities;
-	private float percentageStudyAreaActivities;
+	private double percentageStudyAreaActivities;
 	private int studyAreaChainDistance;
 	private int totalActivities;
+	
+	/*
+	 * A preset threshold that states the distance (expressed in meters) within which
+	 * major activities are considered to be the same location. 
+	 */
 	public final static int DISTANCE_THRESHOLD = 2500; // expressed in meters
 	
 	/**
-	 * Creates a new vehicle with the ID as obtained from the 
-	 * DigiCore data set.
+	 * Creates a new vehicle with the ID as obtained from the DigiCore data set.
 	 * 
 	 * @param id is the unique vehicle identification number used by DigiCore
 	 */
 	public Vehicle(int id){
 
-		this.setVehID(id);
+		this.vehId = id;
 		this.homeLocation = new ArrayList<Activity>();
 		this.chains = new ArrayList<Chain>();
 		this.studyAreaActivities = new ArrayList<Activity>();
-		this.avgActivitesPerChain = 0;
-		this.avgChainDuration = 0;
-		this.avgChainDistance = 0;
+		this.averageActivitesPerChain = 0;
+		this.averageChainDuration = 0;
+		this.averageChainDistance = 0;
 		this.numberOfStudyAreaActivities = 0;
 		this.percentageStudyAreaActivities = 0;
 		this.totalActivities = 0;
@@ -52,72 +54,94 @@ public class Vehicle {
 	
 	/**
 	 * Updates a number of statistics for the vehicle:
-	 * 		- calculates the average number of activities per chain;
-	 * 		- calculates the average chain duration (in minutes);
-	 * 		- calculates the average chain distance (in meters); and
-	 * 		- calculates the average number of activities in the study
-	 * 		  area.
-	 * 
-	 * Note: it is currently assumed that the study area is given in
-	 *       the WGS84_UTM35S coordinate system.
-	 *        
-	 * @param studyArea of type <code>MultiPolygon<code> 
+	 * <ul>
+	 * <li> calculates the average number of activities per chain;
+	 * <li> calculates the average chain duration (in minutes);
+	 * <li> calculates the average chain distance (in meters); and
+	 * <li> calculates the average number of activities in the study  area.
+	 * </ul>
+	 *
+	 * @param studyArea of type <code>MultiPolygon</code>, assumed to be given in the 
+	 * 		  WGS84_UTM35S coordinate system.
 	 */
-	public void updateVehicleStatistics(MultiPolygon studyArea, Point centroid){
-		setAvgActivitiesPerChain();
-		setAvgChainDuration();
-		setAvgChainDistance();
-		setNumberOfStudyAreaActivities( studyArea, centroid );
+	public void updateVehicleStatistics(MultiPolygon studyArea){
+		setAverageActivitiesPerChain();
+		setAverageChainDuration();
+		setAverageChainDistance();
+		setStudyAreaActivities(studyArea);
 	}
 	
-	private void setAvgActivitiesPerChain(){
+	private void setAverageActivitiesPerChain(){
 		int totalActivities = 0;
 		if(this.chains.size() > 0){
 			for (Chain chain : this.chains) {
 				totalActivities += (chain.getActivities().size() - 2);
 			}
-			this.avgActivitesPerChain = ((int) ( totalActivities / this.chains.size() ));
+			this.averageActivitesPerChain = ((int) ( totalActivities / this.chains.size() ));
 		} else{
-			this.avgActivitesPerChain = (0);
+			this.averageActivitesPerChain = (0);
 		}
-		setTotalActivities(totalActivities);
+		this.totalActivities = totalActivities;
 	}
 
-	private void setAvgChainDuration(){
+	private void setAverageChainDuration(){
 		if(this.chains.size() > 0){
 			int duration = 0;
 			for (Chain chain : this.chains){
 				duration += chain.getDuration();
 			}
-			this.avgChainDuration = ((int) (duration / this.chains.size() ));
+			this.averageChainDuration = ((int) (duration / this.chains.size() ));
 		} else{
-			this.avgChainDuration = (0);
+			this.averageChainDuration = (0);
 		}
 	}
 
-	private void setAvgChainDistance() {
+	private void setAverageChainDistance() {
 		if(this.chains.size() > 0){
 			int totalDistance = 0;
 			for(Chain chain: this.chains ){
 				totalDistance += chain.getDistance();
 			}
-			this.avgChainDistance = ((totalDistance / this.chains.size() ));
+			this.averageChainDistance = ((totalDistance / this.chains.size() ));
 		} else{
-			this.avgChainDistance = (0);
+			this.averageChainDistance = (0);
 		}
 	}
 
-	private void setNumberOfStudyAreaActivities(MultiPolygon studyArea, Point centroid){
+	/**
+	 * The method checks each chain, and each activity of that chain, and identifies if
+	 * the activities are within the given study area. All activities within the study
+	 * area are added to the vehicles container (an <code>ArrayList</code>) called 
+	 * <code>studyAreaActivities</code>.
+	 * @param studyArea, assumed to be in the <i>WGS_UTM35S</i> coordinate system.
+	 */
+	private void setStudyAreaActivities(MultiPolygon studyArea){
 		GeometryFactory gf = new GeometryFactory();
+
+		/*
+		 * Calculate the maximum distance that any corner of the envelope of the study 
+		 * area is from the centroid of the study area.  
+		 */
+		Geometry studyAreaEnvelope = studyArea.getEnvelope();
+		Point studyAreaCentroid = studyArea.getCentroid();
+		Coordinate[] cornerPoints = studyAreaEnvelope.getCoordinates();
+		double maxDistance = 0.0;
+		for (Coordinate c : cornerPoints) {
+			maxDistance = Math.max(maxDistance, c.distance(studyAreaCentroid.getCoordinate()));
+		}
 		if(this.chains.size() > 0){
 			for (Chain chain : this.chains) {
 				if(chain.getActivities().size() > 0){
 					for (int i = 1; i < chain.getActivities().size() - 1; i++ ) { // don't count first and last major locations
 						Activity thisActivity = chain.getActivities().get(i);
 						Point p = gf.createPoint( thisActivity.getLocation().getCoordinate() );
-						//TODO The following indicates maximum distance (meters) from the study area centroid:
-						//		Western Cape: 400000
-						if (centroid.distance(p) <= 400000 ){
+						/*
+						 * For efficiency (well, I HOPE), I first check if the point is 
+						 * closer than the calculated maximum distance. This is a 
+						 * 'cheaper' calculation than immediately checking if the point 
+						 * is within the study area. 
+						 */
+						if(p.distance(studyAreaCentroid) < maxDistance){
 							if( studyArea.contains(p) ){
 								this.studyAreaActivities.add( thisActivity );
 								chain.setInStudyArea(true);
@@ -126,27 +150,30 @@ public class Vehicle {
 					}
 				}
 				if( chain.isInStudyArea() ){
+					/*
+					 * TODO Currently the total chain length is added to the study area
+					 * distance. In future we can/could revisit to ensure that only the
+					 * portion INSIDE the study are is actually added.
+					 */					
 					this.studyAreaChainDistance += chain.getDistance();
 				}
 			}
 		}
 		this.numberOfStudyAreaActivities = this.studyAreaActivities.size();
-		this.percentageStudyAreaActivities = (((float) this.numberOfStudyAreaActivities) / 
-										((float) this.getTotalActivities() ) );
+		this.percentageStudyAreaActivities = (((double) this.numberOfStudyAreaActivities) / 
+										((double) this.totalActivities ) );
 	}
 		
 	/**
-	 * Identify the major activity locations. The first chain's first
-	 * major location is identified. All other major locations are 
-	 * then checked, and only if it is further than a predefined 
-	 * threshold of 2500m, will it be considered a 'new' location. 
+	 * <p>This method identifies the major activity locations. The first chain's first major 
+	 * location is identified. All other major locations are then checked, and only if it 
+	 * is further than a predefined threshold, <code>this.DISTANCE_THRESHOLD</code> 
+	 * (default 2500m), will it be considered a <i>new</i> location.</p> 
 	 * 
-	 * The method adjusts all major location coordinates to the 
-	 * weighted center of the location clusters. A second check is
-	 * then done to see whether cluster centroids are within the 
-	 * distance threshold. If so, the dominating cluster is the one
-	 * with the most activity locations, and all dominated clusters'
-	 * locations are adjusted accordingly.
+	 * <p>The method adjusts all major location coordinates to the weighted centre of the 
+	 * location clusters. A second check is then done to see whether cluster centroids are 
+	 * within the distance threshold. If so, the dominating cluster is the one with the 
+	 * most activity locations, and all dominated clusters' locations are adjusted accordingly.
 	 */
 	public void extractMajorLocations(){
 		if(this.chains.size() > 0){
@@ -161,7 +188,7 @@ public class Vehicle {
 						this.chains.get(i).getActivities().size() - 1 ); // get the last activity of the chain
 				Coordinate c1 = a1.getLocation().getCoordinate(); 
 				
-				// now check it against each potential major location
+				// Check it against each potential major location
 				boolean duplicate = false;
 				int j = 0;
 				while( (!duplicate) && (j < majorLocationList.size() ) ){
@@ -184,33 +211,20 @@ public class Vehicle {
 					}
 					j++;
 				}
-				if( !duplicate ){ // then create a new major location
+				if( !duplicate ){ 
+					// Create a new major location
 					newMajorLocation = new ArrayList<Activity>();
 					newMajorLocation.add(a1);
 					majorLocationList.add( newMajorLocation );
 				}
 			}
 			
-			// Now find the centre for each major location, and set the points for all locations the same.
+			/* 
+			 * Find the centre for each major location (using a gravity method) and set 
+			 * the points for all locations the same as the centre.
+			 */
 			for(int i = 0; i < majorLocationList.size(); i++ ){
 				ArrayList<Activity> thisList = majorLocationList.get(i);
-				
-				// Either the centroid of the polygon
-//				ArrayList<Coordinate> coordList = new ArrayList<Coordinate>();
-//				for(GPSPoint gps: thisList ){
-//					coordList.add(gps.getCoordinate() );
-//				}
-//				Coordinate c[] = new Coordinate[coordList.size() + 1];
-//				for(int j = 0; j < coordList.size(); j++ ){
-//					c[j] = coordList.get(j);
-//				}
-//				c[coordList.size()] = coordList.get(0);
-//				GeometryFactory gf = new GeometryFactory();
-//				LinearRing lr = gf.createLinearRing(c);
-//				Polygon p = gf.createPolygon(lr, null);
-//				Coordinate center = p.getCentroid().getCoordinate();
-				
-				// Or just calculate the weighted average (gravity method...)
 				double xSum = 0;
 				double ySum = 0;
 				for(int j = 0; j < thisList.size(); j++ ){
@@ -225,7 +239,9 @@ public class Vehicle {
 				}				
 			}
 			
-			// Consider one last pass if your first points turned out to be outliers.
+			/* 
+			 * Perform one last pass if your first points turned out to be outliers.
+			 */
 			if(majorLocationList.size() > 1){
 				int i = 0; 
 				while( i < majorLocationList.size() - 1 ){
@@ -270,18 +286,17 @@ public class Vehicle {
 	}
 
 	/**
-	 * Considers each chain of the vehicle. If a chain does not start
-	 * AND end at a major location, or if a chain contain at least one 
-	 * minor activity between two major activities, the chain is 
-	 * removed.
+	 * Considers each chain of the vehicle. If a chain does not start <i><b>AND</b></i> 
+	 * end at a major location, or if a chain does not contain at least one minor 
+	 * activity between two major activities, the chain is removed.
 	 */
 	public void cleanChains() {
 		int i = 0;
 		while (i < this.getChains().size() ){
 			Activity first = this.getChains().get(i).getActivities().get(0);
 			Activity last = this.getChains().get(i).getActivities().get(this.getChains().get(i).getActivities().size() - 1);
-			if( (first.getDuration() < ActivityLocations.HOME_DURATION_THRESHOLD) ||
-			    (last.getDuration() < ActivityLocations.HOME_DURATION_THRESHOLD) ||
+			if( (first.getDuration() < ActivityLocations.getMajorActivityMinimumDuration()) ||
+			    (last.getDuration() < ActivityLocations.getMajorActivityMinimumDuration()) ||
 			    (this.getChains().get(i).getActivities().size() <= 2 ) ){
 				this.getChains().remove(i);
 			} else{
@@ -291,6 +306,7 @@ public class Vehicle {
 			}
 		}
 	}
+	
 
 	/**
 	 * Returns the list of major activities. 
@@ -319,39 +335,27 @@ public class Vehicle {
 		return studyAreaActivities;
 	}
 	
-	public void addChain(Chain chain){
-		this.chains.add(chain);
-	}
-
-	public void setTotalActivities(int totalActivities) {
-		this.totalActivities = totalActivities;
-	}
-
 	public int getTotalActivities() {
 		return totalActivities;
 	}
 
-	private void setVehID(int vehID) {
-		this.vehID = vehID;
-	}
-
 	public int getVehID() {
-		return vehID;
+		return vehId;
 	}
 
 	public int getAvgActivitesPerChain() {
-		return avgActivitesPerChain;
+		return averageActivitesPerChain;
 	}
 
 	public int getAvgChainDuration() {
-		return avgChainDuration;
+		return averageChainDuration;
 	}
 
 	public int getAvgChainDistance() {
-		return avgChainDistance;
+		return averageChainDistance;
 	}
 
-	public float getPercentStudyAreaActivities() {
+	public double getPercentStudyAreaActivities() {
 		return percentageStudyAreaActivities;
 	}
 		
@@ -363,6 +367,4 @@ public class Vehicle {
 		return studyAreaChainDistance;
 	}
 
-
-	
 }

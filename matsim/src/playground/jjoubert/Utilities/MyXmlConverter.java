@@ -43,8 +43,15 @@ public class MyXmlConverter {
 		return string;
 	}
 	
-	public void writeObjectToFile(Object obj, String fileString){
-		String xmlString = convertObjectToXmlString(obj);
+	/**
+	 * Method that converts an object to string, using the <code>XStream</code> library,
+	 * and writing the string as an XML file.
+	 * @param object any given <code>Object</code>;
+	 * @param fileString the absolute path and filename where the XML file is to be 
+	 * 		  written.
+	 */
+	public void writeObjectToFile(Object object, String fileString){
+		String xmlString = convertObjectToXmlString(object);
 		try {
 			BufferedWriter xmlOutput = new BufferedWriter(new FileWriter(new File(fileString)));
 			try{

@@ -14,6 +14,8 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
+import playground.jjoubert.Utilities.MyShapefileReader;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -120,7 +122,8 @@ public class AnalyseGAPDensity {
 
 	public static QuadTree<SAZone> buildQuadTree(ArrayList<SAZone> mesozoneList, String shapefile, String province) {
 		System.out.println("Establishing quad tree extent for " + province + "... " );
-		Polygon envelope = (Polygon) (ReadStudyAreaShapeFile.readStudyAreaPolygon( shapefile ) ).getEnvelope();
+		MyShapefileReader msr = new MyShapefileReader(shapefile);
+		Polygon envelope = (Polygon) msr.readMultiPolygon().getEnvelope();
 		Coordinate [] coords = envelope.getCoordinates();
 		double minX = coords[0].x;
 		double minY = coords[0].y;

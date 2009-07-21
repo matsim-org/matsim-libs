@@ -20,7 +20,7 @@ public class FixMinorLocationsOutput {
 	final static String IN_FILE = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorLocations.txt";
 	final static String OUT_FILE = ROOT + PROVINCE + "/Activities/new" + PROVINCE + "MinorLocations.txt";
 	// Other paramaters
-	final static int THRESHOLD = ActivityLocations.HOME_DURATION_THRESHOLD;
+	final static int THRESHOLD = ActivityLocations.getMajorActivityMinimumDuration();
 	final static String DELIMITER = ",";
 
 	public static void main(String args[]){

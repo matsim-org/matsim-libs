@@ -30,9 +30,9 @@ import java.util.Scanner;
 
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.jjoubert.DateString;
 import playground.jjoubert.CommercialTraffic.AnalyseGAPDensity;
 import playground.jjoubert.CommercialTraffic.SAZone;
+import playground.jjoubert.Utilities.DateString;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

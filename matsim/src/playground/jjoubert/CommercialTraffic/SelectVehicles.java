@@ -1,11 +1,4 @@
 package playground.jjoubert.CommercialTraffic;
-/**
- * This class searches through the separated DigiCore vehicle files, identifies which
- * vehicles travel through a given study area, and moves the files into a separate 
- * folder as soon as a point is found within the study area.
- * 
- * @author johanwjoubert
- */
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,18 +14,37 @@ import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import playground.jjoubert.Utilities.MyShapefileReader;
+import playground.jjoubert.Utilities.ProgressBar;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+/**
+ * This class searches through the separated DigiCore vehicle files, identifies which
+ * vehicles travel through a given study area, and moves the files into a separate 
+ * folder as soon as a point is found within the study area.
+ * 
+ * @author johanwjoubert
+ */
 
 public class SelectVehicles {
-	// String value that must be set
+	/* 
+	 * String value that must be set. This can be one of the following values:
+	 * 		- Gauteng
+	 * 		- KZN
+	 * 		- WesternCape
+	 * 		- SouthAfrica
+	 */
 	final static String PROVINCE = "KZN";
-	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
-	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+	/*
+	 * Set the home directory, depending on where the job is executed.
+	 */
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
+//	final static String ROOT = "/home/jjoubert/";									// IVT-Sim0
+	final static String ROOT = "/home/jjoubert/data/";								// Satawal
+	
 	// Derived string values
 	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
 	final static String vehicleSource = ROOT + "VehicleFiles/";
@@ -48,7 +60,9 @@ public class SelectVehicles {
 		System.out.println();
 		System.out.println("Initializing... ");
 		long startTime = System.currentTimeMillis();
-		MultiPolygon studyArea = ReadStudyAreaShapeFile.readStudyAreaPolygon( shapeFileSource );
+		
+		MyShapefileReader msr = new MyShapefileReader(shapeFileSource);
+		MultiPolygon studyArea = msr.readMultiPolygon();
 		
 		final MathTransform mt = getMathTransform(); // Prepare for geometric transformations
 		
@@ -63,9 +77,8 @@ public class SelectVehicles {
 		System.out.println("Done\n" );
 		
 		System.out.println("Processing vehicle files.");
-		ProgressBar pb = new ProgressBar('*');
+		ProgressBar pb = new ProgressBar('*', files);
 		pb.printProgressBar();
-		int dotsPrinted = 0;
 		
 		for (int i = 0; i < vehicleFile.length; i++ ) {
 			if( (vehicleFile[i].isFile()) && !(vehicleFile[i].getName().startsWith(".") ) ){
@@ -78,7 +91,7 @@ public class SelectVehicles {
 			}
 			// Report on progress
 			if( i%100 == 0){
-				dotsPrinted = pb.updateProgress(dotsPrinted, i, files);
+				pb.updateProgress(i);
 			}
 		}
 		long endTime = System.currentTimeMillis();

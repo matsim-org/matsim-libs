@@ -6,11 +6,10 @@ import java.util.GregorianCalendar;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
- * A class to represent a chain of commercial vehicle activities.
- * Each chain to start and end with a major activity.
+ * A container class to represent a chain of commercial vehicle activities. Each chain 
+ * must start and end with a major activity.
  * 
- * @author johanwjoubert
- *
+ * @author jwjoubert
  */
 public class Chain {
 	private GregorianCalendar start;
@@ -19,9 +18,8 @@ public class Chain {
 	private int distance;
 	private boolean inStudyArea;
 	
-	// Constructor
 	/**
-	 * Creates an empty chain.
+	 * Constructor creates an empty chain.
 	 */
 	public Chain(){
 		this.start = null;
@@ -31,10 +29,9 @@ public class Chain {
 	
 
 	/**
-	 * Calculates the duration of the activity (in MINUTES) from the 
-	 * end of the first major activity until the start of the second
-	 * major activity, i.e. from when the vehicle switches on until
-	 * it is switched off again.
+	 * Calculates the duration of the activity (in MINUTES) from the end of the first 
+	 * major activity until the start of the second major activity, i.e. from when the 
+	 * vehicle switches on until it is switched off again.
 	 */
 	public void setDuration(){
 		if(this.activities.size() > 0){
@@ -46,9 +43,9 @@ public class Chain {
 	}
 	
 	/**
-	 * Calculates the distance of the chain. Since activity locations
-	 * should be expressed in the UTM35S coordinate system for South
-	 * Africa, distance is expressed in meters.
+	 * Calculates the distance of the chain. Since activity locations should be expressed 
+	 * in the WGS_UTM35S coordinate system for South Africa, distance is expressed in 
+	 * meters.
 	 */
 	public void setDistance(){
 		
@@ -90,11 +87,11 @@ public class Chain {
 	}
 
 	/** 
-	 * Returns the area status of the chain: <code>true<code> if any
-	 * of the activities of the chain (major or minor) occur in the
-	 * study area, <code>false<code> otherwise.
+	 * Returns the area status of the chain: <code>true</code> if any of the activities 
+	 * of the chain (major or minor) occur in the study area, <code>false</code> 
+	 * otherwise.
 	 * 
-	 * @return inStudyArea of type <code>boolean<code>
+	 * @return inStudyArea of type <code>boolean</code>
 	 */
 	public boolean isInStudyArea() {
 		return inStudyArea;
@@ -103,25 +100,17 @@ public class Chain {
 	/**
 	 * Sets whether the chain has an activity in the study area or not.
 	 * 
-	 * @param inStudyArea of type <code>boolean<code>
+	 * @param inStudyArea of type <code>boolean</code>
 	 */
 	public void setInStudyArea(boolean inStudyArea) {
 		this.inStudyArea = inStudyArea;
 	}
 	
-	/**
-	 * Adds an activity to the chain.
-	 * 
-	 * @param activity
-	 */
-	public void addActivity(Activity activity){
-		this.activities.add(activity);
-	}
 	
 	/**
 	 * Returns the array list of activities currently assigned to the chain.
 	 * 
-	 * @return 	ArrayList < Activity > 
+	 * @return 	ArrayList of <code>Activity</code>s 
 	 */
 	public ArrayList<Activity> getActivities(){
 		return this.activities;

@@ -34,7 +34,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 
-import playground.jjoubert.DateString;
+import playground.jjoubert.Utilities.DateString;
 
 public class AverageEventsToGAP {
 

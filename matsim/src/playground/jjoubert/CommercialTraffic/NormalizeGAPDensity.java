@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import playground.jjoubert.DateString;
 import playground.jjoubert.CommercialModel.Postprocessing.EventsToGAP;
+import playground.jjoubert.Utilities.DateString;
 
 public class NormalizeGAPDensity {
 

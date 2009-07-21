@@ -15,42 +15,50 @@ import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import playground.jjoubert.Utilities.MyShapefileReader;
+import playground.jjoubert.Utilities.MyXmlConverter;
+import playground.jjoubert.Utilities.ProgressBar;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 
 public class ActivityLocations {
-	// String value that must be set
-	final static String PROVINCE = "SouthAfrica";
-	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
-	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
-	// Derived string values:
-	final static String SOURCEFOLDER = ROOT + PROVINCE + "/Sorted/";
-	final static String DESTFOLDER = ROOT + PROVINCE+ "/Activities/";
-	final static String VEH_FOLDER = ROOT + PROVINCE + "/XML/";
-	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
+	/* 
+	 * String value that must be set. Allowed atudy areas are:
+	 * 		- SouthAfrica
+	 * 		- Gauteng
+	 * 		- KZN
+	 * 		- WesternCape
+	 */
+	 static String studyAreaName = "SouthAfrica";
+
+	// Set the home directory, depending on where the job is executed.
+//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
+//	final static String ROOT = "/home/jjoubert/";									// IVT-Sim0
+	final static String ROOT = "/home/jjoubert/data/DigiCore/";						// Satawal
+
+	// Derived string values.
+	private static String sourceFolderName = ROOT + studyAreaName + "/Sorted/";
+	private static String destinationFolderName = ROOT + studyAreaName+ "/Activities/";
+	private static String vehicleFolderName = ROOT + studyAreaName + "/XML/";
+	private static String shapeFileSource = ROOT + "ShapeFiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
+
+	// Geographic transformation strings.
+	private static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
+	private static String WGS84_UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
+
+	// Study-specific parameters that must be set.
+	private static String delimiter = ",";
+	private static int[] statusStart = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20};
+	private static int[] statusStop = {15,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,145,147};
+	private static int majorActivityMinimumDuration = 300; // 5 hours for home (expressed in MINUTES)
+	private static int minorActivityMinimumDuration = 8; // expressed in MINUTES
+	private static int distanceThreshold = Vehicle.DISTANCE_THRESHOLD;
+	private static MultiPolygon studyArea;
 	
-	private final static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
-	private final static String WGS84_UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
-
-	final static String DELIMITER_IN = " "; // Could also be ',' or other;
-	final static String DELIMITER_OUT = ","; // Could also be ' ';
-	final static int[] statusStart = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20};
-	final static int[] statusStop = {15,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,145,147};
-	final static int HOME_DURATION_THRESHOLD = 300; // 5 hours for home (expressed in MINUTES)
-	final static int ACTIVITY_MIN_THRESHOLD = 8; // expressed in MINUTES
-	final static int DISTANCE_THRESHOLD = Vehicle.DISTANCE_THRESHOLD;
-	public static int progressDots;
-	public static MultiPolygon studyArea;
-	public static Point studyAreaCentroid;
-
 	// To determine the duration histogram
-	final static int bucketSize = 30; // Expressed in MINUTES
-	final static int bucketRange = 10080; /// Expressed in MINUTES (Here, a week)
+	private static int bucketSize = 30; // Expressed in MINUTES
+	private static int bucketRange = 10080; /// Expressed in MINUTES (Here, a week)
 	static int numBuckets = (bucketRange / bucketSize) + 1;
 	static ArrayList<Integer> durationBuckets;
 	// a 'BoinkPoint' is an activity that starts and ends at different locations. Currently I don't do anything with them.
@@ -60,10 +68,10 @@ public class ActivityLocations {
 		
 	public static void main( String args[] ) {
 		System.out.println("==========================================================================================");
-		System.out.println("Identifying vehicle activity locations for vehicles travelling through: " + PROVINCE );
+		System.out.println("Identifying vehicle activity locations for vehicles travelling through: " + studyAreaName );
 		System.out.println();
 		long startTime = System.currentTimeMillis();
-		final File inFolder = new File( SOURCEFOLDER );
+		final File inFolder = new File( sourceFolderName );
 		final File vehicles[] = inFolder.listFiles();
 		int numberOfVehicles = 0;
 		int totalVehicles = vehicles.length;
@@ -78,38 +86,32 @@ public class ActivityLocations {
 		
 		MathTransform mt = getMathTransform(); // Prepare for geometric transformations
 		
-		System.out.println("Reading study area: " + PROVINCE );
-		//TODO Redo this part: SelectVehicles is now more general, and may not be reading
-		// 					   only Gauteng, but other study areas as well.	
-		studyArea = ReadStudyAreaShapeFile.readStudyAreaPolygon( shapeFileSource );
-		studyAreaCentroid = studyArea.getCentroid();
+		System.out.println("Reading study area: " + studyAreaName );
+		MyShapefileReader msr = new MyShapefileReader(shapeFileSource);
+		studyArea = msr.readMultiPolygon();
+		studyArea.getCentroid();
 		System.out.println("Done");
 		System.out.println();
 		
-		System.out.println("Processing vehicle files in " + DESTFOLDER + "...");
+		System.out.println("Processing vehicle files in " + destinationFolderName + "...");
 		System.out.println();
-		ProgressBar pb = new ProgressBar('*');
+		ProgressBar pb = new ProgressBar('*', totalVehicles);
 		pb.printProgressBar();
-		int dotsPrinted = 0;
-//		boolean foundPoint = false;
 		
 		try {
-			File outFolder = new File( DESTFOLDER );
+			File outFolder = new File( destinationFolderName );
 			outFolder.mkdir();
-			File vehFolder = new File( VEH_FOLDER );
+			File vehFolder = new File( vehicleFolderName );
 			vehFolder.mkdir();
 			
-			// Create all the output file writers 
-			BufferedWriter vehicleStats = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "VehicleStats.txt")));
-			vehicleStats.write(	vehicleStatsHeaderString() );
-			vehicleStats.newLine();			
-			BufferedWriter majorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "MajorLocations.txt")));
-			majorLocations.write( locationHeaderString() );
-			majorLocations.newLine();
-			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "MinorLocations.txt")));
-			minorLocations.write( locationHeaderString() );
-			minorLocations.newLine();
-			BufferedWriter durationOutput = new BufferedWriter(new FileWriter(new File(DESTFOLDER + PROVINCE + "ActivityDurations.txt")));
+			// Create all the output file writers, and write each's header.
+			BufferedWriter vehicleStats = new BufferedWriter(new FileWriter(new File(destinationFolderName + studyAreaName + "VehicleStats.txt")));
+			writeVehicleStatsHeader(vehicleStats);
+			BufferedWriter majorLocations = new BufferedWriter(new FileWriter(new File(destinationFolderName + studyAreaName + "MajorLocations.txt")));
+			writeLocationHeader(majorLocations);
+			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(destinationFolderName + studyAreaName + "MinorLocations.txt")));
+			writeLocationHeader(minorLocations);
+			BufferedWriter durationOutput = new BufferedWriter(new FileWriter(new File(destinationFolderName + studyAreaName + "ActivityDurations.txt")));
 			durationOutput.write("Bin,Number_of_Activities");
 			durationOutput.newLine();
 
@@ -117,51 +119,42 @@ public class ActivityLocations {
 				for(int i = 0; i < vehicles.length; i++ ){
 					File thisFile = vehicles[i];
 					if(thisFile.isFile() && !(thisFile.getName().startsWith(".")) ){ // avoid .* file names on Mac
-						//TODO Remove next line when SA run is complete
-//						if( !foundPoint ){
-							Vehicle thisVehicle = createNewVehicle(thisFile);
-							ArrayList<GPSPoint> log = readFileToArray(thisFile, mt);				
-							processVehicleActivities(thisVehicle, thisFile, log);
+						Vehicle thisVehicle = createNewVehicle(thisFile);
+						ArrayList<GPSPoint> log = readFileToArray(thisFile, mt);				
+						processVehicleActivities(thisVehicle, thisFile, log);
 
-							if(thisVehicle.getChains().size() > 0){
-								// Write major locations to file
-								for(Activity majorActivity: thisVehicle.getHomeLocation() ){
-									majorLocations.write( locationString(majorActivity) );
-									majorLocations.newLine();
-									numberOfMajorActivities++;
-								}
-
-								// Write activity locations to file 
-								for(Chain thisChain: thisVehicle.getChains() ){
-									// Do NOT consider the major locations at the end-points of each chain
-									for(int j = 1; j < thisChain.getActivities().size() - 1; j++){ 
-										minorLocations.write( locationString(thisChain.getActivities().get(j) ) );
-										minorLocations.newLine();
-										numberOfMinorActivities++;
-									}
-								}
-
-								// Write vehicle statistics	to file					
-								vehicleStats.write(	vehicleStatsString(thisVehicle) );
-								vehicleStats.newLine();
-
-								saveVehicleStringToFile(thisVehicle.getVehID(), convertVehicleToXML(thisVehicle) );
+						if(thisVehicle.getChains().size() > 0){
+							// Write major locations to file
+							for(Activity majorActivity: thisVehicle.getHomeLocation() ){
+								writeLocationLine(majorLocations, majorActivity);
+								numberOfMajorActivities++;
 							}
-							numberOfVehicles++;				
-							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
-							//TODO The following 'else' bit must also come out... just to fix SA run
-//							int theVehicle = Integer.parseInt( thisFile.getName().substring(0, thisFile.getName().length() - 4 ) );
-//							if ( theVehicle == 128155 ) {
-//								foundPoint = true;
-//							}
-//						} else{
-//							numberOfVehicles++;				
-//							dotsPrinted = pb.updateProgress(dotsPrinted, numberOfVehicles, totalVehicles);
-//						}
+
+							// Write minor locations to file 
+							for(Chain thisChain: thisVehicle.getChains() ){
+								// Do NOT consider the major locations at the end-points of each chain
+								for(int j = 1; j < thisChain.getActivities().size() - 1; j++){ 
+									writeLocationLine(minorLocations, thisChain.getActivities().get(j));
+									numberOfMinorActivities++;
+								}
+							}
+
+							// Write vehicle statistics	to file	
+							writeVehicleStatsLine(vehicleStats, thisVehicle);
+							
+							// Writing the vehicle as an XML file
+							MyXmlConverter mxc = new MyXmlConverter();
+							String vehicleFilenameXml = vehicleFolderName + String.valueOf(thisVehicle.getVehID()) + ".xml"; 
+							mxc.writeObjectToFile(thisVehicle, vehicleFilenameXml);
+						}
+						numberOfVehicles++;				
+						pb.updateProgress(numberOfVehicles);
 					}
 				}
 				for (int i = 0; i < durationBuckets.size(); i++) {
-					durationOutput.write((i+1)*10 + DELIMITER_OUT + durationBuckets.get(i));
+					durationOutput.write(String.valueOf((i+1)*10));
+					durationOutput.write(delimiter);
+					durationOutput.write(String.valueOf(durationBuckets.get(i)));
 					durationOutput.newLine();
 				}
 
@@ -180,7 +173,7 @@ public class ActivityLocations {
 		long endTime = System.currentTimeMillis();
 		
 		System.out.println("--------------------------------------");
-		System.out.println("Summary for: " + PROVINCE );
+		System.out.println("Summary for: " + studyAreaName );
 		System.out.println("--------------------------------------");
 		System.out.println("Number of vehicles processed: " + numberOfVehicles );
 		System.out.println("Total home locations: " + numberOfMajorActivities );
@@ -204,46 +197,87 @@ public class ActivityLocations {
 		return mt;
 	}
 
-	private static String vehicleStatsHeaderString() {
-		return "VehicleID" + DELIMITER_OUT + 
-			   "Number_of_home_locations" + DELIMITER_OUT + 
-			   "Number_of_chains" + DELIMITER_OUT + 
-			   "Avg_chain_duration" + DELIMITER_OUT + 
-			   "Avg_chain_distance" + DELIMITER_OUT +
-			   "Avg_activities_per_chain" + DELIMITER_OUT +
-			   "Total_activities" + DELIMITER_OUT + 
-			   "Total_gauteng_activities" + DELIMITER_OUT +
-			   "Percent_gauteng_activities" + DELIMITER_OUT +
-			   "Gauteng_Chain_Distance";
+	private static void writeVehicleStatsHeader(BufferedWriter output) throws IOException {
+		output.write("VehicleID");
+		output.write(delimiter);
+		output.write("Number_of_home_locations");
+		output.write(delimiter);
+		output.write("Number_of_chains");
+		output.write(delimiter);
+		output.write("Avg_chain_duration");
+		output.write(delimiter);
+		output.write("Avg_chain_distance");
+		output.write(delimiter);
+		output.write("Avg_activities_per_chain");
+		output.write(delimiter);
+		output.write("Total_activities");
+		output.write(delimiter);
+		output.write("Total_gauteng_activities");
+		output.write(delimiter);
+		output.write("Percent_gauteng_activities");
+		output.write(delimiter);
+		output.write("Gauteng_Chain_Distance");
+		output.newLine();
 	}
 
-	private static String vehicleStatsString(Vehicle thisVehicle) {
-		return thisVehicle.getVehID() + DELIMITER_OUT + 
-			   thisVehicle.getHomeLocation().size() + DELIMITER_OUT +
-			   thisVehicle.getChains().size() + DELIMITER_OUT + 
-			   thisVehicle.getAvgChainDuration() + DELIMITER_OUT + 
-			   thisVehicle.getAvgChainDistance() + DELIMITER_OUT +
-			   thisVehicle.getAvgActivitesPerChain() + DELIMITER_OUT +
-			   thisVehicle.getTotalActivities() + DELIMITER_OUT +
-			   thisVehicle.getNumberOfStudyAreaActivities() + DELIMITER_OUT +
-			   thisVehicle.getPercentStudyAreaActivities() + DELIMITER_OUT +
-			   thisVehicle.getStudyAreaChainDistance();
+	/**
+	 * Method introduced just to clean up the main method. It simply writes out the given 
+	 * vehicle's statistics to file.
+	 * @param output the <code>BufferedWriter</code> to which output is written;
+	 * @param thisVehicle the vehicle whose statistics are written;
+	 * @throws IOException if the file is not found. This should never be the case, since 
+	 * 	       the file is opened in the main method.
+	 */
+	private static void writeVehicleStatsLine(BufferedWriter output, Vehicle thisVehicle) throws IOException {
+		output.write(String.valueOf(thisVehicle.getVehID()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getHomeLocation().size()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getChains().size()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getAvgChainDuration()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getAvgChainDistance()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getAvgActivitesPerChain()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getTotalActivities()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getNumberOfStudyAreaActivities()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getPercentStudyAreaActivities()));
+		output.write(delimiter); 
+		output.write(String.valueOf(thisVehicle.getStudyAreaChainDistance()));
+		output.newLine();
 	}
 		
-	private static String locationHeaderString(){
-		String s = "ID" + DELIMITER_OUT + 
-				   "Long" + DELIMITER_OUT + 
-				   "LAT" + DELIMITER_OUT + 
-				   "Start" + DELIMITER_OUT + 
-				   "Duration";
-		return s;
+	private static void writeLocationHeader(BufferedWriter output) throws IOException{
+		output.write("ID");
+		output.write(delimiter); 
+		output.write("Long");
+		output.write(delimiter); 
+		output.write("Lat"); 
+		output.write(delimiter); 
+		output.write("Start"); 
+		output.write(delimiter); 
+		output.write("Duration");
+		output.newLine();
 	}
 	
-	private static String locationString(Activity activity){
+	private static void writeLocationLine(BufferedWriter output, Activity activity) throws IOException{
+		output.write(String.valueOf(activity.getLocation().getVehID()));			// vehicle Id
+		output.write(delimiter);
+		output.write(String.valueOf(activity.getLocation().getCoordinate().x));	// Longitude
+		output.write(delimiter);
+		output.write(String.valueOf(activity.getLocation().getCoordinate().y)); // Latitude
+		output.write(delimiter);
+		
+		/*
+		 * Create a nice way of reporting the day and time.
+		 */
 		String hourSpace;
 		String minSpace;
 		String secSpace;
-
 		if( activity.getStartTime().get(GregorianCalendar.HOUR_OF_DAY) < 10 ){
 			hourSpace = "0";
 		} else{
@@ -259,29 +293,31 @@ public class ActivityLocations {
 		} else{
 			secSpace = "";
 		}
+		output.write("Day_"); 
+		output.write(String.valueOf(activity.getStartTime().get(GregorianCalendar.DAY_OF_YEAR)));
+		output.write("_");
+		output.write(hourSpace);
+		output.write(String.valueOf(activity.getStartTime().get(GregorianCalendar.HOUR_OF_DAY)));
+		output.write("H");
+		output.write(minSpace); 
+		output.write(String.valueOf(activity.getStartTime().get(GregorianCalendar.MINUTE)));
+		output.write(":"); 
+		output.write(secSpace); 
+		output.write(String.valueOf(activity.getStartTime().get(GregorianCalendar.SECOND)));
+		output.write(delimiter); 
 		
-		String s = // vehicle
-				   activity.getLocation().getVehID() + DELIMITER_OUT +
-				   // coordinate
-				   activity.getLocation().getCoordinate().x + DELIMITER_OUT + 
-				   activity.getLocation().getCoordinate().y + DELIMITER_OUT +
-				   // the day and time
-				   "Day_" + 
-				   activity.getStartTime().get(GregorianCalendar.DAY_OF_YEAR) + "_" +
-				   hourSpace + activity.getStartTime().get(GregorianCalendar.HOUR_OF_DAY) + "H" +
-				   minSpace + activity.getStartTime().get(GregorianCalendar.MINUTE) + ":" + 
-				   secSpace + activity.getStartTime().get(GregorianCalendar.SECOND) + DELIMITER_OUT + 
-				   // duration
-				   activity.getDuration();	
-		return s;
-	}
+		output.write(String.valueOf(activity.getDuration()));						// duration
 
+		output.newLine();
+
+	}
+	
 	private static void processVehicleActivities( Vehicle thisVehicle, File file, ArrayList<GPSPoint> log) {
 		
 		findNextVehicleStop(log); // Clean all points until first start		
 		ArrayList<Activity> activityList = extractActivities(file, log); // Find all the activities
 		extractChains(thisVehicle, activityList);
-		thisVehicle.updateVehicleStatistics(studyArea, studyAreaCentroid);		
+		thisVehicle.updateVehicleStatistics(studyArea);		
 	}
 
 	private static ArrayList<Activity> extractActivities(File file,
@@ -309,7 +345,7 @@ public class ActivityLocations {
 					x = xSum / locationList.size();
 					y = ySum / locationList.size();
 				} else{
-					System.out.println("There does not seem to be a possible location for this activitiy?!");
+					System.err.println("There does not seem to be a possible location for this activitiy?!");
 				}
 				log.get(0).setCoordinate(new Coordinate(x, y) );
 				// Using the start position as the location of the activity
@@ -323,8 +359,8 @@ public class ActivityLocations {
 
 				// Check if location where activity stops is within the limits from where activity started 
 				int distance = (int) ( log.get(1).getCoordinate().distance( log.get(0).getCoordinate() ) );
-				if(distance > DISTANCE_THRESHOLD){
-//					System.out.println("Woops... this activity starts and ends at different positions.");
+				if(distance > distanceThreshold){
+//					System.err.println("Woops... this activity starts and ends at different positions.");
 					numberOfBoinkPoints++;
 				}
 				
@@ -343,22 +379,22 @@ public class ActivityLocations {
 		Chain thisChain = new Chain();
 		while( activityList.size() > 0){
 			Activity thisActivity = activityList.get(0);
-			if ( thisActivity.getDuration() < ACTIVITY_MIN_THRESHOLD ){ // too short for an activity
+			if ( thisActivity.getDuration() < minorActivityMinimumDuration ){ // too short for an activity
 				activityList.remove(0);				
-			} else if(thisActivity.getDuration() < HOME_DURATION_THRESHOLD ){ // then it is an activity)
+			} else if(thisActivity.getDuration() < majorActivityMinimumDuration ){ // then it is an activity)
 				if( thisChain.getDayStart() == null ){
 					thisChain.setDayStart(thisActivity.getStartTime() ); // set start time
 				}
-				thisChain.addActivity( thisActivity );
+				thisChain.getActivities().add(thisActivity);
 				activityList.remove(0);
 			} else{ // else it is a major (home) location
-				thisChain.addActivity( thisActivity ); // add home location to end of current chain
+				thisChain.getActivities().add(thisActivity); // add home location to end of current chain
 				
-				thisVehicle.addChain( thisChain );
+				thisVehicle.getChains().add( thisChain );
 				
 				thisChain = new Chain();
 				thisChain.setDayStart( thisActivity.getEndTime() );
-				thisChain.addActivity( thisActivity ); // add home location at start of new chain				
+				thisChain.getActivities().add(thisActivity); // add home location at start of new chain				
 				activityList.remove(0);
 			}
 		}
@@ -412,7 +448,7 @@ public class ActivityLocations {
 
 			Scanner input = new Scanner(new BufferedReader(new FileReader(thisFile) ) );
 			while( input.hasNextLine() ){
-				String [] inputString = input.nextLine().split(DELIMITER_IN);
+				String [] inputString = input.nextLine().split(delimiter);
 				if( inputString.length > 5){
 					try{
 						vehID = Integer.parseInt( inputString[0] );
@@ -443,60 +479,9 @@ public class ActivityLocations {
 		Vehicle thisVehicle = new Vehicle( vehicleID );
 		return thisVehicle;		
 	}
-	
-	public static boolean saveVehicleStringToFile(int vehID, String saveString){
-		boolean saved = false;
-		BufferedWriter bw = null;
-		try{
-			bw = new BufferedWriter( new FileWriter(VEH_FOLDER + "/" + vehID + ".xml"));
-			try{
-				bw.write(saveString);
-				saved = true;
-			} finally{
-				bw.close();
-			}
-		} catch(IOException ex){
-			ex.printStackTrace();
-		}
 		
-		return saved;
-	}
-	
-	public static String readVehicleStringFromFile(int vehID, String vehicleFile){
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
-//		String vehicleFile = VEH_FOLDER + "/" + vehID + ".xml";
-		
-		try{
-			br = new BufferedReader( new FileReader(vehicleFile) );
-			try{
-				String s;
-				while( (s = br.readLine() ) != null ){
-					sb.append(s);
-					sb.append("\n");
-				}
-			} finally {
-				br.close();
-			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		return sb.toString();		
-	}
-	
-	public static String convertVehicleToXML (Vehicle vehicle){
-		XStream xstream = new XStream(new DomDriver());		
-		return xstream.toXML(vehicle);
-	}
-	
-	public static Vehicle convertVehicleFromXML (String XMLString){
-		Vehicle vehicle = null;
-		XStream xstream = new XStream(new DomDriver());
-		Object obj = xstream.fromXML(XMLString);
-		if(obj instanceof Vehicle){
-			vehicle = (Vehicle) obj;
-		}
-		return vehicle;
+	public static int getMajorActivityMinimumDuration() {
+		return majorActivityMinimumDuration;
 	}
 
 	
