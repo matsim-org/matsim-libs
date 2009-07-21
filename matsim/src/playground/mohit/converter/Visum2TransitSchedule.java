@@ -68,7 +68,7 @@ public class Visum2TransitSchedule {
 		
 		for (VisumNetwork.StopPoint stopPoint : this.visum.stopPoints.values()){
 			Coord coord = this.coordinateTransformation.transform(visum.stops.get(visum.stopAreas.get(stopPoint.stopAreaId).StopId).coord);
-			TransitStopFacility stop = builder.createTransitStopFacility(stopPoint.id, coord);
+			TransitStopFacility stop = builder.createTransitStopFacility(stopPoint.id, coord, false);
 			stopFacilities.put(stopPoint.id, stop);
 			this.schedule.addStopFacility(stop);
 		}

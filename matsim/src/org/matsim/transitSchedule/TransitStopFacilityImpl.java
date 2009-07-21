@@ -37,10 +37,6 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	private Link link = null;
 	private final boolean isBlockingLane;
 
-	protected TransitStopFacilityImpl(final Id id, final Coord coord) {
-		this(id, coord, false);
-	}
-
 	protected TransitStopFacilityImpl(final Id id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;
 		this.coord = coord;

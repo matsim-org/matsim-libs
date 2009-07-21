@@ -93,7 +93,7 @@ public class timeGraph  {
 					arr = el.getAttribute("arrivalOffset");
 					dep = el.getAttribute("departureOffset");
 					
-					TransitStopFacility stop = schedule.getBuilder().createTransitStopFacility(new IdImpl(stopId),null );
+					TransitStopFacility stop = schedule.getBuilder().createTransitStopFacility(new IdImpl(stopId),null,false );
 					TransitRouteStop routeStop = schedule.getBuilder().createTransitRouteStop(stop,toDouble(arr),toDouble(dep));
 					stops.put(stopId+"/"+(j+1),routeStop);
 				}

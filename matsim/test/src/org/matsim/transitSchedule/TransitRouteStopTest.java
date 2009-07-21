@@ -36,7 +36,7 @@ public class TransitRouteStopTest extends MatsimTestCase {
 	}
 
 	public void testInitialization() {
-		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3));
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
 		TransitRouteStop routeStop = createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);

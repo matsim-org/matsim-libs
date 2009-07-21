@@ -88,10 +88,10 @@ public class TransitQueueSimulationTest extends TestCase {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleBuilder builder = schedule.getBuilder();
 
-		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0));
-		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("stop3"), scenario.createCoord(0, 0));
-		TransitStopFacility stop4 = builder.createTransitStopFacility(scenario.createId("stop4"), scenario.createCoord(0, 0));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("stop3"), scenario.createCoord(0, 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(scenario.createId("stop4"), scenario.createCoord(0, 0), false);
 		ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
@@ -183,8 +183,8 @@ public class TransitQueueSimulationTest extends TestCase {
 		TransitScheduleBuilder builder = schedule.getBuilder();
 		TransitLine line = builder.createTransitLine(scenario.createId("1"));
 
-		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
 		schedule.addStopFacility(stop1);
 		schedule.addStopFacility(stop2);
 
@@ -249,10 +249,10 @@ public class TransitQueueSimulationTest extends TestCase {
 		TransitLine line = builder.createTransitLine(scenario.createId("1"));
 		// important: do NOT add the line to the schedule, or agents will be created twice!
 
-		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0));
-		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("stop3"), scenario.createCoord(0, 0));
-		TransitStopFacility stop4 = builder.createTransitStopFacility(scenario.createId("stop4"), scenario.createCoord(0, 0));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("stop3"), scenario.createCoord(0, 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(scenario.createId("stop4"), scenario.createCoord(0, 0), false);
 		ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));

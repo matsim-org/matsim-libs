@@ -55,7 +55,7 @@ public class ToTransitScheduleConverter {
 			List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
 			for (Id idNode : ptLine.getNodeRoute()){				
 				if (!transitSchedule.getFacilities().containsKey(idNode)){
-					TransitStopFacility transitStopFacility =  this.builder.createTransitStopFacility(idNode, ptNet.getNode(idNode).getCoord());
+					TransitStopFacility transitStopFacility =  this.builder.createTransitStopFacility(idNode, ptNet.getNode(idNode).getCoord(), false);
 					transitSchedule.addStopFacility(transitStopFacility);	
 				}
 				double min = ptLine.getMinutes().get(x++).doubleValue();  

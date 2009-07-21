@@ -98,8 +98,8 @@ public class TransitScheduleTest extends MatsimTestCase {
 
 	public void testAddStopFacility() {
 		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
-		TransitStopFacility stop1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0));
-		TransitStopFacility stop2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(1, 1));
+		TransitStopFacility stop1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
+		TransitStopFacility stop2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(1, 1), false);
 		assertEquals(0, schedule.getFacilities().size());
 		schedule.addStopFacility(stop1);
 		assertEquals(1, schedule.getFacilities().size());
@@ -112,8 +112,8 @@ public class TransitScheduleTest extends MatsimTestCase {
 
 	public void testAddStopFacilityException() {
 		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
-		TransitStopFacility stop1a = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 2));
-		TransitStopFacility stop1b = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(3, 3));
+		TransitStopFacility stop1a = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 2), false);
+		TransitStopFacility stop1b = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(3, 3), false);
 		assertEquals(0, schedule.getFacilities().size());
 		schedule.addStopFacility(stop1a);
 		assertEquals(1, schedule.getFacilities().size());
@@ -140,7 +140,7 @@ public class TransitScheduleTest extends MatsimTestCase {
 
 	public void testGetFacilitiesImmutable() {
 		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
-		TransitStopFacility stop1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0));
+		TransitStopFacility stop1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
 		try {
 			schedule.getFacilities().put(stop1.getId(), stop1);
 			fail("missing exception.");

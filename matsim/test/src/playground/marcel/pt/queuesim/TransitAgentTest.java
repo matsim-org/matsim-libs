@@ -65,8 +65,8 @@ public class TransitAgentTest extends TestCase {
 		person.addPlan(plan);
 		Activity homeAct = pb.createActivityFromLinkId("home", scenario.createId("1"));
 		Leg leg = pb.createLeg(TransportMode.pt);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(100, 100));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(900, 100));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(100, 100), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(900, 100), false);
 		TransitLine line1 = builder.createTransitLine(scenario.createId("L1"));
 		TransitLine line2 = builder.createTransitLine(scenario.createId("L2"));
 		leg.setRoute(new ExperimentalTransitRoute(stop1, line1, stop2));
@@ -101,9 +101,9 @@ public class TransitAgentTest extends TestCase {
 		person.addPlan(plan);
 		Activity homeAct = pb.createActivityFromLinkId("home", scenario.createId("1"));
 		Leg leg = pb.createLeg(TransportMode.pt);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(100, 100));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(900, 100));
-		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("3"), scenario.createCoord(1900, 100));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(100, 100), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(900, 100), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("3"), scenario.createCoord(1900, 100), false);
 		TransitLine line1 = builder.createTransitLine(scenario.createId("L1"));
 		leg.setRoute(new ExperimentalTransitRoute(stop1, line1, stop2));
 		Activity workAct = pb.createActivityFromLinkId("work", scenario.createId("2"));

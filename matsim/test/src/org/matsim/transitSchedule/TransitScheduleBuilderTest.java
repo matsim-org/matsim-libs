@@ -80,7 +80,7 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 
 	public void testCreateTransitRouteStop() {
 		TransitScheduleBuilder builder = createTransitScheduleBuilder();
-		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(5), new CoordImpl(6, 6));
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(5), new CoordImpl(6, 6), false);
 		double arrivalOffset = 23;
 		double departureOffset = 42;
 		TransitRouteStop stop = builder.createTransitRouteStop(stopFacility, 23, 42);
@@ -95,7 +95,7 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 		Coord coord1 = new CoordImpl(511, 1980);
 		Id id2 = new IdImpl(7);
 		Coord coord2 = new CoordImpl(105, 1979);
-		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(id1, coord1);
+		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(id1, coord1, false);
 		assertEquals(id1, stopFacility1.getId());
 		assertEquals(coord1.getX(), stopFacility1.getCoord().getX(), EPSILON);
 		assertEquals(coord1.getY(), stopFacility1.getCoord().getY(), EPSILON);

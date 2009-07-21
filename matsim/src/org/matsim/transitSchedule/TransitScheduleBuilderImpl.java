@@ -54,14 +54,10 @@ public class TransitScheduleBuilderImpl implements TransitScheduleBuilder {
 		return new TransitScheduleImpl(this);
 	}
 
-	public TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate) {
-		return new TransitStopFacilityImpl(facilityId, coordinate);
-	}
-
 	public TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane) {
 		return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
 	}
-	
+
 	public Departure createDeparture(final Id departureId, final double time) {
 		return new DepartureImpl(departureId, time);
 	}

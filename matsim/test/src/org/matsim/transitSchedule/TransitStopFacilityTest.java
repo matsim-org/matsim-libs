@@ -64,9 +64,6 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		assertFalse(stop.getIsBlockingLane());
 		stop = createTransitStopFacility(id, coord, true);
 		assertTrue(stop.getIsBlockingLane());
-		// test default
-		stop = new TransitStopFacilityImpl(id, coord);
-		assertFalse(stop.getIsBlockingLane());
 	}
 
 	public void testLink() {

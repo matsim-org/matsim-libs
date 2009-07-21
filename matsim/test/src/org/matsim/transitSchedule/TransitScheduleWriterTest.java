@@ -68,10 +68,10 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		TransitSchedule schedule1 = builder.createTransitSchedule();
 
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0));
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000));
-		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000), false);
 		schedule1.addStopFacility(stop1);
 		schedule1.addStopFacility(stop2);
 		schedule1.addStopFacility(stop3);

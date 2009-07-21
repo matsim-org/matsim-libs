@@ -122,12 +122,12 @@ public class TwoLinesDemo {
 	private void createTransitSchedule() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleBuilder builder = schedule.getBuilder();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(this.ids[1], this.scenario.createCoord(-100, -50));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(this.ids[2], this.scenario.createCoord(-100, 850));
-		TransitStopFacility stop3 = builder.createTransitStopFacility(this.ids[3], this.scenario.createCoord(1400, 450));
-		TransitStopFacility stop4 = builder.createTransitStopFacility(this.ids[4], this.scenario.createCoord(3400, 450));
-		TransitStopFacility stop5 = builder.createTransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50));
-		TransitStopFacility stop6 = builder.createTransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(this.ids[1], this.scenario.createCoord(-100, -50), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(this.ids[2], this.scenario.createCoord(-100, 850), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(this.ids[3], this.scenario.createCoord(1400, 450), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(this.ids[4], this.scenario.createCoord(3400, 450), false);
+		TransitStopFacility stop5 = builder.createTransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50), false);
+		TransitStopFacility stop6 = builder.createTransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850), false);
 
 		LinkImpl link1 = this.scenario.getNetwork().getLinks().get(this.ids[1]);
 		LinkImpl link2 = this.scenario.getNetwork().getLinks().get(this.ids[2]);

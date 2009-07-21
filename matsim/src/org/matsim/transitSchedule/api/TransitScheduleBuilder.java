@@ -33,16 +33,15 @@ import org.matsim.core.population.routes.NetworkRoute;
 public interface TransitScheduleBuilder {
 
 	public abstract TransitSchedule createTransitSchedule();
-	
+
 	public abstract TransitLine createTransitLine(final Id lineId);
-	
+
 	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final TransportMode mode);
-	
+
 	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
-	
-	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate);
+
 	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane);
-	
+
 	public abstract Departure createDeparture(final Id departureId, final double time);
 
 }

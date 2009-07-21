@@ -52,14 +52,14 @@ import org.xml.sax.SAXException;
 
 /**
  * Reads a transit schedule from a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
- * 
+ *
  * @author mrieser
  */
 public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private static final String STOP_FACILITY = "stopFacility";
 	private static final String LINK_REF_ID = "linkRefId";
-	
+
 	private static final String TRANSIT_LINE = "transitLine";
 	private static final String TRANSIT_ROUTE = "transitRoute";
 	private static final String DESCRIPTION = "description";
@@ -94,7 +94,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (STOP_FACILITY.equals(name)) {
 			TransitStopFacility stop = new TransitStopFacilityImpl(
-					new IdImpl(atts.getValue(ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+					new IdImpl(atts.getValue(ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), false);
 			if (atts.getValue(LINK_REF_ID) != null) {
 				LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(LINK_REF_ID)));
 				if (link == null) {

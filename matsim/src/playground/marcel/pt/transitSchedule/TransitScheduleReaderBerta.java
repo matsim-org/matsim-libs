@@ -58,19 +58,19 @@ import org.xml.sax.SAXException;
 import playground.marcel.SoldnerBerlinToWGS84;
 
 /**
- * Reads transit schedule information from BERTA XML files once used 
+ * Reads transit schedule information from BERTA XML files once used
  * by the Berlin Transport Company.
- * 
+ *
  * @author mrieser
  */
 public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(TransitScheduleReaderBerta.class);
-	
+
 	private static final String LINIENFAHRPLAN = "Linienfahrplan";
 	private static final String BETRIEBSZWEIGNAME = "Betriebszweigname";
 	private static final String BETRIEBSZWEIGNUMMER = "Betriebszweignummer";
-	
+
 	// Linie
 	private static final String LINIE = "Linie";
 	private static final String INTERNE_LINIENNUMMER = "interneLiniennummer";
@@ -120,7 +120,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 	private final SoldnerBerlinToWGS84 soldnerToWgs84 = new SoldnerBerlinToWGS84();
 	private final CoordinateTransformation wgs84ToRBS;
-	
+
 	public TransitScheduleReaderBerta(final TransitSchedule schedule, final CoordinateTransformation coordTransformation) {
 		this.schedule = schedule;
 		this.builder = schedule.getBuilder();
@@ -277,7 +277,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		TransitStopFacility facility = this.schedule.getFacilities().get(hp.id);
 		if (facility == null) {
 			Coord coord = this.wgs84ToRBS.transform(this.soldnerToWgs84.transform(new CoordImpl(hp.x/1000.0, hp.y/1000.0)));
-			facility = this.schedule.getBuilder().createTransitStopFacility(hp.id, coord);
+			facility = this.schedule.getBuilder().createTransitStopFacility(hp.id, coord, false);
 			this.schedule.addStopFacility(facility);
 		}
 		return facility;
@@ -289,7 +289,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		/*package*/ String betriebszweig = null;
 		/*package*/ String betriebszweignummer = null;
 	}
-	
+
 	protected static class BHaltepunkt {
 		/*package*/ Id id = null;
 		/*package*/ double x = 0;

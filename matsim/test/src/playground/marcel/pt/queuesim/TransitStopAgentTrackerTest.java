@@ -44,8 +44,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		PassengerAgent agent1 = new FakeAgent(null, null);
 		PassengerAgent agent2 = new FakeAgent(null, null);
 		PassengerAgent agent3 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
 		assertFalse(tracker.getAgentsAtStop(stop1).contains(agent1));
 		tracker.addAgentToStop(agent1, stop1);
@@ -68,8 +68,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		PassengerAgent agent1 = new FakeAgent(null, null);
 		PassengerAgent agent2 = new FakeAgent(null, null);
 		PassengerAgent agent3 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
 		tracker.addAgentToStop(agent1, stop1);
 		tracker.addAgentToStop(agent2, stop1);
@@ -90,7 +90,7 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		PassengerAgent agent1 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 
 		try {
 			tracker.getAgentsAtStop(stop1).add(agent1);

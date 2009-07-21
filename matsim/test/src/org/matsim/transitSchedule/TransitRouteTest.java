@@ -191,10 +191,10 @@ public class TransitRouteTest extends MatsimTestCase {
 		Link toLink = new FakeLink(new IdImpl(5), null, null);
 		NetworkRoute route = new NodeNetworkRoute(fromLink, toLink);
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0));
-		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(0, 0));
-		TransitStopFacility stopFacility3 = new TransitStopFacilityImpl(new IdImpl(3), new CoordImpl(0, 0));
-		TransitStopFacility stopFacility4 = new TransitStopFacilityImpl(new IdImpl(4), new CoordImpl(0, 0));
+		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility3 = new TransitStopFacilityImpl(new IdImpl(3), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility4 = new TransitStopFacilityImpl(new IdImpl(4), new CoordImpl(0, 0), false);
 		TransitRouteStop stop1 = new TransitRouteStopImpl(stopFacility1, 50, 60);
 		TransitRouteStop stop2 = new TransitRouteStopImpl(stopFacility2, 150, 260);
 		TransitRouteStop stop3 = new TransitRouteStopImpl(stopFacility3, 250, 260);

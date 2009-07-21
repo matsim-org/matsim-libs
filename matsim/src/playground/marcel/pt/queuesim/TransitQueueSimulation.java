@@ -49,6 +49,9 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import playground.marcel.pt.otfvis.FacilityDrawer;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
+/**
+ * @author mrieser
+ */
 public class TransitQueueSimulation extends QueueSimulation {
 
 	private OnTheFlyServer otfServer = null;

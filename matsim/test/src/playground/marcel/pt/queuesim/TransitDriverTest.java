@@ -116,10 +116,10 @@ public class TransitDriverTest extends MatsimTestCase {
 		NetworkRoute route = new NodeNetworkRoute(null, null);
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0));
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(2500, 0));
-		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("4"), new CoordImpl(3500, 0));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(2500, 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("4"), new CoordImpl(3500, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
@@ -154,8 +154,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		NetworkRoute route = new NodeNetworkRoute(null, null);
@@ -218,8 +218,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		NetworkRoute route = new NodeNetworkRoute(null, null);
@@ -271,7 +271,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		NetworkRoute route = new NodeNetworkRoute(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
