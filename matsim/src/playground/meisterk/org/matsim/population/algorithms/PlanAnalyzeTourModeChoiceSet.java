@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -38,7 +37,7 @@ import org.matsim.world.MappedLocation;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 
 /**
- * Feasible mode chain analysis accoring to sectio 3.2 of 
+ * Feasible mode chain analysis according to section 3.2 of 
  * 
  * Miller, E. J., M. J. Roorda and J. A. Carrasco (2005) A tour-based model of travel mode choice,
  * Transportation, 32 (4) 399–422, pp. 404 and 405.
@@ -50,11 +49,13 @@ import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
  */
 public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
-	private MeisterkConfigGroup meisterk = null;
+	private MeisterkConfigGroup meisterkConfigGroup = null;
+	private final PlanomatConfigGroup planomatConfigGroup;
 	
-	public PlanAnalyzeTourModeChoiceSet(MeisterkConfigGroup meisterk) {
+	public PlanAnalyzeTourModeChoiceSet(MeisterkConfigGroup meisterk, final PlanomatConfigGroup planomatConfigGroup) {
 		super();
-		this.meisterk = meisterk;
+		this.meisterkConfigGroup = meisterk;
+		this.planomatConfigGroup = planomatConfigGroup;
 	}
 
 	private EnumSet<TransportMode> modeSet = null;
@@ -75,7 +76,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 	public void run(PlanImpl plan) {
 
-		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
+		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = this.planomatConfigGroup.getTripStructureAnalysisLayer();
 		MappedLocation currentLocation = null, requiredLocation = null, nextLocation = null;
 		
 		// how many mode combinations are possible?
@@ -90,7 +91,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			// setup the trackers for all chain-based modes, set all chain-based modes starting at the first location (usually home)
 			HashMap<TransportMode, MappedLocation> modeTracker = new HashMap<TransportMode, MappedLocation>();
 			for (TransportMode mode : this.modeSet) {
-				if (meisterk.getChainBasedModes().contains(mode)) {
+				if (meisterkConfigGroup.getChainBasedModes().contains(mode)) {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
 						currentLocation = plan.getFirstActivity().getFacility();
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
@@ -115,7 +116,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 					LegImpl currentLeg = (LegImpl) pe;
 	
 					TransportMode legMode = (TransportMode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
-					if (meisterk.getChainBasedModes().contains(legMode)) {
+					if (meisterkConfigGroup.getChainBasedModes().contains(legMode)) {
 						currentLocation = modeTracker.get(legMode);
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
 							requiredLocation = plan.getPreviousActivity(currentLeg).getFacility();
@@ -166,4 +167,19 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		}
 	}
 
+	/**
+	 * Determines whether a particular set of modes is a feasible combination for a given sequence of activity locations in an activity plan.
+	 * 
+	 * @param plan contains the activities and their locations
+	 * @param modeChain the mode chain whose feasibility is checked
+	 * @return 
+	 */
+	public static boolean isModeChainFeasible(PlanImpl plan, TransportMode[] modeChain) {
+		
+		boolean isModeChainFeasible = false;
+		
+		return isModeChainFeasible;
+		
+	}
+	
 }

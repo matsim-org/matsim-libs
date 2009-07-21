@@ -79,11 +79,8 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
-		// config
-		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
-
 		// run
-		this.runDemo((Layer) facilities, meisterk);
+		this.runDemo((Layer) facilities);
 
 	}
 
@@ -96,15 +93,14 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		log.info("Reading network xml file...done.");
 
 		// config
-		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
 		this.config.planomat().setTripStructureAnalysisLayer("link");
 
 		// run
-		this.runDemo((Layer) network, meisterk);
+		this.runDemo((Layer) network);
 
 	}
 
-	protected void runDemo(Layer layer, MeisterkConfigGroup meisterk) {
+	protected void runDemo(Layer layer) {
 
 		HashMap<String, ArrayList<TransportMode[]>> testCases = new HashMap<String, ArrayList<TransportMode[]>>();
 
@@ -374,7 +370,8 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
-		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(meisterk);
+		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
+		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(meisterk, this.config.planomat());
 		EnumSet<TransportMode> possibleModes = EnumSet.of(TransportMode.walk, TransportMode.bike, TransportMode.pt, TransportMode.car);
 		testee.setModeSet(possibleModes);
 
