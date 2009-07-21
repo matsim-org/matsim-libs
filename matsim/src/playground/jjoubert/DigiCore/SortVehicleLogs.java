@@ -23,12 +23,10 @@ import playground.jjoubert.Utilities.ProgressBar;
  */
 
 public class SortVehicleLogs {
-	/*
-	 * Set the home directory, depending on where the job is executed.
-	 */
+	// Set the home directory, depending on where the job is executed.
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
 //	final static String ROOT = "/home/jjoubert/";									// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/data/";								// Satawal
+	final static String ROOT = "/home/jjoubert/data/DigiCore/";						// Satawal
 	
 	// Derived string values
 	final static String SOURCEFOLDER = ROOT + "Vehicles/";
@@ -37,7 +35,8 @@ public class SortVehicleLogs {
 	final static String DELIMITER = ","; // this could be "," or "\t"
 
 	/**
-	 * 
+	 * The main method prints and updates a progress bar every 100 vehicle files that
+	 * have been sorted.
 	 * @param args
 	 */
 	public static void main (String args[] ){
@@ -82,7 +81,7 @@ public class SortVehicleLogs {
 				filesSorted++;
 			}
 			System.out.printf("\n\n");
-			System.out.println("Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
+			System.out.println("Done. Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
 		}
 	}
 	/**
