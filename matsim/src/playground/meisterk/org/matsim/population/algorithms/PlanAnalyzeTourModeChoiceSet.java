@@ -34,8 +34,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.MappedLocation;
 
-import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
-
 /**
  * Feasible mode chain analysis according to section 3.2 of 
  * 
@@ -49,13 +47,15 @@ import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
  */
 public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
-	private MeisterkConfigGroup meisterkConfigGroup = null;
-	private final PlanomatConfigGroup planomatConfigGroup;
+	private final EnumSet<TransportMode> chainBasedModes;
+	private final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer;
 	
-	public PlanAnalyzeTourModeChoiceSet(MeisterkConfigGroup meisterk, final PlanomatConfigGroup planomatConfigGroup) {
+	public PlanAnalyzeTourModeChoiceSet(
+			final EnumSet<TransportMode> chainBasedModes, 
+			final PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		super();
-		this.meisterkConfigGroup = meisterk;
-		this.planomatConfigGroup = planomatConfigGroup;
+		this.chainBasedModes = chainBasedModes;
+		this.tripStructureAnalysisLayer = tripStructureAnalysisLayer;
 	}
 
 	private EnumSet<TransportMode> modeSet = null;
@@ -75,8 +75,8 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 	}
 
 	public void run(PlanImpl plan) {
-
-		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = this.planomatConfigGroup.getTripStructureAnalysisLayer();
+		
+		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = this.tripStructureAnalysisLayer;
 		MappedLocation currentLocation = null, requiredLocation = null, nextLocation = null;
 		
 		// how many mode combinations are possible?
@@ -91,7 +91,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			// setup the trackers for all chain-based modes, set all chain-based modes starting at the first location (usually home)
 			HashMap<TransportMode, MappedLocation> modeTracker = new HashMap<TransportMode, MappedLocation>();
 			for (TransportMode mode : this.modeSet) {
-				if (meisterkConfigGroup.getChainBasedModes().contains(mode)) {
+				if (this.chainBasedModes.contains(mode)) {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
 						currentLocation = plan.getFirstActivity().getFacility();
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
@@ -116,7 +116,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 					LegImpl currentLeg = (LegImpl) pe;
 	
 					TransportMode legMode = (TransportMode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
-					if (meisterkConfigGroup.getChainBasedModes().contains(legMode)) {
+					if (this.chainBasedModes.contains(legMode)) {
 						currentLocation = modeTracker.get(legMode);
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
 							requiredLocation = plan.getPreviousActivity(currentLeg).getFacility();

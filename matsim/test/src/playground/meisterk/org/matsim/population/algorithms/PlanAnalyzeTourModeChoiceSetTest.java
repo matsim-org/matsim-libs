@@ -370,8 +370,8 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
-		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
-		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(meisterk, this.config.planomat());
+//		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
+		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(new MeisterkConfigGroup().getChainBasedModes(), this.config.planomat().getTripStructureAnalysisLayer());
 		EnumSet<TransportMode> possibleModes = EnumSet.of(TransportMode.walk, TransportMode.bike, TransportMode.pt, TransportMode.car);
 		testee.setModeSet(possibleModes);
 
