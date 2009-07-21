@@ -35,10 +35,10 @@ public class ActivityLocations {
 	// Set the home directory, depending on where the job is executed.
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
 //	final static String ROOT = "/home/jjoubert/";									// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/data/DigiCore/";						// Satawal
+	final static String ROOT = "/home/jjoubert/data/";								// Satawal
 
 	// Derived string values.
-	private static String sourceFolderName = ROOT + studyAreaName + "/Sorted/";
+	private static String sourceFolderName = ROOT + "DigiCore/SortedVehicles/";
 	private static String destinationFolderName = ROOT + studyAreaName+ "/Activities/";
 	private static String vehicleFolderName = ROOT + studyAreaName + "/XML/";
 	private static String shapeFileSource = ROOT + "ShapeFiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
@@ -95,6 +95,7 @@ public class ActivityLocations {
 		
 		System.out.println("Processing vehicle files in " + destinationFolderName + "...");
 		System.out.println();
+		
 		ProgressBar pb = new ProgressBar('*', totalVehicles);
 		pb.printProgressBar();
 		
