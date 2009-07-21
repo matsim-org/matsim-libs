@@ -23,7 +23,6 @@ package org.matsim.core.utils.io;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
@@ -102,8 +101,16 @@ public class MatsimFileTypeGuesserTest extends MatsimTestCase {
 		assertEquals(MatsimSignalSystemConfigurationsReader.SIGNALSYSTEMSCONFIG11, g.getSystemId());
 	}
 
-	
-	
+	public void testTransitScheduleV1XML() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
+		assertEquals(MatsimFileTypeGuesser.FileType.TransitSchedule, g.getGuessedFileType());
+		assertNull(g.getPublicId());
+		assertNotNull(g.getSystemId());
+		assertEquals("http://www.matsim.org/files/dtd/transitSchedule_v1.dtd", g.getSystemId());
+	}
+
+
+
 	// TODO needs more test for Households, Transims-Veh, OTFVis, ...
 
 	public void testNotExistant() {

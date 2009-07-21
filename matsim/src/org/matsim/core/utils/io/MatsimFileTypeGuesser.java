@@ -39,21 +39,21 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author mrieser
  */
 public class MatsimFileTypeGuesser extends DefaultHandler {
-	
-	private static final Logger log = Logger
-			.getLogger(MatsimFileTypeGuesser.class);
+
+	private static final Logger log = Logger.getLogger(MatsimFileTypeGuesser.class);
 	/**
 	 * This enum only informs about the correct container, not about the version of the input file.
 	 */
-	public enum FileType {Config, Network, Facilities, Population, World, 
-		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, LaneDefinitions, SignalSystemConfigs };
+	public enum FileType {Config, Network, Facilities, Population, World,
+		Counts, Events, Households, TransimsVehicle, OTFVis, SignalSystems, LaneDefinitions, SignalSystemConfigs,
+		TransitSchedule}
 
 	public static final String SYSTEMIDNOTFOUNDMESSAGE = "System Id of xml document couldn't be detected. " +
 	"Make sure that you try to read a xml document with a valid header. " +
 	"If your header seems to be ok, make shure that there is no / at the " +
 	"end of the first part of the tuple used as value for xsi:schemaLocation.";
-		
-		
+
+
 	private FileType fileType = null;
 	private String xmlPublicId = null;
 	private String xmlSystemId = null;
@@ -82,6 +82,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 					this.fileType = FileType.Config;
 				} else if (shortSystemId.startsWith("counts_")) {
 					this.fileType = FileType.Counts;
+				} else if (shortSystemId.startsWith("transitSchedule_")) {
+					this.fileType = FileType.TransitSchedule;
 				}
 			}
 
@@ -152,6 +154,8 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 				this.fileType = FileType.LaneDefinitions;
 			}	else if ("counts".equals(e.rootTag)){
 				this.fileType = FileType.Counts;
+			} else if ("transitSchedule".equals(e.rootTag)) {
+				this.fileType = FileType.TransitSchedule;
 			} else {
 				log.warn("got unexpected rootTag: " + e.rootTag);
 			}
@@ -162,9 +166,9 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	private final static class XmlHandler extends DefaultHandler {
 
 		private XMLTypeDetectionException exception;
-		
+
 		private boolean detectedFirstEntity = false;
-		
+
 		public XmlHandler() {
 			// public constructor for private inner class
 		}
@@ -175,7 +179,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 			 * As the xml schema of interest may be derived from other schema instances we
 			 * are only interested in the first entity resolved.
 			 */
-			if (! detectedFirstEntity){
+			if (! this.detectedFirstEntity){
 				this.exception  = new XMLTypeDetectionException(publicId, systemId);
 				this.detectedFirstEntity = true;
 			}
@@ -195,9 +199,9 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 			throw this.exception;
 		}
 	}
-	
+
 	/**
-	 * Used to return the declared type encountered in the XML file, the root tag 
+	 * Used to return the declared type encountered in the XML file, the root tag
 	 * and to stop parsing the file
 	 * @author dgrether
 	 *
@@ -207,11 +211,11 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 		public final String publicId;
 		public final String systemId;
 		public String rootTag;
-		
-		public XMLTypeDetectionException(String publicId, String systemId){
+
+		public XMLTypeDetectionException(final String publicId, final String systemId){
 			this.publicId = publicId;
 			this.systemId = systemId;
-		}		
+		}
 
 		@Override
 		public synchronized Throwable fillInStackTrace() {
