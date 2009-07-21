@@ -77,7 +77,7 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 		 * value of constant depends on the average speeds of modes "bike" and "walk", as well as the desired leg distance
 		 * where "walk" and "bike" modes gain the same score
 		 */
-		private double constBike = -1.0;
+		private double constBike = -0.0;
 
 		public KTIScoringParameters(Module ktiConfigGroup) {
 			if (ktiConfigGroup != null) {
