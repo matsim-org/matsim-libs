@@ -104,7 +104,7 @@ public class LogicFactory{
 					//creates logic stops and stopFacilities
 					TransitStopFacility logicTransitStopFacility = this.builder.createTransitStopFacility(logicalId, coord, false); 
 					logicTransitSchedule.addStopFacility(logicTransitStopFacility);
-					TransitRouteStop logicTransitRouteStop = this.builder.createTransitRouteStop(logicTransitStopFacility, transitRouteStop.getArrivalDelay(), transitRouteStop.getDepartureDelay()); 
+					TransitRouteStop logicTransitRouteStop = this.builder.createTransitRouteStop(logicTransitStopFacility, transitRouteStop.getArrivalOffset(), transitRouteStop.getDepartureOffset()); 
 					logicTransitStops.add(logicTransitRouteStop);
 					
 					lastLogicNode= logicNode;

@@ -79,12 +79,12 @@ public class drawGraph extends Frame implements ItemListener{
 			if (s != null && s == route.id.toString()){
 				int dep =0, arr= 0;
 				for (TransitRouteStop stop : route.stops.values()){
-					arr =  (int)(stop.getArrivalDelay()*20);
+					arr =  (int)(stop.getArrivalOffset()*20);
 					
 					if (j!=0){
 							g.drawLine(100+(j-1)*60, 100+dep, 100+60*j, 100 + arr);
 					}
-					dep = (int)(stop.getDepartureDelay()*20);
+					dep = (int)(stop.getDepartureOffset()*20);
 					g.drawString(stop.getStopFacility().getId().toString(), 100+j*60, 90);
 					g.drawLine(100+60*j,100+arr,100+60*j,100+dep);
 					j++;

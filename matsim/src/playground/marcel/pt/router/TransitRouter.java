@@ -109,7 +109,7 @@ public class TransitRouter {
 	/*package*/ void getNextDeparturesAtStop(final TransitStopFacility stop, final double time) {
 		Collection<TransitRouterNetworkNode> nodes = this.transitNetwork.getNearestNodes(stop.getCoord(), 0);
 		for (TransitRouterNetworkNode node : nodes) {
-			double depDelay = node.stop.getDepartureDelay();
+			double depDelay = node.stop.getDepartureOffset();
 			double routeStartTime = time - depDelay;
 			double diff = Double.POSITIVE_INFINITY;
 			Departure bestDeparture = null;

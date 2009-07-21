@@ -56,7 +56,7 @@ public class TransitTravelTimeCalculator {
 					/**Save node departures in the DeparturesMap*/
 					double[] nodeDeparturesArray =new double[numDepartures];
 					for (int j=0; j<numDepartures; j++){
-						double departureTime =departuresArray[j] + transitRouteStop.getDepartureDelay();
+						double departureTime =departuresArray[j] + transitRouteStop.getDepartureOffset();
 						if (departureTime > 86400) departureTime=departureTime-86400;
 						nodeDeparturesArray[j] = departureTime; 
 					} 
@@ -68,7 +68,7 @@ public class TransitTravelTimeCalculator {
 					if (!first){
 						for (LinkImpl lastLink : node.getInLinks().values()){
 							if (lastLink.getFromNode().equals(lastNode)){
-								departureDelay= transitRouteStop.getDepartureDelay();
+								departureDelay= transitRouteStop.getDepartureOffset();
 								linkTravelTime= departureDelay- lastDepartureDelay;
 								linkTravelTime = linkTravelTime/60;
 								linkTravelTimeMap.put(lastLink.getId(), linkTravelTime);

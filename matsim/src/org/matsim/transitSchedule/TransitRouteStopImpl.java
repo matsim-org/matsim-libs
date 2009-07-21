@@ -47,11 +47,11 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		return this.stop;
 	}
 
-	public double getDepartureDelay() {
+	public double getDepartureOffset() {
 		return this.departureOffset;
 	}
 
-	public double getArrivalDelay() {
+	public double getArrivalOffset() {
 		return this.arrivalOffset;
 	}
 

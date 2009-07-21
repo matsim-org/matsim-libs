@@ -146,11 +146,11 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		for (TransitRouteStop stop : stops) {
 			attributes.clear();
 			attributes.add(this.createTuple(REF_ID, stop.getStopFacility().getId().toString()));
-			if (stop.getArrivalDelay() != Time.UNDEFINED_TIME) {
-				attributes.add(this.createTimeTuple(ARRIVAL_OFFSET, stop.getArrivalDelay()));
+			if (stop.getArrivalOffset() != Time.UNDEFINED_TIME) {
+				attributes.add(this.createTimeTuple(ARRIVAL_OFFSET, stop.getArrivalOffset()));
 			}
-			if (stop.getDepartureDelay() != Time.UNDEFINED_TIME) {
-				attributes.add(this.createTimeTuple(DEPARTURE_OFFSET, stop.getDepartureDelay()));
+			if (stop.getDepartureOffset() != Time.UNDEFINED_TIME) {
+				attributes.add(this.createTimeTuple(DEPARTURE_OFFSET, stop.getDepartureOffset()));
 			}
 			this.writeStartTag(STOP, attributes, true);
 		}

@@ -65,7 +65,7 @@ public class TransitScheduleToPTTimeTableConverter {
 				List<Double> minutesList = new ArrayList<Double>();
 				List<Id> idNodeRouteList = new ArrayList<Id>();
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) {
-					minutesList.add(transitRouteStop.getArrivalDelay());
+					minutesList.add(transitRouteStop.getArrivalOffset());
 					idNodeRouteList.add(transitRouteStop.getStopFacility().getId());
 				}
 				

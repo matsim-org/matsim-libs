@@ -34,7 +34,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 
 	public double getLinkTravelTime(Link link, double time) {
 		LinkWrapper wrapped = (LinkWrapper) link;
-		return wrapped.link.toNode.stop.getDepartureDelay() - wrapped.link.fromNode.stop.getDepartureDelay(); // does not yet respect departure time
+		return wrapped.link.toNode.stop.getDepartureOffset() - wrapped.link.fromNode.stop.getDepartureOffset(); // does not yet respect departure time
 	}
 
 }

@@ -85,8 +85,8 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 		double departureOffset = 42;
 		TransitRouteStop stop = builder.createTransitRouteStop(stopFacility, 23, 42);
 		assertEquals(stopFacility, stop.getStopFacility());
-		assertEquals(arrivalOffset, stop.getArrivalDelay(), EPSILON);
-		assertEquals(departureOffset, stop.getDepartureDelay(), EPSILON);
+		assertEquals(arrivalOffset, stop.getArrivalOffset(), EPSILON);
+		assertEquals(departureOffset, stop.getDepartureOffset(), EPSILON);
 	}
 
 	public void testCreateTransitStopFacility() {

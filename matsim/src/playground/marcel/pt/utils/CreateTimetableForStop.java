@@ -48,7 +48,7 @@ public class CreateTimetableForStop {
 		int index = 0;
 		for (TransitRoute route : routes) {
 			TransitRouteStop trStop = route.getStop(stop);
-			double delay = trStop.getDepartureDelay();
+			double delay = trStop.getDepartureOffset();
 			for (Departure dep : route.getDepartures().values()) {
 				departures[index] = dep.getDepartureTime() + delay;
 				index++;

@@ -154,8 +154,8 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 					TransitRouteStop stopA = routeA.getStops().get(i);
 					assertNotNull("stop not found", stopA);
 					assertEquals("different stop facilities.", stopE.getStopFacility().getId(), stopA.getStopFacility().getId());
-					assertEquals("different arrival delay.", stopE.getArrivalDelay(), stopA.getArrivalDelay(), EPSILON);
-					assertEquals("different departure delay.", stopE.getDepartureDelay(), stopA.getDepartureDelay(), EPSILON);
+					assertEquals("different arrival delay.", stopE.getArrivalOffset(), stopA.getArrivalOffset(), EPSILON);
+					assertEquals("different departure delay.", stopE.getDepartureOffset(), stopA.getDepartureOffset(), EPSILON);
 				}
 
 				NetworkRoute netRouteE = routeE.getRoute();
