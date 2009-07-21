@@ -29,21 +29,20 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.world.Location;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 
@@ -59,9 +58,17 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 	private static Logger log = Logger.getLogger(PlanAnalyzeTourModeChoiceSetTest.class);
 
+	private Config config;
+	
 	protected void setUp() throws Exception {
 		super.setUp();
-		super.loadConfig(PlanAnalyzeTourModeChoiceSetTest.CONFIGFILE);
+		this.config = super.loadConfig(PlanAnalyzeTourModeChoiceSetTest.CONFIGFILE);
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		this.config = null;
 	}
 
 	public void testFacilitiesBased() {
@@ -69,7 +76,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		// load data
 		log.info("Reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
 		// config
@@ -85,12 +92,12 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		// load data
 		log.info("Reading network xml file...");
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		log.info("Reading network xml file...done.");
 
 		// config
 		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
-		Gbl.getConfig().planomat().setTripStructureAnalysisLayer("link");
+		this.config.planomat().setTripStructureAnalysisLayer("link");
 
 		// run
 		this.runDemo((Layer) network, meisterk);
@@ -372,7 +379,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		testee.setModeSet(possibleModes);
 
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
+		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = this.config.planomat().getTripStructureAnalysisLayer();
 		Location location = null;
 		ActivityImpl act = null;
 		for (Entry<String, ArrayList<TransportMode[]>> entry : testCases.entrySet()) {

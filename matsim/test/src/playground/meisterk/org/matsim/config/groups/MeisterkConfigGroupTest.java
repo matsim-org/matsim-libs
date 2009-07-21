@@ -28,11 +28,17 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class MeisterkConfigGroupTest extends MatsimTestCase {
 
-	private static MeisterkConfigGroup meisterk;
+	private MeisterkConfigGroup meisterk;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		meisterk = new MeisterkConfigGroup();
+		this.meisterk = new MeisterkConfigGroup();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		this.meisterk = null;
 	}
 
 	public void testMeisterkConfigGroup() {
@@ -43,7 +49,7 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 	
 	public void testAddParam() {
 
-		meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "miv");
+		this.meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "miv");
 		EnumSet<TransportMode> expected = EnumSet.of(TransportMode.miv);
 		this.runTest(expected);
 
@@ -51,7 +57,7 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 
 	public void testAddEmptyParam() {
 
-		meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "");
+		this.meisterk.addParam(MeisterkConfigGroup.MeisterkConfigParameter.CHAIN_BASED_MODES.getParameterName(), "");
 		EnumSet<TransportMode> expected = EnumSet.noneOf(TransportMode.class);
 		this.runTest(expected);
 
@@ -59,7 +65,7 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 	
 	private void runTest(EnumSet<TransportMode> expected) {
 
-		EnumSet<TransportMode> actual = meisterk.getChainBasedModes();
+		EnumSet<TransportMode> actual = this.meisterk.getChainBasedModes();
 		assertEquals(actual.size(), expected.size());
 		Iterator<TransportMode> modeIterator = actual.iterator();
 		while (modeIterator.hasNext()) {
