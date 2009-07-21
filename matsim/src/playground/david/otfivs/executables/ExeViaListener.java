@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -208,8 +210,9 @@ QueueSimulationAfterSimStepListener {
 
 	protected void startupClient(String url) {
 		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad(url);
+		OnTheFlyClientFileQuad client = new OnTheFlyClientFileQuad(url);
 		client.start();
+
 	}
 	
 }
@@ -221,7 +224,7 @@ AfterMobsimListener,
 QueueSimulationInitializedListener,
 QueueSimulationAfterSimStepListener {
 	@Override
-	protected void startupClient(String url) {
+	protected void startupClient(String url)  {
 		OTFVisConfig visconf = new OTFVisConfig();
 		if (Gbl.getConfig() == null) Gbl.createConfig(null);
 		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
@@ -229,6 +232,13 @@ QueueSimulationAfterSimStepListener {
 		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 		OnTheFlyClientFileQuad client = new OTFVisDualView(url, null, false);
 		client.start();
+		while(client.getQueryControl() == null) try {Thread.sleep(500);}catch(Exception e){};
+		if(
+				(client.getQueryControl() != null) && 
+				(controlListener instanceof OTFPopShowListener)
+		) {
+			client.getQueryControl().addQueryEntry("Show plan", "Shows the agent's plan on the left side", playground.david.otfvis.prefuse.QueryAgentPlanSyncView.class);
+		}
 	}
 	
 }
@@ -271,8 +281,8 @@ QueueSimulationAfterSimStepListener {
 		Gbl.getConfig().controler().setOutputDirectory("tmp_delete_this");
 
 		Controler controler = new ResetableMobsimControler(cfg);
-		controlListener = new OTFControlerListener();
-//		controlListener = new OTFPopShowListener();
+//		controlListener = new OTFControlerListener();
+		controlListener = new OTFPopShowListener();
 		controler.addControlerListener(controlListener);
 		controler.getQueueSimulationListener().add(controlListener);
 		controler.run();

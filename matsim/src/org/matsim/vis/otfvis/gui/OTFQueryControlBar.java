@@ -29,9 +29,11 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -84,18 +86,21 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		public Class clazz;
 	}
 
-	private final QueryEntry[] queries = {
-		new QueryEntry("agentPlan", "show the actual plan of an agent", QueryAgentPlan.class),
-		new QueryEntry("agentEvents", "show the actual events of an agent", QueryAgentEvents.class),
-		new QueryEntry("agentPTBus", "highlight all buses of a given line", QueryAgentPTBus.class),
-		new QueryEntry("linkSpinneALL", "show Spinne of ALL traffic", QuerySpinne.class),
-		new QueryEntry("linkSpinneNOW", "show Spinne of all veh on the link NOW", QuerySpinneNOW.class),
-		new QueryEntry("----", "do not use", OTFReplaceQuery.class)
+	private final QueryEntry[] queries2 = {
 	};
+	
+	private final Vector<QueryEntry> queries = new Vector<QueryEntry>(Arrays.asList(
+			new QueryEntry("agentPlan", "show the actual plan of an agent", QueryAgentPlan.class),
+			new QueryEntry("agentEvents", "show the actual events of an agent", QueryAgentEvents.class),
+			new QueryEntry("agentPTBus", "highlight all buses of a given line", QueryAgentPTBus.class),
+			new QueryEntry("linkSpinneALL", "show Spinne of ALL traffic", QuerySpinne.class),
+			new QueryEntry("linkSpinneNOW", "show Spinne of all veh on the link NOW", QuerySpinneNOW.class)
+			)); 
 	
 	private final OTFHostControlBar handler;
 //	private final  String queryType = "Agent";
 	private JTextField text;
+	private JComboBox queryType;
 	private final JTabbedPane pane;
 	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
@@ -116,16 +121,16 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		}
 		{
 			ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
-			leftMFuncModel.setSelectedItem(queries[0]);
-			config.setQueryType(queries[0].clazz.getCanonicalName());
-			JComboBox queryType = new JComboBox();
+			leftMFuncModel.setSelectedItem(queries.get(0));
+			config.setQueryType(queries.get(0).clazz.getCanonicalName());
+			queryType = new JComboBox();
 			com.add(queryType);
 			queryType.setActionCommand("type_changed");
 			queryType.setModel(leftMFuncModel);
 			queryType.setBounds(57, 76, 92, 27);
 			queryType.setMaximumSize(new Dimension(250,60));
 			queryType.addActionListener(this);
-			queryType.setToolTipText(queries[0].toolTip);
+			queryType.setToolTipText(queries.get(0).toolTip);
 	}
 		{
 			JLabel jLabel3 = new JLabel();
@@ -203,6 +208,12 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	public void stateChanged(ChangeEvent e) {
 	}
 	
+	public void addQueryEntry(String name, String tooltip, Class clazz) {
+		queries.add(new QueryEntry(name, tooltip, clazz));
+		ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
+		queryType.setModel(leftMFuncModel);
+		queryType.invalidate();
+	}
 	synchronized public void handleIdQuery(String id, String queryName) {
 		OTFQuery marked = null;
 		marked = createQuery(queryName);

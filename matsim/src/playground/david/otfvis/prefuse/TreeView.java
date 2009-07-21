@@ -104,6 +104,11 @@ public static class MTree extends Tree {
 	
 	public int RECURESEDEPTH = 5;
 	public static Visualization m_vis = null;
+	private boolean fillRef = false;
+	
+	public PopulationProvider getPop() {
+		return m_pop;
+	}
 	
 	public Node createObjectNode(String name, String value, Node parent, Object ob, int layer) {
 		Node child = this.addChild(parent);
@@ -196,6 +201,7 @@ public static class MTree extends Tree {
 		Node root = this.addRoot();
 		root.setString("name", Integer.toString(this.max));
 		generateLayer(this.getRoot(), 0, this.max, (int)Math.log10(this.max)-1, -1);
+		fillRef = true;
 
 	}
 
@@ -215,13 +221,15 @@ public static class MTree extends Tree {
 		if(level == 0) {
 			parent.setInt("level", 0); // is expanded
 			for (int i = start; i<end; i++) {
-				PersonImpl p = m_pop.getPerson(i);
-				if(p != null) {
+				if(idSet.contains(i)) {
 					Node child = this.addNode();
 					//Node child = this.addChild(parent);
 					child.setString("name", Integer.toString(i));
 					child.setInt("level", -1);
-					child.set("ref", p);
+					if(fillRef) {
+						PersonImpl p = m_pop.getPerson(i);
+						child.set("ref", p);
+					}
 					this.addChildEdge(parent, child);
 					if(m_vis != null)m_searchTupleSet.index(m_vis.getVisualItem("tree.nodes", child), "name"); 
 					//this.fireTupleEvent(child, prefuse.data.event.EventConstants.INSERT);
@@ -553,10 +561,10 @@ public boolean focusOnId(String id){
                 		int row = item.getRow();
                 		Node parent = tree.getNode(row);
                 		if(level > 0) {
-                        	int id = Integer.parseInt(ids);
-                    		int step = (int)Math.pow(10, level-1);
-                    		tree.generateLayer(parent, id, id+10*step, 1, 0, item);
-                    		tview.invalidate();
+//                        	int id = Integer.parseInt(ids);
+//                    		int step = (int)Math.pow(10, level-1);
+//                    		tree.generateLayer(parent, id, id+10*step, 1, 0, item);
+//                    		tview.invalidate();
                 		} else if(level < 0) {
                 			Object ref = parent.get("ref");
                     		try {
@@ -570,10 +578,12 @@ public boolean focusOnId(String id){
 							}
                     		tview.invalidate();
                 		} else {
-                			// level == 0 --> this is an already expanded item
+                			// level == 0 --> this is an already expanded item if ref != 0;
                 			Object ref = parent.get("ref");
                         	int id = Integer.parseInt(ids);
-                    		if(ref == null) tree.generateLayer(parent, id, id, 1, -1, item);
+                    		if(ref == null){
+                    			tree.generateLayer(parent, id, id, 1, -1, item);
+                    		}
                 		}
                 	}
                 }

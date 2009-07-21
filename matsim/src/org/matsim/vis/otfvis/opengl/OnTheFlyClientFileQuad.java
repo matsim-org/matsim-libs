@@ -80,6 +80,8 @@ class OTFFrame extends JFrame {
  * @author dstrippgen
  */
 public class OnTheFlyClientFileQuad extends Thread {
+	private OTFQueryControlBar queryControl = null;
+
 	
 	public static void endProgram(int code) {
 		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
@@ -128,6 +130,30 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 	protected String filename;
 	private boolean splitLayout = true;
+	public OTFQueryControlBar getQueryControl() {
+		return queryControl;
+	}
+
+	public OTFHostControlBar getHostControl() {
+		return hostControl;
+	}
+
+	public boolean isSplitLayout() {
+		return splitLayout;
+	}
+
+	public JSplitPane getPane() {
+		return pane;
+	}
+
+	public OTFDrawer getLeftComp() {
+		return leftComp;
+	}
+
+	public OTFDrawer getRightComp() {
+		return rightComp;
+	}
+
 	protected JSplitPane pane = null;
 	protected OTFDrawer leftComp = null;
 	protected OTFDrawer rightComp = null;
@@ -223,7 +249,6 @@ public class OnTheFlyClientFileQuad extends Thread {
 			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
 			PreferencesDialog.buildMenu(frame, visconf, this.hostControl, saver);
 			
-			OTFQueryControlBar queryControl = null;
 			
 			if(!hostControl.isLiveHost()) {
 				frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);

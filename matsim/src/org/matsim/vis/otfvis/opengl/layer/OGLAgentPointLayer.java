@@ -54,7 +54,7 @@ import com.sun.opengl.util.texture.Texture;
  *
  */
 public class OGLAgentPointLayer extends DefaultSceneLayer {
-	private final static int BUFFERSIZE = 25000;
+	private final static int BUFFERSIZE = 10000;
 	
 	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 50.}, new Color[] {

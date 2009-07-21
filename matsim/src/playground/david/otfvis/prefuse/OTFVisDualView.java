@@ -116,8 +116,14 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	                    		invalidate();
 	                		} else if(level < 0) {
 	                			Object ref = parent.get("ref");
+	                    		if(ref == null){
+		                        	int id = Integer.parseInt(ids);
+	        						PersonImpl p = tree.getPop().getPerson(id);
+	        						parent.set("ref", p);
+	        						ref = p;
+	                    		}
 	                    		try {
-									tree.recurseObject(ref, "", parent, 1);
+									if(ref != null) tree.recurseObject(ref, "", parent, 1);
 								} catch (IllegalArgumentException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
