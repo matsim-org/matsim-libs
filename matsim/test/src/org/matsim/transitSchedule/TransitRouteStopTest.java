@@ -45,4 +45,16 @@ public class TransitRouteStopTest extends MatsimTestCase {
 		assertEquals(departureDelay, routeStop.getDepartureDelay(), EPSILON);
 	}
 
+	public void testAwaitDepartureTime() {
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3), false);
+		double arrivalDelay = 4;
+		double departureDelay = 5;
+		TransitRouteStop routeStop = createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
+		assertFalse(routeStop.isAwaitDepartureTime());
+		routeStop.setAwaitDepartureTime(true);
+		assertTrue(routeStop.isAwaitDepartureTime());
+		routeStop.setAwaitDepartureTime(false);
+		assertFalse(routeStop.isAwaitDepartureTime());
+	}
+
 }

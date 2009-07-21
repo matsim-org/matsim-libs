@@ -34,5 +34,27 @@ public interface TransitRouteStop {
 	public abstract double getDepartureDelay();
 
 	public abstract double getArrivalDelay();
+	
+	/**
+	 * Specifies if a driver should wait until the specified departure time
+	 * has come before departing, especially if the driver is too early at 
+	 * the stop. Requires that a departure offset is set for this stop. 
+	 * 
+	 * @param awaitDepartureTime <code>true</code> if the driver should wait if too early
+	 * @see #getDepartureDelay() 
+	 */
+	public abstract void setAwaitDepartureTime(final boolean awaitDepartureTime);
+	
+	/**
+	 * Returns whether a driver should wait until the specified departure 
+	 * time has come before departing, especially if the driver is too 
+	 * early at the stop. Can only be interpreted if a departure offset
+	 * is set for this stop.
+	 *  
+	 * @return <code>true</code> if drivers should wait until the departure 
+	 * time has passed before departing, <code>false</code> otherwise.
+	 * @see #getDepartureDelay() 
+	 */
+	public abstract boolean isAwaitDepartureTime();
 
 }

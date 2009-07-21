@@ -27,19 +27,20 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
  * Describes the stop within a route of a transit line. Specifies also at
  * what time a headway is expected at the stop as offset from the route start.
- * 
+ *
  * @author mrieser
  */
 public class TransitRouteStopImpl implements TransitRouteStop {
 
 	private final TransitStopFacility stop;
-	private final double departureDelay;
-	private final double arrivalDelay;
+	private final double departureOffset;
+	private final double arrivalOffset;
+	private boolean awaitDepartureTime = false;
 
 	protected TransitRouteStopImpl(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
 		this.stop = stop;
-		this.departureDelay = departureDelay;
-		this.arrivalDelay = arrivalDelay;
+		this.departureOffset = departureDelay;
+		this.arrivalOffset = arrivalDelay;
 	}
 
 	public TransitStopFacility getStopFacility() {
@@ -47,10 +48,19 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	}
 
 	public double getDepartureDelay() {
-		return this.departureDelay;
+		return this.departureOffset;
 	}
 
 	public double getArrivalDelay() {
-		return this.arrivalDelay;
+		return this.arrivalOffset;
 	}
+
+	public boolean isAwaitDepartureTime() {
+		return this.awaitDepartureTime;
+	}
+
+	public void setAwaitDepartureTime(final boolean awaitDepartureTime) {
+		this.awaitDepartureTime = awaitDepartureTime;
+	}
+
 }
