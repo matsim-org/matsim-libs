@@ -29,7 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-import playground.jjoubert.DateString;
+import playground.jjoubert.Utilities.DateString;
 
 public class ProcessVehicles {
 	private static String delimiter = ","; 

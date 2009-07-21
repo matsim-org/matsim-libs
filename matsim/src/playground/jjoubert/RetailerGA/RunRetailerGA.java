@@ -26,7 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import playground.jjoubert.DateString;
+import playground.jjoubert.Utilities.DateString;
 
 public class RunRetailerGA {
 
