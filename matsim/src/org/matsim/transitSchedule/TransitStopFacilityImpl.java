@@ -32,10 +32,13 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 public class TransitStopFacilityImpl implements TransitStopFacility {
 
+	private static final long serialVersionUID = 1L;
+
 	private final Id id;
 	private final Coord coord;
 	private Link link = null;
 	private final boolean isBlockingLane;
+	private String name = null;
 
 	protected TransitStopFacilityImpl(final Id id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;
@@ -68,6 +71,14 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 
 	public boolean getIsBlockingLane() {
 		return this.isBlockingLane;
+	}
+	
+	public void setName(final String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 
 	@Override
