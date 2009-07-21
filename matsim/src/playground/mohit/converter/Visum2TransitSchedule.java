@@ -91,7 +91,7 @@ public class Visum2TransitSchedule {
 				  if (mode == null) {
 				  	System.err.println("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 				  }
-				  TransitRoute tRoute = builder.createTransitRoute(new IdImpl(timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+timeProfile.DCode.toString()),null,stops,mode);
+				  TransitRoute tRoute = builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.DCode.toString()),null,stops,mode);
 				  //  convert departures
 				  for (VisumNetwork.Departure d : this.visum.departures.values()){
 					if (d.lineName.compareTo(line.id.toString())== 0 && d.lineRouteName.compareTo(timeProfile.lineRouteName.toString())== 0 && d.TRI.compareTo(timeProfile.index.toString())==0){
