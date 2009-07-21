@@ -675,6 +675,7 @@ public class QueueLane {
 	public Collection<QueueVehicle> getAllVehicles() {
 		Collection<QueueVehicle> vehicles = new ArrayList<QueueVehicle>();
 
+		vehicles.addAll(this.transitVehicleStopQueue);
 		vehicles.addAll(this.waitingList);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);
