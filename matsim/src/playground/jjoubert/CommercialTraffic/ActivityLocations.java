@@ -476,7 +476,8 @@ public class ActivityLocations {
 	}
 
 	private static Vehicle createNewVehicle(File file) {
-		Integer vehicleID = new Integer( (String) file.getName().subSequence(0, (file.getName().length() - 4) ) );
+		int position = file.getName().indexOf(".");
+		Integer vehicleID = Integer.parseInt(file.getName().substring(0, position));
 		Vehicle thisVehicle = new Vehicle( vehicleID );
 		return thisVehicle;		
 	}
