@@ -132,7 +132,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 						else { // retailer does not exists yet
 							
 							Retailer r = new Retailer(rId, null);
-							System.out.println("The strategy " + entries[2] + " will be added to the retailer = " + rId);
+							log.info("The strategy " + entries[2] + " will be added to the retailer = " + rId);
 							//r.addSequentialStrategy(controler, entries[2], this.links);
 							ActivityFacility f = controlerFacilities.get(fId);
 							r.addFacility(f);
@@ -156,7 +156,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		this.links = lrr.ReadLinks(); 
 		Collection<PersonImpl> persons = controler.getPopulation().getPersons().values();
 		int n =3; // TODO: get this from the config file  
-		System.out.println("Number of retail zones = "+  n*n);
+		log.info("Number of retail zones = "+  n*n);
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -165,9 +165,9 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
 				this.shops.add(f);
-				System.out.println("The shop " + f.getId() + "has been added to the file 'shops'");
+				log.info("The shop " + f.getId() + " has been added to the file 'shops'");
 			}
-			else {System.out.println ("Activity options are: " + f.getActivityOptions().values().toString());}
+			else {}//System.out.println ("Activity options are: " + f.getActivityOptions().values().toString());}
 		}
 		for (PersonImpl p : persons) {
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
@@ -206,12 +206,12 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		ArrayList<ActivityFacility> retailersFacilities = new ArrayList<ActivityFacility>();
 		// works, but it is not nicely programmed. shouldn't be a global container, should be
 		// controlled by the controler (or actually added to the population)
-		
+		log.info("There are (is) " + retailers.getRetailers().values().size() + " Retailer(s)");
 		//Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
-		if (controler.getIteration()%5==0 && controler.getIteration()>0){
+		if (controler.getIteration()%2==0 && controler.getIteration()>0){
 			for (Retailer r:retailers.getRetailers().values()) {
 				retailersFacilities.addAll(r.getFacilities().values());
-				log.info("facilities are: " + retailersFacilities );
+				log.info("The retailer " + r.getId().toString() + " owns " + r.getFacilities().values().size() + " facilities");
 			}
 			GravityModelRetailerStrategy gmrs = new GravityModelRetailerStrategy (controler, retailZones, shops, retailersFacilities, links); 
 			gmrs.moveFacilities();

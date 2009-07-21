@@ -71,11 +71,10 @@ public class LinksRetailerReader {
 			}
 		}
 		else {//Francesco: if no file stating which links are allowed is defined
-			Integer linksMax = Integer.parseInt(String.valueOf(Math.round(actualLinks.size()*4)));
-			log.info("links max= " + linksMax);
-			log.info("actual Links= " + actualLinks);
-			//TODO note that usually the ratio links/ actual links is so large than this number doesn't really matter, but a check in this sense would be not bad! 
-			int i=0;
+			Integer linksMax = Integer.parseInt(String.valueOf(Math.round(actualLinks.size()*1.8)));//TODO note that usually the ratio links/ actual links is so large than this number doesn't really matter, but a check in this sense would be not bad! 
+			log.info("Links max= " + linksMax);
+			log.info("Actual Links= " + actualLinks);
+						int i=0;
 			while (this.links.size()<linksMax) {
 				log.info("links size= " + links.size());
 				if (this.links.size()<actualLinks.size()) {
@@ -91,11 +90,9 @@ public class LinksRetailerReader {
 						this.links.add(link);
 					}	
 				}	
-				for (LinkRetailersImpl l:this.links) {
-					log.info("This link is allowed for relocation: " + l.getId()); 
-				}
-			
-				
+			}
+			for (LinkRetailersImpl l:this.links) {
+				log.info("This link is allowed for relocation: " + l.getId()); 
 			}
 		}
 		return this.links;

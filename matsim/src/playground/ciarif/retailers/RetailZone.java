@@ -1,22 +1,19 @@
 package playground.ciarif.retailers;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.TreeMap;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class RetailZone {
 	
-	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
+	//private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	
 	private Id id;
-	private QuadTree<PersonImpl> personsQuadTree; // TODO Check if it does make more sense private, or if static does make sense at all  
+	private QuadTree<PersonImpl> personsQuadTree;   
 	private QuadTree<ActivityFacility> shopsQuadTree;
 	
 	public RetailZone(Id id,final Double minx,final Double miny,final Double maxx,final Double maxy) { 

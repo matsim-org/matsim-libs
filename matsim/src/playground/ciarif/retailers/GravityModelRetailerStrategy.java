@@ -2,15 +2,10 @@ package playground.ciarif.retailers;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -22,8 +17,8 @@ public class GravityModelRetailerStrategy {
 
 	public static final String NAME = "gravityModelRetailerStrategy";
 	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
-	private DenseDoubleMatrix2D prob_i_j;
-	private ArrayList<Consumer> consumers;
+	//private DenseDoubleMatrix2D prob_i_j;
+	//private ArrayList<Consumer> consumers;
 	private Controler controler;
 	private ArrayList<ActivityFacility> shops;
 	private RetailZones retailZones;
@@ -58,7 +53,7 @@ public class GravityModelRetailerStrategy {
 			
 			//double sum_prob =0;
 			double  zone_count =0;
-			
+			// gets the average probability of a 
 			for (RetailZone rz : this.retailZones.getRetailZones().values()) {
 				zone_count++;
 				double counter = 0;
@@ -96,6 +91,7 @@ public class GravityModelRetailerStrategy {
 		ComputeGravityModelParameters cgmp = new ComputeGravityModelParameters ();
 		double [] b= cgmp.computeParameters (controler, prob_i_j, consumers, shops); //TODO think better what should be kept here and what should be passed in the constructor
 		RunRetailerGA rrGA = new RunRetailerGA();
+		
 		GravityModel gm = new GravityModel(controler, b, facilities, consumers, shops);
 		ArrayList<Integer> solution = rrGA.runGA(this.createInitialLocationsForGA(),gm);
 		log.info("The optimized solution is: " + solution);
