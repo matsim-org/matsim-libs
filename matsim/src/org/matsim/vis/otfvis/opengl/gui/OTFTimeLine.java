@@ -27,7 +27,14 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 
-// DS TODO should not be an OTFDrawer, need to handle invalidate better
+// TODO should not be an OTFDrawer, need to handle invalidate better
+/**
+ * OTFTimeLine is the time line toolbar.
+ * It is only used in case of playing a mvi file.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, ItemListener, ChangeListener {
 
 	private static final long serialVersionUID = 1L;

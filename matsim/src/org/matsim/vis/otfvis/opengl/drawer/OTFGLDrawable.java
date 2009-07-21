@@ -26,6 +26,12 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
 
 
+/**
+ * OTFGLDrawable is the Drawable interface for the OpenGL implementation.
+ * Each element that is drawable on screen must implement this interface.
+ * @author dstrippgen
+ *
+ */
 public interface OTFGLDrawable extends OTFDrawable , OTFDataReceiver{
 	public void onDraw(GL gl);
 }

@@ -20,6 +20,12 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
+/**
+ * AbstractBackgroundDrawer is an abstract class for implementing backgrounddrawer.
+ * It already holds the necessary translation variables for x and y coords.
+ * @author dstrippgen
+ *
+ */
 abstract public class AbstractBackgroundDrawer extends OTFGLDrawableImpl{
 	protected double offsetEast; 
 	protected double offsetNorth;

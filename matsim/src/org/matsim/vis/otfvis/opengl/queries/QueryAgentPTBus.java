@@ -50,6 +50,12 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 import com.sun.opengl.util.BufferUtil;
 
+/**
+ * QueryAgentPTBus draws certain public transport related informations.
+ * 
+ * @author mrieser?
+ *
+ */
 public class QueryAgentPTBus implements OTFQuery {
 
 	private static final long serialVersionUID = -8415337571576184768L;

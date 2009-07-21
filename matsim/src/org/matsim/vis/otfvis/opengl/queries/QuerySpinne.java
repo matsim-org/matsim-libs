@@ -67,6 +67,14 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 
 import com.sun.opengl.util.BufferUtil;
 
+/**
+ * QuerySpinne shows a relationship network for a given link based on several options.
+ * The network shown is that of the routes that that agents take over the course of 
+ * their day/trip.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 	private static final long serialVersionUID = -749787121253826794L;

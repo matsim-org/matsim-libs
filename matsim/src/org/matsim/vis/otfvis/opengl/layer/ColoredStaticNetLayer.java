@@ -34,6 +34,13 @@ import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.FastColorizer;
 
 
+/**
+ * ColoredStaticNetLayer can draw a net with dynamically changing link colors.
+ * It is useful for displaying aggregated data like average link travel speed.
+ * It is somewhat slower than the default net, though.
+ * @author dstrippgen
+ *
+ */
 public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 	private int linkTexWidth = 0;
 	private byte [] linkTexBuffer = null;

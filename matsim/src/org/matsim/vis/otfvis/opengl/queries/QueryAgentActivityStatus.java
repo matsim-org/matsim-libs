@@ -36,6 +36,13 @@ import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
+/**
+ * QueryAgentActivityStatus is used by another query QueryAgentPlan, to find the actual activity the
+ * agent is executing at the simulation time given.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class QueryAgentActivityStatus implements OTFQuery {
 
 	private static final long serialVersionUID = -8532403277319196797L;

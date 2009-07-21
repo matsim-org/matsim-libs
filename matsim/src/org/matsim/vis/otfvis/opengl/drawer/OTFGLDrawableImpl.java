@@ -26,6 +26,13 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 
+/**
+ * OTFGLDrawableImpl is a basic implementation of the OTFOGLDrawable interface with an 
+ * additional simple invalidation mechanism.
+ * 
+ * @author dstrippgen
+ *
+ */
 public abstract class OTFGLDrawableImpl implements OTFGLDrawable, OTFDataReceiver {
 	boolean isValid = true;
 	static public GL gl;

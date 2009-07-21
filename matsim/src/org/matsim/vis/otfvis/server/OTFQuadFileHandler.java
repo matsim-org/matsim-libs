@@ -57,6 +57,15 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 
+/**
+ * The OTFQuadFileHandler is made up from the Reader and the Writer part.
+ * The Reader is the the mvi playing OTFServer.
+ * The writer is in charge of writing mvi data into a file.
+ * 
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFQuadFileHandler {
 
 	private static final int BUFFERSIZE = 100000000;

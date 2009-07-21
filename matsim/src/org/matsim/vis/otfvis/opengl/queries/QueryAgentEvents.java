@@ -33,7 +33,6 @@ import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.PersonEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PersonImpl;
@@ -50,6 +49,13 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 import com.sun.opengl.util.BufferUtil;
 
+/**
+ * QueryAgentEvents shows a visual representation of the agents route along with the events happening
+ * to the agent. The events will only show from the time the has first been selected. No past events will be shown.
+ *  
+ * @author dstrippgen
+ *
+ */
 public class QueryAgentEvents extends QueryAgentPlan {
 
 	private static final long serialVersionUID = -7388598935268835323L;

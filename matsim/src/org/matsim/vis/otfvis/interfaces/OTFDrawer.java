@@ -29,6 +29,13 @@ import java.rmi.RemoteException;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 
 
+/**
+ * OTFDrawer is the base interface for the two implementations of the actual client of the OTFVis.
+ * OTFOGLDrawer and JNetComponent( as the Swing variant) rely on this interface. Other drawer classes might follow.
+ * 
+ * @author dstrippgen
+ *
+ */
 public interface OTFDrawer {
 	public void invalidate(int time) throws RemoteException;
 	public void redraw();

@@ -22,6 +22,11 @@ package org.matsim.vis.otfvis.opengl.gl;
 
 import org.jdesktop.animation.timing.interpolation.Evaluator;
 
+/**
+ * EvaluatorPoint3f is a utility class for providing interpolation.
+ * @author dstrippgen
+ *
+ */
 public class EvaluatorPoint3f extends Evaluator<Point3f> {
     public Point3f evaluate(Point3f v0, Point3f v1, float fraction) {
         float x = v0.getX() + ((v1.getX() - v0.getX()) * fraction + .5f);

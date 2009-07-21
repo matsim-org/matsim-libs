@@ -22,8 +22,14 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.rmi.RemoteException;
 
-import org.matsim.vis.otfvis.data.OTFDataWriter;
-
+/**
+ * If a OTFServer reports to be alive (by returning true in the method isLive()) it can savely be casted
+ * to an OTFLiveServerRemote instance. This offers additional options only useful with
+ * the actual running simulation. Most importantly the answering of queries.
+ *  
+ * @author dstrippgen
+ *
+ */
 public interface OTFLiveServerRemote extends OTFServerRemote {
 	public void pause() throws RemoteException;
 	public void play() throws RemoteException;

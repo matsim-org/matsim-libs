@@ -29,7 +29,9 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
 /**
- * This is not a real query, it just toggles the rendering of vehicles while activities
+ * QueryToggleShowParking is not a real query, it just toggles the 
+ * rendering of vehicles while the respective agent attends an activity.
+ * 
  */
 public class QueryToggleShowParking implements OTFQuery {
 	

@@ -265,6 +265,14 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 	}
 
 }
+/**
+ * OTFOGLDrawer is responsible for everything that goes on inside the OpenGL context.
+ * The main functions are invalidate() and redraw(). The latter will simply redraw a given 
+ * SceneGraph, whilst invalidate() will update the content.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);

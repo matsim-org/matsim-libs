@@ -28,6 +28,14 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 
+/**
+ * OTFServerRemote is the one most important interface for the 
+ * communication between client and server. All methods necessary for data
+ * exchange are bundled in this interface.
+ * 
+ * @author dstrippgen
+ *
+ */
 public interface OTFServerRemote extends Remote {
 	public enum TimePreference{EARLIER, LATER};
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;

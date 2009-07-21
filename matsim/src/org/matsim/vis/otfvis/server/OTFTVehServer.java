@@ -37,8 +37,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
-import org.matsim.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -47,18 +45,24 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
+/**
+ * OTFTVehServer is a Server that reads from the T.veh file format.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFTVehServer implements OTFServerRemote {
 	private  String vehFileName = "";
 	private static final int BUFFERSIZE = 100000000;
 	private BufferedReader reader = null;
 	private double nextTime = -1;
 //	private List<Double> times = null;
-	private TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
+	private final TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	private OTFServerQuad quad;
+	private final OTFServerQuad quad;
 
-	private ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
+	private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 	private OTFAgentsListHandler.ExtendedPositionInfo readVehicle = null;
 	private double time;
 	

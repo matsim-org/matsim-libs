@@ -36,6 +36,14 @@ import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
 
 
+/**
+ * PreferencesDialog2 extends PreferencesDialog and is the Dialog used for the OpenGL
+ * based variant of the client.
+ * All user-changeable preferences are represented GUI-wise here.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class PreferencesDialog2 extends PreferencesDialog implements ItemListener{
 
 	public PreferencesDialog2(JFrame frame, OTFVisConfig config, OTFHostControlBar mother) {

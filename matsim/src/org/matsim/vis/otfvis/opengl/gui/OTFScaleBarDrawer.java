@@ -19,6 +19,13 @@ import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
+/**
+ * OTFScaleBarDrawer draws a scale bar as an overlay.
+ * It depends on the chosen coordinates being in meters.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
 
 	private TextRenderer textRenderer = null;

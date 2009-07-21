@@ -27,6 +27,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
+@Deprecated
 public class QueryLinkZoom implements OTFQuery {
 
 	public void draw(OTFDrawer drawer) {

@@ -34,11 +34,18 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer.SimpleQuadDrawer;
 
+/**
+ * CollectDrawLinkId is a specialized class for collecting and drawing the linkIds, if that
+ * option is choosen in Preferences.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class CollectDrawLinkId {
 
 	private static final long serialVersionUID = -1389950511283282110L;
-	private double sx;
-	private double sy;
+	private final double sx;
+	private final double sy;
 	private double width = 0;
 	private double height = 0;
 	

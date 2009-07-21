@@ -36,11 +36,22 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
 
+/**
+ * QueryAgentId is an internal query.
+ * For a given coordinate it tries to find the most likely agent.
+ * It does that by first finding the most likely link to the clicked coordinate and
+ * then the agent nearest to the coordinate on that link.
+ * TODO This might yield unexpected results. It would probably be a better solution to collect
+ * the agents of all surrounding link and then chose the nearest one.
+ *  
+ * @author dstrippgen
+ *
+ */
 public class QueryAgentId implements OTFQuery {
 
 	private static final long serialVersionUID = -4466967514266968254L;
-	private double x;
-	private double y;
+	private final double x;
+	private final double y;
 	private double width = 0;
 	private double height = 0;
 	public List<String> agentIds = new ArrayList<String>();

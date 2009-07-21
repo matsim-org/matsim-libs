@@ -10,6 +10,13 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
+/**
+ * QuerySpinneNOW is a special case of QuerySpinne, where not all agents passing the link are 
+ * considered, but only the ones traveling the links at the time given.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class QuerySpinneNOW extends QuerySpinne {
 
 	/* (non-Javadoc)

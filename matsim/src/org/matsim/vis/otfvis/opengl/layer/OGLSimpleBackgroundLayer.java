@@ -23,17 +23,20 @@ package org.matsim.vis.otfvis.opengl.layer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
-
-import com.sun.opengl.util.texture.Texture;
 
 
+/**
+ * OGLSimpleBackgroundLayer collects all items that are rendered as a background behind the network.
+ * That could be satellite images or such.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {
 
 	private double offsetEast;

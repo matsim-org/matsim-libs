@@ -29,6 +29,9 @@ import javax.media.opengl.glu.GLU;
  * specific target.
  *
  * @author Chris Campbell
+ * 
+ * in the context of the OTFVis the camera is fixed to looking straight downwards onto the network's layer.
+ * 
  */
 public class Camera {
     

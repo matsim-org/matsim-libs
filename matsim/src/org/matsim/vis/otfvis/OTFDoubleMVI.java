@@ -36,6 +36,12 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
+/**
+ * OTFDoubleMVI displays two movies in different areas of a split screen application.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFDoubleMVI extends OnTheFlyClientFileQuad {
 	protected String filename2;
 	

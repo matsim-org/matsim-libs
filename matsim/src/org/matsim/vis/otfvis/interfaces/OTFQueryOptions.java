@@ -22,6 +22,14 @@ package org.matsim.vis.otfvis.interfaces;
 
 import javax.swing.JComponent;
 
+/**
+ * Implementing an OTFQueryOptions interface additionally to the OTFQuery interface
+ * means that the OTFQueryToolBar will display the option pane supported by the interface's
+ * method.
+ * 
+ * @author dstrippgen
+ *
+ */
 public interface OTFQueryOptions {
 	public JComponent getOptionsGUI(JComponent mother);
 }

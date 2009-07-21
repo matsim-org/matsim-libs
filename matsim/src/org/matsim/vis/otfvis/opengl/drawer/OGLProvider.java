@@ -26,6 +26,12 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
 
+/**
+ * OGLProvider is a small interface to be able to exchange the OpenGl provider underlying the OTFVis.
+ * 
+ * @author dstrippgen
+ *
+ */
 public interface OGLProvider {
 	public GL getGL();
 	public Point3f getView() ;

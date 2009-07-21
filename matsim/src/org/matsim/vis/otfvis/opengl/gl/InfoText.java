@@ -38,6 +38,13 @@ import javax.media.opengl.glu.GLUquadric;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 
+/**
+ * InfoText is the class behind all text displayed in the OPenGL context.
+ * Texts can be either drawn for one tick only or reside permanent until removal.
+ * 
+ * @author dstrippgen
+ *
+ */
 public  class InfoText implements Serializable {
 	private static LinkedList<InfoText> elements = new LinkedList<InfoText>(); 
 	private static Set<InfoText> elementsPermanent = new HashSet<InfoText>(); 

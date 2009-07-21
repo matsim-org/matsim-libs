@@ -33,8 +33,8 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
@@ -45,6 +45,14 @@ import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
 
+/**
+ * SimpleStaticNetLayer is the default network drawing layer. 
+ * It represents the network as uni-colored quads.
+ * It is not dynamically changeable.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 
 	public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuadReceiver{

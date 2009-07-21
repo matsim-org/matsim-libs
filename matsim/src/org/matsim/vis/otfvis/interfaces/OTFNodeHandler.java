@@ -25,6 +25,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+@Deprecated
 public interface OTFNodeHandler<SrcNode>  extends Serializable{
 	public void writeNode(SrcNode node, DataOutputStream out) throws IOException;
 	public void readNode(DataInputStream in) throws IOException;

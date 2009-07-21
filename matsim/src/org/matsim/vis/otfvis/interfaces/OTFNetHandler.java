@@ -22,6 +22,7 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.io.Serializable;
 
+@Deprecated
 public interface OTFNetHandler extends Serializable{
 	OTFLinkHandler getLinkHandler();
 	OTFNodeHandler getNodeHandler();

@@ -25,6 +25,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+@Deprecated
 public interface OTFLinkHandler<SrcLink>  extends Serializable{
 	public void writeLink(SrcLink link, DataOutputStream out) throws IOException;
 	public void readLink(DataInputStream in) throws IOException;

@@ -42,6 +42,11 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 
+/**
+ * SimpleBackgroundDrawer can draw a geotools feature (e.g. shape file?) on screen.
+ * @author dstrippgen
+ *
+ */
 public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer implements Serializable {
 
 	/**

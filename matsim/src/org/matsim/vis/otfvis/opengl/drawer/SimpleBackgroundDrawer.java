@@ -29,6 +29,11 @@ import javax.media.opengl.GL;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
+/**
+ * SimpleBackgroundDrawer can draw a picture behind the network at a given coord.
+ * @author dstrippgen
+ *
+ */
 public class SimpleBackgroundDrawer extends AbstractBackgroundDrawer {
 	private Texture picture = null;
 	private final Rectangle2D.Float abskoords;

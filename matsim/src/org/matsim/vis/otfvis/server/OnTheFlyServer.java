@@ -27,7 +27,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +38,6 @@ import java.util.Set;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
-import org.matsim.core.api.experimental.population.Population;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PopulationImpl;
@@ -52,6 +50,17 @@ import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
+/**
+ * OnTheFlyServer is the live server of the OTFVis.
+ * it is injected into a running QueueSimulation by either oveloading the 
+ * simulation's afterSimStep() method or via the external trigger events.
+ * The simulation should call on every tick the method updateStatus().
+ * Then the server can stop the simulation run whenever wanted.
+ * The interface to the client is given by the OTFLiveServerRemote interface.
+ *
+ * @author dstrippgen
+ *
+ */
 public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote{
 
 	private static final long serialVersionUID = -4012748585344947013L;

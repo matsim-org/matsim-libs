@@ -45,6 +45,14 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.RandomColorizer;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.Texture;
 
+/**
+ * OGLAgentPointLayer is responsible for drawing the agents/vehicles as point sprites.
+ * It is a very fast way to draw massive (100ks) of agents in realtime.
+ * It does not run too well on ATI cards, though.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OGLAgentPointLayer extends DefaultSceneLayer {
 	private final static int BUFFERSIZE = 25000;
 	

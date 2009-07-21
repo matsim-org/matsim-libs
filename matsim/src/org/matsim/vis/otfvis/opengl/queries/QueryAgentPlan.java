@@ -54,6 +54,12 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 import com.sun.opengl.util.BufferUtil;
 
+/**
+ * For a given agentID this QueryAgentPlan draws a visual representation of the agent's day.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class QueryAgentPlan implements OTFQuery {
 
 	private static final long serialVersionUID = -8415337571576184768L;

@@ -61,6 +61,14 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
+/**
+ * VisGUIMouseHandler handles any user input.
+ * It is the most important class apart from OTFOGLDrawer and OTFHostControlBar.
+ * It is responsible for moving and zooming the screen rectangle and for handling the user clicks.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class VisGUIMouseHandler extends MouseInputAdapter
 implements MouseWheelListener{
 	private Point3f cameraStart = new Point3f(30000f, 3000f, 1500f);

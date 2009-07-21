@@ -23,6 +23,13 @@ package org.matsim.vis.otfvis.interfaces;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Double;
 
+/**
+ * OTFQueryHandler is the interface to handle Queries through on the client side
+ * It is implemented in the OTFQueryContrlbar.
+ * 
+ * @author dstrippgen
+ *
+ */
 public interface OTFQueryHandler {
 	public void addQuery(OTFQuery query);
 	public void removeQueries();

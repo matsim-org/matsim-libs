@@ -42,11 +42,20 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
+/**
+ * QueryLinkId find the most likely link (or links) to a given coordinate (or rectangle).
+ * The meaning of "nearest" is that of the smallest distance between the middle point of the link
+ * and the given coordinate. 
+ * TODO This might lead to unexpected behavior with long links. 
+ * 
+ * @author dstrippgen
+ *
+ */
 public class QueryLinkId implements OTFQuery {
 
 	private static final long serialVersionUID = -1389950511283282110L;
-	private double sx;
-	private double sy;
+	private final double sx;
+	private final double sy;
 	private double width = 0;
 	private double height = 0;
 	

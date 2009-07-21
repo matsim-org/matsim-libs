@@ -50,6 +50,13 @@ import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.DefaultArchiveDetector;
 
+/**
+ * OTFFileSettingsSaver is responsible for saving and 
+ * retrieving the OTFVisConfig settings in either binary or XML format.
+ * 
+ * @author dstrippgen
+ *
+ */
 public class OTFFileSettingsSaver implements OTFSettingsSaver {
 	String fileName;
 	
