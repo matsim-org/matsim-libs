@@ -45,11 +45,6 @@ import org.matsim.world.MappedLocation;
  * 
  * @author meisterk
  *
- * TODO in order to keep the "branch-and-bound" thing, introduce a method in between PlanAlgorithm.run and this boolean thing,
- * which returns the leg number at which it was detected that a mode chain is unfeasible, use this leg number in PlanAlgorithm.run
- * to determine at which combination to continue. In the boolean method, return true whether this number equals the number of legs,
- * return false otherwise.
- * 
  */
 public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
@@ -138,8 +133,32 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 	 * 
 	 * @param plan contains the activities and their locations
 	 * @param candidate the mode chain whose feasibility is checked
+	 * @param chainBasedModes the set of chain based modes
+	 * @param tripStructureAnalysisLayer indicating whether facility or link is used as the location
+	 * @return true if the mode chain is feasible, false if it is not 
+	 */
+	public static boolean isModeChainFeasible(
+			PlanImpl plan, 
+			TransportMode[] candidate, 
+			EnumSet<TransportMode> chainBasedModes,
+			PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+		
+		int numLegs = plan.getPlanElements().size() / 2;
+		int lastFeasibleLegNum = analyzeModeChainFeasability(plan, candidate, chainBasedModes, tripStructureAnalysisLayer);
+		
+		return (numLegs == lastFeasibleLegNum);
+		
+	}
+	
+	/**
+	 * Determines whether a particular set of modes is a feasible combination for a given sequence of activity locations in an activity plan.
+	 * 
+	 * @param plan contains the activities and their locations
+	 * @param candidate the mode chain whose feasibility is checked
+	 * @param chainBasedModes the set of chain based modes
+	 * @param tripStructureAnalysisLayer indicating whether facility or link is used as the location
 	 * @return An integer value in the range [-numLegs; numLegs]. 
-	 * The absolute of the return value indicates the leg number which is not feasiblebecause the chain based mode is not available. 
+	 * The absolute of the return value indicates the leg number which is not feasible because the chain based mode is not available. 
 	 * The sign indicates whether the chain based modes are at the location of the first or the last activity if the plan is completed, 
 	 * thus if the mode chain is feasible or not. 
 	 */

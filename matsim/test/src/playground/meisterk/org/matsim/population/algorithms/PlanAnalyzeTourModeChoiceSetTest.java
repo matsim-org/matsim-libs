@@ -376,30 +376,13 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 //		testee.setDoLogging(true);
 		
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = this.config.planomat().getTripStructureAnalysisLayer();
-		Location location = null;
-		ActivityImpl act = null;
 		for (Entry<String, ArrayList<TransportMode[]>> entry : testCases.entrySet()) {
 
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
 
-			PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
-
-			String[] locationIdSequence = facString.split(" ");
-			for (int aa=0; aa < locationIdSequence.length; aa++) {
-				location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
-				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
-					act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacility) location);
-				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
-					act = plan.createActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
-				}
-				act.setEndTime(10*3600);
-				if (aa != (locationIdSequence.length - 1)) {
-					plan.createLeg(TransportMode.undefined);
-				}
-			}
+			PlanImpl plan = this.generateTestPlan(facString, layer);
+			
 			testee.run(plan);
 
 			ArrayList<TransportMode[]> actual = testee.getChoiceSet();
@@ -412,4 +395,83 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 	}
 
+	public void testIsModeChainFeasible() {
+		
+		// load data
+		log.info("Reading network xml file...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		log.info("Reading network xml file...done.");
+
+		// config
+		this.config.planomat().setTripStructureAnalysisLayer("link");
+
+		String facString = "1 2 3 4 3 2 1";
+		PlanImpl testPlan = this.generateTestPlan(facString, network);
+		EnumSet<TransportMode> chainBasedModes = EnumSet.of(TransportMode.bike, TransportMode.car);
+		
+		HashMap<TransportMode[], Boolean> candidates = new HashMap<TransportMode[], Boolean>();
+		candidates.put(
+				new TransportMode[]{
+						TransportMode.car, 
+						TransportMode.car, 
+						TransportMode.car, 
+						TransportMode.car, 
+						TransportMode.car, 
+						TransportMode.car}, 
+				true);
+		candidates.put(
+				new TransportMode[]{
+						TransportMode.car, 
+						TransportMode.pt, 
+						TransportMode.car, 
+						TransportMode.car, 
+						TransportMode.pt, 
+						TransportMode.car}, 
+				false);
+		candidates.put(
+				new TransportMode[]{
+						TransportMode.car, 
+						TransportMode.pt, 
+						TransportMode.walk, 
+						TransportMode.walk, 
+						TransportMode.pt, 
+						TransportMode.car}, 
+				true);
+
+		for (TransportMode[] candidate : candidates.keySet()) {
+			assertEquals(
+					Boolean.valueOf(PlanAnalyzeTourModeChoiceSet.isModeChainFeasible(testPlan, candidate, chainBasedModes, this.config.planomat().getTripStructureAnalysisLayer())),
+					candidates.get(candidate));
+		}
+		
+	}
+	
+	private PlanImpl generateTestPlan(String facString, Layer layer) {
+
+		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer = this.config.planomat().getTripStructureAnalysisLayer();
+		Location location = null;
+		ActivityImpl act = null;
+		
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+
+		String[] locationIdSequence = facString.split(" ");
+		for (int aa=0; aa < locationIdSequence.length; aa++) {
+			location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
+				act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacility) location);
+			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
+				act = plan.createActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
+			}
+			act.setEndTime(10*3600);
+			if (aa != (locationIdSequence.length - 1)) {
+				plan.createLeg(TransportMode.undefined);
+			}
+		}
+		
+		return plan;
+		
+	}
+	
 }
