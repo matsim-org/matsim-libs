@@ -39,11 +39,12 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	private final ArrayList<Link> route = new ArrayList<Link>();
 	private double travelCost = Double.NaN;
+	private Id vehicleId = null;
 
-	public LinkNetworkRoute(Link startLink, Link endLink){
+	public LinkNetworkRoute(final Link startLink, final Link endLink){
 		super(startLink, endLink);
 	}
-	
+
 	@Override
 	public double getDistance() {
 		double dist = super.getDistance();
@@ -207,6 +208,14 @@ public class LinkNetworkRoute extends AbstractRoute implements NetworkRoute {
 			prevNode = node;
 		}
 		this.route.trimToSize();
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
+	}
+
+	public void setVehicleId(final Id vehicleId) {
+		this.vehicleId = vehicleId;
 	}
 
 }

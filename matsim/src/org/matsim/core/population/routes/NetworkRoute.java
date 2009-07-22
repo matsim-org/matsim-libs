@@ -35,7 +35,7 @@ import org.matsim.core.network.LinkImpl;
  * @author mrieser
  */
 public interface NetworkRoute extends RouteWRefs {
-	
+
 	public Link getStartLink();
 
 	public List<Node> getNodes();
@@ -64,7 +64,7 @@ public interface NetworkRoute extends RouteWRefs {
 	public List<Link> getLinks();
 
 	public List<Id> getLinkIds();
-	
+
 	/**
 	 * This method returns a new Route object with the subroute of this beginning at fromNode
 	 * till toNode. If from or twoNode are not found in this, an IllegalArgumentException is thrown.
@@ -74,4 +74,15 @@ public interface NetworkRoute extends RouteWRefs {
 	 */
 	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode);
 
+	/**
+	 * Sets the id of the vehicle that should be used to drive along this route.
+	 *
+	 * @param vehicleId
+	 */
+	public abstract void setVehicleId(final Id vehicleId);
+
+	/**
+	 * @return the id of the vehicle that should be used to drive along this route.
+	 */
+	public abstract Id getVehicleId();
 }

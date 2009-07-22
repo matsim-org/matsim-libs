@@ -35,7 +35,9 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	private double cost = Double.NaN;
 
-	
+	private Id vehicleId = null;
+
+
 	/**
 	 * This constructor is only needed for backwards compatibility reasons and thus is
 	 * set to deprecated. New code should make use of the constructor which sets the
@@ -43,8 +45,8 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 	 */
 	@Deprecated
 	public NodeNetworkRoute(){}
-	
-	public NodeNetworkRoute(Link startLink, Link endLink) {
+
+	public NodeNetworkRoute(final Link startLink, final Link endLink) {
 		super(startLink, endLink);
 	}
 
@@ -271,7 +273,15 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 		b.append("[nof_nodes=");
 		b.append(this.route.size());
 		b.append("]");
-		return b.toString();		
+		return b.toString();
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
+	}
+
+	public void setVehicleId(final Id vehicleId) {
+		this.vehicleId  = vehicleId;
 	}
 
 }

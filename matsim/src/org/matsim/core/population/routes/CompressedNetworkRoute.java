@@ -42,7 +42,7 @@ import org.matsim.core.api.experimental.network.Node;
 public class CompressedNetworkRoute extends AbstractRoute implements NetworkRoute {
 
 	private final static Logger log = Logger.getLogger(CompressedNetworkRoute.class);
-	
+
 	private final ArrayList<Link> route = new ArrayList<Link>(0);
 	private final Map<Link, Link> subsequentLinks;
 	private double travelCost = Double.NaN;
@@ -50,8 +50,9 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	private int uncompressedLength = -1;
 	private int modCount = 0;
 	private int routeModCountState = 0;
+	private Id vehicleId = null;
 
-	public CompressedNetworkRoute(Link startLink, Link endLink, final Map<Link, Link> subsequentLinks) {
+	public CompressedNetworkRoute(final Link startLink, final Link endLink, final Map<Link, Link> subsequentLinks) {
 		super(startLink, endLink);
 		this.subsequentLinks = subsequentLinks;
 	}
@@ -94,13 +95,13 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	}
 
 	@Override
-	public void setEndLink(Link link) {
+	public void setEndLink(final Link link) {
 		this.modCount++;
 		super.setEndLink(link);
 	}
-	
+
 	@Override
-	public void setStartLink(Link link) {
+	public void setStartLink(final Link link) {
 		this.modCount++;
 		super.setStartLink(link);
 	}
@@ -278,7 +279,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		if (node != getEndLink().getFromNode()) {
 			throw new IllegalArgumentException("The last node must be the fromNode of the endLink. endLink=" + endLink.getId());
 		}
-		
+
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size() - 1;
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
@@ -304,6 +305,14 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 		}
 		setDistance(dist);
 		return dist;
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
+	}
+
+	public void setVehicleId(final Id vehicleId) {
+		this.vehicleId = vehicleId;
 	}
 
 }
