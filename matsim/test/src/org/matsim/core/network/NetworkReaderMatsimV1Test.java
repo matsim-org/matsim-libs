@@ -27,7 +27,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.xml.sax.helpers.AttributesImpl;
+import org.matsim.testcases.utils.AttributesBuilder;
+import org.xml.sax.Attributes;
 
 public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 
@@ -55,7 +56,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 		Set<TransportMode> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 0, modes.size());
 	}
-	
+
 	/**
 	 * @author mrieser
 	 */
@@ -85,10 +86,10 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 * It creates a single link by specifying the XML-Attributes and using
 	 * {@link NetworkReaderMatsimV1} to "read" the attributes and create
 	 * a link out of it.
-	 * 
-	 * @param modes The allowed transportation modes for the link 
+	 *
+	 * @param modes The allowed transportation modes for the link
 	 * @return the created link
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	private LinkImpl prepareTestAllowedModes(final String modes) {
@@ -98,24 +99,24 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
 		Stack<String> context = new Stack<String>();
-		AttributesImpl atts = new AttributesImpl();
-		atts.addAttribute(null, null, "id", null, "1");
-		atts.addAttribute(null, null, "from", null, "1");
-		atts.addAttribute(null, null, "to", null, "2");
-		atts.addAttribute(null, null, "length", null, "1000");
-		atts.addAttribute(null, null, "freespeed", null, "10");
-		atts.addAttribute(null, null, "capacity", null, "3600");
-		atts.addAttribute(null, null, "permlanes", null, "1");
+		Attributes atts = new AttributesBuilder().
+				add("id", "1").
+				add("from", "1").
+				add("to", "2").
+				add("length", "1000").
+				add("freespeed", "10").
+				add("capacity", "3600").
+				add("permlanes", "1").
+				add("modes", modes).  // specific test setup
+				get();
 
-		// specific test setup
-		atts.addAttribute(null, null, "modes", null, modes);
 		reader.startTag("link", atts, context);
 
 		// start test
 		assertEquals("expected one link.", 1, network.getLinks().size());
 		LinkImpl link = network.getLink(new IdImpl("1"));
 		assertNotNull("expected link with id=1.", link);
-		
+
 		return link;
 	}
 }

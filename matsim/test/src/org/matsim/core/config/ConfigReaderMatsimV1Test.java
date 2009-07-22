@@ -20,11 +20,9 @@
 
 package org.matsim.core.config;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReaderMatsimV1;
-import org.matsim.core.config.Module;
 import org.matsim.testcases.MatsimTestCase;
-import org.xml.sax.helpers.AttributesImpl;
+import org.matsim.testcases.utils.AttributesBuilder;
+import org.xml.sax.Attributes;
 
 public class ConfigReaderMatsimV1Test extends MatsimTestCase {
 
@@ -41,24 +39,15 @@ public class ConfigReaderMatsimV1Test extends MatsimTestCase {
 		config.addModule("test", testModule);
 
 		ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(config);
-		AttributesImpl atts = new AttributesImpl();
-		atts.addAttribute(null, null, "name", null, "test");
+		Attributes atts = new AttributesBuilder().add("name", "test").get();
 		reader.startTag("module", atts, null);
-		atts.clear();
-		atts.addAttribute(null, null, "name", null, "param1");
-		atts.addAttribute(null, null, "value", null, "value1");
+		atts = new AttributesBuilder().add("name", "param1").add("value", "value1").get();
 		reader.startTag("param", atts, null);
-		atts.clear();
-		atts.addAttribute(null, null, "name", null, "param2");
-		atts.addAttribute(null, null, "value", null, "null"); // test for null
+		atts = new AttributesBuilder().add("name", "param2").add("value", "null").get();
 		reader.startTag("param", atts, null);
-		atts.clear();
-		atts.addAttribute(null, null, "name", null, "param3");
-		atts.addAttribute(null, null, "value", null, "NUll"); // test for case-insensitive null
+		atts = new AttributesBuilder().add("name", "param3").add("value", "NUll").get(); // test for case-insensitive null
 		reader.startTag("param", atts, null);
-		atts.clear();
-		atts.addAttribute(null, null, "name", null, "param4");
-		atts.addAttribute(null, null, "value", null, "[null]"); // test for null-substring
+		atts = new AttributesBuilder().add("name", "param4").add("value", "[null]").get(); // test for null-substring
 		reader.startTag("param", atts, null);
 
 		assertTrue(testModule.param1set);
@@ -75,7 +64,7 @@ public class ConfigReaderMatsimV1Test extends MatsimTestCase {
 	/*default*/ static class TestModule extends Module {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		/*default*/ boolean param1set = false;
 		/*default*/ boolean param2set = false;
 		/*default*/ boolean param3set = false;
