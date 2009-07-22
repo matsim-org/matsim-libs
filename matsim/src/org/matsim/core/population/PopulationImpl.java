@@ -41,7 +41,8 @@ import org.matsim.core.utils.misc.Counter;
  * Root class of the population description (previously also called "plans file")
  */
 public class PopulationImpl implements Population {
-	// yyyyyy probably should extend BasicPopulation??
+	// probably should extend BasicPopulation??
+	// top-level containers do not extend the basic stuff
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
