@@ -29,6 +29,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.queuesim.PassengerAgent;
@@ -54,7 +55,7 @@ public class FakeAgent implements DriverAgent, PassengerAgent {
 		this.exitStop = exitStop;
 		this.dummyLeg = new LegImpl(TransportMode.pt);
 		if ((enterStop != null) && (exitStop != null)) {
-			GenericRoute route = new ExperimentalTransitRoute(enterStop.getLink(), exitStop.getLink());
+			GenericRoute route = new ExperimentalTransitRoute(enterStop, null, null, exitStop);
 			route.setRouteDescription(enterStop.getLink(), "PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString(), exitStop.getLink());
 			this.dummyLeg.setRoute(route);
 		}
@@ -92,11 +93,11 @@ public class FakeAgent implements DriverAgent, PassengerAgent {
 	public void teleportToLink(final Link link) {
 	}
 
-	public boolean arriveAtStop(final TransitStopFacility stop) {
+	public boolean getExitAtStop(final TransitStopFacility stop) {
 		return stop == this.exitStop;
 	}
 
-	public boolean ptLineAvailable(final TransitLine line) {
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute route) {
 		return true;
 	}
 

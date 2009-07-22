@@ -20,7 +20,7 @@
 		</leg>
 		<act type="transitInteraction" end_time="00:00:00" link="3" />
  		<leg mode="pt">
-			<route trav_time="01:00:00">PT1 stop2 T1 stop5</route>
+			<route trav_time="01:00:00">PT1 stop2 T1 1 stop5</route>
 		</leg>
 		<act type="transitInteraction" end_time="00:00:00" link="6" />
 		<leg mode="car">

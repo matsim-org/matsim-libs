@@ -20,8 +20,11 @@
 
 package playground.marcel.pt.routes;
 
+import java.util.Collections;
+
 import junit.framework.TestCase;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -30,6 +33,8 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
@@ -55,9 +60,11 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		stop1.setLink(link1);
 		stop2.setLink(link2);
 		TransitLine line = builder.createTransitLine(new IdImpl(5));
-		ExperimentalTransitRoute route = new ExperimentalTransitRoute(stop1, line, stop2);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl(6), null, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
+		ExperimentalTransitRoute route = new ExperimentalTransitRoute(stop1, line, tRoute, stop2);
 		assertEquals(stop1.getId(), route.getAccessStopId());
 		assertEquals(line.getId(), route.getLineId());
+		assertEquals(tRoute.getId(), route.getRouteId());
 		assertEquals(stop2.getId(), route.getEgressStopId());
 		assertEquals(link1, route.getStartLink());
 		assertEquals(link2, route.getEndLink());
@@ -95,20 +102,22 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testSetRouteDescription_PtRoute() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		route.setRouteDescription(null, "PT1 5 11 1980", null);
+		route.setRouteDescription(null, "PT1 5 11 1980 1055", null);
 		assertEquals("5", route.getAccessStopId().toString());
 		assertEquals("11", route.getLineId().toString());
-		assertEquals("1980", route.getEgressStopId().toString());
-		assertEquals("PT1 5 11 1980", route.getRouteDescription());
+		assertEquals("1980", route.getRouteId().toString());
+		assertEquals("1055", route.getEgressStopId().toString());
+		assertEquals("PT1 5 11 1980 1055", route.getRouteDescription());
 	}
 
 	public void testSetRouteDescription_PtRouteWithDescription() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		route.setRouteDescription(null, "PT1 5 11 1980 this is a valid route", null);
+		route.setRouteDescription(null, "PT1 5 11 1980 1055 this is a valid route", null);
 		assertEquals("5", route.getAccessStopId().toString());
 		assertEquals("11", route.getLineId().toString());
-		assertEquals("1980", route.getEgressStopId().toString());
-		assertEquals("PT1 5 11 1980 this is a valid route", route.getRouteDescription());
+		assertEquals("1980", route.getRouteId().toString());
+		assertEquals("1055", route.getEgressStopId().toString());
+		assertEquals("PT1 5 11 1980 1055 this is a valid route", route.getRouteDescription());
 	}
 
 	public void testSetRouteDescription_NonPtRoute() {

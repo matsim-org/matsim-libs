@@ -64,9 +64,11 @@ public class TransitDriver implements TransitDriverAgent {
 		private TransitStopFacility lastHandledStop = null;
 
 		private final TransitLine transitLine;
+		private final TransitRoute transitRoute;
 
 		public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final TransitQueueSimulation sim) {
 			this.transitLine = line;
+			this.transitRoute = route;
 			this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 			this.stopIterator = route.getStops().iterator();
 			this.nextStop = (this.stopIterator.hasNext() ? this.stopIterator.next() : null);
@@ -113,7 +115,7 @@ public class TransitDriver implements TransitDriverAgent {
 			// find out who wants to get out
 			ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
 			for (PassengerAgent passenger : this.vehicle.getPassengers()) {
-				if (passenger.arriveAtStop(stop)) {
+				if (passenger.getExitAtStop(stop)) {
 					passengersLeaving.add(passenger);
 				}
 			}
@@ -125,7 +127,7 @@ public class TransitDriver implements TransitDriverAgent {
 					break;
 				}
 				PassengerAgent passenger = agent;
-				if (passenger.ptLineAvailable(this.transitLine)) {
+				if (passenger.getEnterTransitRoute(this.transitLine, this.transitRoute)) {
 					passengersEntering.add(passenger);
 					freeCapacity--;
 				}

@@ -131,6 +131,7 @@ public class AccessEgressDemo {
 		PopulationBuilder pb = population.getBuilder();
 		TransitStopFacility[] stops = schedule.getFacilities().values().toArray(new TransitStopFacility[schedule.getFacilities().size()]);
 		TransitLine tLine = schedule.getTransitLines().get(this.ids[1]);
+		TransitRoute tRoute = tLine.getRoutes().get(this.ids[1]);
 
 		TransitStopFacility lastStop = schedule.getFacilities().get(this.ids[stops.length - 1]);
 		for (int i = 0; i < stops.length; i++) {
@@ -144,7 +145,7 @@ public class AccessEgressDemo {
 				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[i]);
 				act1.setEndTime(departureTime + j * agentInterval);
 				LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
-				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, lastStop));
+				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, tRoute, lastStop));
 				ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks - 1]);
 
 				population.getPersons().put(person.getId(), person);

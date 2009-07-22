@@ -201,7 +201,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		scenario.getConfig().simulation().setEndTime(7.0*3600);
 
 		Leg leg = pb.createLeg(TransportMode.pt);
-		leg.setRoute(new ExperimentalTransitRoute(stop1, line, stop2));
+		leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
 		Activity workAct = pb.createActivityFromLinkId("work", scenario.createId("2"));
 		plan.addActivity(homeAct);
 		plan.addLeg(leg);
@@ -287,7 +287,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		Activity homeAct = pb.createActivityFromLinkId("home", scenario.createId("1"));
 		homeAct.setEndTime(departure.getDepartureTime() - 60.0);
 		Leg leg1 = pb.createLeg(TransportMode.pt);
-		leg1.setRoute(new ExperimentalTransitRoute(stop1, line, stop3));
+		leg1.setRoute(new ExperimentalTransitRoute(stop1, line, tRoute, stop3));
 		Activity workAct = pb.createActivityFromLinkId("work", scenario.createId("2"));
 		plan1.addActivity(homeAct);
 		plan1.addLeg(leg1);
@@ -298,7 +298,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		Plan plan2 = pb.createPlan();
 		person2.addPlan(plan2);
 		Leg leg2 = pb.createLeg(TransportMode.pt);
-		leg2.setRoute(new ExperimentalTransitRoute(stop3, line, stop4));
+		leg2.setRoute(new ExperimentalTransitRoute(stop3, line, tRoute, stop4));
 		plan2.addActivity(homeAct);
 		plan2.addLeg(leg2);
 		plan2.addActivity(workAct);

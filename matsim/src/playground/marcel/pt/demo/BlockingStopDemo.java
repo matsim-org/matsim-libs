@@ -96,7 +96,7 @@ public class BlockingStopDemo {
 	private void createTransitSchedule() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleBuilder builder = schedule.getBuilder();
-		
+
 		TransitStopFacility[] stops = new TransitStopFacility[nOfStops * 2];
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(nOfStops);
 
@@ -162,7 +162,9 @@ public class BlockingStopDemo {
 		PopulationBuilder pb = population.getBuilder();
 //		TransitStopFacility[] stops = this.schedule.getFacilities().values().toArray(new TransitStopFacility[this.schedule.getFacilities().size()]);
 		TransitLine tLine1 = schedule.getTransitLines().get(this.ids[1]);
+		TransitRoute tRoute1 = tLine1.getRoutes().get(this.ids[1]);
 		TransitLine tLine2 = schedule.getTransitLines().get(this.ids[2]);
+		TransitRoute tRoute2 = tLine2.getRoutes().get(this.ids[2]);
 
 		// bus-passengers line 1
 		for (int i = 1; i < nOfStops; i++) {
@@ -171,7 +173,7 @@ public class BlockingStopDemo {
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[i]);
 			act1.setEndTime(startTime + i*60);
 			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(this.ids[i-1]), tLine1, schedule.getFacilities().get(this.ids[nOfStops-1])));
+			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(this.ids[i-1]), tLine1, tRoute1, schedule.getFacilities().get(this.ids[nOfStops-1])));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
 
 			population.getPersons().put(person.getId(), person);
@@ -189,7 +191,7 @@ public class BlockingStopDemo {
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[nOfLinks+i]);
 			act1.setEndTime(startTime + i*60);
 			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(this.ids[nOfStops+i-1]), tLine2, schedule.getFacilities().get(this.ids[2*nOfStops-1])));
+			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(this.ids[nOfStops+i-1]), tLine2, tRoute2, schedule.getFacilities().get(this.ids[2*nOfStops-1])));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[2*nOfLinks-1]);
 
 			population.getPersons().put(person.getId(), person);
@@ -256,7 +258,7 @@ public class BlockingStopDemo {
 
 		this.sim = new TransitQueueSimulation(this.scenario, events);
 		this.sim.startOTFServer("blocking_stop_demo");
-		
+
 		OTFDemo.ptConnect("blocking_stop_demo");
 
 		this.sim.run();

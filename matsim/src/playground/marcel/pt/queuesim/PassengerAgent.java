@@ -21,6 +21,7 @@
 package playground.marcel.pt.queuesim;
 
 import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
@@ -33,23 +34,21 @@ public interface PassengerAgent {
 	 * Informs a passenger waiting at a stop that a transit line
 	 * has arrived and is ready to be boarded.
 	 *
-	 * @param line the line that is available
-	 *
-	 * TODO [MR] find better name for method
+	 * @param line the transit line that is available
+	 * @param route the route being served
 	 *
 	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
 	 */
-	public boolean ptLineAvailable(final TransitLine line);
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute route);
 
 	/**
 	 * Informs a passenger in a transit vehicle that the vehicle has
 	 * arrived at the specified stop.
 	 *
-	 * TODO [MR] find better name for method
 	 * @param stop the stop the vehicle arrived
 	 *
 	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
 	 */
-	public boolean arriveAtStop(final TransitStopFacility stop);
+	public boolean getExitAtStop(final TransitStopFacility stop);
 
 }

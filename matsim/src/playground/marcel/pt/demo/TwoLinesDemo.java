@@ -216,7 +216,9 @@ public class TwoLinesDemo {
 		PopulationBuilder pb = population.getBuilder();
 
 		TransitLine tLine1 = schedule.getTransitLines().get(this.ids[1]);
+		TransitRoute tRoute1 = tLine1.getRoutes().get(this.ids[1]);
 		TransitLine tLine2 = schedule.getTransitLines().get(this.ids[2]);
+		TransitRoute tRoute2 = tLine1.getRoutes().get(this.ids[1]);
 
 		TransitStopFacility stop1 = schedule.getFacilities().get(this.ids[1]);
 		/*TransitStopFacility stop2 =*/ schedule.getFacilities().get(this.ids[2]);
@@ -231,11 +233,11 @@ public class TwoLinesDemo {
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
+			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:01:00"));
 			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop6));
+			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, tRoute2, stop6));
 			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 
 			plan.addActivity(act1);
@@ -254,11 +256,11 @@ public class TwoLinesDemo {
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop3));
+			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:06:00"));
 			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, stop6));
+			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, tRoute2, stop6));
 			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 
 			plan.addActivity(act1);
@@ -277,11 +279,11 @@ public class TwoLinesDemo {
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", this.ids[1]);
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			LegImpl leg1 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, stop4));
+			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop4));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[3]);
 			act2.setEndTime(Time.parseTime("07:11:00"));
 			LegImpl leg2 = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop4, tLine2, stop6));
+			leg2.setRoute(new ExperimentalTransitRoute(stop4, tLine2, tRoute2, stop6));
 			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", this.ids[6]);
 
 			plan.addActivity(act1);

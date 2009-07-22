@@ -26,49 +26,59 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
 public class ExperimentalTransitRoute extends GenericRouteImpl {
 
+	private static final long serialVersionUID = 1L;
+
 	private Id accessStopId = null;
 	private Id egressStopId = null;
 	private Id lineId = null;
+	private Id routeId = null;
 	private String description = null;
-	
-	public ExperimentalTransitRoute(Link startLink, Link endLink) {
+
+	/*package*/ ExperimentalTransitRoute(final Link startLink, final Link endLink) {
 		super(startLink, endLink);
 	}
-	
-	public ExperimentalTransitRoute(TransitStopFacility accessFacility, TransitLine line, TransitStopFacility egressFacility) {
+
+	public ExperimentalTransitRoute(final TransitStopFacility accessFacility, final TransitLine line, final TransitRoute route, final TransitStopFacility egressFacility) {
 		this(accessFacility.getLink(), egressFacility.getLink());
 		this.accessStopId = accessFacility.getId();
-		this.lineId = line.getId();
+		this.lineId = (line == null ? null : line.getId());
+		this.routeId = (route == null ? null : route.getId());
 		this.egressStopId = egressFacility.getId();
 	}
 
 	public Id getAccessStopId() {
 		return this.accessStopId;
 	}
-	
+
 	public Id getEgressStopId() {
 		return this.egressStopId;
 	}
-	
+
 	public Id getLineId() {
 		return this.lineId;
 	}
-	
+
+	public Id getRouteId() {
+		return this.routeId;
+	}
+
 	@Override
-	public void setRouteDescription(Link startLink, String routeDescription, Link endLink) {
+	public void setRouteDescription(final Link startLink, final String routeDescription, final Link endLink) {
 		super.setRouteDescription(startLink, routeDescription, endLink);
 		if (routeDescription.startsWith("PT1 ")) {
-			String[] parts = StringUtils.explode(routeDescription, ' ', 5);
+			String[] parts = StringUtils.explode(routeDescription, ' ', 6);
 			this.accessStopId = new IdImpl(parts[1]);
 			this.lineId = new IdImpl(parts[2]);
-			this.egressStopId = new IdImpl(parts[3]);
-			if (parts.length > 4) {
-				this.description = parts[4];
+			this.routeId = new IdImpl(parts[3]);
+			this.egressStopId = new IdImpl(parts[4]);
+			if (parts.length > 5) {
+				this.description = parts[5];
 			} else {
 				this.description = null;
 			}
@@ -78,17 +88,18 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 			this.egressStopId = null;
 		}
 	}
-	
+
 	@Override
 	public String getRouteDescription() {
 		if (this.accessStopId == null) {
 			return super.getRouteDescription();
 		}
-		String str = "PT1 " + this.accessStopId.toString() + " " + this.lineId.toString() + " " + this.egressStopId.toString();
+		String str = "PT1 " + this.accessStopId.toString() + " " + this.lineId.toString() + " " +
+				this.routeId.toString() + " " + this.egressStopId.toString();
 		if (this.description != null) {
 			str = str + " " + this.description;
 		}
 		return str;
 	}
-	
+
 }

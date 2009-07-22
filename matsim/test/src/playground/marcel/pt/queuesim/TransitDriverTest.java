@@ -298,11 +298,11 @@ public class TransitDriverTest extends MatsimTestCase {
 	protected static class SpyAgent implements PassengerAgent {
 		public TransitLine offeredLine;
 
-		public boolean arriveAtStop(final TransitStopFacility stop) {
+		public boolean getExitAtStop(final TransitStopFacility stop) {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean ptLineAvailable(final TransitLine tLine) {
+		public boolean getEnterTransitRoute(final TransitLine tLine, TransitRoute route) {
 			this.offeredLine = tLine;
 			return false;
 		}
