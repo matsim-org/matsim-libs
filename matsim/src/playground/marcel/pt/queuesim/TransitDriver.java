@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.Events;
@@ -51,7 +53,7 @@ public class TransitDriver implements TransitDriverAgent {
 		private final NetworkRoute carRoute;
 		private final double departureTime;
 
-		private TransitVehicle vehicle = null;
+		/*package*/ TransitVehicle vehicle = null;
 
 		private int nextLinkIndex = 0;
 		private final TransitQueueSimulation sim;
@@ -79,7 +81,7 @@ public class TransitDriver implements TransitDriverAgent {
 			this.carRoute = route.getRoute();
 			this.linkRoute = this.carRoute.getLinks();
 
-			this.currentLeg.setRoute(this.carRoute);
+			this.currentLeg.setRoute(new NetworkRouteWrapper(this.carRoute)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		}
 
 		public void setVehicle(final TransitVehicle vehicle) {
@@ -208,4 +210,109 @@ public class TransitDriver implements TransitDriverAgent {
 
 		public void teleportToLink(final Link link) {
 		}
+
+
+		/**
+		 * A simple wrapper that delegates all get-Methods to another instance, blocks set-methods
+		 * so this will be read-only, and returns in getVehicleId() a vehicle-Id specific to this driver,
+		 * and not to the NetworkRoute. This allows to share one NetworkRoute from a TransitRoute with
+		 * multiple transit drivers, thus saving memory.
+		 *
+		 * @author mrieser
+		 */
+		protected class NetworkRouteWrapper implements NetworkRoute {
+
+			private static final long serialVersionUID = 1L;
+			private final NetworkRoute delegate;
+
+			public NetworkRouteWrapper(final NetworkRoute route) {
+				this.delegate = route;
+			}
+
+			public List<Id> getLinkIds() {
+				return this.delegate.getLinkIds();
+			}
+
+			public List<Link> getLinks() {
+				return this.delegate.getLinks();
+			}
+
+			public List<Node> getNodes() {
+				return this.delegate.getNodes();
+			}
+
+			public Link getStartLink() {
+				return this.delegate.getStartLink();
+			}
+
+			public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
+				return this.delegate.getSubRoute(fromNode, toNode);
+			}
+
+			public double getTravelCost() {
+				return this.delegate.getTravelCost();
+			}
+
+			public Id getVehicleId() {
+				return TransitDriver.this.vehicle.getBasicVehicle().getId();
+			}
+
+			public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			@Deprecated
+			public void setNodes(final List<Node> srcRoute) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			public void setTravelCost(final double travelCost) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			public void setVehicleId(final Id vehicleId) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			public Link getEndLink() {
+				return this.delegate.getEndLink();
+			}
+
+			public void setEndLink(final Link link) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			public void setStartLink(final Link link) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			public double getDistance() {
+				return this.delegate.getDistance();
+			}
+
+			public Id getEndLinkId() {
+				return this.delegate.getEndLinkId();
+			}
+
+			public Id getStartLinkId() {
+				return this.delegate.getStartLinkId();
+			}
+
+			public double getTravelTime() {
+				return this.delegate.getTravelTime();
+			}
+
+			public void setDistance(final double distance) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+
+			public void setTravelTime(final double travelTime) {
+				throw new UnsupportedOperationException("read only route.");
+			}
+		}
+
 }

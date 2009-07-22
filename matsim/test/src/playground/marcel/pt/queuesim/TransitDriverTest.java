@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.network.Link;
@@ -84,7 +85,14 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitQueueSimulation tqsim = null;
 		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 
-		assertEquals(route, driver.getCurrentLeg().getRoute());
+		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
+		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
+		List<Id> expectedLinkIds = route.getLinkIds();
+		List<Id> actualLinkIds = netRoute.getLinkIds();
+		assertEquals(expectedLinkIds.size(), actualLinkIds.size());
+		for (int i = 0, n = expectedLinkIds.size(); i < n; i++) {
+			assertEquals(expectedLinkIds.get(i), actualLinkIds.get(i));
+		}
 
 		assertEquals(link5, driver.getDestinationLink());
 		assertEquals(link2, driver.chooseNextLink());
