@@ -34,6 +34,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.api.Departure;
@@ -295,6 +296,55 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(tLine, agent.offeredLine);
 	}
 
+	public void testHandleStop_AwaitDepartureTime() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(500, 0), false);
+		double departureOffset1 = 60;
+		double departureOffset2 = 160;
+		double departureOffset3 = Time.UNDEFINED_TIME;
+		TransitRouteStop routeStop1 = builder.createTransitRouteStop(stop1, departureOffset1 - 10.0, departureOffset1);
+		routeStop1.setAwaitDepartureTime(true);
+		stops.add(routeStop1);
+		TransitRouteStop routeStop2 = builder.createTransitRouteStop(stop2, departureOffset2 - 10.0, departureOffset2);
+		routeStop2.setAwaitDepartureTime(false);
+		stops.add(routeStop2);
+		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, departureOffset3);
+		routeStop3.setAwaitDepartureTime(true);
+		stops.add(routeStop3);
+		NetworkRoute route = new NodeNetworkRoute(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
+		double departureTime = 9876.0;
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), departureTime);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		TransitQueueSimulation tqsim = new TransitQueueSimulation(new ScenarioImpl(), new Events());
+
+		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(5));
+		vehType.setCapacity(capacity);
+		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
+		driver.setVehicle(queueVehicle);
+
+		assertEquals(50.0, driver.handleTransitStop(stop1, departureTime + 10), MatsimTestCase.EPSILON);
+		assertEquals(40.0, driver.handleTransitStop(stop1, departureTime + 20), MatsimTestCase.EPSILON);
+		assertEquals(30.0, driver.handleTransitStop(stop1, departureTime + 30), MatsimTestCase.EPSILON);
+		assertEquals(0.0, driver.handleTransitStop(stop1, departureTime + 60), MatsimTestCase.EPSILON);
+
+		// stop2 is not awaitDepartureTime
+		assertEquals(0.0, driver.handleTransitStop(stop2, departureTime + 110), MatsimTestCase.EPSILON);
+
+		// stop3 has no departure time
+		assertEquals(0.0, driver.handleTransitStop(stop3, departureTime + 210), MatsimTestCase.EPSILON);
+	}
+
 	protected static class SpyAgent implements PassengerAgent {
 		public TransitLine offeredLine;
 
@@ -302,7 +352,7 @@ public class TransitDriverTest extends MatsimTestCase {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean getEnterTransitRoute(final TransitLine tLine, TransitRoute route) {
+		public boolean getEnterTransitRoute(final TransitLine tLine, final TransitRoute route) {
 			this.offeredLine = tLine;
 			return false;
 		}

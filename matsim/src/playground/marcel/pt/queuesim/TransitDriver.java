@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -163,6 +164,14 @@ public class TransitDriver implements TransitDriverAgent {
 				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now + stopTime, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 			}
 			this.lastHandledStop = stop;
+
+			if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
+				double earliestDepTime = this.departureTime + this.nextStop.getDepartureOffset();
+				if (now + stopTime < earliestDepTime) {
+					stopTime = earliestDepTime - now;
+				}
+			}
+
 			if (stopTime == 0.0) {
 				if (this.stopIterator.hasNext()) {
 					this.nextStop = this.stopIterator.next();
