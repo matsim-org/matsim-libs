@@ -214,7 +214,8 @@ public class PlanomatTest extends MatsimTestCase {
 		// only plan of that person
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
-		Planomat testee = new Planomat(null, null, this.scenario.getConfig().planomat());
+		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
+		Planomat testee = new Planomat(null, null, planomatConfigGroup);
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
 		
@@ -229,7 +230,8 @@ public class PlanomatTest extends MatsimTestCase {
 				planAnalyzeSubtours, 
 				4711,
 				128,
-				possibleModes);
+				possibleModes,
+				planomatConfigGroup);
 		
 		IChromosome testChromosome = jgapConfiguration.getSampleChromosome();
 		assertEquals(3, testChromosome.getGenes().length);

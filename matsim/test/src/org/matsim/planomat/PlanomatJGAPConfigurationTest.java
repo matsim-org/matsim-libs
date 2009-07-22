@@ -31,6 +31,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -61,7 +62,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		// only plan of that person
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
-		Planomat testee = new Planomat(null, null, this.scenario.getConfig().planomat());
+		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
+		Planomat testee = new Planomat(null, null, planomatConfigGroup);
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
 		
@@ -78,7 +80,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 				planAnalyzeSubtours, 
 				seed,
 				128,
-				possibleModes);
+				possibleModes,
+				planomatConfigGroup);
 
 		// see below for correct functioning of the random number generator
 		Double[] randomNumberSequenceA = new Double[1000];
@@ -113,7 +116,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 				planAnalyzeSubtours, 
 				seed,
 				128,
-				possibleModes);
+				possibleModes,
+				planomatConfigGroup);
 
 		Double[] randomNumberSequenceB = new Double[1000];
 		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
@@ -132,7 +136,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		// only plan of that person
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
-		Planomat testee = new Planomat(null, null, this.scenario.getConfig().planomat());
+		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
+		Planomat testee = new Planomat(null, null, planomatConfigGroup);
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
 		
@@ -149,7 +154,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 				planAnalyzeSubtours, 
 				seed,
 				128,
-				possibleModes);
+				possibleModes,
+				planomatConfigGroup);
 
 		// see below for correct functioning of the random number generator
 		Double[] randomNumberSequenceA = new Double[1000];
@@ -184,7 +190,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 				planAnalyzeSubtours, 
 				seed,
 				128,
-				possibleModes);
+				possibleModes,
+				planomatConfigGroup);
 		Double[] randomNumberSequenceB = new Double[1000];
 		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
 			randomNumberSequenceB[ii] = jgapConfig.getRandomGenerator().nextDouble();

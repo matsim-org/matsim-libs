@@ -63,7 +63,7 @@ public class Planomat implements PlanAlgorithm {
 
 	protected static enum StepThroughPlanAction {EVALUATE, WRITE_BACK}
 
-	private final PlanomatConfigGroup config;
+	private final PlanomatConfigGroup planomatConfigGroup;
 	private final int numTimeIntervals;
 	protected final double timeIntervalSize;
 
@@ -78,11 +78,11 @@ public class Planomat implements PlanAlgorithm {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.config = config;
+		this.planomatConfigGroup = config;
 		
-		this.numTimeIntervals = (int) Math.pow(2, this.config.getLevelOfTimeResolution());
+		this.numTimeIntervals = (int) Math.pow(2, this.planomatConfigGroup.getLevelOfTimeResolution());
 		this.timeIntervalSize = Planomat.SCENARIO_DURATION / numTimeIntervals;
-		this.doLogging = this.config.isDoLogging();
+		this.doLogging = this.planomatConfigGroup.isDoLogging();
 		
 		this.seedGenerator = MatsimRandom.getLocalInstance();
 	}
@@ -123,7 +123,8 @@ public class Planomat implements PlanAlgorithm {
 				planAnalyzeSubtours, 
 				seed,
 				this.numTimeIntervals,
-				possibleModes);
+				possibleModes,
+				this.planomatConfigGroup);
 
 		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan, planAnalyzeSubtours, possibleModes);		
 
@@ -162,7 +163,7 @@ public class Planomat implements PlanAlgorithm {
 	protected TransportMode[] getPossibleModes(final PlanImpl plan) {
 		
 		// remove car option for agents that have no car available
-		EnumSet<TransportMode> possibleModesEnumSet = this.config.getPossibleModes().clone();
+		EnumSet<TransportMode> possibleModesEnumSet = this.planomatConfigGroup.getPossibleModes().clone();
 		
 		String carAvail = plan.getPerson().getCarAvail();
 		if (carAvail != null) {
@@ -180,7 +181,7 @@ public class Planomat implements PlanAlgorithm {
 
 //		IChromosome fittest = null;
 //		String logMessage = null;
-		for (int i = 0, n = this.config.getJgapMaxGenerations(); i < n; i++) {
+		for (int i = 0, n = this.planomatConfigGroup.getJgapMaxGenerations(); i < n; i++) {
 			population.evolve();
 //			if (Gbl.getConfig().planomat().isDoLogging()) {
 //			fittest = population.getFittestChromosome();

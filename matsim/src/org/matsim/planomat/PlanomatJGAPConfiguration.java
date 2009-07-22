@@ -35,7 +35,6 @@ import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
@@ -51,8 +50,9 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			PlanAnalyzeSubtours planAnalyzeSubtours, 
 			long seed,
 			int numTimeIntervals,
-			TransportMode[] possibleModes) {
-		this("", "", plan, planAnalyzeSubtours, seed, numTimeIntervals, possibleModes);
+			TransportMode[] possibleModes,
+			PlanomatConfigGroup planomatConfigGroup) {
+		this("", "", plan, planAnalyzeSubtours, seed, numTimeIntervals, possibleModes, planomatConfigGroup);
 	}
 
 	private PlanomatJGAPConfiguration(
@@ -62,7 +62,8 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			PlanAnalyzeSubtours planAnalyzeSubtours, 
 			long seed,
 			int numTimeIntervals,
-			TransportMode[] possibleModes) {
+			TransportMode[] possibleModes,
+			PlanomatConfigGroup planomatConfigGroup) {
 		super(a_id, a_name);
 
 		Configuration.reset();
@@ -94,11 +95,11 @@ public class PlanomatJGAPConfiguration extends Configuration {
 				numSubtours = planAnalyzeSubtours.getNumSubtours();
 			}
 			
-			int populationSize = Gbl.getConfig().planomat().getPopSize();
+			int populationSize = planomatConfigGroup.getPopSize();
 			if (populationSize == Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue())) {
 				
-				populationSize = Gbl.getConfig().planomat().getLevelOfTimeResolution() * numActs;
-				populationSize += Gbl.getConfig().planomat().getPossibleModes().size() * numSubtours;
+				populationSize = planomatConfigGroup.getLevelOfTimeResolution() * numActs;
+				populationSize += planomatConfigGroup.getPossibleModes().size() * numSubtours;
 				this.setPopulationSize( populationSize );
 				
 			}
