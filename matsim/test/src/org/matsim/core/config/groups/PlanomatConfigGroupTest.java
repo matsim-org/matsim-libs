@@ -22,7 +22,6 @@ package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatConfigGroupTest extends MatsimTestCase {
@@ -31,9 +30,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 
 	public void testPlanomatConfigGroup() {
 		
-		super.loadConfig(this.getInputDirectory() + "empty_config.xml");
-		
-		PlanomatConfigGroup expectedConfig = Gbl.getConfig().planomat();
+		PlanomatConfigGroup expectedConfig = super.loadConfig(this.getInputDirectory() + "empty_config.xml").planomat();
 		
 //		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
 		assertEquals( 
@@ -59,9 +56,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 
 	public void testAddParam() {
 
-		super.loadConfig(this.getInputDirectory() + "config.xml");
-
-		PlanomatConfigGroup expectedConfig = Gbl.getConfig().planomat();
+		PlanomatConfigGroup expectedConfig = super.loadConfig(this.getInputDirectory() + "config.xml").planomat();
 
 		assertEquals( 10, expectedConfig.getPopSize() );
 		assertEquals( 2, expectedConfig.getPossibleModes().toArray().length );
