@@ -69,6 +69,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private static final String STOP = "stop";
 	private static final String LINK = "link";
 	private static final String NAME = "name";
+	private static final String IS_BLOCKING = "isBlocking";
 
 	private static final String ID = "id";
 	private static final String REF_ID = "refId";
@@ -95,8 +96,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (STOP_FACILITY.equals(name)) {
+			boolean isBlocking = Boolean.parseBoolean(atts.getValue(IS_BLOCKING));
 			TransitStopFacility stop = new TransitStopFacilityImpl(
-					new IdImpl(atts.getValue(ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), false);
+					new IdImpl(atts.getValue(ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
 			if (atts.getValue(LINK_REF_ID) != null) {
 				LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(LINK_REF_ID)));
 				if (link == null) {

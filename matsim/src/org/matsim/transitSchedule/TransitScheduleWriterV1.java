@@ -101,6 +101,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 			if (stop.getName() != null) {
 				attributes.add(this.createTuple("name", stop.getName()));
 			}
+			attributes.add(this.createTuple("isBlocking", stop.getIsBlockingLane()));
 			this.writeStartTag(STOP_FACILITY, attributes, true);
 		}
 
