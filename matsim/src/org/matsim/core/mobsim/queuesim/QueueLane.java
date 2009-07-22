@@ -952,7 +952,7 @@ public class QueueLane {
 		return this.destinationLinks;
 	}
 
-	protected int getVisualizerLane() {
+	public int getVisualizerLane() {
 		return this.visualizerLane;
 	}
 

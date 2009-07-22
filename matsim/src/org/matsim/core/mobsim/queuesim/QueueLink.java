@@ -210,7 +210,7 @@ public class QueueLink {
 		resortQueueLanes();
 	}
 
-	protected List<QueueLane> getToNodeQueueLanes() {
+	public List<QueueLane> getToNodeQueueLanes() {
 		if ((this.toNodeQueueLanes == null) && (this.queueLanes.size() == 1)){
 			return this.queueLanes;
 		}
