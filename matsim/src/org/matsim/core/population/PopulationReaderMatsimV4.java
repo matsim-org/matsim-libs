@@ -27,13 +27,9 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -54,6 +50,8 @@ import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.Desires;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
@@ -84,7 +82,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final NetworkLayer network;
 	private final ActivityFacilities facilities;
 	private Knowledges knowledges;
-		
+
 	private PersonImpl currperson = null;
 	private Desires currdesires = null;
 	private Knowledge currknowledge = null;
@@ -111,21 +109,21 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
 	 */
 	@Deprecated
-	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network, final ActivityFacilities facilities, Knowledges knowledges) {
+	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network, final ActivityFacilities facilities, final Knowledges knowledges) {
 		this.plans = pop;
 		this.network = network;
 		this.facilities = facilities;
 		this.knowledges = knowledges;
 	}
-	
+
 	public PopulationReaderMatsimV4(final ScenarioImpl scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		this.facilities = (scenario).getActivityFacilities();
 		this.knowledges = new KnowledgesImpl();
 	}
-	
-	public PopulationReaderMatsimV4(final ScenarioImpl sc, Knowledges knowledges){
+
+	public PopulationReaderMatsimV4(final ScenarioImpl sc, final Knowledges knowledges){
 		this(sc);
 		this.knowledges = knowledges;
 	}
@@ -182,7 +180,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (DESIRES.equals(name)) {
 			this.currdesires = null;
 		} else if (KNOWLEDGE.equals(name)) {
-			
+
 				this.currknowledge = null;
 		} else if (ACTIVITYSPACE.equals(name)) {
 			if (!this.curractspace.isComplete()) {
@@ -395,7 +393,11 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startLeg(final Attributes atts) {
-		this.currleg = this.currplan.createLeg(TransportMode.valueOf(atts.getValue("mode").toLowerCase()));
+		String mode = atts.getValue("mode").toLowerCase();
+		if (mode.equals("undef")) {
+			mode = "undefined";
+		}
+		this.currleg = this.currplan.createLeg(TransportMode.valueOf(mode));
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));
