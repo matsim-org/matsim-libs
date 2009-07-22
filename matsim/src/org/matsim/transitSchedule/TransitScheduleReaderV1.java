@@ -57,26 +57,6 @@ import org.xml.sax.SAXException;
  */
 public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
-	private static final String STOP_FACILITY = "stopFacility";
-	private static final String LINK_REF_ID = "linkRefId";
-
-	private static final String TRANSIT_LINE = "transitLine";
-	private static final String TRANSIT_ROUTE = "transitRoute";
-	private static final String DESCRIPTION = "description";
-	private static final String DEPARTURE = "departure";
-	private static final String ROUTE_PROFILE = "routeProfile";
-	private static final String TRANSPORT_MODE = "transportMode";
-	private static final String STOP = "stop";
-	private static final String LINK = "link";
-	private static final String NAME = "name";
-	private static final String IS_BLOCKING = "isBlocking";
-
-	private static final String ID = "id";
-	private static final String REF_ID = "refId";
-	private static final String ARRIVAL_OFFSET = "arrivalOffset";
-	private static final String DEPARTURE_OFFSET = "departureOffset";
-	private static final String AWAIT_DEPARTURE = "awaitDeparture";
-
 	private final TransitSchedule schedule;
 	private final NetworkLayer network;
 
@@ -95,67 +75,67 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		if (STOP_FACILITY.equals(name)) {
-			boolean isBlocking = Boolean.parseBoolean(atts.getValue(IS_BLOCKING));
+		if (Constants.STOP_FACILITY.equals(name)) {
+			boolean isBlocking = Boolean.parseBoolean(atts.getValue(Constants.IS_BLOCKING));
 			TransitStopFacility stop = new TransitStopFacilityImpl(
-					new IdImpl(atts.getValue(ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
-			if (atts.getValue(LINK_REF_ID) != null) {
-				LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(LINK_REF_ID)));
+					new IdImpl(atts.getValue(Constants.ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
+			if (atts.getValue(Constants.LINK_REF_ID) != null) {
+				LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(Constants.LINK_REF_ID)));
 				if (link == null) {
-					throw new RuntimeException("no link with id " + atts.getValue(LINK_REF_ID));
+					throw new RuntimeException("no link with id " + atts.getValue(Constants.LINK_REF_ID));
 				}
 				stop.setLink(link);
 			}
-			if (atts.getValue(NAME) != null) {
-				stop.setName(atts.getValue(NAME));
+			if (atts.getValue(Constants.NAME) != null) {
+				stop.setName(atts.getValue(Constants.NAME));
 			}
 			this.schedule.addStopFacility(stop);
-		} else if (TRANSIT_LINE.equals(name)) {
-			Id id = new IdImpl(atts.getValue(ID));
+		} else if (Constants.TRANSIT_LINE.equals(name)) {
+			Id id = new IdImpl(atts.getValue(Constants.ID));
 			this.currentTransitLine = new TransitLineImpl(id);
 			this.schedule.addTransitLine(this.currentTransitLine);
-		} else if (TRANSIT_ROUTE.equals(name)) {
-			Id id = new IdImpl(atts.getValue(ID));
+		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
+			Id id = new IdImpl(atts.getValue(Constants.ID));
 			this.currentTransitRoute = new TempTransitRoute(id);
-		} else if (DEPARTURE.equals(name)) {
-			Id id = new IdImpl(atts.getValue(ID));
+		} else if (Constants.DEPARTURE.equals(name)) {
+			Id id = new IdImpl(atts.getValue(Constants.ID));
 			Departure departure = new DepartureImpl(id, Time.parseTime(atts.getValue("departureTime")));
 			this.currentTransitRoute.departures.put(id, departure);
-		} else if (ROUTE_PROFILE.equals(name)) {
+		} else if (Constants.ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRoute();
-		} else if (LINK.equals(name)) {
-			LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(REF_ID)));
+		} else if (Constants.LINK.equals(name)) {
+			LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(Constants.REF_ID)));
 			if (link == null) {
-				throw new RuntimeException("no link with id " + atts.getValue(REF_ID));
+				throw new RuntimeException("no link with id " + atts.getValue(Constants.REF_ID));
 			}
 			this.currentRouteProfile.addLink(link);
-		} else if (STOP.equals(name)) {
-			Id id = new IdImpl(atts.getValue(REF_ID));
+		} else if (Constants.STOP.equals(name)) {
+			Id id = new IdImpl(atts.getValue(Constants.REF_ID));
 			TransitStopFacility facility = this.schedule.getFacilities().get(id);
 			if (facility == null) {
-				throw new RuntimeException("no stop/facility with id " + atts.getValue(REF_ID));
+				throw new RuntimeException("no stop/facility with id " + atts.getValue(Constants.REF_ID));
 			}
 			TempStop stop = new TempStop(facility);
-			String arrival = atts.getValue(ARRIVAL_OFFSET);
-			String departure = atts.getValue(DEPARTURE_OFFSET);
+			String arrival = atts.getValue(Constants.ARRIVAL_OFFSET);
+			String departure = atts.getValue(Constants.DEPARTURE_OFFSET);
 			if (arrival != null) {
 				stop.arrival = Time.parseTime(arrival);
 			}
 			if (departure != null) {
 				stop.departure = Time.parseTime(departure);
 			}
-			stop.awaitDeparture = Boolean.parseBoolean(atts.getValue(AWAIT_DEPARTURE));
+			stop.awaitDeparture = Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE));
 			this.currentTransitRoute.stops.add(stop);
 		}
 	}
 
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
-		if (DESCRIPTION.equals(name) && TRANSIT_ROUTE.equals(context.peek())) {
+		if (Constants.DESCRIPTION.equals(name) && Constants.TRANSIT_ROUTE.equals(context.peek())) {
 			this.currentTransitRoute.description = content;
-		} else if (TRANSPORT_MODE.equals(name)) {
+		} else if (Constants.TRANSPORT_MODE.equals(name)) {
 			this.currentTransitRoute.mode = TransportMode.valueOf(content);
-		} else if (TRANSIT_ROUTE.equals(name)) {
+		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentTransitRoute.stops.size());
 			for (TempStop tStop : this.currentTransitRoute.stops) {
 				TransitRouteStopImpl routeStop = new TransitRouteStopImpl(tStop.stop, tStop.arrival, tStop.departure);

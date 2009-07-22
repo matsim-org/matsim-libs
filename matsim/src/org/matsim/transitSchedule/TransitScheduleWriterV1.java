@@ -38,7 +38,6 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-
 /**
  * Writes a transit schedule to a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
  *
@@ -46,25 +45,6 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 
-	private static final String TRANSIT_STOPS = "transitStops";
-	private static final String STOP_FACILITY = "stopFacility";
-	private static final String TRANSIT_SCHEDULE = "transitSchedule";
-	private static final String TRANSIT_LINE = "transitLine";
-	private static final String TRANSIT_ROUTE = "transitRoute";
-	private static final String DESCRIPTION = "description";
-	private static final String ROUTE_PROFILE = "routeProfile";
-	private static final String STOP = "stop";
-	private static final String ROUTE = "route";
-	private static final String LINK = "link";
-	private static final String DEPARTURES = "departures";
-	private static final String DEPARTURE = "departure";
-	private static final String ID = "id";
-	private static final String REF_ID = "refId";
-	private static final String TRANSPORT_MODE = "transportMode";
-	private static final String DEPARTURE_TIME = "departureTime";
-	private static final String DEPARTURE_OFFSET = "departureOffset";
-	private static final String ARRIVAL_OFFSET = "arrivalOffset";
-	private static final String AWAIT_DEPARTURE = "awaitDeparture";
 
 	private final TransitSchedule schedule;
 
@@ -75,24 +55,24 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 	public void write(final String filename) throws IOException {
 		this.openFile(filename);
 		this.writeXmlHead();
-		this.writeDoctype(TRANSIT_SCHEDULE, "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd");
-		this.writeStartTag(TRANSIT_SCHEDULE, null);
+		this.writeDoctype(Constants.TRANSIT_SCHEDULE, "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd");
+		this.writeStartTag(Constants.TRANSIT_SCHEDULE, null);
 
 		this.writeTransitStops();
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			writeTransitLine(line);
 		}
-		this.writeEndTag(TRANSIT_SCHEDULE);
+		this.writeEndTag(Constants.TRANSIT_SCHEDULE);
 		this.close();
 	}
 
 	private void writeTransitStops() throws IOException {
-		this.writeStartTag(TRANSIT_STOPS, null);
+		this.writeStartTag(Constants.TRANSIT_STOPS, null);
 
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(5);
 		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
 			attributes.clear();
-			attributes.add(this.createTuple(ID, stop.getId().toString()));
+			attributes.add(this.createTuple(Constants.ID, stop.getId().toString()));
 			attributes.add(this.createTuple("x", stop.getCoord().getX()));
 			attributes.add(this.createTuple("y", stop.getCoord().getY()));
 			if (stop.getLink() != null) {
@@ -102,103 +82,103 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 				attributes.add(this.createTuple("name", stop.getName()));
 			}
 			attributes.add(this.createTuple("isBlocking", stop.getIsBlockingLane()));
-			this.writeStartTag(STOP_FACILITY, attributes, true);
+			this.writeStartTag(Constants.STOP_FACILITY, attributes, true);
 		}
 
-		this.writeEndTag(TRANSIT_STOPS);
+		this.writeEndTag(Constants.TRANSIT_STOPS);
 	}
 
 	private void writeTransitLine(final TransitLine line) throws IOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
-		attributes.add(this.createTuple(ID, line.getId().toString()));
-		this.writeStartTag(TRANSIT_LINE, attributes);
+		attributes.add(this.createTuple(Constants.ID, line.getId().toString()));
+		this.writeStartTag(Constants.TRANSIT_LINE, attributes);
 
 		for (TransitRoute route : line.getRoutes().values()) {
 			writeTransitRoute(route);
 		}
 
-		this.writeEndTag(TRANSIT_LINE);
+		this.writeEndTag(Constants.TRANSIT_LINE);
 	}
 
 	private void writeTransitRoute(final TransitRoute route) throws IOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
-		attributes.add(this.createTuple(ID, route.getId().toString()));
-		this.writeStartTag(TRANSIT_ROUTE, attributes);
+		attributes.add(this.createTuple(Constants.ID, route.getId().toString()));
+		this.writeStartTag(Constants.TRANSIT_ROUTE, attributes);
 
 		if (route.getDescription() != null) {
-			this.writeStartTag(DESCRIPTION, null);
+			this.writeStartTag(Constants.DESCRIPTION, null);
 			this.writeContent(route.getDescription(), false);
-			this.writeEndTag(DESCRIPTION);
+			this.writeEndTag(Constants.DESCRIPTION);
 		}
 
-		this.writeStartTag(TRANSPORT_MODE, null);
+		this.writeStartTag(Constants.TRANSPORT_MODE, null);
 		this.writeContent(route.getTransportMode().toString(), false);
-		this.writeEndTag(TRANSPORT_MODE);
+		this.writeEndTag(Constants.TRANSPORT_MODE);
 
 		this.writeRouteProfile(route.getStops());
 		this.writeRoute(route.getRoute());
 		this.writeDepartures(route.getDepartures());
 
-		this.writeEndTag(TRANSIT_ROUTE);
+		this.writeEndTag(Constants.TRANSIT_ROUTE);
 	}
 
 	private void writeRouteProfile(final List<TransitRouteStop> stops) throws IOException {
-		this.writeStartTag(ROUTE_PROFILE, null);
+		this.writeStartTag(Constants.ROUTE_PROFILE, null);
 
 		// optimization: only create one List for multiple departures
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(4);
 		for (TransitRouteStop stop : stops) {
 			attributes.clear();
-			attributes.add(this.createTuple(REF_ID, stop.getStopFacility().getId().toString()));
+			attributes.add(this.createTuple(Constants.REF_ID, stop.getStopFacility().getId().toString()));
 			if (stop.getArrivalOffset() != Time.UNDEFINED_TIME) {
-				attributes.add(this.createTimeTuple(ARRIVAL_OFFSET, stop.getArrivalOffset()));
+				attributes.add(this.createTimeTuple(Constants.ARRIVAL_OFFSET, stop.getArrivalOffset()));
 			}
 			if (stop.getDepartureOffset() != Time.UNDEFINED_TIME) {
-				attributes.add(this.createTimeTuple(DEPARTURE_OFFSET, stop.getDepartureOffset()));
+				attributes.add(this.createTimeTuple(Constants.DEPARTURE_OFFSET, stop.getDepartureOffset()));
 			}
-			attributes.add(this.createTuple(AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
-			this.writeStartTag(STOP, attributes, true);
+			attributes.add(this.createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
+			this.writeStartTag(Constants.STOP, attributes, true);
 		}
 
-		this.writeEndTag(ROUTE_PROFILE);
+		this.writeEndTag(Constants.ROUTE_PROFILE);
 	}
 
 	private void writeRoute(final NetworkRoute route) throws IOException {
 		if (route != null) {
-			this.writeStartTag(ROUTE, null);
+			this.writeStartTag(Constants.ROUTE, null);
 
 			// optimization: only create one List for multiple departures
 			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
-			attributes.add(this.createTuple(REF_ID, route.getStartLink().getId().toString()));
-			this.writeStartTag(LINK, attributes, true);
+			attributes.add(this.createTuple(Constants.REF_ID, route.getStartLink().getId().toString()));
+			this.writeStartTag(Constants.LINK, attributes, true);
 
 			for (Link link : route.getLinks()) {
 				attributes.clear();
-				attributes.add(this.createTuple(REF_ID, link.getId().toString()));
-				this.writeStartTag(LINK, attributes, true);
+				attributes.add(this.createTuple(Constants.REF_ID, link.getId().toString()));
+				this.writeStartTag(Constants.LINK, attributes, true);
 			}
 
 			attributes.clear();
-			attributes.add(this.createTuple(REF_ID, route.getEndLink().getId().toString()));
-			this.writeStartTag(LINK, attributes, true);
+			attributes.add(this.createTuple(Constants.REF_ID, route.getEndLink().getId().toString()));
+			this.writeStartTag(Constants.LINK, attributes, true);
 
-			this.writeEndTag(ROUTE);
+			this.writeEndTag(Constants.ROUTE);
 		}
 	}
 
 	private void writeDepartures(final Map<Id, Departure> departures) throws IOException {
-		this.writeStartTag(DEPARTURES, null);
+		this.writeStartTag(Constants.DEPARTURES, null);
 
 		// optimization: only create one List for multiple departures
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(2);
 
 		for (Departure dep : departures.values()) {
 			attributes.clear();
-			attributes.add(this.createTuple(ID, dep.getId().toString()));
-			attributes.add(this.createTimeTuple(DEPARTURE_TIME, dep.getDepartureTime()));
-			this.writeStartTag(DEPARTURE, attributes, true);
+			attributes.add(this.createTuple(Constants.ID, dep.getId().toString()));
+			attributes.add(this.createTimeTuple(Constants.DEPARTURE_TIME, dep.getDepartureTime()));
+			this.writeStartTag(Constants.DEPARTURE, attributes, true);
 		}
 
-		this.writeEndTag(DEPARTURES);
+		this.writeEndTag(Constants.DEPARTURES);
 	}
 }
