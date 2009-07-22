@@ -23,7 +23,7 @@ package org.matsim.transitSchedule;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllTests {
+public abstract class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
@@ -35,7 +35,7 @@ public class AllTests {
 		suite.addTestSuite(TransitScheduleTest.class);
 		suite.addTestSuite(TransitScheduleBuilderTest.class);
 		suite.addTestSuite(TransitScheduleReaderTest.class);
-		suite.addTestSuite(TransitScheduleWriterTest.class);
+		suite.addTestSuite(TransitScheduleFormatV1Test.class);
 
 		return suite;
 	}

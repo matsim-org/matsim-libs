@@ -48,11 +48,16 @@ import org.xml.sax.SAXException;
 
 
 /**
+ * Tests the file format <code>transitSchedule_v1.dtd</code> by creating a
+ * transit schedule with different attributes, writing it out to a file in
+ * the specified file format, reads it back in and compares the actual values
+ * with the previously set ones.
+ *
  * @author mrieser
  */
-public class TransitScheduleWriterTest extends MatsimTestCase {
+public class TransitScheduleFormatV1Test extends MatsimTestCase {
 
-	public void testWrite() throws IOException, SAXException, ParserConfigurationException {
+	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		NetworkLayer network = new NetworkLayer();
 		NodeImpl n1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
@@ -69,9 +74,11 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		TransitSchedule schedule1 = builder.createTransitSchedule();
 
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0), true);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000), true);
 		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000), false);
+		stop2.setName("S + U Nirgendwo");
+		stop4.setName("Irgendwo");
 		schedule1.addStopFacility(stop1);
 		schedule1.addStopFacility(stop2);
 		schedule1.addStopFacility(stop3);
@@ -81,7 +88,9 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(4);
 		stops.add(builder.createTransitRouteStop(stop1, Time.UNDEFINED_TIME, 0));
 		stops.add(builder.createTransitRouteStop(stop2, 90, 120));
-		stops.add(builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, 300));
+		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, 300);
+		routeStop3.setAwaitDepartureTime(true);
+		stops.add(routeStop3);
 		stops.add(builder.createTransitRouteStop(stop4, 400, Time.UNDEFINED_TIME));
 
 		TransitRoute route1 = builder.createTransitRoute(new IdImpl(1), null, stops, TransportMode.bus);
@@ -135,6 +144,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), EPSILON);
 			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), EPSILON);
 			assertEquals("different link information.", stopE.getLink(), stopA.getLink());
+			assertEquals("different names.", stopE.getName(), stopA.getName());
 		}
 
 		assertEquals("different number of transitLines.", expected.getTransitLines().size(), actual.getTransitLines().size());
@@ -156,6 +166,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 					assertEquals("different stop facilities.", stopE.getStopFacility().getId(), stopA.getStopFacility().getId());
 					assertEquals("different arrival delay.", stopE.getArrivalOffset(), stopA.getArrivalOffset(), EPSILON);
 					assertEquals("different departure delay.", stopE.getDepartureOffset(), stopA.getDepartureOffset(), EPSILON);
+					assertEquals("different awaitDepartureTime.", stopE.isAwaitDepartureTime(), stopA.isAwaitDepartureTime());
 				}
 
 				NetworkRoute netRouteE = routeE.getRoute();

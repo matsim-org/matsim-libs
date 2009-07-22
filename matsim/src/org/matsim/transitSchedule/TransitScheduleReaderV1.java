@@ -68,11 +68,13 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private static final String TRANSPORT_MODE = "transportMode";
 	private static final String STOP = "stop";
 	private static final String LINK = "link";
+	private static final String NAME = "name";
 
 	private static final String ID = "id";
 	private static final String REF_ID = "refId";
 	private static final String ARRIVAL_OFFSET = "arrivalOffset";
 	private static final String DEPARTURE_OFFSET = "departureOffset";
+	private static final String AWAIT_DEPARTURE = "awaitDeparture";
 
 	private final TransitSchedule schedule;
 	private final NetworkLayer network;
@@ -101,6 +103,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 					throw new RuntimeException("no link with id " + atts.getValue(LINK_REF_ID));
 				}
 				stop.setLink(link);
+			}
+			if (atts.getValue(NAME) != null) {
+				stop.setName(atts.getValue(NAME));
 			}
 			this.schedule.addStopFacility(stop);
 		} else if (TRANSIT_LINE.equals(name)) {
@@ -137,6 +142,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			if (departure != null) {
 				stop.departure = Time.parseTime(departure);
 			}
+			stop.awaitDeparture = Boolean.parseBoolean(atts.getValue(AWAIT_DEPARTURE));
 			this.currentTransitRoute.stops.add(stop);
 		}
 	}
@@ -150,7 +156,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (TRANSIT_ROUTE.equals(name)) {
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(this.currentTransitRoute.stops.size());
 			for (TempStop tStop : this.currentTransitRoute.stops) {
-				stops.add(new TransitRouteStopImpl(tStop.stop, tStop.arrival, tStop.departure));
+				TransitRouteStopImpl routeStop = new TransitRouteStopImpl(tStop.stop, tStop.arrival, tStop.departure);
+				stops.add(routeStop);
+				routeStop.setAwaitDepartureTime(tStop.awaitDeparture);
 			}
 			NetworkRoute route = null;
 			if (this.currentRouteProfile.firstLink != null) {
@@ -182,6 +190,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		protected final TransitStopFacility stop;
 		protected double departure = Time.UNDEFINED_TIME;
 		protected double arrival = Time.UNDEFINED_TIME;
+		protected boolean awaitDeparture = false;
 
 		protected TempStop(final TransitStopFacility stop) {
 			this.stop = stop;
