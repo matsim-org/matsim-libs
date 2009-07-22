@@ -46,7 +46,7 @@ public class DgOTFConnectionManager extends OTFConnectionManager {
 		this.add(DgOtfLinkLanesAgentsNoParkingHandler.class, DgSimpleQuadDrawer.class);
 		this.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		this.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		//this line seems to do nothing
+		// this line adds a drawer to a layer
 		this.add(DgSimpleQuadDrawer.class, DgSimpleStaticNetLayer.class);
 		
 		

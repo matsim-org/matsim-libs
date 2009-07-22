@@ -20,8 +20,8 @@
 package playground.dgrether.signalVis;
 
 import java.awt.geom.Point2D;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.media.opengl.GL;
 
@@ -42,12 +42,12 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 	private float startX, startY, endX, endY;
 	private int nrLanes;
 	private int numberOfQueueLanes;
-	private Map<String, Double> laneData;
+
+	private Point2D.Double _branchPoint;
+	private List<LaneData> _laneData;
 	
 	public DgSimpleQuadDrawer() {
-//		log.debug("using DgSimpleQuadDrawer");
 	}
-	static float cellWidth_m = 30.f;
 	
 	@Override
 	public void setQuad(float startX, float startY, float endX, float endY, int nrLanes){
@@ -59,10 +59,12 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		this.nrLanes = nrLanes;
 	}
 	
+	
+	
 	@Override
 	public void onDraw( GL gl) {
 		gl.glColor3d(0.2, 0.2, 0.2);
-		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes* cellWidth_m);
+		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes* SimpleStaticNetLayer.cellWidth_m);
 		this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
 		this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
 		//Draw quad
@@ -77,42 +79,66 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		
 		gl.glColor3d(1.0, 0, 0);
 		
-			
+		double linkWidthX = ortho.x;
+		double linkWidhtY = ortho.y;
+		
 		double dx = this.endX - this.startX;
 		double dy = this.endY - this.startY;
 		double sqrt = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		double dxNorm = dx / sqrt;
 		double dyNorm = dy / sqrt;
+		double zCoord = 1.0;
 		
-		Double branchPoint = null;
-		if (this.laneData != null){
-			for (String key : this.laneData.keySet()) {
-				branchPoint = this.laneData.get(key);
-				log.debug("lane data not null, meter from linkend: " + branchPoint);
-				
-				double branchPointX = (sqrt - branchPoint) * dxNorm;
-				double branchPointY = (sqrt - branchPoint) * dyNorm;
-				double offset = 2.0;
-				gl.glBegin(GL.GL_QUADS);
-//			gl.glTexCoord2f(co.right(),co.bottom()); 
-					gl.glVertex3d(branchPointX - offset, branchPointY - offset, 0.1);
-//			gl.glTexCoord2f(co.right(),co.top()); 
-					gl.glVertex3d(branchPointX - offset, branchPointY + offset, 0.1);
-//			gl.glTexCoord2f(co.left(), co.top()); 
-					gl.glVertex3d(branchPointX + offset, branchPointY + offset, 0.1);
-//			gl.glTexCoord2f(co.left(),co.bottom()); 
-					gl.glVertex3d(branchPointX + offset, branchPointY - offset, 0.1);
-				gl.glEnd();
-			}
+		
+		double branchPoint = 0.0;
+		double branchPointX = 0.0;
+		double branchPointY = 0.0;
+		double offset = 2.0;
+		
+		if (this.numberOfQueueLanes != 1) {
+			gl.glBegin(GL.GL_QUADS);
+			  gl.glVertex3d(_branchPoint.x - offset, _branchPoint.y - offset, zCoord);
+			  gl.glVertex3d(_branchPoint.x - offset, _branchPoint.y + offset, zCoord);
+			  gl.glVertex3d(_branchPoint.x + offset, _branchPoint.y + offset, zCoord);
+			  gl.glVertex3d(_branchPoint.x + offset, _branchPoint.y - offset, zCoord);
+		  gl.glEnd();
+			
+			
 		}
 		
-		
-		
-		
+//		if (this.laneData != null){
+//			for (String key : this.laneData.keySet()) {
+//				branchPoint = this.laneData.get(key);
+//				if (branchPoint == 0.0){
+//					continue;
+//				}
+//				log.debug("lane data not null, meter from linkend: " + branchPoint);
+//				log.debug("startx: " + this.startX + " endx: " + this.endX);
+//				log.debug("startY: " + this.startY + " endY: " + this.endY);
+//				branchPointX = this.startX + (sqrt - branchPoint) * dxNorm;
+//				branchPointY = this.startY + (sqrt - branchPoint) * dyNorm;
+//				log.debug("branchPoint: (" + branchPointX + ", " + branchPointY +")");
+//				double offset = 2.0;
+//				gl.glBegin(GL.GL_QUADS);
+//					gl.glVertex3d(branchPointX - offset, branchPointY - offset, zCoord);
+//					gl.glVertex3d(branchPointX - offset, branchPointY + offset, zCoord);
+//					gl.glVertex3d(branchPointX + offset, branchPointY + offset, zCoord);
+//					gl.glVertex3d(branchPointX + offset, branchPointY - offset, zCoord);
+//				gl.glEnd();
+//			}
+//			
+//			log.debug("Width of quad: " + (nrLanes * cellWidth_m));
+//			double distanceLanes = (nrLanes * cellWidth_m) / (this.nrLanes + 2);
+//			log.debug("distance of lanes : " + distanceLanes);
+//			Point2D.Double normalizedOrthoV = calcNormalizedOrthogonalVector(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y);
+//			for (int i = 0; i < this.nrLanes; i++){
+//				
+//			}
+//		}
 		//draw lines between coordinates of nodes(?)
 		gl.glBegin(GL.GL_LINES);
-			gl.glVertex3d(this.startX, this.startY , 0.1); 
-			gl.glVertex3d(this.endX, this.endY, 0.1); 
+			gl.glVertex3d(this.startX, this.startY , zCoord); 
+			gl.glVertex3d(this.endX, this.endY, zCoord); 
 		gl.glEnd();
 
 		//		
@@ -172,14 +198,51 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		
 	}
 	
-	public void addQueueLaneData(String id, double meterfromlinkend){
-		if (this.laneData == null) {
-			this.laneData = new LinkedHashMap<String, Double>();
-		}
-		this.laneData.put(id, meterfromlinkend);
-	}
+	
 
 	public void setNumberOfLanes(int nrQueueLanes) {
 		this.numberOfQueueLanes = nrQueueLanes;
 	}
+
+	public void setBranchPoint(double x, double y) {
+		this._branchPoint = new Point2D.Double(x, y);
+	}
+
+	public void addNewQueueLaneData(String id, double endx, double endy) {
+		if (this._laneData == null) {
+			this._laneData = new ArrayList<LaneData>();
+		}
+		LaneData ld = new LaneData();
+		ld.setId(id);
+		ld.setEndPoint(endx, endy);
+		this._laneData.add(ld);
+	}
+	
+	private static final class LaneData {
+		private String id;
+		private Point2D.Double endPoint;
+
+		public void setId(String id){
+			this.id = id;
+		}
+
+		public void setEndPoint(double endx, double endy) {
+			this.endPoint = new Point2D.Double(endx, endy);
+		}
+
+		
+		public Point2D.Double getEndPoint() {
+			return endPoint;
+		}
+
+		
+		public void setEndPoint(Point2D.Double endPoint) {
+			this.endPoint = endPoint;
+		}
+
+		
+		public String getId() {
+			return id;
+		}
+	};
 }

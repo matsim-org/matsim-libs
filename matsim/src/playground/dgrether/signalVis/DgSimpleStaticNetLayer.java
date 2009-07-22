@@ -34,4 +34,11 @@ public class DgSimpleStaticNetLayer extends SimpleStaticNetLayer {
 	public DgSimpleStaticNetLayer() {
 	}
 
+	@Override
+	public int getDrawOrder() {
+		return 10;
+	}
+
+	
+	
 }
