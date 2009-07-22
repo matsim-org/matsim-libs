@@ -30,7 +30,7 @@ public class ActivityLocations {
 	 * 		- KZN
 	 * 		- WesternCape
 	 */
-	 static String studyAreaName = "KZN";
+	 static String studyAreaName = "WesternCape";
 
 	// Set the home directory, depending on where the job is executed.
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
