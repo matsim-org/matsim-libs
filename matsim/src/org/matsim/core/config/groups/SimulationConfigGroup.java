@@ -23,6 +23,7 @@ package org.matsim.core.config.groups;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.Time;
 
@@ -292,7 +293,7 @@ public class SimulationConfigGroup extends Module {
 	}
 
 	/** Sets the way the vehicles should be positioned on the links. Currently known and supported styles are
-	 * <code>queue</code> (the default) and <code>equiDist</code>.
+	 * <code>queue</code> and <code>equiDist</code>.
 	 *
 	 * @param style
 	 */
