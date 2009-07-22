@@ -370,11 +370,12 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 
-//		MeisterkConfigGroup meisterk = new MeisterkConfigGroup();
 		PlanAnalyzeTourModeChoiceSet testee = new PlanAnalyzeTourModeChoiceSet(new MeisterkConfigGroup().getChainBasedModes(), this.config.planomat().getTripStructureAnalysisLayer());
 		EnumSet<TransportMode> possibleModes = EnumSet.of(TransportMode.walk, TransportMode.bike, TransportMode.pt, TransportMode.car);
 		testee.setModeSet(possibleModes);
 
+//		testee.setDoLogging(true);
+		
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = this.config.planomat().getTripStructureAnalysisLayer();
 		Location location = null;
@@ -401,7 +402,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			}
 			testee.run(plan);
 
-			ArrayList<TransportMode[]> actual = testee.getResult();
+			ArrayList<TransportMode[]> actual = testee.getChoiceSet();
 			assertEquals(entry.getValue().size(), actual.size());
 			assertTrue(Arrays.deepEquals(
 					(TransportMode[][]) entry.getValue().toArray(new TransportMode[0][0]), 
