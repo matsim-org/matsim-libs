@@ -26,10 +26,11 @@ import org.matsim.core.network.NetworkLayer;
 /**
  * @author mrieser
  */
-public class NodeCarRouteTest extends AbstractNetworkRouteTest {
+public class NodeNetworkRouteTest extends AbstractNetworkRouteTest {
 
-	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, NetworkLayer network) {
+	@Override
+	public NetworkRoute getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
 		return new NodeNetworkRoute(fromLink, toLink);
 	}
-	
+
 }

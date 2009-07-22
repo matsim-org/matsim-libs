@@ -23,14 +23,14 @@ package org.matsim.core.population.routes;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllTests {
+public abstract class AllTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(CompressedNetworkRouteTest.class);
-		suite.addTestSuite(LinkCarRouteTest.class);
-		suite.addTestSuite(NodeCarRouteTest.class);
+		suite.addTestSuite(LinkNetworkRouteTest.class);
+		suite.addTestSuite(NodeNetworkRouteTest.class);
 
 		return suite;
 	}

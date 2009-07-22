@@ -37,7 +37,7 @@ import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getCarRouteInstance(final Link fromLink, final Link toLink, NetworkLayer network) {
+	public NetworkRoute getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
 		return new CompressedNetworkRoute(fromLink, toLink, subsequent.getSubsequentLinks());
 	}
@@ -62,7 +62,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		links.add(link12);
 		links.add(link13);
 		links.add(linkM24);
-		NetworkRoute route = getCarRouteInstance(link1, link4, network);
+		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
 		route.setLinks(link1, links, link4);
 
 		List<Link> links2 = route.getLinks();
@@ -103,7 +103,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	/**
 	 * Tests that {@link CompressedNetworkRoute#getLinks()} doesn't crash or
-	 * hang when a route object is not correctly initialized.  
+	 * hang when a route object is not correctly initialized.
 	 */
 	public void testGetLinks_incompleteInitialization() {
 		NetworkLayer network = createTestNetwork();
@@ -128,7 +128,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	/**
 	 * Tests that {@link CompressedNetworkRoute#getNodes()} doesn't crash or
-	 * hang when a route object is not correctly initialized.  
+	 * hang when a route object is not correctly initialized.
 	 */
 	public void testGetNodes_incompleteInitialization() {
 		NetworkLayer network = createTestNetwork();
@@ -137,17 +137,17 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		Link link2 = network.getLink(new IdImpl("2"));
 		Link link3 = network.getLink(new IdImpl("3"));
 		Link link4 = network.getLink(new IdImpl("4"));
-		
+
 		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
 		subsequentLinks.put(link0, link1);
 		subsequentLinks.put(link1, link2);
 		subsequentLinks.put(link2, link3);
 		subsequentLinks.put(link3, link4);
-		
+
 		NetworkRoute route = new CompressedNetworkRoute(link0, link4, subsequentLinks);
 		// NO route.setLinks() here!
-		
+
 		assertEquals("expected 0 links.", 0, route.getNodes().size());
 	}
-	
+
 }
