@@ -151,7 +151,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	private static final Map<OGLProvider, List<OTFDrawable>> itemsListMap = new HashMap<OGLProvider, List<OTFDrawable>>(); // not yet defined
 
 	protected int netDisplList = -1;
-	/*package*/ static float cellWidth_m = 30.f;
+	public static float cellWidth_m = 30.f;
 
 	@Override
 	public void addItem(OTFDataReceiver item) {
@@ -226,7 +226,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	public void init(SceneGraph graph, boolean initConstData) {
 		myDrawer = (OGLProvider)graph.getDrawer();
 
-		if (netDisplListMap.containsKey(myDrawer) && netDisplList != -2){
+		if (netDisplListMap.containsKey(myDrawer) && (netDisplList != -2)){
 			netDisplList = netDisplListMap.get(myDrawer);
 
 			if(initConstData) {
