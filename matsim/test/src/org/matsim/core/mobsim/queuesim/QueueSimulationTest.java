@@ -21,12 +21,14 @@
 package org.matsim.core.mobsim.queuesim;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
@@ -59,11 +61,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.BasicVehicleImpl;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicleTypeImpl;
 
 public class QueueSimulationTest extends MatsimTestCase {
 
 	private final static Logger log = Logger.getLogger(QueueSimulationTest.class);
-	
+
 	/**
 	 * This test is mostly useful for manual debugging, because only a single agent is simulated
 	 * on a very simple network.
@@ -180,7 +185,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals("wrong time in 3rd event.", 6.0*3600 + 15, collector.events.get(2).getTime(), EPSILON);
 		assertEquals("wrong time in 4th event.", 6.0*3600 + 15, collector.events.get(3).getTime(), EPSILON);
 	}
-	
+
 	/**
 	 * Simulates a single agent that has two activities on the same link. Tests if the simulation
 	 * correctly recognizes such cases.
@@ -249,6 +254,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 	/**
 	 * Tests that no Exception occurs if an agent has no leg at all.
+	 *
+	 * @author mrieser
 	 */
 	public void testAgentWithoutLeg() {
 		Fixture f = new Fixture();
@@ -257,7 +264,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		PlanImpl plan = person.createPlan(true);
 		plan.createActivity("home", f.link1);
 		f.plans.getPersons().put(person.getId(), person);
-		
+
 		/* build events */
 		Events events = new Events();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
@@ -270,38 +277,42 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* finish */
 		assertEquals("wrong number of link enter events.", 0, collector.events.size());
 	}
-	
+
 	/**
 	 * Tests that no Exception occurs if an agent has no leg at all, but the only activity has an end time set.
+	 *
+	 * @author mrieser
 	 */
 	public void testAgentWithoutLegWithEndtime() {
 		Fixture f = new Fixture();
-		
+
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createPlan(true);
 		ActivityImpl act = plan.createActivity("home", f.link1);
 		act.setEndTime(6.0 * 3600);
 		f.plans.getPersons().put(person.getId(), person);
-		
+
 		/* build events */
 		Events events = new Events();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
-		
+
 		/* run sim */
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
-		
+
 		/* finish */
 		assertEquals("wrong number of link enter events.", 0, collector.events.size());
 	}
-	
+
 	/**
 	 * Tests that no Exception occurs if the last activity of an agent has an end time set (which is wrong).
+	 *
+	 * @author mrieser
 	 */
 	public void testAgentWithLastActWithEndtime() {
 		Fixture f = new Fixture();
-		
+
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createPlan(true);
 		ActivityImpl act = plan.createActivity("home", f.link1);
@@ -311,20 +322,20 @@ public class QueueSimulationTest extends MatsimTestCase {
 		act = plan.createActivity("work", f.link2);
 		act.setEndTime(6.0 * 3600 + 60);
 		f.plans.getPersons().put(person.getId(), person);
-		
+
 		/* build events */
 		Events events = new Events();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
-		
+
 		/* run sim */
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.run();
-		
+
 		/* finish */
 		assertEquals("wrong number of link enter events.", 0, collector.events.size());
 	}
-	
+
 	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
 	 * agents driving over a link.
@@ -516,6 +527,11 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals(1000, volume[8]); // all the rest
 	}
 
+	/**
+	 * Tests that vehicles are teleported if needed so that agents can use the car wherever they want.
+	 *
+	 * @author mrieser
+	 */
 	public void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture();
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -524,7 +540,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createLeg(TransportMode.other);
 		l1.setTravelTime(10);
-		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link2)); // TODO [MR] use different factory / TransportationMode
+		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link2));
 		ActivityImpl a2 = plan.createActivity("w", f.link2);
 		a2.setEndTime(7.0*3600 + 20);
 		LegImpl l2 = plan.createLeg(TransportMode.car);
@@ -533,7 +549,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		l2.setRoute(route2);
 		plan.createActivity("l", f.link3);
 		f.plans.getPersons().put(person.getId(), person);
-		
+
 		/* build events */
 		Events events = new Events();
 		BasicEventCollector collector = new BasicEventCollector();
@@ -543,7 +559,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.setTeleportVehicles(true);
 		sim.run();
-		
+
 		/* finish */
 		assertEquals("wrong number of events.", 11, collector.events.size());
 		assertEquals("wrong type of event.", ActivityEndEvent.class, collector.events.get(0).getClass());
@@ -558,8 +574,12 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals("wrong type of event.", AgentArrivalEvent.class, collector.events.get(9).getClass());
 		assertEquals("wrong type of event.", ActivityStartEvent.class, collector.events.get(10).getClass());
 	}
-	
-	
+
+	/**
+	 * Tests that vehicles are not teleported if they are missing, but that an Exception is thrown instead.
+	 *
+	 * @author mrieser
+	 */
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture();
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -577,12 +597,12 @@ public class QueueSimulationTest extends MatsimTestCase {
 		l2.setRoute(route2);
 		plan.createActivity("l", f.link3);
 		f.plans.getPersons().put(person.getId(), person);
-		
+
 		/* build events */
 		Events events = new Events();
 		BasicEventCollector collector = new BasicEventCollector();
 		events.addHandler(collector);
-		
+
 		/* run sim */
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
 		sim.setTeleportVehicles(false);
@@ -592,7 +612,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		} catch (RuntimeException e) {
 			log.info("catched expected RuntimeException: " + e.getMessage());
 		}
-		
+
 		/* finish */
 		assertEquals("wrong number of events.", 6, collector.events.size());
 		assertEquals("wrong type of event.", ActivityEndEvent.class, collector.events.get(0).getClass());
@@ -602,7 +622,64 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals("wrong type of event.", ActivityEndEvent.class, collector.events.get(4).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEvent.class, collector.events.get(5).getClass());
 	}
-	
+
+	/**
+	 * Tests that if a specific vehicle is assigned to an agent in its NetworkRoute, that this vehicle
+	 * is used instead of a default one.
+	 *
+	 * @author mrieser
+	 */
+	public void testAssignedVehicles() {
+		Fixture f = new Fixture();
+		Id id1 = new IdImpl(1);
+		Id id2 = new IdImpl(2);
+		PersonImpl person = new PersonImpl(id1); // do not add person to population, we'll do it ourselves for the test
+		PlanImpl plan = person.createPlan(true);
+		ActivityImpl a1 = plan.createActivity("h", f.link2);
+		a1.setEndTime(7.0*3600);
+		LegImpl l1 = plan.createLeg(TransportMode.car);
+		NetworkRoute route1 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2, f.link3);
+		route1.setNodes(f.link2, f.nodes3, f.link3);
+		route1.setVehicleId(id2);
+		l1.setRoute(route1);
+		plan.createActivity("w", f.link3);
+
+		/* build events */
+		Events events = new Events();
+		BasicEventCollector collector = new BasicEventCollector();
+		events.addHandler(collector);
+
+		/* prepare sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		QueueNetwork qnet = sim.getQueueNetwork();
+		QueueLink qlink2 = qnet.getQueueLink(id2);
+		QueueLink qlink3 = qnet.getQueueLink(new IdImpl(3));
+
+		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
+		QueueVehicle vehicle1 = new QueueVehicleImpl(new BasicVehicleImpl(id1, defaultVehicleType));
+		QueueVehicle vehicle2 = new QueueVehicleImpl(new BasicVehicleImpl(id2, defaultVehicleType));
+		qlink2.addParkedVehicle(vehicle1);
+		qlink2.addParkedVehicle(vehicle2);
+
+		SimulationTimer.setTime(100.0);
+		PersonAgent agent = new PersonAgent(person, sim);
+		agent.initialize();
+		agent.activityEnds(100.0);
+
+		SimulationTimer.setTime(101.0);
+		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer
+		SimulationTimer.setTime(102.0);
+		sim.doSimStep(102.0); // agent should be moved to qlink3
+
+		Collection<QueueVehicle> vehicles = qlink3.getAllVehicles();
+		assertEquals(1, vehicles.size());
+		assertEquals(id2, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
+		// vehicle 1 should still stay on qlink2
+		vehicles = qlink2.getAllVehicles();
+		assertEquals(1, vehicles.size());
+		assertEquals(id1, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
+	}
+
 	/**
 	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
 	 * does not lead to the destination link.
@@ -618,7 +695,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
-	
+
 	/**
 	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
 	 * starts at another link than the previous activity is located at.
@@ -634,7 +711,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
 		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
-	
+
 	/**
 	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
 	 * starts at another link than the previous activity is located at.
@@ -670,6 +747,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 	/**
 	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
 	 * is not specified, even that the destination link is different from the departure link.
+	 *
+	 * @author mrieser
 	 */
 	public void testConsistentRoutes_MissingRoute() {
 		Events events = new Events();
@@ -721,12 +800,12 @@ public class QueueSimulationTest extends MatsimTestCase {
 		plan.createActivity("h", link6);
 		f.plans.getPersons().put(person.getId(), person);
 
-		/* run sim with special logger */		
+		/* run sim with special logger */
 		LogCounter logger = new LogCounter();
 		Logger.getRootLogger().addAppender(logger);
 		new QueueSimulation(f.network, f.plans, events).run();
 		Logger.getRootLogger().removeAppender(logger);
-		
+
 		return logger;
 	}
 
@@ -770,9 +849,11 @@ public class QueueSimulationTest extends MatsimTestCase {
 			if (event.getLevel() == Level.ERROR) this.cntERROR++;
 		}
 
+		@Override
 		public void close() {
 		}
 
+		@Override
 		public boolean requiresLayout() {
 			return false;
 		}
@@ -823,7 +904,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 			/* build plans */
 			this.plans = new PopulationImpl();
-			
+
 			this.nodes3 = new ArrayList<Node>();
 			this.nodes3.add(this.node3);
 

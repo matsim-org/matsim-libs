@@ -91,7 +91,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
 /**
  * Implementation of a queue-based transport simulation.
- * 
+ *
  * @author dstrippgen
  * @author mrieser
  * @author dgrether
@@ -100,7 +100,7 @@ public class QueueSimulation {
 
 	private int snapshotPeriod = Integer.MAX_VALUE;
 	private double snapshotTime = 0;
-	
+
 	protected static final int INFO_PERIOD = 3600;
 	private double infoTime = 0;
 
@@ -115,7 +115,7 @@ public class QueueSimulation {
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
-	
+
 	protected QueueSimEngine simEngine = null;
 
 	/**
@@ -123,7 +123,7 @@ public class QueueSimulation {
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
 	private final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
-	
+
 	private final Date starttime = new Date();
 
 	private double stopTime = 100*3600;
@@ -154,15 +154,15 @@ public class QueueSimulation {
 	private BasicLaneDefinitions laneDefintions;
 
 	private QueueSimListenerManager listenerManager;
-	
+
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
 	protected Scenario scenario = null;
-	
+
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
 	private int cntTeleportVehicle = 0;
-	
+
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -181,7 +181,7 @@ public class QueueSimulation {
 		this.network = new QueueNetwork(network);
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory(this);
-		
+
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
 	}
 
@@ -353,8 +353,8 @@ public class QueueSimulation {
 		}
 		return controler;
 	}
-	
-	
+
+
 
 	private void initPlanbasedControler(final PlanBasedSignalSystemControler controler, final BasicSignalSystemConfiguration config){
 		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
@@ -395,7 +395,7 @@ public class QueueSimulation {
 
 			QueueVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
-			veh.setDriver(agent);
+			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
 
 			if (agent.initialize()) {
@@ -477,7 +477,7 @@ public class QueueSimulation {
 	}
 
 	private void prepareNetworkChangeEventsQueue() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkLayer)this.networkLayer).getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = (this.networkLayer).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
@@ -669,19 +669,19 @@ public class QueueSimulation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Registers this agent as performing an activity and makes sure that the
 	 * agent will be informed once his departure time has come.
-	 * 
+	 *
 	 * @param agent
-	 * 
+	 *
 	 * @see DriverAgent#getDepartureTime()
 	 */
 	protected void scheduleActivityEnd(final DriverAgent agent) {
 		this.activityEndsList.add(agent);
 	}
-	
+
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
 			DriverAgent agent = this.activityEndsList.peek();
@@ -693,11 +693,11 @@ public class QueueSimulation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
-	 * 
+	 *
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
@@ -710,8 +710,12 @@ public class QueueSimulation {
 
 		if (leg.getMode().equals(TransportMode.car)) {
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			Id vehicleId = route.getVehicleId();
+			if (vehicleId == null) {
+				vehicleId = agent.getPerson().getId(); // backwards-compatibility
+			}
 			QueueLink qlink = this.network.getQueueLink(link.getId());
-			QueueVehicle vehicle = qlink.removeParkedVehicle(agent.getPerson().getId());
+			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				if (this.teleportVehicles) {
 					if (agent instanceof PersonAgent) {
@@ -731,6 +735,9 @@ public class QueueSimulation {
 				} else {
 					throw new RuntimeException("car not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
 				}
+			}
+			if (vehicle != null) {
+				vehicle.setDriver(agent);
 			}
 			if (route.getEndLink() == link) {
 				qlink.processVehicleArrival(now, vehicle);
@@ -767,12 +774,12 @@ public class QueueSimulation {
 
 	/** Specifies whether the simulation should track vehicle usage and throw an Exception
 	 * if an agent tries to use a car on a link where the car is not available, or not.
-	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a 
+	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a
 	 * vehicle available. If the requested vehicle is parked somewhere else, the vehicle
 	 * will be teleported to wherever it is requested to for usage. Set to <code>false</code>
 	 * will generate an Exception in the case when an tries to depart with a car on link
 	 * where the car is not parked.
-	 * 
+	 *
 	 * @param teleportVehicles
 	 */
 	public void setTeleportVehicles(final boolean teleportVehicles) {
@@ -781,7 +788,7 @@ public class QueueSimulation {
 
 	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, DriverAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
-		public int compare(Tuple<Double, DriverAgent> o1, Tuple<Double, DriverAgent> o2) {
+		public int compare(final Tuple<Double, DriverAgent> o1, final Tuple<Double, DriverAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
 				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
@@ -793,9 +800,9 @@ public class QueueSimulation {
 	public QueueNetwork getQueueNetwork() {
 		return this.network;
 	}
-	
+
 	public Scenario getScenario() {
 		return this.scenario;
 	}
-	
+
 }
