@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.coverage.grid.file.FSCatalogEntry;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -47,7 +47,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -55,9 +54,6 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
-
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class RetailersSequentialLocationListener implements StartupListener, IterationEndsListener {
 	
@@ -67,7 +63,10 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 	public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	public final static String CONFIG_RETAILERS = "retailers";
-	
+	public final static String CONFIG_ZONES = "zones";
+	public final static String CONFIG_PARTITION = "partition";
+	public final static String CONFIG_SAMPLE_SHOPS = "samplingRateShops";
+	public final static String CONFIG_SAMPLE_PERSONS = "samplingRatePersons";
 	private Retailers retailers;
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
@@ -79,7 +78,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	private String facilityIdFile = null;
 	private ArrayList<LinkRetailersImpl> links = null;
 	private RetailZones retailZones = new RetailZones();
-	private ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
+	ArrayList<ActivityFacility> sampledShops = new ArrayList<ActivityFacility>();
 	public RetailersSequentialLocationListener() {
 	}
 
@@ -96,13 +95,35 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		ActivityFacilitiesImpl facs = (ActivityFacilitiesImpl) controler.getFacilities();
 		txf.write(facs);
 		String retailersOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
+		
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
+		
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
 		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
 		ArrayList<Id> retailersLinks = new ArrayList<Id>();
-		if (this.facilityIdFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");
+		
+		// Parameters which define the number of retail zones and the type of partition
+		String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
+		int number_of_zones =0;
+		if (type_of_partition.equals("symmetric")){
+			number_of_zones = (int) Math.pow((Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ZONES))),2);}
+		else {}//TODO Define the asymmetric version
+		if (number_of_zones == 0) { throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" not defined!");}
+		
+		//Parameters which define the sampling rate for shops and persons. If no sampling rate is given the default is 1 for both of them
+		double samplingRateShops = 1;
+		if (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_SHOPS) != null) {
+			samplingRateShops = Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_SHOPS));
+				if (samplingRateShops>1 || samplingRateShops<0) { throw new RuntimeException("In config file, param = "+CONFIG_SAMPLE_SHOPS+" in module = "+CONFIG_GROUP+" must be set to a value between 0 and 1!!!");}
+		}
+		double samplingRatePersons = 1;
+		if (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_PERSONS) != null) {
+			samplingRatePersons = Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_PERSONS));
+				if (samplingRatePersons>1 || samplingRatePersons<0) { throw new RuntimeException("In config file, param = "+CONFIG_SAMPLE_PERSONS+" in module = "+CONFIG_GROUP+" must be set to a value between 0 and 1!!!");}
 		}
 		
+		//The characteristics of retailers are read
+		if (this.facilityIdFile == null) {throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_ZONES+" not defined!");}
 		else {
 			try { //TODO Modify this!!!! In the sequential case other attributes for the retailer are needed, or in any case some of those which are now there are completely useless!!!!!
 				this.retailers = new Retailers();
@@ -133,7 +154,6 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 							
 							Retailer r = new Retailer(rId, null);
 							log.info("The strategy " + entries[2] + " will be added to the retailer = " + rId);
-							//r.addSequentialStrategy(controler, entries[2], this.links);
 							ActivityFacility f = controlerFacilities.get(fId);
 							r.addFacility(f);
 							retailersLinks.add(f.getLink().getId());
@@ -155,32 +175,43 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		this.lrr = new LinksRetailerReader (controler, retailersLinks);
 		this.links = lrr.ReadLinks(); 
 		Collection<PersonImpl> persons = controler.getPopulation().getPersons().values();
-		int n =3; // TODO: get this from the config file  
-		log.info("Number of retail zones = "+  n*n);
+		log.info("Number of retail zones = "+  number_of_zones*number_of_zones);
+		double n = Math.sqrt(number_of_zones);
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
 		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
-				this.shops.add(f);
+				shops.add(f);
 				log.info("The shop " + f.getId() + " has been added to the file 'shops'");
 			}
-			else {}//System.out.println ("Activity options are: " + f.getActivityOptions().values().toString());}
+			else {}
 		}
+		
 		for (PersonImpl p : persons) {
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() < miny) { miny = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() > maxx) { maxx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() > maxy) { maxy = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
 		}
+		for (ActivityFacility shop : shops) {
+			if (shop.getCoord().getX() < minx) { minx = shop.getCoord().getX(); }
+			if (shop.getCoord().getY() < miny) { miny = shop.getCoord().getY(); }
+			if (shop.getCoord().getX() > maxx) { maxx = shop.getCoord().getX(); }
+			if (shop.getCoord().getY() > maxy) { maxy = shop.getCoord().getY(); }
+		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
-
+		log.info("Min x = " + minx );
+		log.info("Min y = " + miny );
+		log.info("Max x = " + maxx );
+		log.info("Max y = " + maxy );
 		double x_width = (maxx - minx)/n;
 		double y_width = (maxy - miny)/n;
 		int a = 0;
 		int i = 0;
+		
 		while (i<n) {
 			int j = 0;
 			while (j<n) {
@@ -189,10 +220,22 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				double x2= x1 + x_width;
 				double y1= miny + j*y_width;
 				double y2= y1 + y_width;
-				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-				rz.addPersons (persons); 
-				rz.addFacilities (shops);
+				RetailZone rz = new RetailZone (id, x1, y1, x2, y2, samplingRateShops, samplingRatePersons);
+				for (PersonImpl p : persons ) {
+					Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
+					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
+						rz.addPersonToQuadTree(c,p);
+					}		
+				} 
+				for (ActivityFacility af : shops) {
+					Coord c = af.getCoord();
+					if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
+						rz.addShopToQuadTree(c,af);
+					}
+				}	
 				this.retailZones.addRetailZone(rz);
+				log.info("In the zone " + rz.getId() + ", " + rz.getSampledShops().size() + " have been sampled");
+				this.sampledShops.addAll(rz.getSampledShops());
 				a=a+1;
 				j=j+1;
 			}
@@ -208,12 +251,13 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		// controlled by the controler (or actually added to the population)
 		log.info("There are (is) " + retailers.getRetailers().values().size() + " Retailer(s)");
 		//Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
-		if (controler.getIteration()%2==0 && controler.getIteration()>0){
+		if (controler.getIteration()%5==0 && controler.getIteration()>0){
 			for (Retailer r:retailers.getRetailers().values()) {
 				retailersFacilities.addAll(r.getFacilities().values());
 				log.info("The retailer " + r.getId().toString() + " owns " + r.getFacilities().values().size() + " facilities");
 			}
-			GravityModelRetailerStrategy gmrs = new GravityModelRetailerStrategy (controler, retailZones, shops, retailersFacilities, links); 
+			log.info( this.sampledShops.size()+  " shops have been sampled");
+			GravityModelRetailerStrategy gmrs = new GravityModelRetailerStrategy (controler, this.retailZones, this.sampledShops, retailersFacilities, this.links); 
 			gmrs.moveFacilities();
 			gmrs.getMovedFacilities();
 		
