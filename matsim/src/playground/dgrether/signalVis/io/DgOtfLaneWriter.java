@@ -38,55 +38,48 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 	
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
-		String id = this.src.getLink().getId().toString();
-		ByteBufferUtils.putString(out, id);
+//		String id = this.src.getLink().getId().toString();
+//		ByteBufferUtils.putString(out, id);
 		double linkStartX1 = this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad.offsetEast;
 		double linkStartY1 = this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth;
 		double linkEndX1 = this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad.offsetEast;
 		double linkEndY1 = this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad.offsetNorth;
 		
 		
+		//calculate link width
+		double cellWidth = 30.0;
+		double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
+		//calculate length and normal
+		double deltaLinkX = linkEndX1 - linkStartX1;
+		double deltaLinkY = linkEndY1 - linkStartY1;
+		double linkLength = Math.sqrt(Math.pow(deltaLinkX, 2) + Math.pow(deltaLinkY, 2));
+		double deltaLinkXNorm = deltaLinkX / linkLength;
+		double deltaLinkYNorm = deltaLinkY / linkLength;
+		double normalizedOrthogonalX = deltaLinkYNorm;
+		double normalizedOrthogonalY = - deltaLinkXNorm;
+
+		//modify x and y coordinates of quad to get a middle line
+		double mlinkStartX1 = linkStartX1 + (normalizedOrthogonalX * quadWidth/2);
+		double mlinkStartY1 = linkStartY1 + (normalizedOrthogonalY * quadWidth/2);
+		double mlinkEndX1 = linkEndX1 + (normalizedOrthogonalX * quadWidth/2);
+		double mlinkEndY1 = linkEndY1 + (normalizedOrthogonalY * quadWidth/2);
+
+		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
+		out.putInt(numberOfToNodeQueueLanes);
+		log.debug("numberoftoNodeQueueLanes: " + numberOfToNodeQueueLanes);
+
+		out.putDouble(mlinkStartX1);
+		out.putDouble(mlinkStartY1);
 		
 		//number of tonodequeuelanes
-		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
-		
-		log.debug("numberoftoNodeQueueLanes: " + numberOfToNodeQueueLanes);
 		
 		if (numberOfToNodeQueueLanes == 1) {
-			out.putFloat((float)linkStartX1); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(linkStartY1));
-			out.putFloat((float)(linkEndX1)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(linkEndY1));
-			out.putInt(this.src.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
-			out.putInt(numberOfToNodeQueueLanes);
+			//the branch point is the middle of the link end
+			out.putDouble(mlinkEndX1);
+			out.putDouble(mlinkEndY1);
 		}
 		//only write further lane information if there is more than one lane
 		else  {
-			//calculate link width
-			double cellWidth = 30.0;
-			double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
-			//calculate length and normal
-			double deltaLinkX = linkEndX1 - linkStartX1;
-			double deltaLinkY = linkEndY1 - linkStartY1;
-			double linkLength = Math.sqrt(Math.pow(deltaLinkX, 2) + Math.pow(deltaLinkY, 2));
-			double deltaLinkXNorm = deltaLinkX / linkLength;
-			double deltaLinkYNorm = deltaLinkY / linkLength;
-			double normalizedOrthogonalX = deltaLinkYNorm;
-			double normalizedOrthogonalY = - deltaLinkXNorm;
-
-			//modify x and y coordinates of quad to get a middle line
-			double mlinkStartX1 = linkStartX1 + (normalizedOrthogonalX * quadWidth/2);
-			double mlinkStartY1 = linkStartY1 + (normalizedOrthogonalY * quadWidth/2);
-			double mlinkEndX1 = linkEndX1 + (normalizedOrthogonalX * quadWidth/2);
-			double mlinkEndY1 = linkEndY1 + (normalizedOrthogonalY * quadWidth/2);
-			
-			out.putFloat((float)mlinkStartX1); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(mlinkStartY1));
-			out.putFloat((float)(mlinkEndX1)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(mlinkEndY1));
-			out.putInt(this.src.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
-			out.putInt(numberOfToNodeQueueLanes);
-			
 			//write position of branchPoint
 			QueueLane ql = this.src.getOriginalLane();
 			double meterFromLinkEnd = ql.getMeterFromLinkEnd();
@@ -118,6 +111,8 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 			}
 		}
 	}
+	
+	
 	
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {

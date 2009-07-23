@@ -26,6 +26,7 @@ import java.util.List;
 import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 import com.sun.opengl.util.texture.TextureCoords;
@@ -35,11 +36,11 @@ import com.sun.opengl.util.texture.TextureCoords;
  * @author dgrether
  *
  */
-public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
+public class DgSimpleQuadDrawer extends OTFGLDrawableImpl {
 
 	
 	private static final Logger log = Logger.getLogger(DgSimpleQuadDrawer.class);
-	private float startX, startY, endX, endY;
+	private double startX, startY, endX, endY;
 	private int nrLanes;
 	private int numberOfQueueLanes;
 
@@ -49,24 +50,23 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 	public DgSimpleQuadDrawer() {
 	}
 	
-	@Override
-	public void setQuad(float startX, float startY, float endX, float endY, int nrLanes){
-		super.setQuad(startX, startY, endX, endY, nrLanes);
-		this.startX = startX;
-		this.startY = startY;
-		this.endX = endX;
-		this.endY = endY;
-		this.nrLanes = nrLanes;
-	}
+//	@Override
+//	public void setQuad(float startX, float startY, float endX, float endY, int nrLanes){
+//		super.setQuad(startX, startY, endX, endY, nrLanes);
+//		this.startX = startX;
+//		this.startY = startY;
+//		this.endX = endX;
+//		this.endY = endY;
+//		this.nrLanes = nrLanes;
+//	}
+//	
 	
 	
-	
-	@Override
 	public void onDraw( GL gl) {
 		gl.glColor3d(0.2, 0.2, 0.2);
-		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes* SimpleStaticNetLayer.cellWidth_m);
-		this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
-		this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+//		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes* SimpleStaticNetLayer.cellWidth_m);
+//		this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
+//		this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
 //		log.debug("ortho.x " + ortho.x + " ortho.y " + ortho.y);
 		//Draw quad
 		TextureCoords co = new TextureCoords(0,0,1,1);
@@ -80,8 +80,8 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		
 		gl.glColor3d(1.0, 0, 0);
 		
-		double linkWidthX = ortho.x;
-		double linkWidhtY = ortho.y;
+//		double linkWidthX = ortho.x;
+//		double linkWidhtY = ortho.y;
 		
 		double dx = this.endX - this.startX;
 		double dy = this.endY - this.startY;
@@ -96,21 +96,28 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		double branchPointY = 0.0;
 		double offset = 2.0;
 		
+		// always draw a branch point
+		gl.glBegin(GL.GL_QUADS);
+		gl.glVertex3d(_branchPoint.x - offset, _branchPoint.y - offset, zCoord);
+		gl.glVertex3d(_branchPoint.x - offset, _branchPoint.y + offset, zCoord);
+		gl.glVertex3d(_branchPoint.x + offset, _branchPoint.y + offset, zCoord);
+		gl.glVertex3d(_branchPoint.x + offset, _branchPoint.y - offset, zCoord);
+		gl.glEnd();
+	//draw lines between link start point and branch point
+		gl.glBegin(GL.GL_LINES);
+			gl.glVertex3d(this.startX, this.startY , zCoord); 
+			gl.glVertex3d(_branchPoint.x, _branchPoint.y, zCoord); 
+		gl.glEnd();
+
+		//only draw lanes if there are more than one
 		if (this.numberOfQueueLanes != 1) {
-			gl.glBegin(GL.GL_QUADS);
-			  gl.glVertex3d(_branchPoint.x - offset, _branchPoint.y - offset, zCoord);
-			  gl.glVertex3d(_branchPoint.x - offset, _branchPoint.y + offset, zCoord);
-			  gl.glVertex3d(_branchPoint.x + offset, _branchPoint.y + offset, zCoord);
-			  gl.glVertex3d(_branchPoint.x + offset, _branchPoint.y - offset, zCoord);
-		  gl.glEnd();
-			
-		//draw lines between coordinates of nodes(?)
-			gl.glBegin(GL.GL_LINES);
-				gl.glVertex3d(this.startX, this.startY , zCoord); 
-				gl.glVertex3d(_branchPoint.x, _branchPoint.y, zCoord); 
-			gl.glEnd();
-			
 			for (LaneData ld : this._laneData){
+				// draw connections between branch point and lane end
+				gl.glBegin(GL.GL_LINES);
+	  			gl.glVertex3d(_branchPoint.x, _branchPoint.y, zCoord); 
+		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
+  			gl.glEnd();
+				// draw lane ends
 				gl.glBegin(GL.GL_QUADS);
   			  gl.glVertex3d(ld.getEndPoint().x - offset, ld.getEndPoint().y - offset, zCoord);
 	  		  gl.glVertex3d(ld.getEndPoint().x - offset, ld.getEndPoint().y + offset, zCoord);
@@ -213,6 +220,11 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 	public void setNumberOfLanes(int nrQueueLanes) {
 		this.numberOfQueueLanes = nrQueueLanes;
 	}
+	
+	public void setMiddleOfLinkStart(double x, double y) {
+		this.startX = x;
+		this.startY = y;
+	}
 
 	public void setBranchPoint(double x, double y) {
 		this._branchPoint = new Point2D.Double(x, y);
@@ -254,5 +266,7 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		public String getId() {
 			return id;
 		}
-	};
+	}
+
+	
 }
