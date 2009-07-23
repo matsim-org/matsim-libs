@@ -849,11 +849,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 			if (event.getLevel() == Level.ERROR) this.cntERROR++;
 		}
 
-		@Override
 		public void close() {
 		}
 
-		@Override
 		public boolean requiresLayout() {
 			return false;
 		}
