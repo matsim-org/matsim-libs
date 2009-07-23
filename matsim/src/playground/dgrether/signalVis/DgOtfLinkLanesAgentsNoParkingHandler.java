@@ -41,7 +41,6 @@ public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsNoParking
 	private static final Logger log = Logger.getLogger(DgOtfLinkLanesAgentsNoParkingHandler.class);
 	
 	public DgOtfLinkLanesAgentsNoParkingHandler() {
-		log.debug("using DgOtfLinkLanesAgentsNoParkingHandler");
 	}
 
 	static public class Writer extends OTFLinkAgentsNoParkingHandler.Writer {
@@ -55,41 +54,65 @@ public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsNoParking
 			double linkEndX1 = this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad.offsetEast;
 			double linkEndY1 = this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad.offsetNorth;
 			
-			out.putFloat((float)linkStartX1); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(linkStartY1));
-			out.putFloat((float)(linkEndX1)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(linkEndY1));
-			out.putInt(this.src.getLink().getLanesAsInt(0));
 			
 			
 			//number of tonodequeuelanes
 			int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
-			out.putInt(numberOfToNodeQueueLanes);
+			
+			log.debug("numberoftoNodeQueueLanes: " + numberOfToNodeQueueLanes);
+			
+			if (numberOfToNodeQueueLanes == 1) {
+				out.putFloat((float)linkStartX1); //subtract minEasting/Northing somehow!
+				out.putFloat((float)(linkStartY1));
+				out.putFloat((float)(linkEndX1)); //subtract minEasting/Northing somehow!
+				out.putFloat((float)(linkEndY1));
+				out.putInt(this.src.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
+				out.putInt(numberOfToNodeQueueLanes);
+			}
 			//only write further lane information if there is more than one lane
-			if (numberOfToNodeQueueLanes != 1) {
-				//write position of branchPoint
-				QueueLane ql = this.src.getToNodeQueueLanes().get(0);
-				double meterFromLinkEnd = ql.getMeterFromLinkEnd();
+			else  {
+				//calculate link width
+				double cellWidth = 30.0;
+				double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
+				//calculate length and normal
 				double deltaLinkX = linkEndX1 - linkStartX1;
 				double deltaLinkY = linkEndY1 - linkStartY1;
 				double linkLength = Math.sqrt(Math.pow(deltaLinkX, 2) + Math.pow(deltaLinkY, 2));
 				double deltaLinkXNorm = deltaLinkX / linkLength;
 				double deltaLinkYNorm = deltaLinkY / linkLength;
-				double branchPointX = linkStartX1 + ((linkLength - meterFromLinkEnd) * deltaLinkXNorm);
-				double branchPointY = linkStartY1 + ((linkLength - meterFromLinkEnd) * deltaLinkYNorm);
+				double normalizedOrthogonalX = deltaLinkYNorm;
+				double normalizedOrthogonalY = - deltaLinkXNorm;
+
+				//modify x and y coordinates of quad to get a middle line
+				double mlinkStartX1 = linkStartX1 + (normalizedOrthogonalX * quadWidth/2);
+				double mlinkStartY1 = linkStartY1 + (normalizedOrthogonalY * quadWidth/2);
+				double mlinkEndX1 = linkEndX1 + (normalizedOrthogonalX * quadWidth/2);
+				double mlinkEndY1 = linkEndY1 + (normalizedOrthogonalY * quadWidth/2);
+				
+				out.putFloat((float)mlinkStartX1); //subtract minEasting/Northing somehow!
+				out.putFloat((float)(mlinkStartY1));
+				out.putFloat((float)(mlinkEndX1)); //subtract minEasting/Northing somehow!
+				out.putFloat((float)(mlinkEndY1));
+				out.putInt(this.src.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
+				out.putInt(numberOfToNodeQueueLanes);
+				
+				//write position of branchPoint
+				QueueLane ql = this.src.getOriginalLane();
+				double meterFromLinkEnd = ql.getMeterFromLinkEnd();
+				double branchPointX = mlinkStartX1 + ((linkLength - meterFromLinkEnd) * deltaLinkXNorm);
+				double branchPointY = mlinkStartY1 + ((linkLength - meterFromLinkEnd) * deltaLinkYNorm);
+				log.debug("meterfromlinkend: " + meterFromLinkEnd);
+				log.debug("linkstart x " + linkStartX1 + " y " + linkStartY1);
+				log.debug("linkendx: " + linkEndX1 + " linkendy: " + linkEndY1);
+				log.debug("branchPointX: " + branchPointX + " Y " + branchPointY);
 				out.putDouble(branchPointX);
 				out.putDouble(branchPointY);
 				
 				//write toNodeQueueLanes end points
-				//first calculate link width
-				double cellWidth = 30.0;
-				double quadWidth = cellWidth * this.src.getLink().getNumberOfLanes(Time.UNDEFINED_TIME);
-				double distanceBtwLanes = quadWidth / (numberOfToNodeQueueLanes + 2);
-				//this could be optimized is however more transparent as it is
-				double normalizedOrthogonalX = deltaLinkXNorm;
-				double normalizedOrthogonalY = - deltaLinkYNorm;
+				double distanceBtwLanes = quadWidth / (numberOfToNodeQueueLanes + 1);
 				double linkEndX2 = linkEndX1 + (normalizedOrthogonalX * quadWidth);
 				double linkEndY2 = linkEndY1 + (normalizedOrthogonalY * quadWidth);
+				log.debug("normOrtho x " + normalizedOrthogonalX + " y " + normalizedOrthogonalY);
 				
 				double laneEndPointX, laneEndPointY;
 				int laneIncrement = 1;
@@ -97,6 +120,7 @@ public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsNoParking
 					ByteBufferUtils.putString(out, l.getLaneId().toString());
 					laneEndPointX = linkEndX1 + (normalizedOrthogonalX * distanceBtwLanes * laneIncrement);
 					laneEndPointY = linkEndY1 + (normalizedOrthogonalY * distanceBtwLanes * laneIncrement);
+					log.debug("laneEndPoint x " + laneEndPointX + " y " + laneEndPointY);
 					laneIncrement++;
 					out.putDouble(laneEndPointX);
 					out.putDouble(laneEndPointY);
@@ -127,7 +151,7 @@ public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsNoParking
 		
 		int nrToNodeLanes = in.getInt();
 		drawer.setNumberOfLanes(nrToNodeLanes);
-		
+		log.debug("reader numberoftonodelanes: " + nrToNodeLanes);
 		if (nrToNodeLanes != 1) {
 			drawer.setBranchPoint(in.getDouble(), in.getDouble());
 			for (int i = 0; i < nrToNodeLanes; i++){

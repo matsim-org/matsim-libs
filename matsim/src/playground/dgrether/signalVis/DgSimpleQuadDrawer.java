@@ -67,6 +67,7 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, nrLanes* SimpleStaticNetLayer.cellWidth_m);
 		this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
 		this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+//		log.debug("ortho.x " + ortho.x + " ortho.y " + ortho.y);
 		//Draw quad
 		TextureCoords co = new TextureCoords(0,0,1,1);
 		if(SimpleStaticNetLayer.marktex != null) co =  SimpleStaticNetLayer.marktex.getImageTexCoords();
@@ -103,7 +104,20 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 			  gl.glVertex3d(_branchPoint.x + offset, _branchPoint.y - offset, zCoord);
 		  gl.glEnd();
 			
+		//draw lines between coordinates of nodes(?)
+			gl.glBegin(GL.GL_LINES);
+				gl.glVertex3d(this.startX, this.startY , zCoord); 
+				gl.glVertex3d(_branchPoint.x, _branchPoint.y, zCoord); 
+			gl.glEnd();
 			
+			for (LaneData ld : this._laneData){
+				gl.glBegin(GL.GL_QUADS);
+  			  gl.glVertex3d(ld.getEndPoint().x - offset, ld.getEndPoint().y - offset, zCoord);
+	  		  gl.glVertex3d(ld.getEndPoint().x - offset, ld.getEndPoint().y + offset, zCoord);
+		  	  gl.glVertex3d(ld.getEndPoint().x + offset, ld.getEndPoint().y + offset, zCoord);
+			    gl.glVertex3d(ld.getEndPoint().x + offset, ld.getEndPoint().y - offset, zCoord);
+   		  gl.glEnd();
+			}
 		}
 		
 //		if (this.laneData != null){
@@ -135,11 +149,7 @@ public class DgSimpleQuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 //				
 //			}
 //		}
-		//draw lines between coordinates of nodes(?)
-		gl.glBegin(GL.GL_LINES);
-			gl.glVertex3d(this.startX, this.startY , zCoord); 
-			gl.glVertex3d(this.endX, this.endY, zCoord); 
-		gl.glEnd();
+		
 
 		//		
 //		double x1, x2, y1, y2;
