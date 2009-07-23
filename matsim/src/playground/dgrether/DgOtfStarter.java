@@ -31,9 +31,9 @@ public class DgOtfStarter {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String base = "/Volumes/data/work/cvsRep/vsp-cvs/runs/run";
+		String base = "/media/data/work/cvsRep/vsp-cvs/runs/run";
 		 
-		String network = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/network/ivtch-osm.xml";
+		String network = "/media/data/work/vspSvn/studies/schweiz-ivtch/network/ivtch-osm.xml";
 		
 //		String runNumber = "486";
 //	String mvi = "1000.T.mvi";
