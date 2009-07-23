@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class ActivityLocations {
 	/* 
-	 * String value that must be set. Allowed atudy areas are:
+	 * String value that must be set. Allowed study areas are:
 	 * 		- SouthAfrica
 	 * 		- Gauteng
 	 * 		- KZN

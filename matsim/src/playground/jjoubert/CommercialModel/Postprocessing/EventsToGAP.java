@@ -30,9 +30,9 @@ import java.util.Scanner;
 
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.jjoubert.CommercialTraffic.AnalyseGAPDensity;
 import playground.jjoubert.CommercialTraffic.SAZone;
 import playground.jjoubert.Utilities.DateString;
+import playground.jjoubert.Utilities.MyGapReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -75,9 +75,9 @@ public class EventsToGAP {
 		String now = date.toString();
 		String output = OUTPUT_PRE + now + OUTPUT_POST;
 		
-		ArrayList<SAZone> zoneList = AnalyseGAPDensity.readGAPShapeFile( GAP_SHAPEFILE, GAP_ID_INDEX );
-	
-		QuadTree<SAZone> zoneTree = AnalyseGAPDensity.buildQuadTree( zoneList, SHAPEFILE, PROVINCE );
+		MyGapReader mgr = new MyGapReader(PROVINCE, GAP_SHAPEFILE);
+		ArrayList<SAZone> zoneList = mgr.getAllZones();	
+		QuadTree<SAZone> zoneTree = mgr.getGapQuadTree();
 
 		assignActivityToZone(zoneList, zoneTree );
 		

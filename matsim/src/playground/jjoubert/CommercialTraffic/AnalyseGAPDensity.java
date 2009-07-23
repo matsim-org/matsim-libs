@@ -9,19 +9,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.jjoubert.Utilities.MyShapefileReader;
+import playground.jjoubert.Utilities.MyGapReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Class to read minor and major activity files for a given study area. The study area
@@ -29,136 +24,76 @@ import com.vividsolutions.jts.geom.Polygon;
  * developed by the CSIR Built Environment. The activities are then split on an hour-
  * by-hour basis using the start time of the activity. 
  * 
- * @author johanwjoubert	
+ * @author jwjoubert	
  *
  */
 public class AnalyseGAPDensity {
-	// String value that must be set
-	final static String PROVINCE = "Gauteng";
-	final static int GAP_ID_INDEX = 1;
-	// GAP_ID indices:
-	//    Gauteng: 1
-	//    KZN: 2
-	//    WesternCape: 2
-	
-	// Mac
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
-	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
+	/* 
+	 * String value that must be set. Allowed study areas are:
+	 * 		- SouthAfrica
+	 * 		- Gauteng
+	 * 		- KZN
+	 * 		- WesternCape
+	 */
+	static String studyAreaName = "Gauteng";
+
+	// Set the home directory, depending on where the job is executed.
+	//	 static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
+	//	 static String ROOT = "/home/jjoubert/";									// IVT-Sim0
+	static String ROOT = "/home/jjoubert/data/";								// Satawal
+
 	// Derived string values
-	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
-	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
-	final static String INPUT_MINOR = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorLocations.txt";
-	final static String INPUT_MAJOR = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MajorLocations.txt";
-	final static String OUTPUT_MINOR = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorGapStats.txt";
-	final static String OUTPUT_MAJOR = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MajorGapStats.txt";
+	static String gapShapefileName = ROOT + "ShapeFiles/" + studyAreaName + "/" + studyAreaName + "GAP_UTM35S.shp";
+	static String areaShapefileName = ROOT + "ShapeFiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
+	static String inputFilenameMinor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MinorLocations.txt";
+	static String inputFilenameMajor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MajorLocations.txt";
+	static String outputFilenameMinor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MinorGapStats.txt";
+	static String outputFilenameMajor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MajorGapStats.txt";
 
-//	final static String INPUT_MINOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MinorLocations.txt";
-//	final static String INPUT_MAJOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MajorLocations.txt";
-//	final static String OUTPUT_MINOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MinorGapStats.txt";
-//	final static String OUTPUT_MAJOR = ROOT + PROVINCE + "/Activities/20090225-2030/" + PROVINCE + "MajorGapStats.txt";
-
-	public static final String DELIMITER = ",";
-	final static int GAP_SEARCH_AREA = 20000; // in METERS
-	final static int PROGRESS_INCREMENT = 100000;
+	private final static Logger log = Logger.getLogger(AnalyseGAPDensity.class);
+	public static String delimiter = ",";
+	static int gapSearchRadius = 20000; // in METERS
+	static int progressCounter = 0;
+	static int progressMultiplier = 1;
 
 	public static void main( String args[] ) {
-		System.out.println("==========================================================================================");
-		System.out.println("Performing detailed GAP analysis for: " + PROVINCE );
-		System.out.println();
+		log.info("==========================================================================================");
+		log.info("Performing detailed GAP analysis for: " + studyAreaName );
+		log.info("==========================================================================================");
+		log.info("");
 		
-		ArrayList<SAZone> zoneList = readGAPShapeFile( GAP_SHAPEFILE, GAP_ID_INDEX );
-	
-		QuadTree<SAZone> zoneTree = buildQuadTree( zoneList, SHAPEFILE, PROVINCE );
+		
+
+		MyGapReader mgr = new MyGapReader(studyAreaName, gapShapefileName);
+		ArrayList<SAZone> zoneList = mgr.getAllZones();
+		QuadTree<SAZone> zoneTree = mgr.getGapQuadTree();
 
 		assignActivityToZone(zoneList, zoneTree );
-		
+
 		writeZoneStatsToFile( zoneList );
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public
-	static ArrayList<SAZone> readGAPShapeFile ( String fileString , int GapIdIndex){
-		System.out.println("Reading GAP mesozone shapefile... " );
 		
-		ArrayList<SAZone> zoneList = new ArrayList<SAZone>();
-		FeatureSource fs = null;
-		MultiPolygon mp = null;
-		GeometryFactory gf = new GeometryFactory();
-		try {	
-			fs = ShapeFileReader.readDataFile( fileString );
-			ArrayList<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
-			for (int i = 0; i < objectArray.size(); i++) {
-				Object thisZone = objectArray.get(i);
-				// For GAP files, field [1] contains the GAP_ID
-				String name = String.valueOf( ((Feature) thisZone).getAttribute( GapIdIndex ) ); 
-				Geometry shape = ((Feature) thisZone).getDefaultGeometry();
-				if( shape instanceof MultiPolygon ){
-					mp = (MultiPolygon)shape;
-					if( !mp.isSimple() ){
-						System.out.println( "This polygon is NOT simple." );
-					}
-					Polygon polygonArray[] = new Polygon[mp.getNumGeometries()];
-					for(int j = 0; j < mp.getNumGeometries(); j++ ){
-						if(mp.getGeometryN(j) instanceof Polygon ){
-							polygonArray[j] = (Polygon) mp.getGeometryN(j);							
-						} else{
-							System.out.println("Subset of multipolygon is NOT a polygon.");
-						}
-					}
-					SAZone newZone = new SAZone(polygonArray, gf, name, 0);
-					zoneList.add( newZone );
-				} else{
-					System.out.println( " This is not a multipolygon.");
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
-		System.out.printf("Done.\n\n" );
-		return zoneList;
+		log.info("Process completed successfully!" );
 	}
 
-	public static QuadTree<SAZone> buildQuadTree(ArrayList<SAZone> mesozoneList, String shapefile, String province) {
-		System.out.println("Establishing quad tree extent for " + province + "... " );
-		MyShapefileReader msr = new MyShapefileReader(shapefile);
-		Polygon envelope = (Polygon) msr.readMultiPolygon().getEnvelope();
-		Coordinate [] coords = envelope.getCoordinates();
-		double minX = coords[0].x;
-		double minY = coords[0].y;
-		double maxX = coords[2].x;
-		double maxY = coords[2].y;
-		System.out.println("Done." );
-
-		System.out.printf("Building quad tree from mesozones... " );
-
-		QuadTree<SAZone> mesozoneQT = new QuadTree<SAZone>(minX, minY, maxX, maxY);
-		for (SAZone zone : mesozoneList) {
-			mesozoneQT.put(zone.getCentroid().getX(), zone.getCentroid().getY(), zone);
-		}
-		System.out.printf("Done.\n\n");
-		return mesozoneQT;		
-	}
-		
+			
 	private static void assignActivityToZone(ArrayList<SAZone> list, QuadTree<SAZone> tree ){
-		System.out.println("Assigning activity locations to GAP mesozones.");
+		log.info("Start assigning activity locations to GAP mesozones.");
 
 		GeometryFactory gf = new GeometryFactory();
 		
 		try { // Minor activities
-			Scanner inputMinor = new Scanner(new BufferedReader(new FileReader(new File( INPUT_MINOR ) ) ) );
+			Scanner inputMinor = new Scanner(new BufferedReader(new FileReader(new File( inputFilenameMinor ) ) ) );
 			@SuppressWarnings("unused")
 			String header = inputMinor.nextLine();
 
 			try {
-				int numberOfPoints = 0;
 				while(inputMinor.hasNextLine() ){
 					// Report progress
-					if( numberOfPoints%PROGRESS_INCREMENT == 0){
-						System.out.printf("     ...minor activities %8d\n", numberOfPoints );
+					if( progressCounter == progressMultiplier){
+						log.info("... Minor activities processed: " + String.valueOf(progressCounter));
+						progressMultiplier *= 2;
 					}
-					String[] thisLine = inputMinor.nextLine().split( DELIMITER );
+					String[] thisLine = inputMinor.nextLine().split( delimiter );
 					if( thisLine.length > 3 ){
 						double x = Double.parseDouble( thisLine[1] );
 						double y = Double.parseDouble( thisLine[2] );
@@ -168,7 +103,7 @@ public class AnalyseGAPDensity {
 
 						Point thisActivity = gf.createPoint(new Coordinate(x, y) );
 
-						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.get(x, y, GAP_SEARCH_AREA );
+						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.get(x, y, gapSearchRadius );
 						SAZone minorZone = findZoneInArrayList(thisActivity, shortlist );
 						if ( minorZone != null ){
 							minorZone.incrementMinorActivityCountDetail( timeOfDay );
@@ -177,7 +112,7 @@ public class AnalyseGAPDensity {
 							// Point is not is study area		
 						}
 					}
-					numberOfPoints++;
+					progressCounter++;
 				} 
 			} finally {
 				inputMinor.close();
@@ -185,20 +120,24 @@ public class AnalyseGAPDensity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		log.info("... Minor activities processed: " + String.valueOf(progressCounter));
 
+		// Reset the progress counters
+		progressCounter = 0;
+		progressMultiplier = 1;
 		try { // Major activities
-			Scanner inputMajor = new Scanner(new BufferedReader(new FileReader(new File( INPUT_MAJOR ) ) ) );
+			Scanner inputMajor = new Scanner(new BufferedReader(new FileReader(new File( inputFilenameMajor ) ) ) );
 			@SuppressWarnings("unused")
 			String header = inputMajor.nextLine();
 
 			try {
-				int numberOfPoints = 0;
 				while(inputMajor.hasNextLine() ){
 					// Report progress
-					if( numberOfPoints%PROGRESS_INCREMENT == 0){
-						System.out.printf("     ...major activities %8d\n", numberOfPoints );
+					if( progressCounter == progressMultiplier){
+						log.info("... Major activities processed: " + String.valueOf(progressCounter));
+						progressMultiplier *= 2;
 					}
-					String[] thisLine = inputMajor.nextLine().split( DELIMITER );
+					String[] thisLine = inputMajor.nextLine().split( delimiter );
 					if( thisLine.length > 3 ){
 						double x = Double.parseDouble( thisLine[1] );
 						double y = Double.parseDouble( thisLine[2] );
@@ -208,7 +147,7 @@ public class AnalyseGAPDensity {
 
 						Point thisActivity = gf.createPoint(new Coordinate(x, y) );
 						
-						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.get(x, y, GAP_SEARCH_AREA );
+						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.get(x, y, gapSearchRadius );
 						SAZone majorZone = findZoneInArrayList(thisActivity, shortlist );
 						if ( majorZone != null ){
 							majorZone.incrementMajorActivityCountDetail( timeOfDay );
@@ -217,7 +156,7 @@ public class AnalyseGAPDensity {
 							// Point is not is study area		
 						}
 					}
-					numberOfPoints++;
+					progressCounter++;
 				} 
 			} finally {
 				inputMajor.close();
@@ -225,8 +164,9 @@ public class AnalyseGAPDensity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		log.info("... Major activities processed: " + String.valueOf(progressCounter));
 		
-		System.out.printf("Done.\n\n" );
+		log.info("Activity assignment completed.");		
 	}
 
 	private static SAZone findZoneInArrayList(Point p, ArrayList<SAZone> list ) {
@@ -244,104 +184,99 @@ public class AnalyseGAPDensity {
 }
 	
 	private static void writeZoneStatsToFile(ArrayList<SAZone> zoneList) {
-		System.out.print("Writing mesozone statistics to file... ");
+		log.info("Start writing mesozone statistics to file.");
 		try{
-			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( OUTPUT_MINOR ) ) );
-			BufferedWriter outputMajor = new BufferedWriter(new FileWriter( new File ( OUTPUT_MAJOR ) ) );
+			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( outputFilenameMinor ) ) );
+			BufferedWriter outputMajor = new BufferedWriter(new FileWriter( new File ( outputFilenameMajor ) ) );
 			
-			String header = createHeaderString();
-			
-			// Update zone activity counts
+			// Update zone activity counts.
 			for (SAZone zone : zoneList) {
 				zone.updateSAZoneCounts(true); // Update minor
 				zone.updateSAZoneCounts(false); // Update major
 			}
 
-			// Write minor activities
+			// Write activities.
 			try{
-				outputMinor.write( header );
-				outputMinor.newLine();
-				for(int j = 0; j < zoneList.size()-1; j++ ){
-					outputMinor.write( createStatsString( zoneList.get(j) ).get(0) );
-					outputMinor.newLine();
+				// Write a header to each output file.
+				writeHeaderString(outputMinor);
+				writeHeaderString(outputMajor);
+
+				// Write each zone's activities.
+				for (SAZone zone : zoneList) {
+					writeMinorStatisticsString(outputMinor, zone);
+					writeMajorStatisticsString(outputMajor, zone);
 				}
-				outputMinor.write( createStatsString( zoneList.get( zoneList.size()-1 ) ).get(0) );
 			} finally{
 				outputMinor.close();
-			}
-
-			// Write major activities
-			try{
-				outputMajor.write( header );
-				outputMajor.newLine();
-				for(int j = 0; j < zoneList.size()-1; j++ ){
-					outputMajor.write( createStatsString( zoneList.get(j) ).get(1) );
-					outputMajor.newLine();
-				}
-				outputMajor.write( createStatsString( zoneList.get( zoneList.size()-1 ) ).get(0) );
-			} finally{
 				outputMajor.close();
 			}
-			
+
 		} catch(Exception e){
 			e.printStackTrace();
 		}
-		System.out.print("Done.\n\n");
+		log.info("Completed writing to file.");
 	}
 		
-	/*
-	 * Returns a standard header string for the GAP statistics file.
+	/**
+	 * Writes a standard header string for the GAP statistics file.
 	 */
-	private static String createHeaderString(){
-		String headerString = "Name" + DELIMITER + 
-							  "Total_Count" + DELIMITER;
+	private static void writeHeaderString(BufferedWriter output) throws IOException{
+		output.write("Name");
+		output.write(delimiter); 
+		output.write("Total_Count");
+		output.write(delimiter);
 		for(int i = 0; i < 24; i++){
-			headerString += "H" + i + DELIMITER;
+			output.write("H");
+			output.write(String.valueOf(i));
+			output.write(delimiter);
 		}
 		for(int i = 0; i < 23; i++){
-			headerString += "D" + i + DELIMITER;
+			output.write("D");
+			output.write(String.valueOf(i));
+			output.write(delimiter);
 		}
-		headerString += "D23";
-		return headerString;
+		output.write("D23");
+		output.newLine();
 	}
 
-	/*
-	 * Method to create statistics strings. The first string in the array
-	 * relates to 'minor' activities, and the second string to 'major' 
-	 * activities.
+	/**
+	 * Method to create a statistics string for 'minor' activities. 
+	 * @throws IOException 
 	 */
-	private static ArrayList<String> createStatsString(SAZone zone){
-		
-		ArrayList<String> statsString = new ArrayList<String>();
-		
-		// Minor activity string
-		String statsStringMinor = zone.getName() + DELIMITER;
-		statsStringMinor += zone.getMinorActivityCount() + DELIMITER;
+	private static void writeMinorStatisticsString(BufferedWriter output, SAZone zone) throws IOException{
+		output.write(zone.getName());
+		output.write(delimiter);
+		output.write(String.valueOf(zone.getMinorActivityCount()));
+		output.write(delimiter);
 		for(int i = 0; i < 24; i++){
-			statsStringMinor += zone.getMinorActivityCountDetail(i) + DELIMITER;
+			output.write(String.valueOf(zone.getMinorActivityCountDetail(i)));
+			output.write(delimiter);
 		}
 		for(int i = 0; i < 23; i++){
-			statsStringMinor += zone.getMinorActivityDurationDetail(i) + DELIMITER;
+			output.write(String.valueOf(zone.getMinorActivityDurationDetail(i)));
+			output.write(delimiter);
 		}
-		statsStringMinor += zone.getMinorActivityDurationDetail(23);
-
-		// Major activity string
-		String statsStringMajor = zone.getName() + DELIMITER;
-		statsStringMajor += zone.getMajorActivityCount() + DELIMITER;
-		for(int i = 0; i < 24; i++){
-			statsStringMajor += zone.getMajorActivityCountDetail(i) + DELIMITER;
-		}
-		for(int i = 0; i < 23; i++){
-			statsStringMajor += zone.getMajorActivityDurationDetail(i) + DELIMITER;
-		}
-		statsStringMajor += zone.getMajorActivityDurationDetail(23);
-		
-		statsString.add( statsStringMinor );
-		statsString.add( statsStringMajor );
-		
-		return statsString;
+		output.write(String.valueOf(zone.getMinorActivityDurationDetail(23)));		
 	}
-
-
+	
+	/**
+	 * Method to create a statistics string for 'major' activities. 
+	 * @throws IOException 
+	 */
+	private static void writeMajorStatisticsString(BufferedWriter output, SAZone zone) throws IOException{
+		output.write(zone.getName());
+		output.write(delimiter);
+		output.write(String.valueOf(zone.getMajorActivityCount()));
+		output.write(delimiter);
+		for(int i = 0; i < 24; i++){
+			output.write(String.valueOf(zone.getMajorActivityCountDetail(i)));
+			output.write(delimiter);
+		}
+		for(int i = 0; i < 23; i++){
+			output.write(String.valueOf(zone.getMajorActivityDurationDetail(i)));
+			output.write(delimiter);
+		}
+		output.write(String.valueOf(zone.getMajorActivityDurationDetail(23)));		
+	}
 
 }
