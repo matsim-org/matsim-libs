@@ -22,6 +22,7 @@ package org.matsim.core.controler;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.network.Node;
@@ -50,7 +51,7 @@ public class ControlerTest extends MatsimTestCase {
 
 	/**
 	 * Tests that the travel times are correctly calculated during the simulation.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testTravelTimeCalculation() {
@@ -132,7 +133,7 @@ public class ControlerTest extends MatsimTestCase {
 	/**
 	 * Tests that a custom scoring function factory doesn't get overwritten
 	 * in the initialization process of the Controler.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testSetScoringFunctionFactory() {
@@ -161,7 +162,7 @@ public class ControlerTest extends MatsimTestCase {
 
 	/**
 	 * Tests that plans with missing routes are completed (=routed) before the mobsim starts.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testCalcMissingRoutes() {
@@ -218,7 +219,7 @@ public class ControlerTest extends MatsimTestCase {
 
 	/**
 	 * Tests that plans with missing act locations are completed (=xy2links and routed) before the mobsim starts.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testCalcMissingActLinks() {
@@ -309,7 +310,7 @@ public class ControlerTest extends MatsimTestCase {
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 9)).exists());
 		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 10)).exists());
 	}
-	
+
 	/**
 	 * @author wrashid
 	 */
@@ -372,14 +373,14 @@ public class ControlerTest extends MatsimTestCase {
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 1)).exists());
 	}
-	
+
 	/**
 	 * @author mrieser
 	 */
 	public void testSetWriteEventsTxt() {
 		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
-		config.controler().setEventsFileFormats(new EventsFileFormat[] {EventsFileFormat.txt});
+		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
 		final Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
@@ -390,15 +391,15 @@ public class ControlerTest extends MatsimTestCase {
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
 		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
 	}
-	
+
 	/**
 	 * @author mrieser
 	 */
 	public void testSetWriteEventsXml() {
 		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
-		config.controler().setEventsFileFormats(new EventsFileFormat[] {EventsFileFormat.xml});
-		
+		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
+
 		final Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
 		assertEquals(1, controler.getWriteEventsInterval());
@@ -415,18 +416,18 @@ public class ControlerTest extends MatsimTestCase {
 	public void testSetWriteEventsTxtXml() {
 		final Config config = loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
-		config.controler().setEventsFileFormats(new EventsFileFormat[] {EventsFileFormat.txt, EventsFileFormat.xml});
-		
+		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
+
 		final Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.run();
-		
+
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_TXT, 0)).exists());
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS_XML, 0)).exists());
 	}
-	
+
 
 	/** A helper class for testSetScoringFunctionFactory() */
 	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
@@ -448,7 +449,7 @@ public class ControlerTest extends MatsimTestCase {
 		LinkImpl link1 = null;
 		LinkImpl link2 = null;
 		LinkImpl link3 = null;
-		
+
 		protected Fixture() {
 			/* Create a simple network with 4 nodes and 3 links:
 			 *
@@ -463,14 +464,14 @@ public class ControlerTest extends MatsimTestCase {
 			 */
 			this.network = new NetworkLayer();
 			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
-			this.node1 = network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
-			this.node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
-			this.node3 = network.createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
-			this.node4 = network.createNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
-			this.link1 = network.createLink(new IdImpl(1), this.node1, this.node2, 100, 10, 7200, 1);
-			this.link2 = network.createLink(new IdImpl(2), this.node2, this.node3, 1000, 10, 36, 1);
-			this.link3 = network.createLink(new IdImpl(3), this.node3, this.node4, 100, 10, 7200, 1);
+			this.node1 = this.network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
+			this.node2 = this.network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
+			this.node3 = this.network.createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
+			this.node4 = this.network.createNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
+			this.link1 = this.network.createLink(new IdImpl(1), this.node1, this.node2, 100, 10, 7200, 1);
+			this.link2 = this.network.createLink(new IdImpl(2), this.node2, this.node3, 1000, 10, 36, 1);
+			this.link3 = this.network.createLink(new IdImpl(3), this.node3, this.node4, 100, 10, 7200, 1);
 		}
 	}
-	
+
 }
