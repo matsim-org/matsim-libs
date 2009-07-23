@@ -256,7 +256,8 @@ public class AnalyseGAPDensity {
 			output.write(String.valueOf(zone.getMinorActivityDurationDetail(i)));
 			output.write(delimiter);
 		}
-		output.write(String.valueOf(zone.getMinorActivityDurationDetail(23)));		
+		output.write(String.valueOf(zone.getMinorActivityDurationDetail(23)));	
+		output.newLine();
 	}
 	
 	/**

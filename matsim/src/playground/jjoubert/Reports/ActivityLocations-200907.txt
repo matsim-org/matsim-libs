@@ -1,7 +1,7 @@
 
 
 
-Revisio 8011 on Satawal
+Revision 8011 on Satawal
 Processing vehicle files in /home/jjoubert/data/Gauteng/Activities/...
 
 0%                 20%                 40%                 60%                 80%               100%
