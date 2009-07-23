@@ -20,7 +20,10 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
@@ -29,9 +32,9 @@ import org.matsim.core.utils.misc.StringUtils;
 public class ControlerConfigGroup extends Module {
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks}
-	
+
 	public enum EventsFileFormat {txt, xml}
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "controler";
@@ -42,22 +45,22 @@ public class ControlerConfigGroup extends Module {
 	private static final String ROUTINGALGORITHM_TYPE = "routingAlgorithmType";
 	private static final String RUNID = "runId";
 	private static final String LINKTOLINK_ROUTING_ENABLED = "enableLinkToLinkRouting";
-	private static final String EVENTS_FILE_FORMAT = "eventsFileFormat";
+	/*package*/ static final String EVENTS_FILE_FORMAT = "eventsFileFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
-	
+
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
 	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.Dijkstra;
-	
+
 	private boolean linkToLinkRoutingEnabled = false;
-	
+
 	private String runId = null;
-	
-	private EventsFileFormat[] eventsFileFormats = new EventsFileFormat[] {EventsFileFormat.txt};
-	
+
+	private Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.txt));
+
 	private int writeEventsInterval=1;
-	
+
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -80,11 +83,11 @@ public class ControlerConfigGroup extends Module {
 			boolean isFirst = true;
 			StringBuilder str = new StringBuilder();
 			for (EventsFileFormat format : this.eventsFileFormats) {
-				str.append(format.toString());
 				if (!isFirst) {
 					str.append(',');
-					isFirst = false;
 				}
+				str.append(format.toString());
+				isFirst = false;
 			}
 			return str.toString();
 		} else if (WRITE_EVENTS_INTERVAL.equals(key)) {
@@ -110,7 +113,7 @@ public class ControlerConfigGroup extends Module {
 				setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 			}
 			else {
-				throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + this.GROUP_NAME);
+				throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + GROUP_NAME);
 			}
 		} else if (RUNID.equals(key)){
 			this.setRunId(value.trim());
@@ -120,10 +123,12 @@ public class ControlerConfigGroup extends Module {
 			}
 		} else if (EVENTS_FILE_FORMAT.equals(key)) {
 			String[] parts = StringUtils.explode(value, ',');
-			EventsFileFormat[] formats = new EventsFileFormat[parts.length];
-			int i = 0;
+			Set<EventsFileFormat> formats = EnumSet.noneOf(EventsFileFormat.class);
 			for (String part : parts) {
-				formats[i++] = EventsFileFormat.valueOf(part.trim());
+				String trimmed = part.trim();
+				if (trimmed.length() > 0) {
+					formats.add(EventsFileFormat.valueOf(trimmed));
+				}
 			}
 			this.eventsFileFormats = formats;
 		}else if (WRITE_EVENTS_INTERVAL.equals(key)) {
@@ -146,7 +151,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(WRITE_EVENTS_INTERVAL, getValue(WRITE_EVENTS_INTERVAL));
 		return map;
 	}
-	
+
 	@Override
 	protected final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -194,7 +199,7 @@ public class ControlerConfigGroup extends Module {
 		return this.runId;
 	}
 
-	public void setRunId(String runid) {
+	public void setRunId(final String runid) {
 		this.runId = runid;
 	}
 
@@ -206,19 +211,19 @@ public class ControlerConfigGroup extends Module {
 		this.linkToLinkRoutingEnabled = enabled;
 	}
 
-	public EventsFileFormat[] getEventsFileFormats() {
-		return this.eventsFileFormats.clone();
+	public Set<EventsFileFormat> getEventsFileFormats() {
+		return this.eventsFileFormats;
 	}
 
-	public void setEventsFileFormats(final EventsFileFormat[] eventsFileFormats) {
-		this.eventsFileFormats = eventsFileFormats.clone();
+	public void setEventsFileFormats(final Set<EventsFileFormat> eventsFileFormats) {
+		this.eventsFileFormats = Collections.unmodifiableSet(EnumSet.copyOf(eventsFileFormats));
 	}
 
 	public int getWriteEventsInterval() {
-		return writeEventsInterval;
+		return this.writeEventsInterval;
 	}
 
-	public void setWriteEventsInterval(int writeEventsInterval) {
+	public void setWriteEventsInterval(final int writeEventsInterval) {
 		this.writeEventsInterval = writeEventsInterval;
 	}
 
