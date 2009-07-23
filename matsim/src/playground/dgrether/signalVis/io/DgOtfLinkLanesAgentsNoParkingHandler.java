@@ -27,9 +27,12 @@ import org.matsim.core.mobsim.queuesim.QueueLane;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 import playground.dgrether.signalVis.drawer.DgSimpleQuadDrawer;
 
@@ -38,9 +41,11 @@ import playground.dgrether.signalVis.drawer.DgSimpleQuadDrawer;
  * @author dgrether
  *
  */
-public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsNoParkingHandler {
+public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFDataReader {
 
 	private static final Logger log = Logger.getLogger(DgOtfLinkLanesAgentsNoParkingHandler.class);
+	
+	private DgSimpleQuadDrawer drawer;
 	
 	public DgOtfLinkLanesAgentsNoParkingHandler() {
 	}
@@ -146,21 +151,34 @@ public class DgOtfLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsNoParking
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		String id = ByteBufferUtils.getString(in);
-		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
-		this.quadReceiver.setId(id.toCharArray());
+		this.drawer.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
+		this.drawer.setId(id.toCharArray());
 
-		DgSimpleQuadDrawer drawer = (DgSimpleQuadDrawer) this.quadReceiver;
-		
 		int nrToNodeLanes = in.getInt();
 		drawer.setNumberOfLanes(nrToNodeLanes);
 		log.debug("reader numberoftonodelanes: " + nrToNodeLanes);
 		if (nrToNodeLanes != 1) {
-			drawer.setBranchPoint(in.getDouble(), in.getDouble());
+			this.drawer.setBranchPoint(in.getDouble(), in.getDouble());
 			for (int i = 0; i < nrToNodeLanes; i++){
-				drawer.addNewQueueLaneData(ByteBufferUtils.getString(in), in.getDouble(), in.getDouble());
+				this.drawer.addNewQueueLaneData(ByteBufferUtils.getString(in), in.getDouble(), in.getDouble());
 			}
 		}
 		
+	}
+
+	@Override
+	public void connect(OTFDataReceiver receiver) {
+		this.drawer = (DgSimpleQuadDrawer) receiver;
+	}
+
+	@Override
+	public void invalidate(SceneGraph graph) {
+		this.drawer.invalidate(graph);
+	}
+
+	@Override
+	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		// nothing to do as lanes are non dynamical data
 	}
 	
 
