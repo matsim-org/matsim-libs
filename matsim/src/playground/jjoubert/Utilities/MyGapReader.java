@@ -20,12 +20,15 @@
 
 package playground.jjoubert.Utilities;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.jfree.util.Log;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -53,7 +56,7 @@ public class MyGapReader {
 	private double yMax = Double.NEGATIVE_INFINITY;
 	
 	
-	public MyGapReader(String area, String file){
+	public MyGapReader(String area, String filename){
 		this.areaName = area;
 
 		/*
@@ -73,7 +76,14 @@ public class MyGapReader {
 			System.exit(0);
 		}
 		
-		this.shapefile = file;
+		File file = new File(filename);
+		if(file.exists()){
+		this.shapefile = filename;
+		} else{
+			Log.error("The shapefile " + filename + " does not exist!!" );
+			Log.error("Shutting down");
+			System.exit(0);
+		}
 		
 		readGapShapefile();
 		buildQuadTree();

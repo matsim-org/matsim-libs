@@ -43,8 +43,8 @@ public class AnalyseGAPDensity {
 	static String ROOT = "/home/jjoubert/data/";								// Satawal
 
 	// Derived string values
-	static String gapShapefileName = ROOT + "ShapeFiles/" + studyAreaName + "/" + studyAreaName + "GAP_UTM35S.shp";
-	static String areaShapefileName = ROOT + "ShapeFiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
+	static String gapShapefileName = ROOT + "Shapefiles/" + studyAreaName + "/" + studyAreaName + "GAP_UTM35S.shp";
+	static String areaShapefileName = ROOT + "Shapefiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
 	static String inputFilenameMinor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MinorLocations.txt";
 	static String inputFilenameMajor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MajorLocations.txt";
 	static String outputFilenameMinor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MinorGapStats.txt";
