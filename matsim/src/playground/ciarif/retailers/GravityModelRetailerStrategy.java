@@ -1,7 +1,7 @@
 package playground.ciarif.retailers;
 
 import java.util.ArrayList;
-import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
+//import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
@@ -18,8 +18,6 @@ public class GravityModelRetailerStrategy {
 
 	public static final String NAME = "gravityModelRetailerStrategy";
 	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
-	//private DenseDoubleMatrix2D prob_i_j;
-	//private ArrayList<Consumer> consumers;
 	private Controler controler;
 	private ArrayList<ActivityFacility> shops;
 	private RetailZones retailZones;
