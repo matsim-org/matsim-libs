@@ -467,6 +467,10 @@ public class QueueLink {
 		return this.visdata;
 	}
 	
+	public QueueLane getOriginalLane(){
+		return this.originalLane;
+	}
+	
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
