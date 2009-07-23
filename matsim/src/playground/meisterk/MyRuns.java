@@ -27,17 +27,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -47,6 +50,7 @@ import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
+import org.xml.sax.SAXException;
 
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 
@@ -79,14 +83,16 @@ public class MyRuns {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public static void run(Config config) throws Exception {
+	public void run(Config config) throws Exception {
 
 //		MyRuns.writeGUESSFile();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
 //		MyRuns.produceSTRC2007KML();
 
-		MyRuns.setPlansToSameDepTime(config);
+//		MyRuns.setPlansToSameDepTime(config);
+	
+		this.analyzeModeChainFeasibility(config);
 		
 		System.out.println();
 
@@ -102,10 +108,72 @@ public class MyRuns {
 //		Gbl.createWorld();
 //		Gbl.createFacilities();
 
-		run(config);
+		MyRuns myRuns = new MyRuns();
+		myRuns.run(config);
+		
+//		run(config);
 
 	}
 
+	public void analyzeModeChainFeasibility(Config config) {
+
+		// initialize scenario with events from a given events file
+		// - network
+		logger.info("Reading network xml file...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		logger.info("Reading network xml file...done.");
+		
+		// - facilities
+		logger.info("Reading facilities xml file...");
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		try {
+			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		logger.info("Reading facilities xml file...");
+		
+		// - population
+		PersonAlgorithm pa = new PersonAnalyzeModeChainFeasibility();
+		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
+		plansAlgos.add(pa);
+
+		PopulationImpl matsimAgentPopulation = new PopulationImpl();
+		matsimAgentPopulation.setIsStreaming(true);
+		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
+		plansReader.readFile(config.plans().getInputFile());
+
+	}
+	
+	private class PersonAnalyzeModeChainFeasibility implements PersonAlgorithm {
+
+		private int counter = 0;
+		private int skip = 1;
+		
+		public PersonAnalyzeModeChainFeasibility() {
+			super();
+			// TODO Auto-generated constructor stub
+		}
+
+		public void run(PersonImpl person) {
+			
+			this.counter++;
+			if (counter % skip == 0) {
+				skip *= 2;
+				logger.info("Processed " + counter + " persons.");
+			}
+		}
+		
+	}
+	
 	public static void setPlansToSameDepTime(Config config) {
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
