@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package playground.dgrether.signalVis.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -30,6 +30,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+
+import playground.dgrether.signalVis.drawer.DgSimpleQuadDrawer;
 
 
 /**
