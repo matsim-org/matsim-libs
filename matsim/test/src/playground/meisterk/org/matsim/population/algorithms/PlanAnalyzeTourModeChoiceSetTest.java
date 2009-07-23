@@ -438,6 +438,15 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 						TransportMode.pt, 
 						TransportMode.car}, 
 				true);
+		candidates.put(
+				new TransportMode[]{
+						TransportMode.car, 
+						TransportMode.pt, 
+						TransportMode.walk, 
+						TransportMode.walk, 
+						TransportMode.pt, 
+						TransportMode.walk}, 
+				false);
 
 		for (TransportMode[] candidate : candidates.keySet()) {
 			assertEquals(
