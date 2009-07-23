@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import playground.dgrether.signalVis.drawer.DgSimpleQuadDrawer;
 import playground.dgrether.signalVis.io.DgOtfLaneReader;
 import playground.dgrether.signalVis.io.DgOtfLaneWriter;
-import playground.dgrether.signalVis.layer.DgSimpleStaticNetLayer;
+import playground.dgrether.signalVis.layer.DgOtfLaneLayer;
 
 /**
  * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
@@ -117,7 +117,7 @@ public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
 		
 		
 		// drawer -> layer
-		connectionManager.add(DgSimpleQuadDrawer.class, DgSimpleStaticNetLayer.class);
+		connectionManager.add(DgSimpleQuadDrawer.class, DgOtfLaneLayer.class);
 
 		//default code
 		connectionManager.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);

@@ -26,12 +26,12 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
  * @author dgrether
  *
  */
-public class DgSimpleStaticNetLayer extends SimpleStaticNetLayer {
+public class DgOtfLaneLayer extends SimpleStaticNetLayer {
 
 	/**
 	 * 
 	 */
-	public DgSimpleStaticNetLayer() {
+	public DgOtfLaneLayer() {
 	}
 
 	@Override
