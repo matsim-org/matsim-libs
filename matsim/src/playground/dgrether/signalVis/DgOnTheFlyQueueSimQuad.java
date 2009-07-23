@@ -37,7 +37,8 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.dgrether.signalVis.drawer.DgSimpleQuadDrawer;
-import playground.dgrether.signalVis.io.DgOtfLinkLanesAgentsNoParkingHandler;
+import playground.dgrether.signalVis.io.DgOtfLaneReader;
+import playground.dgrether.signalVis.io.DgOtfLaneWriter;
 import playground.dgrether.signalVis.layer.DgSimpleStaticNetLayer;
 
 /**
@@ -92,13 +93,13 @@ public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
 	private OTFConnectionManager setupConnectionManager() {
 		OTFConnectionManager connectionManager = new OTFConnectionManager();
 		// data source to writer
-		connectionManager.add(QueueLink.class, DgOtfLinkLanesAgentsNoParkingHandler.Writer.class);
+		connectionManager.add(QueueLink.class, DgOtfLaneWriter.class);
 		//default network code
 		connectionManager.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		
 		// writer -> reader: from server to client
 		connectionManager
-				.add(DgOtfLinkLanesAgentsNoParkingHandler.Writer.class, DgOtfLinkLanesAgentsNoParkingHandler.class);
+				.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
 		//default network code
 		connectionManager
 		.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
@@ -108,7 +109,7 @@ public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
 		// reader to drawer (or provider to receiver)
 		// this.add(OTFLinkLanesAgentsNoParkingHandler.class,
 		// SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connectionManager.add(DgOtfLinkLanesAgentsNoParkingHandler.class, DgSimpleQuadDrawer.class);
+		connectionManager.add(DgOtfLaneReader.class, DgSimpleQuadDrawer.class);
 		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
 		connectionManager.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		//default network code
