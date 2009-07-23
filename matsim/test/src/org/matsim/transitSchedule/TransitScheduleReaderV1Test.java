@@ -31,6 +31,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -56,9 +57,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 
 	public void testStopFacility_Minimalistic() {
 		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
-		NetworkLayer network = null;
-
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, emptyAtts, context);
@@ -411,13 +410,9 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("foo");
+		Id routeId1 = new IdImpl("1");
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
-
-		String description = "This could be some really long text, even containing line\nbreaks\n\nand other\tspecial characters.";
-		reader.startTag(Constants.DESCRIPTION, AttributesBuilder.getEmpty(), context);
-		reader.endTag(Constants.DESCRIPTION, description, context);
 
 		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
 		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
@@ -445,6 +440,468 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(Time.UNDEFINED_TIME, stop1.getArrivalOffset(), MatsimTestCase.EPSILON);
 		assertEquals(Time.UNDEFINED_TIME, stop1.getDepartureOffset(), MatsimTestCase.EPSILON);
 		assertEquals(false, stop1.isAwaitDepartureTime());
+	}
+
+	public void testRouteProfile_MultipleStop() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+
+		// define some transit stops
+		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_STOPS);
+		Id stopId1 = new IdImpl("stop1");
+		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
+				add(Constants.X, "79").add(Constants.Y, "80").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+		Id stopId2 = new IdImpl("stop2");
+		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
+				add(Constants.X, "51").add(Constants.Y, "42").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+		Id stopId3 = new IdImpl("stop3");
+		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
+				add(Constants.X, "76").add(Constants.Y, "80").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+
+		// now the other stuff
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty
+		context.push(Constants.ROUTE_PROFILE);
+
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop1").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop2").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop3").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // ROUTE_PROFILE
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
+		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		assertEquals(3, route.getStops().size());
+		TransitRouteStop stop1 = route.getStops().get(0);
+		assertNotNull(stop1);
+		assertEquals(schedule.getFacilities().get(stopId1), stop1.getStopFacility());
+		TransitRouteStop stop2 = route.getStops().get(0);
+		assertNotNull(stop2);
+		assertEquals(schedule.getFacilities().get(stopId1), stop2.getStopFacility());
+		TransitRouteStop stop3 = route.getStops().get(0);
+		assertNotNull(stop3);
+		assertEquals(schedule.getFacilities().get(stopId1), stop3.getStopFacility());
+	}
+
+	public void testRouteProfileStop_Offsets() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+
+		// define some transit stops
+		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_STOPS);
+		Id stopId1 = new IdImpl("stop1");
+		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
+				add(Constants.X, "79").add(Constants.Y, "80").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+		Id stopId2 = new IdImpl("stop2");
+		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
+				add(Constants.X, "51").add(Constants.Y, "42").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+		Id stopId3 = new IdImpl("stop3");
+		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
+				add(Constants.X, "76").add(Constants.Y, "80").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+		Id stopId4 = new IdImpl("stop4");
+		atts = new AttributesBuilder().add(Constants.ID, stopId4.toString()).
+		add(Constants.X, "5").add(Constants.Y, "11").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+
+		// now the other stuff
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty
+		context.push(Constants.ROUTE_PROFILE);
+
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop1").
+				add(Constants.ARRIVAL_OFFSET, "60").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop2").
+				add(Constants.DEPARTURE_OFFSET, "90").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop3").
+				add(Constants.ARRIVAL_OFFSET, "120").add(Constants.DEPARTURE_OFFSET, "150").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop4").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // ROUTE_PROFILE
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
+		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		assertEquals(4, route.getStops().size());
+		TransitRouteStop stop1 = route.getStops().get(0);
+
+		assertNotNull(stop1);
+		assertEquals(schedule.getFacilities().get(stopId1), stop1.getStopFacility());
+		assertEquals(60.0, stop1.getArrivalOffset(), MatsimTestCase.EPSILON);
+		assertEquals(Time.UNDEFINED_TIME, stop1.getDepartureOffset(), MatsimTestCase.EPSILON);
+
+		TransitRouteStop stop2 = route.getStops().get(1);
+		assertNotNull(stop2);
+		assertEquals(schedule.getFacilities().get(stopId2), stop2.getStopFacility());
+		assertEquals(Time.UNDEFINED_TIME, stop2.getArrivalOffset(), MatsimTestCase.EPSILON);
+		assertEquals(90.0, stop2.getDepartureOffset(), MatsimTestCase.EPSILON);
+
+		TransitRouteStop stop3 = route.getStops().get(2);
+		assertNotNull(stop3);
+		assertEquals(schedule.getFacilities().get(stopId3), stop3.getStopFacility());
+		assertEquals(120.0, stop3.getArrivalOffset(), MatsimTestCase.EPSILON);
+		assertEquals(150.0, stop3.getDepartureOffset(), MatsimTestCase.EPSILON);
+
+		TransitRouteStop stop4 = route.getStops().get(3);
+		assertNotNull(stop4);
+		assertEquals(schedule.getFacilities().get(stopId4), stop4.getStopFacility());
+		assertEquals(Time.UNDEFINED_TIME, stop4.getArrivalOffset(), MatsimTestCase.EPSILON);
+		assertEquals(Time.UNDEFINED_TIME, stop4.getDepartureOffset(), MatsimTestCase.EPSILON);
+	}
+
+	public void testRouteProfileStop_AwaitDeparture() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+
+		// define some transit stops
+		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_STOPS);
+		Id stopId1 = new IdImpl("stop1");
+		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
+				add(Constants.X, "79").add(Constants.Y, "80").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+		Id stopId2 = new IdImpl("stop2");
+		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
+				add(Constants.X, "51").add(Constants.Y, "42").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+		Id stopId3 = new IdImpl("stop3");
+		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
+				add(Constants.X, "76").add(Constants.Y, "80").get();
+		reader.startTag(Constants.STOP_FACILITY, atts, context);
+		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
+
+		// now the other stuff
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty
+		context.push(Constants.ROUTE_PROFILE);
+
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop1").get(), context); // awaitDeparture not specified
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop2").
+				add(Constants.AWAIT_DEPARTURE, "true").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+		reader.startTag(Constants.STOP, new AttributesBuilder().add(Constants.REF_ID, "stop3").
+				add(Constants.AWAIT_DEPARTURE, "false").get(), context);
+		reader.endTag(Constants.STOP, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // ROUTE_PROFILE
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
+		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		assertEquals(3, route.getStops().size());
+		TransitRouteStop stop1 = route.getStops().get(0);
+		assertEquals(false, stop1.isAwaitDepartureTime());
+		TransitRouteStop stop2 = route.getStops().get(1);
+		assertEquals(true, stop2.isAwaitDepartureTime());
+		TransitRouteStop stop3 = route.getStops().get(2);
+		assertEquals(false, stop3.isAwaitDepartureTime());
+	}
+
+	public void testRouteProfileRoute_NoLink() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+
+		// now the other stuff
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty, but must exist
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+
+		reader.startTag(Constants.ROUTE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.ROUTE, EMPTY_STRING, context);
+
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty, but must exist
+		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		assertNull(route.getRoute());
+	}
+
+	public void testRouteProfileRoute_OneLink() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+
+		NetworkLayer network = new NetworkLayer();
+		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
+		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(5, 11));
+		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(5, 11));
+		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(5, 11));
+		/*LinkImpl link1 =*/ network.createLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		/*LinkImpl link3 =*/network.createLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		/*LinkImpl link4 =*/network.createLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+
+		// now the other stuff
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+
+		reader.startTag(Constants.ROUTE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.ROUTE);
+
+		reader.startTag(Constants.LINK, new AttributesBuilder().add(Constants.REF_ID, "2").get(), context);
+		reader.endTag(Constants.LINK, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // ROUTE
+
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
+		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		NetworkRoute netRoute = route.getRoute();
+		assertNotNull(netRoute);
+		assertEquals(link2, netRoute.getStartLink());
+		assertEquals(link2, netRoute.getEndLink());
+		assertEquals(0, netRoute.getLinks().size());
+		assertEquals(0, netRoute.getNodes().size());
+	}
+
+	public void testRouteProfileRoute_TwoLinks() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+
+		NetworkLayer network = new NetworkLayer();
+		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
+		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(5, 11));
+		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(5, 11));
+		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(5, 11));
+		/*LinkImpl link1 =*/network.createLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		/*LinkImpl link2 =*/network.createLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link3 = network.createLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link4 = network.createLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+
+		// now the other stuff
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+
+		reader.startTag(Constants.ROUTE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.ROUTE);
+
+		reader.startTag(Constants.LINK, new AttributesBuilder().add(Constants.REF_ID, "3").get(), context);
+		reader.endTag(Constants.LINK, EMPTY_STRING, context);
+		reader.startTag(Constants.LINK, new AttributesBuilder().add(Constants.REF_ID, "4").get(), context);
+		reader.endTag(Constants.LINK, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // ROUTE
+
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
+		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		NetworkRoute netRoute = route.getRoute();
+		assertNotNull(netRoute);
+		assertEquals(link3, netRoute.getStartLink());
+		assertEquals(link4, netRoute.getEndLink());
+		assertEquals(0, netRoute.getLinks().size());
+		assertEquals(1, netRoute.getNodes().size());
+		assertEquals(node4, netRoute.getNodes().get(0));
+	}
+
+	public void testRouteProfileRoute_MoreLinks() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+
+		NetworkLayer network = new NetworkLayer();
+		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
+		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(5, 11));
+		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(5, 11));
+		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(5, 11));
+		LinkImpl link1 = network.createLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link3 = network.createLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link4 = network.createLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+
+		// now the other stuff
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+
+		reader.startTag(Constants.ROUTE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.ROUTE);
+
+		reader.startTag(Constants.LINK, new AttributesBuilder().add(Constants.REF_ID, "1").get(), context);
+		reader.endTag(Constants.LINK, EMPTY_STRING, context);
+		reader.startTag(Constants.LINK, new AttributesBuilder().add(Constants.REF_ID, "2").get(), context);
+		reader.endTag(Constants.LINK, EMPTY_STRING, context);
+		reader.startTag(Constants.LINK, new AttributesBuilder().add(Constants.REF_ID, "3").get(), context);
+		reader.endTag(Constants.LINK, EMPTY_STRING, context);
+		reader.startTag(Constants.LINK, new AttributesBuilder().add(Constants.REF_ID, "4").get(), context);
+		reader.endTag(Constants.LINK, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // ROUTE
+
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
+		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		NetworkRoute netRoute = route.getRoute();
+		assertNotNull(netRoute);
+		assertEquals(link1, netRoute.getStartLink());
+		assertEquals(link4, netRoute.getEndLink());
+		assertEquals(2, netRoute.getLinks().size());
+		assertEquals(link2, netRoute.getLinks().get(0));
+		assertEquals(link3, netRoute.getLinks().get(1));
+		assertEquals(3, netRoute.getNodes().size());
+		assertEquals(node2, netRoute.getNodes().get(0));
+		assertEquals(node3, netRoute.getNodes().get(1));
+		assertEquals(node4, netRoute.getNodes().get(2));
 	}
 
 	public void testDepartures_Single() {

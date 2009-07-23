@@ -144,6 +144,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			}
 			NetworkRoute route = null;
 			if (this.currentRouteProfile.firstLink != null) {
+				if (this.currentRouteProfile.lastLink == null) {
+					this.currentRouteProfile.lastLink = this.currentRouteProfile.firstLink;
+				}
 				route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
 				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
 			}
