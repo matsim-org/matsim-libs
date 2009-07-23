@@ -22,6 +22,7 @@ package org.matsim.vis.otfvis.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -165,13 +166,26 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 		// set top node
 		setTopNode(0, 0, easting, northing);
 		// Get the writer Factories from connect
-		OTFWriterFactory<QueueLink> linkWriterFac = null;
-		OTFWriterFactory<QueueNode> nodeWriterFac = null;
-		Class lFac =  connect.getFirstEntry(QueueLink.class);
-		Class nFac =  connect.getFirstEntry(QueueNode.class);
+		Collection<Class> nodeFactories = connect.getEntries(QueueNode.class);
+		Collection<Class> linkFactories =  connect.getEntries(QueueLink.class);
+		List<OTFWriterFactory<QueueLink>> linkWriterFactoriyObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
+		List<OTFWriterFactory<QueueNode>> nodeWriterFractoryObjects = new ArrayList<OTFWriterFactory<QueueNode>>(nodeFactories.size());
 		try {
-			if(lFac != Object.class) linkWriterFac = (OTFWriterFactory<QueueLink>)lFac.newInstance();
-			if(nFac != Object.class) nodeWriterFac = (OTFWriterFactory<QueueNode>)nFac.newInstance();
+			OTFWriterFactory<QueueLink> linkWriterFac = null;			
+			for (Class linkFactory : linkFactories ) {
+				if(linkFactory != Object.class) {
+					linkWriterFac = (OTFWriterFactory<QueueLink>)linkFactory.newInstance();
+					linkWriterFactoriyObjects.add(linkWriterFac);
+				}
+			}
+			OTFWriterFactory<QueueNode> nodeWriterFac = null;
+			for (Class nodeFactory : nodeFactories) {
+				if(nodeFactory != Object.class) {
+					nodeWriterFac = (OTFWriterFactory<QueueNode>)nodeFactory.newInstance();
+					nodeWriterFractoryObjects.add(nodeWriterFac);
+				}
+			}
+			
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -181,21 +195,31 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 		}
 //		System.out.println("server bounds: " +  " coords 0,0-" + easting + "," + northing );
 
-    	if(nodeWriterFac != null) for (QueueNode node : this.net.getNodes().values()) {
-    		OTFDataWriter<QueueNode> writer = nodeWriterFac.getWriter();
-    		if (writer != null) writer.setSrc(node);
-    		put(node.getNode().getCoord().getX() - this.minEasting, node.getNode().getCoord().getY() - this.minNorthing, writer);
+    	if(!nodeWriterFractoryObjects.isEmpty()) {
+    		for (QueueNode node : this.net.getNodes().values()) {
+    			for (OTFWriterFactory<QueueNode> fac : nodeWriterFractoryObjects) {
+    				OTFDataWriter<QueueNode> writer = fac.getWriter();
+    				if (writer != null) writer.setSrc(node);
+    				put(node.getNode().getCoord().getX() - this.minEasting, node.getNode().getCoord().getY() - this.minNorthing, writer);
+    			}
+    		}
     	}
 //		System.out.print("server links/nodes count: " + (net.getLinks().values().size()+net.getNodes().values().size()) );
 
-    	if(linkWriterFac != null) for (QueueLink link : this.net.getLinks().values()) {
-    		double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
-    		double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
-    		OTFDataWriter<QueueLink> writer = linkWriterFac.getWriter();
-    		// null means take the default handler
-    		if (writer != null) writer.setSrc(link);
-    		put(middleEast, middleNorth, writer);
-//    		System.out.println("server link: " + link.getId().toString() + " coords " + middleEast + "," + middleNorth );
+    	if(!linkWriterFactoriyObjects.isEmpty()) {
+    		for (QueueLink link : this.net.getLinks().values()) {
+    			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
+    			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
+
+    			for (OTFWriterFactory<QueueLink> fac : linkWriterFactoriyObjects) {
+    				OTFDataWriter<QueueLink> writer = fac.getWriter();
+    				// null means take the default handler
+    				if (writer != null) writer.setSrc(link);
+    				put(middleEast, middleNorth, writer);
+//      		System.out.println("server link: " + link.getId().toString() + " coords " + middleEast + "," + middleNorth );
+    			}
+    		}
+    		
    	}
 	}
 
