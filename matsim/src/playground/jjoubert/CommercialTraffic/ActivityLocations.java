@@ -21,7 +21,12 @@ import playground.jjoubert.Utilities.ProgressBar;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
-
+/**
+ * This class extracts the activity locations from inputs vehicle files. The class should
+ * be invoked on each study area separately.
+ * 
+ * @author jwjoubert
+ */
 public class ActivityLocations {
 	/* 
 	 * String value that must be set. Allowed study areas are:
@@ -65,7 +70,46 @@ public class ActivityLocations {
 	//TODO Sort out how to handle these 'BoinkPoint's.
 	public static int numberOfBoinkPoints = 0; 
 
-		
+	/**
+	 * The main method calls various other methods, both within the class and from other 
+	 * classes. 
+	 * <h4>Requires:</h4>
+	 * <ul>
+	 * <li> A folder with vehicle files containing <b><i>sorted</i></b> GPS logs. 
+	 * 		Filenames should be <code>VehicleID.txt</code>, where <code>VehicleId</code> 
+	 * 		is the unique integer identifying the vehicle. </li>
+	 * <li> A shapefile of the study area. In the case of South Africa, the <i>UTM35S</i>
+	 * 		 coordinate system should be used. </li>
+	 * </ul> 
+	 * <h4>Produces:</h4>
+	 * In all the output files, the phrase <code>Area</code> refers to the study area:
+	 * <ul>
+	 * <li> A folder called <code>/XML/</code> with xml vehicle files of all vehicles 
+	 * 		performing activities in the given study area. Each <code>VehicleId.xml</code>
+	 * 		file contains the complete vehicle with all its chains, activities, and 
+	 * 		statistics related to the study area. An <code>xml</code> file can be read
+	 * 		in with <code>playground.jjoubert.Utilities.MyXmlConverter.java</code> to
+	 * 		reproduce the <code>Vehicle</code> object. </li>
+	 * <li> A text file <code>AreaActivityDurations.txt</code>. All activity durations, 
+	 * 		both <i>minor</i> and <i>major</i>, are aggregated (binned) into 30-minute 
+	 * 		intervals. </li>
+	 * <li> A text file <code>AreaVehicleStats.txt</code> with statistics of each vehicle. 
+	 *		the statistics include the number of <i>major</i> locations; number of chains;
+	 *		average chain distance and duration; average number of <i>minor</i> activities
+	 *		per chain; total number of activities; percentage activities in the study area;
+	 *		and the total distance of all chains that passes through the study are. </li>
+	 * <li> A text file called <code>AreaMinorLocations.txt</code> listing each <i>minor</i>
+	 * 		activity found in the study area, along with its latitude and longitude
+	 * 		coordinates (expressed as decimal degrees in the <i>UTM35S</i> coordinate
+	 * 		system), the activity's start time, and the duration (in minutes). </li>
+	 * <li> A text file called <code>AreaMajorLocations.txt</code> listing each <i>major</i>
+	 * 		activity found in the study area, along with its latitude and longitude
+	 * 		coordinates (expressed as decimal degrees in the <i>UTM35S</i> coordinate
+	 * 		system), the activity's start time, and the duration (in minutes). </li>
+	 * </ul> 
+	 * 
+	 * @param args
+	 */
 	public static void main( String args[] ) {
 		System.out.println("==========================================================================================");
 		System.out.println("Identifying vehicle activity locations for vehicles travelling through: " + studyAreaName );
@@ -213,11 +257,11 @@ public class ActivityLocations {
 		output.write(delimiter);
 		output.write("Total_activities");
 		output.write(delimiter);
-		output.write("Total_gauteng_activities");
+		output.write("Total_studyArea_activities");
 		output.write(delimiter);
-		output.write("Percent_gauteng_activities");
+		output.write("Percent_studyArea_activities");
 		output.write(delimiter);
-		output.write("Gauteng_Chain_Distance");
+		output.write("StudyArea_Chain_Distance");
 		output.newLine();
 	}
 
@@ -346,7 +390,7 @@ public class ActivityLocations {
 					x = xSum / locationList.size();
 					y = ySum / locationList.size();
 				} else{
-					System.err.println("There does not seem to be a possible location for this activitiy?!");
+					System.err.println("There does not seem to be a possible location for this activity?!");
 				}
 				log.get(0).setCoordinate(new Coordinate(x, y) );
 				// Using the start position as the location of the activity
