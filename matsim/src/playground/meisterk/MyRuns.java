@@ -30,8 +30,11 @@ import java.util.TreeMap;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -39,8 +42,11 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -52,7 +58,9 @@ import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.xml.sax.SAXException;
 
+import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
+import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
 
 public class MyRuns {
 
@@ -139,37 +147,79 @@ public class MyRuns {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Gbl.getWorld().setFacilityLayer(facilities);
 		logger.info("Reading facilities xml file...");
 		
 		// - population
-		PersonAlgorithm pa = new PersonAnalyzeModeChainFeasibility();
+		PersonAnalyzeModeChainFeasibility pa = new PersonAnalyzeModeChainFeasibility();
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
 		PopulationImpl matsimAgentPopulation = new PopulationImpl();
 		matsimAgentPopulation.setIsStreaming(true);
+		matsimAgentPopulation.addAlgorithm(pa);
 		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
 		plansReader.readFile(config.plans().getInputFile());
+		
+		logger.info("Number of selected plans which are infeasible: " + pa.getNumInfeasiblePlans());
 
 	}
 	
 	private class PersonAnalyzeModeChainFeasibility implements PersonAlgorithm {
 
-		private int counter = 0;
-		private int skip = 1;
+		private int numInfeasiblePlans = 0;
 		
 		public PersonAnalyzeModeChainFeasibility() {
 			super();
-			// TODO Auto-generated constructor stub
 		}
 
 		public void run(PersonImpl person) {
 			
-			this.counter++;
-			if (counter % skip == 0) {
-				skip *= 2;
-				logger.info("Processed " + counter + " persons.");
+			PlanImpl selectedPlan = person.getSelectedPlan();
+			
+			ArrayList<TransportMode> modeChain = new ArrayList<TransportMode>();
+			for (PlanElement pe : selectedPlan.getPlanElements()) {
+				if (pe instanceof LegImpl) {
+					LegImpl leg = (LegImpl) pe;
+					modeChain.add(leg.getMode());
+				}
 			}
+			TransportMode[] candidate = new TransportMode[modeChain.size()];
+			candidate = modeChain.toArray(candidate);
+			
+			MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();
+			
+			boolean isFeasible = PlanAnalyzeTourModeChoiceSet.isModeChainFeasible(
+					selectedPlan, 
+					candidate, 
+					meisterkConfigGroup.getChainBasedModes(), 
+					PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility);
+			
+			if (!isFeasible) {
+
+				logger.info("Agent id: " + person.getId());
+				
+				for (PlanElement pe : selectedPlan.getPlanElements()) {
+					
+					if (pe instanceof ActivityImpl) {
+						ActivityImpl act = (ActivityImpl) pe;
+						logger.info("\t" + act.getFacilityId());
+					}
+					
+					if (pe instanceof LegImpl) {
+						LegImpl leg = (LegImpl) pe;
+						modeChain.add(leg.getMode());
+						logger.info("\t" + leg.getMode());
+					}
+					
+				}
+				this.numInfeasiblePlans++;
+			}
+			
+		}
+
+		public int getNumInfeasiblePlans() {
+			return numInfeasiblePlans;
 		}
 		
 	}
