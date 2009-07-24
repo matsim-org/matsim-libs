@@ -37,7 +37,6 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -76,13 +75,13 @@ public class BKickHouseholdsCreatorZurich {
 		
 		String gemeindenKantonZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
 		
-		String plansZurichWoTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_10pct.xml.gz";
+		String plansZurichWoTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 		
 		String einkommenZurichTextfile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/einkommenKantonZurichPlainDataEditedFinalUTF8.txt";
 
-		String householdsXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.xml.gz";
+		String householdsXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 		
-		String householdsTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.txt";
+		String householdsTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.txt";
 		
 		String plansZurich = plansZurichWoTransit;
 		
@@ -94,6 +93,7 @@ public class BKickHouseholdsCreatorZurich {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile(DgPaths.IVTCHNET);
 		scenario.getConfig().plans().setInputFile(plansZurich);
+		scenario.getConfig().scenario().setUseHouseholds(true);
 		ScenarioLoader loader = new ScenarioLoader(scenario);
 		loader.loadScenario();
 		
@@ -117,22 +117,30 @@ public class BKickHouseholdsCreatorZurich {
 	    hh.getMembers().put(p.getId(), (PersonImpl)(BasicPerson)p);
 	    households.getHouseholds().put(p.getId(), hh);
 
-	    //calculate the income
-	    Feature feature = this.getGemeindeFeatureForPerson(p, fts);
 	    double income;
-	    if (feature == null) {
-	    	income = incomeCalcSchweiz.calculateIncome(43665);
+	    // transit persons get the median income without any distribution
+	    if (1000000000  <  Integer.parseInt(p.getId().toString())) {
+	    	income = 43665.0;
 	    }
+	    // all swiss inhabitants have ids smaller than 1 000 000 000
 	    else {
-	    	String gemeindeNameFeature = (String) feature.getAttribute("NAME");
-	    	gemeindeNameFeature = gemeindeNameFeature.trim().split(" ")[0];
-	    	if (gemeindeIncome.containsKey(gemeindeNameFeature)){
-	    		income = incomeCalcZurichKanton.calculateIncome(gemeindeIncome.get(gemeindeNameFeature));
+	    	//calculate the income
+	    	Feature feature = this.getGemeindeFeatureForPerson(p, fts);
+	    	if (feature == null) {
+	    		income = incomeCalcSchweiz.calculateIncome(43665.0);
 	    	}
 	    	else {
-	    		income = incomeCalcSchweiz.calculateIncome(43665);
+	    		String gemeindeNameFeature = (String) feature.getAttribute("NAME");
+	    		gemeindeNameFeature = gemeindeNameFeature.trim().split(" ")[0];
+	    		if (gemeindeIncome.containsKey(gemeindeNameFeature)){
+	    			income = incomeCalcZurichKanton.calculateIncome(gemeindeIncome.get(gemeindeNameFeature));
+	    		}
+	    		else  {
+	    			income = incomeCalcSchweiz.calculateIncome(43665.0);
+	    		}
 	    	}
 	    }
+	    
 	    hh.setIncome(b.createIncome(income, BasicIncome.IncomePeriod.year));
 	    hh.getIncome().setCurrency("SFr");
 	   
