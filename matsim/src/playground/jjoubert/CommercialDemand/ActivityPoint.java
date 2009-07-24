@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyCell.java
+ * ActivityPoint.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,57 +20,24 @@
 
 package playground.jjoubert.CommercialDemand;
 
-import java.util.ArrayList;
+import com.vividsolutions.jts.geom.Point;
 
-import com.vividsolutions.jts.geom.Envelope;
-
-public class MyGridCell extends Envelope{
+public class ActivityPoint{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private int id;
-	private double count;
-	private ArrayList<Double> hourCount;
-
-	public ArrayList<Double> getHourCount() {
-		return hourCount;
-	}
-
-	public MyGridCell(int id, double xMin, double xMax, double yMin, double yMax, Integer numberOfTimeBins){
-		super(xMin, xMax, yMin, yMax);
-		this.id = id;
-		this.count = 0;
-		if(numberOfTimeBins != null){
-			this.setHourlyCounts(numberOfTimeBins);
-		} else{
-			hourCount = null;
-		}
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	private void setHourlyCounts(int hourBins){
-		hourCount = new ArrayList<Double>(hourBins);
-		for(int i = 0; i < hourBins; i++){
-			hourCount.add(new Double(0.0));
-		}
-	}
+	private Point point;
+	private int hour;
 	
-	public double getCount() {
-		return count;
+	public ActivityPoint(Point point, int hour){
+		this.point = point;
+		this.hour = hour;
 	}
-	
-	public void addToTotalCount(double value){
-		this.count += value;
+
+	public Point getPoint() {
+		return point;
 	}
-	
-	public void addToHourCount(int hour, double value){
-		Double oldValue = this.hourCount.get(hour);
-		this.hourCount.set(hour, oldValue + value);
+
+	public int getHour() {
+		return hour;
 	}
 
 }

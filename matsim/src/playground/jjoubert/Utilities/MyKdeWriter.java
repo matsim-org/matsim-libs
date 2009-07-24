@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 import playground.jjoubert.CommercialDemand.MyGrid;
 import playground.jjoubert.CommercialDemand.MyGridCell;
 
@@ -35,6 +37,9 @@ import playground.jjoubert.CommercialDemand.MyGridCell;
  * @author jwjoubert
  */
 public class MyKdeWriter {
+	
+	private final static Logger log = Logger.getLogger(MyKdeWriter.class);
+
 
 	public MyKdeWriter(){
 		
@@ -48,10 +53,13 @@ public class MyKdeWriter {
 	 * 		for the required file format.
 	 */
 	public void writeKdeToFile(MyGrid grid, String outputFilename){
-
-		
-		
-		
+		File outputFile = new File(outputFilename);
+		if(outputFile.exists()){
+			log.error("The file " + outputFilename + " already exists!!");
+			log.error("Since the files are appended, please delete and start over.");
+			System.exit(0);
+		}
+	
 		try {
 			BufferedWriter output = new BufferedWriter(new FileWriter(new File(outputFilename)));
 			try{
