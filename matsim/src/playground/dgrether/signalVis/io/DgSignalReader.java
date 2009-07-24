@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOtfLinkLanesAgentsNoParkingHandler
+ * DgSignalReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,65 +22,33 @@ package playground.dgrether.signalVis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-
-import playground.dgrether.signalVis.drawer.DgLaneSignalDrawer;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgOtfLaneReader extends OTFDataReader {
+public class DgSignalReader extends DgOtfLaneReader {
 
-	private static final Logger log = Logger.getLogger(DgOtfLaneReader.class);
+	/**
+	 * 
+	 */
+	public DgSignalReader() {
+	}
 	
-	protected DgLaneSignalDrawer drawer;
-	
-	public DgOtfLaneReader() {
-	}
-
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-//		String id = ByteBufferUtils.getString(in);
-//		this.drawer.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
-//		this.drawer.setId(id.toCharArray());
-
-		int nrToNodeLanes = in.getInt();
-		drawer.setNumberOfLanes(nrToNodeLanes);
-		log.debug("reader numberoftonodelanes: " + nrToNodeLanes);
-		
-		this.drawer.setMiddleOfLinkStart(in.getDouble(), in.getDouble());
-		this.drawer.setBranchPoint(in.getDouble(), in.getDouble());
-
-		if (nrToNodeLanes != 1){
-			for (int i = 0; i < nrToNodeLanes; i++){
-				this.drawer.addNewQueueLaneData(ByteBufferUtils.getString(in), in.getDouble(), in.getDouble());
-			}
-		}
-		
-	}
-
-	@Override
-	public void connect(OTFDataReceiver receiver) {
-		this.drawer = (DgLaneSignalDrawer) receiver;
-	}
-
-	@Override
-	public void invalidate(SceneGraph graph) {
-		this.drawer.invalidate(graph);
-	}
-
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// nothing to do as lanes are non dynamical data
+		int numberOfLanes = in.getInt();
+		String id;
+		boolean green;
+		for (int i = 0; i < numberOfLanes; i++) {
+			id = ByteBufferUtils.getString(in);
+			green = (in.getInt() == 1 ? true : false);
+			this.drawer.updateGreenState(id, green);
+		}
+	
 	}
-	
 
-	
-	
 }

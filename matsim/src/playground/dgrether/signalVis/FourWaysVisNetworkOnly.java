@@ -21,10 +21,13 @@ package playground.dgrether.signalVis;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.basic.BasicLaneDefinitions;
 
 
-public class FourWaysVis {
+public class FourWaysVisNetworkOnly {
 
 	public static final String TESTINPUTDIR = "test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
@@ -35,37 +38,27 @@ public class FourWaysVis {
 
 		String netFile = TESTINPUTDIR + "network.xml.gz";
 		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
-		String popFile = TESTINPUTDIR + "plans.xml.gz";
-		String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
-		String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
+		
 		
 		String[] netArray = {netFile};
 		
 		//this is run
 //		OTFVis.playNetwork(netArray);
-		
-		
 		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().network().setInputFile(netFile);
-		scenario.getConfig().plans().setInputFile(popFile);
-		
-		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
-		scenario.getConfig().scenario().setUseLanes(true);
-		
-		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
-		scenario.getConfig().scenario().setUseSignalSystems(true);
-		
-		ScenarioLoader loader = new ScenarioLoader(scenario);
-		loader.loadScenario();
-		
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(network).readFile(netFile);
+//		PopulationImpl population = scenario.getPopulation();
 		Events events = new Events();
 		
+		scenario.getConfig().scenario().setUseLanes(true);
+		BasicLaneDefinitions laneDefs = scenario.getLaneDefinitions();
+		
+		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
+		lanesReader.readFile(lanesFile);
 		
 		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
-		client.setLaneDefinitions(scenario.getLaneDefinitions());
-		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
+		client.setLaneDefinitions(laneDefs);
 		client.run();
 		
 		

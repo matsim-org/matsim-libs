@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.vis.otfvis.executables.OTFVisController;
 
 
-public class FourWaysVis {
+
+public class FourWaysVisNoLanes {
 
 	public static final String TESTINPUTDIR = "test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
@@ -38,35 +37,40 @@ public class FourWaysVis {
 		String popFile = TESTINPUTDIR + "plans.xml.gz";
 		String signalFile = TESTINPUTDIR + "testSignalSystems_v1.1.xml";
 		String signalConfigFile = TESTINPUTDIR + "testSignalSystemConfigurations_v1.1.xml";
+		String configFile = TESTINPUTDIR + "config.xml";
 		
 		String[] netArray = {netFile};
+		
+		OTFVisController controller = new OTFVisController(configFile);
+		controller.setOverwriteFiles(true);
+		controller.run();
 		
 		//this is run
 //		OTFVis.playNetwork(netArray);
 		
 		
 		//this is hack
-		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().network().setInputFile(netFile);
-		scenario.getConfig().plans().setInputFile(popFile);
-		
-		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
-		scenario.getConfig().scenario().setUseLanes(true);
-		
-		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
-		scenario.getConfig().scenario().setUseSignalSystems(true);
-		
-		ScenarioLoader loader = new ScenarioLoader(scenario);
-		loader.loadScenario();
-		
-		Events events = new Events();
-		
-		
-		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
-		client.setLaneDefinitions(scenario.getLaneDefinitions());
-		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
-		client.run();
+//		ScenarioImpl scenario = new ScenarioImpl();
+//		scenario.getConfig().network().setInputFile(netFile);
+//		scenario.getConfig().plans().setInputFile(popFile);
+//		
+//		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
+//		scenario.getConfig().scenario().setUseLanes(true);
+//		
+//		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
+//		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
+//		scenario.getConfig().scenario().setUseSignalSystems(true);
+//		
+//		ScenarioLoader loader = new ScenarioLoader(scenario);
+//		loader.loadScenario();
+//		
+//		Events events = new Events();
+//		
+//		
+//		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
+//		client.setLaneDefinitions(scenario.getLaneDefinitions());
+//		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
+//		client.run();
 		
 		
 	}

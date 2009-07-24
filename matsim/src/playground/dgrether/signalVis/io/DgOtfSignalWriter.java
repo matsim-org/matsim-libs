@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOtfLinkLanesAgentsNoParkingHandler
+ * DgOtfSignalWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,65 +22,35 @@ package playground.dgrether.signalVis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.log4j.Logger;
+import org.matsim.core.mobsim.queuesim.QueueLane;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-
-import playground.dgrether.signalVis.drawer.DgLaneSignalDrawer;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgOtfLaneReader extends OTFDataReader {
+public class DgOtfSignalWriter extends DgOtfLaneWriter {
 
-	private static final Logger log = Logger.getLogger(DgOtfLaneReader.class);
-	
-	protected DgLaneSignalDrawer drawer;
-	
-	public DgOtfLaneReader() {
+	/**
+	 * 
+	 */
+	public DgOtfSignalWriter() {
 	}
 
 	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-//		String id = ByteBufferUtils.getString(in);
-//		this.drawer.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
-//		this.drawer.setId(id.toCharArray());
-
-		int nrToNodeLanes = in.getInt();
-		drawer.setNumberOfLanes(nrToNodeLanes);
-		log.debug("reader numberoftonodelanes: " + nrToNodeLanes);
-		
-		this.drawer.setMiddleOfLinkStart(in.getDouble(), in.getDouble());
-		this.drawer.setBranchPoint(in.getDouble(), in.getDouble());
-
-		if (nrToNodeLanes != 1){
-			for (int i = 0; i < nrToNodeLanes; i++){
-				this.drawer.addNewQueueLaneData(ByteBufferUtils.getString(in), in.getDouble(), in.getDouble());
+	public void writeDynData(ByteBuffer out) throws IOException {
+		out.putInt(this.src.getToNodeQueueLanes().size());
+		for (QueueLane ql : this.src.getToNodeQueueLanes()){
+			ByteBufferUtils.putString(out, ql.getLaneId().toString());
+			if (ql.isThisTimeStepGreen()) {
+				out.putInt(1);
+			}
+			else {
+				out.putInt(0);
 			}
 		}
-		
-	}
-
-	@Override
-	public void connect(OTFDataReceiver receiver) {
-		this.drawer = (DgLaneSignalDrawer) receiver;
-	}
-
-	@Override
-	public void invalidate(SceneGraph graph) {
-		this.drawer.invalidate(graph);
-	}
-
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// nothing to do as lanes are non dynamical data
-	}
 	
-
-	
+	}
 	
 }
