@@ -25,7 +25,9 @@ import java.util.UUID;
 
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.events.Events;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
@@ -96,6 +98,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 
 	public void setQueueNetwork(QueueNetwork net) {
 		this.network = net;
+		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
 	}
 	
 	public static void main(final String[] args) {
