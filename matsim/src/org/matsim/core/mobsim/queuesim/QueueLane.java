@@ -320,7 +320,7 @@ public class QueueLane {
 		return this.buffer.isEmpty();
 	}
 
-	protected boolean isThisTimeStepGreen(){
+	public boolean isThisTimeStepGreen(){
 		return this.thisTimeStepGreen ;
 	}
 
