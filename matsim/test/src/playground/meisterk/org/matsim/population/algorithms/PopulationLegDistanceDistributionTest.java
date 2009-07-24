@@ -108,7 +108,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
 		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.pt)[8].intValue());
 
-		testee.printLegDistanceDistribution();
+		testee.printCrosstabAbsolute();
 		
 	}
 	

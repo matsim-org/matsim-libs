@@ -159,7 +159,7 @@ public class MyRuns {
 		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
 		plansReader.readFile(config.plans().getInputFile());
 
-		pa.printLegDistanceDistribution();
+		pa.printCrosstabAbsolute();
 		
 	}
 	

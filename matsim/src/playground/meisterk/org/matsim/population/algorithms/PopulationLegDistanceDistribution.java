@@ -91,7 +91,43 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		return legDistanceDistribution;
 	}
 
-	public void printLegDistanceDistribution() {
+	/**
+	 * 
+	 * @param mode
+	 * @return the number of legs of a mode over all distance classes.
+	 */
+	public int getNumberOfLegs(TransportMode mode) {
+		
+		int numberOfLegs = 0;
+		
+		if (this.legDistanceDistribution.containsKey(mode)) {
+			for (Integer i : this.legDistanceDistribution.get(mode)) {
+				numberOfLegs += i;
+			}
+		}
+		
+		return numberOfLegs;
+		
+	}
+	
+	/**
+	 * 
+	 * @param distanceClassIndex
+	 * @return the number of legs in a distance class.
+	 */
+	public int getNumberOfLegs(int distanceClassIndex) {
+
+		int numberOfLegs = 0;
+		
+		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+			numberOfLegs += this.legDistanceDistribution.get(mode)[distanceClassIndex];
+		}
+		
+		return numberOfLegs;
+
+	}
+	
+	public void printCrosstabAbsolute() {
 		
 		System.out.println();
 		System.out.print("#mode");
@@ -104,7 +140,12 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 			for (Integer i : this.legDistanceDistribution.get(mode)) {
 				System.out.print("\t" + Integer.toString(i));
 			}
+			System.out.print("\t" + this.getNumberOfLegs(mode));
 			System.out.println();
+		}
+		System.out.print("sum");
+		for (int i=0; i < distanceClasses.length; i++) {
+			System.out.print("\t" + this.getNumberOfLegs(i));
 		}
 		System.out.println();
 		
