@@ -59,7 +59,7 @@ public class MyKernelDensityEstimator {
 		String mainAreaShapefileName = root + "Shapefiles/" + mainAreaName + "/" + mainAreaName + "_UTM35S.shp";
 		MyShapefileReader msr = new MyShapefileReader(mainAreaShapefileName);
 		MultiPolygon studyArea = msr.readMultiPolygon();
-		MyGrid grid = new MyGrid(studyArea, 500, 500, 24);
+		MyGrid grid = new MyGrid(studyArea, 1000, 1000, 24);
 		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + "MinorLocations.txt";
 		grid.estimateActivities(activityFilename, 5000);
 		
