@@ -27,9 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
-import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -62,25 +60,26 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
 
 public class LeaveLinkReplanner {
 
+//	protected ActivityImpl prevAct;
 	protected ActivityImpl nextAct;
-	protected ActivityImpl prevAct;
 	protected LegImpl leg;
 	protected double time;
 	protected PersonAgent personAgent;
 	protected PersonImpl person;
-	protected NodeImpl node;
+//	protected NodeImpl node;
 	protected PlanImpl plan;
-	protected QueueNode queueNode;
+//	protected QueueNode queueNode;
 	protected QueueVehicle vehicle;
 	
 	protected PlanAlgorithm replanner; 
 	
 	private static final Logger log = Logger.getLogger(LeaveLinkReplanner.class);
 	
-	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
+//	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
+	public LeaveLinkReplanner(QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	{
-		this.queueNode = queueNode;
-		this.node = queueNode.getNode();
+//		this.queueNode = queueNode;
+//		this.node = queueNode.getNode();
 		this.time = time;
 		this.vehicle = vehicle;
 		this.personAgent = (PersonAgent) vehicle.getDriver();
@@ -90,10 +89,11 @@ public class LeaveLinkReplanner {
 		init();
 	}
 	
-	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time)
+//	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time)
+	public LeaveLinkReplanner(QueueVehicle vehicle, double time)
 	{
-		this.queueNode = queueNode;
-		this.node = queueNode.getNode();
+//		this.queueNode = queueNode;
+//		this.node = queueNode.getNode();
 		this.time = time;
 		this.vehicle = vehicle;
 		this.personAgent = (PersonAgent) vehicle.getDriver();
@@ -112,7 +112,7 @@ public class LeaveLinkReplanner {
 
 		leg = personAgent.getCurrentLeg();
 
-		prevAct = (ActivityImpl)plan.getPreviousActivity(leg);
+//		prevAct = (ActivityImpl)plan.getPreviousActivity(leg);
 		nextAct = (ActivityImpl)plan.getNextActivity(leg);	
 		
 		// if there is a next Activity...
@@ -143,7 +143,6 @@ public class LeaveLinkReplanner {
 		 */ 
 		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
 		NetworkRoute route = (NetworkRoute) this.leg.getRoute();
-
 		
 		// create dummy data for the "new" activities
 		String type = "w";

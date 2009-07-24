@@ -33,22 +33,31 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
+
+/*
+ * Using the LookupTable seems to improve the speed a tiny little bit.
+ * This effect may vary depending on the Network and CostCalculator.
+ * So maybe not using it could be faster...
+ */
 
 public class DijkstraForSelectNodes {
 	
 	private static final Logger log = Logger.getLogger(DijkstraForSelectNodes.class);
 	
 	// Traffic network
-	Network network;
+	NetworkLayer network;
 	
 	// mapping between nodes and dijkstraNodes
-	HashMap<NodeImpl, DijkstraNode> dijkstraNodeMap;
+	Map<NodeImpl, DijkstraNode> dijkstraNodeMap;
+	
+	// LookupTable for the TravelCosts of the various Links
+	Map<LinkImpl, Double> travelCostLookupTable;
 	
 	// CostCalculator for the Dijkstra Algorithm
 	TravelCost costCalculator = new FreespeedTravelTimeCost();
@@ -81,7 +90,7 @@ public class DijkstraForSelectNodes {
 	        else return 0;
 	    }
 	};
-	    
+	
 	   
 	// List of nodes, sorted by their distance to the startnode.
 	private final PriorityQueue<DijkstraNode> unvisitedNodes = new PriorityQueue<DijkstraNode>(INITIAL_CAPACITY, shortestDistanceComparator);
@@ -95,7 +104,7 @@ public class DijkstraForSelectNodes {
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 	}
 	
-	public DijkstraForSelectNodes(Network network, Map<Id, NodeImpl> networkNodesMap)
+	public DijkstraForSelectNodes(NetworkLayer network, Map<Id, NodeImpl> networkNodesMap)
 	{
 		this.network = network;
 		this.networkNodesMap = networkNodesMap;
@@ -105,7 +114,7 @@ public class DijkstraForSelectNodes {
 		initDijkstraNodes();	
 	}
 	
-	public void setNetwork(Network network)
+	public void setNetwork(NetworkLayer network)
 	{
 		this.network = network;
 	}
@@ -318,12 +327,27 @@ public class DijkstraForSelectNodes {
 		// add node to the queue
 		unvisitedNodes.add(node);
 	}
-	
+
+	public void createTravelCostLookupTable()
+	{	
+		travelCostLookupTable = null;
+		Map<LinkImpl, Double> lookupTable = new HashMap<LinkImpl, Double>();
+		
+		for (LinkImpl link : network.getLinks().values())
+		{
+			lookupTable.put(link, getLinkCost(link, time));
+		}
+		
+		travelCostLookupTable = lookupTable;
+	}
+		
 	/*
 	 * Get cost of the given link. This can be for example its length or the time to pass the link.
 	 */
 	protected double getLinkCost(LinkImpl link, double time)
 	{   
+		if (travelCostLookupTable != null) return travelCostLookupTable.get(link);
+		
 		return costCalculator.getLinkTravelCost(link, time);
 	}
 
@@ -380,14 +404,14 @@ public class DijkstraForSelectNodes {
  */
 class DijkstraNode
 {
-	static private HashMap<NodeImpl, DijkstraNode> dijkstraNodeMap;
+	static private Map<NodeImpl, DijkstraNode> dijkstraNodeMap;
 	
 	NodeImpl node = null;
 	DijkstraNode prevNode = null;
 	boolean visited;
 	double minDist;
 
-	static void setNodeMap(HashMap<NodeImpl, DijkstraNode> map)
+	static void setNodeMap(Map<NodeImpl, DijkstraNode> map)
 	{
 		dijkstraNodeMap = map;
 	}

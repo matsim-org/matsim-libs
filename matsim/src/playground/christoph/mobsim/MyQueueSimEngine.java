@@ -1,6 +1,7 @@
 package playground.christoph.mobsim;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
@@ -9,6 +10,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -17,7 +20,6 @@ import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -89,17 +91,41 @@ public class MyQueueSimEngine extends QueueSimEngine{
 		
 		for (DriverAgent driverAgent : queue)
 		{
-			if (driverAgent.getDepartureTime() <= time) 
+			// If the Agent will depart
+			if (driverAgent.getDepartureTime() <= time)
 			{
 				PersonImpl person = driverAgent.getPerson();
 				personsToReplanActEnd.add(person);
 				
 				PersonAgent pa = (PersonAgent) driverAgent;
 				
+				// worked in V1.0
 //				ActivityImpl fromAct = (Activity)person.getSelectedPlan().getPlanElements().get(pa.getNextActivity() - 2);
-				ActivityImpl fromAct = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(pa.getNextActivity());
-				fromActActEnd.add(fromAct);
+				
+				// seems to work currently...
+//				ActivityImpl fromAct = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(pa.getNextActivity());
+		
+				// New approach using non deprecated Methods
+				// The Person is currently at an Activity and is going to leave it.
+				// The Person's CurrentLeg should point to the leg that leads to that Activity...
+				List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+				
+				Leg leg = pa.getCurrentLeg();
+				
+				int index = planElements.indexOf(leg);
+				
+				ActivityImpl fromAct = null;
+				// If the leg is part of the Person's plan
+				if (index >= 0)
+				{
+					fromAct = (ActivityImpl)planElements.get(index + 1);
+				}
+								
 				if (fromAct == null) log.error("Found fromAct that is null!");
+				else
+				{
+					fromActActEnd.add(fromAct);
+				}
 				
 				vehiclesToReplanActEnd.add(pa.getVehicle());
 			}
@@ -160,7 +186,7 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	{
 		// Leave Link Replanning Objects
 		ArrayList<QueueVehicle> vehiclesToReplanLeaveLink = new ArrayList<QueueVehicle>();
-		ArrayList<QueueNode> currentNodesLeaveLink = new ArrayList<QueueNode>();
+//		ArrayList<QueueNode> currentNodesLeaveLink = new ArrayList<QueueNode>();
 		
 		for (QueueNode queueNode : this.network.getNodes().values())
 		{		
@@ -180,7 +206,7 @@ public class MyQueueSimEngine extends QueueSimEngine{
 						if (leaveLinkReplanning)
 						{
 							vehiclesToReplanLeaveLink.add(vehicle);
-							currentNodesLeaveLink.add(queueNode);
+//							currentNodesLeaveLink.add(queueNode);
 						}
 					}
 										
@@ -197,7 +223,8 @@ public class MyQueueSimEngine extends QueueSimEngine{
 //			log.info("Resetting the LinkTravelTime LookupTables in the Replanners. Time: " + time);
 			
 //			log.info("Found " + vehiclesToReplan.size() + " vehicles that are going to leave their links and need probably a replanning!");
-			ParallelLeaveLinkReplanner.run(currentNodesLeaveLink, vehiclesToReplanLeaveLink, time);
+//			ParallelLeaveLinkReplanner.run(currentNodesLeaveLink, vehiclesToReplanLeaveLink, time);
+			ParallelLeaveLinkReplanner.run(vehiclesToReplanLeaveLink, time);
 //			log.info("Done parallel Leave Link Replanning in this step!");
 		}
 	

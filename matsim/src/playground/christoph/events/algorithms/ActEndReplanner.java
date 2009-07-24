@@ -21,6 +21,9 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
@@ -28,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -43,7 +47,10 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
  * contains this and the next Activity and the Leg between them.
  */
 
-public class ActEndReplanner implements ActivityEndEventHandler {
+
+//public class ActEndReplanner implements BasicActivityEndEventHandler {
+//public class ActEndReplanner implements ActivityEndEventHandler {
+public class ActEndReplanner {
 	
 	protected PlanAlgorithm replanner;
 	protected PersonImpl person;
@@ -51,7 +58,9 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 	protected LegImpl betweenLeg;
 	protected ActivityImpl toAct;
 	protected double time;
-		
+	
+	protected PopulationImpl population;
+	
 	private static final Logger log = Logger.getLogger(ActEndReplanner.class);
 
 	// used when starting the Replanner "by hand"
@@ -109,23 +118,28 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 			doReplanning();
 		}
 	}
-	
+/*	
 	// used when acting as EventHandler
-	public ActEndReplanner()
+	public ActEndReplanner(PopulationImpl population)
 	{	
+		this.population = population;
 	}
 	
 	// used when acting as EventHandler
-	public void handleEvent(ActivityEndEvent event) {
-		// TODO Auto-generated method stub
+	public void handleEvent(BasicActivityEndEvent event) {
+
+		
+		Id personId = event.getPersonId();
+		this.person = population.getPersons().get(personId);
 
 		// If replanning flag is set in the Person
-		boolean replanning = (Boolean)event.getPerson().getCustomAttributes().get("endActivityReplanning");
+		boolean replanning = (Boolean)this.person.getCustomAttributes().get("endActivityReplanning");
 		if(replanning) 
 		{
 			this.time = event.getTime();
-			this.person = event.getPerson();
-			this.fromAct = event.getAct();
+
+// TODO: We need the current Activity... (was part of ActivityEndEvents but not of BasicActivityEndEvents)
+//			this.fromAct = event.getAct();
 			
 			PlanImpl plan = person.getSelectedPlan();
 			this.betweenLeg = plan.getNextLeg(fromAct);
@@ -157,7 +171,7 @@ public class ActEndReplanner implements ActivityEndEventHandler {
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub	
 	}
-	
+*/	
 	/*
 	 * Idea:
 	 * MATSim Routers create Routes for complete plans.

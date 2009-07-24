@@ -133,7 +133,7 @@ public class EventControler extends Controler{
 	public EventControler(String[] args)
 	{
 		super(args);
-		config.global().setNumberOfThreads(4);
+		config.global().setNumberOfThreads(1);
 		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
@@ -152,9 +152,7 @@ public class EventControler extends Controler{
 	public EventControler(Config config)
 	{
 		super(config);
-		
-		config.global().setNumberOfThreads(4);
-		
+				
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 
@@ -163,7 +161,6 @@ public class EventControler extends Controler{
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
 		this.setTravelCostCalculator(travelCost);
-
 	}
 	
 	

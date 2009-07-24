@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 
 import playground.christoph.mobsim.MyQueueSimEngine;
@@ -61,24 +62,40 @@ public class BatchRun {
 											 {9, 1, 0, 0},
 											 {10, 0, 0, 0}};
 */	
-	protected static int[][] Versuchsplan = {{0, 0, 10, 0}};
-		
-	protected static String outbase = "G:/mysimulations/kt-zurich/output";
-	protected static String inbase = "G:/mysimulations/kt-zurich/input";
+	protected static int[][] Versuchsplan = {{0, 10, 0, 0}};
+	
+	
+	// Default Config
+//	protected static String configFileName = "config.xml";
+//	protected static String configFilePath = "test/scenarios/berlin";	
+//	protected static String outbase = "output/scenarios/berlin";
+//	protected static String inbase = "test/scenarios/berlin";
+	
+//	protected static String outbase = "G:/mysimulations/kt-zurich/output";
+//	protected static String inbase = "G:/mysimulations/kt-zurich/input";
+//	protected static String configFilePath = "G:/mysimulations/kt-zurich";
+//	protected static String configFileName = "config10pct_factor_0.10_long_replanning.xml";
+
+	protected static String outbase = "mysimulations/kt-zurich/output";
+	protected static String inbase = "mysimulations/kt-zurich/input";
+	protected static String configFilePath = "mysimulations/kt-zurich";
+	protected static String configFileName = "config.xml";
+	
+//	protected static String configFilePath = "mysimulations/zurich-cut";
+//	protected static String configFileName = "config.xml";
 //	protected static String outbase = "mysimulations/zurich-cut/output";
 //	protected static String inbase = "mysimulations/zurich-cut/input";
+
+//	protected static String configFilePath = "mysimulations/berlin";
+//	protected static String configFileName = "config.xml";
 //	protected static String outbase = "mysimulations/berlin/output";
 //	protected static String inbase = "mysimulations/berlin";
 	
+		
+	private final String separator = System.getProperty("file.separator");
+	
 	protected static String outputDirectory;
 	protected static String inputDirectory;
-	
-//	protected static String configFilePath = "mysimulations/zurich-cut";
-	protected static String configFileName = "config.xml";
-	protected static String configFilePath = "G:/mysimulations/kt-zurich";
-//	protected static String configFileName = "config10pct_factor_0.10_long_replanning.xml";
-//	protected static String configFilePath = "mysimulations/berlin";
-//	protected static String configFileName = "config.xml";
 	
 	public static void main(final String[] args)
 	{			
@@ -100,6 +117,9 @@ public class BatchRun {
 				outputDirectory = outbase + "/RandomCompassRouter" + "_Knowledge" + knowledgeFactors[i] + "_Probability" + probabilityFactors[j];
 				inputDirectory = inbase;
 			
+				outputDirectory = outputDirectory.replace("/", separator);
+				inputDirectory = inputDirectory.replace("/", separator);
+				
 				Gbl.reset();
 				
 				// only for RandomCompassRoute Batch Runs...
@@ -109,7 +129,11 @@ public class BatchRun {
 				
 				updateConfigData(config, knowledgeFactors[i]);
 				
-				EventControler controler = new EventControler(config);			
+				//EventControler controler = new EventControler(config);
+				String confFileName = configFilePath + separator + configFileName;
+				String[] args = new String[1];
+				args[0] = confFileName;
+				EventControler controler = new EventControler(args);
 				controler.setOverwriteFiles(true);
 				controler.pNoReplanning = 0.0;
 				controler.pInitialReplanning = 1.0;
@@ -130,6 +154,9 @@ public class BatchRun {
 		{
 			outputDirectory = outbase + "/CompassRouter" + "_Knowledge" + knowledgeFactors[i];
 			inputDirectory = inbase;
+			
+			outputDirectory = outputDirectory.replace("/", separator);
+			inputDirectory = inputDirectory.replace("/", separator);
 			
 			Gbl.reset();
 					
@@ -160,6 +187,9 @@ public class BatchRun {
 				outputDirectory = outbase + "/LeaveLinkReplanningRouter" + "_Knowledge" + knowledgeFactors[i];
 				inputDirectory = inbase;
 			
+				outputDirectory = outputDirectory.replace("/", separator);
+				inputDirectory = inputDirectory.replace("/", separator);
+				
 				Gbl.reset();
 				
 				// only for Batch Runs...
@@ -187,6 +217,9 @@ public class BatchRun {
 			outputDirectory = outbase + "/DoE" + "_Knowledge_Full" + "_Exeriment_" + (i + 1);
 			inputDirectory = inbase;
 		
+			outputDirectory = outputDirectory.replace("/", separator);
+			inputDirectory = inputDirectory.replace("/", separator);
+			
 			Gbl.reset();
 						
 			// only for Batch Runs...
@@ -222,8 +255,8 @@ public class BatchRun {
 	protected Config readConfigFile()
 	{		
 		String dtdFileName = null;
-		String confFileName = configFilePath + "/" + configFileName;
-		
+		String confFileName = configFilePath + separator + configFileName;
+
 		Config config = new Config();
 		config.addCoreModules();
 		
@@ -257,9 +290,14 @@ public class BatchRun {
 	
 	protected void updateConfigData(Config config, String knowledgeFactor)
 	{	
+		// if Module does not exist -> create it
+		if (config.getModule("selection") == null)
+		{
+			config.addModule("selection", new Module("selection"));
+		}
 		// overwrite paths in Config
 		config.getModule("config").addParam("outputConfigFile", outputDirectory + "/output_config.xml");
-
+		
 		//controler.getConfig().getModule("selection").addParam("inputSelectionFile", inputDirectory +  "/input_selection.xml.gz");
 		//controler.getConfig().getModule("selection").addParam("inputSelectionFile", inputDirectory +  "/" + knowledgeFactors[i] + "_input_selection.xml.gz");
 		config.getModule("selection").addParam("inputSelectionFile", inputDirectory +  "/" + knowledgeFactor + "_input_selection.xml.gz");

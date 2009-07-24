@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -42,11 +41,12 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	 * The Method uses the same structure as the LeaveLinkReplanner but instead of single node and vehicles
 	 * Objects now ArrayLists are handed over.
 	 * 
-	 * @param currentNodes
+	 * //@param currentNodes
 	 * @param vehicles
 	 * @param time
 	 */
-	public static void run(ArrayList<QueueNode> currentNodes, ArrayList<QueueVehicle> vehicles, double time)
+	//public static void run(ArrayList<QueueNode> currentNodes, ArrayList<QueueVehicle> vehicles, double time)
+	public static void run(ArrayList<QueueVehicle> vehicles, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -67,9 +67,10 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		for(int j = 0; j < vehicles.size(); j++)
 		{
 			QueueVehicle vehicle = vehicles.get(i);
-			QueueNode queueNode = currentNodes.get(i);
+//			QueueNode queueNode = currentNodes.get(i);
 			
-			replannerThreads[i % numOfThreads].handleVehicle(vehicle, queueNode);
+//			replannerThreads[i % numOfThreads].handleVehicle(vehicle, queueNode);
+			replannerThreads[i % numOfThreads].handleVehicle(vehicle);
 			i++;
 		}
 		
@@ -104,7 +105,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
 		private final List<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
-		private final List<QueueNode> currentNodes = new LinkedList<QueueNode>();
+//		private final List<QueueNode> currentNodes = new LinkedList<QueueNode>();
 
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
 		{
@@ -114,10 +115,11 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			this.time = time;
 		}
 
-		public void handleVehicle(final QueueVehicle vehicle, final QueueNode currentNode)
+//		public void handleVehicle(final QueueVehicle vehicle, final QueueNode currentNode)
+		public void handleVehicle(final QueueVehicle vehicle)
 		{
 			this.vehicles.add(vehicle);
-			this.currentNodes.add(currentNode);
+//			this.currentNodes.add(currentNode);
 		}
 
 		public void run()
@@ -128,7 +130,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			for(int i = 0; i < vehicles.size(); i++)
 			{	
 				QueueVehicle vehicle = vehicles.get(i);
-				QueueNode queueNode = currentNodes.get(i);
+//				QueueNode queueNode = currentNodes.get(i);
 				
 				// If replanning flag is set in the Person
 //				boolean replanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
@@ -148,7 +150,8 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 					// get the replanner or a clone if it, if it's not the first running thread
 					replanner = this.replannerArray[index][threadId];
 					
-					new LeaveLinkReplanner(queueNode, vehicle, time, replanner);
+//					new LeaveLinkReplanner(queueNode, vehicle, time, replanner);
+					new LeaveLinkReplanner(vehicle, time, replanner);
 //					log.info("Did Leave Link Replanning...");
 //				}
 

@@ -38,7 +38,7 @@ import org.matsim.core.utils.misc.Time;
  * Selects Nodes by using a Dijkstra Algorithm. Nodes are included, if
  * they lie on routes that an agent can use to get from the start node to 
  * the end node within a given cost limit.
- * 
+ *  
  *  @author Christoph Dobler
  */
 public class SelectNodesDijkstra extends BasicSelectNodesImpl{
@@ -65,6 +65,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		//this.networkNodesMap.putAll(network.getNodes());
 			
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
+		this.dijkstra.createTravelCostLookupTable();
 	}
 	
 	/* 
@@ -78,6 +79,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.network = network;
 		this.networkNodesMap = networkNodesMap;		
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
+		this.dijkstra.createTravelCostLookupTable();
 	}
 	
 	public SelectNodesDijkstra(NetworkLayer network, NodeImpl startNode, NodeImpl endNode, double costFactor)
@@ -95,6 +97,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		//this.networkNodesMap.putAll(network.getNodes());
 		
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
+		this.dijkstra.createTravelCostLookupTable();
 	}
 	
 	public void setStartNode(NodeImpl startNode)
