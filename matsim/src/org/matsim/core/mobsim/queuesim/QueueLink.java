@@ -503,7 +503,10 @@ public class QueueLink {
 		}
 
 		public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
-			originalLane.visdata.getVehiclePositions(positions);
+			for (QueueLane lane : QueueLink.this.getQueueLanes()) {
+				lane.visdata.getVehiclePositions(positions);
+			}
+//			originalLane.visdata.getVehiclePositions(positions);
 
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
