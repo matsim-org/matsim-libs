@@ -22,6 +22,8 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -33,6 +35,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -678,6 +681,112 @@ public class QueueSimulationTest extends MatsimTestCase {
 		vehicles = qlink2.getAllVehicles();
 		assertEquals(1, vehicles.size());
 		assertEquals(id1, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
+	}
+
+	/**
+	 * Tests that a vehicle starts its route even when start and end link are the same.
+	 *
+	 * @author mrieser
+	 */
+	public void testCircleAsRoute() {
+		Fixture f = new Fixture();
+		LinkImpl link4 = f.network.createLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan = person.createPlan(true);
+		ActivityImpl a1 = plan.createActivity("h", f.link1);
+		a1.setEndTime(7.0*3600);
+		LegImpl l1 = plan.createLeg(TransportMode.car);
+		l1.setTravelTime(10);
+		NetworkRoute netRoute = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link1);
+		List<Link> routeLinks = new ArrayList<Link>();
+		Collections.addAll(routeLinks, f.link2, f.link3, link4);
+		netRoute.setLinks(f.link1, routeLinks, f.link1);
+		l1.setRoute(netRoute);
+
+		plan.createActivity("w", f.link1);
+		f.plans.getPersons().put(person.getId(), person);
+
+		/* build events */
+		Events events = new Events();
+		BasicEventCollector collector = new BasicEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+
+		/* finish */
+		assertEquals("wrong number of events.", 13, collector.events.size());
+		assertEquals("wrong type of event.", ActivityEndEvent.class, collector.events.get(0).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, collector.events.get(1).getClass());
+		assertEquals("wrong type of event.", AgentWait2LinkEvent.class, collector.events.get(2).getClass());
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(3).getClass()); // link1
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(4).getClass()); // link2
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(5).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(6).getClass()); // link3
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(7).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(8).getClass()); // link4
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(9).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(10).getClass()); // link1 again
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, collector.events.get(11).getClass());
+		assertEquals("wrong type of event.", ActivityStartEvent.class, collector.events.get(12).getClass());
+	}
+
+	/**
+	 * Tests that if the endLink of a route is contained within the route itself,
+	 * the vehicle really drives until the end of its route and is not stopped
+	 * when it reaches the endLink the first time.
+	 *
+	 * @author mrieser
+	 */
+	public void testRouteWithEndLinkTwice() {
+		Fixture f = new Fixture();
+		LinkImpl link4 = f.network.createLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PlanImpl plan = person.createPlan(true);
+		ActivityImpl a1 = plan.createActivity("h", f.link1);
+		a1.setEndTime(7.0*3600);
+		LegImpl l1 = plan.createLeg(TransportMode.car);
+		l1.setTravelTime(10);
+		NetworkRoute netRoute = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
+		List<Link> routeLinks = new ArrayList<Link>();
+		Collections.addAll(routeLinks, f.link2, f.link3, link4, f.link1, f.link2);
+		netRoute.setLinks(f.link1, routeLinks, f.link3);
+		l1.setRoute(netRoute);
+
+		plan.createActivity("w", f.link3);
+		f.plans.getPersons().put(person.getId(), person);
+
+		/* build events */
+		Events events = new Events();
+		BasicEventCollector collector = new BasicEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
+		sim.run();
+
+		/* finish */
+		assertEquals("wrong number of events.", 17, collector.events.size());
+		assertEquals("wrong type of event.", ActivityEndEvent.class, collector.events.get(0).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, collector.events.get(1).getClass());
+		assertEquals("wrong type of event.", AgentWait2LinkEvent.class, collector.events.get(2).getClass());
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(3).getClass()); // link1
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(4).getClass()); // link2
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(5).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(6).getClass()); // link3
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(7).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(8).getClass()); // link4
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(9).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(10).getClass()); // link1 again
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(11).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(12).getClass()); // link2 again
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, collector.events.get(13).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, collector.events.get(14).getClass()); // link3 again
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, collector.events.get(15).getClass());
+		assertEquals("wrong type of event.", ActivityStartEvent.class, collector.events.get(16).getClass());
 	}
 
 	/**

@@ -739,7 +739,7 @@ public class QueueSimulation {
 			if (vehicle != null) {
 				vehicle.setDriver(agent);
 			}
-			if (route.getEndLink() == link) {
+			if ((route.getEndLink() == link) && (agent.chooseNextLink() == null)) {
 				qlink.processVehicleArrival(now, vehicle);
 			} else {
 				qlink.addDepartingVehicle(vehicle);

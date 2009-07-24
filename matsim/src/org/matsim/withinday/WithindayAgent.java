@@ -253,7 +253,9 @@ public class WithindayAgent extends PersonAgent {
 
 	@Override
 	public Link chooseNextLink() {
-		this.replan();
+		if (this.getCurrentLink() != this.getDestinationLink()) {
+			this.replan();
+		}
 //		this.cachedNextLink = null;
 		Link l = super.chooseNextLink();
 		if (log.isTraceEnabled())

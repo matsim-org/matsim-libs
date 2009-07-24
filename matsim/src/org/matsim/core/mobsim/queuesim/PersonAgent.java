@@ -263,9 +263,11 @@ public class PersonAgent implements DriverAgent {
 				this.cachedNextLink = this.destinationLink;
 				return this.cachedNextLink;
 			}
-			// there must be something wrong. Maybe the route is too short, or something else, we don't know...
-			log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLink.getId().toString()
-					+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLink.getId().toString());
+			if (this.currentLink != this.destinationLink) {
+				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
+				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLink.getId().toString()
+						+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLink.getId().toString());
+			}
 			return null;
 		}
 

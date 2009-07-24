@@ -408,12 +408,13 @@ public class QueueLane {
 				return;
 			}
 
+			DriverAgent driver = veh.getDriver();
 			// handle transit driver if necessary
-			if (veh.getDriver() instanceof TransitDriverAgent) {
-				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
-				TransitStopFacility stop = driver.getNextTransitStop();
+			if (driver instanceof TransitDriverAgent) {
+				TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
+				TransitStopFacility stop = transitDriver.getNextTransitStop();
 				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
-					double delay = driver.handleTransitStop(stop, now);
+					double delay = transitDriver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
 						veh.setEarliestLinkExitTime(now + delay);
 						if (!stop.getIsBlockingLane()) {
@@ -429,7 +430,7 @@ public class QueueLane {
 			}
 
 			// Check if veh has reached destination:
-			if (veh.getDriver().getDestinationLink() == this.queueLink.getLink()) {
+			if ((driver.getDestinationLink() == this.queueLink.getLink()) && (driver.chooseNextLink() == null)) {
 				this.queueLink.processVehicleArrival(now, veh);
 				// remove _after_ processing the arrival to keep link active
 				this.vehQueue.poll();
