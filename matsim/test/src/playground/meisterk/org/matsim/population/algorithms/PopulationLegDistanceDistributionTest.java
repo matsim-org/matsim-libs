@@ -87,7 +87,28 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		pop.addPerson(testPerson);
 		
 		assertEquals(1, testee.getLegDistanceDistribution().size());
-		assertTrue(testee.getLegDistanceDistribution().containsKey(TransportMode.car));
+		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
+
+		leg.setMode(TransportMode.pt);
+		route.setDistance(13456.7);
+
+		pop.addPerson(testPerson);
+		
+		assertEquals(2, testee.getLegDistanceDistribution().size());
+		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
+		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.pt)[8].intValue());
+		
+		leg.setMode(TransportMode.car);
+		route.setDistance(0.0);
+		
+		pop.addPerson(testPerson);
+		
+		assertEquals(2, testee.getLegDistanceDistribution().size());
+		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[0].intValue());
+		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
+		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.pt)[8].intValue());
+
+		testee.printLegDistanceDistribution();
 		
 	}
 	

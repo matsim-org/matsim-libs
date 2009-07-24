@@ -61,6 +61,7 @@ import org.xml.sax.SAXException;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
+import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
 
 public class MyRuns {
 
@@ -100,7 +101,8 @@ public class MyRuns {
 
 //		MyRuns.setPlansToSameDepTime(config);
 	
-		this.analyzeModeChainFeasibility(config);
+//		this.analyzeModeChainFeasibility(config);
+		this.analyzeLegDistanceDistribution(config);
 		
 		System.out.println();
 
@@ -113,16 +115,54 @@ public class MyRuns {
 	public static void main(final String[] args) throws Exception {
 
 		Config config = Gbl.createConfig(args);
-//		Gbl.createWorld();
-//		Gbl.createFacilities();
 
 		MyRuns myRuns = new MyRuns();
 		myRuns.run(config);
-		
-//		run(config);
 
 	}
 
+	public void analyzeLegDistanceDistribution(Config config) {
+
+		// initialize scenario with events from a given events file
+		// - network
+		logger.info("Reading network xml file...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		logger.info("Reading network xml file...done.");
+		
+		// - facilities
+		logger.info("Reading facilities xml file...");
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		try {
+			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Gbl.getWorld().setFacilityLayer(facilities);
+		logger.info("Reading facilities xml file...");
+		
+		// - population
+		PopulationLegDistanceDistribution pa = new PopulationLegDistanceDistribution();
+		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
+		plansAlgos.add(pa);
+
+		PopulationImpl matsimAgentPopulation = new PopulationImpl();
+		matsimAgentPopulation.setIsStreaming(true);
+		matsimAgentPopulation.addAlgorithm(pa);
+		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
+		plansReader.readFile(config.plans().getInputFile());
+
+		pa.printLegDistanceDistribution();
+		
+	}
+	
 	public void analyzeModeChainFeasibility(Config config) {
 
 		// initialize scenario with events from a given events file

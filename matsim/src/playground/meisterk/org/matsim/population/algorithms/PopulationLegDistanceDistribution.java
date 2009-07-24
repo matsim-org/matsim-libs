@@ -91,4 +91,23 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		return legDistanceDistribution;
 	}
 
+	public void printLegDistanceDistribution() {
+		
+		System.out.println();
+		System.out.print("#mode");
+		for (double d : distanceClasses) {
+			System.out.print("\t" + Double.toString(d));
+		}
+		System.out.println();
+		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+			System.out.print(mode);
+			for (Integer i : this.legDistanceDistribution.get(mode)) {
+				System.out.print("\t" + Integer.toString(i));
+			}
+			System.out.println();
+		}
+		System.out.println();
+		
+	}
+	
 }
