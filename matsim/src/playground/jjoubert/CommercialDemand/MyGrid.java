@@ -151,7 +151,7 @@ public class MyGrid {
 				int hour = Integer.parseInt(line[3].substring(position-2, position));
 				
 				Collection<MyGridCell> cells = grid.get(x, y, radius);
-				double value = 1.0 / (double) cells.size();
+				float value = ((float) 1) / ((float) cells.size());
 				for (MyGridCell cell : cells) {
 					cell.addToTotalCount(value);
 					cell.addToHourCount(hour, value);
