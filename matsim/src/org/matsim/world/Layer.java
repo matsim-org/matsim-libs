@@ -40,13 +40,13 @@ import org.matsim.core.network.NetworkLayer;
  * @author Michael Balmer
  */
 public abstract class Layer implements Serializable {
-	protected final Id type;
-	protected String name;
+	private final Id type;
+	private String name;
 
-	protected MappingRule up_rule = null; // to aggregate
-	protected MappingRule down_rule = null; // to disaggregate
+	private MappingRule upRule = null; // to aggregate
+	private MappingRule downRule = null; // to disaggregate
 
-	protected final TreeMap<Id, MappedLocation> locations = new TreeMap<Id,MappedLocation>();
+	private final TreeMap<Id, MappedLocation> locations = new TreeMap<Id,MappedLocation>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -66,7 +66,7 @@ public abstract class Layer implements Serializable {
 		if (up_rule == null) {
 			Gbl.errorMsg(this.toString() + "[up_rule=null not allowed.]");
 		}
-		this.up_rule = up_rule;
+		this.upRule = up_rule;
 	}
 
 	@Deprecated // use of mapping rules is discouraged
@@ -74,7 +74,7 @@ public abstract class Layer implements Serializable {
 		if (down_rule == null) {
 			Gbl.errorMsg(this.toString() + "[down_rule=null not allowed.]");
 		}
-		this.down_rule = down_rule;
+		this.downRule = down_rule;
 	}
 
 	public final void setName(final String name) {
@@ -87,34 +87,52 @@ public abstract class Layer implements Serializable {
 
 	@Deprecated // use of mapping rules is discouraged
 	protected final boolean removeUpRule() {
-		if (this.up_rule == null) { return true; }
-		if (this.up_rule.getUpLayer().down_rule == null) { Gbl.errorMsg("This should never happen!"); }
+		if (this.upRule == null) { return true; }
+
+		if (this.upRule.getUpLayer().downRule == null) { Gbl.errorMsg("This should never happen!"); }
 
 		Iterator<MappedLocation> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllUpMappings(); }
 
-		l_it = this.up_rule.getUpLayer().locations.values().iterator();
+		l_it = this.upRule.getUpLayer().locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllDownMappings(); }
 
-		this.up_rule.getUpLayer().down_rule = null;
-		this.up_rule = null;
+//		this.upRule.getUpLayer().downRule = null;
+		this.upRule.getUpLayer().forceDownRuleToNull();
+
+		this.upRule = null;
 		return true;
+		
+	}
+	
+	@Deprecated // do not use; this is here only for re-factoring purposes.  kai, jul09
+	void forceDownRuleToNull() {
+		this.downRule = null ;
+	}
+
+	@Deprecated // do not use; this is here only for re-factoring purposes.  kai, jul09
+	void forceUpRuleToNull() {
+		this.upRule = null ;
 	}
 
 	@Deprecated // use of mapping rules is discouraged
 	protected final boolean removeDownRule() {
-		if (this.down_rule == null) { return true; }
-		if (this.down_rule.getDownLayer().up_rule == null) { Gbl.errorMsg("This should never happen!"); }
+		if (this.downRule == null) { return true; }
+		if (this.downRule.getDownLayer().upRule == null) { Gbl.errorMsg("This should never happen!"); }
 
 		Iterator<MappedLocation> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllDownMappings(); }
 
-		l_it = this.down_rule.getDownLayer().locations.values().iterator();
+		l_it = this.downRule.getDownLayer().locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllUpMappings(); }
 
-		this.down_rule.getDownLayer().up_rule = null;
-		this.up_rule = null;
-		return true;
+//		this.downRule.getDownLayer().upRule = null;
+		this.downRule.getDownLayer().forceUpRuleToNull() ;
+
+		this.upRule = null;
+		throw new UnsupportedOperationException(" the previous line is what I found but I think it should be this.downRule=null.  kai, jul09" ) ;
+//		return true;
+
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -132,12 +150,12 @@ public abstract class Layer implements Serializable {
 
 	@Deprecated // use of mapping rules is discouraged
 	public final MappingRule getUpRule() {
-		return this.up_rule;
+		return this.upRule;
 	}
 
 	@Deprecated // use of mapping rules is discouraged
 	public final MappingRule getDownRule() {
-		return this.down_rule;
+		return this.downRule;
 	}
 
 	public final MappedLocation getLocation(final Id location_id) {
@@ -201,8 +219,8 @@ public abstract class Layer implements Serializable {
 	public String toString() {
 		return "[type=" + this.type + "]" +
 		       "[name=" + this.name + "]" +
-		       "[up_rule=" + this.up_rule + "]" +
-		       "[down_rule=" + this.down_rule + "]" +
+		       "[up_rule=" + this.upRule + "]" +
+		       "[down_rule=" + this.downRule + "]" +
 		       "[nof_locations=" + this.locations.size() + "]";
 	}
 }

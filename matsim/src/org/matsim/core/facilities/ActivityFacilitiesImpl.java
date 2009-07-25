@@ -26,11 +26,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.Layer;
+import org.matsim.world.MappedLocation;
 
 public class ActivityFacilitiesImpl extends Layer implements ActivityFacilities {
 
@@ -71,11 +73,12 @@ public class ActivityFacilitiesImpl extends Layer implements ActivityFacilities 
 	//////////////////////////////////////////////////////////////////////
 
 	public final ActivityFacility createFacility(final Id id, final Coord center) {
-		if (this.locations.containsKey(id)) {
+		if (this.getLocations().containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
 		ActivityFacility f = new ActivityFacilityImpl(this,id,center);
-		this.locations.put(f.getId(),f);
+		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.getLocations();
+		locations.put(f.getId(),f);
 
 		// show counter
 		this.counter++;
@@ -123,7 +126,7 @@ public class ActivityFacilitiesImpl extends Layer implements ActivityFacilities 
 				facilitiesAlgo.run(f);
 			}
 			// remove facility because we are streaming
-			this.locations.remove(f.getId());
+			this.getLocations().remove(f.getId());
 		}
 	}
 

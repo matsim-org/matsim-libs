@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.network.NetworkBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.world.Layer;
+import org.matsim.world.MappedLocation;
 
 public class NetworkLayer extends Layer implements Network {
 
@@ -109,7 +110,7 @@ public class NetworkLayer extends Layer implements Network {
 			throw new IllegalArgumentException(this+"[to="+toNode+" does not exist]");
 		}
 
-		if (this.locations.containsKey(id)) {
+		if (this.getLocations().containsKey(id)) {
 			throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!");
 		}
 
@@ -118,7 +119,8 @@ public class NetworkLayer extends Layer implements Network {
 		link.setOrigId(origId);
 		fromNode.addOutLink(link);
 		toNode.addInLink(link);
-		this.locations.put(link.getId(),link);
+		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.getLocations() ;
+		locations.put(link.getId(),link);
 		return link;
 	}
 
@@ -421,7 +423,7 @@ public class NetworkLayer extends Layer implements Network {
 	public boolean removeLink(final LinkImpl link) {
 		// yy should eventually be added to the api.  kai, jul09
 		Id id = link.getId();
-		LinkImpl l = (LinkImpl)this.locations.get(id);
+		LinkImpl l = (LinkImpl)this.getLocations().get(id);
 
 		if ((l == null) || (link != l)) {
 			// there is no link with the specified id, or there is another link than the requested one.
@@ -433,7 +435,7 @@ public class NetworkLayer extends Layer implements Network {
 		NodeImpl to = link.getToNode();
 		to.removeInLink(link);
 
-		return this.locations.remove(id) != null;
+		return this.getLocations().remove(id) != null;
 	}
 
 	/**
@@ -531,11 +533,11 @@ public class NetworkLayer extends Layer implements Network {
 
 	public LinkImpl getLink(final String linkId) {
 		IdImpl i = new IdImpl(linkId);
-		return (LinkImpl) this.locations.get(i);
+		return (LinkImpl) this.getLocations().get(i);
 	}
 
 	public LinkImpl getLink(final Id linkId) {
-		return (LinkImpl) this.locations.get(linkId);
+		return (LinkImpl) this.getLocations().get(linkId);
 	}
 
 	public void setFactory(NetworkFactory networkFactory) {

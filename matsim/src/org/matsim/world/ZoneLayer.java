@@ -20,6 +20,8 @@
 
 package org.matsim.world;
 
+import java.util.Map;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -57,7 +59,7 @@ public class ZoneLayer extends Layer {
 	                             final String min_x, final String min_y, final String max_x, final String max_y,
 	                             final String area, final String zoneName) {
 		Id i = new IdImpl(id);
-		if (this.locations.containsKey(i)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }
+		if (this.getLocations().containsKey(i)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }
 		Coord center = null;
 		Coord min = null;
 		Coord max = null;
@@ -68,7 +70,8 @@ public class ZoneLayer extends Layer {
 		if (area != null) {
 			z.setArea(Double.parseDouble(area));
 		}
-		this.locations.put(i,z);
+		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.getLocations() ;
+		locations.put(i,z);
 		return z;
 	}
 
