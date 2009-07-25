@@ -35,9 +35,13 @@ import org.matsim.core.api.experimental.network.NetworkBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.world.Layer;
+import org.matsim.world.LayerImpl;
+import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
+import org.matsim.world.MappingRule;
 
-public class NetworkLayer extends Layer implements Network {
+public class NetworkLayer implements Network, Layer {
+	Layer layerDelegate = new LayerImpl( LAYER_TYPE, null ) ;
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables
@@ -68,12 +72,10 @@ public class NetworkLayer extends Layer implements Network {
 	// ////////////////////////////////////////////////////////////////////
 
 	public NetworkLayer() {
-		super(LAYER_TYPE, null);
 		this.factory = new NetworkFactory(this);
 	}
 
 	public NetworkLayer(final NetworkFactory factory) {
-		super(LAYER_TYPE, null);
 		this.factory = factory;
 		this.factory.setNetwork(this);
 	}
@@ -546,6 +548,72 @@ public class NetworkLayer extends Layer implements Network {
 
 	public NetworkBuilder getBuilder() {
 		return this.factory;
+	}
+
+	// things below here are originally automatically generated.  kai, jul09
+	
+	public MappingRule getDownRule() {
+		return layerDelegate.getDownRule();
+	}
+
+	public MappedLocation getLocation(Id location_id) {
+		return layerDelegate.getLocation(location_id);
+	}
+
+	public Location getLocation(String location_id) {
+		return layerDelegate.getLocation(location_id);
+	}
+
+	public TreeMap<Id, ? extends MappedLocation> getLocations() {
+		return layerDelegate.getLocations();
+	}
+
+	public String getName() {
+		return layerDelegate.getName();
+	}
+
+	public ArrayList<MappedLocation> getNearestLocations(Coord coord, Location excludeLocation) {
+		return layerDelegate.getNearestLocations(coord, excludeLocation);
+	}
+
+	public ArrayList<MappedLocation> getNearestLocations(Coord coord) {
+		return layerDelegate.getNearestLocations(coord);
+	}
+
+	public Id getType() {
+		return layerDelegate.getType();
+	}
+
+	public MappingRule getUpRule() {
+		return layerDelegate.getUpRule();
+	}
+
+	public void setName(String name) {
+		layerDelegate.setName(name);
+	}
+
+	public final boolean removeUpRule() {
+		return layerDelegate.removeUpRule();
+	}
+
+	public final boolean removeDownRule() {
+		return layerDelegate.removeDownRule();
+	}
+
+	public final void setUpRule(final MappingRule up_rule) {
+		layerDelegate.setUpRule( up_rule ) ;
+	}
+
+	public final void setDownRule(final MappingRule down_rule) {
+		layerDelegate.setDownRule( down_rule ) ;
+	}
+
+	public void forceDownRuleToNull() {
+		layerDelegate.forceDownRuleToNull();
+	}
+
+	public void forceUpRuleToNull() {
+		layerDelegate.forceUpRuleToNull() ;
 	}
 
 }

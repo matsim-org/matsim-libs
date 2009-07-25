@@ -23,6 +23,7 @@ package org.matsim.world.algorithms;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.world.Layer;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.MappingRule;

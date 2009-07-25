@@ -20,9 +20,10 @@
 
 package org.matsim.world;
 
-import java.util.TreeMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -57,7 +58,7 @@ public class MappingRule {
 	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated // use of the current "mapping" syntax is discouraged
-	protected MappingRule(final String mapping_rule, final TreeMap<Id,Layer> layers) {
+	protected MappingRule(final String mapping_rule, final Map<Id,Layer> layers) {
 		if (!mapping_rule.matches("[a-zA-Z]+\\[[\\?\\*1\\+m]\\]-\\[[\\?\\*1\\+m]\\][a-zA-Z]+")) {
 			throw new RuntimeException("mapping_rule="+mapping_rule+" does not match.");
 		}

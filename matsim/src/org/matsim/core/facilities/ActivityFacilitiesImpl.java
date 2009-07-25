@@ -31,10 +31,10 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Layer;
+import org.matsim.world.LayerImpl;
 import org.matsim.world.MappedLocation;
 
-public class ActivityFacilitiesImpl extends Layer implements ActivityFacilities {
+public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

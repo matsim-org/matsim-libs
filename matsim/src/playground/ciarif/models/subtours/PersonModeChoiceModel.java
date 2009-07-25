@@ -38,8 +38,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.world.Location;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
 
 import playground.balmermi.census2000.data.Municipalities;

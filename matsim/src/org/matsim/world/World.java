@@ -23,6 +23,7 @@ package org.matsim.world;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -43,8 +44,8 @@ public class World {
 
 	private String name = null;
 
-	private final TreeMap<Id, Layer> layers = new TreeMap<Id, Layer>();
-	private final TreeMap<String, MappingRule> rules = new TreeMap<String, MappingRule>();
+	private final Map<Id, Layer> layers = new TreeMap<Id, Layer>();
+	private final Map<String, MappingRule> rules = new TreeMap<String, MappingRule>();
 
 	private Layer top_layer = null;
 	private Layer bottom_layer = null;
@@ -258,7 +259,8 @@ public class World {
 		if (network == null) {
 			throw new IllegalArgumentException("network=null not allowed!");
 		}
-		this.layers.put(NetworkLayer.LAYER_TYPE, network);
+		Map<Id,Layer> lll = this.layers ;
+		lll.put(NetworkLayer.LAYER_TYPE, network);
 	}
 
 	protected final void setName(final String name) {
@@ -318,12 +320,12 @@ public class World {
 	}
 
 	@Deprecated
-	public final TreeMap<Id,Layer> getLayers() {
+	public final Map<Id,Layer> getLayers() {
 		return this.layers;
 	}
 
 	@Deprecated
-	public final TreeMap<String,MappingRule> getRules() {
+	public final Map<String,MappingRule> getRules() {
 		return this.rules;
 	}
 

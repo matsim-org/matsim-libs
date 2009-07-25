@@ -20,9 +20,10 @@
 
 package org.matsim.world.algorithms;
 
-import java.util.TreeMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.world.Layer;
 import org.matsim.world.MappingRule;
@@ -50,8 +51,8 @@ public class WorldCheck {
 	private final boolean checkStructure(final World world) {
 		log.info("  analyse world structure...");
 
-		TreeMap<Id,Layer> layers = world.getLayers();
-		TreeMap<String,MappingRule> rules = world.getRules();
+		Map<Id,Layer> layers = world.getLayers();
+		Map<String,MappingRule> rules = world.getRules();
 		log.info("    generals:");
 		log.info("      number of layers = " + layers.size());
 		log.info("      number of rules = " + rules.size());

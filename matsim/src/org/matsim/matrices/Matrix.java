@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.world.Location;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 
 public class Matrix {
 

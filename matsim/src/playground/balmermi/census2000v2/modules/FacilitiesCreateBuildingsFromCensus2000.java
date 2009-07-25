@@ -33,8 +33,8 @@ import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.world.Location;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 
 import playground.balmermi.census2000v2.data.CAtts;
 

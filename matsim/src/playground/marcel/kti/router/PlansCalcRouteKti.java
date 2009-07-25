@@ -37,8 +37,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
-import org.matsim.world.Location;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
 
 public class PlansCalcRouteKti extends PlansCalcRoute {

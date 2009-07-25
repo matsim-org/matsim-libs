@@ -32,12 +32,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * The collection of zone objects in MATSim.
- * @see Layer
+ * @see LayerImpl
  * @see NetworkLayer
  * @see ActivityFacilities
  * @author Michael Balmer
  */
-public class ZoneLayer extends Layer {
+public class ZoneLayer extends LayerImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
