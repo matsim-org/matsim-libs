@@ -122,7 +122,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	@Override
-	void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
 		this.controlCounter++;
 		if (this.controlCounter == controlInterval) {
 			int newLandmarkIndex = checkToAddLandmark(outNode, toNode);

@@ -149,7 +149,7 @@ public class AStarEuclidean extends Dijkstra {
 	 *            The time we start routing.
 	 */
 	@Override
-	void initFromNode(final Node fromNode, final Node toNode, final double startTime, final PriorityQueue<Node> pendingNodes) {
+	protected void initFromNode(final Node fromNode, final Node toNode, final double startTime, final PriorityQueue<Node> pendingNodes) {
 		AStarNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 		data.setExpectedRemainingCost(estimateRemainingTravelCost(fromNode, toNode));
@@ -164,7 +164,7 @@ public class AStarEuclidean extends Dijkstra {
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
 		AStarNodeData data = getData(n);
 		double nCost = data.getCost();
-		if (!data.isVisited(getIterationID())) {
+		if (!data.isVisited(getIterationId())) {
 			double remainingTravelCost = estimateRemainingTravelCost(n, toNode);
 			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
 					+ travelCost, remainingTravelCost, l);
