@@ -40,6 +40,17 @@ import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.MappingRule;
 
+/**
+ * <p> Implementation class behind the "Network" interface.  Currently (jul09) called "...Layer" instead of "...Impl" since it
+ * also implements the "Layer" interface.  There is some agreement that we should get rid of the Layer functionality, in part because
+ * (1) the "Mappings" syntax is rather difficult to use, and (2) one could debate why only "links" and not also "nodes" are 
+ * "locations". </p>
+ * 
+ * <p> It is rather difficult to have the "Layer" functionality one level away from the "NetworkImpl" functionality, since the 
+ * "createLink" method eventually registers the link as a location, and sets a back pointer to the layer. </p>
+ * 
+ * @author nagel
+ */
 public class NetworkLayer implements Network, Layer {
 	Layer layerDelegate = new LayerImpl( LAYER_TYPE, null ) ;
 
