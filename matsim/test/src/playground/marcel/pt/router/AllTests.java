@@ -23,11 +23,12 @@ package playground.marcel.pt.router;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllTests {
+public abstract class AllTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
+		suite.addTestSuite(MultiNodeDijkstraTest.class);
 		suite.addTestSuite(TransitRouterTest.class);
 
 		return suite;
