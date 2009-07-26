@@ -26,7 +26,7 @@ package org.matsim.transitSchedule;
  *
  * @author mrieser
  */
-/*package*/ class Constants {
+/*package*/ abstract class Constants {
 	/*package*/ static final String TRANSIT_STOPS = "transitStops";
 	/*package*/ static final String STOP_FACILITY = "stopFacility";
 	/*package*/ static final String TRANSIT_SCHEDULE = "transitSchedule";
