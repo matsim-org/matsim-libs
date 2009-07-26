@@ -1,6 +1,6 @@
-package org.matsim.core.api.experimental;
+package org.matsim.core.api.internal;
 
-public interface ToplevelContainer {
+public interface MATSimToplevelContainer {
 
 	public Object getBuilder() ;
 	

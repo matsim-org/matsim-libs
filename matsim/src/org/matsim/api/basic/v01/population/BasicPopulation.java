@@ -23,11 +23,12 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MATSimToplevelContainer;
 
 /**
 * @author dgrether
 */
-public interface BasicPopulation<T extends BasicPerson> extends Serializable {
+public interface BasicPopulation<T extends BasicPerson> extends MATSimToplevelContainer, Serializable {
 
 	public String getName();
 	
