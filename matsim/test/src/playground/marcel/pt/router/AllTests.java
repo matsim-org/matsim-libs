@@ -30,6 +30,7 @@ public abstract class AllTests {
 
 		suite.addTestSuite(MultiNodeDijkstraTest.class);
 		suite.addTestSuite(TransitRouterTest.class);
+		suite.addTestSuite(NewTransitRouterTest.class);
 
 		return suite;
 	}

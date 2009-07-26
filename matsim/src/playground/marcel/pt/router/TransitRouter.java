@@ -145,13 +145,15 @@ public class TransitRouter {
 			Tuple<TransitLine, TransitRoute> lineData = this.linkMappings.get(((TransitRouterNetworkWrapper.LinkWrapper) link).link);
 			//			TransitStopFacility nodeData = this.nodeMappings.get(((TransitRouterNetworkWrapper.NodeWrapper)link.getToNode()).node);
 			if (lineData == null) {
-				// it must be one of the "transfer" links. finish the pt leg
 				TransitStopFacility egressStop = this.nodeMappings.get(((TransitRouterNetworkWrapper.NodeWrapper)link.getFromNode()).node);
-				leg = new LegImpl(TransportMode.pt);
-				ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
-				leg.setRoute(ptRoute);
-				legs.add(leg);
-				transitLegCnt++;
+				// it must be one of the "transfer" links. finish the pt leg, if there was one before...
+				if (accessStop != null) {
+					leg = new LegImpl(TransportMode.pt);
+					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
+					leg.setRoute(ptRoute);
+					legs.add(leg);
+					transitLegCnt++;
+				}
 				accessStop = egressStop;
 				line = null;
 				route = null;
