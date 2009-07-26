@@ -32,33 +32,34 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 
 
 
+/**
+ *
+ *
+ * @author mrieser
+ */
 /*package*/ class TransitRouterNetwork {
 
 	private final List<TransitRouterNetworkLink> links = new ArrayList<TransitRouterNetworkLink>();
 	private final List<TransitRouterNetworkNode> nodes = new ArrayList<TransitRouterNetworkNode>();
 	private QuadTree<TransitRouterNetworkNode> qtNodes = null;
-	
+
 	public TransitRouterNetwork() {
-		
+
 	}
-	
+
 	/*package*/ static class TransitRouterNetworkNode {
 		final TransitRouteStop stop;
 		final TransitRoute route;
 		final TransitLine line;
 		final List<TransitRouterNetworkLink> outgoingLinks = new ArrayList<TransitRouterNetworkLink>();
-		
+
 		public TransitRouterNetworkNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 			this.stop = stop;
 			this.route = route;
 			this.line = line;
 		}
-		/*package*/ void addOutgoingLink(TransitRouterNetworkLink link) {
-			this.outgoingLinks.add(link);
-			
-		}
 	}
-	
+
 	/*package*/ static class TransitRouterNetworkLink {
 		final TransitRouterNetworkNode fromNode;
 		final TransitRouterNetworkNode toNode;
@@ -77,14 +78,14 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 		this.nodes.add(node);
 		return node;
 	}
-	
+
 	public TransitRouterNetworkLink createLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
 		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(fromNode, toNode, route, line);
 		this.links.add(link);
-		fromNode.addOutgoingLink(link);
+		fromNode.outgoingLinks.add(link);
 		return link;
 	}
-	
+
 	/*package*/ Collection<TransitRouterNetworkNode> getNodes() {
 		return this.nodes;
 	}
@@ -98,7 +99,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
-		
+
 		for (TransitRouterNetworkNode node : this.nodes) {
 			Coord c = node.stop.getStopFacility().getCoord();
 			if (c.getX() < minX) {
@@ -114,7 +115,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 				maxY = c.getY();
 			}
 		}
-		
+
 		QuadTree<TransitRouterNetworkNode> quadTree = new QuadTree<TransitRouterNetworkNode>(minX, minY, maxX, maxY);
 		for (TransitRouterNetworkNode node : this.nodes) {
 			Coord c = node.stop.getStopFacility().getCoord();
@@ -122,7 +123,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 		}
 		this.qtNodes = quadTree;
 	}
-	
+
 	public final Collection<TransitRouterNetworkNode> getNearestNodes(final Coord coord, final double distance) {
 		return this.qtNodes.get(coord.getX(), coord.getY(), distance);
 	}
