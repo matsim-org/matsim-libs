@@ -201,14 +201,20 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//////////////////////////////////////////////////////////////////////
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+		/*if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
+			for (int z=1;z<plan.getPlanElements().size();z+=2){
+				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
+			}
+		}
+		 */
+		this.locator.run(plan);
 		if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){
 				((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 			}
+			this.router.run(plan);
 		}
-	
-		this.locator.run(plan);
-		this.router.run(plan);
+		//this.router.run(plan);
 		this.timer.run(plan);
 		while (plan.getScore().doubleValue()==-100000){
 			

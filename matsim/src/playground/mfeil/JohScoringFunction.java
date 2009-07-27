@@ -88,8 +88,8 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final double uMin_leisure = 0;
 	private static final double uMax_home = 60; //120//60//80//70
 	private static final double uMax_work= 55;  //100//55//70//60
-	private static final double uMax_shopping = 20; //40//20//12//12
-	private static final double uMax_leisure = 45;  //80//45//24//24
+	private static final double uMax_shopping = 12; //40//20//12//12
+	private static final double uMax_leisure = 35;  //80//45//24//24
 	private static final double alpha_home = 6;//6//8
 	private static final double alpha_work = 4;//4//6
 	private static final double alpha_shopping = 1;//1//1
@@ -104,7 +104,7 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final double gamma_leisure = 1;
 	
 	private static final double uMin_education = 0;
-	private static final double uMax_education = 95;
+	private static final double uMax_education = 40;
 	private static final double alpha_education = 3;
 	private static final double beta_education = 1.2;
 	private static final double gamma_education = 1;

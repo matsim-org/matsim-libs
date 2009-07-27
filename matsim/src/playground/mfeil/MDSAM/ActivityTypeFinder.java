@@ -98,6 +98,9 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 				if (!agentKnActTypes.contains("education_higher"))agentCuActTypes.remove("education_higher");
 				if (!agentKnActTypes.contains("work_sector2"))agentCuActTypes.remove("work_sector2");
 				if (!agentKnActTypes.contains("work_sector3"))agentCuActTypes.remove("work_sector3");
+				// agents cannot attend both edu_prim and edu_sec, therefore try to remove both. That one that is in knowledge stays.
+				if (!agentKnActTypes.contains("education_primary"))agentCuActTypes.remove("education_primary");
+				if (!agentKnActTypes.contains("education_secondary"))agentCuActTypes.remove("education_secondary");
 				return agentCuActTypes;
 			}
 			// remove defined act types from overall list, unless in agent's knowledge

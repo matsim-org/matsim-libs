@@ -168,8 +168,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 			
 			// All act types complying with those eligible to the agent (see ActivityTypeFinder)
 			List<String> actTypes = this.finder.getActTypes(plan.getPerson());
-			for (int i=2;i<plan.getPlanElements().size()-2;i+=2){ // "home" does not need to be checked
-				if (!actTypes.contains(((ActivityImpl)(plan.getPlanElements().get(i))).getType())) {
+			for (int i=2;i<agents.getAgentPlan(j).getPlanElements().size()-2;i+=2){ // "home" does not need to be checked
+				if (!actTypes.contains(((ActivityImpl)(agents.getAgentPlan(j).getPlanElements().get(i))).getType())) {
 					continue optimizedAgentsLoop;
 				}
 			}
@@ -261,13 +261,17 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 		}
 		if (distance==Double.MAX_VALUE){
-			log.warn("No agent to assign from found!");
+			log.warn("No agent to assign from found for agent "+plan.getPerson().getId()+"!");
 			this.nonassignedAgents.add(plan.getPerson().getId().toString());
 			return;
 		}
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
 		this.timer.run(plan);  // includes to write the new score to the plan
+		if (plan.getScore()==-100000) {
+			this.nonassignedAgents.add(plan.getPerson().getId().toString());
+			return;
+		}
 		
 		if (Statistics.prt==true) {
 			ArrayList<String> prt = new ArrayList<String>();

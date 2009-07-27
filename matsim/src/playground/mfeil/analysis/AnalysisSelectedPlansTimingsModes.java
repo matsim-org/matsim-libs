@@ -141,7 +141,7 @@ public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActi
 	public static void main(final String [] args) {
 //		final String populationFilename = "./examples/equil/plans100.xml";
 //		final String networkFilename = "./examples/equil/network.xml";
-		final String populationFilename = "./plans/output_plans.xml";
+		final String populationFilename = "./plans/output_plans.xml.gz";
 //		final String populationFilename = "./output/Test1/ITERS/it.0/0.plans.xml.gz";
 		final String networkFilename = "./test/scenarios/chessboard/network.xml";
 		final String facilitiesFilename = "./test/scenarios/chessboard/facilities.xml";

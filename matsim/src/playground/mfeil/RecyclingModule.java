@@ -193,20 +193,20 @@ public class RecyclingModule implements PlanStrategyModule{
 		
 		/* Assign remaining agents */
 		assignmentModule.prepareReplanning();
-		if (this.list1Pointer.size()>0){
+	/*	if (this.list1Pointer.size()>0){
 			int pointer = 0;
-			for (int i=0;i<list[1].size();i++){
+			for (int i=this.noOfAssignmentAgents;i<list[1].size();i++){
 				if (i!=this.list1Pointer.get(pointer)){
 					assignmentModule.handlePlan(list[1].get(i));
 				}
 				else pointer=java.lang.Math.min(pointer+1, this.list1Pointer.size()-1);
 			}
 		}
-		else {
-			for (int i=0;i<list[1].size();i++){
+		else {*/
+			for (int i=this.noOfAssignmentAgents;i<list[1].size();i++){
 				assignmentModule.handlePlan(list[1].get(i));
 			}
-		}
+		//}
 		assignmentModule.finishReplanning();
 		
 		/* Individually optimize all agents that couldn't be assigned */ 
@@ -321,6 +321,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	
 		/* Further iterations */
 		for (int i=1;i<this.iterations+1;i++){
+			log.info("Metric detection: iteration "+i);
 			
 			for (int z=1;z<coefMatrix[0].length;z++){
 				coefMatrix[i][z]=coefMatrix[i-1][z];
@@ -419,6 +420,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.assignmentModule.prepareReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
 			assignmentModule.handlePlan(list[1].get(j));
+			log.info("Calculating agent "+list[1].get(j).getPerson().getId());
 		}
 		assignmentModule.finishReplanning();
 		for (int j=0;j<java.lang.Math.min(this.noOfAssignmentAgents, list[1].size());j++){
@@ -453,8 +455,15 @@ public class RecyclingModule implements PlanStrategyModule{
 		if (this.nonassignedAgents.size()>0){
 			this.nonassignedAgents.clear();
 			score = this.calculate();// Do this again, now all agents must be assignable.
-			if (this.nonassignedAgents.size()>0) log.warn("Something went wrong when optimizing the non-assigned agents of the metric detection phase!");
+			if (this.nonassignedAgents.size()>0) {
+				log.warn("Something went wrong when optimizing the non-assigned agents of the metric detection phase!");
+			}
 		}
+		log.info("list[0]:");
+		for (int i=0;i<this.list[0].size();i++){
+			log.info("i: "+i+": "+list[0].get(i).getPerson().getId());
+		}
+		
 		return score;
 	}
 	

@@ -209,14 +209,14 @@ public class AnalysisSelectedPlansActivityChains {
 	
 
 	public static void main(final String [] args) {
-//		final String populationFilename = "./examples/equil/plans100.xml";
-//		final String networkFilename = "./examples/equil/network.xml";
-		final String populationFilename = "./plans/output_plans.xml.gz";
-//		final String populationFilename = "./output/Test1/ITERS/it.0/0.plans.xml.gz";
-		final String networkFilename = "./test/scenarios/chessboard/network.xml";
-		final String facilitiesFilename = "./test/scenarios/chessboard/facilities.xml";
+		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
+		final String populationFilename = "/home/baug/mfeil/scrPegasus/output/rec2/ITERS/it.50/50.plans.xml";
+//		final String populationFilename = "./plans/output_plans.xml.gz";
+//		final String networkFilename = "./plans/network.xml";
+//		final String facilitiesFilename = "./plans/facilities.xml.gz";
 
-		final String outputDir = "./plans/";
+		final String outputDir = "/home/baug/mfeil/data/Zurich10";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -225,7 +225,7 @@ public class AnalysisSelectedPlansActivityChains {
 
 		AnalysisSelectedPlansActivityChains sp = new AnalysisSelectedPlansActivityChains(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
 		sp.analyze();
-		sp.checkCorrectness();
+	//	sp.checkCorrectness();
 		
 		log.info("Analysis of plan finished.");
 	}
