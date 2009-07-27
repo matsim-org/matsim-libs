@@ -27,12 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -77,31 +75,7 @@ public class TransitRouter {
 //		new NetworkWriter(this.wrappedNetwork, "wrappedNetwork.xml").write();
 	}
 
-	public List<Id> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
-		// find possible start stops
-		TransitRouterNetwork.TransitRouterNetworkNode fromNode = this.transitNetwork.getNearestNode(fromCoord);
-		TransitRouterNetworkWrapper.NodeWrapper fromNodeWrapped = this.wrappedNetwork.getWrappedNode(fromNode);
-
-		// find possible end stops
-		TransitRouterNetwork.TransitRouterNetworkNode toNode = this.transitNetwork.getNearestNode(toCoord);
-		TransitRouterNetworkWrapper.NodeWrapper toNodeWrapped = this.wrappedNetwork.getWrappedNode(toNode);
-
-		// find routes between start and end stops
-
-		TransitRouterNetworkTravelTimeCost c = new TransitRouterNetworkTravelTimeCost(this.config);
-		Dijkstra d = new Dijkstra(this.wrappedNetwork, c, c);
-		Path p = d.calcLeastCostPath(fromNodeWrapped, toNodeWrapped, departureTime);
-		ArrayList<Id> linkIds = new ArrayList<Id>(p.links.size());
-		for (Link l : p.links) {
-			linkIds.add(l.getId());
-			System.out.println(l.getId().toString());
-		}
-
-		// build route
-		return linkIds;
-	}
-
-	public List<Leg> calcRoute2(final Coord fromCoord, final Coord toCoord, final double departureTime) {
+	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
 		// find possible start stops
 		Collection<TransitRouterNetwork.TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.searchRadius);
 		if (fromNodes.size() < 2) {
