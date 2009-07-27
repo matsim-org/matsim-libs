@@ -28,7 +28,6 @@ import org.matsim.api.basic.v01.population.BasicPopulationWriter;
  *
  */
 public class PopulationWriter extends BasicPopulationWriter {
-	// yyyyyy my intuition tells me to also have this in the builder
 
 	/**
 	 * @param population
