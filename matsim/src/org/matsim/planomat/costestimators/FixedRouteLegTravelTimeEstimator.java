@@ -33,6 +33,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -75,28 +76,35 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		double legTravelTimeEstimation = 0.0;
 
 		if (legIntermediate.getMode().equals(TransportMode.car)) {
+			
+			// Changes by mfeil marked mit "//mfeil"!!!
+			List<Link> l = ((NetworkRoute) legIntermediate.getRoute()).getLinks();//mfeil
+			if (l==null){//mfeil
 
-			// if no fixed route is given, generate free speed route for that leg in a lazy manner
-			if (!this.fixedRoutes.containsKey(legIntermediate)) {
-				
-				// calculate free speed route and cache it
-				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
-						actOrigin.getLink().getToNode(), 
-						actDestination.getLink().getFromNode(), 
-						0.0);
-				this.fixedRoutes.put(legIntermediate, path.links);
-				
-			}
+				// if no fixed route is given, generate free speed route for that leg in a lazy manner
+				if (!this.fixedRoutes.containsKey(legIntermediate)) {
+					
+					// calculate free speed route and cache it
+					Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
+							actOrigin.getLink().getToNode(), 
+							actDestination.getLink().getFromNode(), 
+							0.0);
+					l = path.links;//mfeil
+					this.fixedRoutes.put(legIntermediate, path.links);					
+				}
+				else l = this.fixedRoutes.get(legIntermediate);//mfeil
+			}//mfeil
 			
 			double now = departureTime;
 			now = this.processDeparture(actOrigin.getLink(), now);
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				now = this.processRouteTravelTime(this.fixedRoutes.get(legIntermediate), now);
+				//now = this.processRouteTravelTime(this.fixedRoutes.get(legIntermediate), now);//mfeil
+				now = this.processRouteTravelTime(l, now);//mfeil
 				now = this.processLink(actDestination.getLink(), now);
 			} else if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				now = this.processLink(actOrigin.getLink(), now);
-				now = this.processRouteTravelTime(this.fixedRoutes.get(legIntermediate), now);
+				now = this.processRouteTravelTime(l, now);//mfeil
 			}
 
 			if (doModifyLeg) {
