@@ -76,7 +76,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 * have to reset all nodes at the beginning of each re-routing but can use the
 	 * loop number instead.
 	 */
-	private int iterationID = Integer.MIN_VALUE + 1;
+	private int iterationId = Integer.MIN_VALUE + 1;
 	
 	private int shadowID;
 
@@ -123,7 +123,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 			boolean foundRoute = false;
 			boolean stillSearching = true;
 
-			augmentIterationID();
+			augmentIterationId();
 
 			initFromNode(fromNode, toNode, startTime, pendingNodes);
 
@@ -253,7 +253,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		final NodeData toNodeData = getData(n);
 		final double trace = this.tracer.getTrace(fromNodeData.getTrace(),fromNodeData.getMatsimNode().getCoord(), l.getLength(), n.getCoord());
 
-		if (!toNodeData.isVisited(getIterationID())){
+		if (!toNodeData.isVisited(getIterationId())){
 			visitNode(toNodeData, pendingNodes, currTime + travelTime, currCost + travelCost, fromNodeData,trace);
 			this.netStateWriter.setLinkColor(l.getId(), 0.1);
 		}
@@ -325,7 +325,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		}
 		
 		final NodeData shadow = new NodeData(n,true);
-		shadow.visitShadow(fromNodeData, currCost + travelCost, currTime + travelTime, this.iterationID, trace,fromNodeData.getShadowID());
+		shadow.visitShadow(fromNodeData, currCost + travelCost, currTime + travelTime, this.iterationId, trace,fromNodeData.getShadowID());
 		toNodeData.addShadow(shadow);
 		pendingNodes.add(shadow);
 		
@@ -349,7 +349,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 * @param trace
 	 */
 	private void visitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
-		toNodeData.visit(fromNodeData, cost, time, getIterationID(), trace);
+		toNodeData.visit(fromNodeData, cost, time, getIterationId(), trace);
 		pendingNodes.add(toNodeData);
 	}
 
@@ -377,7 +377,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		}
 
 		toNodeData.reset();
-		toNodeData.visit(fromNodeData, cost, time, getIterationID(),trace);
+		toNodeData.visit(fromNodeData, cost, time, getIterationId(),trace);
 		/* PriorityQueueBucket.remove() uses the comparator given at instantiating
 		 * to find the matching Object. This can lead to removing a wrong object
 		 * which happens to have the same key for comparison, but is a completely
@@ -421,7 +421,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 			toNodeData.rmShadow(del);
 		}
 		final NodeData shadow = new NodeData(toNodeData.getMatsimNode(),true);
-		shadow.visitShadow(fromNodeData, cost, time, this.iterationID, trace, this.shadowID++);
+		shadow.visitShadow(fromNodeData, cost, time, this.iterationId, trace, this.shadowID++);
 		toNodeData.addShadow(shadow);
 		pendingNodes.add(shadow);
 		
@@ -437,11 +437,11 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 * Augments the iterationID and checks whether the visited information in
 	 * the nodes in the nodes have to be reset.
 	 */
-	protected void augmentIterationID() {
-		if (getIterationID() == Integer.MAX_VALUE) {
-			this.iterationID = Integer.MIN_VALUE + 1;
+	protected void augmentIterationId() {
+		if (getIterationId() == Integer.MAX_VALUE) {
+			this.iterationId = Integer.MIN_VALUE + 1;
 		} else {
-			this.iterationID++;
+			this.iterationId++;
 		}
 
 		checkToResetNetworkVisited();
@@ -450,8 +450,8 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	/**
 	 * @return iterationID
 	 */
-	private int getIterationID() {
-		return this.iterationID;
+	private int getIterationId() {
+		return this.iterationId;
 	}
 
 	/**
@@ -470,7 +470,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 			final PriorityQueue<NodeData> pendingNodes) {
 		final NodeData data = getData(fromNode);
 		data.reset();
-		data.visitInitNode(startTime,this.iterationID);
+		data.visitInitNode(startTime,this.iterationId);
 		pendingNodes.add(data);
 	}
 
@@ -484,7 +484,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		// and has the same value as at the 'beginning', we reset all nodes of
 		// the network to avoid identifying a node falsely as visited for the
 		// current iteration
-		if (getIterationID() == Integer.MIN_VALUE + 1) {
+		if (getIterationId() == Integer.MIN_VALUE + 1) {
 			resetNetworkVisited();
 		}
 	}
