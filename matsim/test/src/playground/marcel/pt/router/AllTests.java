@@ -29,11 +29,10 @@ public abstract class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(MultiNodeDijkstraTest.class);
-		suite.addTestSuite(TransitRouterTest.class);
+		suite.addTestSuite(TransitRouterNetworkTravelTimeCostTest.class);
 		suite.addTestSuite(NewTransitRouterTest.class);
 
 		return suite;
 	}
-
 
 }

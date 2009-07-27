@@ -226,10 +226,10 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("red G > C"), netRoute, stops, TransportMode.train);
 			this.redLine.addRoute(route);
 
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<01"), 6.0*3600 + 20.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<02"), 7.0*3600 + 20.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<03"), 8.0*3600 + 20.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<04"), 9.0*3600 + 20.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<01"), 6.0*3600 + 10.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<02"), 7.0*3600 + 10.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<03"), 8.0*3600 + 10.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<04"), 9.0*3600 + 10.0*60));
 		}
 	}
 
@@ -326,21 +326,21 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue I > A"), netRoute, stops, TransportMode.train);
 			this.blueLine.addRoute(route);
 
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<01"), 5.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<02"), 5.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<03"), 5.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<04"), 6.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<05"), 6.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<06"), 6.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<07"), 7.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<08"), 7.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<09"), 7.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<10"), 8.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<11"), 8.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<12"), 8.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<13"), 9.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<14"), 9.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<15"), 9.0*3600 + 46.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<01"), 5.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<02"), 5.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<03"), 5.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<04"), 6.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<05"), 6.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<06"), 6.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<07"), 7.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<08"), 7.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<09"), 7.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<10"), 8.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<11"), 8.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<12"), 8.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<13"), 9.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<14"), 9.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<15"), 9.0*3600 + 56.0*60));
 		}
 	}
 
