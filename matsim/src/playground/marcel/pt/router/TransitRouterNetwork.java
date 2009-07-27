@@ -20,16 +20,28 @@
 
 package playground.marcel.pt.router;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Network;
+import org.matsim.core.api.experimental.network.NetworkBuilder;
+import org.matsim.core.api.experimental.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-
+import org.matsim.world.Layer;
 
 
 /**
@@ -37,60 +49,160 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
  *
  * @author mrieser
  */
-/*package*/ class TransitRouterNetwork {
+/*package*/ class TransitRouterNetwork implements Network {
 
-	private final List<TransitRouterNetworkLink> links = new ArrayList<TransitRouterNetworkLink>();
-	private final List<TransitRouterNetworkNode> nodes = new ArrayList<TransitRouterNetworkNode>();
+	private final Map<Id, TransitRouterNetworkLink> links = new LinkedHashMap<Id, TransitRouterNetworkLink>();
+	private final Map<Id, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id, TransitRouterNetworkNode>();
 	private QuadTree<TransitRouterNetworkNode> qtNodes = null;
+
+	private long nextNodeId = 0;
+	private long nextLinkId = 0;
 
 	public TransitRouterNetwork() {
 
 	}
 
-	/*package*/ static class TransitRouterNetworkNode {
+	/*package*/ static class TransitRouterNetworkNode implements Node {
 		final TransitRouteStop stop;
 		final TransitRoute route;
 		final TransitLine line;
-		final List<TransitRouterNetworkLink> outgoingLinks = new ArrayList<TransitRouterNetworkLink>();
+		final Id id;
+		final Map<Id, TransitRouterNetworkLink> outgoingLinks = new LinkedHashMap<Id, TransitRouterNetworkLink>();
 
-		public TransitRouterNetworkNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
+		public TransitRouterNetworkNode(final Id id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
+			this.id = id;
 			this.stop = stop;
 			this.route = route;
 			this.line = line;
 		}
+
+		public Map<Id, ? extends LinkImpl> getInLinks() {
+			throw new UnsupportedOperationException();
+		}
+
+		public Map<Id, ? extends Link> getOutLinks() {
+			return this.outgoingLinks;
+		}
+
+		public boolean addInLink(final BasicLink link) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean addOutLink(final BasicLink link) {
+			throw new UnsupportedOperationException();
+		}
+
+		public Coord getCoord() {
+			return this.stop.getStopFacility().getCoord();
+		}
+
+		public Id getId() {
+			return this.id;
+		}
 	}
 
-	/*package*/ static class TransitRouterNetworkLink {
+	/*package*/ static class TransitRouterNetworkLink implements Link {
 		final TransitRouterNetworkNode fromNode;
 		final TransitRouterNetworkNode toNode;
 		final TransitRoute route;
 		final TransitLine line;
-		public TransitRouterNetworkLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
+		final Id id;
+		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
+			this.id = id;
 			this.fromNode = fromNode;
 			this.toNode = toNode;
 			this.route = route;
 			this.line = line;
 		}
+
+		public TransitRouterNetworkNode getFromNode() {
+			return this.fromNode;
+		}
+
+		public TransitRouterNetworkNode getToNode() {
+			return this.toNode;
+		}
+
+		public double getCapacity(final double time) {
+			return 9999;
+		}
+
+		public double getFreespeed(final double time) {
+			return 10;
+		}
+
+		public Id getId() {
+			return this.id;
+		}
+
+		public double getNumberOfLanes(final double time) {
+			return 1;
+		}
+
+		public double getLength() {
+			return CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
+		}
+
+		public void setCapacity(final double capacity) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setFreespeed(final double freespeed) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean setFromNode(final BasicNode node) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setNumberOfLanes(final double lanes) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setLength(final double length) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean setToNode(final BasicNode node) {
+			throw new UnsupportedOperationException();
+		}
+
+		public Layer getLayer() {
+			throw new UnsupportedOperationException();
+		}
+
+		public Coord getCoord() {
+			throw new UnsupportedOperationException();
+		}
+
+		public Set<TransportMode> getAllowedModes() {
+			return null;//allowedModes;
+		}
+
+		public void setAllowedModes(final Set<TransportMode> modes) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(stop, route, line);
-		this.nodes.add(node);
+		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(new IdImpl(this.nextNodeId++), stop, route, line);
+		this.nodes.put(node.getId(), node);
 		return node;
 	}
 
 	public TransitRouterNetworkLink createLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(fromNode, toNode, route, line);
-		this.links.add(link);
-		fromNode.outgoingLinks.add(link);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line);
+		this.links.put(link.getId(), link);
+		fromNode.outgoingLinks.put(link.getId(), link);
 		return link;
 	}
 
-	/*package*/ Collection<TransitRouterNetworkNode> getNodes() {
+	public Map<Id, ? extends TransitRouterNetworkNode> getNodes() {
 		return this.nodes;
 	}
 
-	/*package*/ Collection<TransitRouterNetworkLink> getLinks() {
+	public Map<Id, ? extends TransitRouterNetworkLink> getLinks() {
 		return this.links;
 	}
 
@@ -100,7 +212,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
 
-		for (TransitRouterNetworkNode node : this.nodes) {
+		for (TransitRouterNetworkNode node : this.nodes.values()) {
 			Coord c = node.stop.getStopFacility().getCoord();
 			if (c.getX() < minX) {
 				minX = c.getX();
@@ -117,7 +229,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 		}
 
 		QuadTree<TransitRouterNetworkNode> quadTree = new QuadTree<TransitRouterNetworkNode>(minX, minY, maxX, maxY);
-		for (TransitRouterNetworkNode node : this.nodes) {
+		for (TransitRouterNetworkNode node : this.nodes.values()) {
 			Coord c = node.stop.getStopFacility().getCoord();
 			quadTree.put(c.getX(), c.getY(), node);
 		}
@@ -131,4 +243,17 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 	public TransitRouterNetworkNode getNearestNode(final Coord coord) {
 		return this.qtNodes.get(coord.getX(), coord.getY());
 	}
+
+	public double getCapacityPeriod() {
+		return 3600.0;
+	}
+
+	public NetworkBuilder getBuilder() {
+		return null;
+	}
+
+	public double getEffectiveLaneWidth() {
+		return 3;
+	}
+
 }

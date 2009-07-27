@@ -27,7 +27,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.Departure;
 
-import playground.marcel.pt.router.TransitRouterNetworkWrapper.LinkWrapper;
+import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 
 /**
  * TravelTime and TravelCost calculator to be used with the transit network used for transit routing.
@@ -49,7 +49,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 
 	public double getLinkTravelCost(final Link link, final double time) {
 		double cost;
-		if (((LinkWrapper) link).link.route == null) {
+		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)
 			cost = -getLinkTravelTime(link, time) * this.config.marginalUtilityOfTravelTimeWalk + this.config.costLineSwitch;
 		} else {
@@ -66,16 +66,16 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 //		this.previousLink = link;
 //		this.previousTime = time;
 
-		LinkWrapper wrapped = (LinkWrapper) link;
-		if (wrapped.link.route != null) {
+		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+		if (wrapped.route != null) {
 			// agent stays on the same route, so use transit line travel time
 			// TODO [MR] very similar code to TransitRouter.getNextDepartureTime, consolidate
-			double earliestDepartureTime = time - wrapped.link.fromNode.stop.getDepartureOffset();
+			double earliestDepartureTime = time - wrapped.fromNode.stop.getDepartureOffset();
 			if (earliestDepartureTime >= MIDNIGHT) {
 				earliestDepartureTime = earliestDepartureTime % MIDNIGHT;
 			}
 			double bestDepartureTime = Double.POSITIVE_INFINITY;
-			for (Departure dep : wrapped.link.route.getDepartures().values()) {
+			for (Departure dep : wrapped.route.getDepartures().values()) {
 				// TODO [MR] replace linear search with something faster
 				double depTime = dep.getDepartureTime();
 				if (depTime >= MIDNIGHT) {
@@ -87,7 +87,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 			}
 			if (bestDepartureTime == Double.POSITIVE_INFINITY) {
 				// okay, seems we didn't find anything usable, so take the first one in the morning
-				for (Departure dep : wrapped.link.route.getDepartures().values()) {
+				for (Departure dep : wrapped.route.getDepartures().values()) {
 					double depTime = dep.getDepartureTime();
 					if (depTime >= MIDNIGHT) {
 						depTime = depTime % MIDNIGHT;
@@ -97,8 +97,8 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 					}
 				}
 			}
-			double arrivalOffset = (wrapped.link.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.link.toNode.stop.getArrivalOffset() : wrapped.link.toNode.stop.getDepartureOffset();
-			double time2 = (bestDepartureTime - earliestDepartureTime) + (arrivalOffset - wrapped.link.fromNode.stop.getDepartureOffset());
+			double arrivalOffset = (wrapped.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.toNode.stop.getArrivalOffset() : wrapped.toNode.stop.getDepartureOffset();
+			double time2 = (bestDepartureTime - earliestDepartureTime) + (arrivalOffset - wrapped.fromNode.stop.getDepartureOffset());
 			if (time2 < 0) {
 				time2 += MIDNIGHT;
 			}
@@ -108,7 +108,7 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
-		double distance = CoordUtils.calcDistance(wrapped.link.fromNode.stop.getStopFacility().getCoord(), wrapped.link.toNode.stop.getStopFacility().getCoord());
+		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
 		double time2 = distance / this.config.beelineWalkSpeed;
 //		System.out.println(wrapped.link.fromNode.stop.getStopFacility().getId() + "..." + wrapped.link.toNode.stop.getStopFacility().getId() + " = " + (int) time2 + "\t@ " + Time.writeTime(time));
 //		this.cachedTravelTime = time2;

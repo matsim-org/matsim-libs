@@ -22,8 +22,9 @@ package playground.marcel.pt.router;
 
 import junit.framework.TestCase;
 
-import org.matsim.core.api.experimental.network.Link;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 
 public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 
@@ -33,14 +34,13 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new TransitRouterConfig();
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouter router = new TransitRouter(f.schedule);
-		TransitRouterNetworkWrapper routerNet = router.getWrappedTransitRouterNetwork();
+		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
-		TransitRouterNetworkWrapper.LinkWrapper testLink = null;
-		for (Link link2 : routerNet.getLinks().values()) {
-			TransitRouterNetworkWrapper.LinkWrapper link = (TransitRouterNetworkWrapper.LinkWrapper) link2;
-			if ((link.link.line == f.redLine) &&
-					(link.link.fromNode.stop.getStopFacility().getName().equals("C")) &&
-					(link.link.toNode.stop.getStopFacility().getName().equals("G"))) {
+		TransitRouterNetworkLink testLink = null;
+		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
+			if ((link.line == f.redLine) &&
+					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
+					(link.toNode.stop.getStopFacility().getName().equals("G"))) {
 				testLink = link;
 			}
 		}
@@ -53,14 +53,13 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new TransitRouterConfig();
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouter router = new TransitRouter(f.schedule);
-		TransitRouterNetworkWrapper routerNet = router.getWrappedTransitRouterNetwork();
+		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
-		TransitRouterNetworkWrapper.LinkWrapper testLink = null;
-		for (Link link2 : routerNet.getLinks().values()) {
-			TransitRouterNetworkWrapper.LinkWrapper link = (TransitRouterNetworkWrapper.LinkWrapper) link2;
-			if ((link.link.line == f.blueLine) &&
-					(link.link.fromNode.stop.getStopFacility().getName().equals("C")) &&
-					(link.link.toNode.stop.getStopFacility().getName().equals("D"))) {
+		TransitRouterNetworkLink testLink = null;
+		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
+			if ((link.line == f.blueLine) &&
+					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
+					(link.toNode.stop.getStopFacility().getName().equals("D"))) {
 				testLink = link;
 			}
 		}
@@ -76,14 +75,13 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new TransitRouterConfig();
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouter router = new TransitRouter(f.schedule);
-		TransitRouterNetworkWrapper routerNet = router.getWrappedTransitRouterNetwork();
+		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
-		TransitRouterNetworkWrapper.LinkWrapper testLink = null;
-		for (Link link2 : routerNet.getLinks().values()) {
-			TransitRouterNetworkWrapper.LinkWrapper link = (TransitRouterNetworkWrapper.LinkWrapper) link2;
-			if ((link.link.line == f.blueLine) &&
-					(link.link.fromNode.stop.getStopFacility().getName().equals("C")) &&
-					(link.link.toNode.stop.getStopFacility().getName().equals("D"))) {
+		TransitRouterNetworkLink testLink = null;
+		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
+			if ((link.line == f.blueLine) &&
+					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
+					(link.toNode.stop.getStopFacility().getName().equals("D"))) {
 				testLink = link;
 			}
 		}

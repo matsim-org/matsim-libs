@@ -51,9 +51,8 @@ public class TransitRouter {
 
 	private final TransitSchedule schedule;
 	private final TransitRouterNetwork transitNetwork;
-	private final TransitRouterNetworkWrapper wrappedNetwork;
-	private final Map<TransitRouterNetwork.TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>> linkMappings;
-	private final Map<TransitRouterNetwork.TransitRouterNetworkNode, TransitStopFacility> nodeMappings;
+	private final Map<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>> linkMappings;
+	private final Map<TransitRouterNetworkNode, TransitStopFacility> nodeMappings;
 
 	private final MultiNodeDijkstra dijkstra;
 	private final TransitRouterConfig config;
@@ -65,49 +64,46 @@ public class TransitRouter {
 	public TransitRouter(final TransitSchedule schedule, final TransitRouterConfig config) {
 		this.schedule = schedule;
 		this.config = config;
-		this.linkMappings = new HashMap<TransitRouterNetwork.TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>>();
-		this.nodeMappings = new HashMap<TransitRouterNetwork.TransitRouterNetworkNode, TransitStopFacility>();
+		this.linkMappings = new HashMap<TransitRouterNetworkLink, Tuple<TransitLine, TransitRoute>>();
+		this.nodeMappings = new HashMap<TransitRouterNetworkNode, TransitStopFacility>();
 		this.transitNetwork = buildNetwork();
-		this.wrappedNetwork = new TransitRouterNetworkWrapper(this.transitNetwork);
 
 		TransitRouterNetworkTravelTimeCost c = new TransitRouterNetworkTravelTimeCost(this.config);
-		this.dijkstra = new MultiNodeDijkstra(this.wrappedNetwork, c, c);
-//		new NetworkWriter(this.wrappedNetwork, "wrappedNetwork.xml").write();
+		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, c, c);
+//		new NetworkWriter(transitNetwork, "transitNetwork.xml").write();
 	}
 
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
 		// find possible start stops
-		Collection<TransitRouterNetwork.TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.searchRadius);
+		Collection<TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.searchRadius);
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetwork.TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(fromCoord);
+			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(fromCoord);
 			double distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
 			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, distance + this.config.extensionRadius);
 		}
 		List<InitialNode> wrappedFromNodes = new ArrayList<InitialNode>();
-		for (TransitRouterNetwork.TransitRouterNetworkNode node : fromNodes) {
-			TransitRouterNetworkWrapper.NodeWrapper wrappedNode = this.wrappedNetwork.getWrappedNode(node);
+		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.beelineWalkSpeed;
 			double initialCost = - (initialTime * this.config.marginalUtilityOfTravelTimeWalk);
-			wrappedFromNodes.add(new InitialNode(wrappedNode, initialCost, initialTime + departureTime));
+			wrappedFromNodes.add(new InitialNode(node, initialCost, initialTime + departureTime));
 		}
 
 		// find possible end stops
-		Collection<TransitRouterNetwork.TransitRouterNetworkNode> toNodes = this.transitNetwork.getNearestNodes(toCoord, this.config.searchRadius);
+		Collection<TransitRouterNetworkNode> toNodes = this.transitNetwork.getNearestNodes(toCoord, this.config.searchRadius);
 		if (toNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetwork.TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toCoord);
+			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toCoord);
 			double distance = CoordUtils.calcDistance(toCoord, nearestNode.stop.getStopFacility().getCoord());
 			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.extensionRadius);
 		}
 		List<InitialNode> wrappedToNodes = new ArrayList<InitialNode>();
-		for (TransitRouterNetwork.TransitRouterNetworkNode node : toNodes) {
-			TransitRouterNetworkWrapper.NodeWrapper wrappedNode = this.wrappedNetwork.getWrappedNode(node);
+		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.beelineWalkSpeed;
 			double initialCost = - (initialTime * this.config.marginalUtilityOfTravelTimeWalk);
-			wrappedToNodes.add(new InitialNode(wrappedNode, initialCost, initialTime + departureTime));
+			wrappedToNodes.add(new InitialNode(node, initialCost, initialTime + departureTime));
 		}
 
 		// find routes between start and end stops
@@ -129,17 +125,16 @@ public class TransitRouter {
 		Link prevLink = null;
 		int transitLegCnt = 0;
 		for (Link link : p.links) {
-			TransitRouterNetworkWrapper.LinkWrapper wrappedLink = (TransitRouterNetworkWrapper.LinkWrapper) link;
-			Tuple<TransitLine, TransitRoute> lineData = this.linkMappings.get(wrappedLink.link);
+			Tuple<TransitLine, TransitRoute> lineData = this.linkMappings.get(link);
 			//			TransitStopFacility nodeData = this.nodeMappings.get(((TransitRouterNetworkWrapper.NodeWrapper)link.getToNode()).node);
 			if (lineData == null) {
-				TransitStopFacility egressStop = this.nodeMappings.get(((TransitRouterNetworkWrapper.NodeWrapper)link.getFromNode()).node);
+				TransitStopFacility egressStop = this.nodeMappings.get(link.getFromNode());
 				// it must be one of the "transfer" links. finish the pt leg, if there was one before...
 				if (route != null) {
 					leg = new LegImpl(TransportMode.pt);
 					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
-					double arrivalOffset = (wrappedLink.link.fromNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrappedLink.link.fromNode.stop.getArrivalOffset() : wrappedLink.link.fromNode.stop.getDepartureOffset();
+					double arrivalOffset = (((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() : ((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
 					double arrivalTime = getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
@@ -153,10 +148,10 @@ public class TransitRouter {
 			} else {
 				if (lineData.getSecond() != route) {
 					// the line changed
-					TransitStopFacility egressStop = this.nodeMappings.get(((TransitRouterNetworkWrapper.NodeWrapper)link.getFromNode()).node);
+					TransitStopFacility egressStop = this.nodeMappings.get(((TransitRouterNetworkLink)link).getFromNode());
 					if (route == null) {
 						// previously, the agent was on a transfer, add the walk leg
-						transitRouteStart = ((TransitRouterNetworkWrapper.LinkWrapper) link).link.fromNode.stop;
+						transitRouteStart = ((TransitRouterNetworkLink) link).getFromNode().stop;
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.walk);
@@ -181,13 +176,12 @@ public class TransitRouter {
 			prevLink = link;
 		}
 		if (route != null) {
-			TransitRouterNetworkWrapper.LinkWrapper wrappedLink = (TransitRouterNetworkWrapper.LinkWrapper) prevLink;
 			// the last part of the path was with a transit route, so add the pt-leg and final walk-leg
 			leg = new LegImpl(TransportMode.pt);
-			TransitStopFacility egressStop = this.nodeMappings.get(((TransitRouterNetworkWrapper.NodeWrapper)prevLink.getToNode()).node);
+			TransitStopFacility egressStop = this.nodeMappings.get(((TransitRouterNetworkLink) prevLink).getToNode());
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 			leg.setRoute(ptRoute);
-			double arrivalOffset = (wrappedLink.link.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrappedLink.link.toNode.stop.getArrivalOffset() : wrappedLink.link.toNode.stop.getDepartureOffset();
+			double arrivalOffset = (((TransitRouterNetworkLink) prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) prevLink).toNode.stop.getArrivalOffset() : ((TransitRouterNetworkLink) prevLink).toNode.stop.getDepartureOffset();
 			double arrivalTime = getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
@@ -233,7 +227,7 @@ public class TransitRouter {
 		network.finishInit(); // not nice to call "finishInit" here before we added all links...
 
 		// connect all stops with walking links if they're located less than 100m from each other
-		for (TransitRouterNetworkNode node : network.getNodes()) {
+		for (TransitRouterNetworkNode node : network.getNodes().values()) {
 			for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCoord(), 100)) {
 				if (node != node2) {
 					network.createLink(node, node2, null, null); // not sure if null is correct here
@@ -244,8 +238,8 @@ public class TransitRouter {
 		return network;
 	}
 
-	/*package*/ TransitRouterNetworkWrapper getWrappedTransitRouterNetwork() {
-		return this.wrappedNetwork;
+	/*package*/ TransitRouterNetwork getTransitRouterNetwork() {
+		return this.transitNetwork;
 	}
 
 	private double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double time) {
