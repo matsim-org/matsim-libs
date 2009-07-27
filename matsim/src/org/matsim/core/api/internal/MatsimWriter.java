@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicPopulationWriter.java
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,39 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.population;
-
-import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.population.PopulationWriter;
+package org.matsim.core.api.internal;
 
 /**
- * Writes a population to a file.
+ * @author nagel
  *
- * @author mrieser
  */
-public class BasicPopulationWriter implements MatsimWriter {
-	// this really is essentially a factory. :-)
+public interface MatsimWriter {
+	
+	void write( String filename ) ;
 
-	private final BasicPopulation population;
-	
-	public BasicPopulationWriter(final BasicPopulation population) {
-		this.population = population;
-	}
-	
-	/**
-	 * Writes the population in the most current format (currently plans_v4.dtd). 
-	 */
-	public void write(final String filename) {
-		writeV4(filename);
-	}
-		
-	/**
-	 * Writes the population in the format of plans_v4.dtd
-	 * 
-	 * @param filename
-	 */
-	public void writeV4(final String filename) {
-		new PopulationWriter(population, filename, "v4", 1.0).write();
-	}
-	
 }
