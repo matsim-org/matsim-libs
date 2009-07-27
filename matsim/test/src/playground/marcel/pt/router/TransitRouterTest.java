@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.marcel.pt.demo.ScenarioPlayer;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
-public class NewTransitRouterTest extends TestCase {
+public class TransitRouterTest extends TestCase {
 
 	public void visualizeFixture() {
 		Fixture f = new Fixture();
@@ -252,7 +252,7 @@ public class NewTransitRouterTest extends TestCase {
 	}
 
 	public static void main(final String[] args) {
-		new NewTransitRouterTest().visualizeFixture();
+		new TransitRouterTest().visualizeFixture();
 	}
 
 }

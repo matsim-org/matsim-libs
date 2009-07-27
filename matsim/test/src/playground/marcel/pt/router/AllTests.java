@@ -30,7 +30,7 @@ public abstract class AllTests {
 
 		suite.addTestSuite(MultiNodeDijkstraTest.class);
 		suite.addTestSuite(TransitRouterNetworkTravelTimeCostTest.class);
-		suite.addTestSuite(NewTransitRouterTest.class);
+		suite.addTestSuite(TransitRouterTest.class);
 
 		return suite;
 	}
