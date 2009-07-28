@@ -82,6 +82,9 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	
 	public void run (PlanImpl basePlan){
 		
+		// meisterk
+		this.estimator.initPlanSpecificInformation(basePlan);
+		
 		if (basePlan.getPlanElements().size()==1) return;
 		
 		
