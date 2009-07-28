@@ -2,7 +2,9 @@ package org.matsim.lanes.basic;
 
 import java.util.List;
 
-public interface BasicLaneDefinitions {
+import org.matsim.core.api.internal.MatsimToplevelContainer;
+
+public interface BasicLaneDefinitions extends MatsimToplevelContainer {
 
 	public List<BasicLanesToLinkAssignment> getLanesToLinkAssignments();
 
@@ -11,6 +13,6 @@ public interface BasicLaneDefinitions {
 	 */
 	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment);
 
-	public BasicLaneDefinitionsBuilder getLaneDefinitionBuilder();
+	public BasicLaneDefinitionsBuilder getBuilder();
 
 }

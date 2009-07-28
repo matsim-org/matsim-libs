@@ -41,7 +41,7 @@ public class BasicHouseholdsImpl implements BasicHouseholds<BasicHousehold> {
 		this.builder = new BasicHouseholdBuilderImpl();
 	}
 	
-	public BasicHouseholdBuilder getHouseholdBuilder() {
+	public BasicHouseholdBuilder getBuilder() {
 		return this.builder;
 	}
 

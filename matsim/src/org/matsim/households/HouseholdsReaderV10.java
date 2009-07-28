@@ -51,7 +51,7 @@ public class HouseholdsReaderV10 extends BasicHouseholdsReaderV10 {
 
 	@Override
 	protected BasicHousehold createHousehold(Id currentHhId, List<Id> memberIds, List<Id> vehicleIds) {
-		Household hh = this.households.getHouseholdBuilder().createHousehold(currentHhId);
+		Household hh = this.households.getBuilder().createHousehold(currentHhId);
 		if (memberIds != null) {
 			for (Id i : memberIds) {
 				PersonImpl p = scenario.getPopulation().getPersons().get(i);

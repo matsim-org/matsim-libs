@@ -51,7 +51,7 @@ public class BKickHouseholdsCreator {
     Id id1 = sc.createId("1");
     Id id2 = sc.createId("2");
     Households hhs = sc.getHouseholds();
-    HouseholdBuilder b = hhs.getHouseholdBuilder();
+    HouseholdBuilder b = hhs.getBuilder();
 
     Household hh = b.createHousehold(id1);
     hh.setIncome(b.createIncome(120000, BasicIncome.IncomePeriod.year));
@@ -83,7 +83,7 @@ public class BKickHouseholdsCreator {
     popReader.readFile(plansFile);
     
     Households hhs = sc.getHouseholds();
-    HouseholdBuilder b = hhs.getHouseholdBuilder();
+    HouseholdBuilder b = hhs.getBuilder();
 
     IncomeCalculatorKantonZurich incomeCalculator = new IncomeCalculatorKantonZurich();
     

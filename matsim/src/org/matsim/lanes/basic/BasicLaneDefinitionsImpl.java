@@ -51,9 +51,9 @@ public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
 	}
 	
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getLaneDefinitionBuilder()
+	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getBuilder()
 	 */
-	public BasicLaneDefinitionsBuilder getLaneDefinitionBuilder(){
+	public BasicLaneDefinitionsBuilder getBuilder(){
 		return this.builder;
 	}
 }

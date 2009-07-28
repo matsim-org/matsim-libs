@@ -22,13 +22,14 @@ package org.matsim.vehicles;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 
 /**
  * @author dgrether
  *
  */
-public interface BasicVehicles {
+public interface BasicVehicles extends MatsimToplevelContainer {
 
 	public Map<Id, BasicVehicleType> getVehicleTypes();
 	

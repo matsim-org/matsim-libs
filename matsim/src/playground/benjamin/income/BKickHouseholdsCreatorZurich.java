@@ -112,7 +112,7 @@ public class BKickHouseholdsCreatorZurich {
 		BasicPopulation<BasicPerson<BasicPlan>> pop = (BasicPopulation) scenario.getPopulation();
 		for (BasicPerson<BasicPlan> p : pop.getPersons().values()){
 			//create the households
-	    HouseholdBuilder b = households.getHouseholdBuilder();
+	    HouseholdBuilder b = households.getBuilder();
 	    Household hh = b.createHousehold(p.getId());
 	    hh.getMembers().put(p.getId(), (PersonImpl)(BasicPerson)p);
 	    households.getHouseholds().put(p.getId(), hh);

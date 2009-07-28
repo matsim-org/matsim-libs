@@ -44,7 +44,7 @@ public class HouseholdsImpl implements Households {
 		return this.households;
 	}
 
-	public HouseholdBuilder getHouseholdBuilder() {
+	public HouseholdBuilder getBuilder() {
 		return this.builder;
 	}
 

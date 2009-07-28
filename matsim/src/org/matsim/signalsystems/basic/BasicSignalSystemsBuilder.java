@@ -32,7 +32,7 @@ public class BasicSignalSystemsBuilder {
 	/**
 	 * The constructor is only visible in the package because instances should 
 	 * be retrieved from the container, i.e. an instance of BasicSignalSystems
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalSystemsBuilder()
+	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getBuilder()
 	 */
 	BasicSignalSystemsBuilder(){}
 	

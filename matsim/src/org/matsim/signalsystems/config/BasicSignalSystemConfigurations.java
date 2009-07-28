@@ -22,6 +22,7 @@ package org.matsim.signalsystems.config;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 
 
@@ -29,7 +30,7 @@ import org.matsim.api.basic.v01.Id;
  * @author dgrether
  *
  */
-public interface BasicSignalSystemConfigurations {
+public interface BasicSignalSystemConfigurations extends MatsimToplevelContainer {
 	
 	
 	public BasicSignalSystemConfigurationsBuilder getBuilder();

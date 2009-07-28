@@ -22,6 +22,7 @@ package org.matsim.knowledges;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 /**
  * This is just a refactoring of the current code within matsim.
  * It is NOT THE RECOMMENDED WAY TO WRITE CODE.
@@ -29,7 +30,7 @@ import org.matsim.api.basic.v01.Id;
  * @author dgrether
  *
  */
-public interface Knowledges {
+public interface Knowledges extends MatsimToplevelContainer {
 
 	public Map<Id, Knowledge> getKnowledgesByPersonId();
 

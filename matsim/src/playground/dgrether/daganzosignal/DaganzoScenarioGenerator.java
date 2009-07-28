@@ -281,7 +281,7 @@ public class DaganzoScenarioGenerator {
 
 	private BasicLaneDefinitions createLanes(ScenarioImpl scenario) {
 		BasicLaneDefinitions lanes = scenario.getLaneDefinitions();
-		BasicLaneDefinitionsBuilder builder = lanes.getLaneDefinitionBuilder();
+		BasicLaneDefinitionsBuilder builder = lanes.getBuilder();
 		//lanes for link 4
 		BasicLanesToLinkAssignment lanesForLink4 = builder.createLanesToLinkAssignment(id4);
 		BasicLane link4lane1 = builder.createLane(id1);
@@ -300,7 +300,7 @@ public class DaganzoScenarioGenerator {
 	
 	private BasicSignalSystems createSignalSystems(ScenarioImpl scenario) {
 		BasicSignalSystems systems = scenario.getSignalSystems();
-		BasicSignalSystemsBuilder builder = systems.getSignalSystemsBuilder();
+		BasicSignalSystemsBuilder builder = systems.getBuilder();
 		//create the signal system no 1
 		BasicSignalSystemDefinition definition = builder.createSignalSystemDefinition(id1);
 		systems.addSignalSystemDefinition(definition);

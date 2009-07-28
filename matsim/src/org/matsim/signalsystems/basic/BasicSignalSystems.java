@@ -20,9 +20,11 @@ package org.matsim.signalsystems.basic;
 
 import java.util.List;
 
-public interface BasicSignalSystems {
+import org.matsim.core.api.internal.MatsimToplevelContainer;
+
+public interface BasicSignalSystems extends MatsimToplevelContainer {
 	
-	public BasicSignalSystemsBuilder getSignalSystemsBuilder();
+	public BasicSignalSystemsBuilder getBuilder();
 
 	public List<BasicSignalSystemDefinition> getSignalSystemDefinitions();
 

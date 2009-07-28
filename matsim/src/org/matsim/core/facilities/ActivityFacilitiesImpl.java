@@ -34,6 +34,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.world.LayerImpl;
 import org.matsim.world.MappedLocation;
 
+import visad.data.netcdf.UnsupportedOperationException;
+
 public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilities {
 
 	//////////////////////////////////////////////////////////////////////
@@ -88,6 +90,10 @@ public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilit
 		}
 
 		return f;
+	}
+	
+	public Object getBuilder() {
+		throw new UnsupportedOperationException( "The builder for facilities needs to be implemented.  kai, jul09" ) ; 
 	}
 
 	//////////////////////////////////////////////////////////////////////

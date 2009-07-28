@@ -34,7 +34,7 @@ public interface Households extends BasicHouseholds<Household>{
 
 	public Map<Id, Household> getHouseholds();
 	
-	public HouseholdBuilder getHouseholdBuilder();
+	public HouseholdBuilder getBuilder();
 	
 	
 }

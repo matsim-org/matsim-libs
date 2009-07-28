@@ -70,7 +70,7 @@ public class BasicSignalSystemsImpl implements BasicSignalSystems {
 	}
 
 
-	public BasicSignalSystemsBuilder getSignalSystemsBuilder() {
+	public BasicSignalSystemsBuilder getBuilder() {
 		return this.builder;
 	}
 

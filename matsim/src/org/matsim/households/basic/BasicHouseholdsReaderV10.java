@@ -62,7 +62,7 @@ public class BasicHouseholdsReaderV10 extends MatsimXmlParser {
 			throw new IllegalArgumentException("Container for households must not be null!");
 		}
 		this.households = households;
-		this.builder = households.getHouseholdBuilder();
+		this.builder = households.getBuilder();
 	}
 	
 	protected void setHouseholdBuilder(HouseholdBuilder householdBuilder) {

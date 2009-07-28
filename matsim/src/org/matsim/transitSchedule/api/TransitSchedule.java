@@ -23,6 +23,7 @@ package org.matsim.transitSchedule.api;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
  * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time data
@@ -30,7 +31,7 @@ import org.matsim.api.basic.v01.Id;
  * 
  * @author mrieser
  */
-public interface TransitSchedule {
+public interface TransitSchedule extends MatsimToplevelContainer {
 
 	public abstract void addTransitLine(final TransitLine line);
 

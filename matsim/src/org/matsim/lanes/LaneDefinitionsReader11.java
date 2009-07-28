@@ -63,7 +63,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 	public LaneDefinitionsReader11(BasicLaneDefinitions laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
-		builder = this.laneDefinitions.getLaneDefinitionBuilder();
+		builder = this.laneDefinitions.getBuilder();
 	}
 
 	/**
