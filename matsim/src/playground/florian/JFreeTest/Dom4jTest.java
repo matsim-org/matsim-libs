@@ -48,9 +48,9 @@ public class Dom4jTest {
 //	}
 //	
 //    public Document parse(String file) throws DocumentException {
-//    	URL url = getClass().getResource(file);
+////    	URL url = getClass().getResource(file);
 //        SAXReader reader = new SAXReader();
-//        Document document = reader.read(url);
+//        Document document = reader.read(file);
 //        return document;
 //    }
 //
