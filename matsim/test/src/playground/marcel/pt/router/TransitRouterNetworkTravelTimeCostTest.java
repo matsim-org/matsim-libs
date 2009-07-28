@@ -91,6 +91,31 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(22.0*60 + 6.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 47.0*3600), MatsimTestCase.EPSILON);
 	}
 
-	// TODO [MR] add tests for costs
+	public void testTravelCostLineSwitch() {
+		Fixture f = new Fixture();
+		f.init();
+		TransitRouterConfig conf = new TransitRouterConfig();
+		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
+		TransitRouter router = new TransitRouter(f.schedule);
+		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
+		// find the link connecting C and D on the blue line
+		TransitRouterNetworkLink testLink = null;
+		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
+			if ((link.line == null) &&
+					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
+					(link.toNode.stop.getStopFacility().getName().equals("C"))) {
+				testLink = link;
+			}
+		}
+
+		double oldCost = conf.costLineSwitch;
+		double cost1 = tc.getLinkTravelCost(testLink, 7.0*3600);
+		conf.costLineSwitch = 0.0;
+		double cost2 = tc.getLinkTravelCost(testLink, 7.0*3600);
+		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
+		conf.costLineSwitch = 40.125;
+		double cost3 = tc.getLinkTravelCost(testLink, 7.0*3600);
+		assertEquals(40.125, cost3 - cost2, MatsimTestCase.EPSILON);
+	}
 
 }
