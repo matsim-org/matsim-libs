@@ -228,12 +228,20 @@ public class TransitRouter {
 
 		// connect all stops with walking links if they're located less than 100m from each other
 		for (TransitRouterNetworkNode node : network.getNodes().values()) {
-			for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCoord(), 100)) {
-				if (node != node2) {
-					network.createLink(node, node2, null, null); // not sure if null is correct here
+			if (node.getInLinks().size() > 0) { // only add links from this node to other nodes if agents actually can arrive here
+				for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCoord(), 100)) {
+					if ((node != node2) && (node2.getOutLinks().size() > 0)) { // only add links to other nodes when agents can depart there
+//						if ((node.line != node2.line) || (node.stop.getStopFacility() != node2.stop.getStopFacility())) {
+							network.createLink(node, node2, null, null);
+//						}
+					}
 				}
 			}
 		}
+
+		System.out.println("transit router network statistics:");
+		System.out.println(" # nodes: " + network.getNodes().size());
+		System.out.println(" # links: " + network.getLinks().size());
 
 		return network;
 	}
