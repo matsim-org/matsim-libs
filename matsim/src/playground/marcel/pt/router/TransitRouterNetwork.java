@@ -35,7 +35,6 @@ import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.api.experimental.network.NetworkBuilder;
 import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -76,7 +75,7 @@ import org.matsim.world.Layer;
 			this.line = line;
 		}
 
-		public Map<Id, ? extends LinkImpl> getInLinks() {
+		public Map<Id, ? extends Link> getInLinks() {
 			throw new UnsupportedOperationException();
 		}
 
