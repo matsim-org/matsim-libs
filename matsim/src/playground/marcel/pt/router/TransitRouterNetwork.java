@@ -66,6 +66,7 @@ import org.matsim.world.Layer;
 		final TransitRoute route;
 		final TransitLine line;
 		final Id id;
+		final Map<Id, TransitRouterNetworkLink> ingoingLinks = new LinkedHashMap<Id, TransitRouterNetworkLink>();
 		final Map<Id, TransitRouterNetworkLink> outgoingLinks = new LinkedHashMap<Id, TransitRouterNetworkLink>();
 
 		public TransitRouterNetworkNode(final Id id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
@@ -76,7 +77,7 @@ import org.matsim.world.Layer;
 		}
 
 		public Map<Id, ? extends Link> getInLinks() {
-			throw new UnsupportedOperationException();
+			return this.ingoingLinks;
 		}
 
 		public Map<Id, ? extends Link> getOutLinks() {
@@ -194,6 +195,7 @@ import org.matsim.world.Layer;
 		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line);
 		this.links.put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
+		toNode.ingoingLinks.put(link.getId(), link);
 		return link;
 	}
 
