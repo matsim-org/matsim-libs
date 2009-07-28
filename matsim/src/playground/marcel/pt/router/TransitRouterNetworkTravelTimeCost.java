@@ -20,12 +20,17 @@
 
 package playground.marcel.pt.router;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 
@@ -39,9 +44,9 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 	private final static double MIDNIGHT = 24.0*3600;
 
 	private final TransitRouterConfig config;
-//	private final Link previousLink = null;
-//	private final double previousTime = Double.NaN;
-//	private double cachedTravelTime = Double.NaN;
+	private Link previousLink = null;
+	private double previousTime = Double.NaN;
+	private double cachedTravelTime = Double.NaN;
 
 	public TransitRouterNetworkTravelTimeCost(final TransitRouterConfig config) {
 		this.config = config;
@@ -60,59 +65,67 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 	}
 
 	public double getLinkTravelTime(final Link link, final double time) {
-//		if ((link == this.previousLink) && (time == this.previousTime)) {
-//			return this.cachedTravelTime;
-//		}
-//		this.previousLink = link;
-//		this.previousTime = time;
+		if ((link == this.previousLink) && (time == this.previousTime)) {
+			return this.cachedTravelTime;
+		}
+		this.previousLink = link;
+		this.previousTime = time;
 
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null) {
 			// agent stays on the same route, so use transit line travel time
-			// TODO [MR] very similar code to TransitRouter.getNextDepartureTime, consolidate
-			double earliestDepartureTime = time - wrapped.fromNode.stop.getDepartureOffset();
-			if (earliestDepartureTime >= MIDNIGHT) {
-				earliestDepartureTime = earliestDepartureTime % MIDNIGHT;
-			}
-			double bestDepartureTime = Double.POSITIVE_INFINITY;
-			for (Departure dep : wrapped.route.getDepartures().values()) {
-				// TODO [MR] replace linear search with something faster
-				double depTime = dep.getDepartureTime();
-				if (depTime >= MIDNIGHT) {
-					depTime = depTime % MIDNIGHT;
-				}
-				if (depTime >= earliestDepartureTime && depTime < bestDepartureTime) {
-					bestDepartureTime = depTime;
-				}
-			}
-			if (bestDepartureTime == Double.POSITIVE_INFINITY) {
-				// okay, seems we didn't find anything usable, so take the first one in the morning
-				for (Departure dep : wrapped.route.getDepartures().values()) {
-					double depTime = dep.getDepartureTime();
-					if (depTime >= MIDNIGHT) {
-						depTime = depTime % MIDNIGHT;
-					}
-					if (depTime < bestDepartureTime) {
-						bestDepartureTime = depTime;
-					}
-				}
-			}
+			double bestDepartureTime = getNextDepartureTime(wrapped.route, wrapped.fromNode.stop, time);
+
 			double arrivalOffset = (wrapped.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.toNode.stop.getArrivalOffset() : wrapped.toNode.stop.getDepartureOffset();
-			double time2 = (bestDepartureTime - earliestDepartureTime) + (arrivalOffset - wrapped.fromNode.stop.getDepartureOffset());
+			double time2 = (bestDepartureTime - time) + (arrivalOffset - wrapped.fromNode.stop.getDepartureOffset());
 			if (time2 < 0) {
 				time2 += MIDNIGHT;
 			}
 //			System.out.print(wrapped.link.fromNode.stop.getStopFacility().getId() + " > " + wrapped.link.toNode.stop.getStopFacility().getId() + " = " + (int) time2 + "\t@ " + Time.writeTime(time));
 //			System.out.println(" wait-time: " + (int) (bestDepartureTime - earliestDepartureTime) + " travel-time: " + (int) (arrivalOffset - wrapped.link.fromNode.stop.getDepartureOffset()));
-//			this.cachedTravelTime = time2;
+			this.cachedTravelTime = time2;
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
 		double distance = CoordUtils.calcDistance(wrapped.fromNode.stop.getStopFacility().getCoord(), wrapped.toNode.stop.getStopFacility().getCoord());
 		double time2 = distance / this.config.beelineWalkSpeed;
 //		System.out.println(wrapped.link.fromNode.stop.getStopFacility().getId() + "..." + wrapped.link.toNode.stop.getStopFacility().getId() + " = " + (int) time2 + "\t@ " + Time.writeTime(time));
-//		this.cachedTravelTime = time2;
+		this.cachedTravelTime = time2;
 		return time2;
+	}
+
+	private final HashMap<TransitRoute, double[]> sortedDepartureCache = new HashMap<TransitRoute, double[]>();
+
+	public double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {
+		double earliestDepartureTime = depTime - stop.getDepartureOffset();
+
+		if (earliestDepartureTime >= MIDNIGHT) {
+			earliestDepartureTime = earliestDepartureTime % MIDNIGHT;
+		}
+
+		double[] cache = this.sortedDepartureCache.get(route);
+		if (cache == null) {
+			cache = new double[route.getDepartures().size()];
+			int i = 0;
+			for (Departure dep : route.getDepartures().values()) {
+				cache[i++] = dep.getDepartureTime();
+			}
+			Arrays.sort(cache);
+			this.sortedDepartureCache.put(route, cache);
+		}
+		int pos = Arrays.binarySearch(cache, earliestDepartureTime);
+		if (pos < 0) {
+			pos = -(pos + 1);
+		}
+		if (pos >= cache.length) {
+			pos = 0; // there is no later departure time, take the first in the morning
+		}
+		double bestDepartureTime = cache[pos];
+
+		while (bestDepartureTime < earliestDepartureTime) {
+			bestDepartureTime += MIDNIGHT;
+		}
+		return bestDepartureTime + stop.getDepartureOffset();
 	}
 
 }
