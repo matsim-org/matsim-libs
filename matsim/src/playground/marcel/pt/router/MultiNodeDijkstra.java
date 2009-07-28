@@ -37,16 +37,16 @@ import org.matsim.core.router.util.TravelTime;
 
 /**
  * A variant of Dijkstra's algorithm for route finding that supports multiple
- * nodes as start and end. Each start/end node can contain a specific cost 
+ * nodes as start and end. Each start/end node can contain a specific cost
  * component that describes the cost to reach that node to find the least cost
  * path to some place not part of the network.
- * 
+ *
  * @author mrieser
  */
 public class MultiNodeDijkstra extends Dijkstra {
 
 	private static final Logger log = Logger.getLogger(MultiNodeDijkstra.class);
-	
+
 	public MultiNodeDijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 	}
@@ -57,7 +57,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 	}
 
 	public Path calcLeastCostPath(final List<InitialNode> fromNodes, final List<InitialNode> toNodes) {
-		
+
 		Node toNode = toNodes.get(0).node; // just a random one
 		Set<Node> startNodes = new HashSet<Node>();
 		Set<Node> endNodes = new HashSet<Node>();
@@ -68,7 +68,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 		for (InitialNode node : toNodes) {
 			endNodes.add(node.node);
 		}
-		
+
 		augmentIterationId();
 
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
@@ -81,15 +81,15 @@ public class MultiNodeDijkstra extends Dijkstra {
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
-				log.warn("No route was found");
-				return null;
+				// seems we have no more nodes left, but not yet reached all endNodes...
+				endNodes.clear();
+			} else {
+				if (endNodes.contains(outNode)) {
+					endNodes.remove(outNode);
+					foundNodes.add(outNode);
+				}
+				relaxNode(outNode, toNode, pendingNodes);
 			}
-
-			if (endNodes.contains(outNode)) {
-				endNodes.remove(outNode);
-				foundNodes.add(outNode);
-			}
-			relaxNode(outNode, toNode, pendingNodes);
 		}
 
 		// find out which one is the cheapest end node

@@ -372,7 +372,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[23], Time.UNDEFINED_TIME, 50.0*60);
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
-			stop = this.builder.createTransitRouteStop(this.stopFacilities[18], Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			stop = this.builder.createTransitRouteStop(this.stopFacilities[18], 59.0*60, Time.UNDEFINED_TIME);
 			stops.add(stop);
 			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("green clockwise"), netRoute, stops, TransportMode.train);
 			this.greenLine.addRoute(route);

@@ -68,10 +68,10 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("1", p.links.get(0).getId().toString());
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("5", p.links.get(2).getId().toString());
-		
+
 		// change costs
 		tc.setData(new IdImpl(1), 2.0, 5.0);
-		
+
 		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
@@ -81,7 +81,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 
 		// change costs again
 		tc.setData(new IdImpl(1), 2.0, 1.0);
-		
+
 		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
@@ -89,7 +89,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("5", p.links.get(2).getId().toString());
 	}
-	
+
 	public void testMultipleEnds() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
@@ -114,10 +114,10 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("2", p.links.get(0).getId().toString());
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("5", p.links.get(2).getId().toString());
-		
+
 		// change costs
 		tc.setData(new IdImpl(4), 3.0, 1.0);
-		
+
 		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
@@ -127,7 +127,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 
 		// change costs again
 		tc.setData(new IdImpl(6), 7.0, 3.0);
-		
+
 		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
@@ -135,7 +135,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("6", p.links.get(2).getId().toString());
 	}
-	
+
 	public void testMultipleStartsAndEnds() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
@@ -161,11 +161,11 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("2", p.links.get(0).getId().toString());
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("5", p.links.get(2).getId().toString());
-		
+
 		// change costs
 		tc.setData(new IdImpl(3), 3.0, 1.0);
 		tc.setData(new IdImpl(4), 3.0, 1.0);
-		
+
 		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
@@ -176,7 +176,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		// change costs again
 		tc.setData(new IdImpl(3), 3.0, 4.0);
 		tc.setData(new IdImpl(6), 7.0, 3.0);
-		
+
 		p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
@@ -184,11 +184,11 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("6", p.links.get(2).getId().toString());
 	}
-	
+
 	/**
 	 * Both nodes 1 and 4 are part of the start set. Even if the path from 1 to the
 	 * target leads over node 4, it may be faster, due to the intial cost values.
-	 * Test that the route does not cut at node 4 as the first node backwards from 
+	 * Test that the route does not cut at node 4 as the first node backwards from
 	 * the start set.
 	 */
 	public void testStartViaFaster() {
@@ -215,7 +215,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("5", p.links.get(2).getId().toString());
 	}
-	
+
 	public void testEndViaFaster() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
@@ -240,7 +240,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("5", p.links.get(2).getId().toString());
 	}
-	
+
 	public void testOnlyFromToSameNode() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
@@ -265,9 +265,9 @@ public class MultiNodeDijkstraTest extends TestCase {
 	}
 
 	/**
-	 * Tests that a path is found if some links are in the set of start 
-	 * as well as in the set of end nodes and the path only containing 
-	 * of this node is the cheapest. 
+	 * Tests that a path is found if some links are in the set of start
+	 * as well as in the set of end nodes and the path only containing
+	 * of this node is the cheapest.
 	 */
 	public void testSameNodeInFromToSetCheapest() {
 		Fixture f = new Fixture();
@@ -286,18 +286,18 @@ public class MultiNodeDijkstraTest extends TestCase {
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 1.0, 1.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
-		
+
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(0, p.links.size());
 		assertEquals(1, p.nodes.size());
 		assertEquals("4", p.nodes.get(0).getId().toString());
 	}
-	
+
 	/**
-	 * Tests that a path is found if some links are in the set of start 
-	 * as well as in the set of end nodes, but the path only containing 
-	 * of this node is the not the cheapest. 
+	 * Tests that a path is found if some links are in the set of start
+	 * as well as in the set of end nodes, but the path only containing
+	 * of this node is the not the cheapest.
 	 */
 	public void testSameNodeInFromToSetNotCheapest() {
 		Fixture f = new Fixture();
@@ -316,7 +316,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 8.0, 8.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
-		
+
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
 		assertEquals(3, p.links.size());
@@ -324,7 +324,65 @@ public class MultiNodeDijkstraTest extends TestCase {
 		assertEquals("7", p.links.get(1).getId().toString());
 		assertEquals("6", p.links.get(2).getId().toString());
 	}
-	
+
+	/**
+	 * Tests that a route is found even if not all given end nodes are reachable
+	 */
+	public void testSomeEndNodesNotReachable() {
+		Fixture f = new Fixture();
+		TestTimeCost tc = new TestTimeCost();
+		tc.setData(new IdImpl(1), 2.0, 2.0);
+		tc.setData(new IdImpl(2), 1.0, 1.0);
+		tc.setData(new IdImpl(3), 3.0, 3.0);
+		tc.setData(new IdImpl(4), 2.0, 2.0);
+		tc.setData(new IdImpl(5), 1.0, 1.0);
+		tc.setData(new IdImpl(6), 3.0, 3.0);
+		tc.setData(new IdImpl(7), 4.0, 4.0);
+		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
+		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
+		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
+		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(1)), 3.0, 3.0));
+		List<InitialNode> toNodes = new ArrayList<InitialNode>();
+		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
+		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(3)), 3.0, 3.0)); // cannot be reached!
+
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		assertNotNull("no path found!", p);
+		assertEquals(3, p.links.size());
+		assertEquals("2", p.links.get(0).getId().toString());
+		assertEquals("7", p.links.get(1).getId().toString());
+		assertEquals("5", p.links.get(2).getId().toString());
+	}
+
+	/**
+	 * Tests that a route is found even if not all given start nodes lead to an end node
+	 */
+	public void testSomeStartNodesNotUseable() {
+		Fixture f = new Fixture();
+		TestTimeCost tc = new TestTimeCost();
+		tc.setData(new IdImpl(1), 2.0, 2.0);
+		tc.setData(new IdImpl(2), 1.0, 1.0);
+		tc.setData(new IdImpl(3), 3.0, 3.0);
+		tc.setData(new IdImpl(4), 2.0, 2.0);
+		tc.setData(new IdImpl(5), 1.0, 1.0);
+		tc.setData(new IdImpl(6), 3.0, 3.0);
+		tc.setData(new IdImpl(7), 4.0, 4.0);
+		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
+		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
+		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
+		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 3.0, 3.0)); // cannot lead to 5 or 6
+		List<InitialNode> toNodes = new ArrayList<InitialNode>();
+		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
+		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
+
+		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
+		assertNotNull("no path found!", p);
+		assertEquals(3, p.links.size());
+		assertEquals("2", p.links.get(0).getId().toString());
+		assertEquals("7", p.links.get(1).getId().toString());
+		assertEquals("5", p.links.get(2).getId().toString());
+	}
+
 	public void testImpossibleRoute() {
 		Fixture f = new Fixture();
 		TestTimeCost tc = new TestTimeCost();
@@ -344,10 +402,10 @@ public class MultiNodeDijkstraTest extends TestCase {
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNull("wow, impossible path found!", p);
 	}
-	
+
 	/**
 	 * Creates a simple network to be used in tests.
-	 * 
+	 *
 	 * <pre>
 	 *   (1)                       (4)
 	 *      \                     /
@@ -359,12 +417,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 	 *      /                     \
 	 *   (3)                       (6)
 	 * </pre>
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	/*package*/ static class Fixture {
 		/*package*/ NetworkLayer network;
-		
+
 		public Fixture() {
 			this.network = new NetworkLayer();
 			NodeImpl node1 = this.network.createNode(new IdImpl(1), new CoordImpl(1000,    0));
@@ -389,20 +447,20 @@ public class MultiNodeDijkstraTest extends TestCase {
 
 		private final Map<Id, Double> travelTimes = new HashMap<Id, Double>();
 		private final Map<Id, Double> travelCosts = new HashMap<Id, Double>();
-		
-		public void setData(final Id id, double travelTime, double travelCost) {
+
+		public void setData(final Id id, final double travelTime, final double travelCost) {
 			this.travelTimes.put(id, Double.valueOf(travelTime));
 			this.travelCosts.put(id, Double.valueOf(travelCost));
 		}
-		
-		public double getLinkTravelTime(Link link, double time) {
+
+		public double getLinkTravelTime(final Link link, final double time) {
 			return this.travelTimes.get(link.getId()).doubleValue();
 		}
 
-		public double getLinkTravelCost(Link link, double time) {
+		public double getLinkTravelCost(final Link link, final double time) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}
-		
+
 	}
-	
+
 }
