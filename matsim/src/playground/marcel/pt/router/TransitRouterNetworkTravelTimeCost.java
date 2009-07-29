@@ -122,10 +122,11 @@ public class TransitRouterNetworkTravelTimeCost implements TravelCost, TravelTim
 		}
 		double bestDepartureTime = cache[pos];
 
-		while (bestDepartureTime < earliestDepartureTime) {
+		bestDepartureTime += stop.getDepartureOffset();
+		while (bestDepartureTime < depTime) {
 			bestDepartureTime += MIDNIGHT;
 		}
-		return bestDepartureTime + stop.getDepartureOffset();
+		return bestDepartureTime;
 	}
 
 }

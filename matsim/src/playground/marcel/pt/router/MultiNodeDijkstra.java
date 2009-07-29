@@ -23,6 +23,7 @@ package playground.marcel.pt.router;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -56,27 +57,26 @@ public class MultiNodeDijkstra extends Dijkstra {
 		super(network, costFunction, timeFunction, preProcessData);
 	}
 
-	public Path calcLeastCostPath(final List<InitialNode> fromNodes, final List<InitialNode> toNodes) {
+	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes) {
 
-		Node toNode = toNodes.get(0).node; // just a random one
-		Set<Node> startNodes = new HashSet<Node>();
-		Set<Node> endNodes = new HashSet<Node>();
+		Node toNode = null;
+		Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
 		Set<Node> foundNodes = new HashSet<Node>();
-		for (InitialNode node : fromNodes) {
-			startNodes.add(node.node);
-		}
-		for (InitialNode node : toNodes) {
-			endNodes.add(node.node);
-		}
 
 		augmentIterationId();
 
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
-		for (InitialNode node : fromNodes) {
-			DijkstraNodeData data = getData(node.node);
-			visitNode(node.node, data, pendingNodes, node.initialTime, node.initialCost, null);
+		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
+			DijkstraNodeData data = getData(entry.getKey());
+			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
 		}
 
+		// find out which one is the cheapest end node
+		double minCost = Double.POSITIVE_INFINITY;
+		double arrivalTime = Double.NaN;
+		Node minCostNode = null;
+
+		// do the real work
 		while (endNodes.size() > 0) {
 			Node outNode = pendingNodes.poll();
 
@@ -87,26 +87,24 @@ public class MultiNodeDijkstra extends Dijkstra {
 				if (endNodes.contains(outNode)) {
 					endNodes.remove(outNode);
 					foundNodes.add(outNode);
+					DijkstraNodeData data = getData(outNode);
+					InitialNode initData = toNodes.get(outNode);
+					double cost = data.getCost() + initData.initialCost;
+					if (cost < minCost) {
+						arrivalTime = data.getTime() + initData.initialTime;
+						minCost = cost;
+						minCostNode = outNode;
+					}
 				}
-				relaxNode(outNode, toNode, pendingNodes);
+				DijkstraNodeData data = getData(outNode);
+				if (data.getCost() > minCost) {
+					endNodes.clear(); // we can't get any better now
+				} else {
+					relaxNode(outNode, toNode, pendingNodes);
+				}
 			}
 		}
 
-		// find out which one is the cheapest end node
-		double minCost = Double.POSITIVE_INFINITY;
-		double arrivalTime = Double.NaN;
-		Node minCostNode = null;
-		for (InitialNode node : toNodes) {
-			if (foundNodes.contains(node.node)) {
-				DijkstraNodeData data = getData(node.node);
-				double cost = data.getCost() + node.initialCost;
-				if (cost < minCost) {
-					arrivalTime = data.getTime() + node.initialTime;
-					minCost = cost;
-					minCostNode = node.node;
-				}
-			}
-		}
 		if (minCostNode == null) {
 			log.warn("No route was found");
 			return null;
@@ -134,11 +132,9 @@ public class MultiNodeDijkstra extends Dijkstra {
 	}
 
 	public static class InitialNode {
-		public final Node node;
 		public final double initialCost;
 		public final double initialTime;
 		public InitialNode(final Node node, final double initialCost, final double initialTime) {
-			this.node = node;
 			this.initialCost = initialCost;
 			this.initialTime = initialTime;
 		}

@@ -24,14 +24,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -39,47 +42,38 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
-import playground.mmoyo.PTRouter.PTTimeTable;
-import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
-import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-import playground.mmoyo.input.PTNetworkFactory;
-import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
+import playground.marcel.pt.config.TransitConfigGroup;
+import playground.marcel.pt.router.TransitRouter;
+import playground.marcel.pt.router.TransitRouterConfig;
 
-public class PlansCalcPtRoute extends PlansCalcRoute {
+/**
+ * @author mrieser
+ */
+public class PlansCalcTransitRoute extends PlansCalcRoute {
 
-	private final SimplifyPtLegs planSimplifier;
-	private final TransitRouteFinder ptRouter;
+	private final TransitLegsRemover transitLegsRemover = new TransitLegsRemover();
+//	private final TransitRouteFinder ptRouter;
+	private final TransitRouterConfig routerConfig = new TransitRouterConfig();
+	private final TransitRouter transitRouter;
+	private final TransitConfigGroup transitConfig;
 
 	private PlanImpl currentPlan = null;
-	private final List<Tuple<LegImpl, List<LegImpl>>> legReplacements = new LinkedList<Tuple<LegImpl, List<LegImpl>>>();
+	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
-	public PlansCalcPtRoute(final PlansCalcRouteConfigGroup config, final NetworkLayer network,
+	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final NetworkLayer network,
 			final TravelCost costCalculator, final TravelTime timeCalculator,
-			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule) {
+			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
+			final TransitConfigGroup transitConfig) {
 		super(config, network, costCalculator, timeCalculator, factory);
-		this.planSimplifier = new SimplifyPtLegs();
 
-//		String timeTableFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/inptnetfile.xml";
-//		String ptNewLinesFilename = "../shared-svn/studies/schweiz-ivtch/pt-experimental/TestCase/InPTDIVA.xml";
-		String transitScheduleFilename = "test/input/playground/marcel/pt/transitSchedule.xml";
-		
-		TransitScheduleToPTTimeTableConverter transitScheduleToPTTimeTableConverter = new TransitScheduleToPTTimeTableConverter();
-		PTTimeTable timeTable = transitScheduleToPTTimeTableConverter.getPTTimeTable(transitScheduleFilename, network);
-//		new PTLineAggregator(ptNewLinesFilename, net, timeTable).addLines();
-
-		PTNetworkFactory ptNetFactory = new PTNetworkFactory(); // this looks like it could be an abstract Utility class.
-		// internal setup of things should happen internally somewhere, not be called externally...
-//		ptNetFactory.createTransferLinks(net, timeTable); // this looks like it could be a static helper method
-//		ptNetFactory.createDetachedTransfers(net, 300); // this also.
-//
-//		this.ptRouter = new TransitRouteFinder(new PTRouter2(net, timeTable)); // should work with transitSchedule only
-		
-		this.ptRouter = new TransitRouteFinder(schedule);
+		this.transitConfig = transitConfig;
+		this.transitRouter = new TransitRouter(schedule, this.routerConfig);
 	}
 
 	@Override
 	public void handlePlan(final PlanImpl plan) {
-		this.planSimplifier.run(plan);
+//		System.out.println("Person: " + plan.getPerson().getId());
+		this.transitLegsRemover.run(plan);
 		this.currentPlan = plan;
 		this.legReplacements.clear();
 		super.handlePlan(plan);
@@ -90,45 +84,69 @@ public class PlansCalcPtRoute extends PlansCalcRoute {
 
 	@Override
 	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
-		if (TransportMode.pt.equals(leg.getMode())) {
+		if (this.transitConfig.getTransitModes().contains(leg.getMode())) {
 			return this.handlePtPlan(leg, fromAct, toAct, depTime);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);
 	}
 
 	private double handlePtPlan(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
-		List<LegImpl> legs= this.ptRouter.calculateRoute(fromAct, toAct, this.currentPlan.getPerson());
-		this.legReplacements.add(new Tuple<LegImpl, List<LegImpl>>(leg, legs));
+		List<Leg> legs= this.transitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 
 		double travelTime = 0.0;
-		for (LegImpl leg2 : legs) {
-			travelTime += leg2.getTravelTime();
+		if (legs != null) {
+			for (Leg leg2 : legs) {
+				travelTime += leg2.getTravelTime();
+			}
 		}
-		return travelTime; // this is currently only the time traveling, not including the time waiting at stops etc.
+		return travelTime;
 	}
 
 	private void replaceLegs() {
-		Iterator<Tuple<LegImpl, List<LegImpl>>> replacementIterator = this.legReplacements.iterator();
+		Iterator<Tuple<Leg, List<Leg>>> replacementIterator = this.legReplacements.iterator();
 		if (!replacementIterator.hasNext()) {
 			return;
 		}
 		List<PlanElement> planElements = this.currentPlan.getPlanElements();
-		Tuple<LegImpl, List<LegImpl>> currentTuple = replacementIterator.next();
+		Tuple<Leg, List<Leg>> currentTuple = replacementIterator.next();
 		for (int i = 0; i < this.currentPlan.getPlanElements().size(); i++) {
 			PlanElement pe = planElements.get(i);
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				if (leg == currentTuple.getFirst()) {
 					// do the replacement
 					boolean isFirstLeg = true;
-					for (LegImpl leg2 : currentTuple.getSecond()) {
-						if (isFirstLeg) {
-							planElements.set(i, leg2);
+					if (currentTuple.getSecond() != null) {
+						// first and last leg do not have the route set, as the start or end  link is unknown.
+						Leg firstLeg = currentTuple.getSecond().get(0);
+						Link fromLink = ((ActivityImpl) planElements.get(i-1)).getLink();
+						Link toLink = null;
+						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
+							toLink = ((RouteWRefs) currentTuple.getSecond().get(1).getRoute()).getStartLink();
 						} else {
-							i++;
-							planElements.add(i, new ActivityImpl("pt interaction", (LinkImpl)(leg2.getRoute().getStartLink())));
-							i++;
-							planElements.add(i, leg2);
+							toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+						}
+						firstLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
+
+						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
+						toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
+						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
+							fromLink = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getStartLink();
+						}
+						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
+
+						for (Leg leg2 : currentTuple.getSecond()) {
+							if (isFirstLeg) {
+								planElements.set(i, leg2);
+								isFirstLeg = false;
+							} else {
+								i++;
+								ActivityImpl act = new ActivityImpl("pt interaction", (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
+								planElements.add(i, act);
+								i++;
+								planElements.add(i, leg2);
+							}
 						}
 					}
 					if (!replacementIterator.hasNext()) {

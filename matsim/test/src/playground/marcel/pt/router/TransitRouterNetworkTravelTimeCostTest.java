@@ -89,6 +89,8 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 25.0*3600), MatsimTestCase.EPSILON);
 		// planned departure at 47:00, has to wait until 05:22 = 53:22
 		assertEquals(22.0*60 + 6.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 47.0*3600), MatsimTestCase.EPSILON);
+		// planned departure at 49:00, has to wait until 05:22 = 53:22, tests explicitly > 2*MIDNIGHT
+		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 49.0*3600), MatsimTestCase.EPSILON);
 	}
 
 	public void testTravelCostLineSwitch() {

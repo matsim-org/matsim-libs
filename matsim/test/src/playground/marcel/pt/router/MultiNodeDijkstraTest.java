@@ -20,15 +20,14 @@
 
 package playground.marcel.pt.router;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -55,12 +54,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(1)), 1.0, 1.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 3.0, 3.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(3)), 2.0, 2.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 0.0, 0.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(1)), new InitialNode(null, 1.0, 1.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(null, 3.0, 3.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(3)), new InitialNode(null, 2.0, 2.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(null, 0.0, 0.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -101,12 +100,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 7.0, 7.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 0.0, 0.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 5.0, 5.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 4.0, 4.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 1.0, 1.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 0.0, 0.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 5.0, 5.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(f.network.getNodes().get(new IdImpl(5)), 4.0, 4.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(f.network.getNodes().get(new IdImpl(6)), 1.0, 1.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -147,13 +146,13 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 7.0, 7.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 4.0, 4.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(3)), 3.0, 3.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 5.0, 5.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 4.0, 4.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 1.0, 1.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 4.0, 4.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(3)), new InitialNode(f.network.getNodes().get(new IdImpl(3)), 3.0, 3.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 5.0, 5.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(f.network.getNodes().get(new IdImpl(5)), 4.0, 4.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(f.network.getNodes().get(new IdImpl(6)), 1.0, 1.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -202,11 +201,11 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(1)), 1.0, 1.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 4.0, 4.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 0.0, 0.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(1)), new InitialNode(f.network.getNodes().get(new IdImpl(1)), 1.0, 1.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 4.0, 4.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(f.network.getNodes().get(new IdImpl(5)), 0.0, 0.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -227,11 +226,11 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 1.0, 1.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(8)), 3.0, 3.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 1.0, 1.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(8)), new InitialNode(f.network.getNodes().get(new IdImpl(8)), 3.0, 3.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -252,10 +251,10 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 1.0, 1.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 3.0, 3.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 1.0, 1.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 3.0, 3.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -280,12 +279,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 1.0, 1.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 1.0, 1.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 1.0, 1.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 1.0, 1.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -310,12 +309,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 10.0, 10.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 8.0, 8.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 10.0, 10.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 8.0, 8.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -339,12 +338,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(1)), 3.0, 3.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(3)), 3.0, 3.0)); // cannot be reached!
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(1)), new InitialNode(f.network.getNodes().get(new IdImpl(1)), 3.0, 3.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(3)), new InitialNode(f.network.getNodes().get(new IdImpl(3)), 3.0, 3.0)); // cannot be reached!
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -368,12 +367,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(4)), 3.0, 3.0)); // cannot lead to 5 or 6
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 2.0, 2.0));
+		fromNodes.put(f.network.getNodes().get(new IdImpl(4)), new InitialNode(f.network.getNodes().get(new IdImpl(4)), 3.0, 3.0)); // cannot lead to 5 or 6
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(5)), new InitialNode(f.network.getNodes().get(new IdImpl(5)), 1.0, 1.0));
+		toNodes.put(f.network.getNodes().get(new IdImpl(6)), new InitialNode(f.network.getNodes().get(new IdImpl(6)), 3.0, 3.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNotNull("no path found!", p);
@@ -394,10 +393,10 @@ public class MultiNodeDijkstraTest extends TestCase {
 		tc.setData(new IdImpl(6), 3.0, 3.0);
 		tc.setData(new IdImpl(7), 4.0, 4.0);
 		MultiNodeDijkstra dijkstra = new MultiNodeDijkstra(f.network, tc, tc);
-		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
-		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(1)), 1.0, 1.0));
-		List<InitialNode> toNodes = new ArrayList<InitialNode>();
-		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(2)), 3.0, 3.0));
+		Map<Node, InitialNode> fromNodes = new HashMap<Node, InitialNode>();
+		fromNodes.put(f.network.getNodes().get(new IdImpl(1)), new InitialNode(f.network.getNodes().get(new IdImpl(1)), 1.0, 1.0));
+		Map<Node, InitialNode> toNodes = new HashMap<Node, InitialNode>();
+		toNodes.put(f.network.getNodes().get(new IdImpl(2)), new InitialNode(f.network.getNodes().get(new IdImpl(2)), 3.0, 3.0));
 
 		Path p = dijkstra.calcLeastCostPath(fromNodes, toNodes);
 		assertNull("wow, impossible path found!", p);
