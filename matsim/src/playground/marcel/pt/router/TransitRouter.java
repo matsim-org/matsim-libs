@@ -252,7 +252,7 @@ public class TransitRouter {
 		return network;
 	}
 
-	/*package*/ TransitRouterNetwork getTransitRouterNetwork() {
+	public TransitRouterNetwork getTransitRouterNetwork() {
 		return this.transitNetwork;
 	}
 
