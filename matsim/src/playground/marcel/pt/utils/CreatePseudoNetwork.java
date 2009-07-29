@@ -47,19 +47,19 @@ public class CreatePseudoNetwork {
 //	public static final String INPUT_SCHEDULE = "../thesis-data/examples/berta/schedule.xml";
 //	public static final String OUTPUT_SCHEDULE = "../thesis-data/examples/berta/pseudoSchedule.xml";
 //	public static final String OUTPUT_NETWORK = "../thesis-data/examples/berta/pseudoNetwork.xml";
-	
+
 	private Map<Tuple<TransitStopFacility, TransitStopFacility>, LinkImpl> links = null;
 	private Map<TransitStopFacility, NodeImpl> nodes = null;
 	private final NetworkLayer network;
 	private final TransitSchedule schedule;
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
-	
+
 	public CreatePseudoNetwork(final TransitSchedule schedule, final NetworkLayer network) {
 		this.network = network;
 		this.schedule = schedule;
 	}
-	
+
 	public NetworkLayer run() {
 		this.linkIdCounter = 0;
 		this.nodeIdCounter = 0;
@@ -72,13 +72,13 @@ public class CreatePseudoNetwork {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-		
+
 		this.links = new HashMap<Tuple<TransitStopFacility, TransitStopFacility>, LinkImpl>();
 		this.nodes = new HashMap<TransitStopFacility, NodeImpl>();
-		
+
 		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
-		
-		for (TransitLine tLine : schedule.getTransitLines().values()) {
+
+		for (TransitLine tLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
 				ArrayList<Link> routeLinks = new ArrayList<Link>();
 				TransitStopFacility prevFacility = null;
@@ -105,37 +105,42 @@ public class CreatePseudoNetwork {
 				}
 			}
 		}
-		
+
 		for (Tuple<TransitLine, TransitRoute> remove : toBeRemoved) {
 			remove.getFirst().removeRoute(remove.getSecond());
 		}
-		
+
 //		new NetworkWriter(network, OUTPUT_NETWORK).write();
 //		try {
 //			new TransitScheduleWriterV1(schedule).write(OUTPUT_SCHEDULE);
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-		return network;
+		return this.network;
 	}
-	
+
 	private LinkImpl getNetworkLink(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
 		Tuple<TransitStopFacility, TransitStopFacility> connection = new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop);
-		LinkImpl link = links.get(connection);
+		LinkImpl link = this.links.get(connection);
 		if (link == null) {
-			NodeImpl fromNode = nodes.get(fromStop);
+			NodeImpl fromNode = this.nodes.get(fromStop);
 			if (fromNode == null) {
-				fromNode = network.createNode(new IdImpl(nodeIdCounter++), fromStop.getCoord());
-				nodes.put(fromStop, fromNode);
+				fromNode = this.network.createNode(new IdImpl(this.nodeIdCounter++), fromStop.getCoord());
+				this.nodes.put(fromStop, fromNode);
 			}
-			NodeImpl toNode = nodes.get(toStop);
+			NodeImpl toNode = this.nodes.get(toStop);
 			if (toNode == null) {
-				toNode = network.createNode(new IdImpl(nodeIdCounter++), toStop.getCoord());
-				nodes.put(toStop, toNode);
+				toNode = this.network.createNode(new IdImpl(this.nodeIdCounter++), toStop.getCoord());
+				this.nodes.put(toStop, toNode);
 			}
-			link = network.createLink(new IdImpl(linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromStop.getCoord(), toStop.getCoord()), 30.0 / 3.6, 500, 1);
-			links.put(new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop), link);
+			link = this.network.createLink(new IdImpl(this.linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromStop.getCoord(), toStop.getCoord()), 30.0 / 3.6, 500, 1);
+			this.links.put(new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop), link);
 		}
 		return link;
+	}
+
+	public Link getLinkBetweenStops(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
+		Tuple<TransitStopFacility, TransitStopFacility> connection = new Tuple<TransitStopFacility, TransitStopFacility>(fromStop, toStop);
+		return this.links.get(connection);
 	}
 }
