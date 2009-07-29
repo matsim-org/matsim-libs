@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.Leg;
@@ -45,6 +46,7 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.router.TransitRouter;
 import playground.marcel.pt.router.TransitRouterConfig;
+import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 /**
  * @author mrieser
@@ -52,10 +54,10 @@ import playground.marcel.pt.router.TransitRouterConfig;
 public class PlansCalcTransitRoute extends PlansCalcRoute {
 
 	private final TransitLegsRemover transitLegsRemover = new TransitLegsRemover();
-//	private final TransitRouteFinder ptRouter;
 	private final TransitRouterConfig routerConfig = new TransitRouterConfig();
 	private final TransitRouter transitRouter;
 	private final TransitConfigGroup transitConfig;
+	private final TransitSchedule schedule;
 
 	private PlanImpl currentPlan = null;
 	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
@@ -66,6 +68,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 			final TransitConfigGroup transitConfig) {
 		super(config, network, costCalculator, timeCalculator, factory);
 
+		this.schedule = schedule;
 		this.transitConfig = transitConfig;
 		this.transitRouter = new TransitRouter(schedule, this.routerConfig);
 	}
@@ -116,7 +119,6 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 				Leg leg = (Leg) pe;
 				if (leg == currentTuple.getFirst()) {
 					// do the replacement
-					boolean isFirstLeg = true;
 					if (currentTuple.getSecond() != null) {
 						// first and last leg do not have the route set, as the start or end  link is unknown.
 						Leg firstLeg = currentTuple.getSecond().get(0);
@@ -136,14 +138,21 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 						}
 						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
+						boolean isFirstLeg = true;
+						Coord nextCoord = null;
 						for (Leg leg2 : currentTuple.getSecond()) {
 							if (isFirstLeg) {
 								planElements.set(i, leg2);
 								isFirstLeg = false;
 							} else {
 								i++;
-								ActivityImpl act = new ActivityImpl("pt interaction", (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
-								planElements.add(i, act);
+								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
+									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
+									planElements.add(i, new ActivityImpl("pt interaction", this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink()));
+									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
+								} else { // walk legs don't have a coord, use the coord from the last egress point
+									planElements.add(i, new ActivityImpl("pt interaction", nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink()));
+								}
 								i++;
 								planElements.add(i, leg2);
 							}
