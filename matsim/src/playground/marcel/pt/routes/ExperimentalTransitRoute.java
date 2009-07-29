@@ -24,7 +24,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitStopFacility;
@@ -33,6 +32,9 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class ExperimentalTransitRoute extends GenericRouteImpl {
 
 	private static final long serialVersionUID = 1L;
+
+	private final static String SEPARATOR = "===";
+	private final static String IDENTIFIER_1 = "PT1" + SEPARATOR;
 
 	private Id accessStopId = null;
 	private Id egressStopId = null;
@@ -71,8 +73,8 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	@Override
 	public void setRouteDescription(final Link startLink, final String routeDescription, final Link endLink) {
 		super.setRouteDescription(startLink, routeDescription, endLink);
-		if (routeDescription.startsWith("PT1 ")) {
-			String[] parts = StringUtils.explode(routeDescription, ' ', 6);
+		if (routeDescription.startsWith(IDENTIFIER_1)) {
+			String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
 			this.accessStopId = new IdImpl(parts[1]);
 			this.lineId = new IdImpl(parts[2]);
 			this.routeId = new IdImpl(parts[3]);
@@ -94,10 +96,10 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 		if (this.accessStopId == null) {
 			return super.getRouteDescription();
 		}
-		String str = "PT1 " + this.accessStopId.toString() + " " + this.lineId.toString() + " " +
-				this.routeId.toString() + " " + this.egressStopId.toString();
+		String str = IDENTIFIER_1 + this.accessStopId.toString() + SEPARATOR + this.lineId.toString() + SEPARATOR +
+				this.routeId.toString() + SEPARATOR + this.egressStopId.toString();
 		if (this.description != null) {
-			str = str + " " + this.description;
+			str = str + SEPARATOR + this.description;
 		}
 		return str;
 	}
