@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -211,7 +209,7 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test {@link QuadTree#values()}.
+	 * Test {@link QuadTree#values()} that it returns the correct content.
 	 */
 	public void testValues() {
 		QuadTree<String> qt = getTestTree();
@@ -242,6 +240,30 @@ public class QuadTreeTest extends MatsimTestCase {
 			iter.remove();
 			fail("expected UnsupportedOperationException, got none.");
 		} catch (UnsupportedOperationException expected) {}
+	}
+
+	/**
+	 * Tests that a once obtained values-collection is indeed a live view
+	 * on the QuadTree, so when the QuadTree changes, the view is updated
+	 * as well.
+	 */
+	public void testValues_isView() {
+		QuadTree<String> qt = getTestTree();
+		int size = qt.size();
+		Collection<String> values = qt.values();
+		valuesTester(qt.size(), values);
+
+		qt.put(80.0, 80.0, "80.0, 80.0");
+		assertEquals(size + 1, qt.size());
+		valuesTester(size + 1, values);
+
+		qt.put(75.0, 75.0, "75.0, 75.0");
+		assertEquals(size + 2, qt.size());
+		valuesTester(size + 2, values);
+
+		assertTrue(qt.remove(80.0, 80.0, "80.0, 80.0"));
+		assertEquals(size + 1, qt.size());
+		valuesTester(size + 1, values);
 	}
 
 	/**
