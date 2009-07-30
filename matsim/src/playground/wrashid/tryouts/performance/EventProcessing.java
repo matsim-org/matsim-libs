@@ -25,6 +25,8 @@ public class EventProcessing {
 		
 		System.out.println(args[0]);
 		System.out.println(args[1]);
+		System.out.println(args[2]);
+		System.out.println(args[3]);
 		
 		int numberOfThreads=Integer.parseInt(args[0]);
 		int numberOfHandlers=Integer.parseInt(args[1]);
