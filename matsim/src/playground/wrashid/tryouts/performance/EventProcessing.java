@@ -14,12 +14,16 @@ public class EventProcessing {
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
-		Events events = new ParallelEvents(2);
+		Events events = new ParallelEvents(8);
 		//Events events = new Events();
 		
 		// start iteration
 		events.initProcessing();
 
+		events.addHandler(ep.new Handler1());
+		events.addHandler(ep.new Handler1());
+		events.addHandler(ep.new Handler1());
+		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
