@@ -33,6 +33,8 @@ public class EventProcessing {
 		//System.out.println(args[2]);
 		//System.out.println(args[3]);
 		
+		// the first two arguments are the config file and the dtd...
+		
 		int numberOfThreads=Integer.parseInt(args[2]);
 		int numberOfHandlers=Integer.parseInt(args[3]);
 		
