@@ -21,19 +21,28 @@
 package org.matsim.core.population;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.core.api.experimental.network.Link;
+import org.matsim.core.api.experimental.population.Activity;
+import org.matsim.core.api.experimental.population.Person;
+import org.matsim.core.api.experimental.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.SAXException;
 
 public class PopulationReaderMatsimV4Test extends MatsimTestCase {
+
+	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV4Test.class);
 
 	/**
 	 * @author mrieser
@@ -46,7 +55,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		final ScenarioImpl scenario = new ScenarioImpl();
 		final NetworkLayer network = scenario.getNetwork();
 		final PopulationImpl population = scenario.getPopulation();
-		
+
 		new MatsimNetworkReader(scenario.getNetwork()).parse("test/scenarios/equil/network.xml");
 		new PopulationReaderMatsimV4(scenario).parse(getInputDirectory() + "plans2.xml");
 
@@ -76,6 +85,41 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		RouteWRefs route2b = leg2b.getRoute();
 		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route2b.getStartLink());
 		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route2b.getEndLink());
+	}
+
+	public void testReadActivity() {
+		final ScenarioImpl scenario = new ScenarioImpl();
+		final NetworkLayer network = scenario.getNetwork();
+		NodeImpl node1 = network.createNode(scenario.createId("1"), scenario.createCoord(0, 0));
+		NodeImpl node2 = network.createNode(scenario.createId("2"), scenario.createCoord(0, 1000));
+		Link link3 = network.createLink(scenario.createId("3"), node1, node2, 1000.0, 10.0, 2000.0, 1);
+		final PopulationImpl population = scenario.getPopulation();
+
+		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+
+		Stack<String> context = new Stack<String>(); // not sure the context is ever used in the reader...
+		reader.startTag("plans", AttributesBuilder.getEmpty(), context);
+		reader.startTag("person", new AttributesBuilder().add("id", "2").get(), context);
+		reader.startTag("plan", new AttributesBuilder().add("selected", "no").get(), context);
+		reader.startTag("act", new AttributesBuilder().add("type", "h").add("link", "3").get(), context);
+		reader.endTag("act", "", context);
+		reader.startTag("leg", new AttributesBuilder().add("mode", "car").get(), context);
+		reader.endTag("leg", "", context);
+		try {
+			reader.startTag("act", new AttributesBuilder().add("type", "h").add("link", "2").get(), context);
+			fail("missing exception.");
+		}
+		catch (IllegalArgumentException e) {
+			log.info("catched expected exception.", e);
+		}
+		reader.endTag("plan", "", context);
+		reader.endTag("person", "", context);
+		reader.endTag("plans", "", context);
+
+		assertEquals(1, population.getPersons().size());
+		Person person = population.getPersons().get(new IdImpl("2"));
+		Plan plan = person.getPlans().get(0);
+		assertEquals(link3.getId(), ((Activity) plan.getPlanElements().get(0)).getLinkId());
 	}
 
 }

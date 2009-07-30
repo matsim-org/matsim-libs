@@ -357,6 +357,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
+			if (link == null) {
+				throw new IllegalArgumentException("No link found with id = " + atts.getValue("link"));
+			}
 			this.curract = this.currplan.createActivity(atts.getValue("type"), link);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
