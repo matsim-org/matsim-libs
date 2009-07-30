@@ -67,7 +67,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 		super(a_id, a_name);
 
 		Configuration.reset();
-		
+
 		this.setBreeder(new GABreeder());
 		try {
 			// initialize random number generator
@@ -77,7 +77,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			setEventManager(new EventManager());
 
 			this.setBreeder(new PlanomatGABreeder());
-			
+
 			// initialize selection:
 			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(
 					this, 0.90d);
@@ -94,35 +94,30 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			if (planAnalyzeSubtours != null) {
 				numSubtours = planAnalyzeSubtours.getNumSubtours();
 			}
-			
+
 			int populationSize = planomatConfigGroup.getPopSize();
 			if (populationSize == Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue())) {
-				
+
 				populationSize = planomatConfigGroup.getLevelOfTimeResolution() * numActs;
 				populationSize += planomatConfigGroup.getPossibleModes().size() * numSubtours;
 				this.setPopulationSize( populationSize );
-				
+
 			}
 			this.setPopulationSize(populationSize);
-			
+
 			// initialize sample chromosome
 			Gene[] sampleGenes = new Gene[1 + numActs + numSubtours];
 
-			try {
-				// first integer gene for the start time of the plan
-				sampleGenes[0] = new IntegerGene(this, 0, numTimeIntervals - 1);
-				// one integer gene for each activity duration
-				for (int ii=0; ii < numActs; ii++) {
-					sampleGenes[1 + ii] = new IntegerGene(this, 0, numTimeIntervals - 1);
-				}
-				// one integer gene for the mode of each subtour
-				for (int ii=0; ii < numSubtours; ii++) {
-					sampleGenes[1 + numActs + ii] = new IntegerGene(this, 0, possibleModes.length - 1);
-				}
-			} catch (InvalidConfigurationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}		
+			// first integer gene for the start time of the plan
+			sampleGenes[0] = new IntegerGene(this, 0, numTimeIntervals - 1);
+			// one integer gene for each activity duration
+			for (int ii=0; ii < numActs; ii++) {
+				sampleGenes[1 + ii] = new IntegerGene(this, 0, numTimeIntervals - 1);
+			}
+			// one integer gene for the mode of each subtour
+			for (int ii=0; ii < numSubtours; ii++) {
+				sampleGenes[1 + numActs + ii] = new IntegerGene(this, 0, possibleModes.length - 1);
+			}
 
 			IChromosome sampleChromosome = null;
 			try {
@@ -131,12 +126,12 @@ public class PlanomatJGAPConfiguration extends Configuration {
 				e.printStackTrace();
 			}
 			this.setSampleChromosome(sampleChromosome);
-			
+
 			// initialize fitness function
 			// - maximum selection
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
 			// - MATSim scoring function
-			
+
 			// initialize genetic operators
 			this.setChromosomePool(new ChromosomePool());
 			this.addGeneticOperator(new CrossoverOperator(this, 0.6d));
