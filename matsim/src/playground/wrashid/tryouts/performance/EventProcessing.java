@@ -15,33 +15,32 @@ import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
  * => wichtig, dass man nice raus nimmt...
  * make run "MEMORY=-Xms1g -Xmx1g" "MAINCLASS=playground/wrashid/tryouts/performance/EventProcessing"
  * 
+ * First compile with the above command.
+ * Then go to folder classes
+ * Then start:
+ * java playground/wrashid/tryouts/performance/EventProcessing <numberOfThreads> <numberOfHandlers>
  */
 public class EventProcessing {
 	public static void main(String[] args) {
 		
-		System.out.println(args[0]);
-		System.out.println(args[1]);
+		int numberOfThreads=Integer.parseInt(args[0]);
+		int numberOfHandlers=Integer.parseInt(args[1]);
 		
-		/*
+		
 		
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
-		Events events = new ParallelEvents(8);
+		Events events = new ParallelEvents(numberOfThreads);
 		//Events events = new Events();
 		
 		// start iteration
 		events.initProcessing();
 
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-
+		
+		for (int i=0;i<numberOfHandlers;i++){
+			events.addHandler(ep.new Handler1());
+		}
 		
 		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""));
 		
@@ -56,7 +55,7 @@ public class EventProcessing {
 		
 		System.out.println("time needed in [s]:" + (System.currentTimeMillis() -  timer)/1000);
 		
-*/
+
 	}
 	
 	private class Handler1 implements LinkLeaveEventHandler {
