@@ -179,12 +179,12 @@ compile:
 
 run: compile
 	@echo "------------------------------------------------------------"
-	$(JAVA) $(JAVAX) $(MAINCLASS) $(CONFIG) $(DTD)
+	$(JAVA) $(JAVAX) $(MAINCLASS) $(CONFIG) $(DTD) $(ARGS)
 	@echo "------------------------------------------------------------"
 
 runonly:
 	@echo "------------------------------------------------------------"
-	$(JAVA) $(JAVAX) $(MAINCLASS) $(CONFIG) $(DTD)
+	$(JAVA) $(JAVAX) $(MAINCLASS) $(CONFIG) $(DTD) $(ARGS)
 	@echo "------------------------------------------------------------"
 
 tags:
