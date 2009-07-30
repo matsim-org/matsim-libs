@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="simulation">
+		<param name="endTime" value="30:00:00" /> <!-- in case an agent want's to take transit after midnight -->
+	</module>
+		
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.1" />
+		<param name="Module_1" value="TimeAllocationMutator" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="ChangeLegMode" />
+
+		<param name="ModuleProbability_4" value="0.7" />
+		<param name="Module_4" value="SelectExpBeta" />
+	</module>
+	
+	<module name="changeLegMode">
+		<param name="modes" value="car,pt" />
+	</module>
+	
+	<module name="transit">
+		<param name="transitScheduleFile" value="" /><!-- TODO [MR] -->
+		<param name="transitModes" value="pt" />
+	</module>
+
+</config>

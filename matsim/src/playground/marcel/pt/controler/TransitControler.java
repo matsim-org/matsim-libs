@@ -36,7 +36,8 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.routerintegration.PlansCalcTransitRoute;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import playground.marcel.pt.router.PlansCalcTransitRoute;
 
 
 public class TransitControler extends Controler {
@@ -44,8 +45,8 @@ public class TransitControler extends Controler {
 	private final TransitConfigGroup transitConfig;
 	private final TransitSchedule schedule;
 
-	public TransitControler(final String configFileName) {
-		super(configFileName);
+	public TransitControler(final String[] args) {
+		super(args);
 
 		this.transitConfig = new TransitConfigGroup();
 		this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
@@ -54,6 +55,11 @@ public class TransitControler extends Controler {
 
 		TransitControlerListener cl = new TransitControlerListener(this.schedule, this.scenarioData.getNetwork(), this.transitConfig);
 		addControlerListener(cl);
+	}
+
+	@Override
+	protected void runMobSim() {
+		new TransitQueueSimulation(this.scenarioData, this.events);
 	}
 
 	@Override
@@ -86,6 +92,14 @@ public class TransitControler extends Controler {
 			}
 		}
 
+	}
+
+	public static void main(final String[] args) {
+		if (args.length > 0) {
+			new TransitControler(args).run();
+		} else {
+			new TransitControler(new String[] {"src/playground/marcel/pt/controler/transitConfig.xml"}).run();
+		}
 	}
 
 }

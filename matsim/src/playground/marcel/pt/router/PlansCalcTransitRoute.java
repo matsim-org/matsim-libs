@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.routerintegration;
+package playground.marcel.pt.router;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -44,8 +44,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.router.TransitRouter;
-import playground.marcel.pt.router.TransitRouterConfig;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 /**

@@ -45,8 +45,8 @@ import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
+import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.marcel.pt.router.TransitRouter;
-import playground.marcel.pt.routerintegration.PlansCalcTransitRoute;
 import playground.mohit.converter.Visum2TransitSchedule;
 import playground.mohit.converter.VisumNetwork;
 import playground.mohit.converter.VisumNetworkReader;
