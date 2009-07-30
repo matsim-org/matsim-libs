@@ -54,7 +54,7 @@ public abstract class ParallelReplanner {
 		// create new Array of Replanners
 		createReplannerArray();
 	}
-	
+		
 	/* 
 	 * Creates an Array that contains the Replanners that were initialized in the Controler
 	 * and clone of them for every additional replanning thread.

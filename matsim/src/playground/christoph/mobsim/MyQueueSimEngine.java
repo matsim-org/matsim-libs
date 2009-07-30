@@ -1,6 +1,7 @@
 package playground.christoph.mobsim;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -33,7 +34,7 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	protected static boolean actEndReplanning = true; 
 	protected static boolean leaveLinkReplanning = true;
 
-	//protected Map <NodeImpl, QueueLink[]> lookupTable;
+	//protected Map <NodeImpl, QueueLink[]> lookupTable;actEndReplanning
 	protected Map <Id, QueueLink[]> lookupTable;
 	protected QueueNetwork network;
 	protected ReplanningQueueSimulation simulation;
@@ -75,6 +76,8 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	
 	public void actEndReplanning(double time)
 	{
+		Date start = new Date();
+		
 		// Act End Replanning Objects
 		ArrayList<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
 		ArrayList<PersonImpl> personsToReplanActEnd = new ArrayList<PersonImpl>();
@@ -99,10 +102,10 @@ public class MyQueueSimEngine extends QueueSimEngine{
 				
 				PersonAgent pa = (PersonAgent) driverAgent;
 				
-				// worked in V1.0
+				// worked in V1.0 - looks like some changes in the indices happend since then
 //				ActivityImpl fromAct = (Activity)person.getSelectedPlan().getPlanElements().get(pa.getNextActivity() - 2);
 				
-				// seems to work currently...
+				// seems to work currently but uses deprecated Method...
 //				ActivityImpl fromAct = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(pa.getNextActivity());
 		
 				// New approach using non deprecated Methods
@@ -112,16 +115,27 @@ public class MyQueueSimEngine extends QueueSimEngine{
 				
 				Leg leg = pa.getCurrentLeg();
 				
-				int index = planElements.indexOf(leg);
-				
 				ActivityImpl fromAct = null;
-				// If the leg is part of the Person's plan
-				if (index >= 0)
+				
+				// first Activity is running - there is no previous Leg
+				if (leg == null)
 				{
-					fromAct = (ActivityImpl)planElements.get(index + 1);
+					fromAct = (ActivityImpl)planElements.get(0);
+				}
+				else
+				{
+					int index = planElements.indexOf(leg);
+					// If the leg is part of the Person's plan
+					if (index >= 0)
+					{
+						fromAct = (ActivityImpl)planElements.get(index + 1);
+					}
 				}
 								
-				if (fromAct == null) log.error("Found fromAct that is null!");
+				if (fromAct == null)
+				{
+					log.error("Found fromAct that is null!");
+				}
 				else
 				{
 					fromActActEnd.add(fromAct);
@@ -138,22 +152,28 @@ public class MyQueueSimEngine extends QueueSimEngine{
 		{	
 //			log.info("Time: " + time  + ", " + vehiclesToReplanActEnd.size() + " vehicles will end their current activity now and need a replanning!");
 //			System.out.println("Time: " + time  + ", " + vehiclesToReplanActEnd.size() + " vehicles will end their current activity now and need a replanning!");
-			ParallelActEndReplanner.run(fromActActEnd, vehiclesToReplanActEnd, time);
+//			Date startReplanning = new Date();
+
+			new ParallelActEndReplanner().run(fromActActEnd, vehiclesToReplanActEnd, time);
+//			ParallelActEndReplanner.run(fromActActEnd, vehiclesToReplanActEnd, time);
+			
 //			log.info("Done parallel Act End Replanning in this step!");
 			
 			replanningCounter = replanningCounter + vehiclesToReplanActEnd.size();
+			
+//			long totalTime = new Date().getTime() - start.getTime();
+//			long replanningTime = new Date().getTime() - startReplanning.getTime();
+//			double ratio = Double.valueOf(replanningTime) / Double.valueOf(totalTime);
+//			log.info("Total Time: " + totalTime + ", Replanning Time: " + replanningTime + ", Ratio: " + ratio);
 		}
-		
 	}	// actEndReplanning
 
 	
 	@Override
 	protected void simStep(final double time)
 	{
-		
 		// Do Replanning if active...
 		if (leaveLinkReplanning) leaveLinkReplanning(time);
-
 	
 /* 
  * If using ActivityEndsList from the QueueSimulation, the Replanning has to be started 
@@ -184,6 +204,8 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	
 	protected void leaveLinkReplanning(double time)
 	{
+		Date start = new Date();
+		
 		// Leave Link Replanning Objects
 		ArrayList<QueueVehicle> vehiclesToReplanLeaveLink = new ArrayList<QueueVehicle>();
 //		ArrayList<QueueNode> currentNodesLeaveLink = new ArrayList<QueueNode>();
@@ -222,9 +244,19 @@ public class MyQueueSimEngine extends QueueSimEngine{
 			
 //			log.info("Resetting the LinkTravelTime LookupTables in the Replanners. Time: " + time);
 			
+			Date startReplanning = new Date();
+			
 //			log.info("Found " + vehiclesToReplan.size() + " vehicles that are going to leave their links and need probably a replanning!");
 //			ParallelLeaveLinkReplanner.run(currentNodesLeaveLink, vehiclesToReplanLeaveLink, time);
-			ParallelLeaveLinkReplanner.run(vehiclesToReplanLeaveLink, time);
+			new ParallelLeaveLinkReplanner().run(vehiclesToReplanLeaveLink, time);
+			
+			replanningCounter = replanningCounter + vehiclesToReplanLeaveLink.size();
+			
+			long totalTime = new Date().getTime() - start.getTime();
+			long replanningTime = new Date().getTime() - startReplanning.getTime();
+			double ratio = Double.valueOf(replanningTime) / Double.valueOf(totalTime);
+//			log.info("Total Time: " + totalTime + ", Replanning Time: " + replanningTime + ", Ratio: " + ratio + ", Vehicles: " + vehiclesToReplanLeaveLink.size());
+			
 //			log.info("Done parallel Leave Link Replanning in this step!");
 		}
 	

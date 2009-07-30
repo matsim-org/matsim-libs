@@ -201,7 +201,7 @@ public class ActEndReplanner {
 		// Create new Plan and select it.
 		// This Plan contains only the just ended and the next Activity.
 		// -> That's the only Part of the Route that we want to replan.
-		PlanImpl newPlan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl newPlan = new PlanImpl(person);
 		person.addPlan(newPlan);
 		person.setSelectedPlan(newPlan);
 		
@@ -226,7 +226,7 @@ public class ActEndReplanner {
 		
 		// By doing the replanning the "betweenLeg" is replanned, so the changes are
 		// included in the previously selected plan, too!
-		replanner.run(newPlan);
+//		replanner.run(newPlan);
 		
 		// reactivate previously selected, replanned plan
 		person.setSelectedPlan(currentPlan);

@@ -40,6 +40,8 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	protected double travelCostFactor;
 	protected double marginalUtlOfDistance;
 	
+	protected KnowledgeTools knowledgeTools;
+	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostCalculator.class);
 	
 	public KnowledgeTravelCostCalculator(TravelTime timeCalculator)
@@ -50,12 +52,14 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		 */
 		this.travelCostFactor = -Gbl.getConfig().charyparNagelScoring().getTraveling() / 3600.0;
 		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistanceCar();
+		
+		knowledgeTools = new KnowledgeTools();
 	}
 	
 	public double getLinkTravelCost(final Link link, final double time) 
 	{		
 		// try getting NodeKnowledge from the Persons Knowledge
-		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
+		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		
 		// if the Person doesn't know the link -> return max costs 
 		if (!nodeKnowledge.knowsLink((LinkImpl)link))

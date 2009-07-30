@@ -42,7 +42,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	public double getLinkTravelCost(final Link link, final double time) 
 	{
 		// try getting NodeKnowledge from the Persons Knowledge
-		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
+		NodeKnowledge nodeKnowledge = new KnowledgeTools().getNodeKnowledge(person);
 		
 		// if the Person doesn't know the link -> return max costs 
 		if (!nodeKnowledge.knowsLink((LinkImpl)link))

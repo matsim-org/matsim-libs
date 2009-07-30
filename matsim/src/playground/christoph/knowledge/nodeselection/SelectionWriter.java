@@ -123,7 +123,7 @@ public class SelectionWriter extends Writer {
 						// Nodes
 						this.handler.startNodes(out);
 						
-						Map<Id, NodeImpl> nodesMap = KnowledgeTools.getKnownNodes(p);
+						Map<Id, NodeImpl> nodesMap = new KnowledgeTools().getKnownNodes(p);
 						this.handler.nodes(nodesMap, out);
 						
 						this.handler.endNodes(out);

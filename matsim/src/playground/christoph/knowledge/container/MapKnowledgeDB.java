@@ -25,7 +25,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	private static String separator = "@";
 	//private static String tableName = "MapKnowledge";
-	private static String tableName = "batchtable2_0";
+	private static String tableName = "BatchTable2_0";
 	
 	public MapKnowledgeDB()
 	{
@@ -82,11 +82,15 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	{	
 		// If Knowledge is currently not in Memory, get it from the DataBase
 		if (!localKnowledge)
-		{		
-			dbConnectionTool.connect();
-			ResultSet rs = dbConnectionTool.executeQuery("SELECT * FROM " + tableName + " WHERE PersonId='" + this.getPerson().getId() + "'");
-			dbConnectionTool.disconnect();
-				
+		{	
+			ResultSet rs;
+			synchronized(dbConnectionTool)
+			{
+				dbConnectionTool.connect();
+				rs = dbConnectionTool.executeQuery("SELECT * FROM " + tableName + " WHERE PersonId='" + this.getPerson().getId() + "'");
+				dbConnectionTool.disconnect();
+			}
+			
 			try 
 			{			
 				while (rs.next())
@@ -94,7 +98,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 					boolean listType = Boolean.valueOf(rs.getString("WhiteList"));
 					this.isWhiteList = listType;
 					
-					String[] nodeIds = rs.getString("NodeIds").split(this.separator);
+					String[] nodeIds = rs.getString("NodeIds").split(separator);
 			
 					for (String id : nodeIds)
 					{								

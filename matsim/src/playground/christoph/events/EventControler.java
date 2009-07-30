@@ -40,6 +40,10 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -47,10 +51,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.analysis.wardrop.ActTimesCollector;
 import playground.christoph.analysis.wardrop.Wardrop;
+import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
+import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.KMLPersonWriter;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
+import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -66,6 +73,7 @@ import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
+import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
@@ -133,7 +141,7 @@ public class EventControler extends Controler{
 	public EventControler(String[] args)
 	{
 		super(args);
-		config.global().setNumberOfThreads(1);
+//		config.global().setNumberOfThreads(2);
 		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
@@ -213,11 +221,13 @@ public class EventControler extends Controler{
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
 		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
-		//OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-		
+//		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+	
 		// Use the Wrapper with the same CostCalculator as the MobSim uses
 		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
+
+		// Don't use Knowledge for CostCalculations
 		
 //		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
 //		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
@@ -227,7 +237,12 @@ public class EventControler extends Controler{
 		dijkstraRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
 		
 		replanners.add(dijkstraRouter);
+
 		
+		TravelTime travelTime2 = new FreespeedTravelTimeCost();
+		TravelCost travelCost2 = new OnlyTimeDependentTravelCostCalculator(travelTime2);
+		PlansCalcRoute dijkstraRouter2 = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost2, travelTime2, new DijkstraFactory());
+		replanners.add(dijkstraRouter2);
 	}
 	
 	public ArrayList<PlanAlgorithm> getReplanningRouters()
@@ -241,8 +256,10 @@ public class EventControler extends Controler{
 	protected void initParallelReplanningModules()
 	{
 		ParallelReplanner.init(replanners);
-		ParallelReplanner.setNumberOfThreads(3);
+		ParallelReplanner.setNumberOfThreads(2);
 
+		ParallelActEndReplanner.init();
+		ParallelLeaveLinkReplanner.init();
 	/*
 		ParallelLeaveLinkReplanner.init(replanners);
 		ParallelLeaveLinkReplanner.setNumberOfThreads(2);
@@ -323,6 +340,23 @@ public class EventControler extends Controler{
 		
 		log.info("Set Knowledge Data Handler");
 		setKnowledgeStorageHandler();
+		
+		
+//		KnowledgeDBStorageHandler knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
+//		
+//		knowledgeDBStorageHandler.run();
+//		for(PersonImpl person : population.getPersons().values())
+//		{
+//			System.out.println("ping");
+//			knowledgeDBStorageHandler.addPerson(person);
+//			knowledgeDBStorageHandler.newPersons.notify();
+//		}
+//		try {
+//			knowledgeDBStorageHandler.join();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 //		log.info("Create known Nodes Maps");
 //		createKnownNodes();
@@ -481,11 +515,13 @@ public class EventControler extends Controler{
 			PersonImpl p = PersonIterator.next();
 		
 			Map<String,Object> customAttributes = p.getCustomAttributes();
+//			customAttributes.put("Replanner", replanners.get(0));	// A*
 //			customAttributes.put("Replanner", replanners.get(1));	// Random
 //			customAttributes.put("Replanner", replanners.get(2));	// Tabu
 //			customAttributes.put("Replanner", replanners.get(3));	// Compass
 //			customAttributes.put("Replanner", replanners.get(4));	// RandomCompass
 			customAttributes.put("Replanner", replanners.get(5));	// DijstraWrapper
+//			customAttributes.put("Replanner", replanners.get(6));	// Dijstra
 		}
 	}
 	

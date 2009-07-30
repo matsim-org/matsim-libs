@@ -53,7 +53,8 @@ public class CreateKnowledgeForDatabase {
 	private ArrayList<PlanAlgorithm> replanners;
 	private ArrayList<SelectNodes> nodeSelectors;
 	private double dijkstraCostFactor = 1.0;
-	private double[] dijkstraCostFactors = {1.0, 1.5, 2.0, 2.5, 3.0};
+	//private double[] dijkstraCostFactors = {1.0, 1.5, 2.0, 2.5, 3.0};
+	private double[] dijkstraCostFactors = {2.0};
 	private int parallelThreads = 2;
 	private ReplanningQueueSimulation sim;
 	private Events events;
@@ -62,12 +63,20 @@ public class CreateKnowledgeForDatabase {
 	private final String dtdFileName = null;
 	
 	private final String separator = System.getProperty("file.separator");
-	
+
+/*
+	// Default
 	private String configFileName = "test/scenarios/berlin/config.xml";
 	private String networkFile = "test/scenarios/berlin/network.xml";
 	private String populationFile = "test/scenarios/berlin/plans_hwh_1pct.xml";
 	private String facilitiesFile = null;
+*/
 
+	private String configFileName = "mysimulations/kt-zurich/config.xml";
+	private String networkFile = "mysimulations/kt-zurich/input/network.xml";
+	private String populationFile = "mysimulations/kt-zurich/input/plans.xml.gz";
+	private String facilitiesFile = "mysimulations/kt-zurich/input/facilities.xml.gz";
+	
 /*	
  	private String configFileName = "mysimulations/kt-zurich-cut/config_10.xml";
 	private String networkFile = "mysimulations/kt-zurich-cut/network.xml";

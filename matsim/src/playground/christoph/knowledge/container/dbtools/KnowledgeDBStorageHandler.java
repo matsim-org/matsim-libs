@@ -1,9 +1,11 @@
 package playground.christoph.knowledge.container.dbtools;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -17,52 +19,85 @@ import playground.christoph.router.util.KnowledgeTools;
  */
 public class KnowledgeDBStorageHandler extends Thread implements BasicActivityStartEventHandler{
 
-	LinkedList<PersonImpl> personsToProcess = new LinkedList<PersonImpl>();
+	private ArrayList<PersonImpl> newPersons = new ArrayList<PersonImpl>();
+	private LinkedList<PersonImpl> personsToProcess = new LinkedList<PersonImpl>();
 
-	private boolean stopHandler = false;
-	private boolean running = false;
-	
 	private PopulationImpl population;
+	private KnowledgeTools knowledgeTools;
+	
+	private boolean stopHandler = false;
+		
+//	private int count = 0;
+
 	
 	public KnowledgeDBStorageHandler(PopulationImpl population)
 	{
 		this.population = population;
+		this.setDaemon(true);
+		
+		knowledgeTools = new KnowledgeTools();
 	}
-	
-	
 	
 	@Override
 	public void run()
 	{
+//		System.out.println("Running!");
 		while(!stopHandler)
-		{			
+		{	
+			/*
+			 *  Don't allow adding of new Persons while we move them from
+			 *  from newPersons to personsToProcess. We don't have to
+			 *  lock personsToProcess because they are only accessed from
+			 *  within startProcessing.
+			 */
+			synchronized(newPersons)
+			{
+				personsToProcess.addAll(newPersons);
+				newPersons.clear();
+			}
+			
+//			System.out.println("restart");
 			startProcessing();
 			
-			/*
-			 *  All Elements from the LinkedList where processed.
-			 *  Wait for some time and then look again for new Elements.
-			 */
-			try { Thread.sleep(50); }
-			catch (Exception e) {}
+			// lock newPersons so that we don't miss a notify from addPerson
+			try 
+			{
+				synchronized(newPersons)
+				{
+//					System.out.println("locked");
+					
+					// if there are no newPersons we wait until we get notified
+					if (newPersons.size() == 0)
+					{
+//						System.out.println("waiting");
+						newPersons.wait();
+					}
+//					System.out.println("released");
+				}
+			}
+			catch (InterruptedException e)
+			{
+				Gbl.errorMsg(e);
+			}
 		}
 	}
 	
 	public void addPerson(PersonImpl person)
 	{
-		personsToProcess.add(person);
-		
-		if (!running) startProcessing();
+		synchronized(newPersons)
+		{
+			newPersons.add(person);
+			newPersons.notify();
+		}
 	}
 	
 	public void startProcessing()
-	{
-		running = true;
-		
+	{		
 		while ((personsToProcess.peek() != null) && !stopHandler)
 		{
 			PersonImpl person = personsToProcess.poll();
 			
-			NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
+			NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 			
 			if(nodeKnowledge instanceof DBStorage)
 			{
@@ -75,31 +110,19 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 					 *  The NodeKnowledge Class decides, whether reading the
 					 *  Knowledge from the Database is really neccessary or not.
 					 */
-					((DBStorage) nodeKnowledge).readFromDB();					
+					((DBStorage) nodeKnowledge).readFromDB();
+					
+//					count++;
+//					if (count % 1000 == 0) System.out.println("Read " + count + " Knowledges from DB");
 				}				
 			}
 		}
-		running = false;
-	}
-	
-	public void stopProcessing()
-	{
-		stopHandler = true;
-		
-		while (running)
-		{
-			try { Thread.sleep(50); }
-			catch (Exception e) {}
-		}
-		
-		stopHandler = false;
 	}
 
-	
-	public void handleEvent(BasicActivityStartEvent event)
+	public synchronized void handleEvent(BasicActivityStartEvent event)
 	{
 		PersonImpl person = population.getPersons().get(event.getPersonId());
-		NodeKnowledge nodeKnowledge = KnowledgeTools.getNodeKnowledge(person);
+		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		
 		if (nodeKnowledge instanceof DBStorage)
 		{
@@ -112,4 +135,5 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		// TODO Auto-generated method stub
 		
 	}
+	
 }

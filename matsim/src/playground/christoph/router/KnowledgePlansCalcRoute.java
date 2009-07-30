@@ -23,7 +23,6 @@ package playground.christoph.router;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;

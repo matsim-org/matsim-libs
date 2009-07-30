@@ -313,14 +313,14 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * current TimeStep of the QueueSimulation. If all Links are needed, use
 	 * getLinkVehicleCounts().
 	 */
-	public Map<Id, Integer> getChangedLinkVehiclesCounts() {
+	public synchronized Map<Id, Integer> getChangedLinkVehiclesCounts() {
 		return previousCountsMap;
 	}
 
 	/*
 	 * Returns the number of Vehicles, that are driving on the Link.
 	 */
-	public int getLinkDrivingVehiclesCount(Id id) {
+	public synchronized int getLinkDrivingVehiclesCount(Id id) {
 		int count = 0;
 
 		count = count + waitingMap.get(id);

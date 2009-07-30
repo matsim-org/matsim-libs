@@ -60,26 +60,20 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
 
 public class LeaveLinkReplanner {
 
-//	protected ActivityImpl prevAct;
 	protected ActivityImpl nextAct;
 	protected LegImpl leg;
 	protected double time;
 	protected PersonAgent personAgent;
 	protected PersonImpl person;
-//	protected NodeImpl node;
 	protected PlanImpl plan;
-//	protected QueueNode queueNode;
 	protected QueueVehicle vehicle;
 	
 	protected PlanAlgorithm replanner; 
 	
 	private static final Logger log = Logger.getLogger(LeaveLinkReplanner.class);
 	
-//	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	public LeaveLinkReplanner(QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	{
-//		this.queueNode = queueNode;
-//		this.node = queueNode.getNode();
 		this.time = time;
 		this.vehicle = vehicle;
 		this.personAgent = (PersonAgent) vehicle.getDriver();
@@ -89,11 +83,8 @@ public class LeaveLinkReplanner {
 		init();
 	}
 	
-//	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time)
 	public LeaveLinkReplanner(QueueVehicle vehicle, double time)
 	{
-//		this.queueNode = queueNode;
-//		this.node = queueNode.getNode();
 		this.time = time;
 		this.vehicle = vehicle;
 		this.personAgent = (PersonAgent) vehicle.getDriver();
@@ -112,17 +103,18 @@ public class LeaveLinkReplanner {
 
 		leg = personAgent.getCurrentLeg();
 
-//		prevAct = (ActivityImpl)plan.getPreviousActivity(leg);
 		nextAct = (ActivityImpl)plan.getNextActivity(leg);	
 		
 		// if there is a next Activity...
 		if(nextAct != null)
 		{
-			routing();			
+//			log.info("Id: " + person.getId());
+//			routingOld();
+			routing();
 		}
 		else
 		{
-			log.error("An agents next activity is null - this should not happen!");
+			log.error("An agents next activity is null - this should not happen! Id: " + person.getId());
 		}
 	}
 	
@@ -153,7 +145,81 @@ public class LeaveLinkReplanner {
 
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
-		//newFromAct.setDuration(0);
+
+		NodeNetworkRoute subRoute = new NodeNetworkRoute(this.vehicle.getCurrentLink(), route.getEndLink());
+		/*
+		 * This can be used for debugging purposes. It copies the current
+		 * non-driven Parts of the Route to the new SubRoute which is
+		 * replanned afterwards. By doing this we can skip the replanning
+		 * and still have a correct SubRoute. In normal usage we don't need
+		 * this because the SubRoute is created new anyway.
+		 */
+//		subRoute.setNodes(this.vehicle.getCurrentLink(), route.getNodes().subList(currentNodeIndex - 1, route.getNodes().size()), route.getEndLink());
+		
+		// put the new route in a new leg
+		LegImpl newLeg = new LegImpl(leg.getMode());
+		newLeg.setDepartureTime(leg.getDepartureTime());
+		newLeg.setTravelTime(leg.getTravelTime());
+		newLeg.setArrivalTime(leg.getArrivalTime());
+		newLeg.setRoute(subRoute);
+				
+		// create new plan and select it
+		PlanImpl newPlan = new PlanImpl(person);
+			
+		// here we are at the moment
+		newPlan.addActivity(newFromAct);
+		
+		// Route from the current position to the next destination.
+		newPlan.addLeg(newLeg);
+		
+		// next Activity
+		newPlan.addActivity(nextAct);
+		
+		/*
+		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
+		 *  The router may need their knowledge (activity room, ...).
+		 */
+		if (replanner instanceof KnowledgePlansCalcRoute)
+		{
+			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
+			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
+		}	
+
+		replanner.run(newPlan);	
+		
+		// get new calculated Route
+		NetworkRoute newRoute = (NetworkRoute) newLeg.getRoute();
+		
+		// get Nodes from the current Route
+		List<Node> nodesBuffer = route.getNodes();
+		// remove Nodes after the current Position in the Route
+		nodesBuffer.subList(currentNodeIndex - 1, nodesBuffer.size()).clear();
+				
+		// Merge already driven parts of the Route with the new routed parts.
+		// The changes will be made in the original list, so they will be directly in the Route.
+		nodesBuffer.addAll(newRoute.getNodes());
+	}
+	
+	
+	protected void routingOld()
+	{
+//		Date date = new Date();
+		/*
+		 * Get the index and the currently next Node on the route.
+		 * Entries with a lower index have already been visited!
+		 */ 
+		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
+		NetworkRoute route = (NetworkRoute) this.leg.getRoute();
+		
+		// create dummy data for the "new" activities
+		String type = "w";
+		// This would be the "correct" Type - but it is slower and is not necessary
+		//String type = this.plan.getPreviousActivity(leg).getType();
+		
+		ActivityImpl newFromAct = new ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
+
+		newFromAct.setStartTime(time);
+		newFromAct.setEndTime(time);
 		
 		// Create a copy of the ArrayList - don't edit the ArrayList itself! 
 		ArrayList<Node> nodesRoute = new ArrayList<Node>();
@@ -251,6 +317,7 @@ public class LeaveLinkReplanner {
 		
 		log.info(newRouteString);
 */
+//		log.info("Calculation Time old =  " + (new Date().getTime() - date.getTime()));
 	}
 	
 	/*

@@ -73,7 +73,6 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	 * For examples used when creating a clone. 
 	 * In general these maps are static, so it is no problem to share the map.
 	 */
-
 	public SelectNodesDijkstra(NetworkLayer network, Map<Id, NodeImpl> networkNodesMap)
 	{
 		this.network = network;

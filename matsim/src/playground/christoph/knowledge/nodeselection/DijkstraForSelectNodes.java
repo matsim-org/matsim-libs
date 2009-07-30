@@ -114,6 +114,16 @@ public class DijkstraForSelectNodes {
 		initDijkstraNodes();	
 	}
 	
+	public DijkstraForSelectNodes(NetworkLayer network)
+	{
+		this.network = network;
+		this.networkNodesMap = network.getNodes();
+		
+		dijkstraNodeMap = new HashMap<NodeImpl, DijkstraNode>();
+		DijkstraNode.setNodeMap(dijkstraNodeMap);
+		initDijkstraNodes();	
+	}
+	
 	public void setNetwork(NetworkLayer network)
 	{
 		this.network = network;

@@ -169,7 +169,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 				// If flag is set, remove Knowledge after doing the replanning.
 				if (removeKnowledge)
 				{
-					KnowledgeTools.removeKnowledge(person);
+					new KnowledgeTools().removeKnowledge(person);
 				}
 				
 				numRuns++;

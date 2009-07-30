@@ -49,14 +49,13 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	 * from a Database before they are needed what should speed up the Simulation.
 	 */
 	protected final PriorityBlockingQueue<DriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
-	protected final double timeOffset = 30.0;
+	protected final double timeOffset = 60.0;
 	
 	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final Events events)
 	{
 		super(network, population, events);
-
+		
 		// eigenes Queuenetwork hinterlegen, welches MyQueueNodes enthaelt -> noetig fuer das Replanning!
-		//this.network = new MyQueueNetwork(network, new MyQueueNetworkFactory());
 		this.network = new MyQueueNetwork(network);
 		this.networkLayer = network;
 		
@@ -69,6 +68,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		//setAgentFactory(new MyAgentFactory(this));
 		
 		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
+		this.knowledgeDBStorageHandler.start();
 		getEvents().addHandler(knowledgeDBStorageHandler);
 	}
 
@@ -132,9 +132,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	}
 	
 	private void handleOffsetActivityEnds(final double time)
-	{
-		knowledgeDBStorageHandler.stopProcessing();
-		
+	{		
 		while (this.offsetActivityEndsList.peek() != null)
 		{
 			DriverAgent agent = this.offsetActivityEndsList.peek();
@@ -147,9 +145,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 			{
 				return;
 			}
-		}
-		
-		knowledgeDBStorageHandler.startProcessing();
+		} 
 	}
 	
 	/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {

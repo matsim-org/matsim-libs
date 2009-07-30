@@ -62,7 +62,7 @@ public class BatchRun {
 											 {9, 1, 0, 0},
 											 {10, 0, 0, 0}};
 */	
-	protected static int[][] Versuchsplan = {{0, 10, 0, 0}};
+	protected static int[][] Versuchsplan = {{0, 0, 0, 10}};
 	
 	
 	// Default Config
@@ -172,7 +172,6 @@ public class BatchRun {
 			controler.pLeaveLinkReplanning = 0.0;
 			controler.run();
 			controler = null;
-
 		}
 	}
 	

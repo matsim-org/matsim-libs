@@ -75,7 +75,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = new KnowledgeTools().getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 	
@@ -95,7 +95,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = KnowledgeTools.getKnownLinks(linksArray, knownNodesMap);
+			linksArray = new KnowledgeTools().getKnownLinks(linksArray, knownNodesMap);
 			
 			/*
 			 * If there are no Links available something may be wrong.

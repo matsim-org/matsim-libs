@@ -42,7 +42,7 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static Map<Id, NodeImpl> getKnownNodes(PersonImpl person)
+	public synchronized Map<Id, NodeImpl> getKnownNodes(PersonImpl person)
 	{
 		Map<Id, NodeImpl> knownNodesMap = null;
 		
@@ -73,7 +73,7 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static NodeKnowledge getNodeKnowledge(PersonImpl person)
+	public synchronized NodeKnowledge getNodeKnowledge(PersonImpl person)
 	{
 		NodeKnowledge nodeKnowledge = null;
 		
@@ -103,7 +103,7 @@ public class KnowledgeTools {
 	 * Returns only those links, where Start- and Endnode are contained in the Map.
 	 * If no Nodes are known, all links are returned.
 	 */
-	public static Link[] getKnownLinks(Link[] links, Map<Id, NodeImpl> knownNodesMap)
+	public synchronized Link[] getKnownLinks(Link[] links, Map<Id, NodeImpl> knownNodesMap)
 	{	
 		// If the current Person has knowledge about known Nodes (Map exists and has Elements)
 		if((knownNodesMap != null) && (knownNodesMap.size() != 0))
@@ -152,7 +152,7 @@ public class KnowledgeTools {
 	 * doing their routing. An Example would be a Random Router that does only an
 	 * initial planning before starting the mobsim.
 	 */ 
-	public static void removeKnowledge(PersonImpl person)
+	public void removeKnowledge(PersonImpl person)
 	{
 		Map<Id, NodeImpl> knownNodesMap = null;
 		

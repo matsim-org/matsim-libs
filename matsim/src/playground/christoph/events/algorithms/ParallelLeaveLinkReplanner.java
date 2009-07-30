@@ -21,7 +21,6 @@ package playground.christoph.events.algorithms;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
@@ -37,6 +36,9 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelLeaveLinkReplanner.class);
 	
+	private static ReplannerThread[] replannerThreads;
+	private static ThreadLocker threadLocker;
+	
 	/** 
 	 * The Method uses the same structure as the LeaveLinkReplanner but instead of single node and vehicles
 	 * Objects now ArrayLists are handed over.
@@ -46,46 +48,34 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	 * @param time
 	 */
 	//public static void run(ArrayList<QueueNode> currentNodes, ArrayList<QueueVehicle> vehicles, double time)
-	public static void run(ArrayList<QueueVehicle> vehicles, double time)
-	{		
-		Thread[] threads = new Thread[numOfThreads];
-		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
-		
-		// setup threads
-		for (int i = 0; i < numOfThreads; i++) 
-		{
-			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners, time);
-			replannerThreads[i] = replannerThread;
-			
-			Thread thread = new Thread(replannerThread, "Thread#" + i);
-			threads[i] = thread;
-		}
-		
-		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
-		int i = 0;
-		//for (Vehicle vehicle : vehicles)
-		for(int j = 0; j < vehicles.size(); j++)
+	public void run(ArrayList<QueueVehicle> vehicles, double time)
+	{			
+		// distribute workload between threads
+		// as long as threads are waiting we don't need synchronized data structures
+		for(int i = 0; i < vehicles.size(); i++)
 		{
 			QueueVehicle vehicle = vehicles.get(i);
-//			QueueNode queueNode = currentNodes.get(i);
 			
-//			replannerThreads[i % numOfThreads].handleVehicle(vehicle, queueNode);
 			replannerThreads[i % numOfThreads].handleVehicle(vehicle);
-			i++;
 		}
 		
-		// start the threads
-		for (Thread thread : threads) 
+		try
 		{
-			thread.start();
-		}
-		
-		// wait for the threads to finish
-		try {
-			for (Thread thread : threads) 
+			// lock threadLocker until wait() statement listens for the notifies
+			synchronized(threadLocker) 
 			{
-				thread.join();
-			}
+				// set current Time
+				ReplannerThread.setTime(time);
+	
+				threadLocker.setCounter(replannerThreads.length);
+				threadLocker.time = time;
+				
+				for (ReplannerThread replannerThread : replannerThreads)
+				{
+					replannerThread.startReplanning();		
+				}
+				threadLocker.wait();
+			}		
 		} 
 		catch (InterruptedException e)
 		{
@@ -93,78 +83,149 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		}
 	}
 	
+	public static void init()
+	{
+		threadLocker = new ThreadLocker();
+		
+		ReplannerThread.setThreadLocker(threadLocker);
+		
+		replannerThreads = new ReplannerThread[numOfThreads];
+		
+		// setup threads
+		for (int i = 0; i < numOfThreads; i++) 
+		{
+			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners);
+			replannerThreads[i] = replannerThread;
+			
+			replannerThread.start();
+		}
+	}
+	
+	private static class ThreadLocker
+	{
+		private int count = 0;
+		public double time;
+		
+		public synchronized void setCounter(int i)
+		{
+			this.count = i;
+		}
+				
+		public synchronized void incCounter()
+		{
+			count++;
+		}
+		
+		public synchronized void decCounter()
+		{
+			count--;
+			if(count == 0)
+			{
+//				log.info("Notify " + time);
+				notify();
+			}
+		}
+	}
 	
 	
 	/**
 	 * The thread class that really handles the persons.
 	 */
-	private static class ReplannerThread implements Runnable 
+	private static class ReplannerThread extends Thread 
 	{
+		private static ThreadLocker threadLocker;
+		private static double time = 0.0;
+		private static boolean simulationRunning = true;
+		
 		public final int threadId;
-		private double time = 0.0;
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
-		private final List<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
-//		private final List<QueueNode> currentNodes = new LinkedList<QueueNode>();
+		private final LinkedList<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
 
-		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
+		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners)
 		{
 			this.threadId = i;
 			this.replannerArray = replannerArray;
 			this.replanners = replanners;
-			this.time = time;
 		}
 
-//		public void handleVehicle(final QueueVehicle vehicle, final QueueNode currentNode)
+		public static void setThreadLocker (ThreadLocker tl)
+		{
+			threadLocker = tl;
+		}
+		
+		public static void setTime(final double t)
+		{
+			time = t;
+		}
+		
 		public void handleVehicle(final QueueVehicle vehicle)
 		{
 			this.vehicles.add(vehicle);
-//			this.currentNodes.add(currentNode);
 		}
 
+		public void startReplanning()
+		{
+			synchronized(this)
+			{
+				notify();
+			}
+		}
+		
+		@Override
 		public void run()
 		{
-			int numRuns = 0;
-			
-			//for (Vehicle vehicle : this.vehicles)
-			for(int i = 0; i < vehicles.size(); i++)
-			{	
-				QueueVehicle vehicle = vehicles.get(i);
-//				QueueNode queueNode = currentNodes.get(i);
-				
-				// If replanning flag is set in the Person
-//				boolean replanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
-//				if(replanning)
-				/*
-				 *  Replanning Flag is already checked in the MyQueueNetwork class.
-				 *  If among the link leaving Agents no one has set the replanning flag,
-				 *  there is no need to start the Replanner...
-				 */			
-//				{
-					// replanner of the person
-					PlanAlgorithm replanner = (PlanAlgorithm)vehicle.getDriver().getPerson().getCustomAttributes().get("Replanner");
-					
-					// get the index of the Replanner in the replanners Array
-					int index = replanners.indexOf(replanner);
-					
-					// get the replanner or a clone if it, if it's not the first running thread
-					replanner = this.replannerArray[index][threadId];
-					
-//					new LeaveLinkReplanner(queueNode, vehicle, time, replanner);
-					new LeaveLinkReplanner(vehicle, time, replanner);
-//					log.info("Did Leave Link Replanning...");
-//				}
+			while (simulationRunning)
+			{
+				try
+				{
+					/*
+					 * thradLocker.decCounter() and wait() have to be
+					 * executed in a synchronized block! Otherwise it could
+					 * happen, that the replanning ends and the replanning of
+					 * the next SimStep executes the notify command before
+					 * wait() is called -> we have a DeadLock!
+					 */
+					synchronized(this)
+					{
+						threadLocker.decCounter();
+						wait();
+					}
 
-	
-				numRuns++;
-				if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
+					//log.info("Runnning: " + time);
+
+					int numRuns = 0;
+					
+					while(vehicles.peek() != null)
+					{
+						QueueVehicle vehicle = vehicles.poll();
+
+						// replanner of the person
+						PlanAlgorithm replanner = (PlanAlgorithm)vehicle.getDriver().getPerson().getCustomAttributes().get("Replanner");
+						
+						// get the index of the Replanner in the replanners Array
+						int index = replanners.indexOf(replanner);
+						
+						// get the replanner or a clone if it, if it's not the first running thread
+						replanner = this.replannerArray[index][threadId];
+
+//						new LeaveLinkReplanner(queueNode, vehicle, time, replanner);
+						new LeaveLinkReplanner(vehicle, time, replanner);
+						//log.info("Did Leave Link Replanning...");
+						
+						numRuns++;
+						if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
+					}
+					
+//					log.info("Thread " + threadId + " done.");
+				}
+				catch (InterruptedException ie)
+				{
+					log.error("Something is going wrong here...");
+				}
+			}	// while Simulation Running
 			
-			}
-		
-//			log.info("Thread " + threadId + " done.");
-			
-		}	// run
-		
+		}	// run()
 	}	// ReplannerThread
 	
 }
