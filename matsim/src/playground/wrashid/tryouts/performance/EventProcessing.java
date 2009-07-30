@@ -15,13 +15,16 @@ import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
  * => wichtig, dass man nice raus nimmt...
  * make run "MEMORY=-Xms1g -Xmx1g" "MAINCLASS=playground/wrashid/tryouts/performance/EventProcessing"
  * 
- * First compile with the above command.
+ * First compile with the above command (in the matsim folder)
  * Then go to folder classes
  * Then start:
  * java playground/wrashid/tryouts/performance/EventProcessing <numberOfThreads> <numberOfHandlers>
  */
 public class EventProcessing {
 	public static void main(String[] args) {
+		
+		System.out.println(args[0]);
+		System.out.println(args[1]);
 		
 		int numberOfThreads=Integer.parseInt(args[0]);
 		int numberOfHandlers=Integer.parseInt(args[1]);
