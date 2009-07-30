@@ -129,7 +129,7 @@ public class QuadTree<T> implements Serializable {
 		if(leaf != null) return leaf.values;
 		return null;
 	}
-	
+
 	/** Clear the QuadTree. */
 	public void clear() {
 		this.top.clear();
@@ -260,12 +260,8 @@ public class QuadTree<T> implements Serializable {
    * Returns a collection view of the values contained in this map.  The
    * collection's iterator will return the values in the order that their
    * corresponding keys appear in the tree.  The collection is backed by
-   * this <tt>TreeMap</tt> instance, so changes to this map are reflected in
-   * the collection, and vice-versa.  The collection supports element
-   * removal, which removes the corresponding mapping from the map through
-   * the <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-   * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations.
-   * It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
+   * this <tt>QuadMap</tt> instance, so changes to this map are reflected in
+   * the collection.
    *
    * @return a collection view of the values contained in this map.
    */
@@ -466,19 +462,19 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		   /**
-	     * Computes the intersection of this <code>Rect</code> with the 
-	     * specified <code>Rect</code>. Returns a new <code>Rect</code> 
+	     * Computes the intersection of this <code>Rect</code> with the
+	     * specified <code>Rect</code>. Returns a new <code>Rect</code>
 	     * that represents the intersection of the two rectangles.
 	     * If the two rectangles do not intersect, the result will be
 	     * null.
 	     *
 	     * @param     r   the specified <code>Rectangle</code>
-	     * @return    the largest <code>Rectangle</code> contained in both the 
-	     *            specified <code>Rectangle</code> and in 
+	     * @return    the largest <code>Rectangle</code> contained in both the
+	     *            specified <code>Rectangle</code> and in
 	     *		  this <code>Rectangle</code>; or if the rectangles
 	     *            do not intersect, an empty rectangle.
 	     */
-	    public Rect intersection(Rect r) {
+	    public Rect intersection(final Rect r) {
 		double tx1 = this.minX;
 		double ty1 = this.minY;
 		double tx2 = this.maxX;
@@ -489,27 +485,27 @@ public class QuadTree<T> implements Serializable {
 		if (ty2 > r.maxY) ty2 = r.maxY;
 		// did they intersect at all?
 		if(tx2-tx1 <=0.f || ty2-ty1 <= 0.f) return null;
-		
+
 		return new Rect(tx1, ty1, tx2, ty2);
 	    }
-	    
+
 	    /**
-	     * Adds a <code>Rect</code> to this <code>Rect</code>. 
+	     * Adds a <code>Rect</code> to this <code>Rect</code>.
 	     * The resulting <code>Rect</code> is the union of the two
-	     * rectangles. 
+	     * rectangles.
 	     * @param  r the specified <code>Rect</code>
 	     */
-	    public Rect union(Rect r) {
-			return new Rect( Math.min(minX, r.minX),
-					Math.min(minY, r.minY),
-					Math.max(maxX, r.maxX),
-					Math.max(maxY, r.maxY));
+	    public Rect union(final Rect r) {
+			return new Rect( Math.min(this.minX, r.minX),
+					Math.min(this.minY, r.minY),
+					Math.max(this.maxX, r.maxX),
+					Math.max(this.maxY, r.maxY));
 		    }
-	    
+
 	    public Rect scale(double scaleX, double scaleY) {
-	    	scaleY *= centerY - minY;
-	    	scaleX *= centerX - minX;
-			return new Rect(minX - scaleX, minY-scaleY, maxX + scaleX, maxY + scaleY);
+	    	scaleY *= this.centerY - this.minY;
+	    	scaleX *= this.centerX - this.minX;
+			return new Rect(this.minX - scaleX, this.minY-scaleY, this.maxX + scaleX, this.maxY + scaleY);
 		    }
 	}
 
