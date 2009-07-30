@@ -148,10 +148,14 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 								i++;
 								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
 									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
-									planElements.add(i, new ActivityImpl("pt interaction", this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink()));
+									ActivityImpl act = new ActivityImpl("pt interaction", this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
+									act.setDuration(0.0);
+									planElements.add(i, act);
 									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 								} else { // walk legs don't have a coord, use the coord from the last egress point
-									planElements.add(i, new ActivityImpl("pt interaction", nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink()));
+									ActivityImpl act = new ActivityImpl("pt interaction", nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
+									act.setDuration(0.0);
+									planElements.add(i, act);
 								}
 								i++;
 								planElements.add(i, leg2);
