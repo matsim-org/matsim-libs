@@ -61,7 +61,7 @@ import playground.marcel.pt.utils.CreatePseudoNetwork;
 
 public class VisualizeTransitPlans {
 
-	private final static String NETWORK_FILE = "";
+	private final static String NETWORK_FILE = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
 	private final static String TRANSIT_SCHEDULE_FILE = "../thesis-data/application/transitschedule.oevModell.xml";
 	private final static String POPULATION_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
 
