@@ -34,6 +34,8 @@ import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.population.Activity;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -52,20 +54,11 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			int numTimeIntervals,
 			TransportMode[] possibleModes,
 			PlanomatConfigGroup planomatConfigGroup) {
-		this("", "", plan, planAnalyzeSubtours, seed, numTimeIntervals, possibleModes, planomatConfigGroup);
-	}
 
-	private PlanomatJGAPConfiguration(
-			String a_id, 
-			String a_name, 
-			PlanImpl plan, 
-			PlanAnalyzeSubtours planAnalyzeSubtours, 
-			long seed,
-			int numTimeIntervals,
-			TransportMode[] possibleModes,
-			PlanomatConfigGroup planomatConfigGroup) {
-		super(a_id, a_name);
+		// JGAP Configuration object is initialized without an id. This means there can be only one configuration object per thread, which is what we want.
+		super(null);
 
+		// Configuration for current thread is reset.
 		Configuration.reset();
 
 		this.setBreeder(new GABreeder());
@@ -89,7 +82,16 @@ public class PlanomatJGAPConfiguration extends Configuration {
 
 			// initialize population properties
 			// - population size: equal to the string length, if not specified otherwise (de Jong, 1975)
-			int numActs = plan.getPlanElements().size() / 2;
+			int numActs = 0;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					numActs++;
+				}
+			}
+			// first and last activity are the same
+			// TODO what if this is not the case?
+			numActs -= 1;
+			
 			int numSubtours = 0;
 			if (planAnalyzeSubtours != null) {
 				numSubtours = planAnalyzeSubtours.getNumSubtours();
@@ -98,9 +100,9 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			int populationSize = planomatConfigGroup.getPopSize();
 			if (populationSize == Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue())) {
 
-				populationSize = planomatConfigGroup.getLevelOfTimeResolution() * numActs;
+				populationSize = 1;
+				populationSize += planomatConfigGroup.getLevelOfTimeResolution() * numActs;
 				populationSize += planomatConfigGroup.getPossibleModes().size() * numSubtours;
-				this.setPopulationSize( populationSize );
 
 			}
 			this.setPopulationSize(populationSize);

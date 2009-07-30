@@ -93,7 +93,7 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
 		}
 		
-		// cache car routes in case route re not modified by the used implementation of the LegTravelTimeEstimator 
+		// cache car routes in case routes are not modified by the used implementation of the LegTravelTimeEstimator 
 		this.legTravelTimeEstimator.initPlanSpecificInformation(plan);
 		
 		// perform subtour analysis only if mode choice on subtour basis is optimized

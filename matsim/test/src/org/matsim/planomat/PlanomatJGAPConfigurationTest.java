@@ -27,6 +27,7 @@ import org.jgap.BaseGeneticOperator;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
@@ -40,12 +41,15 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
+	private static final Id TEST_PERSON_ID = new IdImpl("100");
+	private static final int TEST_PLAN_NR = 0;
+	
 	private ScenarioImpl scenario;
 	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		Config config = super.loadConfig(this.getInputDirectory() + "config.xml");
+		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
 		config.plans().setInputFile(getPackageInputDirectory() + "testPlans.xml");
 		ScenarioLoader loader = new ScenarioLoader(config);
 		loader.loadScenario();
@@ -54,85 +58,37 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 	public void testPlanomatJGAPConfiguration() {
 
-		// init test Plan
-		final int TEST_PLAN_NR = 0;
-
-		// first person
-		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
-		// only plan of that person
-		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
-
-		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
-		Planomat testee = new Planomat(null, null, planomatConfigGroup);
-
-		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
+		this.runATest(1, 0, BestChromosomesSelector.class, 15, 2, 0.6);
 		
-		PlanAnalyzeSubtours planAnalyzeSubtours = null;
-		if (possibleModes.length > 0) {
-			planAnalyzeSubtours = new PlanAnalyzeSubtours();
-			planAnalyzeSubtours.run(testPlan);
-		}
-
-		// run testee
-		long seed = 3810;
-		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(
-				testPlan, 
-				planAnalyzeSubtours, 
-				seed,
-				128,
-				possibleModes,
-				planomatConfigGroup);
-
-		// see below for correct functioning of the random number generator
-		Double[] randomNumberSequenceA = new Double[1000];
-		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
-			randomNumberSequenceA[ii] = jgapConfig.getRandomGenerator().nextDouble();
-		}
+	}
+	
+	public void testPlanomatJGAPConfigurationCarPt() {
 		
-		// test correct setting of natural selector
-		assertEquals(1, jgapConfig.getNaturalSelectorsSize(false));
-		assertEquals(0, jgapConfig.getNaturalSelectorsSize(true));
-		assertEquals(BestChromosomesSelector.class, jgapConfig.getNaturalSelector(false, 0).getClass());
-
-		// test correct setting of population size
-		int expectedPopSize = 14;
-		assertEquals(expectedPopSize, jgapConfig.getPopulationSize());
-
-		// test correct settings for genetic operators
-		assertEquals(2, jgapConfig.getGeneticOperators().size());
-		Iterator geneticOperatorsIterator = jgapConfig.getGeneticOperators().iterator();
-		while (geneticOperatorsIterator.hasNext()) {
-			BaseGeneticOperator bgo = (BaseGeneticOperator) geneticOperatorsIterator.next();
-			if (bgo.getClass().equals(CrossoverOperator.class)) {
-				assertEquals(0.6d, ((CrossoverOperator) bgo).getCrossOverRatePercent(), EPSILON);
-			} else if (bgo.getClass().equals(MutationOperator.class)) {
-				assertEquals(expectedPopSize, ((MutationOperator) bgo).getMutationRate());
-			}
-		}
+		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
+		this.runATest(1, 0, BestChromosomesSelector.class, 17, 2, 0.6);
 		
-		// test correct setting of random number generator
-		jgapConfig = new PlanomatJGAPConfiguration(
-				testPlan, 
-				planAnalyzeSubtours, 
-				seed,
-				128,
-				possibleModes,
-				planomatConfigGroup);
-
-		Double[] randomNumberSequenceB = new Double[1000];
-		for (int ii=0; ii < randomNumberSequenceA.length; ii++) {
-			randomNumberSequenceB[ii] = jgapConfig.getRandomGenerator().nextDouble();
-		}
-		assertTrue(Arrays.deepEquals(randomNumberSequenceA, randomNumberSequenceB));
 	}
 
-	public void testPlanomatJGAPConfigurationCarPt() {
+	public void testPlanWithoutLegs() {
+		
+		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		testPlan.removeActivity(2);
+		this.runATest(1, 0, BestChromosomesSelector.class, 8, 2, 0.6);
+		
+	}
 
-		// init test Plan
-		final int TEST_PLAN_NR = 0;
-
+	private void runATest(
+			int expectedNumberOfNaturalSelectorsFalse,
+			int expectedNumberOfNaturalSelectorsTrue,
+			Class expectedNaturalSelectorType,
+			int expectedPopulationSize,
+			int expectedNumberOfGeneticOperators,
+			double expectedCrossoverRate
+			) {
+		
 		// first person
-		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(new IdImpl("100"));
+		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -164,23 +120,22 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		}
 
 		// test correct setting of natural selector
-		assertEquals(1, jgapConfig.getNaturalSelectorsSize(false));
-		assertEquals(0, jgapConfig.getNaturalSelectorsSize(true));
-		assertEquals(BestChromosomesSelector.class, jgapConfig.getNaturalSelector(false, 0).getClass());
+		assertEquals(expectedNumberOfNaturalSelectorsFalse, jgapConfig.getNaturalSelectorsSize(false));
+		assertEquals(expectedNumberOfNaturalSelectorsTrue, jgapConfig.getNaturalSelectorsSize(true));
+		assertEquals(expectedNaturalSelectorType, jgapConfig.getNaturalSelector(false, 0).getClass());
 
 		// test correct setting of population size
-		int expectedPopSize = 16;
-		assertEquals(expectedPopSize, jgapConfig.getPopulationSize());
+		assertEquals(expectedPopulationSize, jgapConfig.getPopulationSize());
 
 		// test correct settings for genetic operators
-		assertEquals(2, jgapConfig.getGeneticOperators().size());
-		Iterator geneticOperatorsIterator = jgapConfig.getGeneticOperators().iterator();
+		assertEquals(expectedNumberOfGeneticOperators, jgapConfig.getGeneticOperators().size());
+		Iterator<BaseGeneticOperator> geneticOperatorsIterator = jgapConfig.getGeneticOperators().iterator();
 		while (geneticOperatorsIterator.hasNext()) {
-			BaseGeneticOperator bgo = (BaseGeneticOperator) geneticOperatorsIterator.next();
-			if (bgo.getClass().equals(CrossoverOperator.class)) {
-				assertEquals(0.6d, ((CrossoverOperator) bgo).getCrossOverRatePercent(), EPSILON);
-			} else if (bgo.getClass().equals(MutationOperator.class)) {
-				assertEquals(expectedPopSize, ((MutationOperator) bgo).getMutationRate());
+			BaseGeneticOperator bgo = geneticOperatorsIterator.next();
+			if (bgo instanceof CrossoverOperator) {
+				assertEquals(expectedCrossoverRate, ((CrossoverOperator) bgo).getCrossOverRatePercent(), EPSILON);
+			} else if (bgo instanceof MutationOperator) {
+				assertEquals(expectedPopulationSize, ((MutationOperator) bgo).getMutationRate());
 			}
 		}
 
@@ -197,8 +152,10 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 			randomNumberSequenceB[ii] = jgapConfig.getRandomGenerator().nextDouble();
 		}
 		assertTrue(Arrays.deepEquals(randomNumberSequenceA, randomNumberSequenceB));
+		
 	}
-
+	
+	
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();

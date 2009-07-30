@@ -111,9 +111,6 @@ public class PlanomatTest extends MatsimTestCase {
 
 	public void testRunCarPtWithEvents() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-//		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
-//
-//		this.modifyNetwork();
 		this.runATestRun(PlanomatTestRun.WITHEVENTS_CAR_PT);
 	}
 
@@ -123,8 +120,6 @@ public class PlanomatTest extends MatsimTestCase {
 
 	public void testCarAvailabilityAlways() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
-		
 		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		p.setCarAvail("always");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
@@ -132,8 +127,6 @@ public class PlanomatTest extends MatsimTestCase {
 	
 	public void testCarAvailabilityNever() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-		this.scenario.getConfig().planomat().setRoutingCapability(PlanomatConfigGroup.RoutingCapability.linearInterpolation);
-		
 		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		p.setCarAvail("never");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
