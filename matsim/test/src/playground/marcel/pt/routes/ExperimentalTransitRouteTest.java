@@ -102,22 +102,22 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testSetRouteDescription_PtRoute() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		route.setRouteDescription(null, "PT1 5 11 1980 1055", null);
+		route.setRouteDescription(null, "PT1===5===11===1980===1055", null);
 		assertEquals("5", route.getAccessStopId().toString());
 		assertEquals("11", route.getLineId().toString());
 		assertEquals("1980", route.getRouteId().toString());
 		assertEquals("1055", route.getEgressStopId().toString());
-		assertEquals("PT1 5 11 1980 1055", route.getRouteDescription());
+		assertEquals("PT1===5===11===1980===1055", route.getRouteDescription());
 	}
 
 	public void testSetRouteDescription_PtRouteWithDescription() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		route.setRouteDescription(null, "PT1 5 11 1980 1055 this is a valid route", null);
+		route.setRouteDescription(null, "PT1===5===11===1980===1055===this is a===valid route", null);
 		assertEquals("5", route.getAccessStopId().toString());
 		assertEquals("11", route.getLineId().toString());
 		assertEquals("1980", route.getRouteId().toString());
 		assertEquals("1055", route.getEgressStopId().toString());
-		assertEquals("PT1 5 11 1980 1055 this is a valid route", route.getRouteDescription());
+		assertEquals("PT1===5===11===1980===1055===this is a===valid route", route.getRouteDescription());
 	}
 
 	public void testSetRouteDescription_NonPtRoute() {
