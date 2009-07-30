@@ -149,9 +149,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	
 	public void run (PlanImpl basePlan){
 		
-		// meisterk
-		this.estimator.initPlanSpecificInformation(basePlan);
-		
 		/*Do nothing if the plan has only one or two activities (=24h home)*/
 		if (basePlan.getPlanElements().size()<=3) return;
 		
@@ -179,6 +176,9 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			routes.add(r);
 		}
 		this.routes = routes;
+		
+		// meisterk
+		this.estimator.initPlanSpecificInformation(plan);
 		
 		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
 		//PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
