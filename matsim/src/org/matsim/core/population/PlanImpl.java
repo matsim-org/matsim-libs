@@ -196,7 +196,13 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 
 	@Override
 	public final String toString() {
-		return "[score=" + this.getScore().toString() + "]" +
+		
+		String scoreString = "undefined";
+		if (this.getScore() != null) {
+			scoreString = this.getScore().toString();
+		}
+		
+		return "[score=" + scoreString + "]" +
 				"[selected=" + this.isSelected() + "]" +
 				"[nof_acts_legs=" + getPlanElements().size() + "]";
 	}

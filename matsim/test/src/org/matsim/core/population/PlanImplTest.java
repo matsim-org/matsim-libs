@@ -266,4 +266,44 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}
 	
+	/**
+	 * @author meisterk
+	 */
+	public void testRemoveActivity() {
+
+		PlanImpl testee = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		testee.createActivity("h", new CoordImpl(0, 0));
+		LegImpl leg = testee.createLeg(TransportMode.car);
+		testee.createActivity("w", new CoordImpl(100, 200));
+		leg = testee.createLeg(TransportMode.car);
+		testee.createActivity("h", new CoordImpl(0, 0));
+
+		testee.removeActivity(3);
+		assertEquals(5, testee.getPlanElements().size());
+		
+		testee.removeActivity(4);
+		assertEquals(3, testee.getPlanElements().size());
+		
+	}
+
+	/**
+	 * @author meisterk
+	 */
+	public void testRemoveLeg() {
+
+		PlanImpl testee = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		testee.createActivity("h", new CoordImpl(0, 0));
+		LegImpl leg = testee.createLeg(TransportMode.car);
+		testee.createActivity("w", new CoordImpl(100, 200));
+		leg = testee.createLeg(TransportMode.car);
+		testee.createActivity("h", new CoordImpl(0, 0));
+
+		testee.removeLeg(4);
+		assertEquals(5, testee.getPlanElements().size());
+		
+		testee.removeLeg(3);
+		assertEquals(3, testee.getPlanElements().size());
+
+	}
+	
 }
