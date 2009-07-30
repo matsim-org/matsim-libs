@@ -9,8 +9,21 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 
 // this events processing relies on creating artifical events, intead of reading them
+/*
+ * make clean ; nice make run "MEMORY=-Xms1g -Xmx1g" "MAINCLASS=playground/wrashid/tryouts/performance/EventProcessing"
+ * 
+ * => wichtig, dass man nice raus nimmt...
+ * make run "MEMORY=-Xms1g -Xmx1g" "MAINCLASS=playground/wrashid/tryouts/performance/EventProcessing"
+ * 
+ */
 public class EventProcessing {
 	public static void main(String[] args) {
+		
+		System.out.println(args[0]);
+		System.out.println(args[1]);
+		
+		/*
+		
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
@@ -43,7 +56,7 @@ public class EventProcessing {
 		
 		System.out.println("time needed in [s]:" + (System.currentTimeMillis() -  timer)/1000);
 		
-
+*/
 	}
 	
 	private class Handler1 implements LinkLeaveEventHandler {
