@@ -51,11 +51,11 @@ import org.matsim.knowledges.Knowledges;
 public class AnalysisSelectedPlansActivityChains {
 
 	protected final PopulationImpl population;
-	protected final String outputDir;
+	protected String outputDir;
 	protected ArrayList<List<PlanElement>> activityChains;
 	protected ArrayList<ArrayList<PlanImpl>> plans;
-	protected final Map<String,Double> minimumTime;
-	protected final Knowledges knowledges;
+	protected Map<String,Double> minimumTime;
+	protected Knowledges knowledges;
 	protected static final Logger log = Logger.getLogger(AnalysisSelectedPlansActivityChains.class);
 	
 
@@ -70,6 +70,19 @@ public class AnalysisSelectedPlansActivityChains {
 		this.minimumTime.put("work", 3600.0);
 		this.minimumTime.put("shopping", 1800.0);
 		this.minimumTime.put("leisure", 3600.0);
+	}
+	
+	public AnalysisSelectedPlansActivityChains(final PopulationImpl population) {
+		this.population = population;
+		initAnalysis();
+	}
+	
+	public ArrayList<List<PlanElement>> getActivityChains (){
+		return this.activityChains;
+	}
+	
+	public ArrayList<ArrayList<PlanImpl>> getPlans (){
+		return this.plans;
 	}
 	
 	protected void initAnalysis(){
@@ -158,34 +171,6 @@ public class AnalysisSelectedPlansActivityChains {
 		}
 		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
 		stream1.println();
-		
-		/*
-	 	Analysis of legs 
-		double averageDistance=0;
-		double averageTime=0;
-		stream1.println("Person ID\tInitial travel distance\tFinal travel distance\tInitial travel time\tFinal travel time");
-		for (int i=0; i<this.plans.size();i++){
-			
-			for (int j=0; j<this.plans.get(i).size();j++){
-				stream1.print(this.plans.get(i).get(j).getPerson().getId()+"\t");
-				double distance=0;
-				double time=0;
-				for (int k=1;k<this.plans.get(i).get(j).getPlanElements().size();k=k+2){
-					distance+=((Leg)(this.plans.get(i).get(j).getPlanElements().get(k))).getRoute().getDistance();
-					time +=((Leg)(this.plans.get(i).get(j).getPlanElements().get(k))).getTravelTime();
-				}
-				averageDistance+=distance;
-				averageTime+=time;
-				stream1.println(distance+"\t"+time);
-			}
-		}
-		stream1.println();
-		stream1.println((averageDistance/this.population.getPersons().size())+"\tAverage distance\t"
-				+(averageTime/this.population.getPersons().size())+"\tAverage travel time");
-		
-		
-		stream1.close();
-		*/
 	}
 	
 	protected boolean checkForEquality (PlanImpl plan, List<PlanElement> activityChain){
@@ -211,7 +196,7 @@ public class AnalysisSelectedPlansActivityChains {
 	public static void main(final String [] args) {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/scrPegasus/output/rec2/ITERS/it.50/50.plans.xml";
+		final String populationFilename = "/home/baug/mfeil/data/mz/plans.xml";
 //		final String populationFilename = "./plans/output_plans.xml.gz";
 //		final String networkFilename = "./plans/network.xml";
 //		final String facilitiesFilename = "./plans/facilities.xml.gz";
