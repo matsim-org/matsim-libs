@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.network.Node;
 import org.matsim.core.api.experimental.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -54,6 +55,7 @@ public class Application1 {
 
 	private static final Logger log = Logger.getLogger(Application1.class);
 
+	private final static String NETWORK_FILE = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
 	private final static String DILUTED_PT_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt.xml.gz";
 	private final static String DILUTED_PT_ROUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
 
@@ -103,6 +105,7 @@ public class Application1 {
 	protected void routePopulation() {
 		PopulationImpl pop = this.scenario.getPopulation();
 		try {
+			new MatsimNetworkReader(this.scenario.getNetwork()).parse(NETWORK_FILE);
 			new MatsimPopulationReader(this.scenario).parse(DILUTED_PT_1PCT_PLANS_FILENAME);
 			pop.printPlansCount();
 		} catch (SAXException e) {

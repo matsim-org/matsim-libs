@@ -45,6 +45,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -107,6 +108,7 @@ public class VisualizeTransitPlans {
 						Activity act = (Activity) pe;
 						ActivityImpl visAct = (ActivityImpl) pb.createActivityFromCoord(act.getType(), act.getCoord());
 						visAct.setStartTime(act.getStartTime());
+						visAct.setDuration(((ActivityImpl)act).getDuration());
 						visAct.setEndTime(act.getEndTime());
 						visAct.setLink(this.visScenario.getNetwork().getNearestLink(act.getCoord()));
 						visPlan.addActivity(visAct);
@@ -119,9 +121,34 @@ public class VisualizeTransitPlans {
 						} else {
 							visLeg.setRoute(leg.getRoute()); // reuse route
 						}
+						visLeg.setTravelTime(leg.getTravelTime());
 						visPlan.addLeg(visLeg);
 					}
 				}
+				// step again through the plan and set the links in the routes
+
+				Link fromLink = null;
+				Link toLink = null;
+				Route route = null;
+				for (PlanElement pe : visPlan.getPlanElements()) {
+					if (pe instanceof ActivityImpl) {
+						fromLink = toLink;
+						toLink = ((ActivityImpl) pe).getLink();
+						if (route != null) {
+							if (route instanceof GenericRouteImpl) {
+								((GenericRouteImpl) route).setStartLink(fromLink);
+								((GenericRouteImpl) route).setEndLink(toLink);
+							} else if (route instanceof NetworkRoute) {
+								((NetworkRoute) route).setStartLink(fromLink);
+								((NetworkRoute) route).setEndLink(toLink);
+							}
+						}
+					}
+					if (pe instanceof Leg) {
+						route = ((Leg) pe).getRoute();
+					}
+				}
+
 				visPerson.addPlan(visPlan);
 			}
 			visPop.addPerson(visPerson);
@@ -133,6 +160,7 @@ public class VisualizeTransitPlans {
 		visConfig.addCoreModules();
 		visConfig.network().setInputFile("vis.network.xml");
 		visConfig.plans().setInputFile("vis.plans.xml");
+		visConfig.simulation().setSnapshotStyle("queue");
 		new ConfigWriter(visConfig, "vis.config.xml").write();
 
 	}
