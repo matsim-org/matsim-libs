@@ -26,8 +26,6 @@ import java.util.Collections;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
-import com.sun.tools.javac.tree.Tree.Case;
-
 public class RetailerSA {
 	private double temperatureReductionFrequency;
 	private double temperatureReductionFactor;
