@@ -50,8 +50,10 @@ import playground.marcel.pt.routes.ExperimentalTransitRoute;
  * @author mrieser
  */
 public class PlansCalcTransitRoute extends PlansCalcRoute {
+	
+	public final static String TRANSIT_ACTIVITY_TYPE = "pt interaction";
 
-	private final TransitLegsRemover transitLegsRemover = new TransitLegsRemover();
+	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
 	private final TransitRouterConfig routerConfig = new TransitRouterConfig();
 	private final TransitRouter transitRouter;
 	private final TransitConfigGroup transitConfig;
@@ -146,12 +148,12 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 								i++;
 								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
 									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
-									ActivityImpl act = new ActivityImpl("pt interaction", this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
+									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 								} else { // walk legs don't have a coord, use the coord from the last egress point
-									ActivityImpl act = new ActivityImpl("pt interaction", nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
+									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 								}

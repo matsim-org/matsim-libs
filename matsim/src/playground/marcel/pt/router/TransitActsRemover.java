@@ -20,13 +20,45 @@
 
 package playground.marcel.pt.router;
 
+import java.util.List;
+
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.core.api.experimental.population.Activity;
+import org.matsim.core.api.experimental.population.Leg;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class TransitLegsRemover implements PlanAlgorithm {
+/**
+ * Removes all transit activities (like "pt -interaction") as well as the legs
+ * following those activities. In addition, all legs with mode "walk"
+ * are set to mode "pt" to be routed again with the transit. 
+ * 
+ * @see PlansCalcTransitRoute#TRANSIT_ACTIVITY_TYPE
+ * 
+ * @author mrieser
+ */
+public class TransitActsRemover implements PlanAlgorithm {
 
 	public void run(final PlanImpl plan) {
-		// TODO [MR] Auto-generated method stub
+		List<PlanElement> planElements = plan.getPlanElements();
+		for (int i = 0, n = planElements.size(); i < n; i++) {
+			PlanElement pe = planElements.get(i);
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
+					plan.removeActivity(i);
+					n -= 2;
+					i--; // i will be incremented again in next loop-iteration, so we'll check the next act
+				}
+			} else if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				if (TransportMode.walk.equals(leg.getMode())) {
+					leg.setMode(TransportMode.pt);
+					leg.setRoute(null);
+				}
+			}
+		}
 	}
 
 }
