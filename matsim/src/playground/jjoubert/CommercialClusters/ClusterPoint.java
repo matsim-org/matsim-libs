@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityCluster.java
+ * ClusterPoint.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,25 +20,33 @@
 
 package playground.jjoubert.CommercialClusters;
 
-import java.util.ArrayList;
-
 import com.vividsolutions.jts.geom.Point;
 
-public class ActivityCluster {
-	private String clusterId;
-	private ArrayList<Point> points;
+/**
+ * A simple class linking a point to a specific cluster.
+ * 
+ * @author jwjoubert
+ */
+public class ClusterPoint{
+	private Point point;
+	private Cluster cluster;
 	
-	public ActivityCluster(String clusterId){
-		this.clusterId = clusterId;
-		this.points = new ArrayList<Point>();
+	public ClusterPoint(Point point, Cluster cluster){
+		this.point = point;
+		this.cluster = cluster;
 	}
 
-	public String getClusterId() {
-		return clusterId;
+	public Point getPoint() {
+		return point;
+	}
+
+	public Cluster getCluster() {
+		return cluster;
 	}
 	
-	public ArrayList<Point> getPoints() {
-		return points;
+	public void setCluster(Cluster cluster){
+		this.cluster = cluster;
 	}
 	
+
 }
