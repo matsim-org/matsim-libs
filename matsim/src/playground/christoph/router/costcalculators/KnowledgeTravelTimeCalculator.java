@@ -129,7 +129,6 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		
 		// number of vehicles that are on the link or that are already waiting to enter the link
 		//double vehicles = queueLink.getAllVehicles().size() - queueLink.vehParkingCount();// - queueLink.getVehiclesOnParkingList().size();
-
 		double vehicles = myQueueNetwork.getLinkVehiclesCounter().getLinkDrivingVehiclesCount(link.getId());
 		
 		return vehicles;

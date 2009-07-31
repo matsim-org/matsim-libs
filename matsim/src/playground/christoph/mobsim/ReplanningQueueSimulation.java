@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;
@@ -37,8 +38,9 @@ import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandle
 
 public class ReplanningQueueSimulation extends QueueSimulation{
 
-	protected Controler controler;
+	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
 	
+	protected Controler controler;
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 	
 	/*
@@ -85,7 +87,15 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	@Override
 	protected boolean doSimStep(final double time) 
 	{
-		ParallelReplanner.updateLinkTravelTimesLookupTables();
+		/*
+		 * Update the LookupTables for the LinkTravelTimes and LinkTravelCosts.
+		 * Update the LinkTravelTimes first because the LinkTravelCosts may use
+		 * them already!
+		 */
+//		log.info("Updating LookupTable...");
+		ParallelReplanner.updateLinkTravelTimesLookupTables(time);
+		ParallelReplanner.updateLinkTravelCostsLookupTables(time);
+//		log.info("done");
 		
 		if (MyQueueSimEngine.isActEndReplanning())
 		{

@@ -75,8 +75,10 @@ import playground.christoph.router.TabuRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
+import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
+import playground.scnadine.choiceSetGeneration.algorithms.FreeSpeedTravelTimeCalculator;
 
 
 /**
@@ -213,26 +215,29 @@ public class EventControler extends Controler{
 		
 		
 		// Dijkstra for Replanning
-		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
-		KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
+//		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
+//		KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
 		
 		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
 //		TravelTimeDistanceCostCalculator travelCost = new TravelTimeDistanceCostCalculator(travelTime);
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
+//		TravelTime travelTime = new FreeSpeedTravelTimeCalculator();
 		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
-//		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
+		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
+		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 	
 		// Use the Wrapper with the same CostCalculator as the MobSim uses
 		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
 
 		// Don't use Knowledge for CostCalculations
-		
-//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
-//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
-		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
+		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTimeWrapper);
+		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper);
+
+//		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
+//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		dijkstraRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
 		

@@ -43,10 +43,10 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * created.
 	 */
 
-
 	private QueueNetwork queueNetwork;
 
-	private static final Logger log = Logger.getLogger(LinkVehiclesCounter.class);
+	private static final Logger log = Logger
+			.getLogger(LinkVehiclesCounter.class);
 
 	// cyclical Status information - adapted from QueueSimulation
 	protected static final int INFO_PERIOD = 3600;
@@ -57,22 +57,23 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	// Map<Id, Integer> transitVehicleStopQueueMap; // maybe later...
 	Map<Id, Integer> bufferMap;
 
+	// List of Links where the number of Cars has changed (and maybe changed back again...)
 	Map<Id, Integer> countChangedMap; // LinkId, CarCount driving on the Link
+	
 	Map<Id, Integer> previousCountsMap; // Counts from the previous TimeStep
 
 	int lostVehicles = 0;
 	int initialVehicleCount;
 
-	public void setQueueNetwork(QueueNetwork queueNetwork)
-	{
+	public void setQueueNetwork(QueueNetwork queueNetwork) {
 		this.queueNetwork = queueNetwork;
-		
+
 		// Doing this will create the Maps and fill them with "0" Entries.
 		createInitialCounts();
 	}
-	
+
 	private void createInitialCounts() {
-		
+
 		// initialize the Data Structures
 		parkingMap = new HashMap<Id, Integer>();
 		waitingMap = new HashMap<Id, Integer>();
@@ -99,7 +100,6 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	
 	public void handleEvent(BasicLinkEnterEvent event) {
 		// log.info("BasicLinkEnterEvent");
 
@@ -115,7 +115,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 
 	public void handleEvent(BasicLinkLeaveEvent event) {
 		// log.info("BasicLinkLeaveEvent");
-		
+
 		Id id = event.getLinkId();
 
 		int vehCount;
@@ -144,44 +144,39 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	}
 
 	/*
-	 * Structure of this method: Have a look at QueueSimulation.agentDeparts()...
+	 * Structure of this method: Have a look at
+	 * QueueSimulation.agentDeparts()...
 	 */
 	public void handleEvent(BasicAgentDepartureEvent event) {
 		// log.info("BasicAgentDepartureEvent");
 
-		//Handling depends on the Route of the Agent		
-		LegImpl leg = ((AgentDepartureEvent)event).getLeg();
-		LinkImpl link = queueNetwork.getNetworkLayer().getLink(event.getLinkId());
-		
-		if(leg.getMode().equals(TransportMode.car))
-		{
+		// Handling depends on the Route of the Agent
+		LegImpl leg = ((AgentDepartureEvent) event).getLeg();
+		LinkImpl link = queueNetwork.getNetworkLayer().getLink(
+				event.getLinkId());
+
+		if (leg.getMode().equals(TransportMode.car)) {
 			Id id = event.getLinkId();
-			
+
 			int vehCount;
 			vehCount = parkingMap.get(id);
 			vehCount--;
 			parkingMap.put(id, vehCount);
-			
+
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
-			if (route.getEndLink() == link) 
-			{
+			if (route.getEndLink() == link) {
 				// nothing to do here...
-			} 
-			else 
-			{	
+			} else {
 				vehCount = waitingMap.get(id);
 				vehCount++;
 				waitingMap.put(id, vehCount);
-	
+
 				countChangedMap.put(id, vehCount);
 			}
-		}
-		else
-		{
+		} else {
 			log.error("Unknown Leg Mode!");
 		}
 	}
-
 
 	public void handleEvent(BasicAgentWait2LinkEvent event) {
 		// log.info("BasicAgentWait2LinkEvent");
@@ -198,7 +193,6 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		bufferMap.put(id, vehCount);
 	}
 
-	
 	public void handleEvent(BasicAgentStuckEvent event) {
 		// log.info("BasicAgentStuckEvent");
 
@@ -210,82 +204,61 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	}
 
 	/*
-	 * Looks like that there is a small Error in the counting of the VehQueue Map
-	 * (and only in this Map what is quite strange because i have no idea how this is possible)
+	 * Looks like that there is a small Error in the counting of the VehQueue
+	 * Map (and only in this Map what is quite strange because i have no idea
+	 * how this is possible)
 	 * 
-	 * To use this method, some getters have to be added to the  QueueLink Class!
+	 * To use this method, some getters have to be added to the QueueLink Class!
 	 */
-/*
-	private void checkVehicleCount(QueueSimulationAfterSimStepEvent e) {
-		int parking = 0;
-		int waiting = 0;
-		int inQueue = 0;
-		int inBuffer = 0;
+	/*
+	 * private void checkVehicleCount(QueueSimulationAfterSimStepEvent e) { int
+	 * parking = 0; int waiting = 0; int inQueue = 0; int inBuffer = 0;
+	 * 
+	 * for (int count : parkingMap.values()) parking = parking + count; for (int
+	 * count : waitingMap.values()) waiting = waiting + count; for (int count :
+	 * vehQueueMap.values()) inQueue = inQueue + count; for (int count :
+	 * bufferMap.values()) inBuffer = inBuffer + count;
+	 * 
+	 * int countDiff = initialVehicleCount - this.lostVehicles - parking -
+	 * waiting - inQueue - inBuffer; if (countDiff != 0) {
+	 * Log.error(e.getSimulationTime() +
+	 * " Wrong number of vehicles in the Simulation - probably missed some Events! Difference: "
+	 * + countDiff); }
+	 * 
+	 * if (e.getSimulationTime() >= infoTime) { infoTime += INFO_PERIOD;
+	 * log.info("SIMULATION AT " + Time.writeTime(e.getSimulationTime()) +
+	 * " checking parking Vehicles Counts"); }
+	 * 
+	 * for (QueueLink queueLink : queueNetwork.getLinks().values()) { Id id =
+	 * queueLink.getLink().getId();
+	 * 
+	 * int inBufferCount = queueLink.getVehiclesInBuffer().size(); int
+	 * myInBufferCount = bufferMap.get(id); if (inBufferCount !=
+	 * myInBufferCount) { int diff = inBufferCount - myInBufferCount;
+	 * bufferMap.put(id, inBufferCount);
+	 * 
+	 * int myVehQueueCount = vehQueueMap.get(queueLink.getLink().getId());
+	 * vehQueueMap.put(id, myVehQueueCount - diff); }
+	 * 
+	 * if (Simulation.getLost() != lostVehicles) { log.error("Wrong LostCount");
+	 * log.error("Expected: " + Simulation.getLost() + ", Found: " +
+	 * lostVehicles); } if (queueLink.parkingCount() != parkingMap.get(id)) {
+	 * log.error("Wrong ParkingCount on Link " + id); log.error("Expected: " +
+	 * queueLink.parkingCount() + ", Found: " + parkingMap.get(id)); } if
+	 * (queueLink.bufferCount() != bufferMap.get(id)) {
+	 * log.error("Wrong BufferCount on Link " + id); log.error("Expected: " +
+	 * queueLink.bufferCount() + ", Found: " + bufferMap.get(id)); } if
+	 * (queueLink.vehQueueCount() != vehQueueMap.get(id)) {
+	 * log.error("Wrong VehicleQueueCount on Link " + id);
+	 * log.error("Expected: " + queueLink.vehQueueCount() + ", Found: " +
+	 * vehQueueMap.get(id)); } if (queueLink.waitingCount() !=
+	 * waitingMap.get(id)) { log.error("Wrong WaitingCount on Link " + id);
+	 * log.error("Expected: " + queueLink.waitingCount() + ", Found: " +
+	 * waitingMap.get(id)); }
+	 * 
+	 * } }
+	 */
 
-		for (int count : parkingMap.values())
-			parking = parking + count;
-		for (int count : waitingMap.values())
-			waiting = waiting + count;
-		for (int count : vehQueueMap.values())
-			inQueue = inQueue + count;
-		for (int count : bufferMap.values())
-			inBuffer = inBuffer + count;
-
-		int countDiff = initialVehicleCount - this.lostVehicles - parking - waiting - inQueue - inBuffer;
-		if (countDiff != 0) {
-			Log.error(e.getSimulationTime() + " Wrong number of vehicles in the Simulation - probably missed some Events! Difference: "	+ countDiff);
-		}
-
-		if (e.getSimulationTime() >= infoTime) {
-			infoTime += INFO_PERIOD;
-			log.info("SIMULATION AT " + Time.writeTime(e.getSimulationTime()) + " checking parking Vehicles Counts");			 
-		}
-
-		for (QueueLink queueLink : queueNetwork.getLinks().values()) 
-		{
-			Id id = queueLink.getLink().getId();
-			
-			int inBufferCount = queueLink.getVehiclesInBuffer().size();
-			int myInBufferCount = bufferMap.get(id);
-			if (inBufferCount != myInBufferCount)
-			{
-				int diff = inBufferCount - myInBufferCount;
-				bufferMap.put(id, inBufferCount);
-				
-				int myVehQueueCount = vehQueueMap.get(queueLink.getLink().getId());
-				vehQueueMap.put(id, myVehQueueCount - diff);
-			}
-			
-			if (Simulation.getLost() != lostVehicles) 
-			{
-				log.error("Wrong LostCount");
-				log.error("Expected: " + Simulation.getLost() + ", Found: " + lostVehicles);
-			}
-			if (queueLink.parkingCount() != parkingMap.get(id)) 
-			{
-				log.error("Wrong ParkingCount on Link " + id);
-				log.error("Expected: " + queueLink.parkingCount() + ", Found: " + parkingMap.get(id));
-			}
-			if (queueLink.bufferCount() != bufferMap.get(id)) 
-			{
-				log.error("Wrong BufferCount on Link " + id);
-				log.error("Expected: " + queueLink.bufferCount() + ", Found: " + bufferMap.get(id));
-			}
-			if (queueLink.vehQueueCount() != vehQueueMap.get(id)) 
-			{
-				log.error("Wrong VehicleQueueCount on Link " + id);
-				log.error("Expected: " + queueLink.vehQueueCount() + ", Found: " + vehQueueMap.get(id));
-			}
-			if (queueLink.waitingCount() != waitingMap.get(id)) 
-			{
-				log.error("Wrong WaitingCount on Link " + id);
-				log.error("Expected: " + queueLink.waitingCount() + ", Found: " + waitingMap.get(id));
-			}
-			
-		}
-	}
-*/
-	
 	/*
 	 * Remove Link from Map, if VehicleCount has not changed or has changed more
 	 * often, so that in the end its the same as in the beginning.
@@ -294,9 +267,10 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * would be faster to recalculate the TravelTimes for all Links in the Map
 	 * without check.
 	 */
-	private synchronized void filterChangedLinks() {
-		for (Iterator<Id> iterator = countChangedMap.keySet().iterator(); iterator
-				.hasNext();) {
+	private synchronized void filterChangedLinks() 
+	{
+		for (Iterator<Id> iterator = countChangedMap.keySet().iterator(); iterator.hasNext();)
+		{
 			Id id = iterator.next();
 			if (countChangedMap.get(id) == previousCountsMap.get(id))
 				iterator.remove();
@@ -310,17 +284,18 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	/*
 	 * Returns a Map<LinkId, driving Vehicles on the Link>. The Map contains
 	 * only those Links, where the number of Vehicles has changed within in the
-	 * current TimeStep of the QueueSimulation. If all Links are needed, use
-	 * getLinkVehicleCounts().
+	 * current TimeStep of the QueueSimulation. If all Links are needed, create 
+	 * Method like getLinkVehicleCounts().
 	 */
-	public synchronized Map<Id, Integer> getChangedLinkVehiclesCounts() {
+	public Map<Id, Integer> getChangedLinkVehiclesCounts()
+	{
 		return previousCountsMap;
 	}
 
 	/*
 	 * Returns the number of Vehicles, that are driving on the Link.
 	 */
-	public synchronized int getLinkDrivingVehiclesCount(Id id) {
+	public int getLinkDrivingVehiclesCount(Id id) {
 		int count = 0;
 
 		count = count + waitingMap.get(id);
@@ -330,18 +305,16 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		return count;
 	}
 
-	
-	public synchronized void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
-//		checkVehicleCount(e);
+	public synchronized void notifySimulationAfterSimStep(
+			QueueSimulationAfterSimStepEvent e) {
+		// checkVehicleCount(e);
 		filterChangedLinks();
 	}
 
-	
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
 		createInitialCounts();
 	}
 
-	
 	public void reset(int iteration) {
 		createInitialCounts();
 	}

@@ -126,9 +126,12 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 //		Insert Into MapKnowledge SET NodeId='2', PersonId='12'
 		String query = "INSERT INTO " + tableName + " SET PersonId='"+ person.getId() + "', WhiteList=" + isWhiteList + ", NodeIds='" + nodesString + "'";
 		
-		dbConnectionTool.connect();
-		dbConnectionTool.executeUpdate(query);
-		dbConnectionTool.disconnect();
+		synchronized(dbConnectionTool)
+		{
+			dbConnectionTool.connect();
+			dbConnectionTool.executeUpdate(query);
+			dbConnectionTool.disconnect();
+		}
 	}
 
 	
@@ -145,9 +148,12 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		{			
 			String clearTable = "DELETE FROM " + tableName;
 			
-			dbConnectionTool.connect();
-			dbConnectionTool.executeUpdate(clearTable);
-			dbConnectionTool.disconnect();
+			synchronized(dbConnectionTool)
+			{
+				dbConnectionTool.connect();
+				dbConnectionTool.executeUpdate(clearTable);
+				dbConnectionTool.disconnect();
+			}
 		}
 	}
 	
@@ -163,9 +169,12 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		{
 //			DBConnectionTool dbConnectionTool = new DBConnectionTool();
 			
-			dbConnectionTool.connect();
-			dbConnectionTool.executeUpdate(createTable);
-			dbConnectionTool.disconnect();
+			synchronized(dbConnectionTool)
+			{
+				dbConnectionTool.connect();
+				dbConnectionTool.executeUpdate(createTable);
+				dbConnectionTool.disconnect();
+			}
 		}
 	
      /*       
@@ -191,33 +200,35 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	{
 		String tableExists = "SHOW TABLES LIKE '" + tableName + "'";
 		
-		dbConnectionTool.connect();
-		ResultSet rs = dbConnectionTool.executeQuery(tableExists);
-		
-		try 
-		{	
-			// If the Table doesn't exist -> create it.
-			if (rs.next()) return true;
-		} 
-		catch (SQLException e)
-		{		
-			e.printStackTrace();
+		synchronized(dbConnectionTool)
+		{
+			dbConnectionTool.connect();
+			ResultSet rs = dbConnectionTool.executeQuery(tableExists);
+			
+			try 
+			{	
+				// If the Table doesn't exist -> create it.
+				if (rs.next()) return true;
+			} 
+			catch (SQLException e)
+			{		
+				e.printStackTrace();
+			}
+			dbConnectionTool.disconnect();
 		}
-		dbConnectionTool.disconnect();
-		
 		return false;
 	}
 	
 	private String createNodesString(Map<Id, NodeImpl> nodes)
 	{
 		// if no Nodes are known -> just return a separator
-		if (nodes.values().size() == 0) return this.separator;
+		if (nodes.values().size() == 0) return separator;
 		
 		String string = "";
 		
 		for (Node node : nodes.values())
 		{
-			string = string + node.getId() + this.separator;
+			string = string + node.getId() + separator;
 		}
 			
 		return string;

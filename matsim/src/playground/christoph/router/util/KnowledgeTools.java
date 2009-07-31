@@ -42,7 +42,7 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public synchronized Map<Id, NodeImpl> getKnownNodes(PersonImpl person)
+	public Map<Id, NodeImpl> getKnownNodes(PersonImpl person)
 	{
 		Map<Id, NodeImpl> knownNodesMap = null;
 		
@@ -73,7 +73,7 @@ public class KnowledgeTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public synchronized NodeKnowledge getNodeKnowledge(PersonImpl person)
+	public NodeKnowledge getNodeKnowledge(PersonImpl person)
 	{
 		NodeKnowledge nodeKnowledge = null;
 		
@@ -103,7 +103,7 @@ public class KnowledgeTools {
 	 * Returns only those links, where Start- and Endnode are contained in the Map.
 	 * If no Nodes are known, all links are returned.
 	 */
-	public synchronized Link[] getKnownLinks(Link[] links, Map<Id, NodeImpl> knownNodesMap)
+	public Link[] getKnownLinks(Link[] links, Map<Id, NodeImpl> knownNodesMap)
 	{	
 		// If the current Person has knowledge about known Nodes (Map exists and has Elements)
 		if((knownNodesMap != null) && (knownNodesMap.size() != 0))

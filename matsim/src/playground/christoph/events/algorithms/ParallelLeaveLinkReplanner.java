@@ -49,7 +49,8 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	 */
 	//public static void run(ArrayList<QueueNode> currentNodes, ArrayList<QueueVehicle> vehicles, double time)
 	public void run(ArrayList<QueueVehicle> vehicles, double time)
-	{			
+	{	
+//		log.info("Start Replanning");
 		// distribute workload between threads
 		// as long as threads are waiting we don't need synchronized data structures
 		for(int i = 0; i < vehicles.size(); i++)
@@ -81,6 +82,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		{
 			Gbl.errorMsg(e);
 		}
+//		log.info("done");
 	}
 	
 	public static void init()
@@ -179,6 +181,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			{
 				try
 				{
+//					log.info("Thread " + threadId + " done");
 					/*
 					 * thradLocker.decCounter() and wait() have to be
 					 * executed in a synchronized block! Otherwise it could
@@ -191,7 +194,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 						threadLocker.decCounter();
 						wait();
 					}
-
+//					log.info("Thread " + threadId + " started");
 					//log.info("Runnning: " + time);
 
 					int numRuns = 0;

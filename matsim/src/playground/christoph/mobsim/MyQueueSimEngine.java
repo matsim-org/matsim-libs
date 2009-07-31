@@ -173,8 +173,10 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	protected void simStep(final double time)
 	{
 		// Do Replanning if active...
+//		log.info("Do LeaveLinkReplanning...");
 		if (leaveLinkReplanning) leaveLinkReplanning(time);
-	
+//		log.info("done");
+		
 /* 
  * If using ActivityEndsList from the QueueSimulation, the Replanning has to be started 
  * from the ReplanningQueueSimulation because doing it from here would be already to late.

@@ -9,34 +9,60 @@ import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
+import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 
 public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	
-	protected TravelCost travelCostcalculator;
+	protected TravelCost travelCostCalculator;
 	protected Map<Link, Double> linkTravelCosts;
 	protected boolean useLookupTable = true;
-	protected boolean updateLookupTable = false;
+	protected double lastUpdate = Time.UNDEFINED_TIME; 
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
 	public KnowledgeTravelCostWrapper(TravelCost travelCost)
 	{
-		this.travelCostcalculator = travelCost;
+		this.travelCostCalculator = travelCost;
+		
+		LinkIdComparator linkComparator = new LinkIdComparator();
+		linkTravelCosts = new TreeMap<Link, Double>(linkComparator);
 	}
 	
 	public void setTravelCostCalculator(TravelCost travelCost)
 	{
-		this.travelCostcalculator = travelCost;
+		this.travelCostCalculator = travelCost;
 	}
 	
 	public TravelCost getTravelCostCalculator()
 	{
-		return this.travelCostcalculator;
+		return this.travelCostCalculator;
+	}
+	
+	@Override
+	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
+	{
+		super.setMyQueueNetwork(myQueueNetwork);
+		if (travelCostCalculator instanceof KnowledgeTravelCost)
+		{
+			((KnowledgeTravelCost)travelCostCalculator).setMyQueueNetwork(myQueueNetwork);
+		}
+	}
+
+	@Override
+	public void setPerson(PersonImpl person)
+	{
+		super.setPerson(person);
+		if (travelCostCalculator instanceof KnowledgeTravelCost)
+		{
+			((KnowledgeTravelCost)travelCostCalculator).setPerson(person);
+		}
 	}
 	
 	public double getLinkTravelCost(final Link link, final double time) 
@@ -55,50 +81,64 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 //			log.info("Link is part of the Persons knowledge!");
 			if(useLookupTable)
 			{
-				if (linkTravelCosts == null) createLookupTable(time);
-			
-				if (updateLookupTable) updateLookupTable(time);
-				
 				return linkTravelCosts.get(link);
 			}
-			else return travelCostcalculator.getLinkTravelCost(link, time);
+			else 
+			{
+//				log.info("Get Costs from TravelCostCalculator");
+				return travelCostCalculator.getLinkTravelCost(link, time);
+			}
 		}
 	}
-	
 
 	private void createLookupTable(double time)
 	{
-//		log.info("Creating LookupTable fuer LinkTravelTimes. Time = " + time);
-		LinkIdComparator linkComparator = new LinkIdComparator();
-		linkTravelCosts = new TreeMap<Link, Double>(linkComparator);
+//		log.info("Creating LookupTable for LinkTravelTimes. Time: " + time);
+		resetLookupTable();
 		
 		for (QueueLink queueLink : myQueueNetwork.getLinks().values())
 		{
 			LinkImpl link = queueLink.getLink();
-			linkTravelCosts.put(link, travelCostcalculator.getLinkTravelCost(link, time));
+			linkTravelCosts.put(link, travelCostCalculator.getLinkTravelCost(link, time));
 		}
+//		log.info("Done");
 	}
 	
-	private void updateLookupTable(double time)
+	public void updateLookupTable(double time)
 	{
-		Map<Id, Integer> links2Update = this.myQueueNetwork.getLinkVehiclesCounter().getChangedLinkVehiclesCounts();
-		
-		for (Id id : links2Update.keySet())
+		if (useLookupTable)
 		{
-			LinkImpl link = this.myQueueNetwork.getNetworkLayer().getLink(id);
-			linkTravelCosts.put(link, travelCostcalculator.getLinkTravelCost(link, time));
+			if (lastUpdate != time)
+			{
+				// executed only initially
+				if (linkTravelCosts.size() == 0) createLookupTable(time);
+				
+				// Reset Person so that their Knowledge can't be used
+				this.setPerson(null);
+				
+//				log.info("Updating LookupTable for LinkTravelTimes. Time: " + time);
+				Map<Id, Integer> links2Update = this.myQueueNetwork.getLinkVehiclesCounter().getChangedLinkVehiclesCounts();
+			
+				for (Id id : links2Update.keySet())
+				{
+					LinkImpl link = this.myQueueNetwork.getNetworkLayer().getLink(id);
+					linkTravelCosts.put(link, travelCostCalculator.getLinkTravelCost(link, time));
+				}
+				lastUpdate = time;
+			}
+//			else
+//			{
+//				log.error("Duplicated LookupTable Update requested... skipped it!");
+//			}
+//			log.info("Done");
 		}
 	}
-	
-	public void updateLookupTable()
-	{
-		updateLookupTable = true;
-	}
+
 	
 	public void resetLookupTable()
 	{
 //		log.info("Resetting LookupTable");
-		linkTravelCosts = null;
+		linkTravelCosts.clear();
 	}
 	
 
@@ -107,18 +147,20 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	{
 		TravelCost travelCostCalculatorClone;
 		
-		if(this.travelCostcalculator instanceof KnowledgeTravelCost)
+		if(this.travelCostCalculator instanceof KnowledgeTravelCost)
 		{
-			travelCostCalculatorClone = ((KnowledgeTravelCost)this.travelCostcalculator).clone();
+			travelCostCalculatorClone = ((KnowledgeTravelCost)this.travelCostCalculator).clone();
 		}
 		else
 		{
 			log.error("Could not clone the CostCalculator - use reference to the existing Calculator and hope the best...");
-			travelCostCalculatorClone = this.travelCostcalculator;
+			travelCostCalculatorClone = this.travelCostCalculator;
 		}
 		
 		KnowledgeTravelCostWrapper clone = new KnowledgeTravelCostWrapper(travelCostCalculatorClone);
-
+		clone.useLookupTable = this.useLookupTable;
+		clone.linkTravelCosts = this.linkTravelCosts;
+		
 		return clone;
 	}
 
