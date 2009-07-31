@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -31,6 +32,7 @@ import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -50,18 +52,58 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	private final SwissHaltestellen haltestellen;
 	private final Layer municipalities;
 
-	public PlansCalcRouteKti(final NetworkLayer network, final PreProcessLandmarks preProcessData,
-			final TravelCost costCalculator, final TravelTime timeCalculator,
-			final Matrix ptTravelTimes, final SwissHaltestellen haltestellen, final Layer municipalities) {
+	public PlansCalcRouteKti(
+			final NetworkLayer network, 
+			final PreProcessLandmarks preProcessData,
+			final TravelCost costCalculator, 
+			final TravelTime timeCalculator,
+			final Matrix ptTravelTimes, 
+			final SwissHaltestellen haltestellen, 
+			final Layer municipalities) {
 		this(network, preProcessData, costCalculator, timeCalculator, new FreespeedTravelTimeCost(), ptTravelTimes, haltestellen, municipalities);
 	}
 
-	private PlansCalcRouteKti(final NetworkLayer network, final PreProcessLandmarks preProcessData,
-			final TravelCost costCalculator, final TravelTime timeCalculator,
+	private PlansCalcRouteKti(
+			final NetworkLayer network, 
+			final PreProcessLandmarks preProcessData,
+			final TravelCost costCalculator, 
+			final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost timeCostCalc,
-			final Matrix ptTravelTimes, final SwissHaltestellen haltestellen, final Layer municipalities) {
+			final Matrix ptTravelTimes, 
+			final SwissHaltestellen haltestellen, 
+			final Layer municipalities) {
 		super(network, new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
 				new AStarLandmarks(network, preProcessData, timeCostCalc, timeCostCalc));
+		this.network = network;
+		this.ptTravelTimes = ptTravelTimes;
+		this.haltestellen = haltestellen;
+		this.municipalities = municipalities;
+	}
+
+	/**
+	 * @deprecated
+	 * 
+	 * @param group
+	 * @param network
+	 * @param costCalculator
+	 * @param timeCalculator
+	 * @param factory
+	 * @param ptTravelTimes
+	 * @param haltestellen
+	 * @param municipalities
+	 * 
+	 * @author meisterk
+	 */
+	public PlansCalcRouteKti(
+			final PlansCalcRouteConfigGroup group,
+			final NetworkLayer network, 
+			final TravelCost costCalculator,
+			final TravelTime timeCalculator, 
+			final LeastCostPathCalculatorFactory factory,
+			final Matrix ptTravelTimes, 
+			final SwissHaltestellen haltestellen, 
+			final Layer municipalities) {
+		super(group, network, costCalculator, timeCalculator, factory);
 		this.network = network;
 		this.ptTravelTimes = ptTravelTimes;
 		this.haltestellen = haltestellen;

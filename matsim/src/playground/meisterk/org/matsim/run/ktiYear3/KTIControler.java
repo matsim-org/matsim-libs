@@ -103,6 +103,16 @@ public class KTIControler extends Controler {
 					ptRoutingInfo.getHaltestellen(),
 					municipalityLayer);
 
+//			router = new PlansCalcRouteKti(
+//			super.getConfig().plansCalcRoute(), 
+//			super.network, 
+//			travelCosts, 
+//			travelTimes, 
+//			super.getLeastCostPathCalculatorFactory(), 
+//			ptRoutingInfo.getPtTravelTimes(), 
+//			ptRoutingInfo.getHaltestellen(), 
+//			municipalityLayer);
+
 		}
 
 		return router;
