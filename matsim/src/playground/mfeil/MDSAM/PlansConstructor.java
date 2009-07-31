@@ -28,6 +28,8 @@ import playground.mfeil.ActChainEqualityCheck;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChains;
+import playground.mfeil.config.TimeModeChoicerConfigGroup;
+
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -37,11 +39,14 @@ import java.util.Iterator;
 import java.util.List;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
@@ -78,8 +83,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-		this.inputFile = "./plans/input_plans2.xml";	
-		this.outputFile = "./plans/output_plans.xml.gz";	
+		this.inputFile = "/home/baug/mfeil/data/mz/plans.xml";	
+		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.population = new PopulationImpl();
 		this.network = controler.getNetwork();
 		this.init(network);	
@@ -131,7 +136,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(ranking.size()-2)){
+			if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
 					PlanImpl plan = iterator.next();
@@ -181,8 +186,22 @@ public class PlansConstructor implements PlanStrategyModule{
 					}
 					plan.getFirstActivity().setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
 					plan.getLastActivity().setCoord(person.getSelectedPlan().getLastActivity().getCoord());
-					//this.locator.run(plan); // not necessary to have facilities
+					
 					this.linker.run(plan);
+					
+					/* Analysis of subtours and random allocation of modes to subtours */
+					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+					planAnalyzeSubtours.run(plan);
+					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
+						TransportMode[]	modes = TimeModeChoicerConfigGroup.getPossibleModes();
+						TransportMode mode = modes[(int)(MatsimRandom.getRandom().nextDouble()*modes.length)];
+						for (int k=1;k<plan.getPlanElements().size();k+=2){
+							if (planAnalyzeSubtours.getSubtourIndexation()[(k-1)/2]==j){
+								((LegImpl)plan.getPlanElements().get(k)).setMode(mode);
+							}
+						}
+					}
+					
 					this.router.run(plan);					
 					person.addPlan(plan);
 				}
