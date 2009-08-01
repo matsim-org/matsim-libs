@@ -1,5 +1,10 @@
 package playground.florian.ScoreStatsHandler;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -39,8 +44,13 @@ public class ScoreStatsOutput implements ShutdownListener{
 		}
 		out.writeFile(filename);
 		if (createChart){
-//			ScoreToChartTest.createChartFromXMLScore(filename);
+			JFreeChart chart = ScoreToChartTest.createChartFromXMLScore(filename);
+			try {
+				ChartUtilities.saveChartAsPNG(new File(filename + ".png"), chart, 800, 600);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}		
 	}
-	
 }
