@@ -37,7 +37,7 @@ public class ClusterActivities {
 	 * 		- KZN
 	 * 		- WesternCape
 	 */
-	private static String studyAreaName = "WesternCape";
+	private static String studyAreaName = "KZN";
 	/*
 	 * String value that must be set. Allowed activity types are:
 	 * 		- Minor
