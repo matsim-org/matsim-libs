@@ -46,9 +46,9 @@ public class ClusterActivities {
 	private static String activityType = "Minor";
 
 	// Set the home directory, depending on where the job is executed.
-	static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+//	static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
 //	static String root = "/home/jjoubert/";										// IVT-Sim0
-//	static String root = "/home/jjoubert/data/";								// Satawal
+	static String root = "/home/jjoubert/data/";								// Satawal
 
 	private final static Logger log = Logger.getLogger(ClusterActivities.class);
 	private static int radius = 100;
@@ -62,14 +62,14 @@ public class ClusterActivities {
 		log.info("Clustering activities for " + studyAreaName);
 		log.info("========================================================");
 		log.info("");
-//		String studyAreaShapefile = root + "Shapefiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
-//		MyShapefileReader msr = new MyShapefileReader(studyAreaShapefile);
-//		MultiPolygon studyArea = msr.readMultiPolygon();
+		String studyAreaShapefile = root + "Shapefiles/" + studyAreaName + "/" + studyAreaName + "_UTM35S.shp";
+		MyShapefileReader msr = new MyShapefileReader(studyAreaShapefile);
+		MultiPolygon studyArea = msr.readMultiPolygon();
 		
-//		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Locations.txt";
-		String activityFilename = root + "Gauteng/Activities/GautengMinorLocations_CityDeepSample.txt";
+		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Locations.txt";
+//		String activityFilename = root + "Gauteng/Activities/GautengMinorLocations_CityDeepSample.txt";
 		MyActivityReader ar = new MyActivityReader();
-		QuadTree<Point> studyAreaPoints = ar.readActivityPointsToQuadTree(activityFilename);
+		QuadTree<Point> studyAreaPoints = ar.readActivityPointsToQuadTree(activityFilename, studyArea);
 		
 		DJCluster djc = new DJCluster(radius, minPoints, studyAreaPoints);
 		djc.clusterInput();
