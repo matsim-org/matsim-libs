@@ -394,12 +394,12 @@ public class DJCluster {
 						log.info("Cluster " + c.getClusterId());
 					}
 					//TODO Fix contraction
-					Polygon nonConvexHull = contractPolygon(c, convexHull);
-					Polygon nonConvexHullBuffer = (Polygon) nonConvexHull.buffer(2);
+//					Polygon nonConvexHull = contractPolygon(c, convexHull);
+//					Polygon nonConvexHullBuffer = (Polygon) nonConvexHull.buffer(2);
 					
 					output_Polygon.write(c.getClusterId());
 					output_Polygon.newLine();
-					Coordinate [] boundary = nonConvexHullBuffer.getCoordinates();
+					Coordinate [] boundary = convexHullBuffer.getCoordinates();
 					for (Coordinate coordinate : boundary) {
 						output_Polygon.write(String.valueOf(coordinate.x));
 						output_Polygon.write(",");
