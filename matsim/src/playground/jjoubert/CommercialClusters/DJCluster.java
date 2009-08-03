@@ -353,7 +353,7 @@ public class DJCluster {
 			BufferedWriter output_Points = new BufferedWriter(new FileWriter(new File(pointFilename)));
 			BufferedWriter output_Clusters = new BufferedWriter(new FileWriter(new File(clusterFilename)));
 			BufferedWriter output_Lines = new BufferedWriter(new FileWriter(new File(lineFilename)));
-			BufferedWriter output_Polygon = new BufferedWriter(new FileWriter(new File(polygonFilename)));
+//			BufferedWriter output_Polygon = new BufferedWriter(new FileWriter(new File(polygonFilename)));
 			try{
 				// Write headers.
 				output_Points.write("ID,X,Y,ClusterID");
@@ -362,8 +362,8 @@ public class DJCluster {
 				output_Clusters.newLine();
 				output_Lines.write("ID");
 				output_Lines.newLine();
-				output_Polygon.write("ID");
-				output_Polygon.newLine();
+//				output_Polygon.write("ID");
+//				output_Polygon.newLine();
 				
 				for (Cluster c : this.getClusterList()) {
 					c.setCenterOfGravity();
@@ -379,35 +379,32 @@ public class DJCluster {
 					output_Clusters.newLine();
 					
 					// Write the cluser's polygon
-					ArrayList<Point> al = c.getPoints();
-					Coordinate[] ca = new Coordinate[ al.size()+1 ];
-					for(int i = 0; i < al.size(); i++){
-						ca[i] = new Coordinate(al.get(i).getX(), al.get(i).getY());
-					}
-					ca[ca.length-1] = ca[0];
+//					ArrayList<Point> al = c.getPoints();
+//					Coordinate[] ca = new Coordinate[ al.size()+1 ];
+//					for(int i = 0; i < al.size(); i++){
+//						ca[i] = new Coordinate(al.get(i).getX(), al.get(i).getY());
+//					}
+//					ca[ca.length-1] = ca[0];
 					
-					Geometry g = gf.createMultiPoint(ca);
-					Polygon convexHull = (Polygon) g.convexHull();
-					Polygon convexHullBuffer = (Polygon) convexHull.buffer(2);
+//					Geometry g = gf.createMultiPoint(ca);
+//					Polygon convexHull = (Polygon) g.convexHull();
+//					Polygon convexHullBuffer = (Polygon) convexHull.buffer(2);
 					
-					if(c.getClusterId().equalsIgnoreCase("41")){						
-						log.info("Cluster " + c.getClusterId());
-					}
 					//TODO Fix contraction
 //					Polygon nonConvexHull = contractPolygon(c, convexHull);
 //					Polygon nonConvexHullBuffer = (Polygon) nonConvexHull.buffer(2);
 					
-					output_Polygon.write(c.getClusterId());
-					output_Polygon.newLine();
-					Coordinate [] boundary = convexHullBuffer.getCoordinates();
-					for (Coordinate coordinate : boundary) {
-						output_Polygon.write(String.valueOf(coordinate.x));
-						output_Polygon.write(",");
-						output_Polygon.write(String.valueOf(coordinate.y));
-						output_Polygon.newLine();
-					}
-					output_Polygon.write("END");
-					output_Polygon.newLine();
+//					output_Polygon.write(c.getClusterId());
+//					output_Polygon.newLine();
+//					Coordinate [] boundary = convexHullBuffer.getCoordinates();
+//					for (Coordinate coordinate : boundary) {
+//						output_Polygon.write(String.valueOf(coordinate.x));
+//						output_Polygon.write(",");
+//						output_Polygon.write(String.valueOf(coordinate.y));
+//						output_Polygon.newLine();
+//					}
+//					output_Polygon.write("END");
+//					output_Polygon.newLine();
 					
 					for (Point p : c.getPoints()) {
 						// Write the point
@@ -453,8 +450,8 @@ public class DJCluster {
 				output_Clusters.close();
 				output_Lines.write("END");
 				output_Lines.close();
-				output_Polygon.write("END");
-				output_Polygon.close();
+//				output_Polygon.write("END");
+//				output_Polygon.close();
 			}
 			
 		} catch (IOException e) {

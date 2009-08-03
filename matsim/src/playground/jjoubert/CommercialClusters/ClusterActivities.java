@@ -73,10 +73,10 @@ public class ClusterActivities {
 		
 		DJCluster djc = new DJCluster(radius, minPoints, studyAreaPoints);
 		djc.clusterInput();
-		String pointFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "_" + radius + "_" + minPoints + ".txt";
-		String clusterFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "_" + radius + "_" + minPoints + ".txt";
-		String lineFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "_" + radius + "_" + minPoints + ".txt";
-		String polygonFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "_" + radius + "_" + minPoints + ".txt";
+		String pointFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Point_" + radius + "_" + minPoints + ".txt";
+		String clusterFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Cluster_" + radius + "_" + minPoints + ".txt";
+		String lineFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Line_" + radius + "_" + minPoints + ".txt";
+		String polygonFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Polygon_" + radius + "_" + minPoints + ".txt";
 		/*
 		 * For the City Deep sample, use the following filenames.
 		 */
