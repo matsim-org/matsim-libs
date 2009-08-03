@@ -10,9 +10,13 @@ import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 
 // this events processing relies on creating artifical events, intead of reading them
 /*
- * use 
+ * use for compiling:
  * make clean ; nice make run "MEMORY=-Xms1g -Xmx1g" "MAINCLASS=playground/wrashid/tryouts/performance/EventProcessing" ARGS="2 4"
  * (first parameter is numberOfThreads and Second parameter is numberOfHandlers)
+ * 
+ * use for running (without nice):
+ * make runonly "MEMORY=-Xms1g -Xmx1g" "MAINCLASS=playground/wrashid/tryouts/performance/EventProcessing" ARGS="2 4"
+ * 
  */
 public class EventProcessing {
 	public static void main(String[] args) {
