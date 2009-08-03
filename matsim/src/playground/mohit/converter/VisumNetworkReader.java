@@ -30,8 +30,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.mohit.converter.VisumNetwork;
-
 
 public class VisumNetworkReader {
 
@@ -41,7 +39,7 @@ public class VisumNetworkReader {
 
 	/** index for accessing the localized strings. */
 	private int language = 0;
-	
+
 	/* collection of localized strings: [0] english, [1] german */
 	private final String[] TABLE_STOP = {"$STOP:", "$HALTESTELLE:"};
 	private final String[] TABLE_STOPAREA = {"$STOPAREA:", "$HALTESTELLENBEREICH:"};
@@ -52,7 +50,10 @@ public class VisumNetworkReader {
 	private final String[] TABLE_TIMEPROFILE = {"$TIMEPROFILE:", "$FAHRZEITPROFIL:"};
 	private final String[] TABLE_TIMEPROFILEITEM = {"$TIMEPROFILEITEM:", "$FAHRZEITPROFILELEMENT:"};
 	private final String[] TABLE_VEHJOURNEY = {"$VEHJOURNEY:", "$FZGFAHRT:"};
-	
+	private final String[] TABLE_VEHUNIT = {"$VEHUNIT:", "$FZGEINHEIT:"};
+	private final String[] TABLE_VEHCOMB = {"$VEHCOMB:", "$FZGKOMB:"};
+	private final String[] TABLE_VEHUNITTIVEHCOMB = {"$VEHUNITTIVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
+
 	private final String[] ATTRIBUTE_STOP_NO = {"NO", "NR"};
 	private final String[] ATTRIBUTE_STOP_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_STOP_XCOORD = {"XCOORD", "XKOORD"};
@@ -60,49 +61,60 @@ public class VisumNetworkReader {
 
 	private final String[] ATTRIBUTE_STOPAREA_NO = {"NO", "NR"};
 	private final String[] ATTRIBUTE_STOPAREA_STOPNO = {"STOPNO", "HSTNR"};
-	
+
 	private final String[] ATTRIBUTE_STOPPT_NO = {"NO", "NR"};
 	private final String[] ATTRIBUTE_STOPPT_STOPAREANO = {"STOPAREANO", "HSTBERNR"};
 	private final String[] ATTRIBUTE_STOPPT_NAME =  {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_STOPPT_RLNO = {"LINKNO", "STRNR"};
-	
+
 	private final String[] ATTRIBUTE_LR_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_LR_LINENAME = {"LINENAME", "LINNAME"};
 	private final String[] ATTRIBUTE_LR_DCODE = {"DIRECTIONCODE", "RICHTUNGCODE"};
-	
+
 	private final String[] ATTRIBUTE_L_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_L_TCODE = {"TSYSCODE", "VSYSCODE"};
-	
+	private final String[] ATTRIBUTE_L_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
+
 	private final String[] ATTRIBUTE_LRI_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
 	private final String[] ATTRIBUTE_LRI_LNAME ={"LINENAME", "LINNAME"};
 	private final String[] ATTRIBUTE_LRI_ID ={"INDEX", "INDEX"};
 	private final String[] ATTRIBUTE_LRI_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
 	private final String[] ATTRIBUTE_LRI_SPNO = {"STOPPOINTNO", "HPUNKTNR"};
-	
+
 	private final String[] ATTRIBUTE_TP_LNAME ={"LINENAME", "LINNAME"};
 	private final String[] ATTRIBUTE_TP_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_TP_ID ={"NAME", "NAME"};	
+	private final String[] ATTRIBUTE_TP_ID ={"NAME", "NAME"};
 	private final String[] ATTRIBUTE_TP_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
-	
+	private final String[] ATTRIBUTE_TP_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
+
 	private final String[] ATTRIBUTE_TPI_LNAME ={"LINENAME", "LINNAME"};
 	private final String[] ATTRIBUTE_TPI_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_TPI_ID ={"INDEX", "INDEX"};	
+	private final String[] ATTRIBUTE_TPI_ID ={"INDEX", "INDEX"};
 	private final String[] ATTRIBUTE_TPI_TPNAME ={"TIMEPROFILENAME", "FZPROFILNAME"};
 	private final String[] ATTRIBUTE_TPI_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
 	private final String[] ATTRIBUTE_TPI_ARR ={"ARR", "ANKUNFT"};
 	private final String[] ATTRIBUTE_TPI_DEP ={"DEP", "ABFAHRT"};
 	private final String[] ATTRIBUTE_TPI_LRIINDEX ={"LRITEMINDEX", "LRELEMINDEX"};
-	
+
 	private final String[] ATTRIBUTE_D_LNAME ={"LINENAME", "LINNAME"};
 	private final String[] ATTRIBUTE_D_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_D_ID ={"NO", "NR"};	
-	private final String[] ATTRIBUTE_D_TPNAME ={"TIMEPROFILENAME", "FZPROFILNAME"};	
-	private final String[] ATTRIBUTE_D_DEP ={"DEP", "ABFAHRT"};	
-	private final String[] ATTRIBUTE_D_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};	
-	
-	
-	
-	
+	private final String[] ATTRIBUTE_D_ID ={"NO", "NR"};
+	private final String[] ATTRIBUTE_D_TPNAME ={"TIMEPROFILENAME", "FZPROFILNAME"};
+	private final String[] ATTRIBUTE_D_DEP ={"DEP", "ABFAHRT"};
+	private final String[] ATTRIBUTE_D_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
+
+	private final String[] ATTRIBUTE_VEHUNIT_ID = {"NO", "NR"};
+	private final String[] ATTRIBUTE_VEHUNIT_CODE = {"CODE", "CODE"};
+	private final String[] ATTRIBUTE_VEHUNIT_SEATCAP = {"SEATCAP", "SITZPL"};
+	private final String[] ATTRIBUTE_VEHUNIT_TOTALCAP = {"TOTALCAP", "GESAMTPL"};
+
+	private final String[] ATTRIBUTE_VEHCOMB_NO = {"NO", "NR"};
+	private final String[] ATTRIBUTE_VEHCOMB_NAME = {"NAME", "NAME"};
+
+	private final String[] ATTRIBUTE_VEHUNITTOVEHCOMB_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
+	private final String[] ATTRIBUTE_VEHUNITTOVEHCOMB_VEHUNITNO = {"VEHUNITNO", "FZGEINHEITNR"};
+	private final String[] ATTRIBUTE_VEHUNITTOVEHCOMB_NUMVEHUNITS = {"NUMVEHUNITS", "ANZFZGEINH"};
+
 	public VisumNetworkReader(final VisumNetwork network) {
 		this.network = network;
 	}
@@ -129,24 +141,30 @@ public class VisumNetworkReader {
 					// just a comment, ignore it
 				} else if (line.startsWith("$VERSION:")) {
 					readVersion(line, reader);
-				} else if (line.startsWith(TABLE_STOP[language])) {
+				} else if (line.startsWith(this.TABLE_STOP[this.language])) {
 					readStops(line, reader);
-				} else if (line.startsWith(TABLE_STOPAREA[language])) {
+				} else if (line.startsWith(this.TABLE_STOPAREA[this.language])) {
 					readStopAreas(line, reader);
-				} else if (line.startsWith(TABLE_STOPPOINT[language])) {
+				} else if (line.startsWith(this.TABLE_STOPPOINT[this.language])) {
 					readStopPoints(line, reader);
-				} else if (line.startsWith(TABLE_LINE[language])) {
+				} else if (line.startsWith(this.TABLE_LINE[this.language])) {
 					readLines(line, reader);
-				} else if (line.startsWith(TABLE_LINEROUTE[language])) {
+				} else if (line.startsWith(this.TABLE_LINEROUTE[this.language])) {
 					readLineRoutes(line, reader);
-				} else if (line.startsWith(TABLE_LINEROUTEITEM[language])) {
+				} else if (line.startsWith(this.TABLE_LINEROUTEITEM[this.language])) {
 					readLineRouteItems(line, reader);
-				} else if (line.startsWith(TABLE_TIMEPROFILE[language])) {
+				} else if (line.startsWith(this.TABLE_TIMEPROFILE[this.language])) {
 					readTimeProfile(line, reader);
-				} else if (line.startsWith(TABLE_TIMEPROFILEITEM[language])) {
+				} else if (line.startsWith(this.TABLE_TIMEPROFILEITEM[this.language])) {
 					readTimeProfileItems(line, reader);
-				} else if (line.startsWith(TABLE_VEHJOURNEY[language])) {
+				} else if (line.startsWith(this.TABLE_VEHJOURNEY[this.language])) {
 					readDepartures(line, reader);
+				} else if (line.startsWith(this.TABLE_VEHUNIT[this.language])) {
+					readVehicleUnits(line, reader);
+				} else if (line.startsWith(this.TABLE_VEHCOMB[this.language])) {
+					readVehicleCombinations(line, reader);
+				} else if (line.startsWith(this.TABLE_VEHUNITTIVEHCOMB[this.language])) {
+					readVehicleUnitToVehicleCombination(line, reader);
 				} else if (line.startsWith("$")) {
 					readUnknownTable(line, reader);
 				} else {
@@ -173,12 +191,12 @@ public class VisumNetworkReader {
 		}
 
 	}
-	
+
 
 	private void readVersion(final String tableAttributes, final BufferedReader reader) throws IOException {
 		final String[] attributes = StringUtils.explode(tableAttributes.substring("$VERSION:".length()), ';');
 		final int idxLanguage = getAttributeIndex("LANGUAGE", attributes);
-		
+
 		String line = reader.readLine();
 		final String[] parts = StringUtils.explode(line, ';');
 		if (parts[idxLanguage].equals("ENG")) {
@@ -193,11 +211,11 @@ public class VisumNetworkReader {
 	}
 
 	private void readStops(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_STOP[language].length()), ';');
-		final int idxNo = getAttributeIndex(ATTRIBUTE_STOP_NO[language], attributes);
-		final int idxName = getAttributeIndex(ATTRIBUTE_STOP_NAME[language], attributes);
-		final int idxXcoord = getAttributeIndex(ATTRIBUTE_STOP_XCOORD[language], attributes);
-		final int idxYcoord = getAttributeIndex(ATTRIBUTE_STOP_YCOORD[language], attributes);
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_STOP[this.language].length()), ';');
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_STOP_NO[this.language], attributes);
+		final int idxName = getAttributeIndex(this.ATTRIBUTE_STOP_NAME[this.language], attributes);
+		final int idxXcoord = getAttributeIndex(this.ATTRIBUTE_STOP_XCOORD[this.language], attributes);
+		final int idxYcoord = getAttributeIndex(this.ATTRIBUTE_STOP_YCOORD[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
@@ -209,11 +227,11 @@ public class VisumNetworkReader {
 			line = reader.readLine();
 		}
 	}
-	
+
 	private void readStopAreas(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_STOPAREA[language].length()), ';');
-		final int idxNo = getAttributeIndex(ATTRIBUTE_STOPAREA_NO[language], attributes);
-		final int idxStopId = getAttributeIndex(ATTRIBUTE_STOPAREA_STOPNO[language], attributes);
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_STOPAREA[this.language].length()), ';');
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_STOPAREA_NO[this.language], attributes);
+		final int idxStopId = getAttributeIndex(this.ATTRIBUTE_STOPAREA_STOPNO[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
@@ -225,11 +243,11 @@ public class VisumNetworkReader {
 		}
 	}
 	private void readStopPoints(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring( TABLE_STOPPOINT[language].length()), ';');
-		final int idxNo = getAttributeIndex(ATTRIBUTE_STOPPT_NO[language], attributes);
-		final int idxStopAreaNo = getAttributeIndex(ATTRIBUTE_STOPPT_STOPAREANO[language], attributes);
-		final int idxName = getAttributeIndex(ATTRIBUTE_STOPPT_NAME[language], attributes);
-		final int idxRLNo = getAttributeIndex(ATTRIBUTE_STOPPT_RLNO[language], attributes);
+		final String[] attributes = StringUtils.explode(tableAttributes.substring( this.TABLE_STOPPOINT[this.language].length()), ';');
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_STOPPT_NO[this.language], attributes);
+		final int idxStopAreaNo = getAttributeIndex(this.ATTRIBUTE_STOPPT_STOPAREANO[this.language], attributes);
+		final int idxName = getAttributeIndex(this.ATTRIBUTE_STOPPT_NAME[this.language], attributes);
+		final int idxRLNo = getAttributeIndex(this.ATTRIBUTE_STOPPT_RLNO[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
@@ -241,10 +259,10 @@ public class VisumNetworkReader {
 		}
 	}
 	private void readLineRoutes(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_LINEROUTE[language].length()), ';');
-		final int idxName = getAttributeIndex(ATTRIBUTE_LR_NAME[language], attributes);
-		final int idxLineName = getAttributeIndex(ATTRIBUTE_LR_LINENAME[language], attributes);
-		final int idxDCode = getAttributeIndex(ATTRIBUTE_LR_DCODE[language], attributes);
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_LINEROUTE[this.language].length()), ';');
+		final int idxName = getAttributeIndex(this.ATTRIBUTE_LR_NAME[this.language], attributes);
+		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_LR_LINENAME[this.language], attributes);
+		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_LR_DCODE[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
@@ -256,33 +274,33 @@ public class VisumNetworkReader {
 		}
 	}
 	private void readLines(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_LINE[language].length()), ';');
-		final int idxName = getAttributeIndex(ATTRIBUTE_L_NAME[language], attributes);
-		final int idxTCode = getAttributeIndex(ATTRIBUTE_L_TCODE[language], attributes);
-		
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_LINE[this.language].length()), ';');
+		final int idxName = getAttributeIndex(this.ATTRIBUTE_L_NAME[this.language], attributes);
+		final int idxTCode = getAttributeIndex(this.ATTRIBUTE_L_TCODE[this.language], attributes);
+		final int idxVehCombNo = getAttributeIndex(this.ATTRIBUTE_L_VEHCOMBNO[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-			VisumNetwork.TransitLine tLine = new VisumNetwork.TransitLine(new IdImpl(parts[idxName]),parts[idxTCode]);
+			VisumNetwork.TransitLine tLine = new VisumNetwork.TransitLine(new IdImpl(parts[idxName]),parts[idxTCode], parts[idxVehCombNo]);
 			this.network.addline(tLine);
 			// proceed to next line
 			line = reader.readLine();
 		}
 	}
 	private void readLineRouteItems(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_LINEROUTEITEM[language].length()), ';');
-		final int idxLineRouteName = getAttributeIndex(ATTRIBUTE_LRI_LRNAME[language], attributes);
-		final int idxLineName = getAttributeIndex(ATTRIBUTE_LRI_LNAME[language], attributes);
-		final int idxIndex = getAttributeIndex(ATTRIBUTE_LRI_ID[language], attributes);
-		final int idxDCode = getAttributeIndex(ATTRIBUTE_LRI_DCODE[language], attributes);
-		final int idxStopPointNo = getAttributeIndex(ATTRIBUTE_LRI_SPNO[language], attributes);
-	
-	
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_LINEROUTEITEM[this.language].length()), ';');
+		final int idxLineRouteName = getAttributeIndex(this.ATTRIBUTE_LRI_LRNAME[this.language], attributes);
+		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_LRI_LNAME[this.language], attributes);
+		final int idxIndex = getAttributeIndex(this.ATTRIBUTE_LRI_ID[this.language], attributes);
+		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_LRI_DCODE[this.language], attributes);
+		final int idxStopPointNo = getAttributeIndex(this.ATTRIBUTE_LRI_SPNO[this.language], attributes);
+
+
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-		
+
 			VisumNetwork.LineRouteItem lri1 = new VisumNetwork.LineRouteItem(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxDCode],new IdImpl(parts[idxStopPointNo]));
 			this.network.addLineRouteItem(lri1);
 			// proceed to next line
@@ -290,63 +308,120 @@ public class VisumNetworkReader {
 		}
 	}
 	private void readTimeProfile(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_TIMEPROFILE[language].length()), ';');
-		final int idxLineName = getAttributeIndex(ATTRIBUTE_TP_LNAME[language], attributes);
-		final int idxLineRouteName = getAttributeIndex(ATTRIBUTE_TP_LRNAME[language], attributes);
-		final int idxIndex = getAttributeIndex(ATTRIBUTE_TP_ID[language], attributes);
-		final int idxDCode = getAttributeIndex(ATTRIBUTE_TP_DCODE[language], attributes);
-		
-		
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_TIMEPROFILE[this.language].length()), ';');
+		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_TP_LNAME[this.language], attributes);
+		final int idxLineRouteName = getAttributeIndex(this.ATTRIBUTE_TP_LRNAME[this.language], attributes);
+		final int idxIndex = getAttributeIndex(this.ATTRIBUTE_TP_ID[this.language], attributes);
+		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_TP_DCODE[this.language], attributes);
+		final int idxVehCombNo = getAttributeIndex(this.ATTRIBUTE_TP_VEHCOMBNO[this.language], attributes);
+
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-		
-			VisumNetwork.TimeProfile tp1 = new VisumNetwork.TimeProfile(new IdImpl(parts[idxLineName]),new IdImpl(parts[idxLineRouteName]),new IdImpl(parts[idxIndex]),new IdImpl(parts[idxDCode]));
+
+			VisumNetwork.TimeProfile tp1 = new VisumNetwork.TimeProfile(new IdImpl(parts[idxLineName]),
+					new IdImpl(parts[idxLineRouteName]), new IdImpl(parts[idxIndex]), new IdImpl(parts[idxDCode]),
+					parts[idxVehCombNo]);
 			this.network.addTimeProfile(tp1);
 			// proceed to next line
 			line = reader.readLine();
 		}
 	}
 	private void readTimeProfileItems(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_TIMEPROFILEITEM[language].length()), ';');
-		final int idxLineRouteName = getAttributeIndex(ATTRIBUTE_TPI_LRNAME[language], attributes);
-		final int idxLineName = getAttributeIndex(ATTRIBUTE_TPI_LNAME[language], attributes);
-		final int idxTPName = getAttributeIndex(ATTRIBUTE_TPI_TPNAME[language], attributes);
-		final int idxDCode = getAttributeIndex(ATTRIBUTE_TPI_DCODE[language], attributes);
-		final int idxIndex = getAttributeIndex(ATTRIBUTE_TPI_ID[language], attributes);
-		final int idxArr = getAttributeIndex(ATTRIBUTE_TPI_ARR[language], attributes);
-		final int idxDep = getAttributeIndex(ATTRIBUTE_TPI_DEP[language], attributes);
-		final int idxLRIIndex = getAttributeIndex(ATTRIBUTE_TPI_LRIINDEX[language], attributes);
-		
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_TIMEPROFILEITEM[this.language].length()), ';');
+		final int idxLineRouteName = getAttributeIndex(this.ATTRIBUTE_TPI_LRNAME[this.language], attributes);
+		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_TPI_LNAME[this.language], attributes);
+		final int idxTPName = getAttributeIndex(this.ATTRIBUTE_TPI_TPNAME[this.language], attributes);
+		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_TPI_DCODE[this.language], attributes);
+		final int idxIndex = getAttributeIndex(this.ATTRIBUTE_TPI_ID[this.language], attributes);
+		final int idxArr = getAttributeIndex(this.ATTRIBUTE_TPI_ARR[this.language], attributes);
+		final int idxDep = getAttributeIndex(this.ATTRIBUTE_TPI_DEP[this.language], attributes);
+		final int idxLRIIndex = getAttributeIndex(this.ATTRIBUTE_TPI_LRIINDEX[this.language], attributes);
+
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-		
+
 			VisumNetwork.TimeProfileItem tpi1 = new VisumNetwork.TimeProfileItem(parts[idxLineName],parts[idxLineRouteName],parts[idxTPName],parts[idxDCode],parts[idxIndex],parts[idxArr],parts[idxDep],new IdImpl(parts[idxLRIIndex]));
 			this.network.addTimeProfileItem(tpi1);
 			// proceed to next line
 			line = reader.readLine();
 		}
 	}
+
 	private void readDepartures(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(TABLE_VEHJOURNEY[language].length()), ';');
-		final int idxLineRouteName = getAttributeIndex(ATTRIBUTE_D_LRNAME[language], attributes);
-		final int idxLineName = getAttributeIndex(ATTRIBUTE_D_LNAME[language], attributes);
-		final int idxIndex = getAttributeIndex(ATTRIBUTE_D_ID[language], attributes);
-		final int idxTRI = getAttributeIndex(ATTRIBUTE_D_TPNAME[language], attributes);
-		final int idxDep = getAttributeIndex(ATTRIBUTE_D_DEP[language], attributes);
-		final int idxDCode = getAttributeIndex(ATTRIBUTE_D_DCODE[language], attributes);
-		
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHJOURNEY[this.language].length()), ';');
+		final int idxLineRouteName = getAttributeIndex(this.ATTRIBUTE_D_LRNAME[this.language], attributes);
+		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_D_LNAME[this.language], attributes);
+		final int idxIndex = getAttributeIndex(this.ATTRIBUTE_D_ID[this.language], attributes);
+		final int idxTRI = getAttributeIndex(this.ATTRIBUTE_D_TPNAME[this.language], attributes);
+		final int idxDep = getAttributeIndex(this.ATTRIBUTE_D_DEP[this.language], attributes);
+		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_D_DCODE[this.language], attributes);
+
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-		
+
 			VisumNetwork.Departure d = new VisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxTRI],parts[idxDep],new IdImpl(parts[idxDCode]));
 			this.network.addDeparture(d);
 			// proceed to next line
 			line = reader.readLine();
 		}
 	}
+
+	private void readVehicleUnits(final String tableAttributes, final BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHUNIT[this.language].length()), ';');
+		final int idxId = getAttributeIndex(this.ATTRIBUTE_VEHUNIT_ID[this.language], attributes);
+		final int idxCode = getAttributeIndex(this.ATTRIBUTE_VEHUNIT_CODE[this.language], attributes);
+		final int idxSeatCap = getAttributeIndex(this.ATTRIBUTE_VEHUNIT_SEATCAP[this.language], attributes);
+		final int idxTotalCap = getAttributeIndex(this.ATTRIBUTE_VEHUNIT_TOTALCAP[this.language], attributes);
+
+		String line = reader.readLine();
+		while (line.length() > 0) {
+			final String[] parts = StringUtils.explode(line, ';');
+
+			VisumNetwork.VehicleUnit vehicleUnit = new VisumNetwork.VehicleUnit(parts[idxId], parts[idxCode],
+					Integer.parseInt(parts[idxSeatCap]), Integer.parseInt(parts[idxTotalCap]));
+			this.network.addVehicleUnit(vehicleUnit);
+			// proceed to next line
+			line = reader.readLine();
+		}
+	}
+
+	private void readVehicleCombinations(final String tableAttributes, final BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHCOMB[this.language].length()), ';');
+		final int idxId = getAttributeIndex(this.ATTRIBUTE_VEHCOMB_NO[this.language], attributes);
+		final int idxName = getAttributeIndex(this.ATTRIBUTE_VEHCOMB_NAME[this.language], attributes);
+
+		String line = reader.readLine();
+		while (line.length() > 0) {
+			final String[] parts = StringUtils.explode(line, ';');
+
+			VisumNetwork.VehicleCombination vehicleComb = new VisumNetwork.VehicleCombination(parts[idxId], parts[idxName]);
+			this.network.addVehicleCombination(vehicleComb);
+			// proceed to next line
+			line = reader.readLine();
+		}
+	}
+
+	private void readVehicleUnitToVehicleCombination(final String tableAttributes, final BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHUNITTIVEHCOMB[this.language].length()), ';');
+		final int idxVehicleUnit = getAttributeIndex(this.ATTRIBUTE_VEHUNITTOVEHCOMB_VEHUNITNO[this.language], attributes);
+		final int idxVehicleComb = getAttributeIndex(this.ATTRIBUTE_VEHUNITTOVEHCOMB_VEHCOMBNO[this.language], attributes);
+		final int idxVehicleNumber = getAttributeIndex(this.ATTRIBUTE_VEHUNITTOVEHCOMB_NUMVEHUNITS[this.language], attributes);
+
+		String line = reader.readLine();
+		while (line.length() > 0) {
+			final String[] parts = StringUtils.explode(line, ';');
+
+			VisumNetwork.VehicleCombination vehicleComb = this.network.vehicleCombinations.get(parts[idxVehicleComb]);
+			vehicleComb.vehUnitId = parts[idxVehicleUnit];
+			vehicleComb.numOfVehicles = Integer.parseInt(parts[idxVehicleNumber]);
+			// proceed to next line
+			line = reader.readLine();
+		}
+	}
+
 	private void readUnknownTable(final String tableAttributes, final BufferedReader reader) throws IOException {
 		String line = reader.readLine();
 		while (line.length() > 0) {

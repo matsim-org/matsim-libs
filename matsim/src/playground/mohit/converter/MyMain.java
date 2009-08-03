@@ -8,16 +8,18 @@ import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.BasicVehiclesImpl;
 public class MyMain {
 
 	private static final Logger log = Logger.getLogger(MyMain.class);
-	
+
 	/**
 	 * @param args
 	 */
 	public static void main(final String[] args) {
 		final VisumNetwork vNetwork = new VisumNetwork();
-		  
+
 		log.info("reading visum network");
 		try {
 			new playground.mohit.converter.VisumNetworkReader(vNetwork).read("/Volumes/Data/VSP/coding/eclipse35/thesis-data/networks/yalcin/ptzh_orig.net"); // yalcin
@@ -53,19 +55,20 @@ public class MyMain {
 //		System.out.println("Time Profile Items......." );
 //		for (TimeProfileItem tpi1 : vNetwork.timeProfileItems.values()) {
 //			System.out.println("> " + tpi1.lineRouteName +tpi1.timeProfileName+ "  " + tpi1.lineName+ "   " + tpi1.index + "   " + tpi1.arr+ "   " + tpi1.dep+ "   " + tpi1.lRIIndex );
-//		
+//
 //		}
 //		System.out.println("Departures....." );
 //		for (Departure d1 : vNetwork.departures.values()) {
 //			System.out.println("> " + d1.lineRouteName + "  " + d1.lineName + "   " + d1.index+ "   " + d1.TRI+ "   " + d1.dep);
-//			
+//
 //		}
-//		
+//
 		log.info("converting data");
+		BasicVehicles vehicles = new BasicVehiclesImpl();
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		new Visum2TransitSchedule(vNetwork, schedule).convert();
-		
+		new Visum2TransitSchedule(vNetwork, schedule, vehicles).convert();
+
 		try {
 			log.info("writing transit schedule.");
 			new TransitScheduleWriterV1(schedule).write("/Users/cello/Desktop/Mohit/zuerichSchedule.xml");

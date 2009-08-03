@@ -41,6 +41,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 import org.xml.sax.SAXException;
 
@@ -69,6 +70,7 @@ public class Application1 {
 
 	protected void prepareConfig() {
 		this.config.scenario().setUseTransit(true);
+		this.config.scenario().setUseVehicles(true);
 	}
 
 	protected void convertSchedule() {
@@ -78,9 +80,11 @@ public class Application1 {
 //			new VisumNetworkReader(vNetwork).read("/Volumes/Data/VSP/coding/eclipse35/thesis-data/networks/yalcin/ptzh_orig.net");
 			new VisumNetworkReader(vNetwork).read("/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/input/oev_modell.net");
 			log.info("converting visum data to TransitSchedule.");
-			new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule()).convert();
+			new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles()).convert();
 			log.info("writing TransitSchedule to file.");
-			new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write("../thesis-data/application/transitschedule.oevModell.xml");
+			new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write("../thesis-data/application/transitschedule.oevModellZH.xml");
+			log.info("writing vehicles to file.");
+			new VehicleWriterV1(this.scenario.getVehicles()).writeFile("../thesis-data/application/vehicles.oevModellZH.xml");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -89,7 +93,7 @@ public class Application1 {
 	protected void readSchedule() {
 		log.info("reading TransitSchedule from file.");
 		try {
-			new TransitScheduleReader(this.scenario).readFile("../thesis-data/application/transitSchedule.oevModell.xml");
+			new TransitScheduleReader(this.scenario).readFile("../thesis-data/application/transitSchedule.oevModellZH.xml");
 //			new TransitScheduleReader(this.scenario).readFile("../thesis-data/application/zuerichSchedule.xml");
 //			new TransitScheduleReader(this.scenario).readFile("../shared-svn/studies/schweiz-ivtch/pt-experimental/TransitSim/transitSchedule.xml");
 		} catch (IOException e) {
@@ -159,9 +163,9 @@ public class Application1 {
 	public static void main(final String[] args) {
 		Application1 app = new Application1();
 		app.prepareConfig();
-//		app.convertSchedule();
-		app.readSchedule(); // either convert, or read, but not both!
-		app.routePopulation();
+		app.convertSchedule();
+//		app.readSchedule(); // either convert, or read, but not both!
+//		app.routePopulation();
 //		app.visualizeRouterNetwork();
 
 		log.info("done.");
