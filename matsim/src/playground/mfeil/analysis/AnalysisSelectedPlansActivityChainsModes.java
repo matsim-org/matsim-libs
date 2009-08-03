@@ -47,21 +47,12 @@ import org.matsim.knowledges.Knowledges;
  */
 public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPlansActivityChains{
 
-	protected final PopulationImpl population;
-	protected String outputDir;
-	protected ArrayList<List<PlanElement>> activityChains;
-	protected ArrayList<ArrayList<PlanImpl>> plans;
-	protected Knowledges knowledges;
 	protected static final Logger log = Logger.getLogger(AnalysisSelectedPlansActivityChainsModes.class);
 	
 
 
 	public AnalysisSelectedPlansActivityChainsModes(final PopulationImpl population, Knowledges knowledges, final String outputDir) {
 		super (population, knowledges, outputDir);
-		this.population = population;
-		this.outputDir = outputDir;
-		this.knowledges = knowledges;
-		initAnalysis();
 	}
 	
 	protected boolean checkForEquality (PlanImpl plan, List<PlanElement> activityChain){
@@ -115,15 +106,15 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 	
 
 	public static void main(final String [] args) {
-//		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-//		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-//		final String populationFilename = "/home/baug/mfeil/data/mz/plans.xml";
-		final String populationFilename = "./plans/output_plans.xml.gz";
-		final String networkFilename = "./plans/network.xml";
-		final String facilitiesFilename = "./plans/facilities.xml.gz";
+		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
+		final String populationFilename = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
+//		final String populationFilename = "./plans/output_plans.xml.gz";
+//		final String networkFilename = "./plans/network.xml";
+//		final String facilitiesFilename = "./plans/facilities.xml.gz";
 
-//		final String outputDir = "/home/baug/mfeil/data/Zurich10";
-		final String outputDir = "./plans";
+		final String outputDir = "/home/baug/mfeil/data/mz";
+//		final String outputDir = "./plans";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
