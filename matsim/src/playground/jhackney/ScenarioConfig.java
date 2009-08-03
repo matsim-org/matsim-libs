@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.Events;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -55,8 +56,8 @@ public abstract class ScenarioConfig {
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
 
 	//For TRB run analyses of 500 iterations
-	private static final String output_directory = "D:/SocialNetsFolder/FixedEd/TRB1/timecorr/";
-	private static final String input_directory = "D:/SocialNetsFolder/FixedEd/TRB1/";
+	private static final String output_directory = "D:/SocialNetsFolder/HC/TRB7_HC/";
+	private static final String input_directory = "D:/SocialNetsFolder/HC/TRB7_HC/";
 	private static String configFileName;
 	private static String dtdFileName;
 //	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
@@ -68,8 +69,8 @@ public abstract class ScenarioConfig {
 //	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
 //	private static final String output_directory="D:/SocialNetsFolder/Battery/22_HC/timecorr/";//AnalyzeTimeCorrelation
 //	private static final String input_directory="D:/SocialNetsFolder/Battery/22_HC/";//AnalyzeTimeCorrelation
-	private static final String out2 = "1.out";
-	private static final String out1 = "AgentsAtActivities1.out";
+	private static final String out2 = "Nofile1.out";// 1.out
+	private static final String out1 = "Nofile2.out";//"AgentsAtActivities1.out";
 	private static String eventsFileName=null;
 	private static String worldFileName=null;
 	private static String netFileName=null;
@@ -96,8 +97,9 @@ public abstract class ScenarioConfig {
 
 	public static final void setUpScenarioConfig() {
 //		config = Gbl.createConfig(null);
+		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
 
-		configFileName = input_directory + "output_config.xml.gz";
+		configFileName = input_directory + "output_config.xml";
 		dtdFileName = "D:/eclipse_workspace/matsim/dtd/config_v1.dtd";
 		config.config().setOutputFile(output_directory + "output_config.xml");
 
@@ -121,7 +123,7 @@ public abstract class ScenarioConfig {
 		config.plans().setInputFile("output_plans.xml.gz");
 		popFileName="output_plans.xml.gz";
 //		config.plans().setInputFile("plans.xml.gz");//AnalyzeScores
-		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
+		config.plans().setOutputFile(output_directory + "new_output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
 
@@ -151,7 +153,52 @@ public abstract class ScenarioConfig {
 		config.getModule("kml21").addParam("outputEgoNetPlansKMLMainFile","egoNetKML" );
 		config.getModule("kml21").addParam("outputKMLDemoColoredLinkFile", "egoNetLinkColorFile");
 		config.getModule("kml21").addParam("useCompression", "true");
-
+		
+//		scoring.setBrainExpBeta(2.0);
+//		scoring.setLateArrival(-18.0);
+//		scoring.setEarlyDeparture(0.0);
+//		scoring.setPerforming(6.0);
+//		scoring.setTraveling(-6.0);
+//		scoring.setTravelingPt(-6.0);
+//		scoring.setMarginalUtlOfDistanceCar(0.0);
+//		scoring.setWaiting(0.0);
+//		scoring.setPathSizeLogitBeta(1.0);
+//
+//		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("home");
+//		params.setTypicalDuration(12.*3600);
+//		params.setMinimalDuration(8.*3600);
+//		scoring.addActivityParams(params);
+//		
+//		new CharyparNagelScoringConfigGroup.ActivityParams("work");
+//		params.setTypicalDuration(8.*3600);
+//		params.setMinimalDuration(6.*3600);
+//		params.setOpeningTime(7.*3600);
+//		params.setClosingTime(18.*3600);
+//		params.setLatestStartTime(9.*3600);
+//		scoring.addActivityParams(params);
+//
+//		params = new CharyparNagelScoringConfigGroup.ActivityParams("education");
+//		params.setTypicalDuration(6.*3600);
+//		params.setMinimalDuration(4.*3600);
+//		params.setOpeningTime(7.*3600);
+//		params.setLatestStartTime(9.*3600);
+//		params.setClosingTime(18.*3600);
+//		scoring.addActivityParams(params);
+//		
+//		params = new CharyparNagelScoringConfigGroup.ActivityParams("shop");
+//		params.setTypicalDuration(2.*3600);
+//		params.setMinimalDuration(1.*3600);
+//		params.setOpeningTime(8.*3600);
+//		params.setClosingTime(20.*3600);
+//		scoring.addActivityParams(params);
+//		
+//		params = new CharyparNagelScoringConfigGroup.ActivityParams("leisure");
+//		params.setTypicalDuration(2.*3600);
+//		params.setMinimalDuration(1.*3600);
+//		params.setOpeningTime(6.*3600);
+//		params.setClosingTime(24.*3600);
+//		scoring.addActivityParams(params);
+//		
 	}
 
 	//////////////////////////////////////////////////////////////////////

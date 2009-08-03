@@ -60,11 +60,13 @@ public abstract class Scenario {
 //	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
 //	private static final String input_directory="output/TRB6/";//AnalyzeScores
 
-//	private static final String output_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/timecorr/";
-//	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
-	private static final String thisrun = "3_HC_4";
-	private static final String output_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
-	private static final String input_directory="D:/SocialNetsFolder/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
+//	private static final String output_directory="D:/eclipse_workspace/matsim/output/TRB1_501_F2F/timecorr/";
+//	private static final String input_directory="D:/eclipse_workspace/matsim/output/TRB1_501_F2F/";
+
+	private static final String thisrun = "TRB1_HC";
+	private static final String output_directory="D:/SocialNetsFolder/HC/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
+	private static final String input_directory="D:/SocialNetsFolder/HC/"+thisrun+"/";//AnalyzeTimeCorrelation
+
 //	private static final String output_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/timecorr/";//AnalyzeTimeCorrelation
 //	private static final String input_directory="/data/matsim/jhackney/results/matsim/SNController4/"+thisrun+"/";//AnalyzeTimeCorrelation
 	private static final String out2 = thisrun+".out";
@@ -104,8 +106,8 @@ public abstract class Scenario {
 		config.matrices().setInputFile(input_directory + "matrices.xml");
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
-//		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
-		config.plans().setInputFile("output_plans.xml.gz");
+		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
+//		config.plans().setInputFile("output_plans.xml.gz");
 //		config.plans().setInputFile("plans.xml.gz");//AnalyzeScores
 		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
