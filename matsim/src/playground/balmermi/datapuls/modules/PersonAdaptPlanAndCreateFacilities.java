@@ -32,10 +32,12 @@ import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -72,9 +74,21 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 		if (person.getPlans().size() != 1) { throw new RuntimeException("Each person must have one plan."); }
 		PlanImpl plan = person.getPlans().get(0);
 		Desires desires = person.createDesires("");
+		double time = 0.0;
 		for (PlanElement e : plan.getPlanElements()) {
 			if (e instanceof Activity) {
-				Activity a = (Activity)e;
+				ActivityImpl a = (ActivityImpl)e;
+				
+				// set times
+				a.setStartTime(time);
+				if (a.getEndTime() != Time.UNDEFINED_TIME) {
+					a.setDuration(a.getEndTime()-a.getStartTime());
+					time = a.getEndTime();
+				}
+				else if (a.getDuration() != Time.UNDEFINED_TIME) {
+					a.setEndTime(a.getStartTime()+a.getDuration());
+					time = a.getEndTime();
+				}
 				
 				// redefine act types
 				if (a.getType().startsWith("h")) {
@@ -118,8 +132,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					}
 					else if (((CoordImpl)af.getCoord()).equals(c)) {
 						ActivityOption ao = af.getActivityOption(a.getType());
-						if (ao != null) { ao.setCapacity(ao.getCapacity()+1.0); }
-						else {
+						if (ao == null) {
 							ao = af.createActivityOption(a.getType());
 							ao.setCapacity(1.0);
 							if (a.getType().equals("tta")){ ao.addOpeningTime(ot); }

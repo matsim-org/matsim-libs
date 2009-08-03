@@ -34,15 +34,31 @@ import playground.balmermi.datapuls.modules.PersonAdaptPlanAndCreateFacilities;
 public class CBPopulationPreparation {
 
 	//////////////////////////////////////////////////////////////////////
+	// printUsage
+	//////////////////////////////////////////////////////////////////////
+
+	private static void printUsage() {
+		System.out.println();
+		System.out.println("FacilitiesCreation");
+		System.out.println();
+		System.out.println("Usage: CBPopulationPreparation inputCBPopulation outputPopulation outputFacilities");
+		System.out.println();
+		System.out.println("---------------------");
+		System.out.println("2009, matsim.org");
+		System.out.println();
+	}
+
+	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
+		if (args.length != 3) { printUsage(); return; }
 
 		final PopulationImpl population = new PopulationImpl();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(population,null);
-		PopulationWriter plansWriter = new PopulationWriter(population,"../../output/output_plans.xml");
+		PopulationWriter plansWriter = new PopulationWriter(population,args[1].trim());
 		
 		ActivityFacilities afs = new ActivityFacilitiesImpl();
 
@@ -52,14 +68,14 @@ public class CBPopulationPreparation {
 		System.out.println("done. (adding algorithms)");
 
 		System.out.println("stream population...");
-		plansReader.readFile("../../input/plansCB.xml");
+		plansReader.readFile(args[0].trim());
 		population.printPlansCount();
 		plansWriter.write();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (stream population)");
 
 		System.out.println("writing facilities...");
-		new FacilitiesWriter(afs,"../../output/output_facilities.xml").write();
+		new FacilitiesWriter(afs,args[2].trim()).write();
 		System.out.println("done. (writing facilities)");
 	}
 }

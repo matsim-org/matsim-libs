@@ -48,10 +48,13 @@ public class FacilitiesCreation {
 		System.out.println();
 	}
 
+	//////////////////////////////////////////////////////////////////////
+	// main
+	//////////////////////////////////////////////////////////////////////
+
 	public static void main(String[] args) {
-		if (args.length != 4) {
-			printUsage(); return;
-		}
+		if (args.length != 4) { printUsage(); return; }
+		
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(args[0].trim());
 		log.info("number of facilities ec2000: "+facilities.getFacilities().size());
