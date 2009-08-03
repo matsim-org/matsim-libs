@@ -20,6 +20,8 @@
 
 package org.matsim.core.utils.collections;
 
+import java.io.Serializable;
+
 /**
  * A Tuple stores two values (a "pair") and respects their order.
  * This generic class implements a commonly used data structure which is not present in
@@ -31,15 +33,19 @@ package org.matsim.core.utils.collections;
  * @param <A>
  * @param <B>
  */
-public class Tuple<A extends Object, B extends Object> {
+public class Tuple<A extends Object, B extends Object> implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5006806073108429434L;
 	/**
 	 * First entry of the tuple
 	 */
-	private A first;
+	private final A first;
 	/**
 	 * Second entry of the tuple
 	 */
-	private B second;
+	private final B second;
 	/**
 	 * Creates a new tuple with the two entries.
 	 * @param first
