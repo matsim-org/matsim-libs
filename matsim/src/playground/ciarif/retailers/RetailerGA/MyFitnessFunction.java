@@ -26,8 +26,8 @@ import java.util.Collections;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.ciarif.retailers.GravityModel;
 import playground.ciarif.retailers.RetailersSequentialLocationListener;
+import playground.ciarif.retailers.stategies.GravityModel;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

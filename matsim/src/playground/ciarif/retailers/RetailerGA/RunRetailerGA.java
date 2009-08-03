@@ -6,12 +6,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 //import java.io.PrintStream;
 import java.util.ArrayList;
-import playground.ciarif.retailers.GravityModel;
+
+import playground.ciarif.retailers.stategies.GravityModel;
 import playground.jjoubert.Utilities.DateString;
 
 public class RunRetailerGA
 {
-  public ArrayList<Integer> runGA(ArrayList<Integer> first, GravityModel gm)
+ public ArrayList<Integer> runGA(ArrayList<Integer> first, GravityModel gm)
+ 
   {
     int genomeLength = first.size();
     int populationSize = 10;

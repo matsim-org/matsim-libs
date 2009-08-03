@@ -39,9 +39,9 @@ public class RetailersControler extends Controler {
 	
     public static void main (final String[] args) { 
     	Controler controler = new RetailersControler(args);
+    	//controler.addControlerListener(new RetailersLocationListener());
     	//controler.addControlerListener(new RetailersParallelLocationListener());
-    	controler.addControlerListener(new RetailersSequentialLocationListener()); //TODO Introduce a parameter in config file for the type of 
-    	// relocation to be performed, sequential or parallel
+    	controler.addControlerListener(new RetailersSequentialLocationListener()); 
     	controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
     	controler.run();
     }

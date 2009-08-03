@@ -1,7 +1,8 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.stategies;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.network.Link;
@@ -11,6 +12,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 
+import playground.ciarif.retailers.data.FacilityRetailersImpl;
+import playground.ciarif.retailers.data.LinkRetailersImpl;
+
 
 public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	
@@ -19,15 +23,16 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
 	private Controler controler;
 	private int alternatives;	
+	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 	
-	public LogitMaxLinkRetailerStrategy (Controler controler, ArrayList<LinkRetailersImpl> arrayList) {
+	public LogitMaxLinkRetailerStrategy (Controler controler) {
 		this.controler = controler;
 		String logitAlternatives = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_N_ALTERNATIVES);
 		int alternatives = Integer.parseInt(logitAlternatives);
 		this.alternatives = alternatives;
 	}
 
-	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
+	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> Allowedlinks) {
 		
 		// example to get the facilities (locations) of a link 
 //		controler.getNetwork().getLink("").getUpMapping();
@@ -65,9 +70,11 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			for (int k=0;k<probs.length;k++) {
 				if (r<=probs [k]) {
 					f.moveTo(newLinks.get(k).getCoord());
+					this.movedFacilities.put(f.getId(),f);
 				}
 			}
 		}
+		return this.movedFacilities;
 	}
 	private final double[] calcLogitProbability(double[] utils) {
 		double exp_sum = 0.0;
@@ -81,4 +88,5 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			Map<Id, FacilityRetailersImpl> facilities) {
 		// TODO Auto-generated method stub
 	}
+	
 }

@@ -1,4 +1,4 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.stategies;
 
 
 
@@ -6,6 +6,7 @@ package playground.ciarif.retailers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -17,22 +18,23 @@ import org.matsim.core.population.PersonImpl;
 
 import org.opengis.go.display.primitive.GraphicLineString;
 
+import playground.ciarif.retailers.data.LinkRetailersImpl;
+import playground.ciarif.retailers.utils.Utils;
+
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	
 	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	public static final String NAME = "maxLinkRetailerStrategy";
 	private Controler controler;
-
-	private ArrayList<LinkRetailersImpl> links;
+	private Map<Id,ActivityFacility> movedFacilities;
 	// TODO balmermi: do the same speed optimization here
 
-	public MaxLinkRetailerStrategy(Controler controler, ArrayList<LinkRetailersImpl> arrayList) {
+	public MaxLinkRetailerStrategy(Controler controler) {
 		this.controler = controler;
-		this.links = arrayList;
 	}
 	
 	
-	public void moveFacilities(Map<Id, ActivityFacility> facilities) {
+	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
 
 		for (ActivityFacility f : facilities.values()) {
 			
@@ -43,8 +45,8 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 				// then the specific shop is moved only if it exceeds a given capacity. This allows for moving 
 				// only "interesting" facilities (large enough to notice differences in the customer data) 
 
-			int rd = MatsimRandom.getRandom().nextInt(this.links.size());
-			BasicLinkImpl link = (BasicLinkImpl)this.links.get(rd);
+			int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
+			BasicLinkImpl link = (BasicLinkImpl)allowedLinks.get(rd);
 			log.info("The link " + link.getId() + " is proposed as new location for the facility " + f.getId());
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
@@ -99,10 +101,12 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			}	
 			if (move_facilities == true) {
 				Utils.moveFacility(f,link, controler.getWorld());
+				this.movedFacilities.put(f.getId(),f);
 			}
 			else {
 				log.info ("The facility " + f.getId() + " will stay at the current link");
 			} 
 		}
+		return this.movedFacilities;
 	}
 }	

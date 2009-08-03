@@ -1,4 +1,4 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,6 +9,8 @@ import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
+
+import playground.ciarif.retailers.stategies.MaxLinkRetailerStrategy;
 
 public class RetailZone {
 	
@@ -35,7 +37,7 @@ public class RetailZone {
 		return id;
 	}
 
-	public void addPersonToQuadTree(Coord coord, PersonImpl person) {
+	public void addPersonToQuadTree(Coord coord, PersonImpl person) {//TODO look if it is possible to eliminate the QuadTree and use another data structure
 		this.personsQuadTree.put(coord.getX(),coord.getY(),person);
 		double rd = MatsimRandom.getRandom().nextDouble();
 		if (rd <= this.personsSamplingRate) {
@@ -43,7 +45,7 @@ public class RetailZone {
 		}
 	}
 
-	public void addShopToQuadTree(Coord coord, ActivityFacility shop) {
+	public void addShopToQuadTree(Coord coord, ActivityFacility shop) { //TODO look if it is possible to eliminate the QuadTree and use another data structure
 		this.shopsQuadTree.put(coord.getX(),coord.getY(),shop);	
 		double rd = MatsimRandom.getRandom().nextDouble();
 		if (rd <= this.shopsSamplingRate) {

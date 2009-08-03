@@ -1,36 +1,39 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.IO;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
-
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class PlansSummaryTable implements PlanAlgorithm {
-	
+public class MakeATableFromXMLFacilities {
 //////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
-	
+	private Object facilities;
+			
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansSummaryTable(String outfile) {
+	public MakeATableFromXMLFacilities(String outfile) {
 		super();
-		System.out.println("    init " + this.getClass().getName() + " module...");
+		//this.retailers = retailers;
 		try {
 			fw = new FileWriter(outfile);
+			System.out.println(outfile);
 			out = new BufferedWriter(fw);
-			//out.write("pid\tact1\tlink1\tfacId1\t...\tactn\tlinkn\tfacIdn\tIteration\n");
-			out.write("linkId\tfacId\tIteration\n");
+			out.write("Fac_id\tfac_x\tfac_y\tLink_id\tcapacity\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -38,39 +41,7 @@ public class PlansSummaryTable implements PlanAlgorithm {
 		}
 		System.out.println("    done.");
 	}
-	
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
 
-	
-	public void run(PersonImpl person, int iter) {
-		try {
-			PlanImpl plan = person.getSelectedPlan();
-			//out.write(person.getId() + "\t");
-			//out.write(plan.getScore() + "\t");
-			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
-				//Leg l = (Leg)plan.getActsLegs().get(i);
-				ActivityImpl a = (ActivityImpl)plan.getPlanElements().get(i+1);
-				if (a.getType().contains("shop")) {
-					//Link arr_link = a.getLink();
-					//out.write(a.getType() + "\t");
-					out.write(a.getLinkId() + "\t");
-					out.write(a.getFacilityId() + "\t");
-					out.write(iter +"\n");
-				}
-				
-			}
-			
-			//out.write("\n");
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-	}
-	
 	//////////////////////////////////////////////////////////////////////
 	// final method
 	//////////////////////////////////////////////////////////////////////
@@ -85,8 +56,28 @@ public class PlansSummaryTable implements PlanAlgorithm {
 			System.exit(-1);
 		}
 	}
-	public void run(PlanImpl plan) {
-		
-		
+
+	//////////////////////////////////////////////////////////////////////
+	// run methods
+	//////////////////////////////////////////////////////////////////////
+
+	public void write(Map<Id,ActivityFacility> facilities) {
+		try {
+			this.facilities = facilities;
+			
+			for (ActivityFacility f : facilities.values()) {
+				if (f.getActivityOption("shop")!=null){
+					out.write(f.getId()+ "\t");
+					out.write(f.getCoord().getX()+ "\t");
+					out.write(f.getCoord().getY()+"\t");
+					out.write(f.getLink().getId()+"\t");
+					out.write(f.getActivityOption("shop").getCapacity()+"\n");
+					}
+				}
+			out.flush();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

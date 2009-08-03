@@ -1,4 +1,4 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.utils;
 
 import org.matsim.core.network.LinkImpl;
 

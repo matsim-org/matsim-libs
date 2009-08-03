@@ -1,4 +1,4 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.data;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;

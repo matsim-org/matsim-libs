@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -55,6 +54,15 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 
+import playground.ciarif.retailers.IO.FileRetailerReader;
+import playground.ciarif.retailers.IO.LinksRetailerReader;
+import playground.ciarif.retailers.data.LinkRetailersImpl;
+import playground.ciarif.retailers.data.RetailZone;
+import playground.ciarif.retailers.data.RetailZones;
+import playground.ciarif.retailers.data.Retailer;
+import playground.ciarif.retailers.data.Retailers;
+import playground.ciarif.retailers.stategies.GravityModelRetailerStrategy;
+
 public class RetailersSequentialLocationListener implements StartupListener, IterationEndsListener {
 	
 	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
@@ -68,45 +76,47 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	public final static String CONFIG_SAMPLE_SHOPS = "samplingRateShops";
 	public final static String CONFIG_SAMPLE_PERSONS = "samplingRatePersons";
 	private Retailers retailers;
-	private RetailersSummaryWriter rs = null;
-	private PlansSummaryTable pst = null;
-	private MakeATableFromXMLFacilities txf = null;
-	private LinksRetailerReader lrr = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private ArrayList<LinkRetailersImpl> links = null;
+	private ArrayList<LinkRetailersImpl> retailersLinks = null;
 	private RetailZones retailZones = new RetailZones();
+	private Map<Id,ActivityFacility> controlerFacilities = null;
 	ArrayList<ActivityFacility> sampledShops = new ArrayList<ActivityFacility>();
+	
 	public RetailersSequentialLocationListener() {
+	
 	}
 
 	public void notifyStartup(StartupEvent event) {
 
 		Controler controler = event.getControler();
+		this.controlerFacilities = controler.getFacilities().getFacilities();
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
-		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
+		
+		// Make a table with all shop activities listed  
+		/*String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
-		this.pst = new PlansSummaryTable (popOutFile);
+		PlansSummaryTable pst = new PlansSummaryTable (popOutFile);*/
 		
-		this.txf = new MakeATableFromXMLFacilities("output/facilities_table2.txt");
-		ActivityFacilitiesImpl facs = (ActivityFacilitiesImpl) controler.getFacilities();
-		txf.write(facs);
-		String retailersOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
+		// Make a table where all shops of the given scenario are listed with their attributes
+		/*MakeATableFromXMLFacilities txf = new MakeATableFromXMLFacilities("../../output/facilities_table2.txt");
+		txf.write(this.controlerFacilities);*/
 		
+		// Make a table reporting the movements of retailers' shops iteration after iteration
+		/*String retailersOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
-		
-		this.rs = new RetailersSummaryWriter (retailersOutFile);
-		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
-		ArrayList<Id> retailersLinks = new ArrayList<Id>();
+		RetailersSummaryWriter rs = new RetailersSummaryWriter (retailersOutFile);
+		*/
 		
 		// Parameters which define the number of retail zones and the type of partition
 		String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
 		int number_of_zones =0;
+		int n = (int)Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ZONES));
 		if (type_of_partition.equals("symmetric")){
-			number_of_zones = (int) Math.pow((Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ZONES))),2);}
+			number_of_zones = (int) Math.pow(n,2);}
 		else {}//TODO Define the asymmetric version
 		if (number_of_zones == 0) { throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" not defined!");}
 		
@@ -121,75 +131,80 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			samplingRatePersons = Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_PERSONS));
 				if (samplingRatePersons>1 || samplingRatePersons<0) { throw new RuntimeException("In config file, param = "+CONFIG_SAMPLE_PERSONS+" in module = "+CONFIG_GROUP+" must be set to a value between 0 and 1!!!");}
 		}
+		else {} //TODO put a warning here
 		
 		//The characteristics of retailers are read
+		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
 		if (this.facilityIdFile == null) {throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_ZONES+" not defined!");}
-		else {
-			try { //TODO Modify this!!!! In the sequential case other attributes for the retailer are needed, or in any case some of those which are now there are completely useless!!!!!
-				this.retailers = new Retailers();
-				FileReader fr = new FileReader(this.facilityIdFile);
-				BufferedReader br = new BufferedReader(fr);
-				// Skip header
-				String curr_line = br.readLine();
-				int notFoundFacilities = 0;
-				while ((curr_line = br.readLine()) != null) {
-					String[] entries = curr_line.split("\t", -1);
-					// header: r_id  f_id  strategy linkId capacity
-					// index:     0     1      2	   3	  4
-					Id rId = new IdImpl(entries[0]);
-					Id fId = new IdImpl (entries[1]);
-					Map<Id,ActivityFacility> controlerFacilities = controler.getFacilities().getFacilities();
-					
- 					if (controlerFacilities.get(fId) != null) {
-						if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
-							
-							ActivityFacility f = controlerFacilities.get(fId);
-							log.info("The added facility is = " + f.getId());
-							this.retailers.getRetailers().get(rId).addFacility(f);
-							log.info("The added facility is on the link number = " + f.getLink().getId());
-							retailersLinks.add(f.getLink().getId());
-
-						}	
-						else { // retailer does not exists yet
-							
-							Retailer r = new Retailer(rId, null);
-							log.info("The strategy " + entries[2] + " will be added to the retailer = " + rId);
-							ActivityFacility f = controlerFacilities.get(fId);
-							r.addFacility(f);
-							retailersLinks.add(f.getLink().getId());
-							log.info("The added facility is on the link number = " + f.getLink().getId());
-							this.retailers.addRetailer(r);
+		else { 
+			this.retailers = new FileRetailerReader (this.controlerFacilities, this.facilityIdFile).readRetailers();
+		}
+		
+		//Links allowed for relocation are read or generated
+		this.retailersLinks = new LinksRetailerReader (controler, retailers).ReadLinks();
+		
+		
+		//Retail zones are created
+		Collection<PersonImpl> persons = controler.getPopulation().getPersons().values();
+		log.info("Number of retail zones = "+  n);//TODO solve better this problem of n and number of zones, names given here are confusing
+		this.createZonesFromScenario(persons, this.findScenarioShops(), n, samplingRatePersons, samplingRateShops);
+		
+	}
+	
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		Controler controler = event.getControler();
+		Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+		ArrayList<ActivityFacility> retailersFacilities = new ArrayList<ActivityFacility>();
+		// works, but it is not nicely programmed. shouldn't be a global container, should be
+		// controlled by the controler (or actually added to the population)
+		log.info("There is (are) " + retailers.getRetailers().values().size() + " Retailer(s)");
+		//Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
+		if (controler.getIteration()%5==0 && controler.getIteration()>0){
+			// TODO could try to use a double ""for" cycle in order to avoid to use the getIteration method
+			// the first is 0...n where n is the number of times the gravity model needs to 
+			// be computed, the second is 0...k, where k is the number of iterations needed 
+			// in order to obtain a relaxed state, or maybe use a while.
+			//int iter = controler.getIteration();
+			//if (controler.getIteration()>0 & controler.getIteration()%5==0){
+			for (Retailer r:retailers.getRetailers().values()) {
+				retailersFacilities.addAll(r.getFacilities().values());
+				log.info("The retailer " + r.getId().toString() + " owns " + r.getFacilities().values().size() + " facilities");
+			}
+				log.info( this.sampledShops.size()+  " shops have been sampled");
+				//GravityModelRetailerStrategy gmrs = new GravityModelRetailerStrategy (controler, this.retailZones, this.sampledShops, retailersFacilities, this.retailersLinks); 
+				//gmrs.moveFacilities();
+			//movedFacilities = gmrs.getMovedFacilities();
+			int counter = 0;
+			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
+				
+				PlanImpl plan = p.getSelectedPlan(); 
+				boolean routeIt = false;
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof ActivityImpl) {
+						ActivityImpl act = (ActivityImpl) pe;
+						if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
+							// likely contains too much persons in it!!!!
+							act.setLink(act.getFacility().getLink());
+							routeIt = true;
 						}
 					}
-					else {
-						notFoundFacilities = notFoundFacilities+1;
-						log.warn("The facility " + fId + " has not been found" );
-					}
 				}
-				log.warn(notFoundFacilities + " facilities have not been found");
-			} 
-			catch (IOException e) {
-				Gbl.errorMsg(e);
+				
+				if (routeIt) {
+					pcrl.run(plan);
+					counter = counter+1;
+				}
 			}
-		}
-		this.lrr = new LinksRetailerReader (controler, retailersLinks);
-		this.links = lrr.ReadLinks(); 
-		Collection<PersonImpl> persons = controler.getPopulation().getPersons().values();
-		log.info("Number of retail zones = "+  number_of_zones*number_of_zones);
-		double n = Math.sqrt(number_of_zones);
+			log.info("The program re-routed " +  counter + " persons who were shopping in moved facilities");
+		}	
+	}
+	
+	private void createZonesFromScenario (Collection<PersonImpl> persons, ArrayList<ActivityFacility> shops, int n, double samplingRatePersons, double samplingRateShops) {
+		
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
-		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
-			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
-				shops.add(f);
-				log.info("The shop " + f.getId() + " has been added to the file 'shops'");
-			}
-			else {}
-		}
-		
 		for (PersonImpl p : persons) {
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() < miny) { miny = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
@@ -235,7 +250,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				}	
 				this.retailZones.addRetailZone(rz);
 				log.info("In the zone " + rz.getId() + ", " + rz.getSampledShops().size() + " have been sampled");
-				this.sampledShops.addAll(rz.getSampledShops());
+				this.sampledShops.addAll(rz.getSampledShops()); //TODO change this!!! The sampling should happen after the model has been estimated
 				a=a+1;
 				j=j+1;
 			}
@@ -243,45 +258,16 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		}
 	}
 	
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		Controler controler = event.getControler();
-		Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
-		ArrayList<ActivityFacility> retailersFacilities = new ArrayList<ActivityFacility>();
-		// works, but it is not nicely programmed. shouldn't be a global container, should be
-		// controlled by the controler (or actually added to the population)
-		log.info("There are (is) " + retailers.getRetailers().values().size() + " Retailer(s)");
-		//Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
-		if (controler.getIteration()%5==0 && controler.getIteration()>0){
-			for (Retailer r:retailers.getRetailers().values()) {
-				retailersFacilities.addAll(r.getFacilities().values());
-				log.info("The retailer " + r.getId().toString() + " owns " + r.getFacilities().values().size() + " facilities");
+	private ArrayList<ActivityFacility> findScenarioShops() {
+		ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
+		for (ActivityFacility f : this.controlerFacilities.values()) {
+			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
+				shops.add(f);
+				log.info("The shop " + f.getId() + " has been added to the file 'shops'");
 			}
-			log.info( this.sampledShops.size()+  " shops have been sampled");
-			GravityModelRetailerStrategy gmrs = new GravityModelRetailerStrategy (controler, this.retailZones, this.sampledShops, retailersFacilities, this.links); 
-			gmrs.moveFacilities();
-			gmrs.getMovedFacilities();
-		
-			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
-				
-				PlanImpl plan = p.getSelectedPlan();
-				// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
-				boolean routeIt = false;
-				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) pe;
-						if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
-							// likely contains too much persons in it!!!!
-							act.setLink(act.getFacility().getLink());
-							routeIt = true;
-						}
-					}
-				}
-				if (routeIt) {
-					pcrl.run(plan);
-					log.info("The program is re-routing persons who were shopping in moved facilities");
-				}
-			}
-		}	
-	}
+			else {}
+		}
+		return shops;
+	}	
 }
 

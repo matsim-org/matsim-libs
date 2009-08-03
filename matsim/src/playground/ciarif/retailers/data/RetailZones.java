@@ -1,10 +1,12 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.data;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+
+import playground.ciarif.retailers.stategies.MaxLinkRetailerStrategy;
 
 public class RetailZones {
 	

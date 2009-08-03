@@ -1,4 +1,4 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.data;
 
 import java.util.*;
 

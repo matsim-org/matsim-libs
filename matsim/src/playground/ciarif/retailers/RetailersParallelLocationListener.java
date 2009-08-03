@@ -56,6 +56,16 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.ciarif.retailers.IO.LinksRetailerReader;
+import playground.ciarif.retailers.IO.MakeATableFromXMLFacilities;
+import playground.ciarif.retailers.IO.PlansSummaryTable;
+import playground.ciarif.retailers.IO.RetailersSummaryWriter;
+import playground.ciarif.retailers.data.LinkRetailersImpl;
+import playground.ciarif.retailers.data.Retailer;
+import playground.ciarif.retailers.data.Retailers;
+import playground.ciarif.retailers.stategies.MaxLinkRetailerStrategy;
+import playground.ciarif.retailers.utils.Utils;
+
 
 public class RetailersParallelLocationListener implements StartupListener, BeforeMobsimListener {
 	
@@ -70,12 +80,14 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 	private RetailersSummaryWriter rs = null;
 	private PlansSummaryTable pst = null;
 	private MakeATableFromXMLFacilities txf = null;
-	private LinksRetailerReader lrr = null;
+	//private LinksRetailerReader lrr = null;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
-	private ArrayList<LinkRetailersImpl> links = null;
+	private ArrayList<LinkRetailersImpl> retailersLinks = new ArrayList<LinkRetailersImpl>();
+	private Map<Id,ActivityFacility> controlerFacilities = null;
+	private Map<Id,ActivityFacility> retailersFacilities = new TreeMap<Id, ActivityFacility>();
 	
 	public RetailersParallelLocationListener() {
 	}
@@ -83,22 +95,24 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 	public void notifyStartup(StartupEvent event) {
 
 		Controler controler = event.getControler();
+		this.controlerFacilities = controler.getFacilities().getFacilities();
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
 		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
-		this.lrr = new LinksRetailerReader (controler);
-		this.links = lrr.ReadLinks(); 
+		//this.lrr = new LinksRetailerReader (controler);
+		//this.links = lrr.ReadLinks(); 
 		this.txf = new MakeATableFromXMLFacilities("output/facilities_table2.txt");
-		ActivityFacilitiesImpl facs = (ActivityFacilitiesImpl) controler.getFacilities();
-		txf.write(facs);
+		txf.write(this.controlerFacilities);
 		String retailersOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RET_SUM_TABLE);
 		if (retailersOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RET_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.rs = new RetailersSummaryWriter (retailersOutFile);
 		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
-		if (this.facilityIdFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");
-		}
+		//this.retailersLinks = new LinksRetailerReader (controler, retailers).ReadLinks();
+		//The characteristics of retailers are read
+		if (this.facilityIdFile == null) {throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");}
+		
 		else {
 			try {
 				this.retailers = new Retailers();
@@ -114,14 +128,16 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
 						Id fId = new IdImpl (entries[1]);
 						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
+						this.retailersFacilities.put(f.getId(),f);
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
 					else { // retailer does not exists yet
 						Retailer r = new Retailer(rId, null);
-						r.addStrategy(controler, entries[2], this.links);
+						r.addStrategy(controler, entries[2]);
 						Id fId = new IdImpl (entries[1]);
 						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
+						this.retailersFacilities.put(f.getId(),f);
 						this.retailers.addRetailer(r);
 					}
 				}
@@ -129,13 +145,52 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			catch (IOException e) {
 				Gbl.errorMsg(e);
 			}
-		} 
+		}
+		
+		//Links allowed for relocation are read or generated
+		log.info("Retailers = "+ retailers);
+		this.retailersLinks = new LinksRetailerReader (controler, this.retailers).ReadLinks();
+		if (this.facilityIdFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");
+		}
+		
 		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
 	}
 	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+		
+		
 		Controler controler = event.getControler();
-		if (controler.getIteration()%1==0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
+		if (controler.getIteration()%1==0 & controler.getIteration()>0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
+			
+
+			
+//			movedFacilities = gmrs.getMovedFacilities();
+//			int counter = 0;
+//			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
+//				
+//				PlanImpl plan = p.getSelectedPlan(); 
+//				boolean routeIt = false;
+//				for (PlanElement pe : plan.getPlanElements()) {
+//					if (pe instanceof ActivityImpl) {
+//						ActivityImpl act = (ActivityImpl) pe;
+//						if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
+//							// likely contains too much persons in it!!!!
+//							act.setLink(act.getFacility().getLink());
+//							routeIt = true;
+//						}
+//					}
+//				}
+//				
+//				if (routeIt) {
+//					pcrl.run(plan);
+//					counter = counter+1;
+//					
+//				}
+//			}
+//			log.info("The program re-routed " +  counter + " persons who were shopping in moved facilities");
+//		}	<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		
+		
 			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 			
 			// works, but it is not nicely programmed. shouldn't be a global container, should be
@@ -147,10 +202,9 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			int retailers_count = 0;
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");
-				Map<Id,ActivityFacility> facs = r.runStrategy();
-				movedFacilities.putAll(facs); //fc TODO this is not true!!!! Only some of this facilities will really be moved!!!!!!!!!!! 
-				// probably is not incorrect but slower and should be changed
-				System.out.println("moved facilities =" + facs);
+				movedFacilities = r.runStrategy(retailersLinks);
+				
+				//TODO The check of moved facilities should happen here!!!!
 			}
 			
 			int iter = controler.getIteration();
@@ -160,8 +214,6 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 				pst.run(p,iter);
 				//for (Plan plan : p.getPlans()) {
 				PlanImpl plan = p.getSelectedPlan();
-					// fc: is it not possible anymore to use only the selected plan? 
-					// if I understand what's happening, at least potentially, much more persons than necessary are re-routed 
 					boolean routeIt = false;
 					for (PlanElement pe : plan.getPlanElements()) {
 						if (pe instanceof ActivityImpl) {

@@ -1,4 +1,4 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.IO;
 
 import java.io.IOException;
 import java.util.Iterator;

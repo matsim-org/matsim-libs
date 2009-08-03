@@ -1,4 +1,4 @@
-package playground.ciarif.retailers;
+package playground.ciarif.retailers.IO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,9 +11,15 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
+
+import playground.ciarif.retailers.RetailersSequentialLocationListener;
+import playground.ciarif.retailers.data.LinkRetailersImpl;
+import playground.ciarif.retailers.data.Retailer;
+import playground.ciarif.retailers.data.Retailers;
 
 public class LinksRetailerReader {
 	public final static String CONFIG_LINKS = "links";
@@ -21,15 +27,16 @@ public class LinksRetailerReader {
 	private String linkIdFile;// = null;
 	protected ArrayList<LinkRetailersImpl> links = new ArrayList<LinkRetailersImpl>();
 	private Controler controler;
-	private ArrayList<Id> actualLinks;
+	private ArrayList<Id> actualLinks = new ArrayList<Id>();
+	private Retailers retailers;
 	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
 	public LinksRetailerReader (Controler controler){
 		this.controler = controler;
 	}
 	
-	public LinksRetailerReader(Controler controler, ArrayList<Id> retailersLinks) {
+	public LinksRetailerReader(Controler controler, Retailers retailers) {
 		this.controler = controler;
-		this.actualLinks = retailersLinks;
+		this.retailers = retailers;
 	}
 
 	public ArrayList<LinkRetailersImpl> ReadLinks() {
@@ -71,7 +78,12 @@ public class LinksRetailerReader {
 			}
 		}
 		else {//Francesco: if no file stating which links are allowed is defined
-			Integer linksMax = Integer.parseInt(String.valueOf(Math.round(actualLinks.size()*1.8)));//TODO note that usually the ratio links/ actual links is so large than this number doesn't really matter, but a check in this sense would be not bad! 
+			for (Retailer r:retailers.getRetailers().values()) {
+				for (ActivityFacility af: r.getFacilities().values()){
+					this.actualLinks.add(af.getLink().getId());
+				}
+			}
+			Integer linksMax = Integer.parseInt(String.valueOf(Math.round(this.actualLinks.size()*1.8)));//TODO note that usually the ratio links/ actual links is so large than this number doesn't really matter, but a check in this sense would be not bad! 
 			log.info("Links max= " + linksMax);
 			log.info("Actual Links= " + actualLinks);
 						int i=0;
