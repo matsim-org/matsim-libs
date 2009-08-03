@@ -44,7 +44,7 @@ public class LogicIntoPlainTranslator {
 		}
 	}
 
-	private Node convertToPlain(Id logicNodeId){
+	public Node convertToPlain(Id logicNodeId){
 		return logicToPlainStopMap.get(logicNodeId);
 	}
 	
@@ -100,8 +100,8 @@ public class LogicIntoPlainTranslator {
 				}else{
 					LegImpl leg = (LegImpl)pe;
 					NetworkRoute logicRoute = (NetworkRoute)leg.getRoute();
-					List<Link> plainLinks = convertToPlain(logicRoute.getLinks());
-					logicRoute.setLinks(null, plainLinks, null); 
+					List<Node> plainNodes = convertNodesToPlain(logicRoute.getNodes());
+					logicRoute.setNodes(null, plainNodes, null); 
 				}
 			}
 		}
@@ -112,11 +112,9 @@ public class LogicIntoPlainTranslator {
 		for(LegImpl logicLeg : logicLegList){
 			NetworkRoute logicRoute= (NetworkRoute)logicLeg.getRoute();
 			List<Link> plainLinks = convertToPlain(logicRoute.getLinks());
-			
 			//if(plainLinks.size()>0){
 				NetworkRoute plainRoute = new LinkNetworkRoute(null, null);
 				plainRoute.setLinks(null, plainLinks, null);
-				
 				LegImpl plainLeg = new LegImpl(logicLeg.getMode());
 				plainLeg = logicLeg;
 				plainLeg.setRoute(plainRoute);
@@ -124,6 +122,7 @@ public class LogicIntoPlainTranslator {
 				logicLeg.setRoute(plainRoute);
 			//}
 		}
+		
 		logicLegList = null;
 		return plainLegList;
 	}
@@ -154,25 +153,4 @@ public class LogicIntoPlainTranslator {
 		return plainLegList;
 	}
 	
-	/*
-	public Path getPlainPath (final Path logicPath){
-		List<Node> plainNodes = new ArrayList<Node>(); 
-		List<Link> plainLinks = new ArrayList<Link>();
-		double travelTime = logicPath.travelTime;
-		double travelCost = logicPath.travelCost;
-		
-		for (Node logicNode: logicPath.nodes){
-			Node plainNode= convertToPlainNode(logicNode);
-			plainNodes.add(plainNode);
-		}
-		
-		for (Link logicLink: logicPath.links){
-			Link plainLink= convertToPlainLink(logicLink);
-			plainLinks.add(plainLink);
-		}
-	
-		Path plainPath = new Path(plainNodes, plainLinks, travelTime, travelCost);
-		return plainPath;
-	}
-	*/
 }

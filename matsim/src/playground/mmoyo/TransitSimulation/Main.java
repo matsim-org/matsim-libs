@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
 import playground.mmoyo.PTRouter.PTActWriter;
 import playground.mmoyo.PTRouter.PTRouter;
 
-
 /**
  * This class contains the options to route with a TransitSchedule object 
  */
@@ -31,7 +30,7 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
-	private static final String PLANFILE = PATH +  "plans.xml"; // "DetouredPlansSimplified.xml";   //"plans.xml";
+	private static final String PLANFILE = PATH +  "_input_file.xml"; // "plans.xml";
 	private static final String OUTPUTPLANS = PATH + "output_plans.xml";
 	private static final String NETWORK = PATH + "network.xml";
 	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
@@ -61,7 +60,7 @@ public class Main {
 	
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		
-		int option =4;
+		int option =3;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -71,8 +70,8 @@ public class Main {
 				plainNetwork=logicFactory.getPlainNet();
 				PTRouter ptRouter = logicFactory.getPTRouter();
 				
-				Coord coord1 = new CoordImpl(686897, 250590);   
-				Coord coord2 = new CoordImpl(684854, 254079);   
+				Coord coord1 = new CoordImpl(686897, 250590);
+				Coord coord2 = new CoordImpl(684854, 254079);
 				NodeImpl nodeA = plainNetwork.getNode("299598");
 				NodeImpl nodeB = plainNetwork.getNode("8503309");
 				Path path = ptRouter.findPTPath (coord1, coord2, 37075, 400);
@@ -86,25 +85,15 @@ public class Main {
 			case 3: //Routes a population/
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.findRouteForActivities();
-	    		//new PopulationWriter(ptActWriter.detouredPopulation, PATH + "detouredplans.xml", "v4").write();
-	    		break;
+				break;
 
 			case 4:  //tests the TransitRouteFinder class with the population of PTActWriter class
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.printPTLegs(transitSchedule);
 				break;
 
-			case 5: //creates GIS net from plainNetwork*/
-				/*
-				plainNet=logicFactory.getPlainNet();
-				org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape nodes2ESRIShape = new Nodes2ESRIShape(plainNet, PATH + "ESRISNet.xml");
-				nodes2ESRIShape.write();
-				*/
-				break;
-				
-			case 6:
+			case 5:
 				plainNetwork=logicFactory.getPlainNet();
-				//agent 35420 
 				NodeImpl node1 = plainNetwork.getNode("299598");
 				NodeImpl node2 = plainNetwork.getNode("8503006");
 				double distance = CoordUtils.calcDistance(node1.getCoord(), node2.getCoord());
@@ -112,11 +101,13 @@ public class Main {
 				//-->check if their nodes are joined by detTransfer links 
 				break;
 				
-			case 7:  //simplifies a plan
-				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PATH + "detouredPlans.xml", PATH + "simplifiedPlan.xml");
+			case 6:  //simplifies a plan
+				String planToSimplify = "output_plan.xml";
+				String simplifiedPlan = "simplfied_plan.xml";
+				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
 				ptActWriter.SimplifyPtLegs();
 				break;
-			
+					
 		}
 	}
 }
