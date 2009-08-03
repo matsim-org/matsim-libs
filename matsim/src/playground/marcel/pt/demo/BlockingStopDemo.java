@@ -130,7 +130,7 @@ public class BlockingStopDemo {
 		schedule.addTransitLine(tLine1);
 
 		Departure dep1 = builder.createDeparture(this.ids[1], busDeparture);
-		dep1.setVehicleId(this.ids[1]);
+		dep1.setVehicleId(new IdImpl("tr_1"));
 		tRoute1.addDeparture(dep1);
 
 		// line 2
@@ -157,7 +157,7 @@ public class BlockingStopDemo {
 		schedule.addTransitLine(tLine2);
 
 		Departure dep2 = builder.createDeparture(this.ids[2], busDeparture);
-		dep2.setVehicleId(this.ids[2]);
+		dep2.setVehicleId(new IdImpl("tr_2"));
 		tRoute2.addDeparture(dep2);
 
 //		try {
@@ -175,8 +175,10 @@ public class BlockingStopDemo {
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		vehicles.getVehicles().put(this.ids[1], vb.createVehicle(this.ids[1], vehicleType));
-		vehicles.getVehicles().put(this.ids[2], vb.createVehicle(this.ids[2], vehicleType));
+		Id id = new IdImpl("tr_1");
+		vehicles.getVehicles().put(id, vb.createVehicle(id, vehicleType));
+		id = new IdImpl("tr_2");
+		vehicles.getVehicles().put(id, vb.createVehicle(id, vehicleType));
 	}
 
 	private void createPopulation() {

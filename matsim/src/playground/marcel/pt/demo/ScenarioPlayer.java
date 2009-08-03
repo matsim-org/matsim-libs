@@ -37,6 +37,7 @@ import org.xml.sax.SAXException;
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
+import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 /**
  * Visualizes a transit schedule and simulates the transit vehicle's movements.
@@ -50,7 +51,6 @@ public class ScenarioPlayer {
 	public static void play(final ScenarioImpl scenario, final Events events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-		sim.setCreateMissingVehicles(true);
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
@@ -77,6 +77,7 @@ public class ScenarioPlayer {
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
+		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");

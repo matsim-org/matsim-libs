@@ -49,6 +49,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
+import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 public class TwoLinesDemo {
 
@@ -298,13 +299,15 @@ public class TwoLinesDemo {
 		}
 	}
 
+	private void createTransitVehicles() {
+		new CreateVehiclesForSchedule(this.scenario.getTransitSchedule(), this.scenario.getVehicles()).run();
+	}
+
 	private void runSim() {
 		Events events = new Events();
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer("two_lines_demo");
-		sim.setCreateMissingVehicles(true);
-
 		OTFDemo.ptConnect("two_lines_demo");
 
 		sim.run();
@@ -316,6 +319,7 @@ public class TwoLinesDemo {
 		createNetwork();
 		createTransitSchedule();
 		createPopulation();
+		createTransitVehicles();
 		runSim();
 	}
 

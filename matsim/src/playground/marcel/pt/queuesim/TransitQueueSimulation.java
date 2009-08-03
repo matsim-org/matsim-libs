@@ -26,7 +26,6 @@ import java.util.HashMap;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -39,11 +38,6 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.BasicVehicleCapacity;
-import org.matsim.vehicles.BasicVehicleCapacityImpl;
-import org.matsim.vehicles.BasicVehicleImpl;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
@@ -60,7 +54,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 	private TransitSchedule schedule = null;
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
-	private boolean createMissingVehicles = false;
 
 	public TransitQueueSimulation(final ScenarioImpl scenario, final Events events) {
 		super(scenario, events);
@@ -107,30 +100,16 @@ public class TransitQueueSimulation extends QueueSimulation {
 		if (this.schedule != null) {
 			BasicVehicles vehicles = ((ScenarioImpl) this.scenario).getVehicles();
 
-			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("transitVehicleType"));
-			BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
-			capacity.setSeats(Integer.valueOf(101));
-			capacity.setStandingRoom(Integer.valueOf(0));
-			vehicleType.setCapacity(capacity);
-
 			for (TransitLine line : this.schedule.getTransitLines().values()) {
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (Departure departure : route.getDepartures().values()) {
 						TransitDriver driver = new TransitDriver(line, route, departure, this.agentTracker, this);
-						if (departure.getVehicleId() == null && !this.createMissingVehicles) {
+						if (departure.getVehicleId() == null) {
 							throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
 						}
-						TransitQueueVehicle veh;
-						if (departure.getVehicleId() == null) {
-							veh = new TransitQueueVehicle(new BasicVehicleImpl(driver.getPerson().getId(), vehicleType), 5);
-						} else {
-							veh = new TransitQueueVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
-						}
+						TransitQueueVehicle veh = new TransitQueueVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
 						veh.setDriver(driver);
 						driver.setVehicle(veh);
-						if (departure.getVehicleId() == null) {
-							departure.setVehicleId(veh.getBasicVehicle().getId());
-						}
 						QueueLink qlink = this.network.getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
 						qlink.addParkedVehicle(veh);
 
@@ -152,10 +131,6 @@ public class TransitQueueSimulation extends QueueSimulation {
 		} else {
 			super.agentDeparts(agent, link);
 		}
-	}
-
-	public void setCreateMissingVehicles(final boolean createMissingVehicles) {
-		this.createMissingVehicles = createMissingVehicles;
 	}
 
 }

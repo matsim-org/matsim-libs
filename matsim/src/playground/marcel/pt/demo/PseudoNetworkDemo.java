@@ -46,6 +46,7 @@ import playground.marcel.OTFDemo;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 import playground.marcel.pt.utils.CreatePseudoNetwork;
+import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 public class PseudoNetworkDemo {
 
@@ -122,7 +123,7 @@ public class PseudoNetworkDemo {
 		events.addHandler(writer);
 
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-		sim.setCreateMissingVehicles(true);
+		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
