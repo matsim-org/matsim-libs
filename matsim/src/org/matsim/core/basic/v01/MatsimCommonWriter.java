@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.basic.v01.population.PopulationSchemaV5Names;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 

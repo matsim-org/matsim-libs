@@ -22,7 +22,7 @@ package org.matsim.core.population.routes;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.BasicRouteImpl;
+import org.matsim.core.basic.v01.population.BasicRouteImpl;
 
 /**
  * Default, abstract implementation of the {@link RouteWRefs}-interface.

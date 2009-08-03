@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLeg.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,57 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.knowledges;
 
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.core.utils.misc.Time;
+import java.util.List;
 
-public class BasicLegImpl implements BasicLeg {
+import org.matsim.core.basic.v01.facilities.BasicActivityOption;
 
-	protected BasicRoute route = null;
+/**
+ * @author dgrether
+ */
+public interface BasicKnowledge<A extends BasicActivityOption> {
 
-	private double depTime = Time.UNDEFINED_TIME;
-	private double travTime = Time.UNDEFINED_TIME;
-	private TransportMode mode;
-
+	public void setDescription(String desc);
 	
-	public BasicLegImpl(TransportMode mode) {
-		// yyyyyy this should be "protected"
-		this.mode = mode;
-	}
-
-	public BasicRoute getRoute() {
-		return this.route;
-	}
-
-	public final void setRoute(BasicRoute route) {
-		this.route = route;
-	}
-
-	public final TransportMode getMode() {
-		return this.mode;
-	}
-
-	public final void setMode(TransportMode mode) {
-		this.mode = mode;
-	}
-
-	public final double getDepartureTime() {
-		return this.depTime;
-	}
-
-	public final void setDepartureTime(final double depTime) {
-		this.depTime = depTime;
-	}
-
-	public final double getTravelTime() {
-		return this.travTime;
-	}
-
-	public final void setTravelTime(final double travTime) {
-		this.travTime = travTime;
-	}
-
+	public String getDescription();
+	
+	public List<A> getActivities();
+	
+	public void addActivity(A activity);
 }

@@ -17,9 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.events;
+package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.AgentWait2LinkEvent;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.population.ActivityImpl;
 
 

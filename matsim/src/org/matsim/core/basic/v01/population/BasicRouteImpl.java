@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.population;
 
 import java.util.List;
 

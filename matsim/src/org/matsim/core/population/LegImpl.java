@@ -22,7 +22,7 @@ package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.BasicLegImpl;
+import org.matsim.core.basic.v01.network.BasicLegImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;

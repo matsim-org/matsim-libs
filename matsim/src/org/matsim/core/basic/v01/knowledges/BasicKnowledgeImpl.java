@@ -1,4 +1,4 @@
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.knowledges;
 
 import java.util.ArrayList;
 import java.util.List;

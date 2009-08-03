@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.facilities;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +25,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.BasicLocation;
-import org.matsim.core.basic.v01.facilities.BasicActivityOption;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 
 /**

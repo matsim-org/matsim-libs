@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
@@ -51,6 +52,8 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
+import org.matsim.core.api.experimental.events.BasicEventsBuilder;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -79,7 +82,7 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
  * @author dstrippgen
  * @author mrieser
  */
-public class Events {
+public class Events implements MatsimToplevelContainer {
 
 	private static final Logger log = Logger.getLogger(Events.class);
 

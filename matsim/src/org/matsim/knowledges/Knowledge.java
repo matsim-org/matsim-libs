@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.BasicKnowledge;
+import org.matsim.core.basic.v01.knowledges.BasicKnowledge;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
