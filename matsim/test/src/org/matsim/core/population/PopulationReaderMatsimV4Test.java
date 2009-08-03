@@ -26,11 +26,12 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.experimental.population.Person;
-import org.matsim.core.api.experimental.population.Plan;
+
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;

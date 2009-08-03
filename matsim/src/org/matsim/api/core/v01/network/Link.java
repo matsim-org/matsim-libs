@@ -1,4 +1,4 @@
-package org.matsim.core.api.experimental.network;
+package org.matsim.api.core.v01.network;
 
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.world.Location;

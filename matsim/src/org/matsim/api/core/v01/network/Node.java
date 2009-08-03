@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.experimental.network;
+package org.matsim.api.core.v01.network;
 
 import java.util.Map;
 

@@ -22,7 +22,7 @@ package org.matsim.core.population.routes;
 
 import java.util.Map;
 
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 

@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.NetworkLayer;

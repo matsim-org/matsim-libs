@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
+ * NetworkBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.api.core.v01.network;
 
-package org.matsim.core.api.experimental.population;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
 
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 
 /**
- * @author nagel
+ * @author dgrether
  *
  */
-public class PopulationWriter extends BasicPopulationWriter {
+public interface NetworkBuilder extends BasicNetworkBuilder {
 
-	/**
-	 * @param population
-	 */
-	public PopulationWriter(BasicPopulation population) {
-		super(population);
-	}
-
+	public Node createNode(final Id id);
+	
+	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	
+	
 }

@@ -30,7 +30,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;

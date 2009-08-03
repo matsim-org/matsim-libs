@@ -19,7 +19,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;

@@ -20,7 +20,7 @@
 
 package org.matsim.core.router.costcalculators;
 
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelMinCost;

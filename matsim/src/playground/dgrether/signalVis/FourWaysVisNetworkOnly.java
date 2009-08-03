@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;

@@ -23,8 +23,8 @@ package org.matsim.core.population.routes;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 
 

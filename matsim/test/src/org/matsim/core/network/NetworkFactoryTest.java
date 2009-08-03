@@ -21,7 +21,7 @@
 package org.matsim.core.network;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;

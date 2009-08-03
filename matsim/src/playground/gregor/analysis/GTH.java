@@ -22,7 +22,7 @@ package playground.gregor.analysis;
 
 import java.util.List;
 
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 

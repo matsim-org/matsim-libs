@@ -23,8 +23,9 @@ package org.matsim.withinday.coopers.routeprovider;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Node;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.routeprovider.AbstractRouteProvider;

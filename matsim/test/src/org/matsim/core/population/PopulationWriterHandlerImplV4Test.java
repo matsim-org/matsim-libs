@@ -22,7 +22,7 @@ package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
-import org.matsim.core.api.experimental.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;

@@ -23,7 +23,7 @@
  */
 package playground.johannes.socialnetworks.interaction;
 
-import org.matsim.core.api.experimental.population.Person;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author illenberger

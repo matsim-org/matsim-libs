@@ -23,7 +23,8 @@ package org.matsim.withinday.contentment;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.network.Link;
+
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;

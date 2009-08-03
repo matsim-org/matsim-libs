@@ -30,15 +30,15 @@ import org.geotools.feature.Feature;
 import com.vividsolutions.jts.geom.Point;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.Scenario;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.experimental.population.Leg;
-import org.matsim.core.api.experimental.population.Person;
-import org.matsim.core.api.experimental.population.Plan;
-import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.experimental.population.PopulationBuilder;
-import org.matsim.core.api.experimental.population.PopulationWriter;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 

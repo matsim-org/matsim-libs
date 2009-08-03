@@ -20,8 +20,8 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.population.Route;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Route;
 
 /**
  * Defines the minimum amount of information a route in MATSim must provide.

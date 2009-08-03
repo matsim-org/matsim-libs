@@ -30,7 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 

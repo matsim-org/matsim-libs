@@ -1,6 +1,6 @@
 package playground.christoph.router;
 
-import org.matsim.core.api.experimental.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;

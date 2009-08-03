@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.BasicNodeImpl;
 
 public class NodeImpl extends BasicNodeImpl implements Node {

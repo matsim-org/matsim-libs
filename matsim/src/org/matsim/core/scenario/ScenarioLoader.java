@@ -26,8 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.BasicScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -52,7 +51,7 @@ import org.matsim.world.MatsimWorldReader;
  * of the scenario assuming that required parts are already 
  * loaded or created by the user.
  * 
- * @see org.matsim.core.api.experimental.ScenarioImpl
+ * @see org.matsim.api.core.v01.ScenarioImpl
  * 
  * @author dgrether
  */

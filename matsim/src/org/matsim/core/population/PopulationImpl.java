@@ -27,10 +27,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Person;
-import org.matsim.core.api.experimental.population.Population;
-import org.matsim.core.api.experimental.population.PopulationBuilder;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;

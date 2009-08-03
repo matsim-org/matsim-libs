@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Network;
-import org.matsim.core.api.experimental.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkBuilder;
 import org.matsim.core.network.LinkImpl;
 
 public class SubNetwork implements Network {

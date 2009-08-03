@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.opengl;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;

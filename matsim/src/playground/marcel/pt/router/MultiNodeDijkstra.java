@@ -28,9 +28,10 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Network;
-import org.matsim.core.api.experimental.network.Node;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelCost;

@@ -29,8 +29,8 @@ import net.opengis.kml._2.LinkType;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Person;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;

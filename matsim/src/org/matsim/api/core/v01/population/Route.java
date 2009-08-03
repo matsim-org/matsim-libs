@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Network.java
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,12 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.experimental.network;
+package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.basic.v01.population.BasicRoute;
 
-public interface Network extends BasicNetwork<Node, Link> {
+/**
+ * @author nagel
+ *
+ */
+public interface Route extends BasicRoute {
 
-	public NetworkBuilder getBuilder();
-	
 }

@@ -24,11 +24,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Network;
-import org.matsim.core.api.experimental.network.Node;
-import org.matsim.core.api.experimental.population.PopulationWriter;
+
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.MatsimNetworkReader;

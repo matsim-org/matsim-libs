@@ -23,8 +23,8 @@ package org.matsim.vis.routervis;
 import java.io.IOException;
 import java.util.PriorityQueue;
 
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;

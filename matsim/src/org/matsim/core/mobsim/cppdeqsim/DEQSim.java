@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;

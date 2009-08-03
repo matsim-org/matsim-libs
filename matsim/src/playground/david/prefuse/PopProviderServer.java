@@ -26,8 +26,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 
-import org.matsim.core.api.experimental.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;

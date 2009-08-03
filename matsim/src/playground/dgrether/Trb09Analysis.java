@@ -20,7 +20,8 @@
 package playground.dgrether;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.ScenarioImpl;
+
+import org.matsim.api.core.v01.ScenarioImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;

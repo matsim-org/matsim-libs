@@ -26,7 +26,7 @@ package playground.johannes.socialnetworks.interaction;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;

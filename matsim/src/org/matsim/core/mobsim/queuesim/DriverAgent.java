@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 

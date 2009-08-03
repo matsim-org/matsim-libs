@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api.experimental;
+package org.matsim.api.core.v01;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
@@ -156,21 +156,21 @@ public class ScenarioImpl implements Scenario {
 	
 	
 	/**
-	 * @see org.matsim.core.api.experimental.Scenario#getActivityFacilities()
+	 * @see org.matsim.api.core.v01.Scenario#getActivityFacilities()
 	 */
 	public ActivityFacilities getActivityFacilities() {
 		return this.facilities;
 	}
 
 	/**
-	 * @see org.matsim.core.api.experimental.Scenario#getNetwork()
+	 * @see org.matsim.api.core.v01.Scenario#getNetwork()
 	 */
 	public NetworkLayer getNetwork() {
 		return this.network;
 	}
 
 	/**
-	 * @see org.matsim.core.api.experimental.Scenario#getPopulation()
+	 * @see org.matsim.api.core.v01.Scenario#getPopulation()
 	 */
 	public PopulationImpl getPopulation() {
 		return this.population;

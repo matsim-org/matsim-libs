@@ -7,9 +7,10 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.population.Activity;
-import org.matsim.core.api.experimental.population.Route;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.events.Events;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.*;
@@ -22,7 +23,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.api.experimental.population.Leg;
 
 /*
  * TODO: (next steps):
@@ -50,14 +50,14 @@ import org.matsim.core.api.experimental.population.Leg;
 
 /*
  * Some first performance experiments:
- * (100% Zürich, on home compi)
+ * (100% Zï¿½rich, on home compi)
  * - parallel JDEQSim (optimal division - manual): 147.7sec / 130.5sec.
  * - JDEQSim: 181.4sec.
  * - parallel JDEQSim (without optimal devision): 153.2 sec./ 136.3 sec. (not yet optimal, as not fifty fifty devision of events).
  * - parallel JDEQSim (optimal division - manual), maxTimeDelta=600: 126.2sec / 109sec. 
  * - parallel JDEQSim (optimal division - manual), maxTimeDelta=100000: 121sec / 104sec.
  * 
- * (10% Zürich, on home compi)
+ * (10% Zï¿½rich, on home compi)
  * - parallel JDEQSim (optimal division - manual): 19.4 sec. / 17.1 sec.
  * - JDEQSim: 25sec.
  * - parallel JDEQSim (without optimal devision): 21.9 sec. / 19.490 sec.

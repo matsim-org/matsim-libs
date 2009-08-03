@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.api.experimental.Scenario;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;

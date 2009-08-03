@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Plans.java
+ * Leg.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.experimental.population;
+package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.PlanElement;
 
-/**
- * Root class of the population description (previously also called "plans file")
- */
-public interface Population extends BasicPopulation<Person> {
-	
-	/** @deprecated use getBuilder() */
-	public PopulationBuilder getPopulationBuilder() ;
+public interface Leg extends BasicLeg, PlanElement {
 
-	public PopulationBuilder getBuilder();
-	
-	
+	// in order to get correct type(s):
+	public Route getRoute();
 
 }

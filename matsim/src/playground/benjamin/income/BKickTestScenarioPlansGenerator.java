@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.population.Person;
-import org.matsim.core.api.experimental.population.Plan;
-import org.matsim.core.api.experimental.population.PopulationBuilder;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;

@@ -30,8 +30,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.core.api.experimental.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;

@@ -22,7 +22,7 @@ package org.matsim.households;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.ScenarioImpl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.households.basic.BasicHousehold;
 import org.matsim.households.basic.BasicHouseholds;

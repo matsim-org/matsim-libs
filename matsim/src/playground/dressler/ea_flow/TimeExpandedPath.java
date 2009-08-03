@@ -24,8 +24,8 @@ package playground.dressler.ea_flow;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * Class representing a path with flow over time on an network

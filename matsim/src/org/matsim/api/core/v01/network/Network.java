@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*																															*
+ * project: org.matsim.*
+ * Network.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,42 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api.experimental;
-import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.core.api.experimental.network.Network;
-import org.matsim.core.api.experimental.population.Population;
 
+package org.matsim.api.core.v01.network;
 
+import org.matsim.api.basic.v01.network.BasicNetwork;
 
-/**
- * The scenario is the entry point to MATSim 
- * scenarios. An implementation of Scenario
- * has to provide consistent implementations
- * for the different return types, e.g. Network, 
- * Facilities or Population.
- * @see org.matsim.core.scenario.ScenarioLoader
- * @author dgrether
- *
- */
-public interface Scenario extends BasicScenario {
+public interface Network extends BasicNetwork<Node, Link> {
 
-	public Network getNetwork();
-
-	public Population getPopulation() ;
-	
-	// the following are available via the Impl only
-//	public ActivityFacilities getActivityFacilities() ;
-//
-//	public Knowledges getKnowledges();
-//	
-//	public Households getHouseholds();
-//	
-//	public BasicVehicles getVehicles();
-//
-//	public BasicLaneDefinitions getLaneDefinitions();
-//	
-//	public BasicSignalSystems getSignalSystems();
-//	
-//	public BasicSignalSystemConfigurations getSignalSystemConfigurations();
+	public NetworkBuilder getBuilder();
 	
 }

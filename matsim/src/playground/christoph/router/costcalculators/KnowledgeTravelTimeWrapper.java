@@ -5,7 +5,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.LinkImpl;

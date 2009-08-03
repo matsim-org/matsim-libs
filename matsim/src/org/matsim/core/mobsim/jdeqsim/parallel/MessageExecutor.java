@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.core.api.experimental.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.parallelEventsHandler.ConcurrentListSPSC;
 import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
 import org.matsim.core.mobsim.jdeqsim.EndLegMessage;

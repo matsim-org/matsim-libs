@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Network;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;

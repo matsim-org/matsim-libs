@@ -22,7 +22,7 @@ package playground.christoph.router.util;
 
 import java.util.List;
 
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 public class LoopRemover {

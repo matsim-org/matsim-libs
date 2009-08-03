@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;

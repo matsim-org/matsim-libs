@@ -20,8 +20,8 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.core.api.experimental.network.Link;
-import org.matsim.core.api.experimental.network.Node;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 //matsim imports
 

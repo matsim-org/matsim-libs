@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.matsim.core.api.experimental.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelTime;

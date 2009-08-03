@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,14 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.experimental.population;
+package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.utils.customize.Customizable;
 
 /**
- * @author nagel
- *
+ * @author dgrether
  */
-public interface Route extends BasicRoute {
-
+public interface Person extends BasicPerson<Plan>, Customizable{
 }
