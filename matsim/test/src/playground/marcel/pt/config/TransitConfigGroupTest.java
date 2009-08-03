@@ -70,6 +70,36 @@ public class TransitConfigGroupTest extends TestCase {
 		assertEquals(filename, cg.getParams().get(TransitConfigGroup.TRANSIT_SCHEDULE_FILE));
 	}
 
+	public void testVehiclesFile() {
+		TransitConfigGroup cg = new TransitConfigGroup();
+		// test initial value
+		assertNull(cg.getVehiclesFile());
+		assertNull(cg.getValue(TransitConfigGroup.VEHICLES_FILE));
+		assertEquals("null", cg.getParams().get(TransitConfigGroup.VEHICLES_FILE));
+		// set to non-null value
+		String filename = "/path/to/some/file.xml";
+		cg.setVehiclesFile(filename);
+		assertEquals(filename, cg.getVehiclesFile());
+		assertEquals(filename, cg.getValue(TransitConfigGroup.VEHICLES_FILE));
+		assertEquals(filename, cg.getParams().get(TransitConfigGroup.VEHICLES_FILE));
+		// overwrite value
+		filename = "C:\\some\\other\\file.txt";
+		cg.setVehiclesFile(filename);
+		assertEquals(filename, cg.getVehiclesFile());
+		assertEquals(filename, cg.getValue(TransitConfigGroup.VEHICLES_FILE));
+		assertEquals(filename, cg.getParams().get(TransitConfigGroup.VEHICLES_FILE));
+		// set to null value
+		cg.setVehiclesFile(null);
+		assertNull(cg.getTransitScheduleFile());
+		assertNull(cg.getValue(TransitConfigGroup.VEHICLES_FILE));
+		assertEquals("null", cg.getParams().get(TransitConfigGroup.VEHICLES_FILE));
+		// test with addParam instead of setter
+		cg.addParam(TransitConfigGroup.VEHICLES_FILE, filename);
+		assertEquals(filename, cg.getVehiclesFile());
+		assertEquals(filename, cg.getValue(TransitConfigGroup.VEHICLES_FILE));
+		assertEquals(filename, cg.getParams().get(TransitConfigGroup.VEHICLES_FILE));
+	}
+
 	public void testTransitModes() {
 		TransitConfigGroup cg = new TransitConfigGroup();
 		Set<TransportMode> modes;

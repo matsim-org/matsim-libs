@@ -39,9 +39,11 @@ public class TransitConfigGroup extends Module {
 	public static final String GROUP_NAME = "transit";
 
 	/*package*/ static final String TRANSIT_SCHEDULE_FILE = "transitScheduleFile";
+	/*pacakge*/ static final String VEHICLES_FILE = "vehiclesFile";
 	/*package*/ static final String TRANSIT_MODES = "transitModes";
 
 	private String transitScheduleFile = null;
+	private String vehiclesFile = null;
 
 	private Set<TransportMode> transitModes = Collections.unmodifiableSet(
 			EnumSet.of(TransportMode.pt, TransportMode.bus, TransportMode.train, TransportMode.tram));
@@ -54,6 +56,8 @@ public class TransitConfigGroup extends Module {
 	public void addParam(final String paramName, final String value) {
 		if (TRANSIT_SCHEDULE_FILE.equals(paramName)) {
 			setTransitScheduleFile(value);
+		} else if (VEHICLES_FILE.equals(paramName)) {
+				setVehiclesFile(value);
 		} else if (TRANSIT_MODES.equals(paramName)) {
 			String[] parts = StringUtils.explode(value, ',');
 			Set<TransportMode> tModes = EnumSet.noneOf(TransportMode.class);
@@ -74,6 +78,9 @@ public class TransitConfigGroup extends Module {
 		if (TRANSIT_SCHEDULE_FILE.equals(paramName)) {
 			return getTransitScheduleFile();
 		}
+		if (VEHICLES_FILE.equals(paramName)) {
+			return getVehiclesFile();
+		}
 		if (TRANSIT_MODES.equals(paramName)) {
 			boolean isFirst = true;
 			StringBuilder str = new StringBuilder();
@@ -93,6 +100,7 @@ public class TransitConfigGroup extends Module {
 	protected Map<String, String> getParams() {
 		Map<String, String> params = super.getParams();
 		addParameterToMap(params, TRANSIT_SCHEDULE_FILE);
+		addParameterToMap(params, VEHICLES_FILE);
 		addParameterToMap(params, TRANSIT_MODES);
 		return params;
 	}
@@ -101,6 +109,7 @@ public class TransitConfigGroup extends Module {
 	protected Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(TRANSIT_SCHEDULE_FILE, "Input file containing the transit schedule to be simulated.");
+		comments.put(VEHICLES_FILE, "Input file containing the vehicles used by the departures in the transit schedule.");
 		comments.put(TRANSIT_MODES, "Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt,bus,train,tram'.");
 		return comments;
 	}
@@ -111,6 +120,14 @@ public class TransitConfigGroup extends Module {
 
 	public String getTransitScheduleFile() {
 		return this.transitScheduleFile;
+	}
+
+	public void setVehiclesFile(final String filename) {
+		this.vehiclesFile = filename;
+	}
+
+	public String getVehiclesFile() {
+		return this.vehiclesFile;
 	}
 
 	public void setTransitModes(final Set<TransportMode> modes) {
