@@ -70,7 +70,7 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 			}
 			for (int i = 0;i<activityChain.size();i++){
 				if (i%2==0) actsmodes2.add(((ActivityImpl)(activityChain.get(i))).getType().toString());	
-				else actsmodes1.add(((LegImpl)(plan.getPlanElements().get(i))).getMode().toString());
+				else actsmodes2.add(((LegImpl)(plan.getPlanElements().get(i))).getMode().toString());
 			}		
 			return (actsmodes1.equals(actsmodes2));
 		}
