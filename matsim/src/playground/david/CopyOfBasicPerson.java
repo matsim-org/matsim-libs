@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.core.basic.v01.BasicPlanImpl;
+import org.matsim.core.basic.v01.population.BasicPlanImpl;
 
 public class CopyOfBasicPerson<P extends BasicPlanImpl> {
 	

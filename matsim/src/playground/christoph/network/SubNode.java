@@ -7,7 +7,7 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.basic.v01.BasicNodeImpl;
+import org.matsim.core.basic.v01.network.BasicNodeImpl;
 
 public class SubNode extends BasicNodeImpl implements Node{
 

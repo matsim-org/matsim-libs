@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.BasicActivityImpl;
+import org.matsim.core.basic.v01.population.BasicActivityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
