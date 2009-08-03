@@ -214,7 +214,6 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			}
 			this.router.run(plan);
 		}
-		//this.router.run(plan);
 		this.timer.run(plan);
 		while (plan.getScore().doubleValue()==-100000){
 			
