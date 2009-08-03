@@ -83,8 +83,9 @@ public class DgOtfStarter {
 //		filename = "/Users/dgrether/Desktop/bkickRuns/run703/500.events.mvi";
 //		filename = "/Users/dgrether/Desktop/bkickRuns/run704/500.events.mvi";
 //		filename = DgPaths.RUNBASE + "run709/it.1000/1000.analysis/709.vis.mvi";
-		filename = DgPaths.RUNBASE + "run710/it.1000/1000.analysis/710.vis.mvi";
+//		filename = DgPaths.RUNBASE + "run710/it.1000/1000.analysis/710.vis.mvi";
 		
+		filename = DgPaths.RUNBASE + "run710/it.1000/1000.analysis/710.vis.mvi";
 		
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);

@@ -18,10 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dgrether.analysis;
+package playground.dgrether.analysis.population;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
 
 
 /**
@@ -29,16 +28,17 @@ import org.matsim.api.basic.v01.Id;
  * @author dgrether
  *
  */
-public class PlanComparisonStringWriter implements PlanComparisonWriter {
+public class PlanComparisonStringWriter {
 	/**
 	 * A StringBuffer to concat the result.
 	 */
 	private StringBuffer _buffer;
 
-	/**
-	 * @see playground.dgrether.analysis.PlanComparisonWriter#write(playground.dgrether.analysis.PlanComparison)
-	 */
-	public void write(PlanComparison pc) {
+	public PlanComparisonStringWriter(DgAnalysisPopulation pop) {
+		write(pop);
+	}
+
+	private void write(DgAnalysisPopulation pc) {
 		double score1, score2;
 		String linesep = System.getProperty("line.separator");
 		Coord coordinates;
@@ -58,12 +58,14 @@ public class PlanComparisonStringWriter implements PlanComparisonWriter {
 		_buffer.append("Delta") ;
 		_buffer.append(linesep);
 
-		for (Id i : pc.getPersonIds()) {
-			score1 = pc.getFirstScore(i);
-			score2 = pc.getSecondScore(i);
+		
+		
+		for (DgPersonData pd : pc.getPersonData().values()) {
+			score1 = pd.getPlanData().get(DgAnalysisPopulation.RUNID1).getScore();
+			score2 = pd.getPlanData().get(DgAnalysisPopulation.RUNID2).getScore();
 			if ( !Double.isNaN(score1) && !Double.isNaN(score2) ) {
-				coordinates = pc.getHomeLocation(i).getCoord();
-				_buffer.append(i.toString());
+				coordinates = pd.getActivity().getCoord();
+				_buffer.append(pd.getPersonId().toString());
 				_buffer.append("\t");
 				if ((coordinates != null) && !Double.isNaN(coordinates.getX()))
 						_buffer.append(coordinates.getX());

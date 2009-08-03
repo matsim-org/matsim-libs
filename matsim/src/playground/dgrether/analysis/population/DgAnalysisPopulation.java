@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * PlanComparison.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,29 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
 
-import java.util.List;
+package playground.dgrether.analysis.population;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-
-
+import org.matsim.core.population.PlanImpl;
 /**
+ * This Class provides a data object to compare to iterations. 
  * @author dgrether
- *
+ * 
  */
-public class IdFactory {
-
+public class DgAnalysisPopulation {
 	
-	public static Id get(int i) {
-		return new IdImpl(i);
+	private static final Logger log = Logger.getLogger(DgAnalysisPopulation.class);
+	
+	public static final Id RUNID1 = new IdImpl("run1");
+	public static final Id RUNID2 = new IdImpl("run2");
+	
+	private Map<Id, DgPersonData> table;
+	/**
+	 * Creates a PlanComparison Object with the initial size
+	 * @param size
+	 */
+	public DgAnalysisPopulation() {
+     table = new LinkedHashMap<Id, DgPersonData>();
 	}
-
-	public static void generateIds(int number, List<Id> idList) {
-		for (int i = 1; i <= number; i++) {
-			idList.add(IdFactory.get(i));
+	
+	public Map<Id, DgPersonData> getPersonData() {
+		return table;
+	}
+	
+	public int calculateNumberOfCarPlans(Id runId) {
+		int carplans = 0;
+		for (DgPersonData d : table.values()) {
+			if (d.getPlanData().get(runId).getPlan().getType().equals(PlanImpl.Type.CAR)){
+				carplans++;
+			}
 		}
+		return carplans;
 	}
-	
+
 }

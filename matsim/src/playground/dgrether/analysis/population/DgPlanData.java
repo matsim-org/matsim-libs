@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanComparisonWriter.java
+ * DgPlanData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.dgrether.analysis.population;
 
-package playground.dgrether.analysis;
+import org.matsim.core.population.PlanImpl;
 
 
+public class DgPlanData {
 
-/**
- * Simple Interface which is implemented by all classes
- * being able to write a PlanComparison to a specific
- * dataformat.
- * @author dgrether
- * 
- */
-public interface PlanComparisonWriter {
-	/**
-	 * Writes the PlanComparison Object to the appropriate format.
-	 * @param pc the PlanComparison file to write
-	 */
-	public void write(PlanComparison pc);
+	private Double score = null;
+
+	private PlanImpl plan;
+	
+	public DgPlanData() {
+	}
+
+	
+	public Double getScore() {
+		return score;
+	}
+
+	
+	public void setScore(Double score) {
+		this.score = score;
+	}
+
+
+	
+	public PlanImpl getPlan() {
+		return plan;
+	}
+
+
+	
+	public void setPlan(PlanImpl plan) {
+		this.plan = plan;
+	}
+	
+	
+
 }

@@ -37,7 +37,6 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.dgrether.signalVis.drawer.DgLaneSignalDrawer;
-import playground.dgrether.signalVis.io.DgOtfLaneReader;
 import playground.dgrether.signalVis.io.DgOtfSignalWriter;
 import playground.dgrether.signalVis.io.DgSignalReader;
 import playground.dgrether.signalVis.layer.DgOtfLaneLayer;
@@ -110,7 +109,7 @@ public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
 		// reader to drawer (or provider to receiver)
 		// this.add(OTFLinkLanesAgentsNoParkingHandler.class,
 		// SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connectionManager.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
+		connectionManager.add(DgSignalReader.class, DgLaneSignalDrawer.class);
 		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
 		connectionManager.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		//default network code

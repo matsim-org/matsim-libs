@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TimeDependendData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
-
-import java.util.List;
-
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+package playground.dgrether.analysis.interfaces;
 
 
-/**
- * @author dgrether
- *
- */
-public class IdFactory {
+public interface TimeDependendData {
 
-	
-	public static Id get(int i) {
-		return new IdImpl(i);
-	}
-
-	public static void generateIds(int number, List<Id> idList) {
-		for (int i = 1; i <= number; i++) {
-			idList.add(IdFactory.get(i));
-		}
-	}
-	
 }

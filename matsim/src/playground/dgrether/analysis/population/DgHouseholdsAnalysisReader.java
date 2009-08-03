@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanComparisonFileWriter.java
+ * DgHouseholdsAnalysisReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.dgrether.analysis.population;
 
-package playground.dgrether.analysis;
+import org.matsim.households.basic.BasicHousehold;
+import org.matsim.households.basic.BasicHouseholds;
+import org.matsim.households.basic.BasicHouseholdsImpl;
+import org.matsim.households.basic.BasicHouseholdsReaderV10;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-/**
- * This class can be used to write a PlanComparison to a file.
- * @author dgrether
- *
- */
-public class PlanComparisonFileWriter implements PlanComparisonWriter {
 
-	private BufferedWriter writer;
-	/**
-	 * 
-	 * @param filename
-	 */
-	public PlanComparisonFileWriter(String filename) {
-		try {
-			this.writer = new BufferedWriter(new FileWriter(filename));
-		} catch (IOException e) {
-			e.printStackTrace();
+public class DgHouseholdsAnalysisReader {
+
+	
+	private DgAnalysisPopulation pop;
+
+
+	public DgHouseholdsAnalysisReader(DgAnalysisPopulation pop) {
+		this.pop = pop;
+	}
+	
+	
+	public void readHousholds(String filename) {
+		BasicHouseholds<BasicHousehold> hhs = new BasicHouseholdsImpl();
+		BasicHouseholdsReaderV10 reader = new BasicHouseholdsReaderV10(hhs);
+		reader.readFile(filename);
+		for (BasicHousehold hh : hhs.getHouseholds().values()) {
+			DgPersonData pd = this.pop.getPersonData().get(hh.getMemberIds().get(0));
+			pd.setIncome(hh.getIncome());
 		}
 	}
-	/**
-	 * @see playground.dgrether.analysis.PlanComparisonWriter#write(playground.dgrether.analysis.PlanComparison)
-	 */
-	public void write(PlanComparison pc) {
-		PlanComparisonStringWriter pcsw = new PlanComparisonStringWriter();
-		pcsw.write(pc);
-		try {
-			this.writer.append(pcsw.getResult());
-		  this.writer.flush();
-		  this.writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+	
 }

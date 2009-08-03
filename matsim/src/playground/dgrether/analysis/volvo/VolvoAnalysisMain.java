@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dgrether.analysis;
+package playground.dgrether.analysis.volvo;
 
 import java.io.IOException;
 import java.util.Locale;

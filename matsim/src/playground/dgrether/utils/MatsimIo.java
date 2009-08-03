@@ -23,16 +23,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -62,7 +58,7 @@ public class MatsimIo {
 		return conf;
 	}
 
-	public static void writerConfig(final Config config, final String filename) {
+	public static void writeConfig(final Config config, final String filename) {
 		ConfigWriter configWriter = new ConfigWriter(config, filename);
 		configWriter.write();
 	}
@@ -87,10 +83,7 @@ public class MatsimIo {
 
 
 	public static void writePlans(final PopulationImpl plans, final String filename) {
-		if (Gbl.getConfig() == null) {
-			Gbl.createConfig(null);
-		}
-		PopulationWriter pwriter = new PopulationWriter(plans, filename, "v4");
+		PopulationWriter pwriter = new PopulationWriter(plans, filename, "v4", 1.0);
 //		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
 		pwriter.write();
 	}

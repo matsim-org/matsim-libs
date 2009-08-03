@@ -137,7 +137,7 @@ public class CMCFScenarioGenerator {
 		reRoute.setDisableAfter(iterations);
 		this.config.strategy().addStrategySettings(reRoute);
 
-		MatsimIo.writerConfig(this.config, configOut);
+		MatsimIo.writeConfig(this.config, configOut);
 
 		log.info("scenario written!");
 	}

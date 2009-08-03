@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * PlanComparisonFileWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,29 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils;
 
-import java.util.List;
+package playground.dgrether.analysis.population;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-
-
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 /**
+ * This class can be used to write a PlanComparison to a file.
  * @author dgrether
  *
  */
-public class IdFactory {
+public class PlanComparisonFileWriter {
 
-	
-	public static Id get(int i) {
-		return new IdImpl(i);
+	private BufferedWriter writer;
+	private DgAnalysisPopulation pop;
+	/**
+	 * 
+	 * @param filename
+	 */
+	public PlanComparisonFileWriter(DgAnalysisPopulation pop) {
+		this.pop = pop;
 	}
-
-	public static void generateIds(int number, List<Id> idList) {
-		for (int i = 1; i <= number; i++) {
-			idList.add(IdFactory.get(i));
+	
+	public void write(String filename) {
+		this.write(filename, this.pop);
+	}
+	
+	private void write(String filename, DgAnalysisPopulation pc) {
+		try {
+			this.writer = new BufferedWriter(new FileWriter(filename));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PlanComparisonStringWriter pcsw = new PlanComparisonStringWriter(pc);
+		try {
+			this.writer.append(pcsw.getResult());
+		  this.writer.flush();
+		  this.writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
-	
 }

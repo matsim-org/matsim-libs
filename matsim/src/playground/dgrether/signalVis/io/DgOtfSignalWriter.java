@@ -22,8 +22,11 @@ package playground.dgrether.signalVis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.queuesim.QueueLane;
+import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 
 /**
@@ -31,13 +34,15 @@ import org.matsim.core.utils.misc.ByteBufferUtils;
  *
  */
 public class DgOtfSignalWriter extends DgOtfLaneWriter {
-
+	
+	private static final Logger log = Logger.getLogger(DgOtfSignalWriter.class);
+	
 	/**
 	 * 
 	 */
 	public DgOtfSignalWriter() {
 	}
-
+	
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
 		out.putInt(this.src.getToNodeQueueLanes().size());
@@ -50,7 +55,11 @@ public class DgOtfSignalWriter extends DgOtfLaneWriter {
 				out.putInt(0);
 			}
 		}
+	}
 	
+	@Override
+	public OTFDataWriter<QueueLink> getWriter() {
+		return new DgOtfSignalWriter();
 	}
 	
 }
