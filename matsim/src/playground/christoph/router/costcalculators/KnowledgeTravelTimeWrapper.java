@@ -23,7 +23,9 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 	protected TravelTime travelTimeCalculator;
 	protected Map<Link, Double> linkTravelTimes;
 	protected boolean useLookupTable = true;
+	protected boolean checkNodeKnowledge = true;
 	protected double lastUpdate = Time.UNDEFINED_TIME; 
+	protected KnowledgeTools knowledgeTools;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
@@ -32,7 +34,9 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		this.travelTimeCalculator = travelTime;
 		
 		LinkIdComparator linkComparator = new LinkIdComparator();
-		linkTravelTimes = new TreeMap<Link, Double>(linkComparator);
+		this.linkTravelTimes = new TreeMap<Link, Double>(linkComparator);
+		
+		this.knowledgeTools = new KnowledgeTools();
 	}
 	
 	public void setTravelTimeCalculator(TravelTime travelTime)
@@ -43,6 +47,11 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 	public TravelTime getTravelTimeCalculator()
 	{
 		return this.travelTimeCalculator;
+	}
+	
+	public void checkNodeKnowledge(boolean value)
+	{
+		this.checkNodeKnowledge = value;
 	}
 	
 	@Override
@@ -66,13 +75,13 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 	}
 	
 	public double getLinkTravelTime(final Link link, final double time) 
-	{	
+	{		
 		NodeKnowledge nodeKnowledge = null;
 		
-		if (person != null)
+		if (checkNodeKnowledge && person != null)
 		{
 			// try getting NodeKnowledge from the Persons Knowledge
-			nodeKnowledge = new KnowledgeTools().getNodeKnowledge(person);
+			nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		}
 		
 		// if the Person doesn't know the link -> return max costs 
@@ -165,6 +174,7 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		KnowledgeTravelTimeWrapper clone = new KnowledgeTravelTimeWrapper(travelTimeCalculatorClone);
 		clone.useLookupTable = this.useLookupTable;
 		clone.linkTravelTimes = this.linkTravelTimes;
+		clone.checkNodeKnowledge = this.checkNodeKnowledge;
 		
 		return clone;
 	}

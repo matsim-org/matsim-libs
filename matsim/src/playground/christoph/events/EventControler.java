@@ -229,6 +229,9 @@ public class EventControler extends Controler{
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 	
+		travelTimeWrapper.checkNodeKnowledge(false);
+		travelCostWrapper.checkNodeKnowledge(false);
+		
 		// Use the Wrapper with the same CostCalculator as the MobSim uses
 		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
 

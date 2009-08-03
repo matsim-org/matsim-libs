@@ -42,6 +42,8 @@ public class DeadEndRemover {
 
 	private final static Logger log = Logger.getLogger(DeadEndRemover.class);
 	
+	private static KnowledgeTools knowledgeTools = new KnowledgeTools();
+	
 	public static void removeDeadEnds(PersonImpl person)
 	{
 		Map<Id, NodeImpl> knownNodesMap;
@@ -51,7 +53,7 @@ public class DeadEndRemover {
 		 * If there is no NodeKnowledge there can't be a Map of known Nodes
 		 * so set the knownNodesMap to null.
 		 */ 
-		if(person.getCustomAttributes().containsKey("NodeKnowledge")) knownNodesMap = new KnowledgeTools().getKnownNodes(person);
+		if(person.getCustomAttributes().containsKey("NodeKnowledge")) knownNodesMap = knowledgeTools.getKnownNodes(person);
 		else knownNodesMap = null;
 		
 		// if the Person has an Activity Room in his/her Knowledge

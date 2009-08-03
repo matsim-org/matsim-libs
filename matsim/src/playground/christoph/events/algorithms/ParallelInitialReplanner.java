@@ -120,13 +120,15 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
 		private final List<PersonImpl> persons = new LinkedList<PersonImpl>();
-
+		private KnowledgeTools knowledgeTools;
+		
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
 		{
 			this.threadId = i;
 			this.replannerArray = replannerArray;
 			this.replanners = replanners;
 			this.time = time;
+			this.knowledgeTools = new KnowledgeTools();
 		}
 
 		public void setRemoveKnowledge(boolean value)
@@ -169,7 +171,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 				// If flag is set, remove Knowledge after doing the replanning.
 				if (removeKnowledge)
 				{
-					new KnowledgeTools().removeKnowledge(person);
+					knowledgeTools.removeKnowledge(person);
 				}
 				
 				numRuns++;

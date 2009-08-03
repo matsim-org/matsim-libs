@@ -45,7 +45,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
-
+	protected KnowledgeTools knowledgeTools;
 	 
 	/**
 	 * Default constructor.
@@ -56,6 +56,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 	 */
 	public TabuRoute() 
 	{
+		this.knowledgeTools = new KnowledgeTools();
 	}
 
 	
@@ -75,7 +76,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = new KnowledgeTools().getKnownNodes(this.person);
+		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 	
@@ -95,7 +96,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = new KnowledgeTools().getKnownLinks(linksArray, knownNodesMap);
+			linksArray = knowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 			
 			/*
 			 * If there are no Links available something may be wrong.

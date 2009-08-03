@@ -32,6 +32,10 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.mobsim.MyQueueNetwork;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.util.SubNetworkCreator;
+import playground.christoph.network.util.SubNetworkTools;
+import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
 public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable{
@@ -40,6 +44,8 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	protected MyQueueNetwork myQueueNetwork;
 	protected double time;
 	protected PlansCalcRouteConfigGroup configGroup;
+	protected SubNetworkTools subNetworkTools = new SubNetworkTools();
+	protected SubNetworkCreator subNetworkCreator;
 	
 	private final static Logger log = Logger.getLogger(KnowledgePlansCalcRoute.class);
 	
@@ -49,6 +55,8 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 //		super(network, costCalculator, timeCalculator);
 		super(new PlansCalcRouteConfigGroup(), network, costCalculator, timeCalculator, new DijkstraFactory());
 		configGroup = new PlansCalcRouteConfigGroup();
+		
+		subNetworkCreator = new SubNetworkCreator(network);
 	}
 	
 	@Deprecated
@@ -56,17 +64,23 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	{
 		super(network, router, routerFreeflow);
 		configGroup = new PlansCalcRouteConfigGroup();
+		
+		subNetworkCreator = new SubNetworkCreator(network);
 	}
 		
 	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 		configGroup = group;
+		
+		subNetworkCreator = new SubNetworkCreator(network);
 	}
 	
 	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 		configGroup = group;
+		
+		subNetworkCreator = new SubNetworkCreator(network);
 	}
 	
 	
@@ -85,6 +99,27 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		if(this.getPtFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
 			((PersonLeastCostPathCalculator)this.getPtFreeflowLeastCostPathCalculator()).setPerson(person);
+		}
+		
+		
+		if (this.getLeastCostPathCalculator() instanceof MyDijkstra)
+		{
+			SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+			if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(subNetwork);
+			
+			new KnowledgeTools().removeKnowledge(person);
+			
+			((MyDijkstra)this.getLeastCostPathCalculator()).setNetwork(subNetwork);
+		}
+		
+		if (this.getPtFreeflowLeastCostPathCalculator() instanceof MyDijkstra)
+		{
+			SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+			if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(subNetwork);
+			
+			new KnowledgeTools().removeKnowledge(person);
+			
+			((MyDijkstra)this.getPtFreeflowLeastCostPathCalculator()).setNetwork(subNetwork);
 		}
 	}
 	

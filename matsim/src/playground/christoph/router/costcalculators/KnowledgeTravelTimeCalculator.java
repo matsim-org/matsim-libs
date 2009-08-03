@@ -29,7 +29,7 @@ import playground.christoph.router.util.KnowledgeTravelTime;
 public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	
 	//public static double tbuffer = 5.0;	// only for the batch runs
-	protected double tbuffer = 20.0;			// time distance ("safe distance") between two vehicles
+	protected double tbuffer = 20.0;		// time distance ("safety distance") between two vehicles
 	protected double vehicleLength = 7.5;	// length of a vehicle
 	protected boolean calcFreeSpeedTravelTimes = false;
 	
@@ -63,7 +63,8 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	public double getLinkTravelTime(Link link, double time, double vehicles)
 	{
 		// if there are currently no vehicles on the link -> return the freespeed travel time
-		if(vehicles == 0.0) {
+		if(vehicles == 0.0)
+		{
 			return link.getLength()/link.getFreespeed(time);
 		}
 		

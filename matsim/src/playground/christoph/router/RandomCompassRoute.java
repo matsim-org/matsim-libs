@@ -45,7 +45,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 	public static double compassProbability = 0.50;	// only for the batch runs...
 	//protected double compassProbability = 0.50;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
-
+	protected KnowledgeTools knowledgeTools;
 	
 	private final static Logger log = Logger.getLogger(RandomCompassRoute.class);
 	
@@ -55,6 +55,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 	 */
 	public RandomCompassRoute() 
 	{	
+		this.knowledgeTools = new KnowledgeTools();
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -77,7 +78,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		nodes.add(fromNode);
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = new KnowledgeTools().getKnownNodes(this.person);
+		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
 
 		while(!currentNode.equals(toNode))
 		{
@@ -97,7 +98,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 			
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = new KnowledgeTools().getKnownLinks(linksArray, knownNodesMap);
+			linksArray = knowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 	
 			// if a route should not return to the previous node from the step before
 			if (tabuSearch) linksArray = TabuSelector.getLinks(linksArray, previousNode);

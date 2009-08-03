@@ -23,7 +23,9 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	protected TravelCost travelCostCalculator;
 	protected Map<Link, Double> linkTravelCosts;
 	protected boolean useLookupTable = true;
+	protected boolean checkNodeKnowledge = true;
 	protected double lastUpdate = Time.UNDEFINED_TIME; 
+	protected KnowledgeTools knowledgeTools;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
@@ -33,6 +35,8 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		
 		LinkIdComparator linkComparator = new LinkIdComparator();
 		linkTravelCosts = new TreeMap<Link, Double>(linkComparator);
+		
+		this.knowledgeTools = new KnowledgeTools();
 	}
 	
 	public void setTravelCostCalculator(TravelCost travelCost)
@@ -43,6 +47,11 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	public TravelCost getTravelCostCalculator()
 	{
 		return this.travelCostCalculator;
+	}
+	
+	public void checkNodeKnowledge(boolean value)
+	{
+		this.checkNodeKnowledge = value;
 	}
 	
 	@Override
@@ -68,10 +77,10 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	public double getLinkTravelCost(final Link link, final double time) 
 	{
 		// try getting NodeKnowledge from the Persons Knowledge
-		NodeKnowledge nodeKnowledge = new KnowledgeTools().getNodeKnowledge(person);
+		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		
 		// if the Person doesn't know the link -> return max costs 
-		if (!nodeKnowledge.knowsLink((LinkImpl)link))
+		if (checkNodeKnowledge && !nodeKnowledge.knowsLink((LinkImpl)link))
 		{
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;
@@ -160,6 +169,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		KnowledgeTravelCostWrapper clone = new KnowledgeTravelCostWrapper(travelCostCalculatorClone);
 		clone.useLookupTable = this.useLookupTable;
 		clone.linkTravelCosts = this.linkTravelCosts;
+		clone.checkNodeKnowledge = checkNodeKnowledge;
 		
 		return clone;
 	}

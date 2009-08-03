@@ -41,6 +41,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	protected double marginalUtlOfDistance;
 	
 	protected KnowledgeTools knowledgeTools;
+//	protected SubNetworkTools subNetworkTools;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostCalculator.class);
 	
@@ -57,7 +58,8 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	}
 	
 	public double getLinkTravelCost(final Link link, final double time) 
-	{		
+	{	
+/*
 		// try getting NodeKnowledge from the Persons Knowledge
 		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		
@@ -67,11 +69,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;
 		}
-//		else
-//		{
-//			log.info("Link is part of the Persons knowledge!");
-//		}
-		
+*/		
 		// Person knows the link, so calculate it's costs
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 	

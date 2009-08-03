@@ -47,7 +47,8 @@ public class SelectionWriter extends Writer {
 	
 	private SelectionWriterHandler handler = null;
 	private final PopulationImpl population;
-
+	private KnowledgeTools knowledgeTools;
+	
 	private final static Logger log = Logger.getLogger(SelectionWriter.class);
 
 
@@ -69,6 +70,8 @@ public class SelectionWriter extends Writer {
 		this.description = description;
 		this.fileNameCreator = new FileNameCreator(this.outfile);
 		createHandler(this.dtdFile);
+		
+		this.knowledgeTools = new KnowledgeTools();
 	}
 
 	/*
@@ -123,7 +126,7 @@ public class SelectionWriter extends Writer {
 						// Nodes
 						this.handler.startNodes(out);
 						
-						Map<Id, NodeImpl> nodesMap = new KnowledgeTools().getKnownNodes(p);
+						Map<Id, NodeImpl> nodesMap = knowledgeTools.getKnownNodes(p);
 						this.handler.nodes(nodesMap, out);
 						
 						this.handler.endNodes(out);

@@ -42,6 +42,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
+	protected KnowledgeTools knowledgeTools;
 	
 	private final static Logger log = Logger.getLogger(CompassRoute.class);
 	
@@ -51,6 +52,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	 */
 	public CompassRoute() 
 	{
+		this.knowledgeTools = new KnowledgeTools();
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -70,7 +72,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = new KnowledgeTools().getKnownNodes(this.person);
+		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 		
@@ -88,7 +90,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 			
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = new KnowledgeTools().getKnownLinks(linksArray, knownNodesMap);
+			linksArray = knowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 	
 			// if a route should not return to the previous node from the step before
 			if (tabuSearch) linksArray = TabuSelector.getLinks(linksArray, previousNode);

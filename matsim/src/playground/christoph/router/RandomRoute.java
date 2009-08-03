@@ -42,6 +42,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 	
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
+	protected KnowledgeTools knowledgeTools;
 	
 	/**
 	 * Default constructor.
@@ -52,6 +53,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 	 */
 	public RandomRoute() 
 	{
+		this.knowledgeTools = new KnowledgeTools();
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -70,7 +72,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		Map<Id, NodeImpl> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = new KnowledgeTools().getKnownNodes(this.person);
+		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
 		 
 		nodes.add(fromNode);
 		
@@ -87,7 +89,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 		
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = new KnowledgeTools().getKnownLinks(linksArray, knownNodesMap);
+			linksArray = knowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 
 			if (linksArray.length == 0)
 			{
