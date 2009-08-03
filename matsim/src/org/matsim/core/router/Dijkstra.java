@@ -84,7 +84,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	/**
 	 * The network on which we find routes.
 	 */
-	private final Network network;
+	protected Network network;
 
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
