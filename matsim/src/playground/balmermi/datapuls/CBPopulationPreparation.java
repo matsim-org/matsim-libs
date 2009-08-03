@@ -1,0 +1,65 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FacilitiesCreation.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.balmermi.datapuls;
+
+import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationWriter;
+
+import playground.balmermi.datapuls.modules.PersonAdaptPlanAndCreateFacilities;
+
+public class CBPopulationPreparation {
+
+	//////////////////////////////////////////////////////////////////////
+	// main
+	//////////////////////////////////////////////////////////////////////
+
+	public static void main(String[] args) {
+
+		final PopulationImpl population = new PopulationImpl();
+		population.setIsStreaming(true);
+		PopulationReader plansReader = new MatsimPopulationReader(population,null);
+		PopulationWriter plansWriter = new PopulationWriter(population,"../../output/output_plans.xml");
+		
+		ActivityFacilities afs = new ActivityFacilitiesImpl();
+
+		System.out.println("adding algorithms...");
+		population.addAlgorithm(new PersonAdaptPlanAndCreateFacilities(afs));
+		population.addAlgorithm(plansWriter);
+		System.out.println("done. (adding algorithms)");
+
+		System.out.println("stream population...");
+		plansReader.readFile("../../input/plansCB.xml");
+		population.printPlansCount();
+		plansWriter.write();
+		Gbl.printMemoryUsage();
+		System.out.println("done. (stream population)");
+
+		System.out.println("writing facilities...");
+		new FacilitiesWriter(afs,"../../output/output_facilities.xml").write();
+		System.out.println("done. (writing facilities)");
+	}
+}
