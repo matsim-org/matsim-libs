@@ -1,6 +1,7 @@
 package playground.gregor.otf.drawer;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,8 +13,11 @@ import javax.media.opengl.GL;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.netvis.renderers.ValueColorizer;
+import org.matsim.vis.otfvis.opengl.gl.InfoText;
 
+import com.sun.opengl.util.j2d.TextRenderer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -34,8 +38,9 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 	private final ValueColorizer colorizer;
 	private final double on;
 	private final double oe;
+	private TextRenderer textRenderer = null;
 
-	public OTFSheltersDrawer(final FeatureSource features, final Map<String,ArrayList<Double>> occupancy, double on, double oe){
+	public OTFSheltersDrawer(final FeatureSource features, final Map<String,ArrayList<Tuple<Integer,Double>>> occupancy, double on, double oe){
 		this.oe = oe;
 		this.on = on;
 		double [] values = {-1.,0.,1.0,1.5,2.0};
@@ -51,16 +56,16 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 		while (it.hasNext()){
 			final Feature ft = it.next();
 			String id = ((Integer) ft.getAttribute("ID")).toString();
-			ArrayList<Double> l = occupancy.get(id);
+			ArrayList<Tuple<Integer,Double>> l = occupancy.get(id);
 			if (l == null || l.size() == 0) {
-				l = new ArrayList<Double>();
-				l.add(-1.);
+				l = new ArrayList<Tuple<Integer,Double>>();
+				l.add(new Tuple<Integer,Double>(0,-1.));
 			}
 			this.shelters.add(getShelter(ft,l));
 		}
 	}
 
-	private Shelter getShelter(Feature ft, ArrayList<Double> arrayList) {
+	private Shelter getShelter(Feature ft, ArrayList<Tuple<Integer,Double>> arrayList) {
 		Shelter s = new Shelter();
 		if (arrayList == null) {
 			throw new RuntimeException("this should not happen!");
@@ -106,6 +111,10 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 
 	@Override
 	public void onDraw(GL gl, int time) {
+		if (this.textRenderer == null) {
+			initTextRenderer();
+		}
+		
 		
 		int relTime = ((((time - 3*3600)/60)));
 		
@@ -119,26 +128,44 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 			if (relTime >= s.occupancy.size()) {
 				sTime = s.occupancy.size()-1;
 			}
-			Color color = this.colorizer.getColor(s.occupancy.get(sTime));
+			Color color = this.colorizer.getColor(s.occupancy.get(sTime).getSecond());
 			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,color.getAlpha()/255.);
 			gl.glBegin(GL.GL_POLYGON);
 			for (int i = 0; i < s.xpoints.length; i++) {
 
 				gl.glVertex3f(s.xpoints[i],s.ypoints[i],1.f);
 			}
+			
 			gl.glEnd();	
+			
+			this.textRenderer.begin3DRendering();
+			float c = 1.f;
+			String text = ""+s.occupancy.get(sTime).getFirst();
+			float width = (float) this.textRenderer.getBounds(text).getWidth();
+			// Render the text
+			this.textRenderer.setColor(c, c, c, 1.f);
+			this.textRenderer.draw3D(text,s.xpoints[0],s.ypoints[0],1.f,.5f);
+			this.textRenderer.end3DRendering();
 			
 		}
 
 	}
 
+	
+	private void initTextRenderer() {
+		// Create the text renderer
+		Font font = new Font("SansSerif", Font.PLAIN, 30);
+		this.textRenderer  = new TextRenderer(font, true, false);
+		InfoText.setRenderer(this.textRenderer);
+	}
+	
 	private static class Shelter implements Serializable{
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 2583984535719211050L;
 		int glType;
-		List<Double> occupancy;
+		List<Tuple<Integer,Double>> occupancy;
 		float [] xpoints;
 		float [] ypoints;
 	}

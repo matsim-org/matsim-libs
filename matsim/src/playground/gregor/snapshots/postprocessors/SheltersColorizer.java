@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
@@ -14,17 +15,11 @@ import org.matsim.evacuation.base.BuildingsShapeReader;
 public class SheltersColorizer implements LinkLeaveEventHandler {
 
 	Map<String,ShelterInfo> shelters = new HashMap<String,ShelterInfo>();
-	Map<String,ArrayList<Double>> occupancies = null;
+	Map<String,ArrayList<Tuple<Integer,Double>>> occupancies = null;
 	private final double snapPeriod;
-	private final double scenarioSize;
-	
-	
-	
-	
 	public SheltersColorizer(String buildings, double snapPeriod, double scenarioSize) {
 		this.snapPeriod = snapPeriod;
-		this.scenarioSize = scenarioSize;
-		List<Building> bs = BuildingsShapeReader.readDataFile(buildings);
+		List<Building> bs = BuildingsShapeReader.readDataFile(buildings,scenarioSize);
 		for (Building b : bs) {
 			if (b.isQuakeProof()) {
 				Counter c= new Counter("shelter " + b.getId() + ":");
@@ -49,16 +44,16 @@ public class SheltersColorizer implements LinkLeaveEventHandler {
 				si.lastSnap = snapshotIndex;
 			}
 			if (this.occupancies == null) {
-				this.occupancies = new HashMap<String,ArrayList<Double>>();
+				this.occupancies = new HashMap<String,ArrayList<Tuple<Integer,Double>>>();
 			}
 			
-			ArrayList<Double> occupancy = this.occupancies.get(id);
+			ArrayList<Tuple<Integer,Double>> occupancy = this.occupancies.get(id);
 			if (occupancy == null) {
-				occupancy = new ArrayList<Double>();
+				occupancy = new ArrayList<Tuple<Integer,Double>>();
 				this.occupancies.put(id, occupancy);
 			}
 			
-			double oldVal = 0;
+			Tuple<Integer,Double> oldVal = new Tuple<Integer,Double>(0,0.);
 			if (occupancy.size() > 0){
 				oldVal = occupancy.get(occupancy.size()-1);
 			}
@@ -66,8 +61,8 @@ public class SheltersColorizer implements LinkLeaveEventHandler {
 			while (snapshotIndex > si.lastSnap ) {
 				si.lastSnap++;
 				if (snapshotIndex == si.lastSnap) {
-					double d = si.c.getCounter()/(si.b.getShelterSpace() * this.scenarioSize);
-					occupancy.add(d);
+					double d = si.c.getCounter()/Math.max(1.,si.b.getShelterSpace());
+					occupancy.add(new Tuple<Integer,Double>(si.c.getCounter(),d));
 				} else {
 					occupancy.add(oldVal);
 				}
@@ -75,7 +70,7 @@ public class SheltersColorizer implements LinkLeaveEventHandler {
 		}
 	}
 	
-	public Map<String,ArrayList<Double>> getOccMap() {
+	public Map<String,ArrayList<Tuple<Integer,Double>>> getOccMap() {
 		return this.occupancies;
 	}
 

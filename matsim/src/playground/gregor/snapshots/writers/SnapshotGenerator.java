@@ -20,6 +20,7 @@
 
 package playground.gregor.snapshots.writers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 	private final String snapshotStyle;
 	private final List<PostProcessorI> colorizers = new ArrayList<PostProcessorI>();
 	private final MVISnapshotWriter writer;
+	private TableSnapshotWriter tableWriter;
 	private final double endTime;
 	private double visOutputMod;
 
@@ -80,6 +82,10 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 		this.writer = writer;
 		this.writer.open();
 		reset(-1);
+	}
+	
+	public void enableTableWriter(String filename) {
+		this.tableWriter = new TableSnapshotWriter(filename);
 	}
 
 	public void addColorizer(PostProcessorI colorizer) {
@@ -154,17 +160,25 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 		System.out.println("create snapshot at " + Time.writeTime(time));
 		Collection<PositionInfo> positions = getVehiclePositions(time);
 		for (PositionInfo pos : positions) {
-			if (pos.getAgentId().hashCode() % this.visOutputMod != 0 ) {
+			if ( (pos.getVehicleState() == PositionInfo.VehicleState.Parking) || (pos.getAgentId().hashCode() % this.visOutputMod != 0) ) {
 				continue;
 			}
+			
 			for (PostProcessorI pp : this.colorizers){
 				pp.processPositionInfo(pos);
 			}
-
 			ExtendedPositionInfo position = new ExtendedPositionInfo(pos.getAgentId(), pos.getEasting(), 
 					pos.getNorthing(), pos.getElevation(), pos.getAzimuth(), pos.getSpeed(),
 					pos.getVehicleState(),pos.getType(),pos.getUserData());
 			this.writer.addVehicle(time, position);
+			
+			if (this.tableWriter != null) {
+				try {
+					this.tableWriter.addVehicle(time,position);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -186,6 +200,9 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 
 	public void finish() {
 		this.writer.finish();
+		if (this.tableWriter != null) {
+			this.tableWriter.finish();
+		}
 	}
 
 	private static class EventLink {

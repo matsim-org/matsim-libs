@@ -60,8 +60,11 @@ public class Convexer {
 				System.out.println("toGo:"  + toGo);
 			}
 
-
-
+			int qp = (Integer) ft.getAttribute("quakeProof");
+			if (qp != 1) {
+				continue;
+			}
+			
 			final Geometry geo = ft.getDefaultGeometry();
 			Polygon poly;
 			if (geo instanceof Polygon) {
@@ -132,9 +135,9 @@ public class Convexer {
 	}
 
 	public static void main(final String [] args) throws Exception {
-		String root = "../../../workspace/vsp-cvs/studies/padang/gis/";
-		final String input = "./tmp/regionII.shp";
-		final String output = "../../inputs/gis/region.shp";
+		String input = "../../inputs/networks/evac_zone_buildings_v20090728.shp";
+//		final String input = "./tmp/regionII.shp";
+		final String output = "../../inputs/gis/shelters.shp";
 		final FeatureSource inFt = ShapeFileReader.readDataFile(input);
 		new Convexer(inFt,output).convex();
 

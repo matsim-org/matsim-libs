@@ -29,6 +29,7 @@ import org.geotools.data.FeatureSource;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
@@ -192,7 +193,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	private int cntTimesteps=0;
 //	private SimpleBackgroundTextureDrawer sbg;
 	private final List<OTFBackgroundTexturesDrawer> sbgs = new ArrayList<OTFBackgroundTexturesDrawer>();
-private Map<String, ArrayList<Double>> occMap = null;
+private Map<String, ArrayList<Tuple<Integer,Double>>> occMap = null;
 
 
 	public void addVehicle(final double time, final ExtendedPositionInfo position) {
@@ -237,7 +238,7 @@ private Map<String, ArrayList<Double>> occMap = null;
 	}
 
 
-	public void setSheltersOccupancyMap(Map<String, ArrayList<Double>> occMap) {
+	public void setSheltersOccupancyMap(Map<String, ArrayList<Tuple<Integer,Double>>> occMap) {
 		this.occMap  = occMap;
 		
 	}

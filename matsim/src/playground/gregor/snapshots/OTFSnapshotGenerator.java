@@ -38,6 +38,9 @@ public class OTFSnapshotGenerator {
 	private final ScenarioImpl scenario;
 	private final String eventsFile;
 	
+//	private final String txtSnapshotFile = null;
+	private final String txtSnapshotFile = "../../outputs/output/snapshots.txt.gz";
+	
 	public OTFSnapshotGenerator() {
 		
 		ScenarioLoader sl = new ScenarioLoader("../../outputs/output/output_config.xml.gz");
@@ -47,11 +50,15 @@ public class OTFSnapshotGenerator {
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 		this.scenario.getConfig().simulation().setEndTime(5*3600);
-		this.scenario.getConfig().evacuation().setBuildingsFile("../../inputs/networks/buildings_v20090403.shp");
-		this.scenario.getConfig().evacuation().setSampleSize("0.01");
+		
+		this.scenario.getConfig().evacuation().setBuildingsFile("../../inputs/networks/evac_zone_buildings_v20090728.shp");
+		this.scenario.getConfig().evacuation().setSampleSize("0.1");
+		this.scenario.getConfig().controler().setLastIteration(160);
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		sl.loadNetwork();
-		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz"; 
+		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz";
+		
+//		this.txtSnapshotFile = "../../outputs/output/snapshots.txt.gz";
 	}
 
 	public OTFSnapshotGenerator(String[] args) {
@@ -102,6 +109,10 @@ public class OTFSnapshotGenerator {
 //		writer.addSimpleBackgroundTextureDrawer(sbgIII);
 		
 		SnapshotGenerator sg = new SnapshotGenerator(this.scenario,writer);
+		if (this.txtSnapshotFile != null) {
+			sg.enableTableWriter(this.txtSnapshotFile);
+		}
+		
 		sg.setVisOutputSample(VIS_OUTPUT_SAMPLE);
 		ev.addHandler(sg);
 		sg.addColorizer(d);

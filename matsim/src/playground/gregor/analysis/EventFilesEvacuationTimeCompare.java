@@ -205,10 +205,10 @@ public class EventFilesEvacuationTimeCompare {
 	}
 	
 	public static void main(final String [] args) {
-		String eventsFile1 = MY_STATIC_STUFF.OUTPUTS + "output/ITERS/it.200/200.events.txt.gz";
-		String eventsFile2 = MY_STATIC_STUFF.OUTPUTS + "output_delay/ITERS/it.200/200.events.txt.gz";
+		String eventsFile1 = MY_STATIC_STUFF.RUNS_SVN + "run320/stage2/output/ITERS/it.0/0.events.txt.gz";
+		String eventsFile2 = MY_STATIC_STUFF.RUNS_SVN + "run319/stage2/output/ITERS/it.0/0.events.txt.gz";
 		String network = "../../inputs/networks/padang_net_evac_v20080618.xml";
-		String outfile = MY_STATIC_STUFF.OUTPUTS + "output/analysis/etimcomp.shp";
+		String outfile = MY_STATIC_STUFF.RUNS_SVN + "run320/analysis/etimcomp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		
