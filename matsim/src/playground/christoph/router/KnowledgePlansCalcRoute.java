@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -45,6 +46,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	protected double time;
 	protected PlansCalcRouteConfigGroup configGroup;
 	protected SubNetworkTools subNetworkTools = new SubNetworkTools();
+	protected KnowledgeTools knowledgeTools = new KnowledgeTools();
 	protected SubNetworkCreator subNetworkCreator;
 	
 	private final static Logger log = Logger.getLogger(KnowledgePlansCalcRoute.class);
@@ -102,24 +104,36 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		}
 		
 		
-		if (this.getLeastCostPathCalculator() instanceof MyDijkstra)
+		if (this.getLeastCostPathCalculator() instanceof DijkstraWrapper)
 		{
-			SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
-			if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(subNetwork);
+			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
+			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
 			
-			new KnowledgeTools().removeKnowledge(person);
-			
-			((MyDijkstra)this.getLeastCostPathCalculator()).setNetwork(subNetwork);
+			if (dijkstra instanceof MyDijkstra)
+			{
+				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
+				
+				new KnowledgeTools().removeKnowledge(person);
+				
+				((MyDijkstra)dijkstra).setNetwork(subNetwork);
+			}
 		}
 		
-		if (this.getPtFreeflowLeastCostPathCalculator() instanceof MyDijkstra)
+		if (this.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
 		{
-			SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
-			if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(subNetwork);
+			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
+			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
 			
-			new KnowledgeTools().removeKnowledge(person);
-			
-			((MyDijkstra)this.getPtFreeflowLeastCostPathCalculator()).setNetwork(subNetwork);
+			if (dijkstra instanceof MyDijkstra)
+			{
+				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
+				
+				new KnowledgeTools().removeKnowledge(person);
+				
+				((MyDijkstra)dijkstra).setNetwork(subNetwork);
+			}
 		}
 	}
 	

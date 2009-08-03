@@ -14,7 +14,7 @@ import playground.christoph.network.SubNode;
 
 public class SubNetworkCreator {
 
-	private NodeKnowledge nodeKnowledge;
+//	private NodeKnowledge nodeKnowledge;
 	private NetworkLayer network;
 	
 //	private Map<Id, NodeImpl[]> inNodes;
@@ -46,14 +46,14 @@ public class SubNetworkCreator {
 		}
 	}
 	
-	public SubNetwork createSubNetwork()
+	public SubNetwork createSubNetwork(NodeKnowledge nodeKnowledge)
 	{
 		SubNetwork subNetwork = new SubNetwork(network);
 		
-		return createSubNetwork(subNetwork);
+		return createSubNetwork(nodeKnowledge, subNetwork);
 	}
 	
-	public SubNetwork createSubNetwork(SubNetwork subNetwork)
+	public SubNetwork createSubNetwork(NodeKnowledge nodeKnowledge, SubNetwork subNetwork)
 	{
 		for (NodeImpl node : nodeKnowledge.getKnownNodes().values())
 		{
@@ -71,7 +71,7 @@ public class SubNetworkCreator {
 					subNetwork.addLink(link);
 				}
 			}
-						
+			
 			LinkImpl[] out = outLinks.get(node.getId());
 			//NodeImpl[] out = outNodes.get(node.getId());
 			

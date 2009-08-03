@@ -66,9 +66,11 @@ import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
 import playground.christoph.mobsim.MyQueueSimEngine;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
+import playground.christoph.network.SubNetwork;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
 import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.MyDijkstra;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
@@ -236,7 +238,7 @@ public class EventControler extends Controler{
 		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
 
 		// Don't use Knowledge for CostCalculations
-		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTimeWrapper);
+		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper);
 
 //		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
@@ -349,28 +351,8 @@ public class EventControler extends Controler{
 		log.info("Set Knowledge Data Handler");
 		setKnowledgeStorageHandler();
 		
-		
-//		KnowledgeDBStorageHandler knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
-//		
-//		knowledgeDBStorageHandler.run();
-//		for(PersonImpl person : population.getPersons().values())
-//		{
-//			System.out.println("ping");
-//			knowledgeDBStorageHandler.addPerson(person);
-//			knowledgeDBStorageHandler.newPersons.notify();
-//		}
-//		try {
-//			knowledgeDBStorageHandler.join();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-//		log.info("Create known Nodes Maps");
-//		createKnownNodes();
-
-//		log.info("Write known Nodes Maps to a File");
-//		writeKownNodesMap();
+		log.info("Set SubNetworks");
+		setSubNetworks();
 		
 		/* 
 		 * Could be done before or after the creation of the activity rooms -
@@ -655,6 +637,16 @@ public class EventControler extends Controler{
 		}
 	}
 	
+	
+	protected void setSubNetworks()
+	{
+		for(PersonImpl person : this.getPopulation().getPersons().values())
+		{
+			Map<String, Object> customAttributes = person.getCustomAttributes();
+
+			customAttributes.put("SubNetwork", new SubNetwork(this.network));
+		}
+	}
 	
 	/*
 	 * Creates the Maps of Nodes that each Agents "knows".
