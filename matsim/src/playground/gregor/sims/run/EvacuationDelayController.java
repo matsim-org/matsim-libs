@@ -29,7 +29,7 @@ public class EvacuationDelayController extends Controler {
 	@Override
 	protected PopulationImpl loadPopulation() {
 		if (this.buildings == null) {
-			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
+			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
 		}
 		
 		return new DelayedEvacuationPopulationLoader(this.buildings,this.scenarioData).getPopulation();

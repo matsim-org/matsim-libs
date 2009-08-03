@@ -27,7 +27,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		FloodingReader fr = new FloodingReader(sc.getConfig().evacuation().getFloodingDataFile(),true);
 		
 		Events events = new Events();
-		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(),fr,events);
+		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(),fr,events,sc.getConfig().evacuation().getBufferSize());
 		
 		double delta = Math.pow(10, -6);
 		

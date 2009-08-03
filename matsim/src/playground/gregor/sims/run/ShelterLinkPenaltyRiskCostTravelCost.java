@@ -24,7 +24,7 @@ public class ShelterLinkPenaltyRiskCostTravelCost implements TravelCost {
 	}
 	
 	public double getLinkTravelCost(Link link, double time) {
-			return this.ttc.getLinkTravelTime(link, time) + this.slp.getLinkTravelCost(link, time) + this.rc.getLinkRisk(link); // + this.sc.getSocialCost(link, time);
+			return this.ttc.getLinkTravelTime(link, time) + this.slp.getLinkTravelCost(link, time); // + this.rc.getLinkRisk(link); // + this.sc.getSocialCost(link, time);
 	}
 
 }

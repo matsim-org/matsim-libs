@@ -61,10 +61,10 @@ public class ShelterEvacuationController extends Controler {
 
 		FloodingReader fr  = new FloodingReader(netcdf,true);
 		
-		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents());
-		this.events.addHandler(rc);
+//		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents());
+//		this.events.addHandler(rc);
 		
-		this.travelCostCalculator = new ShelterLinkPenaltyRiskCostTravelCost(this.travelTimeCalculator,si,rc,null);
+		this.travelCostCalculator = new ShelterLinkPenaltyRiskCostTravelCost(this.travelTimeCalculator,si,null,null);
 		
 	}
 
@@ -75,7 +75,7 @@ public class ShelterEvacuationController extends Controler {
 	@Override
 	protected NetworkLayer loadNetwork() {
 		if (this.buildings == null) {
-			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
+			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
 		}
 		this.esnl = new EvacuationShelterNetLoader(this.buildings,this.scenarioData);
 		NetworkLayer net = this.esnl.getNetwork();
@@ -90,11 +90,12 @@ public class ShelterEvacuationController extends Controler {
 	@Override
 	protected PopulationImpl loadPopulation() {
 		if (this.buildings == null) {
-			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
+			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
 		}
 		EvacuationPopulationFromShapeFileLoader epl = new EvacuationPopulationFromShapeFileLoader(this.buildings,this.scenarioData);
 		PopulationImpl pop = epl.getPopulation();
 		this.esnl.generateShelterLinks();
+		this.scenarioData.setPopulation(pop);
 		return pop;
 	}
 	

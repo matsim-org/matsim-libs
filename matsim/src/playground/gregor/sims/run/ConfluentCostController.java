@@ -40,7 +40,7 @@ public class ConfluentCostController extends Controler {
 
 		FloodingReader fr  = new FloodingReader(netcdf);
 		
-		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents());
+		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents(),this.scenarioData.getConfig().evacuation().getBufferSize());
 		
 		
 		this.travelCostCalculator = new RiskAverseCostCalculator(this.travelTimeCalculator,lpc,rc); 
@@ -60,7 +60,7 @@ public class ConfluentCostController extends Controler {
 	@Override
 	protected PopulationImpl loadPopulation() {
 		if (this.buildings == null) {
-			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile());
+			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
 		}
 		
 		return new EvacuationPopulationFromShapeFileLoader(this.buildings,this.scenarioData).getPopulation();

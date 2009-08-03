@@ -70,6 +70,10 @@ public class EvacuationConfigGroup  extends Module{
 	 */
 	private static final String SAMPLE_SIZE = "sampleSize";
 	
+	/**
+	 * 
+	 */
+	private static final String BUFFER_SIZE = "bufferSize";
 	
 	
 	/**
@@ -97,6 +101,11 @@ public class EvacuationConfigGroup  extends Module{
 	 */
 	private double sampleSize = 0.;
 	
+	/**
+	 * the size of the spatial buffer
+	 */
+	private double bufferSize = 250.;
+	
 
 	public EvacuationConfigGroup(){
 		super(GROUP_NAME);
@@ -116,6 +125,8 @@ public class EvacuationConfigGroup  extends Module{
 			return getEvacuationScanrio().toString();
 		}else if (SAMPLE_SIZE.equals(key)) {
 			return Double.toString(getSampleSize());
+		}else if (BUFFER_SIZE.equals(key)) {
+			return Double.toString(getBufferSize());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -134,6 +145,8 @@ public class EvacuationConfigGroup  extends Module{
 			setEvacuationScenario(value);
 		}else if(SAMPLE_SIZE.equals(key)){
 			setSampleSize(value);
+		}else if(BUFFER_SIZE.equals(key)){
+			setBufferSize(value);
 		}else {
 			throw new IllegalArgumentException(key);
 		}
@@ -147,6 +160,7 @@ public class EvacuationConfigGroup  extends Module{
 		map.put(BUILDINGS_FILE, getValue(BUILDINGS_FILE));
 		map.put(SCENARIO, getValue(SCENARIO));
 		map.put(SAMPLE_SIZE, getValue(SAMPLE_SIZE));
+		map.put(BUFFER_SIZE, getValue(BUFFER_SIZE));
 		return map;
 	}
 	
@@ -257,5 +271,21 @@ public class EvacuationConfigGroup  extends Module{
 	 */
 	public void setSampleSize(String sampleSize) {
 		this.sampleSize = Double.parseDouble(sampleSize);
+	}
+	
+	/**
+	 * 
+	 * @return the size of the spatial buffer
+	 */
+	public double getBufferSize() {
+		return this.bufferSize;
+	}
+	
+	/**
+	 * 
+	 * @param buffer size
+	 */
+	public void setBufferSize(String bufferSize) {
+		this.bufferSize = Double.parseDouble(bufferSize);
 	}
 }
