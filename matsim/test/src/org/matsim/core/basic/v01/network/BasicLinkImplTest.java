@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.network;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -26,6 +26,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01;
+package org.matsim.core.basic.v01.network;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,10 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.core.basic.v01.events.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.vehicles.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.households.AllTests.suite());
-		suite.addTest(org.matsim.core.basic.v01.network.AllTests.suite());
+		suite.addTestSuite(BasicLinkImplTest.class);
 		//$JUnit-END$
 		return suite;
 	}
