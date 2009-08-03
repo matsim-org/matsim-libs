@@ -24,7 +24,7 @@ package playground.mfeil.MDSAM;
 
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.MatsimPopulationReader;
-//import playground.mfeil.ActChainEqualityCheck;
+import playground.mfeil.ActChainEqualityCheck;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChains;
@@ -51,7 +51,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -76,7 +75,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	private final NetworkLayer network;
 	private final PlansCalcRoute router;
 //	private final LocationMutatorwChoiceSet locator;
-	private final LegTravelTimeEstimator estimator;
+//	private final LegTravelTimeEstimator estimator;
 	private final XY2Links linker;
 	private static final Logger log = Logger.getLogger(PlansConstructor.class);
 	
@@ -84,7 +83,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
+		this.outputFile = "/home/baug/mfeil/data/mz2/output_plans.xml.gz";	
 		this.population = new PopulationImpl();
 		this.network = controler.getNetwork();
 		this.init(network);	
@@ -92,10 +91,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), this.tDepDelayCalc);
-		this.estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
-				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				this.router);
+//		this.estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+//				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+//				PlanomatConfigGroup.RoutingCapability.fixedRoute,
+//				this.router);
 		this.linker = new XY2Links (this.controler.getNetwork());
 //		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 	}
@@ -166,50 +165,51 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	private void enlargePlansSet (){
 		log.info("Adding alternative plans...");
-		// balmermi: please check in your java file
-		throw new RuntimeException("ActChainEqualityCheck does not exist");
-//		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
-//		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-//			PersonImpl person = iterator.next();
-//			for (int i=0;i<this.actChains.size();i++){
-//				
-//				// Add all plans with activity chains different to the one of person's current plan
-//				if (!acCheck.checkForEquality(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
-//					PlanImpl plan = new PlanImpl (person);
-//					for (int j=0;j<this.actChains.get(i).size();j++){
-//						if (j%2==0) {
-//							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
-//							plan.addActivity((BasicActivity)act);
-//						}
-//						else {
-//							LegImpl leg = new LegImpl((LegImpl)this.actChains.get(i).get(j));
-//							plan.addLeg((BasicLeg)leg);
-//						}
-//					}
-//					plan.getFirstActivity().setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
-//					plan.getLastActivity().setCoord(person.getSelectedPlan().getLastActivity().getCoord());
-//					
-//					this.linker.run(plan);
-//					
-//					/* Analysis of subtours and random allocation of modes to subtours */
-//					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-//					planAnalyzeSubtours.run(plan);
-//					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
-//						TransportMode[]	modes = TimeModeChoicerConfigGroup.getPossibleModes();
-//						TransportMode mode = modes[(int)(MatsimRandom.getRandom().nextDouble()*modes.length)];
-//						for (int k=1;k<plan.getPlanElements().size();k+=2){
-//							if (planAnalyzeSubtours.getSubtourIndexation()[(k-1)/2]==j){
-//								((LegImpl)plan.getPlanElements().get(k)).setMode(mode);
-//							}
-//						}
-//					}
-//					
-//					this.router.run(plan);					
-//					person.addPlan(plan);
-//				}
-//			}
-//		}
-//		log.info("done.");
+		int counter=0;
+		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			counter++;
+			if (counter%10==0) log.info("Handled "+counter+" persons");
+			for (int i=0;i<this.actChains.size();i++){
+				
+				// Add all plans with activity chains different to the one of person's current plan
+				if (!acCheck.checkForEquality(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
+					PlanImpl plan = new PlanImpl (person);
+					for (int j=0;j<this.actChains.get(i).size();j++){
+						if (j%2==0) {
+							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
+							plan.addActivity((BasicActivity)act);
+						}
+						else {
+							LegImpl leg = new LegImpl((LegImpl)this.actChains.get(i).get(j));
+							plan.addLeg((BasicLeg)leg);
+						}
+					}
+					plan.getFirstActivity().setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
+					plan.getLastActivity().setCoord(person.getSelectedPlan().getLastActivity().getCoord());
+					
+					this.linker.run(plan);
+					
+					/* Analysis of subtours and random allocation of modes to subtours */
+					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+					planAnalyzeSubtours.run(plan);
+					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
+						TransportMode[]	modes = TimeModeChoicerConfigGroup.getPossibleModes();
+						TransportMode mode = modes[(int)(MatsimRandom.getRandom().nextDouble()*modes.length)];
+						for (int k=1;k<plan.getPlanElements().size();k+=2){
+							if (planAnalyzeSubtours.getSubtourIndexation()[(k-1)/2]==j){
+								((LegImpl)plan.getPlanElements().get(k)).setMode(mode);
+							}
+						}
+					}
+					
+					this.router.run(plan);					
+					person.addPlan(plan);
+				}
+			}
+		}
+		log.info("done.");
 	}
 	
 	private void writePlans(){

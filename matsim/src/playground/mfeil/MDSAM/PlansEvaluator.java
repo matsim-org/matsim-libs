@@ -23,18 +23,23 @@ package playground.mfeil.MDSAM;
 
 
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
@@ -42,6 +47,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
+
 
 
 
@@ -100,7 +106,7 @@ public class PlansEvaluator implements PlanStrategyModule{
 			PersonImpl person = iterator1.next();
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				this.router.run(plan);
+				//this.router.run(plan);
 				this.estimator.initPlanSpecificInformation(plan);
 				// Start from first leg
 				for (int i=1;i<plan.getPlanElements().size();i++){
@@ -127,7 +133,58 @@ public class PlansEvaluator implements PlanStrategyModule{
 	}
 	
 	private void writePlansForBiogeme(){
-		// to be written yet
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(this.outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		// First row
+		stream.print("Id\tChoice\t");
+		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
+		for (int i = 0;i<p.getPlans().size();i++){
+			for (int j =0;j<p.getPlans().get(i).getPlanElements().size();j++){
+				stream.print("x"+(i+1)+""+(j+1)+"\t");
+			}
+		}
+		stream.println();
+		
+		// Filling plans
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			stream.print(person.getId()+"\t");
+			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				PlanImpl plan = iterator2.next();
+				for (int i=0;i<plan.getPlanElements().size();i++){
+					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).getDuration()+"\t");
+					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()+"\t");
+				}
+			}
+			stream.println();
+		}
+		
+		/* Write selected plan*/
+		PlanImpl plan = this.population.getPersons().get(new IdImpl ("324")).getSelectedPlan();
+		stream.print(1);
+		stream.print("\t"+1);
+		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(0))).getStartTime()+
+				((ActivityImpl)(plan.getPlanElements().get(6))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(6))).getStartTime()));
+		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(2))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(2))).getStartTime()));
+		stream.print("\t"+0);
+		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(2))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(2))).getStartTime()));
+		stream.print("\t"+2);
+		stream.print("\t"+1);
+		stream.print("\t"+0);
+		stream.print("\t"+1);
+		double traveltime = 0;
+		for (int i=1;i<plan.getPlanElements().size();i+=2){
+			traveltime += ((LegImpl)(plan.getPlanElements().get(i))).getTravelTime();
+		}
+		stream.print("\t"+traveltime);
+		stream.print("\t"+0);
+		stream.print("\t"+0);		
 	}
 		
 }
