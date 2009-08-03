@@ -64,6 +64,7 @@ public class TwoLinesDemo {
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseTransit(true);
+		config.scenario().setUseVehicles(true);
 		config.simulation().setSnapshotStyle("queue");
 		config.simulation().setEndTime(24.0*3600);
 	}
@@ -302,6 +303,7 @@ public class TwoLinesDemo {
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer("two_lines_demo");
+		sim.setCreateMissingVehicles(true);
 
 		OTFDemo.ptConnect("two_lines_demo");
 

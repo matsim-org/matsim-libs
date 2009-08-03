@@ -24,8 +24,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.Departure;
-import org.matsim.vehicles.BasicVehicle;
-import org.matsim.vehicles.BasicVehicleImpl;
 
 /**
  * @author mrieser
@@ -53,12 +51,11 @@ public class DepartureTest extends MatsimTestCase {
 		assertEquals(time, dep.getDepartureTime(), EPSILON);
 	}
 
-	public void testVehicle() {
+	public void testVehicleId() {
 		Departure dep = createDeparture(new IdImpl(6791), 7.0*3600);
-		assertNull(dep.getVehicle());
-		BasicVehicle veh = new BasicVehicleImpl(new IdImpl(2491), null);
-		dep.setVehicle(veh);
-		assertEquals(veh, dep.getVehicle());
+		assertNull(dep.getVehicleId());
+		Id vehId = new IdImpl(2491);
+		dep.setVehicleId(vehId);
+		assertEquals(vehId, dep.getVehicleId());
 	}
-
 }

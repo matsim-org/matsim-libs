@@ -20,21 +20,26 @@
 
 package org.matsim.transitSchedule.api;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.Identifiable;
-import org.matsim.vehicles.BasicVehicle;
 
 /**
  * Describes a single departure along a route in a transit line.
- * 
+ *
  * @author mrieser
  */
 public interface Departure extends Identifiable {
 
 	public abstract double getDepartureTime();
 
-	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
-	public abstract void setVehicle(final BasicVehicle vehicle);
+	/**
+	 * @param vehicleId the id of the vehicle to be used for this departure, may be <code>null</code>
+	 */
+	public abstract void setVehicleId(final Id vehicleId);
 
-	public abstract BasicVehicle getVehicle();
+	/**
+	 * @return The id of the vehicle to be used for this departure, may be <code>null</code>
+	 */
+	public abstract Id getVehicleId();
 
 }

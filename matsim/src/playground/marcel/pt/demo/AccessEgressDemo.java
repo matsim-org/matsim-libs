@@ -27,6 +27,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.LinkImpl;
@@ -38,12 +39,17 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.BasicVehicleCapacity;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.VehicleBuilder;
 
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
@@ -77,6 +83,7 @@ public class AccessEgressDemo {
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
+		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		config.simulation().setSnapshotStyle("queue");
 		config.simulation().setEndTime(24.0*3600);
@@ -121,7 +128,22 @@ public class AccessEgressDemo {
 		schedule.addTransitLine(tLine);
 
 		for (int i = 0; i < nOfBuses; i++	) {
-			tRoute.addDeparture(builder.createDeparture(this.ids[i], departureTime + i*heading + (i == delayedBus ? delay : 0)));
+			Departure dep = builder.createDeparture(this.ids[i], departureTime + i*heading + (i == delayedBus ? delay : 0));
+			dep.setVehicleId(this.ids[i]);
+			tRoute.addDeparture(dep);
+		}
+	}
+
+	private void createVehicles() {
+		BasicVehicles vehicles = this.scenario.getVehicles();
+		VehicleBuilder vb = vehicles.getBuilder();
+		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
+		BasicVehicleCapacity capacity = vb.createVehicleCapacity();
+		capacity.setSeats(Integer.valueOf(101));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
+		for (int i = 0; i < nOfBuses; i++) {
+			vehicles.getVehicles().put(this.ids[i], vb.createVehicle(this.ids[i], vehicleType));
 		}
 	}
 
@@ -180,6 +202,7 @@ public class AccessEgressDemo {
 		prepareConfig();
 		createNetwork();
 		createTransitSchedule();
+		createVehicles();
 		createPopulation();
 		runSim();
 	}

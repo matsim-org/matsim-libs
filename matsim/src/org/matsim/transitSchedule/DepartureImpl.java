@@ -22,20 +22,18 @@ package org.matsim.transitSchedule;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.transitSchedule.api.Departure;
-import org.matsim.vehicles.BasicVehicle;
 
 
 /**
  * Describes a single departure along a route in a transit line.
- * 
+ *
  * @author mrieser
  */
 public class DepartureImpl implements Departure {
 
 	private final Id id;
 	private final double departureTime;
-	
-	private BasicVehicle vehicle = null;
+	private Id vehicleId = null;
 
 	protected DepartureImpl(final Id id, final double departureTime) {
 		this.id = id;
@@ -49,14 +47,13 @@ public class DepartureImpl implements Departure {
 	public double getDepartureTime() {
 		return this.departureTime;
 	}
-	
-	/** Stores with which vehicle this heading departs. Note that this information is not (yet) persistent / stored in file! */
-	public void setVehicle(final BasicVehicle vehicle) {
-		this.vehicle = vehicle;
+
+	public void setVehicleId(final Id vehicleId) {
+		this.vehicleId = vehicleId;
 	}
-	
-	public BasicVehicle getVehicle() {
-		return this.vehicle;
+
+	public Id getVehicleId() {
+		return this.vehicleId;
 	}
 
 }

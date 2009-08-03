@@ -47,6 +47,7 @@ package org.matsim.transitSchedule;
 	/*package*/ static final String LINK_REF_ID = "linkRefId";
 	/*package*/ static final String TRANSPORT_MODE = "transportMode";
 	/*package*/ static final String DEPARTURE_TIME = "departureTime";
+	/*package*/ static final String VEHICLE_REF_ID = "vehicleRefId";
 	/*package*/ static final String DEPARTURE_OFFSET = "departureOffset";
 	/*package*/ static final String ARRIVAL_OFFSET = "arrivalOffset";
 	/*package*/ static final String AWAIT_DEPARTURE = "awaitDeparture";

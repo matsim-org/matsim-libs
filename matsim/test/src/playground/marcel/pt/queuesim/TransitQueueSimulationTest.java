@@ -59,6 +59,8 @@ import org.matsim.vehicles.BasicVehicleCapacityImpl;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
+import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.VehicleBuilder;
 
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
@@ -73,6 +75,7 @@ public class TransitQueueSimulationTest extends TestCase {
 	public void testCreateAgents() {
 		// setup: config
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().simulation().setEndTime(8.0*3600);
 
@@ -83,6 +86,20 @@ public class TransitQueueSimulationTest extends TestCase {
 		NodeImpl node3 = network.createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
 		Link link1 = network.createLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		Link link2 = network.createLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+
+		// setup: vehicles
+		BasicVehicles vehicles = scenario.getVehicles();
+		VehicleBuilder vb = vehicles.getBuilder();
+		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
+		BasicVehicleCapacity capacity = vb.createVehicleCapacity();
+		capacity.setSeats(Integer.valueOf(101));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
+		vehicles.getVehicles().put(new IdImpl("veh1"), vb.createVehicle(new IdImpl("veh1"), vehicleType));
+		vehicles.getVehicles().put(new IdImpl("veh2"), vb.createVehicle(new IdImpl("veh2"), vehicleType));
+		vehicles.getVehicles().put(new IdImpl("veh3"), vb.createVehicle(new IdImpl("veh3"), vehicleType));
+		vehicles.getVehicles().put(new IdImpl("veh4"), vb.createVehicle(new IdImpl("veh4"), vehicleType));
+		vehicles.getVehicles().put(new IdImpl("veh5"), vb.createVehicle(new IdImpl("veh5"), vehicleType));
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -113,8 +130,12 @@ public class TransitQueueSimulationTest extends TestCase {
 		{ // line 1, 1 route, 2 departures
 			TransitLine line = builder.createTransitLine(scenario.createId("1"));
 			TransitRoute tRoute = builder.createTransitRoute(scenario.createId(">"), route, stops, TransportMode.pt);
-			tRoute.addDeparture(builder.createDeparture(scenario.createId("dep1"), 6.0*3600));
-			tRoute.addDeparture(builder.createDeparture(scenario.createId("dep2"), 7.0*3600));
+			Departure dep = builder.createDeparture(scenario.createId("dep1"), 6.0*3600);
+			dep.setVehicleId(new IdImpl("veh1"));
+			tRoute.addDeparture(dep);
+			dep = builder.createDeparture(scenario.createId("dep2"), 7.0*3600);
+			dep.setVehicleId(new IdImpl("veh2"));
+			tRoute.addDeparture(dep);
 			line.addRoute(tRoute);
 			schedule.addTransitLine(line);
 		}
@@ -123,17 +144,23 @@ public class TransitQueueSimulationTest extends TestCase {
 			TransitLine line = builder.createTransitLine(scenario.createId("2"));
 			{ // route 1
 				TransitRoute tRoute = builder.createTransitRoute(scenario.createId("A"), route, stops, TransportMode.pt);
-				tRoute.addDeparture(builder.createDeparture(scenario.createId("dep3"), 8.0*3600));
+				Departure dep = builder.createDeparture(scenario.createId("dep3"), 8.0*3600);
+				dep.setVehicleId(new IdImpl("veh3"));
+				tRoute.addDeparture(dep);
 				line.addRoute(tRoute);
 			}
 			{ // route 2
 				TransitRoute tRoute = builder.createTransitRoute(scenario.createId("B"), route, stops, TransportMode.pt);
-				tRoute.addDeparture(builder.createDeparture(scenario.createId("dep4"), 8.5*3600));
+				Departure dep = builder.createDeparture(scenario.createId("dep4"), 8.5*3600);
+				dep.setVehicleId(new IdImpl("veh4"));
+				tRoute.addDeparture(dep);
 				line.addRoute(tRoute);
 			}
 			{ // route 3
 				TransitRoute tRoute = builder.createTransitRoute(scenario.createId("C"), route, stops, TransportMode.pt);
-				tRoute.addDeparture(builder.createDeparture(scenario.createId("dep5"), 9.0*3600));
+				Departure dep = builder.createDeparture(scenario.createId("dep5"), 9.0*3600);
+				dep.setVehicleId(new IdImpl("veh5"));
+				tRoute.addDeparture(dep);
 				line.addRoute(tRoute);
 			}
 			schedule.addTransitLine(line);
@@ -385,7 +412,7 @@ public class TransitQueueSimulationTest extends TestCase {
 			TransitQueueVehicle veh = new TransitQueueVehicle(new BasicVehicleImpl(this.driver.getPerson().getId(), vehicleType), 5);
 			veh.setDriver(this.driver);
 			this.driver.setVehicle(veh);
-			this.departure.setVehicle(veh.getBasicVehicle());
+			this.departure.setVehicleId(veh.getBasicVehicle().getId());
 			QueueLink qlink = this.network.getQueueLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
 			qlink.addParkedVehicle(veh);
 

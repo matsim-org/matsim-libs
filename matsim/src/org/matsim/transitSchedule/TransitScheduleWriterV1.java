@@ -170,12 +170,15 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 		this.writeStartTag(Constants.DEPARTURES, null);
 
 		// optimization: only create one List for multiple departures
-		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(2);
+		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(3);
 
 		for (Departure dep : departures.values()) {
 			attributes.clear();
 			attributes.add(this.createTuple(Constants.ID, dep.getId().toString()));
 			attributes.add(this.createTimeTuple(Constants.DEPARTURE_TIME, dep.getDepartureTime()));
+			if (dep.getVehicleId() != null) {
+				attributes.add(this.createTuple(Constants.VEHICLE_REF_ID, dep.getVehicleId().toString()));
+			}
 			this.writeStartTag(Constants.DEPARTURE, attributes, true);
 		}
 

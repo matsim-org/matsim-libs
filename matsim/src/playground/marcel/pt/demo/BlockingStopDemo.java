@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.api.experimental.network.Link;
 import org.matsim.core.api.experimental.population.PopulationBuilder;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
 import org.matsim.core.network.LinkImpl;
@@ -39,12 +40,17 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.BasicVehicleCapacity;
+import org.matsim.vehicles.BasicVehicleType;
+import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vehicles.VehicleBuilder;
 
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
@@ -74,6 +80,7 @@ public class BlockingStopDemo {
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
+		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		config.simulation().setSnapshotStyle("queue");
 		config.simulation().setEndTime(24.0*3600);
@@ -122,7 +129,9 @@ public class BlockingStopDemo {
 		tLine1.addRoute(tRoute1);
 		schedule.addTransitLine(tLine1);
 
-		tRoute1.addDeparture(builder.createDeparture(this.ids[1], busDeparture));
+		Departure dep1 = builder.createDeparture(this.ids[1], busDeparture);
+		dep1.setVehicleId(this.ids[1]);
+		tRoute1.addDeparture(dep1);
 
 		// line 2
 		stopList = new ArrayList<TransitRouteStop>(nOfStops);
@@ -147,13 +156,27 @@ public class BlockingStopDemo {
 		tLine2.addRoute(tRoute2);
 		schedule.addTransitLine(tLine2);
 
-		tRoute2.addDeparture(builder.createDeparture(this.ids[2], busDeparture));
+		Departure dep2 = builder.createDeparture(this.ids[2], busDeparture);
+		dep2.setVehicleId(this.ids[2]);
+		tRoute2.addDeparture(dep2);
 
 //		try {
 //			new TransitScheduleWriterV1(this.schedule).write("blockingStopSchedule.xml");
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
+	}
+
+	private void createVehicles() {
+		BasicVehicles vehicles = this.scenario.getVehicles();
+		VehicleBuilder vb = vehicles.getBuilder();
+		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
+		BasicVehicleCapacity capacity = vb.createVehicleCapacity();
+		capacity.setSeats(Integer.valueOf(101));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
+		vehicles.getVehicles().put(this.ids[1], vb.createVehicle(this.ids[1], vehicleType));
+		vehicles.getVehicles().put(this.ids[2], vb.createVehicle(this.ids[2], vehicleType));
 	}
 
 	private void createPopulation() {
@@ -272,6 +295,7 @@ public class BlockingStopDemo {
 		createNetwork();
 		createTransitSchedule();
 		createPopulation();
+		createVehicles();
 		runSim();
 	}
 

@@ -51,6 +51,7 @@ public class TransitControler extends Controler {
 		this.transitConfig = new TransitConfigGroup();
 		this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
 		this.config.scenario().setUseTransit(true);
+		this.config.scenario().setUseVehicles(true);
 		this.schedule = this.scenarioData.getTransitSchedule();
 
 		TransitControlerListener cl = new TransitControlerListener(this.schedule, this.scenarioData.getNetwork(), this.transitConfig);

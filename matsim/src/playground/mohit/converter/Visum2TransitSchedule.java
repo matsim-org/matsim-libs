@@ -135,7 +135,7 @@ public class Visum2TransitSchedule {
 								Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
 								BasicVehicle veh = vb.createVehicle(new IdImpl(vehId++), vehType);
 								this.vehicles.getVehicles().put(veh.getId(), veh);
-								departure.setVehicle(veh);
+								departure.setVehicleId(veh.getId());
 								tRoute.addDeparture(departure);
 							}
 						}

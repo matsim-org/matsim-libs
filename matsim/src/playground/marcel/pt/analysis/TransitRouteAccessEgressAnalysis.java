@@ -41,16 +41,16 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 
 	public final TransitRoute transitRoute;
 	public Map<Id, Departure> headings = null;
-	private Map<Departure, Map<Id, Integer>> accessCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
-	private Map<Departure, Map<Id, Integer>> egressCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
+	private final Map<Departure, Map<Id, Integer>> accessCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
+	private final Map<Departure, Map<Id, Integer>> egressCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
 	private final VehicleTracker vehTracker;
 
 	public TransitRouteAccessEgressAnalysis(final TransitRoute transitRoute, final VehicleTracker vehicleTracker) {
 		this.transitRoute = transitRoute;
 		this.vehTracker = vehicleTracker;
 	}
-	
-	public void handleEvent(BasicPersonEntersVehicleEvent event) {
+
+	public void handleEvent(final BasicPersonEntersVehicleEvent event) {
 		if (this.headings == null) {
 			collectHeadingsInfo();
 		}
@@ -67,7 +67,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		}
 	}
 
-	public void handleEvent(BasicPersonLeavesVehicleEvent event) {
+	public void handleEvent(final BasicPersonLeavesVehicleEvent event) {
 		if (this.headings == null) {
 			collectHeadingsInfo();
 		}
@@ -84,18 +84,18 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		}
 	}
 
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		this.headings = null;
 		this.accessCounters.clear();
 		this.egressCounters.clear();
 	}
-	
+
 	public void printStats() {
 		List<Id> stopFacilityIds = new ArrayList<Id>(this.transitRoute.getStops().size());
 		for (TransitRouteStop stop : this.transitRoute.getStops()) {
 			stopFacilityIds.add(stop.getStopFacility().getId());
 		}
-		
+
 		System.out.print("stops/departure");
 		for (Id id : stopFacilityIds) {
 			System.out.print("\t" + id);
@@ -127,7 +127,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 			System.out.println();
 		}
 	}
-	
+
 	public Map<Id, Integer> getAccessCounter(final Departure departure) {
 		Map<Id, Integer> counter = this.accessCounters.get(departure);
 		if (counter == null) {
@@ -136,7 +136,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		}
 		return counter;
 	}
-	
+
 	public Map<Id, Integer> getEgressCounter(final Departure departure) {
 		Map<Id, Integer> counter = this.egressCounters.get(departure);
 		if (counter == null) {
@@ -145,19 +145,19 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		}
 		return counter;
 	}
-	
+
 	/**
 	 * Lazy initialization, as the vehicle info may not be available from the beginning.
 	 */
 	private void collectHeadingsInfo() {
 		Map<Id, Departure> map = new HashMap<Id, Departure>(this.transitRoute.getDepartures().size()*2);
-		
+
 		for (Departure departure : this.transitRoute.getDepartures().values()) {
-			if (departure.getVehicle() != null) {
-				map.put(departure.getVehicle().getId(), departure);
+			if (departure.getVehicleId() != null) {
+				map.put(departure.getVehicleId(), departure);
 			}
 		}
-		
+
 		/* try to make it thread-safe by assigning class-member at the end.
 		 * if two threads enter this method, nothing bad should happen,
 		 * as both threads should generated the same initialization.

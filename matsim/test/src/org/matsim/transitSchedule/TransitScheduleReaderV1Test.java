@@ -995,4 +995,59 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertEquals(depId2, dep2.getId());
 		assertEquals(Time.parseTime(depTime2), dep2.getDepartureTime(), MatsimTestCase.EPSILON);
 	}
+
+	public void testDepartures_withVehicleRef() {
+		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
+		Stack<String> context = new Stack<String>();
+		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
+		context.push(Constants.TRANSIT_SCHEDULE);
+		Id lineId = new IdImpl("1");
+		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
+		context.push(Constants.TRANSIT_LINE);
+
+		Id routeId1 = new IdImpl("foo");
+		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
+		context.push(Constants.TRANSIT_ROUTE);
+
+		// by definition of the file format, transitRoute *must* have transportMode, routeProfile and departures defined
+		reader.startTag(Constants.TRANSPORT_MODE, AttributesBuilder.getEmpty(), context);
+		reader.endTag(Constants.TRANSPORT_MODE, "bus", context);
+		reader.startTag(Constants.ROUTE_PROFILE, AttributesBuilder.getEmpty(), context); // route profile can be empty
+		reader.endTag(Constants.ROUTE_PROFILE, EMPTY_STRING, context);
+		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
+		context.push(Constants.DEPARTURES);
+
+		Id depId1 = new IdImpl("23");
+		String depTime1 = "07:35:42";
+		reader.startTag(Constants.DEPARTURE, new AttributesBuilder().add(Constants.ID, depId1.toString()).
+				add(Constants.DEPARTURE_TIME, depTime1).add(Constants.VEHICLE_REF_ID, "v 975").get(), context);
+		reader.endTag(Constants.DEPARTURE, EMPTY_STRING, context);
+
+		Id depId2 = new IdImpl("42");
+		String depTime2 = "07:35:42";
+		reader.startTag(Constants.DEPARTURE, new AttributesBuilder().add(Constants.ID, depId2.toString()).
+				add(Constants.DEPARTURE_TIME, depTime2).get(), context);
+		reader.endTag(Constants.DEPARTURE, EMPTY_STRING, context);
+
+		reader.endTag(context.pop(), EMPTY_STRING, context); // DEPATURES
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_LINE
+		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
+
+		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
+		assertEquals(2, route.getDepartures().size());
+		Departure dep1 = route.getDepartures().get(depId1);
+		assertNotNull(dep1);
+		assertEquals(depId1, dep1.getId());
+		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(new IdImpl("v 975"), dep1.getVehicleId());
+		Departure dep2 = route.getDepartures().get(depId2);
+		assertNotNull(dep2);
+		assertEquals(depId2, dep2.getId());
+		assertEquals(Time.parseTime(depTime2), dep2.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertNull(dep2.getVehicleId());
+	}
+
+
 }

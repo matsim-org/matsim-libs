@@ -50,7 +50,7 @@ import playground.marcel.pt.utils.CreatePseudoNetwork;
 public class PseudoNetworkDemo {
 
 	private static final String SERVERNAME = "pseudoNetworkDemo";
-	
+
 	public static void main(final String[] args) {
 		String networkFile = null;
 		String transitScheduleFile = null;
@@ -61,13 +61,15 @@ public class PseudoNetworkDemo {
 //			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
 //			transitScheduleFile = "../thesis-data/examples/berta/schedule.xml";
 //			transitScheduleFile = "/Users/cello/Desktop/Mohit/berlinSchedule.xml";
-			transitScheduleFile = "/Users/cello/Desktop/Mohit/zuerichSchedule.xml";
+//			transitScheduleFile = "../thesis-data/application/zuerichSchedule.xml";
+			transitScheduleFile = "../thesis-data/application/transitSchedule.oevModellZH.xml";
 		}
-		
+
 		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		
+
 		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
@@ -81,7 +83,7 @@ public class PseudoNetworkDemo {
 				e.printStackTrace();
 			}
 		}
-		
+
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		try {
 			new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
@@ -92,12 +94,12 @@ public class PseudoNetworkDemo {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		network.getLinks().clear();
 		network.getNodes().clear();
-		
+
 		new CreatePseudoNetwork(schedule, network).run();
-		
+
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		LinkImpl link1 = network.getLink(scenario.createId("1"));
 
@@ -114,16 +116,17 @@ public class PseudoNetworkDemo {
 		leg.setRoute(network.getFactory().createRoute(TransportMode.walk, link1, link1));
 		plan.addLeg(leg);
 		plan.addActivity(population.getBuilder().createActivityFromLinkId("home", link1.getId()));
-		
+
 		final Events events = new Events();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
-		
+
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		sim.setCreateMissingVehicles(true);
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
 		writer.closeFile();
 	}
-	
+
 }

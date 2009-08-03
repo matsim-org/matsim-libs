@@ -97,8 +97,12 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		route1.setDescription("Just a comment.");
 
 		route1.addDeparture(builder.createDeparture(new IdImpl("2"), 7.0*3600));
-		route1.addDeparture(builder.createDeparture(new IdImpl("4"), 7.0*3600 + 300));
-		route1.addDeparture(builder.createDeparture(new IdImpl("7"), 7.0*3600 + 600));
+		Departure dep = builder.createDeparture(new IdImpl("4"), 7.0*3600 + 300);
+		dep.setVehicleId(new IdImpl("86"));
+		route1.addDeparture(dep);
+		dep = builder.createDeparture(new IdImpl("7"), 7.0*3600 + 600);
+		dep.setVehicleId(new IdImpl("19"));
+		route1.addDeparture(dep);
 
 		TransitLine line1 = builder.createTransitLine(new IdImpl("8"));
 		line1.addRoute(route1);
@@ -190,6 +194,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 					Departure departureA = routeA.getDepartures().get(departureE.getId());
 					assertNotNull("departure not found: " + departureE.getId().toString(), departureA);
 					assertEquals("different departure times.", departureE.getDepartureTime(), departureA.getDepartureTime(), EPSILON);
+					assertEquals("different vehicle ids.", departureE.getVehicleId(), departureA.getVehicleId());
 				}
 			}
 		}

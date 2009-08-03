@@ -50,6 +50,7 @@ public class ScenarioPlayer {
 	public static void play(final ScenarioImpl scenario, final Events events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		sim.setCreateMissingVehicles(true);
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
@@ -72,6 +73,7 @@ public class ScenarioPlayer {
 
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
 		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().scenario().setUseVehicles(true);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");

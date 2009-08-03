@@ -100,6 +100,10 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (Constants.DEPARTURE.equals(name)) {
 			Id id = new IdImpl(atts.getValue(Constants.ID));
 			Departure departure = new DepartureImpl(id, Time.parseTime(atts.getValue("departureTime")));
+			String vehicleRefId = atts.getValue(Constants.VEHICLE_REF_ID);
+			if (vehicleRefId != null) {
+				departure.setVehicleId(new IdImpl(vehicleRefId));
+			}
 			this.currentTransitRoute.departures.put(id, departure);
 		} else if (Constants.ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRoute();
