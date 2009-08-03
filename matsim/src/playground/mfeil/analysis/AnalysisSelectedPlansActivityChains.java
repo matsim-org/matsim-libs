@@ -21,6 +21,7 @@
 package playground.mfeil.analysis;
 
 import java.io.File;
+import playground.mfeil.ActChainEqualityCheck;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -89,12 +90,12 @@ public class AnalysisSelectedPlansActivityChains {
 		
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<PlanImpl>>();
-		
+		ActChainEqualityCheck ac = new ActChainEqualityCheck();
 		Map<Id,PersonImpl> agents = this.population.getPersons();
 		for (PersonImpl person:agents.values()){
 			boolean alreadyIn = false;
 			for (int i=0;i<this.activityChains.size();i++){
-				if (this.checkForEquality(person.getSelectedPlan(), this.activityChains.get(i))){
+				if (ac.checkEqualActChains(person.getSelectedPlan().getPlanElements(), this.activityChains.get(i))){
 					plans.get(i).add(person.getSelectedPlan());
 					alreadyIn = true;
 					break;
@@ -173,35 +174,17 @@ public class AnalysisSelectedPlansActivityChains {
 		stream1.println();
 	}
 	
-	protected boolean checkForEquality (PlanImpl plan, List<PlanElement> activityChain){
-		
-		if (plan.getPlanElements().size()!=activityChain.size()){
-		
-			return false;
-		}
-		else{
-			ArrayList<String> acts1 = new ArrayList<String> ();
-			ArrayList<String> acts2 = new ArrayList<String> ();
-			for (int i = 0;i<plan.getPlanElements().size();i=i+2){
-				acts1.add(((ActivityImpl)(plan.getPlanElements().get(i))).getType().toString());				
-			}
-			for (int i = 0;i<activityChain.size();i=i+2){
-				acts2.add(((ActivityImpl)(activityChain.get(i))).getType().toString());				
-			}		
-			return (acts1.equals(acts2));
-		}
-	}			
-	
 
 	public static void main(final String [] args) {
-		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/mz/plans.xml";
-//		final String populationFilename = "./plans/output_plans.xml.gz";
-//		final String networkFilename = "./plans/network.xml";
-//		final String facilitiesFilename = "./plans/facilities.xml.gz";
+//		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+//		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
+//		final String populationFilename = "/home/baug/mfeil/data/mz/plans.xml";
+		final String populationFilename = "./plans/output_plans.xml.gz";
+		final String networkFilename = "./plans/network.xml";
+		final String facilitiesFilename = "./plans/facilities.xml.gz";
 
-		final String outputDir = "/home/baug/mfeil/data/Zurich10";
+//		final String outputDir = "/home/baug/mfeil/data/Zurich10";
+		final String outputDir = "./plans";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);

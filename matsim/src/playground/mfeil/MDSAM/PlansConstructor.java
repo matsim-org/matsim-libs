@@ -28,8 +28,9 @@ import playground.mfeil.ActChainEqualityCheck;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChains;
+import playground.mfeil.analysis.AnalysisSelectedPlansActivityChainsModes;
 import playground.mfeil.config.TimeModeChoicerConfigGroup;
-
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -44,16 +45,14 @@ import org.matsim.population.algorithms.XY2Links;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 
@@ -82,8 +81,10 @@ public class PlansConstructor implements PlanStrategyModule{
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-		this.inputFile = "/home/baug/mfeil/data/mz/plans.xml";	
+		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/mz2/output_plans.xml.gz";	
+	//	this.inputFile = "./plans/input_plans.xml";	
+	//	this.outputFile = "./plans/output_plans.xml.gz";	
 		this.population = new PopulationImpl();
 		this.network = controler.getNetwork();
 		this.init(network);	
@@ -114,16 +115,40 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 
 	public void finishReplanning(){
+	//	this.selectZurich10MZPlans();
 		this.reducePersons();
 		this.linkRouteOrigPlans();
 		this.enlargePlansSet();
 		this.writePlans();
 	}
 	
+	/*
+	// Method that filter only Zurich10% plans
+	private void selectZurich10MZPlans (){
+		log.info("Creating Zurich10% population...");
+		// Quite strange coding but throws ConcurrentModificationException otherwise...
+		Object [] a = this.population.getPersons().values().toArray();
+		for (int i=a.length-1;i>=0;i--){
+			PersonImpl person = (PersonImpl) a[i];
+			boolean isIn = false;
+			for (int j=0;j<person.getSelectedPlan().getPlanElements().size();j+=2){
+				if (CoordUtils.calcDistance(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(j))).getCoord(), new CoordImpl(683518.0,246836.0))<=30000){
+					isIn = true;
+					break;
+				}
+			}
+			if (!isIn){
+				this.population.getPersons().remove(person.getId());
+			}
+		}
+		log.info("done... Size of population is "+this.population.getPersons().size()+".");
+	}
+	*/
+	
 	private void reducePersons (){
 		// Drop those persons whose plans do not belong to x most frequent activity chains.
 		log.info("Analyzing activitiy chains...");
-		AnalysisSelectedPlansActivityChains analyzer = new AnalysisSelectedPlansActivityChains(this.population);
+		AnalysisSelectedPlansActivityChains analyzer = new AnalysisSelectedPlansActivityChainsModes(this.population);
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
 		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
 		log.info("done.");
@@ -174,7 +199,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (int i=0;i<this.actChains.size();i++){
 				
 				// Add all plans with activity chains different to the one of person's current plan
-				if (!acCheck.checkForEquality(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
+				if (!acCheck.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
 					PlanImpl plan = new PlanImpl (person);
 					for (int j=0;j<this.actChains.get(i).size();j++){
 						if (j%2==0) {
@@ -191,7 +216,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					
 					this.linker.run(plan);
 					
-					/* Analysis of subtours and random allocation of modes to subtours */
+					/* Analysis of subtours and random allocation of modes to subtours 
 					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 					planAnalyzeSubtours.run(plan);
 					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
@@ -202,10 +227,11 @@ public class PlansConstructor implements PlanStrategyModule{
 								((LegImpl)plan.getPlanElements().get(k)).setMode(mode);
 							}
 						}
-					}
+					}*/
 					
 					this.router.run(plan);					
-					person.addPlan(plan);
+					//person.addPlan(plan);
+					person.getPlans().set(i, plan);
 				}
 			}
 		}

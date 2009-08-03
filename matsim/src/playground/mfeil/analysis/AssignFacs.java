@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AnalysisSelectedPlansActivityChains.java
+ * AssignFacs.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -37,8 +37,7 @@ import org.matsim.core.population.*;
 
 
 /**
- * Simple class to analyze the selected plans of a plans (output) file. Extracts the 
- * activity chains and their number of occurrences.
+ * Simple class to assign facilities to a MZ plans file.
  *
  * @author mfeil
  */

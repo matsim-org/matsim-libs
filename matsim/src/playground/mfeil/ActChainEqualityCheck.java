@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 
 
 /**
@@ -34,7 +36,7 @@ import org.matsim.core.population.ActivityImpl;
 
 public class ActChainEqualityCheck {
 
-	public boolean checkForEquality (List<PlanElement> ac1, List<PlanElement> ac2){
+	public boolean checkEqualActChains (List<PlanElement> ac1, List<PlanElement> ac2){
 		
 		if (ac1.size()!=ac2.size()){
 		
@@ -52,4 +54,25 @@ public class ActChainEqualityCheck {
 			return (acts1.equals(acts2));
 		}
 	}	
+	
+	public boolean checkEqualActChainsModes (List<PlanElement> ac1, List<PlanElement> ac2){
+		
+		if (ac1.size()!=ac2.size()){
+			
+			return false;
+		}
+		else{
+			ArrayList<String> actsmodes1 = new ArrayList<String> ();
+			ArrayList<String> actsmodes2 = new ArrayList<String> ();
+			for (int i = 0;i<ac1.size();i++){
+				if (i%2==0)	actsmodes1.add(((ActivityImpl)(ac1.get(i))).getType().toString());		
+				else actsmodes1.add(((LegImpl)(ac1.get(i))).getMode().toString());
+			}
+			for (int i = 0;i<ac2.size();i++){
+				if (i%2==0) actsmodes2.add(((ActivityImpl)(ac2.get(i))).getType().toString());	
+				else actsmodes2.add(((LegImpl)(ac2.get(i))).getMode().toString());
+			}		
+			return (actsmodes1.equals(actsmodes2));
+		}
+	}		
 }	

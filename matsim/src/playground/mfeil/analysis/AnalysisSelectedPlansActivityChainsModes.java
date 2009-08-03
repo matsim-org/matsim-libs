@@ -25,8 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.api.experimental.ScenarioImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -34,9 +36,12 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
+
+import playground.mfeil.ActChainEqualityCheck;
 
 
 /**
@@ -55,26 +60,32 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 		super (population, knowledges, outputDir);
 	}
 	
-	protected boolean checkForEquality (PlanImpl plan, List<PlanElement> activityChain){
+	public AnalysisSelectedPlansActivityChainsModes(final PopulationImpl population) {
+		super (population);
+	}
+	
+	protected void initAnalysis(){
 		
-		if (plan.getPlanElements().size()!=activityChain.size()){
-		
-			return false;
-		}
-		else{
-			ArrayList<String> actsmodes1 = new ArrayList<String> ();
-			ArrayList<String> actsmodes2 = new ArrayList<String> ();
-			for (int i = 0;i<plan.getPlanElements().size();i++){
-				if (i%2==0)	actsmodes1.add(((ActivityImpl)(plan.getPlanElements().get(i))).getType().toString());		
-				else actsmodes1.add(((LegImpl)(plan.getPlanElements().get(i))).getMode().toString());
+		this.activityChains = new ArrayList<List<PlanElement>>();
+		this.plans = new ArrayList<ArrayList<PlanImpl>>();
+		ActChainEqualityCheck ac = new ActChainEqualityCheck();
+		Map<Id,PersonImpl> agents = this.population.getPersons();
+		for (PersonImpl person:agents.values()){
+			boolean alreadyIn = false;
+			for (int i=0;i<this.activityChains.size();i++){
+				if (ac.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.activityChains.get(i))){
+					plans.get(i).add(person.getSelectedPlan());
+					alreadyIn = true;
+					break;
+				}
 			}
-			for (int i = 0;i<activityChain.size();i++){
-				if (i%2==0) actsmodes2.add(((ActivityImpl)(activityChain.get(i))).getType().toString());	
-				else actsmodes2.add(((LegImpl)(plan.getPlanElements().get(i))).getMode().toString());
-			}		
-			return (actsmodes1.equals(actsmodes2));
+			if (!alreadyIn){
+				this.activityChains.add(person.getSelectedPlan().getPlanElements());
+				this.plans.add(new ArrayList<PlanImpl>());
+				this.plans.get(this.plans.size()-1).add(person.getSelectedPlan());
+			}
 		}
-	}		
+	}
 	
 	protected void analyze(){
 	
