@@ -22,24 +22,16 @@ package playground.mfeil.MDSAM;
 
 
 
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Iterator;
-
 import org.apache.log4j.Logger;
-
-
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
@@ -58,25 +50,18 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
  */
 
 
-public class PlansEvaluator implements PlanStrategyModule{
+public class PlansEvaluator extends PlansConstructor implements PlanStrategyModule{
 		
-	private final Controler controler;
-	private final String inputFile, outputFile;
-	private PopulationImpl population;
+	private final String outputFile;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
-	private final NetworkLayer network;
 	private final PlansCalcRoute router;
 	private final LegTravelTimeEstimator estimator;
 	private static final Logger log = Logger.getLogger(PlansEvaluator.class);
 	
 	                      
 	public PlansEvaluator (Controler controler) {
-		this.controler = controler;
-		this.inputFile = "./plans/input_plans.xml.gz";	
+		super (controler);
 		this.outputFile = "./plans/output_plans.dat";	
-		this.population = new PopulationImpl();
-		this.network = controler.getNetwork();
-		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
@@ -87,21 +72,13 @@ public class PlansEvaluator implements PlanStrategyModule{
 				this.router);
 		
 	}
-	
-	private void init(final NetworkLayer network) {
-		this.network.connect();
-	}
-	
-	public void prepareReplanning() {
-		// Read the external plans file.
-		new MatsimPopulationReader(this.population, this.controler.getNetwork()).readFile(this.inputFile);		
-	}
-
-	public void handlePlan(final PlanImpl plan) {			
-		// Do nothing here. We work only on the external plans.
-	}
 
 	public void finishReplanning(){
+		this.evaluatePlans();
+		this.writePlansForBiogeme(this.outputFile);
+	}
+	
+	private void evaluatePlans (){
 		for (Iterator<PersonImpl> iterator1 = this.population.getPersons().values().iterator(); iterator1.hasNext();){
 			PersonImpl person = iterator1.next();
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
@@ -122,6 +99,10 @@ public class PlansEvaluator implements PlanStrategyModule{
 						act.setStartTime(plan.getPreviousLeg(act).getArrivalTime());
 						try {
 							act.setDuration(act.getEndTime()-act.getStartTime());
+							if (act.getDuration()<=0) {
+								act.setDuration(1);
+								act.setEndTime(act.getStartTime()+1);
+							}
 						}catch(Exception e){
 							log.info("Activity has no end time. No activity duration written.");
 						}
@@ -129,62 +110,5 @@ public class PlansEvaluator implements PlanStrategyModule{
 				}
 			}
 		}
-		this.writePlansForBiogeme();
 	}
-	
-	private void writePlansForBiogeme(){
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(this.outputFile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		
-		// First row
-		stream.print("Id\tChoice\t");
-		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
-		for (int i = 0;i<p.getPlans().size();i++){
-			for (int j =0;j<p.getPlans().get(i).getPlanElements().size();j++){
-				stream.print("x"+(i+1)+""+(j+1)+"\t");
-			}
-		}
-		stream.println();
-		
-		// Filling plans
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
-			stream.print(person.getId()+"\t");
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
-				for (int i=0;i<plan.getPlanElements().size();i++){
-					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).getDuration()+"\t");
-					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()+"\t");
-				}
-			}
-			stream.println();
-		}
-		
-		/* Write selected plan*/
-		PlanImpl plan = this.population.getPersons().get(new IdImpl ("324")).getSelectedPlan();
-		stream.print(1);
-		stream.print("\t"+1);
-		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(0))).getStartTime()+
-				((ActivityImpl)(plan.getPlanElements().get(6))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(6))).getStartTime()));
-		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(2))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(2))).getStartTime()));
-		stream.print("\t"+0);
-		stream.print("\t"+(((ActivityImpl)(plan.getPlanElements().get(2))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(2))).getStartTime()));
-		stream.print("\t"+2);
-		stream.print("\t"+1);
-		stream.print("\t"+0);
-		stream.print("\t"+1);
-		double traveltime = 0;
-		for (int i=1;i<plan.getPlanElements().size();i+=2){
-			traveltime += ((LegImpl)(plan.getPlanElements().get(i))).getTravelTime();
-		}
-		stream.print("\t"+traveltime);
-		stream.print("\t"+0);
-		stream.print("\t"+0);		
-	}
-		
 }

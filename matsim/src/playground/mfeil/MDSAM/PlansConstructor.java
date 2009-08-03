@@ -29,31 +29,31 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChains;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChainsModes;
-import playground.mfeil.config.TimeModeChoicerConfigGroup;
-import org.matsim.core.utils.geometry.CoordImpl;
+//import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.List;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+//import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
+//import org.matsim.core.utils.geometry.CoordUtils;
+
 
 
 
@@ -66,38 +66,28 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 public class PlansConstructor implements PlanStrategyModule{
 		
-	private final Controler controler;
-	private final String inputFile, outputFile;
-	private PopulationImpl population;
-	private ArrayList<List<PlanElement>> actChains;
-	private final DepartureDelayAverageCalculator tDepDelayCalc;
-	private final NetworkLayer network;
-	private final PlansCalcRoute router;
-//	private final LocationMutatorwChoiceSet locator;
-//	private final LegTravelTimeEstimator estimator;
-	private final XY2Links linker;
-	private static final Logger log = Logger.getLogger(PlansConstructor.class);
+	protected final Controler controler;
+	protected final String inputFile, outputFile, outputFileBiogeme;
+	protected PopulationImpl population;
+	protected ArrayList<List<PlanElement>> actChains;
+	protected final NetworkLayer network;
+	protected final PlansCalcRoute router;
+	protected final XY2Links linker;
+	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz2/output_plans.xml.gz";	
+		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
 	//	this.inputFile = "./plans/input_plans.xml";	
 	//	this.outputFile = "./plans/output_plans.xml.gz";	
 		this.population = new PopulationImpl();
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
-		this.controler.getEvents().addHandler(tDepDelayCalc);
-		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), this.tDepDelayCalc);
-//		this.estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-//				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
-//				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-//				this.router);
 		this.linker = new XY2Links (this.controler.getNetwork());
-//		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -119,11 +109,13 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.reducePersons();
 		this.linkRouteOrigPlans();
 		this.enlargePlansSet();
-		this.writePlans();
+		this.getSimilarityOfPlans();
+		this.writePlans(this.outputFile);
+		this.writePlansForBiogeme(this.outputFileBiogeme);
 	}
 	
 	/*
-	// Method that filter only Zurich10% plans
+	// Method that filters only Zurich10% plans
 	private void selectZurich10MZPlans (){
 		log.info("Creating Zurich10% population...");
 		// Quite strange coding but throws ConcurrentModificationException otherwise...
@@ -231,17 +223,64 @@ public class PlansConstructor implements PlanStrategyModule{
 					
 					this.router.run(plan);					
 					//person.addPlan(plan);
-					person.getPlans().set(i, plan);
+					person.getPlans().add(i, plan);
 				}
 			}
 		}
 		log.info("done.");
 	}
 	
-	private void writePlans(){
+	private void getSimilarityOfPlans () {
+		UniSAM sim = new UniSAM ();
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				PlanImpl plan = iterator2.next();
+				if (plan.equals(person.getSelectedPlan())) continue;
+				sim.run(person.getSelectedPlan(), plan);
+			}
+		}
+	}
+	
+	protected void writePlans(String outputFile){
 		log.info("Writing plans...");
-		new PopulationWriter(this.population, this.outputFile).write();
+		new PopulationWriter(this.population, outputFile).write();
 		log.info("done.");
+	}
+	
+	protected void writePlansForBiogeme(String outputFile){
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		// First row
+		stream.print("Id\tChoice\t");
+		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
+		for (int i = 0;i<p.getPlans().size();i++){
+			for (int j =0;j<p.getPlans().get(i).getPlanElements().size();j++){
+				stream.print("x"+(i+1)+""+(j+1)+"\t");
+			}
+		}
+		stream.println();
+		
+		// Filling plans
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			stream.print(person.getId()+"\t");
+			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				PlanImpl plan = iterator2.next();
+				for (int i=0;i<plan.getPlanElements().size();i++){
+					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).getDuration()+"\t");
+					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()+"\t");
+				}
+			}
+			stream.println();
+		}
+		stream.close();
 	}
 		
 }
