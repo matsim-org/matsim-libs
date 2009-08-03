@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for playground.meisterk.org.matsim.config.groups");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(MeisterkConfigGroupTest.class);
+		suite.addTestSuite(KtiConfigGroupTest.class);
 		//$JUnit-END$
 		return suite;
 	}

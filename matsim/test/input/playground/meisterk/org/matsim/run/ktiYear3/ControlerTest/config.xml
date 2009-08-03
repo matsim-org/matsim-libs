@@ -12,7 +12,7 @@
 
 	<module name="controler">
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="9" />
 		<param name="routingAlgorithmType" value="AStarLandmarks" />
 	<!--	<param name="outputDirectory" value="output/ktiTest" /> --> <!-- set the name of the output directory -->
 	</module>

@@ -1,11 +1,6 @@
 package playground.meisterk.org.matsim.run.ktiYear3;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -14,6 +9,7 @@ import org.matsim.world.Layer;
 import org.matsim.world.World;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
+import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.org.matsim.controler.listeners.SaveRevisionInfo;
 import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
@@ -22,28 +18,25 @@ import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFa
 
 public class KTIControler extends Controler {
 
-	public static final String KTI_CONFIG_MODULE_NAME = "kti";
-	
-	private PreProcessLandmarks commonRoutingData = null;
 	private PTRoutingInfo ptRoutingInfo=null;
 	private static boolean firstTime=true;
 
-	public KTIControler(String[] args) {
-		super(Gbl.createConfig(args));
-	}
+	private final KtiConfigGroup ktiConfigGroup;
 
-	public KTIControler(Config config) {
-		super(config);
+	public KTIControler(String[] args) {
+		super(args);
+
+		this.ktiConfigGroup = new KtiConfigGroup();
+		super.config.addModule(KtiConfigGroup.KTI_CONFIG_MODULE_NAME, this.ktiConfigGroup);
+
 	}
 
 	public void run() {
 
-		Module ktiConfigGroup = super.config.getModule(KTIControler.KTI_CONFIG_MODULE_NAME);
-		
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				super.config.charyparNagelScoring(), 
 				this.getFacilityPenalties(),
-				ktiConfigGroup);
+				this.ktiConfigGroup);
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		this.ptRoutingInfo = new PTRoutingInfo();
@@ -70,48 +63,30 @@ public class KTIControler extends Controler {
 
 		PlanAlgorithm router = null;
 
-		boolean usePlansCalcRouteKti = Boolean.parseBoolean(
-				Gbl.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("usePlansCalcRouteKti"));
-		if (!usePlansCalcRouteKti) {
+		if (!this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			router = super.getRoutingAlgorithm(travelCosts, travelTimes);
 		} else {
-
-			synchronized (this) {
-				if (this.commonRoutingData == null) {
-					this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-					this.commonRoutingData.run(this.network);
-				}
-			}
 
 			// at this position, we need to read the information about pt routing (only the first time)
 			// the problem is, that this method is invoked before the startup listeners, and therefore we need
 			// information about pt routing here.
 			if (firstTime){
-				ptRoutingInfo.prepareKTIRouter(this);
+				ptRoutingInfo.prepareKTIRouter(this.ktiConfigGroup, this.getNetwork());
 				firstTime=false;
 			}
 
 			World localWorld = ptRoutingInfo.getLocalWorld();
 			Layer municipalityLayer = localWorld.getLayer("municipality");
-			
+
 			router = new PlansCalcRouteKti(
-					this.network, 
-					this.commonRoutingData, 
+					super.getConfig().plansCalcRoute(), 
+					super.network, 
 					travelCosts, 
 					travelTimes, 
+					super.getLeastCostPathCalculatorFactory(), 
 					ptRoutingInfo.getPtTravelTimes(), 
-					ptRoutingInfo.getHaltestellen(),
+					ptRoutingInfo.getHaltestellen(), 
 					municipalityLayer);
-
-//			router = new PlansCalcRouteKti(
-//			super.getConfig().plansCalcRoute(), 
-//			super.network, 
-//			travelCosts, 
-//			travelTimes, 
-//			super.getLeastCostPathCalculatorFactory(), 
-//			ptRoutingInfo.getPtTravelTimes(), 
-//			ptRoutingInfo.getHaltestellen(), 
-//			municipalityLayer);
 
 		}
 

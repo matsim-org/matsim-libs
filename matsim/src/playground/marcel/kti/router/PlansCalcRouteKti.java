@@ -45,13 +45,23 @@ import org.matsim.world.MappedLocation;
 
 public class PlansCalcRouteKti extends PlansCalcRoute {
 
-	private final static double WALK_SPEED = 3.0/3.6; // 3.0km/h --> m/s = speed of people walking to the next station from home (bee-line!)
-
+	private final PlansCalcRouteConfigGroup group;
 	private final NetworkLayer network;
 	private final Matrix ptTravelTimes;
 	private final SwissHaltestellen haltestellen;
 	private final Layer municipalities;
 
+	/**
+	 * @deprecated
+	 * 
+	 * @param network
+	 * @param preProcessData
+	 * @param costCalculator
+	 * @param timeCalculator
+	 * @param ptTravelTimes
+	 * @param haltestellen
+	 * @param municipalities
+	 */
 	public PlansCalcRouteKti(
 			final NetworkLayer network, 
 			final PreProcessLandmarks preProcessData,
@@ -78,10 +88,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		this.ptTravelTimes = ptTravelTimes;
 		this.haltestellen = haltestellen;
 		this.municipalities = municipalities;
+		this.group = null;
 	}
 
 	/**
-	 * @deprecated
 	 * 
 	 * @param group
 	 * @param network
@@ -104,6 +114,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			final SwissHaltestellen haltestellen, 
 			final Layer municipalities) {
 		super(group, network, costCalculator, timeCalculator, factory);
+		this.group = group;
 		this.network = network;
 		this.ptTravelTimes = ptTravelTimes;
 		this.haltestellen = haltestellen;
@@ -131,10 +142,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			throw new RuntimeException("No entry found for " + from.getId() + " --> " + to.getId());
 		}
 		final double timeInVehicle = traveltime.getValue() * 60.0;
-		final double beeLineWalkTime = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) / WALK_SPEED;
+		final double beeLineWalkTime = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) / this.group.getWalkSpeedFactor();
 
 		final double walkDistance = CoordUtils.calcDistance(fromAct.getCoord(), fromStop) + CoordUtils.calcDistance(toAct.getCoord(), toStop);
-		final double walkTime = walkDistance / WALK_SPEED;
+		final double walkTime = walkDistance / this.group.getWalkSpeedFactor();
 //		System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + "min + " + (walkTime / 60) + "min (" + walkDistance + "m walk); beeLine: " + beeLineWalkTime/60 + "min walk");
 
 		RouteWRefs newRoute;

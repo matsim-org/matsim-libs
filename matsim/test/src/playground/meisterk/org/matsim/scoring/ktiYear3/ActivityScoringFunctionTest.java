@@ -65,7 +65,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory.KTIScoringParameters;
+import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
 
@@ -74,6 +74,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	private PopulationImpl population;
 	private PlanImpl plan;
 	private Config config;
+	private KtiConfigGroup ktiConfigGroup;
 	private ActivityFacilities facilities;
 	private NetworkLayer network;
 	
@@ -96,6 +97,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		
 		this.config.planomat().setDoLogging(false);
 
+		this.ktiConfigGroup = new KtiConfigGroup();
+		this.config.addModule(KtiConfigGroup.KTI_CONFIG_MODULE_NAME, this.ktiConfigGroup);
+		
 		// generate person
 		this.population = new PopulationImpl();
 //		Id personId = new IdImpl("123");
@@ -232,7 +236,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				this.config.charyparNagelScoring(), 
 				facilityPenalties,
-				this.config.getModule(KTIScoringParameters.CONST_BIKE));
+				this.ktiConfigGroup);
 		// init Planomat, which loads config!
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.config.planomat());
 
@@ -380,7 +384,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
 				this.config.charyparNagelScoring(), 
 				emptyFacilityPenalties,
-				null);
+				this.ktiConfigGroup);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
 		testee.endActivity(Time.parseTime("08:00:00"));
@@ -505,12 +509,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		}
 		
 		// score legs
-		KTIScoringParameters ktiScoringParameters = factory.getKtiScoringParameters();
 		for (PlanElement pe : this.plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
 				if (leg.getMode().equals(TransportMode.bike)) {
-					expectedScore += ktiScoringParameters.getConstBike();
+					expectedScore += this.ktiConfigGroup.getConstBike();
 				}
 			}
 		}

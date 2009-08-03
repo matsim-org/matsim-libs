@@ -29,7 +29,6 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for playground.meisterk.scoring.ktiYear3");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ActivityScoringFunctionTest.class);
-		suite.addTestSuite(KTIYear3ScoringFunctionFactoryTest.class);
 		//$JUnit-END$
 		return suite;
 	}

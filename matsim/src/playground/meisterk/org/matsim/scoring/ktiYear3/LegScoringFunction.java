@@ -25,7 +25,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
-import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory.KTIScoringParameters;
+import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 
 
 /**
@@ -37,13 +37,13 @@ import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFa
 public class LegScoringFunction extends
 		org.matsim.core.scoring.charyparNagel.LegScoringFunction {
 
-	private final KTIScoringParameters ktiScoringParameters;
+	private final KtiConfigGroup ktiConfigGroup;
 
 	public LegScoringFunction(PlanImpl plan,
 			CharyparNagelScoringParameters params,
-			KTIScoringParameters ktiScoringParameters) {
+			KtiConfigGroup ktiConfigGroup) {
 		super(plan, params);
-		this.ktiScoringParameters = ktiScoringParameters;
+		this.ktiConfigGroup = ktiConfigGroup;
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class LegScoringFunction extends
 		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
 		
 		if (leg.getMode().equals(TransportMode.bike)) {
-			legScore += ktiScoringParameters.getConstBike();
+			legScore += this.ktiConfigGroup.getConstBike();
 		}
 		
 		return legScore;

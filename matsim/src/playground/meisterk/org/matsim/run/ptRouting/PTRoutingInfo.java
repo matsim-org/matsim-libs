@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
@@ -15,7 +15,7 @@ import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 import playground.marcel.kti.router.SwissHaltestellen;
-import playground.meisterk.org.matsim.run.ktiYear3.KTIControler;
+import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 
 
 public class PTRoutingInfo {
@@ -25,19 +25,16 @@ public class PTRoutingInfo {
 
 	private static final Logger log = Logger.getLogger(PTRoutingInfo.class);
 	
-	public void prepareKTIRouter(Controler c) {
+	public void prepareKTIRouter(final KtiConfigGroup ktiConfigGroup, final NetworkLayer network) {
 		
-		boolean usePlansCalcRouteKti = Boolean.parseBoolean(
-				c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("usePlansCalcRouteKti"));
-		if (!usePlansCalcRouteKti) {
+		if (!ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			log.error("The kti module is missing.");
 		}
 
 		// municipality layer from world file
 		this.localWorld = new World();
-		String worldFilename = c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("worldInputFilename");
 		try {
-			new MatsimWorldReader(localWorld).parse(worldFilename);
+			new MatsimWorldReader(localWorld).parse(ktiConfigGroup.getWorldInputFilename());
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -50,13 +47,13 @@ public class PTRoutingInfo {
 		Matrices matrices = new Matrices();
 		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", localWorld.getLayer("municipality"), null);
 		VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
-		reader.readFile(c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("pt_traveltime_matrix_filename"));
+		reader.readFile(ktiConfigGroup.getPtTraveltimeMatrixFilename());
 		log.info("Reading traveltime matrix...done.");
 
 		log.info("Reading haltestellen...");
-		this.haltestellen = new SwissHaltestellen(c.getNetwork());
+		this.haltestellen = new SwissHaltestellen(network);
 		try {
-			haltestellen.readFile(c.getConfig().getModule(KTIControler.KTI_CONFIG_MODULE_NAME).getValue("pt_haltestellen_filename"));
+			haltestellen.readFile(ktiConfigGroup.getPtHaltestellenFilename());
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
