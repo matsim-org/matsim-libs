@@ -66,8 +66,8 @@ public class ClusterActivities {
 		MyShapefileReader msr = new MyShapefileReader(studyAreaShapefile);
 		MultiPolygon studyArea = msr.readMultiPolygon();
 		
-//		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Locations.txt";
-		String activityFilename = root + "Gauteng/Activities/GautengMinorLocations_CityDeepSample.txt";
+		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Locations.txt";
+//		String activityFilename = root + "Gauteng/Activities/GautengMinorLocations_CityDeepSample.txt";
 		MyActivityReader ar = new MyActivityReader();
 		QuadTree<Point> studyAreaPoints = ar.readActivityPointsToQuadTree(activityFilename, studyArea);
 		
