@@ -24,7 +24,7 @@ package playground.mfeil.MDSAM;
 
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.MatsimPopulationReader;
-import playground.mfeil.ActChainEqualityCheck;
+//import playground.mfeil.ActChainEqualityCheck;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChains;
@@ -166,48 +166,50 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	private void enlargePlansSet (){
 		log.info("Adding alternative plans...");
-		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
-			for (int i=0;i<this.actChains.size();i++){
-				
-				// Add all plans with activity chains different to the one of person's current plan
-				if (!acCheck.checkForEquality(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
-					PlanImpl plan = new PlanImpl (person);
-					for (int j=0;j<this.actChains.get(i).size();j++){
-						if (j%2==0) {
-							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
-							plan.addActivity((BasicActivity)act);
-						}
-						else {
-							LegImpl leg = new LegImpl((LegImpl)this.actChains.get(i).get(j));
-							plan.addLeg((BasicLeg)leg);
-						}
-					}
-					plan.getFirstActivity().setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
-					plan.getLastActivity().setCoord(person.getSelectedPlan().getLastActivity().getCoord());
-					
-					this.linker.run(plan);
-					
-					/* Analysis of subtours and random allocation of modes to subtours */
-					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-					planAnalyzeSubtours.run(plan);
-					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
-						TransportMode[]	modes = TimeModeChoicerConfigGroup.getPossibleModes();
-						TransportMode mode = modes[(int)(MatsimRandom.getRandom().nextDouble()*modes.length)];
-						for (int k=1;k<plan.getPlanElements().size();k+=2){
-							if (planAnalyzeSubtours.getSubtourIndexation()[(k-1)/2]==j){
-								((LegImpl)plan.getPlanElements().get(k)).setMode(mode);
-							}
-						}
-					}
-					
-					this.router.run(plan);					
-					person.addPlan(plan);
-				}
-			}
-		}
-		log.info("done.");
+		// balmermi: please check in your java file
+		throw new RuntimeException("ActChainEqualityCheck does not exist");
+//		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
+//		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+//			PersonImpl person = iterator.next();
+//			for (int i=0;i<this.actChains.size();i++){
+//				
+//				// Add all plans with activity chains different to the one of person's current plan
+//				if (!acCheck.checkForEquality(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
+//					PlanImpl plan = new PlanImpl (person);
+//					for (int j=0;j<this.actChains.get(i).size();j++){
+//						if (j%2==0) {
+//							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
+//							plan.addActivity((BasicActivity)act);
+//						}
+//						else {
+//							LegImpl leg = new LegImpl((LegImpl)this.actChains.get(i).get(j));
+//							plan.addLeg((BasicLeg)leg);
+//						}
+//					}
+//					plan.getFirstActivity().setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
+//					plan.getLastActivity().setCoord(person.getSelectedPlan().getLastActivity().getCoord());
+//					
+//					this.linker.run(plan);
+//					
+//					/* Analysis of subtours and random allocation of modes to subtours */
+//					PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+//					planAnalyzeSubtours.run(plan);
+//					for (int j=0;j<planAnalyzeSubtours.getNumSubtours();j++){
+//						TransportMode[]	modes = TimeModeChoicerConfigGroup.getPossibleModes();
+//						TransportMode mode = modes[(int)(MatsimRandom.getRandom().nextDouble()*modes.length)];
+//						for (int k=1;k<plan.getPlanElements().size();k+=2){
+//							if (planAnalyzeSubtours.getSubtourIndexation()[(k-1)/2]==j){
+//								((LegImpl)plan.getPlanElements().get(k)).setMode(mode);
+//							}
+//						}
+//					}
+//					
+//					this.router.run(plan);					
+//					person.addPlan(plan);
+//				}
+//			}
+//		}
+//		log.info("done.");
 	}
 	
 	private void writePlans(){
