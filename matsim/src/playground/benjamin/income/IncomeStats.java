@@ -52,12 +52,16 @@ public class IncomeStats {
 
 	public IncomeStats(BasicHouseholds<BasicHousehold> hhs){
 		this.households = hhs;
+		this.totalIncome = calculateTotalIncome();
+		log.error("total income: " + this.totalIncome);
+
 	}
 	
 	
 	public IncomeStats(Households hhs) {
 		this.households = (BasicHouseholds)hhs;
 		this.totalIncome = calculateTotalIncome();
+		log.error("total income: " + this.totalIncome);
 	}
 	
 	private double calculateTotalIncome(){
@@ -112,7 +116,13 @@ public class IncomeStats {
 			for (int j = 0; j < hhsPerStepSize; j++) {
 				incomePerStep += hhQueue.poll().getIncome().getIncome();
 			}
-			yValues[i] = incomePerStep / hhsPerStepSize; 
+			if (i != 0) {
+				yValues[i] =  yValues[i-1] + incomePerStep  ; 
+			}
+		}
+		
+		for (int i = 0; i < yValues.length; i++) {
+			yValues[i] = yValues[i] / this.totalIncome;
 		}
 		
 		XYLineChart chart = new XYLineChart("Lorenz", "number of hh percent", "percentage of income");
