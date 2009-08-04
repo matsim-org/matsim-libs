@@ -1,4 +1,4 @@
-package playground.mmoyo.input;
+package playground.mmoyo.deprecVersion;
 
 import java.io.IOException;
 import java.util.ArrayList;

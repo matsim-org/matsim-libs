@@ -12,7 +12,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
-import playground.mmoyo.input.PTLinesReader;
+import playground.mmoyo.deprecVersion.PTLinesReader;
 
 /**
  * Contains the information of departures for every station and PTLine

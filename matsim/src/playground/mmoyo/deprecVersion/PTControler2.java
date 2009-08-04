@@ -1,4 +1,4 @@
-package playground.mmoyo.PTRouter;
+package playground.mmoyo.deprecVersion;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -13,9 +13,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.StationValidator;
-import playground.mmoyo.input.PTLineAggregator;
+import playground.mmoyo.deprecVersion.PTLineAggregator;
 import playground.mmoyo.converters.ToTransitScheduleConverter;
 import playground.mmoyo.converters.TransitScheduleToPTTimeTableConverter;
+import playground.mmoyo.PTRouter.PTActWriter;
+import playground.mmoyo.PTRouter.PTTimeTable;
 
 /** 
  * Executable class to perform data input, validations and routing test according to timetable information

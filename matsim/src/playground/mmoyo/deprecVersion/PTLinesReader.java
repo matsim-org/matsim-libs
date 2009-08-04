@@ -1,4 +1,4 @@
-package playground.mmoyo.input;
+package playground.mmoyo.deprecVersion;
 
 import playground.mmoyo.PTRouter.*;
 

@@ -2,7 +2,7 @@ package playground.mmoyo.Validators;
 
 import playground.mmoyo.PTRouter.PTTimeTable;
 import playground.mmoyo.PTRouter.PTTravelCost;
-import playground.mmoyo.PTRouter.PTTravelTime1;
+import playground.mmoyo.deprecVersion.PTTravelTime1;
 import playground.mmoyo.PTRouter.MyDijkstra;
 import playground.mmoyo.PTRouter.PTLine;
 import org.matsim.api.basic.v01.Id;

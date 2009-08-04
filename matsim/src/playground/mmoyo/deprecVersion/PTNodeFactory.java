@@ -1,4 +1,4 @@
-package playground.mmoyo.input;
+package playground.mmoyo.deprecVersion;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
-import playground.mmoyo.input.PTStation;
+import playground.mmoyo.deprecVersion.PTStation;
 import playground.mmoyo.PTRouter.PTTimeTable;
 import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.Validators.StationValidator;

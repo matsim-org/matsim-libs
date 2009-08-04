@@ -7,7 +7,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
-import playground.mmoyo.input.PTStation;
+import playground.mmoyo.deprecVersion.PTStation;
 
 /**
  * Validates that all nodes in an intersection have the same coordinate and correct id`s

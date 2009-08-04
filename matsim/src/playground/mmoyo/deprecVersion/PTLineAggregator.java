@@ -1,4 +1,4 @@
-package playground.mmoyo.input;
+package playground.mmoyo.deprecVersion;
 
 import java.util.ArrayList;
 import org.matsim.api.basic.v01.TransportMode;
