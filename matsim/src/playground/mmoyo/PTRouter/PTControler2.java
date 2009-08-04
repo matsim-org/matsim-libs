@@ -14,8 +14,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.mmoyo.Validators.NetValidator;
 import playground.mmoyo.Validators.StationValidator;
 import playground.mmoyo.input.PTLineAggregator;
-import playground.mmoyo.input.transitconverters.ToTransitScheduleConverter;
-import playground.mmoyo.input.transitconverters.TransitScheduleToPTTimeTableConverter;
+import playground.mmoyo.converters.ToTransitScheduleConverter;
+import playground.mmoyo.converters.TransitScheduleToPTTimeTableConverter;
 
 /** 
  * Executable class to perform data input, validations and routing test according to timetable information
