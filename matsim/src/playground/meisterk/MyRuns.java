@@ -157,8 +157,10 @@ public class MyRuns {
 		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
 		plansReader.readFile(config.plans().getInputFile());
 
-		for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-			pa.printCrosstab(crosstabFormat);
+		for (boolean isCumulative : new boolean[]{false, true}) {
+			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
+				pa.printCrosstab(crosstabFormat, isCumulative);
+			}
 		}
 		
 	}

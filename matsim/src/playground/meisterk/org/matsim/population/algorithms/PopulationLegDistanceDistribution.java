@@ -47,23 +47,22 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		1000.0, 2000.0, 5000.0, 
 		10000.0, 20000.0, 50000.0, 100000.0, 
 		Double.MAX_VALUE};
-//	public static final DecimalFormat PERCENTAGE_PATTERN = new DecimalFormat("#.##"); 
-	
+
 	private HashMap<TransportMode, Integer[]> legDistanceDistribution = new HashMap<TransportMode, Integer[]>();
-	
+
 	public void run(PersonImpl person) {
 		this.run(person.getSelectedPlan());
 	}
-	
+
 	public void run(PlanImpl plan) {
-		
+
 		for (PlanElement pe : plan.getPlanElements()) {
-			
+
 			if (pe instanceof LegImpl) {
-				
+
 				LegImpl leg = (LegImpl) pe;
 				TransportMode mode = leg.getMode();
-				
+
 				Integer[] distanceDistro = null;
 				if (!this.legDistanceDistribution.containsKey(mode)) {
 					distanceDistro = new Integer[distanceClasses.length];
@@ -74,49 +73,53 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 				} else {
 					distanceDistro = this.legDistanceDistribution.get(mode);
 				}
-				
+
 				int index = getDistanceClassIndex(leg.getRoute().getDistance());
 				distanceDistro[index]++;
 			}
-			
+
 		}
-		
+
 	}
 
 	public static int getDistanceClassIndex(double distance) {
-		
+
 		int index = 0;
 		while (distance > distanceClasses[index]) {
 			index++;
 		}
-		
+
 		return index;
-		
+
 	}
 
-	public HashMap<TransportMode, Integer[]> getLegDistanceDistribution() {
-		return legDistanceDistribution;
+	public int getNumberOfModes() {
+		return this.legDistanceDistribution.keySet().size();
 	}
-
+	
+	public int getNumberOfLegs(TransportMode mode, int distanceClassIndex) {
+		return this.legDistanceDistribution.get(mode)[distanceClassIndex];
+	}
+	
 	/**
 	 * 
 	 * @param mode
 	 * @return the number of legs of a mode over all distance classes.
 	 */
 	public int getNumberOfLegs(TransportMode mode) {
-		
+
 		int numberOfLegs = 0;
-		
+
 		if (this.legDistanceDistribution.containsKey(mode)) {
 			for (Integer i : this.legDistanceDistribution.get(mode)) {
 				numberOfLegs += i;
 			}
 		}
-		
+
 		return numberOfLegs;
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param distanceClassIndex
@@ -125,20 +128,20 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 	public int getNumberOfLegs(int distanceClassIndex) {
 
 		int numberOfLegs = 0;
-		
+
 		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
 			numberOfLegs += this.legDistanceDistribution.get(mode)[distanceClassIndex];
 		}
-		
+
 		return numberOfLegs;
 
 	}
-	
+
 	/**
 	 * @return the overall number of legs.
 	 */
 	public int getNumberOfLegs() {
-		
+
 		int numberOfLegs = 0;
 
 		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
@@ -146,33 +149,33 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 				numberOfLegs += i;
 			}
 		}
-		
+
 		return numberOfLegs;
-		
+
 	}
-	
-	public enum CrosstabFormat{ABSOLUTE, PERCENTAGE};
-	
+
+	public enum CrosstabFormat {ABSOLUTE, PERCENTAGE};
+
 	/**
 	 * Prints the crosstab.
+	 *
+	 * @param crosstabFormat indicates if absolute numbers or percentage of all legs are printed
+	 * @param isCumulative indicates if cumulative numbers are printed
 	 */
-	public void printCrosstab(CrosstabFormat crosstabFormat) {
+	public void printCrosstab(CrosstabFormat crosstabFormat, boolean isCumulative) {
+
+		int numberOfLegs;
 		
 		NumberFormat nf = NumberFormat.getPercentInstance();
 		nf.setMaximumFractionDigits(2);
-		
+
 		System.out.println();
 		/*
 		 * header - start
 		 */
-		System.out.println("#distance classes in km");
-		System.out.print("#mode");
-		for (int i=0; i < distanceClasses.length; i++) {
-			if (i < (distanceClasses.length - 1)) {
-				System.out.print("\t" + Double.toString(distanceClasses[i] / 1000));
-			} else {
-				System.out.print("\t>" + Double.toString(distanceClasses[i - 1] / 1000));
-			}
+		System.out.print("#d [km]");
+		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+			System.out.print("\t" + mode);
 		}
 		System.out.print("\tsum");
 		System.out.println();
@@ -183,26 +186,48 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		/*
 		 * table - start
 		 */
-		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
-			System.out.print(mode);
-			for (Integer i : this.legDistanceDistribution.get(mode)) {
+		for (int i=0; i < distanceClasses.length; i++) {
+			if (i < (distanceClasses.length - 1)) {
+				System.out.print(Double.toString(distanceClasses[i] / 1000));
+			} else {
+				System.out.print(">" + Double.toString(distanceClasses[i - 1] / 1000));
+			}
+			for (TransportMode mode : this.legDistanceDistribution.keySet()) {
 				System.out.print("\t");
+				if (isCumulative) {
+					numberOfLegs = 0;
+					for (int j=0; j<=i; j++) {
+						numberOfLegs += this.getNumberOfLegs(mode, j);
+					}
+					
+				} else {
+					numberOfLegs = this.getNumberOfLegs(mode, i);
+					
+				}
 				switch(crosstabFormat) {
 				case ABSOLUTE:
-					System.out.print(Integer.toString(i));
+					System.out.print(Integer.toString(numberOfLegs));
 					break;
 				case PERCENTAGE:
-					System.out.print(nf.format((double) i / (double) this.getNumberOfLegs()));
+					System.out.print(nf.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
 					break;
 				}
 			}
 			System.out.print("\t");
+			if (isCumulative) {
+				numberOfLegs = 0;
+				for (int j=0; j<=i; j++) {
+					numberOfLegs += this.getNumberOfLegs(j);
+				}
+			} else {
+				numberOfLegs = this.getNumberOfLegs(i);
+			}
 			switch(crosstabFormat) {
 			case ABSOLUTE:
-				System.out.print(Integer.toString(this.getNumberOfLegs(mode)));
+				System.out.print(Integer.toString(numberOfLegs));
 				break;
 			case PERCENTAGE:
-				System.out.print(nf.format((double) this.getNumberOfLegs(mode) / (double) this.getNumberOfLegs()));
+				System.out.print(nf.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
 				break;
 			}
 			System.out.println();
@@ -215,24 +240,27 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		 * sum - start
 		 */
 		System.out.print("sum");
-		for (int i=0; i < distanceClasses.length; i++) {
+		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
 			System.out.print("\t");
+			numberOfLegs = this.getNumberOfLegs(mode);
 			switch(crosstabFormat) {
 			case ABSOLUTE:
-				System.out.print(this.getNumberOfLegs(i));
+				System.out.print(numberOfLegs);
 				break;
 			case PERCENTAGE:
-				System.out.print(nf.format((double) this.getNumberOfLegs(i) / (double) this.getNumberOfLegs()));
+				System.out.print(nf.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
 				break;
 			}
 		}
+		
 		System.out.print("\t");
+		numberOfLegs = this.getNumberOfLegs();
 		switch(crosstabFormat) {
 		case ABSOLUTE:
-			System.out.print(Integer.toString(this.getNumberOfLegs()));
+			System.out.print(Integer.toString(numberOfLegs));
 			break;
 		case PERCENTAGE:
-			System.out.print(nf.format((double) this.getNumberOfLegs() / (double) this.getNumberOfLegs()));
+			System.out.print(nf.format(1.0));
 			break;
 		}
 		/*
@@ -240,7 +268,7 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		 */
 
 		System.out.println();
-		
+
 	}
-	
+
 }

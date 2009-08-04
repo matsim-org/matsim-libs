@@ -88,27 +88,27 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		
 		pop.addPerson(testPerson);
 		
-		assertEquals(1, testee.getLegDistanceDistribution().size());
-		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
+		assertEquals(1, testee.getNumberOfModes());
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 5));
 
 		leg.setMode(TransportMode.pt);
 		route.setDistance(13456.7);
 
 		pop.addPerson(testPerson);
 		
-		assertEquals(2, testee.getLegDistanceDistribution().size());
-		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
-		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.pt)[8].intValue());
+		assertEquals(2, testee.getNumberOfModes());
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 5));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, 8));
 		
 		leg.setMode(TransportMode.car);
 		route.setDistance(0.0);
 		
 		pop.addPerson(testPerson);
 		
-		assertEquals(2, testee.getLegDistanceDistribution().size());
-		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[0].intValue());
-		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
-		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.pt)[8].intValue());
+		assertEquals(2, testee.getNumberOfModes());
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 0));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 5));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, 8));
 
 		assertEquals(3, testee.getNumberOfLegs());
 		assertEquals(2, testee.getNumberOfLegs(TransportMode.car));
@@ -117,8 +117,11 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		assertEquals(1, testee.getNumberOfLegs(5));
 		assertEquals(1, testee.getNumberOfLegs(8));
 		
-		testee.printCrosstab(CrosstabFormat.ABSOLUTE);
-		testee.printCrosstab(CrosstabFormat.PERCENTAGE);
+		for (boolean isCumulative : new boolean[]{false, true}) {
+			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
+				testee.printCrosstab(crosstabFormat, isCumulative);
+			}
+		}
 		
 	}
 	
