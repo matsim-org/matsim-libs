@@ -66,18 +66,17 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 		//only draw lanes if there are more than one
 		if (this.numberOfQueueLanes != 1) {
 			for (LaneData ld : this.laneData.values()){
-				
+				// draw connections between branch point and lane end
+				gl.glBegin(GL.GL_LINES);
+	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord); 
+		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
+  			gl.glEnd();
 				if (ld.isGreen()) {
 					gl.glColor3d(0.0, 1.0, 0.0);
 				}
 				else {
 					gl.glColor3d(1.0, 0.0, 0.0);
 				}
-				// draw connections between branch point and lane end
-				gl.glBegin(GL.GL_LINES);
-	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord); 
-		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
-  			gl.glEnd();
 				// draw lane ends
 				gl.glBegin(GL.GL_QUADS);
   			  gl.glVertex3d(ld.getEndPoint().x - offset, ld.getEndPoint().y - offset, zCoord);

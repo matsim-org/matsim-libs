@@ -41,12 +41,14 @@ public class DgSignalReader extends DgOtfLaneReader {
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		int numberOfLanes = in.getInt();
-		String id;
-		boolean green;
-		for (int i = 0; i < numberOfLanes; i++) {
-			id = ByteBufferUtils.getString(in);
-			green = (in.getInt() == 1 ? true : false);
-			this.drawer.updateGreenState(id, green);
+		if (numberOfLanes > 1) {
+			String id;
+			boolean green;
+			for (int i = 0; i < numberOfLanes; i++) {
+				id = ByteBufferUtils.getString(in);
+				green = (in.getInt() == 1 ? true : false);
+				this.drawer.updateGreenState(id, green);
+			}
 		}
 	
 	}

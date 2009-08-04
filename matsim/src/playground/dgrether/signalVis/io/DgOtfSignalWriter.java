@@ -45,14 +45,17 @@ public class DgOtfSignalWriter extends DgOtfLaneWriter {
 	
 	@Override
 	public void writeDynData(ByteBuffer out) throws IOException {
-		out.putInt(this.src.getToNodeQueueLanes().size());
-		for (QueueLane ql : this.src.getToNodeQueueLanes()){
-			ByteBufferUtils.putString(out, ql.getLaneId().toString());
-			if (ql.isThisTimeStepGreen()) {
-				out.putInt(1);
-			}
-			else {
-				out.putInt(0);
+		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
+		out.putInt(numberOfToNodeQueueLanes);
+		if (numberOfToNodeQueueLanes > 1) {
+			for (QueueLane ql : this.src.getToNodeQueueLanes()){
+				ByteBufferUtils.putString(out, ql.getLaneId().toString());
+				if (ql.isThisTimeStepGreen()) {
+					out.putInt(1);
+				}
+				else {
+					out.putInt(0);
+				}
 			}
 		}
 	}
