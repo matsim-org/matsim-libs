@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * KMLSnowballVertexStyle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import gnu.trove.TDoubleObjectHashMap;
+import net.opengis.kml._2.LinkType;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class KMLSnowballVertexStyle extends KMLVertexColorStyle<SampledGraph, SampledVertex> {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double getNormConstant(int i);
+	/**
+	 * @param vertexIconLink
+	 */
+	public KMLSnowballVertexStyle(LinkType vertexIconLink) {
+		super(vertexIconLink);
+		// TODO Auto-generated constructor stub
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValues(playground.johannes.socialnetworks.graph.Graph)
+	 */
+	@Override
+	protected TDoubleObjectHashMap<String> getValues(SampledGraph graph) {
+		
+		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
+		for(SampledVertex v : graph.getVertices()) {
+			values.put(v.getIterationSampled(), String.valueOf(v.getIterationSampled()));
+		}
+		
+		return values;
+	}
+
+	@Override
+	public String getObjectSytleId(SampledVertex object) {
+		return String.valueOf(object.getIterationSampled());
+	}
+
 }

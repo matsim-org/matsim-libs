@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * Facility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.view;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import org.matsim.api.core.v01.network.Link;
 
+import playground.johannes.plans.plain.PlainFacility;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public interface Facility extends PlainFacility {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double getNormConstant(int i);
+	public Link getLink();
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraph.java
+ * SampledSocialNet.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.util.Set;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicPerson;
 
 import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseGraph;
 import playground.johannes.socialnetworks.graph.SparseVertex;
+import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraph extends SparseGraph {
+public class SampledSocialNet<P extends BasicPerson<?>> extends SocialNetwork<P> implements SampledGraph {
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SpatialEdge> getEdges() {
-		return (Set<? extends SpatialEdge>) super.getEdges();
+	public Set<? extends SampledSocialTie> getEdges() {
+		return (Set<? extends SampledSocialTie>) super.getEdges();
 	}
 
 	@SuppressWarnings("unchecked")
+	public Set<? extends SampledEgo<P>> getVertices() {
+		return (Set<? extends SampledEgo<P>>) super.getVertices();
+	}
+
 	@Override
-	public Set<? extends SpatialVertex> getVertices() {
-		return (Set<? extends SpatialVertex>) super.getVertices();
+	public SampledSocialTie getEdge(SparseVertex v1, SparseVertex v2) {
+		return (SampledSocialTie) super.getEdge(v1, v2);
+	}
+
+	@Override
+	public SampledEgo<P> getEgo(P p) {
+		return (SampledEgo<P>) super.getEgo(p);
 	}
 
 	@Override
@@ -55,27 +63,4 @@ public class SpatialGraph extends SparseGraph {
 		return super.insertVertex(v);
 	}
 
-	public double[] getBounds() {
-		double[] bounds = new double[4];
-		
-		double xmin = Double.MAX_VALUE;
-		double ymin = Double.MAX_VALUE;
-		double xmax = - Double.MAX_VALUE;
-		double ymax = - Double.MAX_VALUE;
-		
-		for(SpatialVertex v : getVertices()) {
-			Coord c = v.getCoordinate();
-			xmin = Math.min(xmin, c.getX());
-			ymin = Math.min(ymin, c.getY());
-			xmax = Math.max(xmax, c.getX());
-			ymax = Math.max(ymax, c.getY());
-		}
-		
-		bounds[0] = xmin;
-		bounds[1] = ymin;
-		bounds[2] = xmax;
-		bounds[3] = ymax;
-		
-		return bounds;
-	}
 }

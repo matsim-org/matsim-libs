@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * SampledEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import playground.johannes.socialnetworks.graph.Edge;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public interface SampledEdge extends Edge {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double getNormConstant(int i);
 }

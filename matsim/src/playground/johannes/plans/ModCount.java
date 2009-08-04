@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * ModCount.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+package playground.johannes.plans;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public interface ModCount {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public long getModCount();
 	
-	public double getNormConstant(int i);
 }

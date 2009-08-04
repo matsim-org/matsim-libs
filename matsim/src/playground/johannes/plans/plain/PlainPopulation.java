@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * RawPopulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.plain;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import java.util.Map;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public interface PlainPopulation {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public Map<String, ? extends PlainPerson> getPersons();
 	
-	public double getNormConstant(int i);
+	public void addPerson(PlainPerson person);
+	
+	public void removePerson(PlainPerson person);
+	
 }

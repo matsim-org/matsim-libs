@@ -40,16 +40,16 @@ public class LatticeGenerator {
 		SpatialGraphFactory factory = new SpatialGraphFactory();
 		SpatialGraph graph = factory.createGraph();
 		
-		double x_center = width/2.0;
-		double y_center = height/2.0;
+//		double x_center = width/2.0;
+//		double y_center = height/2.0;
 		
 		int step = gap + 1;
 		for(int i = 1; i <= width; i += step) {
 			for(int k = 1; k <= width; k += step) {
-				double dx = Math.abs(x_center - i);
-				double dy = Math.abs(y_center - k);
-				double d = Math.sqrt(dx*dx + dy*dy);
-				if(d <= width/2.0)
+//				double dx = Math.abs(x_center - i);
+//				double dy = Math.abs(y_center - k);
+//				double d = Math.sqrt(dx*dx + dy*dy);
+//				if(d <= width/2.0)
 					factory.addVertex(graph, new CoordImpl(i, k));
 			}
 		}
@@ -75,7 +75,7 @@ public class LatticeGenerator {
 		Ergm ergm = new Ergm();
 		ErgmTerm[] terms = new ErgmTerm[2];
 		terms[0] = new ErgmDensity();
-		terms[0].setTheta(0);
+		terms[0].setTheta(2);
 		
 		ErgmGravity gravity = new ErgmGravity(matrix, 1);
 		gravity.setTheta(1);
@@ -87,6 +87,7 @@ public class LatticeGenerator {
 //		terms[2] = attach;
 		
 		ergm.setErgmTerms(terms);
+		ergm.init(matrix);
 		/*
 		 * Setup gibbs sampler.
 		 */
@@ -97,8 +98,8 @@ public class LatticeGenerator {
 //		handler.setSampleSize(sampleSize);
 //		handler.setSampleInterval(sampleInterval);
 		DumpHandler handler = new DumpHandler("/Users/fearonni/vsp-work/work/socialnets/mcmc/output/", grid);
-		handler.setBurnin((long)2E8);
-		handler.setDumpInterval((long)2E7);
+		handler.setBurnin((long)4E9);
+		handler.setDumpInterval((long)1E8);
 		handler.setLogInterval((long)1E6);
 		
 //		logger.info(String.format("Starting gibbs sampler. Burnin time: %1$s iterations.", burnin));

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * ActivityImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.view.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.Map;
 
+import org.matsim.api.core.v01.network.Link;
+
+import playground.johannes.plans.plain.impl.PlainActivityImpl;
+import playground.johannes.plans.view.Activity;
+import playground.johannes.plans.view.Facility;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class ActivityView extends AbstractView<PlainActivityImpl> implements Activity {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	private Map<String, Link> linkMapping;
 	
-	public double getNormConstant(int i);
+	private Map<String, Facility> facilityMapping;
+	
+	public ActivityView(PlainActivityImpl rawAct) {
+		super(rawAct);
+	}
+	
+	public Link getLink() {
+		return linkMapping.get(getLinkId());
+	}
+
+	public String getLinkId() {
+		return delegate.getLinkId();
+	}
+
+	public Facility getFacility() {
+		return facilityMapping.get(getFacilityId());
+	}
+
+	public String getFacilityId() {
+		return delegate.getFacilityId();
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.plans.view.impl.AbstractView#update()
+	 */
+	@Override
+	protected void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * RawLeg.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+package playground.johannes.plans.plain;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public interface PlainLeg {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public PlainRoute getRoute();
 	
-	public double getNormConstant(int i);
+	public void setRoute(PlainRoute route);
+	
 }

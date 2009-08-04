@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * RawLegImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.plain.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import playground.johannes.plans.ModCount;
+import playground.johannes.plans.plain.PlainLeg;
+import playground.johannes.plans.plain.PlainRoute;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class PlainLegImpl implements PlainLeg, ModCount {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	private PlainRoute route;
 	
-	public double getNormConstant(int i);
+	public PlainRoute getRoute() {
+		return route;
+	}
+
+	public void setRoute(PlainRoute route) {
+		this.route = route;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.plans.ModCount#getModCount()
+	 */
+	public long getModCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

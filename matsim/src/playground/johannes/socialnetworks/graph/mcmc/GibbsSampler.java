@@ -99,7 +99,8 @@ public class GibbsSampler {
 		
 		if(i != j) {
 			boolean y_ij = m.getEdge(i, j);
-			double p = 1 / (1 + d.changeStatistic(m, i, j, y_ij));
+//			double p = 1 / (1 + d.changeStatistic(m, i, j, y_ij));
+			double p = d.getNormConstant(i) / (1 + d.changeStatistic(m, i, j, y_ij));
 			
 			if(random.nextDouble() <= p) {
 				/*

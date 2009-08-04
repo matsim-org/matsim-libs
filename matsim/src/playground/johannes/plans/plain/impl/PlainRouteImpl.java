@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * RawRouteImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.plain.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.Collections;
+import java.util.List;
 
+import playground.johannes.plans.ModCount;
+import playground.johannes.plans.plain.PlainRoute;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class PlainRouteImpl implements PlainRoute, ModCount {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	private List<String> linkIds;
 	
-	public double getNormConstant(int i);
+	private long modCount = 0;
+	
+	public List<String> getLinkIds() {
+		return linkIds;
+	}
+
+	public long getModCount() {
+		return modCount;
+	}
+
+	public void setLinkIds(List<String> linkIds) {
+		this.linkIds = Collections.unmodifiableList(linkIds);
+		modCount++;
+	}
+
 }

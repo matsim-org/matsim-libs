@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * RawActivityImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.plain.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import playground.johannes.plans.ModCount;
+import playground.johannes.plans.plain.PlainActivity;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class PlainActivityImpl implements PlainActivity, ModCount {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double getNormConstant(int i);
+	public String getLinkId() {
+		return "this is a link id";
+	}
+
+	public String getFacilityId() {
+		return "this is a facility id";
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.plans.ModCount#getModCount()
+	 */
+	public long getModCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

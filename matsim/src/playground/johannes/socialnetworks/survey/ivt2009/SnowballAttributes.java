@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * SnowballAttributes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+package playground.johannes.socialnetworks.survey.ivt2009;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class SnowballAttributes {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	private int detected = -1;
 	
-	public double getNormConstant(int i);
+	private int sampled = -1;
+	
+	public void detect(int iteration) {
+		detected = iteration;
+	}
+	
+	public int getIterationDeteted() {
+		return detected;
+	}
+	
+	public boolean isDetected() {
+		return (detected > -1);
+	}
+	
+	public void sample(int iteration) {
+		sampled = iteration;
+	}
+	
+	public int getIterationSampled() {
+		return sampled;
+	}
+	
+	public boolean isSampled() {
+		return sampled > -1;
+	}
 }

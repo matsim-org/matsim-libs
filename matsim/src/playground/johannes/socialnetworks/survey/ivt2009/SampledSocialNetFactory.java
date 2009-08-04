@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * SampledSocialNetFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import org.matsim.api.basic.v01.population.BasicPerson;
 
+import playground.johannes.socialnetworks.graph.GraphFactory;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class SampledSocialNetFactory <P extends BasicPerson<?>> implements GraphFactory<SampledSocialNet<P>, SampledEgo<P>, SampledSocialTie> {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public SampledSocialTie addEdge(SampledSocialNet<P> g, SampledEgo<P> v1,
+			SampledEgo<P> v2) {
+		SampledSocialTie e = new SampledSocialTie(v1, v2);
+		if(g.insertEdge(e, v1, v2)) {
+			return e;
+		} else {
+			return null;
+		}
+	}
+
+	public SampledEgo<P> addVertex(SampledSocialNet<P> g) {
+		throw new UnsupportedOperationException("Don't know what to with that...");
+	}
 	
-	public double getNormConstant(int i);
+	public SampledEgo<P> addVertex(SampledSocialNet<P> g, P person, int iteration) {
+		SampledEgo<P> ego = new SampledEgo<P>(person);
+		ego.detect(iteration);
+		if(g.insertVertex(ego))
+			return ego;
+		else
+			return null;
+	}
+
+	public SampledSocialNet<P> createGraph() {
+		return new SampledSocialNet<P>();
+	}
+
 }

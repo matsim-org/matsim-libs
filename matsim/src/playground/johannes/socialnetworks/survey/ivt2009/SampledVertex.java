@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * SampledVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public interface SampledVertex extends Vertex {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public void detect(int iteration);
 	
-	public double getNormConstant(int i);
+	public int getIterationDetected();
+	
+	public boolean isDetected();
+	
+	public void sample(int iteration);
+	
+	public int getIterationSampled();
+	
+	public boolean isSampled();
+	
 }

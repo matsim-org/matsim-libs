@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraph.java
+ * SampledEgo.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,65 +17,68 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-import java.util.Set;
+import java.util.List;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.population.BasicPerson;
 
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseGraph;
-import playground.johannes.socialnetworks.graph.SparseVertex;
+import playground.johannes.socialnetworks.graph.social.Ego;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraph extends SparseGraph {
+public class SampledEgo<P extends BasicPerson<?>> extends Ego<P> implements SampledVertex {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SpatialEdge> getEdges() {
-		return (Set<? extends SpatialEdge>) super.getEdges();
+	private SnowballAttributes attributes;
+	
+	private SampledEgo<P> recruitedBy;
+	
+	protected SampledEgo(P person) {
+		super(person);
+		attributes = new SnowballAttributes();
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SpatialVertex> getVertices() {
-		return (Set<? extends SpatialVertex>) super.getVertices();
+	public List<? extends SampledSocialTie> getEdges() {
+		return (List<? extends SampledSocialTie>) super.getEdges();
 	}
 
-	@Override
-	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
-		return super.insertEdge(e, v1, v2);
+	@SuppressWarnings("unchecked")
+	public List<? extends SampledEgo<P>> getNeighbours() {
+		return (List<? extends SampledEgo<P>>) super.getNeighbours();
 	}
 
-	@Override
-	protected boolean insertVertex(SparseVertex v) {
-		return super.insertVertex(v);
+	public void detect(int iteration) {
+		attributes.detect(iteration);
 	}
 
-	public double[] getBounds() {
-		double[] bounds = new double[4];
-		
-		double xmin = Double.MAX_VALUE;
-		double ymin = Double.MAX_VALUE;
-		double xmax = - Double.MAX_VALUE;
-		double ymax = - Double.MAX_VALUE;
-		
-		for(SpatialVertex v : getVertices()) {
-			Coord c = v.getCoordinate();
-			xmin = Math.min(xmin, c.getX());
-			ymin = Math.min(ymin, c.getY());
-			xmax = Math.max(xmax, c.getX());
-			ymax = Math.max(ymax, c.getY());
-		}
-		
-		bounds[0] = xmin;
-		bounds[1] = ymin;
-		bounds[2] = xmax;
-		bounds[3] = ymax;
-		
-		return bounds;
+	public int getIterationDetected() {
+		return attributes.getIterationDeteted();
+	}
+
+	public int getIterationSampled() {
+		return attributes.getIterationSampled();
+	}
+
+	public boolean isDetected() {
+		return attributes.isDetected();
+	}
+
+	public boolean isSampled() {
+		return attributes.isSampled();
+	}
+
+	public void sample(int iteration) {
+		attributes.sample(iteration);
+	}
+
+	public void setRecruitedBy(SampledEgo<P> ego) {
+		recruitedBy = ego;
+	}
+	
+	public SampledEgo<P> getRecruitedBy() {
+		return recruitedBy;
 	}
 }

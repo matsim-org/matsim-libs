@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * RawPersonImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.plain.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.List;
 
+import playground.johannes.plans.ModCount;
+import playground.johannes.plans.plain.PlainPerson;
+import playground.johannes.plans.plain.PlainPlan;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class PlainPersonImpl implements PlainPerson, ModCount {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	private List<PlainPlan> plans;
 	
-	public double getNormConstant(int i);
+	public List<PlainPlan> getPlans() {
+		return plans;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.plans.ModCount#getModCount()
+	 */
+	public long getModCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

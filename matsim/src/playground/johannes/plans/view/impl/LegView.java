@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * LegImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.view.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import playground.johannes.plans.plain.impl.PlainLegImpl;
+import playground.johannes.plans.view.Leg;
+import playground.johannes.plans.view.Route;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class LegView extends AbstractView<PlainLegImpl> implements Leg {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public LegView(PlainLegImpl rawLeg) {
+		super(rawLeg);
+	}
 	
-	public double getNormConstant(int i);
+	public Route getRoute() {
+		return null;
+//		return delegate.getRoute();
+	}
+
+	public void setRoute(Route route) {
+//		delegate.setRoute(route);
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.plans.view.impl.AbstractView#update()
+	 */
+	@Override
+	protected void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

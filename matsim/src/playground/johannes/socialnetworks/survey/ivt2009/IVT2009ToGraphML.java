@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.ivtsurveys;
+package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -61,6 +61,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
+import playground.johannes.socialnetworks.ivtsurveys.SNKMLEgoAlterSytle;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -234,14 +235,19 @@ public class IVT2009ToGraphML {
 		 */
 		Distribution edgeLengthDistr = SpatialGraphStatistics.edgeLengthDistribution(egoSet);
 		double d_mean = edgeLengthDistr.mean();
-		logger.info("Mean edge length is " + d_mean);	
+		logger.info("Mean edge length is " + d_mean);
 	
+		Distribution edgeLengthDistrNorm = SpatialGraphStatistics.normalizedEdgeLengthDistribution(egoSet, 1000);
+		double d_mean_norm = edgeLengthDistrNorm.mean();
+		logger.info("Normalized mean edge length is " + d_mean_norm);
+		
 		SpatialGrid<Double> densityGrid = null;
 		if(args[2] != null)
 			densityGrid = SpatialGrid.readFromFile(args[2]);
 
 		if(output != null) {
 			Distribution.writeHistogram(edgeLengthDistr.absoluteDistribution(1000), output + "edgelength.hist.txt");
+			Distribution.writeHistogram(edgeLengthDistrNorm.absoluteDistribution(1000), output + "edgelength.norm.hist.txt");
 			Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(egoSet), output + "edgelength_k.txt", "k", "edge length");
 			
 			if(densityGrid != null) {
@@ -325,9 +331,13 @@ public class IVT2009ToGraphML {
 	}
 	
 	private static BasicPerson<BasicPlan<PlanElement>> createAlter(String alterKey, int counter, Map<String, String> egoData, String egoId, BasicPopulation population) {
+		String name = getValue(egoData, alterKey+counter);
+		System.out.println(name);
 		String alterAge = getValue(egoData, makeKey(alterKey, ALTER_AGE_KEY, counter));
-//		if(alterAge == null)
-//			logger.warn(String.format("Missing age for alter %1$s of userId %2$s. Ignoring.", counter, egoId));
+		if(alterAge == null) {
+			logger.warn(String.format("Missing age for alter %1$s of userId %2$s. Ignoring.", counter, egoId));
+			return null;
+		}
 		
 		String alterCoord = getValue(egoData, makeKey(alterKey, ALTER_LOC_KEY, counter));
 		if(alterCoord == null) {

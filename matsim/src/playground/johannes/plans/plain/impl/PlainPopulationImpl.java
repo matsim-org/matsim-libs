@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * RawPopulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.plain.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import playground.johannes.plans.ModCount;
+import playground.johannes.plans.plain.PlainPerson;
+import playground.johannes.plans.plain.PlainPopulation;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class PlainPopulationImpl implements PlainPopulation, ModCount {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	private Map<String, PlainPersonImpl> persons;
 	
-	public double getNormConstant(int i);
+	private Map<String, PlainPersonImpl> unmodifiablePersons;
+	
+	private long modCount;
+	
+	public PlainPopulationImpl() {
+		persons = new HashMap<String, PlainPersonImpl>();
+		unmodifiablePersons = Collections.unmodifiableMap(persons);
+	}
+	
+	public Map<String, PlainPersonImpl> getPersons() {
+		return unmodifiablePersons;
+	}
+
+	public long getModCount() {
+		return modCount;
+	}
+
+	public void addPerson(PlainPerson person) {
+		persons.put("id", (PlainPersonImpl) person);
+		modCount++;
+	}
+
+	public void removePerson(PlainPerson person) {
+		persons.remove((PlainPersonImpl) person);
+		modCount++;
+	}
 }

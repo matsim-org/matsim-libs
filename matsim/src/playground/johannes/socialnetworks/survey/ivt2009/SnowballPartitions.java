@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * SnowballPartititions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class SnowballPartitions {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	public static Set<SampledVertex> createSampledPartition(SampledGraph g) {
+		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
+		for(SampledVertex vertex : g.getVertices()) {
+			if(vertex.isSampled())
+				vertices.add(vertex);
+		}
+		return vertices;
+	}
 	
-	public double getNormConstant(int i);
+	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
+		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
+		for(SampledVertex vertex : g.getVertices()) {
+			if(vertex.getIterationSampled() == itertation)
+				vertices.add(vertex);
+		}
+		return vertices;
+	}
 }

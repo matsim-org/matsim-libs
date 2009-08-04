@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * PlanImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,54 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.view.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.List;
 
+import playground.johannes.plans.plain.impl.PlainPlanImpl;
+import playground.johannes.plans.view.Activity;
+import playground.johannes.plans.view.Leg;
+import playground.johannes.plans.view.Plan;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class PlanView extends AbstractView<PlainPlanImpl> implements Plan {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
 	
-	public double getNormConstant(int i);
+	public PlanView(PlainPlanImpl rawPlan) {
+		super(rawPlan);
+//		delegate = new PlainPlanImpl<Activity, Leg>();
+//		for(PlainActivity rawAct : rawPlan.getActivities()) {
+//			Activity act = new ActivityImpl(rawAct);
+//			delegate.getActivities().add(act);
+//		}
+//		for(PlainLeg<?> rawLeg : rawPlan.getLegs()) {
+//			Leg leg = new LegImpl(rawLeg);
+//			delegate.getLegs().add(leg);
+//		}
+			
+	}
+	
+	public List<Activity> getActivities() {
+//		return delegate.getActivities();
+		return null;
+	}
+
+	
+	public List<Leg> getLegs() {
+//		return delegate.getLegs();
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.plans.view.impl.AbstractView#update()
+	 */
+	@Override
+	protected void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -76,7 +76,7 @@ public class KMLWriter {
 	
 	private KMLObjectDescriptor<Edge> edgeDescriptor;
 	
-	private ObjectFactory objectFactory;
+	protected ObjectFactory objectFactory;
 	
 	private LinkType vertexIconLink;
 	
@@ -119,7 +119,7 @@ public class KMLWriter {
 		this.vertexStyle = (KMLObjectStyle<Graph, Vertex>) vertexStyle;
 	}
 
-	public KMLObjectStyle<? extends Graph, ? extends Edge> getEdgeStyle() {
+	public KMLObjectStyle<Graph, Edge> getEdgeStyle() {
 		return edgeStyle;
 	}
 
@@ -128,7 +128,7 @@ public class KMLWriter {
 		this.edgeStyle = (KMLObjectStyle<Graph, Edge>) edgeStyle;
 	}
 
-	public KMLObjectDescriptor<? extends Vertex> getVertexDescriptor() {
+	public KMLObjectDescriptor<Vertex> getVertexDescriptor() {
 		return vertexDescriptor;
 	}
 
@@ -137,7 +137,7 @@ public class KMLWriter {
 		this.vertexDescriptor = (KMLObjectDescriptor<Vertex>) vertexDescriptor;
 	}
 
-	public KMLObjectDescriptor<? extends Edge> getEdgeDescriptor() {
+	public KMLObjectDescriptor<Edge> getEdgeDescriptor() {
 		return edgeDescriptor;
 	}
 
@@ -274,7 +274,7 @@ public class KMLWriter {
 		kmzWriter.close();
 	}
 	
-	private String makeCoordinateString(Coord coord) {
+	protected String makeCoordinateString(Coord coord) {
 		StringBuffer buffer = new StringBuffer(50);
 		buffer.append(Double.toString(coord.getX()));
 		buffer.append(COMMA);
@@ -282,7 +282,7 @@ public class KMLWriter {
 		return buffer.toString();
 	}
 	
-	private class DefaultVertexStyle implements KMLObjectStyle<Graph, Vertex> {
+	protected class DefaultVertexStyle implements KMLObjectStyle<Graph, Vertex> {
 
 		private static final String DEFAULT_VERTEX_STYLE_ID = "defaultVertexStyle";
 		
@@ -307,7 +307,7 @@ public class KMLWriter {
 		
 	}
 	
-	private class DefaultEdgeStyle implements KMLObjectStyle<Graph, Edge> {
+	protected class DefaultEdgeStyle implements KMLObjectStyle<Graph, Edge> {
 	
 		private static final String DEFAULT_EDGE_STYLE_ID = "defaultEdgeStyle";
 		

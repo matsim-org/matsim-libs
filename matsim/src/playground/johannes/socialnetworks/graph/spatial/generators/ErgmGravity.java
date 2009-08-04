@@ -24,7 +24,11 @@
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
@@ -46,6 +50,7 @@ public class ErgmGravity extends ErgmTerm {
 	
 	private TIntObjectHashMap<TDoubleDoubleHashMap> normConstants;
 	
+	private TIntDoubleHashMap const_i = new TIntDoubleHashMap();
 //	private TDoubleIntHashMap edges;
 	
 //	private TIntDoubleHashMap max_length;
@@ -78,6 +83,7 @@ public class ErgmGravity extends ErgmTerm {
 		
 		
 		for(int i = 0; i < n; i++) {
+//			double sum = 0;
 			TDoubleDoubleHashMap norm_i = new TDoubleDoubleHashMap();
 //			double maxlen = 0;
 			Coord c_i = m.getVertex(i).getCoordinate();
@@ -89,12 +95,15 @@ public class ErgmGravity extends ErgmTerm {
 					double bin = getBin(d);
 //					edges.adjustOrPutValue(bin, 1, 1);
 					norm_i.adjustOrPutValue(bin, 1, 1);
+//					sum += 1.0/bin;
 					
 //					maxlen = Math.max(d, maxlen);
 				}
-				
-				
 			}
+//			if(sum == 0)
+//				System.err.println();
+//			
+//			const_i.put(i, sum);
 //			max_length.put(i, maxlen);
 //			double dx = Math.abs(xcenter - c_i.getX());
 //			double dy = Math.abs(ycenter - c_i.getY());
@@ -139,7 +148,7 @@ public class ErgmGravity extends ErgmTerm {
 //					a=1;
 //				
 //				if(Math.random() < 0.3) {
-//				writer.write(String.format("%1$s\t%2$s\t%3$s\t%4$s\t%5$s\t%6$s", r, a, count, count/a, d, r/a));
+//				writer.write(String.format("%1$s\t%2$s", d, sum));
 //				writer.newLine();
 //				}
 //			}
@@ -154,6 +163,19 @@ public class ErgmGravity extends ErgmTerm {
 //			e.printStackTrace();
 //		}
 		
+		for(int i = 0; i < n; i++) {
+			Coord c_i = m.getVertex(i).getCoordinate();
+			double sum = 0;
+			for(int j = 0; j < n; j++) {
+				if(j != i) {
+					Coord c_j = m.getVertex(j).getCoordinate();
+					double d = getBin(CoordUtils.calcDistance(c_i, c_j));
+					sum += 1/(d);// * normConstants.get(i).get(d));
+				}
+			}
+			
+			const_i.put(i, 1/sum);
+		}
 	}
 	
 	public double calculateCircleSegment(double dx, double dy, double r) {
@@ -184,7 +206,10 @@ public class ErgmGravity extends ErgmTerm {
 	}
 
 	private double getBin(double d) {
-		return Math.ceil(d/descretization);
+		if(d == 0)
+			return 1;
+		else
+			return Math.ceil(d/descretization);
 	}
 	
 	@Override
@@ -196,14 +221,19 @@ public class ErgmGravity extends ErgmTerm {
 		
 		
 		double norm_i = normConstants.get(i).get(d);
+		double norm_const = const_i.get(i);
+		if(norm_const == 0 || Double.isNaN(norm_const) || Double.isInfinite(norm_const)) {
+			System.err.println("Zero, NaN or Infinity!");
+		}
 //		double norm_j = normConstants.get(j).get(d);
 //		double n_edges = edges.get(d);
 		
 		if(norm_i == 0) {
 			throw new IllegalArgumentException(String.format("Norm must no be zero! i=%1$s, d=%2$s", i, d));
 		}
-		
-		return - getTheta() * (Math.log(1 / (d * norm_i)));
+		double r = - getTheta() * (Math.log(norm_const / (d))); 
+//		System.out.println(String.valueOf(r));
+		return r;
 //		return - getTheta() * (Math.log(1 / (d * n_edges)));
 	}
 

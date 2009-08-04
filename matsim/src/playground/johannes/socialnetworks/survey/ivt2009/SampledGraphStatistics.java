@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraph.java
+ * SampledGraphStatistics.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,65 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
 
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseGraph;
-import playground.johannes.socialnetworks.graph.SparseVertex;
+import playground.johannes.socialnetworks.graph.GraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraph extends SparseGraph {
+public class SampledGraphStatistics {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SpatialEdge> getEdges() {
-		return (Set<? extends SpatialEdge>) super.getEdges();
+	public static Distribution degreeDistribution(SampledGraph g) {
+		return GraphStatistics.degreeDistribution(SnowballPartitions.createSampledPartition(g));
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SpatialVertex> getVertices() {
-		return (Set<? extends SpatialVertex>) super.getVertices();
+	
+	public static Distribution localClusteringDistribution(SampledGraph g) {
+		return GraphStatistics.localClusteringDistribution(SnowballPartitions.createSampledPartition(g));
 	}
-
-	@Override
-	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
-		return super.insertEdge(e, v1, v2);
+	
+	public static Distribution edgeLenghtDistribution(SampledSocialNet<?> g) {
+		return SpatialGraphStatistics.edgeLengthDistribution((Set<? extends SpatialVertex>)SnowballPartitions.createSampledPartition(g));
 	}
-
-	@Override
-	protected boolean insertVertex(SparseVertex v) {
-		return super.insertVertex(v);
-	}
-
-	public double[] getBounds() {
-		double[] bounds = new double[4];
-		
-		double xmin = Double.MAX_VALUE;
-		double ymin = Double.MAX_VALUE;
-		double xmax = - Double.MAX_VALUE;
-		double ymax = - Double.MAX_VALUE;
-		
-		for(SpatialVertex v : getVertices()) {
-			Coord c = v.getCoordinate();
-			xmin = Math.min(xmin, c.getX());
-			ymin = Math.min(ymin, c.getY());
-			xmax = Math.max(xmax, c.getX());
-			ymax = Math.max(ymax, c.getY());
-		}
-		
-		bounds[0] = xmin;
-		bounds[1] = ymin;
-		bounds[2] = xmax;
-		bounds[3] = ymax;
-		
-		return bounds;
+	
+	public static Distribution normalizedEdgeLengthDistribution(SampledSocialNet<?> g, SpatialGraph g2, double descretization) {
+		return SpatialGraphStatistics.normalizedEdgeLengthDistribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition(g), g2, descretization);
 	}
 }

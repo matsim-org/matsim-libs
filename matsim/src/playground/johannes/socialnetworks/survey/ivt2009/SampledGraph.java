@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * SampledGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.Set;
 
+import playground.johannes.socialnetworks.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public interface SampledGraph extends Graph {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double getNormConstant(int i);
+	public Set<? extends SampledVertex> getVertices();
+
+	public Set<? extends SampledEdge> getEdges();
+
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * PopulationImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.view.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import playground.johannes.plans.plain.impl.PlainPersonImpl;
+import playground.johannes.plans.plain.impl.PlainPopulationImpl;
+import playground.johannes.plans.view.Person;
+import playground.johannes.plans.view.Population;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class PopulationView extends AbstractView<PlainPopulationImpl> implements Population {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	private Map<String, PersonView> persons = new HashMap<String, PersonView>();
 	
-	public double getNormConstant(int i);
+	private Map<String, PersonView> unmodifiablePersons;
+	
+	public PopulationView(PlainPopulationImpl rawPopulation) {
+		super(rawPopulation);
+		unmodifiablePersons = Collections.unmodifiableMap(persons);
+	}
+	
+	public Map<String, PersonView> getPersons() {
+		synchronize();
+		return unmodifiablePersons;
+	}
+	
+	@Override
+	protected void update() {
+		Collection<PlainPersonImpl> newPersons = synchronizeCollections(delegate.getPersons().values(), persons.values());
+		
+		for(PlainPersonImpl p : newPersons) {
+			PersonView view = new PersonView(p);
+			persons.put("id", view);
+		}
+	}
+
+	public void addPerson(Person person) {
+		delegate.addPerson(((PersonView) person).getDelegate());
+	}
+
+	public void removePerson(Person person) {
+		delegate.removePerson(((PersonView) person).getDelegate());
+	}
+	
+	
 }

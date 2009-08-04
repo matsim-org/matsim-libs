@@ -43,6 +43,12 @@ public class SpatialVertex extends SparseVertex {
 		return (List<? extends SpatialVertex>) super.getNeighbours();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends SpatialEdge> getEdges() {
+		return (List<? extends SpatialEdge>) super.getEdges();
+	}
+
 	public Coord getCoordinate() {
 		return coord;
 	}

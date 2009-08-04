@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * PersonImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.view.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.List;
 
+import playground.johannes.plans.plain.impl.PlainPersonImpl;
+import playground.johannes.plans.view.Person;
+import playground.johannes.plans.view.Plan;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
-
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+public class PersonView extends AbstractView<PlainPersonImpl> implements Person {
 	
-	public double getNormConstant(int i);
+	private List<Plan> plans;
+	
+	public PersonView(PlainPersonImpl plainPerson) {
+		super(plainPerson);
+	}
+	
+	public List<Plan> getPlans() {
+		synchronize();
+		return plans;
+	}
+
+	@Override
+	protected void update() {
+		
+	}
+
 }

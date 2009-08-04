@@ -88,6 +88,49 @@ public class SpatialGraphStatistics {
 		return stats;
 	}
 	
+	public static Distribution normalizedEdgeLengthDistribution(Set<? extends SpatialVertex> vertices, SpatialGraph vertices2, double descretization) {
+		HashMap<SpatialVertex, TDoubleDoubleHashMap> normConstants = new HashMap<SpatialVertex, TDoubleDoubleHashMap>();
+		
+		double bounds[] = vertices2.getBounds();
+		for(SpatialVertex v_i : vertices) {
+			
+			Coord c_i = v_i.getCoordinate();
+			if(c_i.getX() >= bounds[0] && c_i.getY() >= bounds[1] && c_i.getY() <= bounds[2] && c_i.getY() <= bounds[3]) {
+			TDoubleDoubleHashMap norm_i = new TDoubleDoubleHashMap();
+			
+			
+//			for(SpatialVertex v_j : vertices) {
+			for(SpatialVertex v_j : vertices2.getVertices()) {
+//				if(v_i != v_j) {
+					Coord c_j = v_j.getCoordinate();
+					double d = CoordUtils.calcDistance(c_i, c_j);
+					
+					double bin = Math.ceil(d/descretization);
+					norm_i.adjustOrPutValue(bin, 1, 1);
+//				}
+			}
+			normConstants.put(v_i, norm_i);
+			}
+		}
+		
+		Distribution stats = new Distribution();
+		for(SpatialVertex v1 : vertices) {
+			Coord c_i = v1.getCoordinate();
+			if(c_i.getX() >= bounds[0] && c_i.getY() >= bounds[1] && c_i.getY() <= bounds[2] && c_i.getY() <= bounds[3]) {
+			for(SparseEdge e : v1.getEdges()) {
+				double d = ((SpatialEdge)e).length();
+				if(d > 0) {
+				double n = normConstants.get(v1).get(Math.ceil(d/descretization));
+				n += 1;
+				stats.add(d, 1/n);
+				}
+			}
+			}
+		}
+		
+		return stats;
+	}
+	
 	public static TObjectDoubleHashMap<? extends SpatialVertex> meanEdgeLength(SpatialGraph g) {
 		return meanEdgeLength(g.getVertices());
 	}

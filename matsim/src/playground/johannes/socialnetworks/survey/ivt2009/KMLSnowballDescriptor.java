@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * KMLPersonDescriptor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import org.matsim.api.basic.v01.population.BasicPerson;
 
+import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectDescriptor;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledEgo<BasicPerson<?>>> {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double getNormConstant(int i);
+	public String getDescription(SampledEgo<BasicPerson<?>> object) {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("Name: ");
+		builder.append(object.getPerson().getId().toString());
+		builder.append("<br>");
+		builder.append("Sampled: ");
+		builder.append(String.valueOf(object.getIterationSampled()));
+		builder.append("<br>");
+		builder.append("Detected: ");
+		builder.append(String.valueOf(object.getIterationDetected()));
+		builder.append("<br>");
+		builder.append("Recruited by: ");
+		SampledEgo<?> name = object.getRecruitedBy();
+		if(name == null)
+			builder.append("seed");
+		else
+			builder.append(name.getPerson().getId().toString());
+		
+		return builder.toString();
+	}
+
+	public String getName(SampledEgo<BasicPerson<?>> object) {
+		return object.getPerson().getId().toString();
+	}
+
 }

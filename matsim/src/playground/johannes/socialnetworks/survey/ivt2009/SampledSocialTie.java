@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * SampledSocialTie.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.survey.ivt2009;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
-
+import playground.johannes.socialnetworks.graph.social.Ego;
+import playground.johannes.socialnetworks.graph.social.SocialTie;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public class SampledSocialTie extends SocialTie implements SampledEdge {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	public double getNormConstant(int i);
+	public SampledSocialTie(Ego<?> v1, Ego<?> v2) {
+		super(v1, v2);
+	}
+
+	public SampledSocialTie(Ego<?> v1, Ego<?> v2, int created) {
+		super(v1, v2, created);
+	}
+
 }

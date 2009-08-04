@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ConditionalDistribution.java
+ * AbstractView.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,63 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.plans.view.impl;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
+import playground.johannes.plans.ModCount;
 
 /**
  * @author illenberger
  *
  */
-public interface ConditionalDistribution {
+public abstract class AbstractView <T extends ModCount> {
 
-	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
+	protected T delegate;
 	
-	public double getNormConstant(int i);
+	protected long delegateVersion;
+	
+	protected AbstractView(T delegate) {
+		this.delegate = delegate;
+		delegateVersion = delegate.getModCount();
+	}
+	
+	protected void synchronize() {
+		if(delegate.getModCount() > delegateVersion)
+			update();
+	}
+	
+	protected abstract void update();
+	
+	public T getDelegate() {
+		return delegate;
+	}
+	
+	protected <S, V extends AbstractView<?>> Collection<S>  synchronizeCollections(Collection<S> source, Collection<V> target) {
+		List<V> removedElements = new LinkedList<V>();
+		List<S> newElements = new LinkedList<S>();
+		
+		removedElements.addAll(target);
+		for(S e : source) {
+//			if(removedElements.contains(e))
+			boolean contains = false;
+			for(V e2 : removedElements) {
+				if(e2.getDelegate().equals(e)) {
+					contains = true;
+					break;
+				}
+					
+			}
+			if(contains)
+				removedElements.remove(e);
+			else
+				newElements.add(e);
+		}
+		
+		target.removeAll(removedElements);
+		
+		return newElements;
+	}
 }
