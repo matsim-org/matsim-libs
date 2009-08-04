@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChains;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChainsModes;
-//import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -52,7 +52,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
-//import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 
 
@@ -114,7 +114,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.writePlansForBiogeme(this.outputFileBiogeme);
 	}
 	
-	/*
+	
 	// Method that filters only Zurich10% plans
 	private void selectZurich10MZPlans (){
 		log.info("Creating Zurich10% population...");
@@ -124,6 +124,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			PersonImpl person = (PersonImpl) a[i];
 			boolean isIn = false;
 			for (int j=0;j<person.getSelectedPlan().getPlanElements().size();j+=2){
+				//30km circle around Zurich city centre (Bellevue)
 				if (CoordUtils.calcDistance(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(j))).getCoord(), new CoordImpl(683518.0,246836.0))<=30000){
 					isIn = true;
 					break;
@@ -135,7 +136,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done... Size of population is "+this.population.getPersons().size()+".");
 	}
-	*/
+	
 	
 	private void reducePersons (){
 		// Drop those persons whose plans do not belong to x most frequent activity chains.
@@ -220,9 +221,23 @@ public class PlansConstructor implements PlanStrategyModule{
 							}
 						}
 					}*/
-					
-					this.router.run(plan);					
-					//person.addPlan(plan);
+	
+					for (int j=1;j<plan.getPlanElements().size();j++){
+						if (j%2==1){
+							this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+						}
+						else {
+							((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+							if (j!=plan.getPlanElements().size()-1){
+								((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
+								((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+							}
+						}
+					}
+					// if plan too long make it unvalid (set score to -100000)
+					if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
+						plan.setScore(-100000.0);
+					}
 					person.getPlans().add(i, plan);
 				}
 			}
@@ -265,18 +280,34 @@ public class PlansConstructor implements PlanStrategyModule{
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
 			}
 		}
+		for (int i = 0;i<p.getPlans().size();i++){
+			stream.print("av"+(i+1)+"\t");
+		}
 		stream.println();
 		
 		// Filling plans
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
 			stream.print(person.getId()+"\t");
+			int position = -1;
+			for (int i=0;i<person.getPlans().size();i++){
+				if (person.getPlans().get(i).equals(person.getSelectedPlan())) {
+					position = i+1;
+					break;
+				}
+			}
+			stream.print(position+"\t");
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				for (int i=0;i<plan.getPlanElements().size();i++){
-					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).getDuration()+"\t");
+				for (int i=0;i<plan.getPlanElements().size()-1;i++){
+					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()+"\t");
 					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()+"\t");
 				}
+			}
+			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				PlanImpl plan = iterator2.next();
+				if (plan.getScore()==-100000.0)	stream.print(0+"\t");
+				else stream.print(1+"\t");
 			}
 			stream.println();
 		}
