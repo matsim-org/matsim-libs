@@ -59,7 +59,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	 */
 	private static final long serialVersionUID = 6481835753628883014L;
 	
-	transient private final Logger log = Logger.getLogger(OTFConnectionManager.class);
+	/* transient */ private static final Logger log = Logger.getLogger(OTFConnectionManager.class);
 	private boolean isValidated = false;
 
 	public static class Entry implements Serializable{
@@ -125,7 +125,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		Iterator<Entry> iter = connections.iterator();
 		while(iter.hasNext()) {
 			Entry entry = iter.next();
-			if (entry.from == from && entry.to == to) iter.remove();
+			if ((entry.from == from) && (entry.to == to)) iter.remove();
 		}
 	}
 
