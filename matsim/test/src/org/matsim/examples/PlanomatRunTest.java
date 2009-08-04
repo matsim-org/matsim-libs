@@ -46,6 +46,10 @@ public class PlanomatRunTest extends MatsimTestCase {
 		this.runControlerTest(this.config);
 	}
 
+	/**
+	 * TODO this test always files for an unknown reason. 
+	 * checksums of actual test results are not stable even in repeated runs of this test on one machine 
+	 */
 	public void testMainCarPt() {
 		this.runControlerTest(this.config);
 	}
