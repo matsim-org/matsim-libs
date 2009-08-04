@@ -20,6 +20,7 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.TransportMode;
@@ -40,7 +41,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonAlgorithm {
 
-	public static final double[] distanceClasses = new double[]{0.0, 100.0, 200.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0, 20000.0, 50000.0, 100000.0, Double.MAX_VALUE};
+	public static final double[] distanceClasses = new double[]{
+		0.0, 
+		100.0,	200.0, 500.0, 
+		1000.0, 2000.0, 5000.0, 
+		10000.0, 20000.0, 50000.0, 100000.0, 
+		Double.MAX_VALUE};
+//	public static final DecimalFormat PERCENTAGE_PATTERN = new DecimalFormat("#.##"); 
 	
 	private HashMap<TransportMode, Integer[]> legDistanceDistribution = new HashMap<TransportMode, Integer[]>();
 	
@@ -127,26 +134,111 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 
 	}
 	
-	public void printCrosstabAbsolute() {
+	/**
+	 * @return the overall number of legs.
+	 */
+	public int getNumberOfLegs() {
+		
+		int numberOfLegs = 0;
+
+		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+			for (Integer i : this.legDistanceDistribution.get(mode)) {
+				numberOfLegs += i;
+			}
+		}
+		
+		return numberOfLegs;
+		
+	}
+	
+	public enum CrosstabFormat{ABSOLUTE, PERCENTAGE};
+	
+	/**
+	 * Prints the crosstab.
+	 */
+	public void printCrosstab(CrosstabFormat crosstabFormat) {
+		
+		NumberFormat nf = NumberFormat.getPercentInstance();
+		nf.setMaximumFractionDigits(2);
 		
 		System.out.println();
+		/*
+		 * header - start
+		 */
+		System.out.println("#distance classes in km");
 		System.out.print("#mode");
-		for (double d : distanceClasses) {
-			System.out.print("\t" + Double.toString(d));
+		for (int i=0; i < distanceClasses.length; i++) {
+			if (i < (distanceClasses.length - 1)) {
+				System.out.print("\t" + Double.toString(distanceClasses[i] / 1000));
+			} else {
+				System.out.print("\t>" + Double.toString(distanceClasses[i - 1] / 1000));
+			}
 		}
+		System.out.print("\tsum");
 		System.out.println();
+		/*
+		 * header - end
+		 */
+
+		/*
+		 * table - start
+		 */
 		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
 			System.out.print(mode);
 			for (Integer i : this.legDistanceDistribution.get(mode)) {
-				System.out.print("\t" + Integer.toString(i));
+				System.out.print("\t");
+				switch(crosstabFormat) {
+				case ABSOLUTE:
+					System.out.print(Integer.toString(i));
+					break;
+				case PERCENTAGE:
+					System.out.print(nf.format((double) i / (double) this.getNumberOfLegs()));
+					break;
+				}
 			}
-			System.out.print("\t" + this.getNumberOfLegs(mode));
+			System.out.print("\t");
+			switch(crosstabFormat) {
+			case ABSOLUTE:
+				System.out.print(Integer.toString(this.getNumberOfLegs(mode)));
+				break;
+			case PERCENTAGE:
+				System.out.print(nf.format((double) this.getNumberOfLegs(mode) / (double) this.getNumberOfLegs()));
+				break;
+			}
 			System.out.println();
 		}
+		/*
+		 * table - end
+		 */
+
+		/*
+		 * sum - start
+		 */
 		System.out.print("sum");
 		for (int i=0; i < distanceClasses.length; i++) {
-			System.out.print("\t" + this.getNumberOfLegs(i));
+			System.out.print("\t");
+			switch(crosstabFormat) {
+			case ABSOLUTE:
+				System.out.print(this.getNumberOfLegs(i));
+				break;
+			case PERCENTAGE:
+				System.out.print(nf.format((double) this.getNumberOfLegs(i) / (double) this.getNumberOfLegs()));
+				break;
+			}
 		}
+		System.out.print("\t");
+		switch(crosstabFormat) {
+		case ABSOLUTE:
+			System.out.print(Integer.toString(this.getNumberOfLegs()));
+			break;
+		case PERCENTAGE:
+			System.out.print(nf.format((double) this.getNumberOfLegs() / (double) this.getNumberOfLegs()));
+			break;
+		}
+		/*
+		 * sum - end
+		 */
+
 		System.out.println();
 		
 	}

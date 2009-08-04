@@ -62,6 +62,7 @@ import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
+import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution.CrosstabFormat;
 
 public class MyRuns {
 
@@ -136,13 +137,10 @@ public class MyRuns {
 		try {
 			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Gbl.getWorld().setFacilityLayer(facilities);
@@ -159,7 +157,9 @@ public class MyRuns {
 		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
 		plansReader.readFile(config.plans().getInputFile());
 
-		pa.printCrosstabAbsolute();
+		for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
+			pa.printCrosstab(crosstabFormat);
+		}
 		
 	}
 	
@@ -178,13 +178,10 @@ public class MyRuns {
 		try {
 			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Gbl.getWorld().setFacilityLayer(facilities);

@@ -36,6 +36,8 @@ import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution.CrosstabFormat;
+
 public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
 	protected void setUp() throws Exception {
@@ -108,7 +110,15 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.car)[5].intValue());
 		assertEquals(1, testee.getLegDistanceDistribution().get(TransportMode.pt)[8].intValue());
 
-		testee.printCrosstabAbsolute();
+		assertEquals(3, testee.getNumberOfLegs());
+		assertEquals(2, testee.getNumberOfLegs(TransportMode.car));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt));
+		assertEquals(1, testee.getNumberOfLegs(0));
+		assertEquals(1, testee.getNumberOfLegs(5));
+		assertEquals(1, testee.getNumberOfLegs(8));
+		
+		testee.printCrosstab(CrosstabFormat.ABSOLUTE);
+		testee.printCrosstab(CrosstabFormat.PERCENTAGE);
 		
 	}
 	
