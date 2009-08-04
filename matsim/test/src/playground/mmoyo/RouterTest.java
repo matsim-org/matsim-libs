@@ -47,7 +47,7 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.PTRouter.PTOb;
+import playground.mmoyo.deprecVersion.PTOb;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
 public class RouterTest extends MatsimTestCase {
