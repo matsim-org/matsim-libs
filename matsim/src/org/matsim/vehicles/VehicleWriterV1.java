@@ -57,7 +57,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		atts.clear();
 		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
-		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "vehicleDefinitions_v1.00.xsd"));
+		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "vehicleDefinitions_v1.0.xsd"));
 		this.writeStartTag(VehicleSchemaV1Names.VEHICLEDEFINITIONS, atts);
 		this.writeVehicleTypes(this.vehicleTypes);
 		this.writeVehicles(this.vehicles);

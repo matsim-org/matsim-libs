@@ -19,6 +19,7 @@
 
 package org.matsim.core.basic.v01.vehicles;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
@@ -55,13 +56,22 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 	
 
 	public void testWriter() throws FileNotFoundException, IOException {
+		
+		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
+		
 		//read it
 		BasicVehicles vehicles = new BasicVehiclesImpl();
 		BasicVehicleReaderV1 reader = new BasicVehicleReaderV1(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
 		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
-		writer.writeFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+		writer.writeFile(outfileName);
+		assertTrue(new File(outfileName).exists()); 
+		//read it again
+		vehicles = new BasicVehiclesImpl();
+		reader = new BasicVehicleReaderV1(vehicles);
+		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+		
 		//check it, check it, check it now!
 		this.checkContent(vehicles);
 	}
@@ -69,6 +79,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 	private void checkContent(BasicVehicles vehdef) {
 		Map<Id, BasicVehicleType> vehicleTypes = vehdef.getVehicleTypes();
 		Map<Id, BasicVehicle> vehicles = vehdef.getVehicles();
+			
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
 		BasicVehicleType vehType = vehicleTypes.get(new IdImpl("normalCar"));
