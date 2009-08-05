@@ -20,9 +20,6 @@
 
 package playground.marcel.kti.test;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -31,21 +28,19 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.Matrix;
-import org.matsim.visum.VisumMatrixReader;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
-import playground.marcel.kti.router.SwissHaltestellen;
+import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
+import playground.meisterk.org.matsim.run.ptRouting.PlansCalcRouteKtiInfo;
 
 public class KtiPtTester {
 
 	private Config config;
 	private ScenarioImpl data;
-	private Matrix ptTravelTimes = null;
 
 	public KtiPtTester(final String[] args) {
 		
@@ -55,39 +50,40 @@ public class KtiPtTester {
 		this.config = this.data.getConfig();
 	}
 
-	@SuppressWarnings("deprecation")
-	public void readPtTimeMatrix(final String filename) {
-		Matrices matrices = new Matrices();
-		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", ((ScenarioImpl)this.data).getWorld().getLayer("municipality"), null);
-		System.out.println("  reading visum matrix file... ");
-		VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
-		reader.readFile(filename);
-		System.out.println("  done.");
-	}
-
 	public void run() {
 		Gbl.startMeasurement();
-//		this.data.getWorld();
-		Gbl.printRoundTime();
-		readPtTimeMatrix("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx");
 		Gbl.printRoundTime();
 		PopulationImpl population = this.data.getPopulation();
 		Gbl.printRoundTime();
-		SwissHaltestellen haltestellen = new SwissHaltestellen((NetworkLayer) this.data.getNetwork());
-		try {
-			haltestellen.readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/externals/ptNationalModel/Haltestellen.txt");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Gbl.printRoundTime();
-		PreProcessLandmarks commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		commonRoutingData.run(this.data.getNetwork());
 		FreespeedTravelTimeCost fttc = new FreespeedTravelTimeCost();
 		Gbl.printRoundTime();
+		
+		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+		ktiConfigGroup.setUsePlansCalcRouteKti(true);
+		ktiConfigGroup.setPtHaltestellenFilename("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/externals/ptNationalModel/Haltestellen.txt");
+		ktiConfigGroup.setPtTraveltimeMatrixFilename("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx");
+		ktiConfigGroup.setWorldInputFilename(this.config.world().getInputFile());
+		
+		PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
+		plansCalcRouteKtiInfo.prepare(ktiConfigGroup, (NetworkLayer) this.data.getNetwork());
+
+		Gbl.printRoundTime();
+
+		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new AStarLandmarksFactory(
+				(NetworkLayer) this.data.getNetwork(), 
+				new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
+		
+		PlansCalcRouteKti calcPtLeg = new PlansCalcRouteKti(
+				this.config.plansCalcRoute(), 
+				(NetworkLayer) this.data.getNetwork(), 
+				fttc, 
+				fttc, 
+				leastCostPathCalculatorFactory, 
+				plansCalcRouteKtiInfo);
+
+		Gbl.printRoundTime();
+
 		Counter counter = new Counter("handle person #");
-		PlansCalcRouteKti calcPtLeg = new PlansCalcRouteKti((NetworkLayer) this.data.getNetwork(), commonRoutingData, fttc, fttc, this.ptTravelTimes, haltestellen, ((ScenarioImpl)this.data).getWorld().getLayer("municipality"));
 		for (PersonImpl person : population.getPersons().values()) {
 			counter.incCounter();
 			calcPtLeg.run(person.getSelectedPlan());
@@ -99,7 +95,15 @@ public class KtiPtTester {
 	}
 
 	public static void main(final String[] args) {
-		new KtiPtTester(args).run();
+		if ((args == null) || (args.length == 0)) {
+			System.out.println("No argument given!");
+			System.out.println("Usage: KtiPtTester config-file");
+			System.out.println();
+		} else {
+			final KtiPtTester ktiPtTester = new KtiPtTester(args);
+			ktiPtTester.run();
+		}
+		System.exit(0);
 	}
 
 }

@@ -28,7 +28,7 @@ public class KTIControler extends Controler {
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
 	
-	private PlansCalcRouteKtiInfo plansCalcRouteKti = null;
+	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
 
 	private final KtiConfigGroup ktiConfigGroup;
 
@@ -36,7 +36,7 @@ public class KTIControler extends Controler {
 		super(args);
 
 		this.ktiConfigGroup = new KtiConfigGroup();
-		super.config.addModule(KtiConfigGroup.KTI_CONFIG_MODULE_NAME, this.ktiConfigGroup);
+		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
 	}
 	
@@ -50,8 +50,8 @@ public class KTIControler extends Controler {
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKti = new PlansCalcRouteKtiInfo();
-			this.plansCalcRouteKti.prepareKTIRouter(this.ktiConfigGroup, this.getNetwork());
+			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
+			this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, this.getNetwork());
 		}
 		
 		super.setUp();
@@ -85,7 +85,7 @@ public class KTIControler extends Controler {
 					travelCosts, 
 					travelTimes, 
 					super.getLeastCostPathCalculatorFactory(), 
-					this.plansCalcRouteKti);
+					this.plansCalcRouteKtiInfo);
 
 		}
 

@@ -24,8 +24,12 @@ public class PlansCalcRouteKtiInfo {
 	private World localWorld=null;
 
 	private static final Logger log = Logger.getLogger(PlansCalcRouteKtiInfo.class);
-	
-	public void prepareKTIRouter(final KtiConfigGroup ktiConfigGroup, final NetworkLayer network) {
+
+	public PlansCalcRouteKtiInfo() {
+		super();
+	}
+
+	public void prepare(final KtiConfigGroup ktiConfigGroup, final NetworkLayer network) {
 		
 		if (!ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			log.error("The kti module is missing.");

@@ -52,7 +52,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 
 		Config config = new Config();
 		KtiConfigGroup testee = new KtiConfigGroup();
-		config.addModule(KtiConfigGroup.KTI_CONFIG_MODULE_NAME, testee);
+		config.addModule(KtiConfigGroup.GROUP_NAME, testee);
 		try {
 			new MatsimConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
 		} catch (IOException e) {

@@ -98,7 +98,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.config.planomat().setDoLogging(false);
 
 		this.ktiConfigGroup = new KtiConfigGroup();
-		this.config.addModule(KtiConfigGroup.KTI_CONFIG_MODULE_NAME, this.ktiConfigGroup);
+		this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 		
 		// generate person
 		this.population = new PopulationImpl();

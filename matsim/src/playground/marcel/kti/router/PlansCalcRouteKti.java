@@ -29,11 +29,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteWRefs;
-import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -62,46 +59,6 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	private final SwissHaltestellen haltestellen;
 	private final Layer municipalities;
 	
-	/**
-	 * @deprecated
-	 * 
-	 * @param network
-	 * @param preProcessData
-	 * @param costCalculator
-	 * @param timeCalculator
-	 * @param ptTravelTimes
-	 * @param haltestellen
-	 * @param municipalities
-	 */
-	public PlansCalcRouteKti(
-			final NetworkLayer network, 
-			final PreProcessLandmarks preProcessData,
-			final TravelCost costCalculator, 
-			final TravelTime timeCalculator,
-			final Matrix ptTravelTimes, 
-			final SwissHaltestellen haltestellen, 
-			final Layer municipalities) {
-		this(network, preProcessData, costCalculator, timeCalculator, new FreespeedTravelTimeCost(), ptTravelTimes, haltestellen, municipalities);
-	}
-
-	private PlansCalcRouteKti(
-			final NetworkLayer network, 
-			final PreProcessLandmarks preProcessData,
-			final TravelCost costCalculator, 
-			final TravelTime timeCalculator,
-			final FreespeedTravelTimeCost timeCostCalc,
-			final Matrix ptTravelTimes, 
-			final SwissHaltestellen haltestellen, 
-			final Layer municipalities) {
-		super(network, new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
-				new AStarLandmarks(network, preProcessData, timeCostCalc, timeCostCalc));
-		this.network = network;
-		this.ptTravelTimes = ptTravelTimes;
-		this.haltestellen = haltestellen;
-		this.municipalities = municipalities;
-		this.group = null;
-	}
-
 	public PlansCalcRouteKti(
 			final PlansCalcRouteConfigGroup group,
 			final NetworkLayer network, 
@@ -116,8 +73,6 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		this.haltestellen = ptRoutingInfo.getHaltestellen();
 		this.municipalities = ptRoutingInfo.getLocalWorld().getLayer("municipality");
 	}
-
-	
 	
 	@Override
 	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {

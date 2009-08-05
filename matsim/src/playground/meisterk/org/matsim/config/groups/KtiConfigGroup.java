@@ -26,7 +26,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 
 public class KtiConfigGroup extends Module {
 
-	public static final String KTI_CONFIG_MODULE_NAME = "kti";
+	public static final String GROUP_NAME = "kti";
 
 	private final static Logger logger = Logger.getLogger(KtiConfigGroup.class);
 
@@ -86,7 +86,7 @@ public class KtiConfigGroup extends Module {
 	}
 	
 	public KtiConfigGroup() {
-		super(KTI_CONFIG_MODULE_NAME);
+		super(GROUP_NAME);
 		for (KtiConfigParameter param : KtiConfigParameter.values()) {
 			param.setActualValue(param.getDefaultValue());
 			super.addParam(param.getParameterName(), param.getDefaultValue());
@@ -126,22 +126,32 @@ public class KtiConfigGroup extends Module {
 		return KtiConfigParameter.PT_HALTESTELLEN_FILENAME.getActualValue();
 	}
 
-
+	public void setPtHaltestellenFilename(String ptHaltestellenFilename) {
+		KtiConfigParameter.PT_HALTESTELLEN_FILENAME.setActualValue(ptHaltestellenFilename);
+	}
 
 	public String getPtTraveltimeMatrixFilename() {
 		return KtiConfigParameter.PT_TRAVEL_TIME_MATRIX_FILENAME.getActualValue();
 	}
 
-
+	public void setPtTraveltimeMatrixFilename(String ptTraveltimeMatrixFilename) {
+		KtiConfigParameter.PT_TRAVEL_TIME_MATRIX_FILENAME.setActualValue(ptTraveltimeMatrixFilename);
+	}
 
 	public String getWorldInputFilename() {
 		return KtiConfigParameter.WORLD_INPUT_FILENAME.getActualValue();
 	}
 
-
+	public void setWorldInputFilename(String worldInputFilename) {
+		KtiConfigParameter.WORLD_INPUT_FILENAME.setActualValue(worldInputFilename);
+	}
 
 	public boolean isUsePlansCalcRouteKti() {
 		return Boolean.parseBoolean(KtiConfigParameter.USE_PLANS_CALC_ROUTE_KTI.getActualValue());
+	}
+	
+	public void setUsePlansCalcRouteKti(boolean usePlansCalcRouteKti) {
+		KtiConfigParameter.USE_PLANS_CALC_ROUTE_KTI.setActualValue(Boolean.toString(usePlansCalcRouteKti));
 	}
 	
 }
