@@ -39,9 +39,21 @@ public class KtiConfigGroup extends Module {
 	public enum KtiConfigParameter {
 		
 		CONST_BIKE("constBike", "0.0", ""),
+		/**
+		 * the path to the file with the travel-time matrix (VISUM-format)
+		 */
 		PT_TRAVEL_TIME_MATRIX_FILENAME("pt_traveltime_matrix_filename", "", ""),
+		/**
+		 * the path to the file containing the list of all pt-stops and their coordinates.
+		 */
 		PT_HALTESTELLEN_FILENAME("pt_haltestellen_filename", "", ""),
+		/**
+		 * the path to the world file containing a layer 'municipality'
+		 */
 		WORLD_INPUT_FILENAME("worldInputFilename", "", ""),
+		/**
+		 * boolean variable indicating whether the kti router should be used or not
+		 */
 		USE_PLANS_CALC_ROUTE_KTI("usePlansCalcRouteKti", "false", "");
 		
 		private final String parameterName;

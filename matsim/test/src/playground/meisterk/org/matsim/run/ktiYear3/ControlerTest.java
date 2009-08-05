@@ -20,6 +20,8 @@
 
 package playground.meisterk.org.matsim.run.ktiYear3;
 
+import java.io.File;
+
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -40,9 +42,19 @@ public class ControlerTest extends MatsimTestCase {
 		testee.run();
 
 		PlansCalcRoute router = (PlansCalcRoute) testee.getRoutingAlgorithm(testee.getTravelCostCalculator(), testee.getTravelTimeCalculator());
-		assertEquals(PlansCalcRouteKti.class, router.getClass());
-		assertEquals(AStarLandmarks.class, router.getLeastCostPathCalculator().getClass());
+		assertEquals(
+				PlansCalcRouteKti.class, 
+				router.getClass());
+		assertEquals(
+				AStarLandmarks.class, 
+				router.getLeastCostPathCalculator().getClass());
+		assertEquals(
+				playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory.class, 
+				testee.getScoringFunctionFactory().getClass());
 		
+		assertTrue(new File(this.getOutputDirectory() + KTIControler.SVN_INFO_FILE_NAME).exists());
+		assertTrue(new File(this.getOutputDirectory() + KTIControler.CALC_LEG_TIMES_KTI_FILE_NAME).exists());
+		assertTrue(new File(this.getOutputDirectory() + KTIControler.SCORE_ELEMENTS_FILE_NAME).exists());
 	}
 
 }

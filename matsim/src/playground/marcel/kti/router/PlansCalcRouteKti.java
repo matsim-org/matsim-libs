@@ -43,6 +43,15 @@ import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
 
+/**
+ * Special Routing Module for finding (more or less) realistic public transit travel times.
+ * 
+ * The travel time of a leg with mode 'pt' (meaning pseudo/public transport) 
+ * is estimated by a municipality-to-municipality travel time matrix, plus walk-speed access to and egress from the next pt stop.
+ * 
+ * @author mrieser
+ *
+ */
 public class PlansCalcRouteKti extends PlansCalcRoute {
 
 	private final PlansCalcRouteConfigGroup group;
