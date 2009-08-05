@@ -54,6 +54,11 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		this.checkNodeKnowledge = value;
 	}
 	
+	public void useLookupTable(boolean value)
+	{
+		this.useLookupTable = value;
+	}
+	
 	@Override
 	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
 	{

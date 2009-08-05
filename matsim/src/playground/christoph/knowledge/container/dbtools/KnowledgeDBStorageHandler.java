@@ -11,6 +11,7 @@ import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.DBStorage;
 import playground.christoph.knowledge.container.NodeKnowledge;
+import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.util.KnowledgeTools;
 
 /*
@@ -24,18 +25,19 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 
 	private PopulationImpl population;
 	private KnowledgeTools knowledgeTools;
+	private SubNetworkTools subNetworkTools;
 	
 	private boolean stopHandler = false;
 		
 //	private int count = 0;
 
-	
 	public KnowledgeDBStorageHandler(PopulationImpl population)
 	{
 		this.population = population;
 		this.setDaemon(true);
 		
 		knowledgeTools = new KnowledgeTools();
+		subNetworkTools = new SubNetworkTools();
 	}
 	
 	@Override
@@ -123,6 +125,8 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 	{
 		PersonImpl person = population.getPersons().get(event.getPersonId());
 		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
+		
+		subNetworkTools.resetSubNetwork(person);
 		
 		if (nodeKnowledge instanceof DBStorage)
 		{

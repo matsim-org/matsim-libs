@@ -75,6 +75,11 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		return nodes;
 	}
 	
+	public void reset()
+	{
+		this.nodes = new HashMap<Id, NodeImpl>();
+	}
+	
 	public void setKnownNodes(Map<Id, NodeImpl> nodes)
 	{
 		// If we have a network, we can check, whether using a Black- or WhiteList would be better.

@@ -1,17 +1,19 @@
 package playground.christoph.network;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 
 public class SubNetwork implements Network {
 
-	protected final Map<Id, SubNode> nodes = new TreeMap<Id, SubNode>();
-	protected final Map<Id, LinkImpl> links = new TreeMap<Id, LinkImpl>();
+	protected Map<Id, Node> nodes;
+	protected Map<Id, LinkImpl> links;
 	
 	protected Network network;
 	
@@ -20,6 +22,18 @@ public class SubNetwork implements Network {
 	public SubNetwork(Network network)
 	{
 		this.network = network;
+	}
+	
+	public void initialize()
+	{
+		nodes = new TreeMap<Id, Node>();
+		links = new TreeMap<Id, LinkImpl>();
+	}
+	
+	public void initialize(int nodesCount)
+	{
+		nodes = new HashMap<Id, Node>((int)(nodesCount * 1.1), 0.95f);
+		links = new TreeMap<Id, LinkImpl>();
 	}
 	
 	public boolean isInitialized()
@@ -34,8 +48,10 @@ public class SubNetwork implements Network {
 	
 	public void reset()
 	{
-		this.nodes.clear();
-		this.links.clear();
+//		this.nodes.clear();
+//		this.links.clear();
+		this.nodes = new HashMap<Id, Node>();
+		this.links = new HashMap<Id, LinkImpl>();
 		this.isInitialized = false;
 	}
 	
@@ -59,12 +75,12 @@ public class SubNetwork implements Network {
 		return links;
 	}
 
-	public Map<Id, SubNode> getNodes()
+	public Map<Id, Node> getNodes()
 	{
 		return nodes;
 	}
 
-	public void addSubNode(SubNode subNode)
+	public void addSubNode(Node subNode)
 	{
 		nodes.put(subNode.getId(), subNode);
 	}

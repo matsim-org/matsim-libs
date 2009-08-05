@@ -59,7 +59,33 @@ public class SubNetworkTools {
 		
 		return null;
 	}
-		
+	
+	/*
+	 * To save memory, some routers may want to reset a Person's SubNetwork after
+	 * doing their routing. An Example would be a Random Router that does only an
+	 * initial planning before starting the mobsim.
+	 * Reset means, that Nodes, Links, etc. are deleted but the SubNetwork Object
+	 * still exists. It can be recreated by using the Person's NodeKnowledge.
+	 */ 
+	public void resetSubNetwork(PersonImpl person)
+	{		
+		// Try getting knowledge from the current Person.
+		if(person != null)
+		{	
+			Map<String,Object> customAttributes = person.getCustomAttributes();
+			
+			if (customAttributes.get("SubNetwork") != null && customAttributes.get("SubNetwork") instanceof SubNetwork)
+			{
+				SubNetwork subNetwork = (SubNetwork)customAttributes.get("SubNetwork");
+				subNetwork.reset();
+			}
+		}
+		else
+		{
+			log.error("person = null!");
+		}
+	}
+	
 	/*
 	 * To save memory, some routers may want to remove a Person's SubNetwork after
 	 * doing their routing. An Example would be a Random Router that does only an

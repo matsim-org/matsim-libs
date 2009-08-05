@@ -37,6 +37,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 
 /*

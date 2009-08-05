@@ -138,7 +138,8 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	public void clearLocalKnowledge()
 	{
 		localKnowledge = false;
-		super.getKnownNodes().clear();
+//		super.getKnownNodes().clear();
+		super.reset();
 	}
 	
 	

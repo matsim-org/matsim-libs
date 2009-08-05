@@ -66,6 +66,7 @@ import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
 import playground.christoph.mobsim.MyQueueSimEngine;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
+import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
@@ -147,6 +148,9 @@ public class EventControler extends Controler{
 		super(args);
 //		config.global().setNumberOfThreads(2);
 		
+		// Use MyLinkImpl. They can carry some additional Information like their TravelTime or VehicleCount.
+		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
+		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 
@@ -164,7 +168,10 @@ public class EventControler extends Controler{
 	public EventControler(Config config)
 	{
 		super(config);
-				
+
+		// Use MyLinkImpl. They can carry some additional Information like their TravelTime or VehicleCount.
+		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
+		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 
@@ -224,25 +231,28 @@ public class EventControler extends Controler{
 //		TravelTimeDistanceCostCalculator travelCost = new TravelTimeDistanceCostCalculator(travelTime);
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
-//		TravelTime travelTime = new FreeSpeedTravelTimeCalculator();
+/*
 		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
 		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 	
-		travelTimeWrapper.checkNodeKnowledge(false);
-		travelCostWrapper.checkNodeKnowledge(false);
+		travelTimeWrapper.checkNodeKnowledge(true);
+		travelCostWrapper.checkNodeKnowledge(true);
+		travelTimeWrapper.useLookupTable(false);
+		travelCostWrapper.useLookupTable(false);
 		
-		// Use the Wrapper with the same CostCalculator as the MobSim uses
-		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
-
 		// Don't use Knowledge for CostCalculations
 		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper);
-
-//		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
-//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
+*/
+		// Don't use Wrappers with LookupTables
+		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
+		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
+		
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		dijkstraRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
 		
@@ -646,6 +656,32 @@ public class EventControler extends Controler{
 
 			customAttributes.put("SubNetwork", new SubNetwork(this.network));
 		}
+		
+/*
+		SubNetworkCreator snc = new SubNetworkCreator(this.network);
+		KnowledgeTools kt = new KnowledgeTools();
+		
+		int i = 0;
+		for(PersonImpl person : this.getPopulation().getPersons().values())
+		{
+			Map<String, Object> customAttributes = person.getCustomAttributes();
+
+			NodeKnowledge nk = kt.getNodeKnowledge(person);
+			
+			((MapKnowledgeDB)nk).readFromDB();
+			
+			SubNetwork subNetwork = snc.createSubNetwork(nk);
+			
+			((MapKnowledgeDB)nk).clearLocalKnowledge();
+			
+//			log.info("Nodes: " + subNetwork.getNodes().size() + ", Links: " + subNetwork.getLinks().size());
+			
+			customAttributes.put("SubNetwork", subNetwork);
+			i++;
+			if (i % 1000 == 0) log.info("Subnetworks: " + i);
+//			customAttributes.put("SubNetwork", new SubNetwork(this.network));
+		}
+*/
 	}
 	
 	/*

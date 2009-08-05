@@ -3,6 +3,7 @@ package playground.christoph.events;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -30,6 +31,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
+import playground.christoph.network.MyLinkImpl;
+
 public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
 		BasicAgentDepartureEventHandler, BasicAgentWait2LinkEventHandler,
@@ -45,8 +48,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 
 	private QueueNetwork queueNetwork;
 
-	private static final Logger log = Logger
-			.getLogger(LinkVehiclesCounter.class);
+	private static final Logger log = Logger.getLogger(LinkVehiclesCounter.class);
 
 	// cyclical Status information - adapted from QueueSimulation
 	protected static final int INFO_PERIOD = 3600;
@@ -267,13 +269,12 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * would be faster to recalculate the TravelTimes for all Links in the Map
 	 * without check.
 	 */
-	private synchronized void filterChangedLinks() 
+	private void filterChangedLinks() 
 	{
 		for (Iterator<Id> iterator = countChangedMap.keySet().iterator(); iterator.hasNext();)
 		{
 			Id id = iterator.next();
-			if (countChangedMap.get(id) == previousCountsMap.get(id))
-				iterator.remove();
+			if (countChangedMap.get(id) == previousCountsMap.get(id)) iterator.remove();
 		}
 		previousCountsMap.clear();
 		previousCountsMap.putAll(countChangedMap);
@@ -281,6 +282,33 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		countChangedMap.clear();
 	}
 
+	/*
+	 * We assume that the Simulation uses MyLinkImpl instead of LinkImpl, so
+	 * we don't check this for every Link...
+	 */
+	private void setLinkVehicleCounts()
+	{
+		Map<Id, Integer> links2Update = getChangedLinkVehiclesCounts();
+		
+		/*
+		 * We also could iterate over all NetworkLinks and check whether their
+		 * VehiclesCount has changed - but in most cases only a few Links will change
+		 * in a single SimStep so iterating over the changed Entry and look for
+		 *  the corresponding Link should be faster...
+		 *  [TODO] Check, whether this Assumption is true.
+		 */
+        for (Entry<Id, Integer> entry : links2Update.entrySet()) 
+        {
+            Id id = entry.getKey();
+            Integer vehiclesCount = entry.getValue();
+            
+            // Assumption...
+            MyLinkImpl link = (MyLinkImpl)this.queueNetwork.getNetworkLayer().getLink(id);
+            
+            link.setVehiclesCount(vehiclesCount);
+        }        
+	}
+	
 	/*
 	 * Returns a Map<LinkId, driving Vehicles on the Link>. The Map contains
 	 * only those Links, where the number of Vehicles has changed within in the
@@ -309,6 +337,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 			QueueSimulationAfterSimStepEvent e) {
 		// checkVehicleCount(e);
 		filterChangedLinks();
+		setLinkVehicleCounts();
 	}
 
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
