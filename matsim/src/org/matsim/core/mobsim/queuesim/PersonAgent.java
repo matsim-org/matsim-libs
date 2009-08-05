@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -219,16 +220,25 @@ public class PersonAgent implements DriverAgent {
 		if (act.getDuration() == Time.UNDEFINED_TIME && act.getEndTime() == Time.UNDEFINED_TIME) {
 			setDepartureTime(Double.POSITIVE_INFINITY);
 		} else {
-			/* The person leaves the activity either 'actDur' later or
-			 * when the end is defined of the activity, whatever comes first. */
+			
 			double departure = 0;
-			if (act.getDuration() == Time.UNDEFINED_TIME) {
-				departure = act.getEndTime();
-			} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-				departure = now + act.getDuration();
-			} else {
-				departure = Math.min(act.getEndTime(), now + act.getDuration());
-			}
+
+//			if ( old_logic ) {  // FIXME yyyyyy Dominik todo 5/aug/09
+				/* The person leaves the activity either 'actDur' later or
+				 * when the end is defined of the activity, whatever comes first. */
+				if (act.getDuration() == Time.UNDEFINED_TIME) {
+					departure = act.getEndTime();
+				} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
+					departure = now + act.getDuration();
+				} else {
+					departure = Math.min(act.getEndTime(), now + act.getDuration());
+				}
+//			} else {
+//				departure = act.getEndTime() ;
+//			}
+				
+			
+			
 			if (departure < now) {
 				// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
 				departure = now;
