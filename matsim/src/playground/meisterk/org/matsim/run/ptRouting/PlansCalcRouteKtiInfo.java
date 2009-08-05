@@ -18,12 +18,12 @@ import playground.marcel.kti.router.SwissHaltestellen;
 import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 
 
-public class PTRoutingInfo {
+public class PlansCalcRouteKtiInfo {
 	private Matrix ptTravelTimes = null;
 	private SwissHaltestellen haltestellen = null;
 	private World localWorld=null;
 
-	private static final Logger log = Logger.getLogger(PTRoutingInfo.class);
+	private static final Logger log = Logger.getLogger(PlansCalcRouteKtiInfo.class);
 	
 	public void prepareKTIRouter(final KtiConfigGroup ktiConfigGroup, final NetworkLayer network) {
 		

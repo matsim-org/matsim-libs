@@ -11,7 +11,7 @@ import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.org.matsim.controler.listeners.SaveRevisionInfo;
 import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
-import playground.meisterk.org.matsim.run.ptRouting.PTRoutingInfo;
+import playground.meisterk.org.matsim.run.ptRouting.PlansCalcRouteKtiInfo;
 import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory;
 
 /**
@@ -28,7 +28,7 @@ public class KTIControler extends Controler {
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
 	
-	private PTRoutingInfo ptRoutingInfo=null;
+	private PlansCalcRouteKtiInfo plansCalcRouteKti = null;
 
 	private final KtiConfigGroup ktiConfigGroup;
 
@@ -50,8 +50,8 @@ public class KTIControler extends Controler {
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.ptRoutingInfo = new PTRoutingInfo();
-			this.ptRoutingInfo.prepareKTIRouter(this.ktiConfigGroup, this.getNetwork());
+			this.plansCalcRouteKti = new PlansCalcRouteKtiInfo();
+			this.plansCalcRouteKti.prepareKTIRouter(this.ktiConfigGroup, this.getNetwork());
 		}
 		
 		super.setUp();
@@ -85,9 +85,7 @@ public class KTIControler extends Controler {
 					travelCosts, 
 					travelTimes, 
 					super.getLeastCostPathCalculatorFactory(), 
-					ptRoutingInfo.getPtTravelTimes(), 
-					ptRoutingInfo.getHaltestellen(), 
-					ptRoutingInfo.getLocalWorld().getLayer("municipality"));
+					this.plansCalcRouteKti);
 
 		}
 

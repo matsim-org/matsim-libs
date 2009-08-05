@@ -43,6 +43,8 @@ import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
 
+import playground.meisterk.org.matsim.run.ptRouting.PlansCalcRouteKtiInfo;
+
 /**
  * Special Routing Module for finding (more or less) realistic public transit travel times.
  * 
@@ -59,7 +61,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	private final Matrix ptTravelTimes;
 	private final SwissHaltestellen haltestellen;
 	private final Layer municipalities;
-
+	
 	/**
 	 * @deprecated
 	 * 
@@ -100,36 +102,23 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		this.group = null;
 	}
 
-	/**
-	 * 
-	 * @param group
-	 * @param network
-	 * @param costCalculator
-	 * @param timeCalculator
-	 * @param factory
-	 * @param ptTravelTimes
-	 * @param haltestellen
-	 * @param municipalities
-	 * 
-	 * @author meisterk
-	 */
 	public PlansCalcRouteKti(
 			final PlansCalcRouteConfigGroup group,
 			final NetworkLayer network, 
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, 
 			final LeastCostPathCalculatorFactory factory,
-			final Matrix ptTravelTimes, 
-			final SwissHaltestellen haltestellen, 
-			final Layer municipalities) {
+			final PlansCalcRouteKtiInfo ptRoutingInfo) {
 		super(group, network, costCalculator, timeCalculator, factory);
 		this.group = group;
 		this.network = network;
-		this.ptTravelTimes = ptTravelTimes;
-		this.haltestellen = haltestellen;
-		this.municipalities = municipalities;
+		this.ptTravelTimes = ptRoutingInfo.getPtTravelTimes();
+		this.haltestellen = ptRoutingInfo.getHaltestellen();
+		this.municipalities = ptRoutingInfo.getLocalWorld().getLayer("municipality");
 	}
 
+	
+	
 	@Override
 	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		if (TransportMode.pt.equals(leg.getMode())) {
