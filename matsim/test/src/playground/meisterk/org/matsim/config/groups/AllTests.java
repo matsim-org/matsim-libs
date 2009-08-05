@@ -20,6 +20,7 @@
 
 package playground.meisterk.org.matsim.config.groups;
 
+import playground.meisterk.kti.config.KtiConfigGroupTest;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

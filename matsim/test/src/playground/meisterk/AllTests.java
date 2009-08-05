@@ -30,7 +30,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTest(playground.meisterk.org.matsim.config.groups.AllTests.suite());
 		suite.addTest(playground.meisterk.org.matsim.population.algorithms.AllTests.suite());
-		suite.addTest(playground.meisterk.org.matsim.scoring.ktiYear3.AllTests.suite());
+		suite.addTest(playground.meisterk.kti.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}

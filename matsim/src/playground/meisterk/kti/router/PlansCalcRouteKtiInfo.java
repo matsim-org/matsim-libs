@@ -15,7 +15,7 @@ import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 import playground.marcel.kti.router.SwissHaltestellen;
-import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
+import playground.meisterk.kti.config.KtiConfigGroup;
 
 
 public class PlansCalcRouteKtiInfo {

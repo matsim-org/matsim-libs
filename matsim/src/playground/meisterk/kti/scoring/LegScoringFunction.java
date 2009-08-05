@@ -25,7 +25,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
-import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
+import playground.meisterk.kti.config.KtiConfigGroup;
 
 
 /**

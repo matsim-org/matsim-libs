@@ -18,16 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.org.matsim.scoring.ktiYear3;
+package playground.meisterk.kti;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import playground.meisterk.kti.config.KtiConfigGroupTest;
+import playground.meisterk.kti.scoring.ActivityScoringFunctionTest;
 
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk.scoring.ktiYear3");
+		TestSuite suite = new TestSuite("Tests for playground.meisterk.kti");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(KtiConfigGroupTest.class);
+//		suite.addTestSuite(KtiControlerTest.class);
 		suite.addTestSuite(ActivityScoringFunctionTest.class);
 		//$JUnit-END$
 		return suite;

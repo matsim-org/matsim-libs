@@ -29,7 +29,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
-import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
+import playground.meisterk.kti.config.KtiConfigGroup;
 
 
 public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {

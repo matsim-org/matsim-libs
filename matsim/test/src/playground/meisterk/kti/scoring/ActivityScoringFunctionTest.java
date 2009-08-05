@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.org.matsim.scoring.ktiYear3;
+package playground.meisterk.kti.scoring;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -65,9 +65,9 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.scoring.ActivityScoringFunction;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
-import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
 

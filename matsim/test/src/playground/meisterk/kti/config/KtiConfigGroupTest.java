@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.org.matsim.config.groups;
+package playground.meisterk.kti.config;
 
 import java.io.IOException;
 

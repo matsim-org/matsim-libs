@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.org.matsim.run.ktiYear3;
+package playground.meisterk.kti.controler;
 
 import java.io.File;
 
@@ -29,7 +29,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.marcel.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.controler.KTIControler;
 
-public class ControlerTest extends MatsimTestCase {
+public class KtiControlerTest extends MatsimTestCase {
 
 	public void testRun() {
 		
