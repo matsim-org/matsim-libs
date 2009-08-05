@@ -1,4 +1,4 @@
-package playground.meisterk.org.matsim.run.ktiYear3;
+package playground.meisterk.kti.controler;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelCost;
@@ -7,12 +7,12 @@ import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
+import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
+import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 import playground.meisterk.org.matsim.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.org.matsim.controler.listeners.SaveRevisionInfo;
 import playground.meisterk.org.matsim.controler.listeners.ScoreElements;
-import playground.meisterk.org.matsim.run.ptRouting.PlansCalcRouteKtiInfo;
-import playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory;
 
 /**
  * A special controler for the KTI-Project.

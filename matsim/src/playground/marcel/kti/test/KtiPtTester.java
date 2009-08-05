@@ -34,8 +34,8 @@ import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
+import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
-import playground.meisterk.org.matsim.run.ptRouting.PlansCalcRouteKtiInfo;
 
 public class KtiPtTester {
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.org.matsim.scoring.ktiYear3;
+package playground.meisterk.kti.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.population.LegImpl;

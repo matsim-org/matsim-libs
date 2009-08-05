@@ -27,6 +27,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
+import playground.meisterk.kti.controler.KTIControler;
 
 public class ControlerTest extends MatsimTestCase {
 
@@ -49,7 +50,7 @@ public class ControlerTest extends MatsimTestCase {
 				AStarLandmarks.class, 
 				router.getLeastCostPathCalculator().getClass());
 		assertEquals(
-				playground.meisterk.org.matsim.scoring.ktiYear3.KTIYear3ScoringFunctionFactory.class, 
+				playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory.class, 
 				testee.getScoringFunctionFactory().getClass());
 		
 		assertTrue(new File(this.getOutputDirectory() + KTIControler.SVN_INFO_FILE_NAME).exists());

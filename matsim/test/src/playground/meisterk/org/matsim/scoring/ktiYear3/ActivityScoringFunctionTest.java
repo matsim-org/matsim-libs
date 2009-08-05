@@ -65,6 +65,8 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.meisterk.kti.scoring.ActivityScoringFunction;
+import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 import playground.meisterk.org.matsim.config.groups.KtiConfigGroup;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {

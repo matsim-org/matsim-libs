@@ -70,7 +70,7 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 	}
 
 	public void notifyScoring(ScoringEvent event) {
-		playground.meisterk.org.matsim.scoring.ktiYear3.ActivityScoringFunction asf = null;
+		playground.meisterk.kti.scoring.ActivityScoringFunction asf = null;
 		TreeMap<String, Double> sumScoreParts = new TreeMap<String, Double>();
 		for (String str : ScoreElements.SCORE_ELEMENT_NAMES) {
 			sumScoreParts.put(str, 0.0);
@@ -84,8 +84,8 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 			
 			ScoringFunction sf = eventsToScore.getScoringFunctionForAgent(p.getId());
 			if (sf instanceof ScoringFunctionAccumulator) {
-				if (((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0) instanceof playground.meisterk.org.matsim.scoring.ktiYear3.ActivityScoringFunction) {
-					asf = (playground.meisterk.org.matsim.scoring.ktiYear3.ActivityScoringFunction) ((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0);
+				if (((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0) instanceof playground.meisterk.kti.scoring.ActivityScoringFunction) {
+					asf = (playground.meisterk.kti.scoring.ActivityScoringFunction) ((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0);
 					d = sumScoreParts.get("sum") + sf.getScore();
 					sumScoreParts.put("sum", d);
 					d = sumScoreParts.get("perf") + asf.getPerformanceScore();

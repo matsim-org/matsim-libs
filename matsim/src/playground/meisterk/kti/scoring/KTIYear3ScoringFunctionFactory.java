@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.org.matsim.scoring.ktiYear3;
+package playground.meisterk.kti.scoring;
 
 import java.util.TreeMap;
 
