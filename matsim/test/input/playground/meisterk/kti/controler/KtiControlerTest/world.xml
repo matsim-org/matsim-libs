@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE world SYSTEM "http://matsim.org/files/dtd/world_v2.dtd">
+
+<world name="Zones of Zurich">
+
+	<layer type="municipality" is_raster="false">
+		<zone id="26101" center_x="683366" center_y="248622.125" min_x="682308.5625" min_y="246509.578125" max_x="683885.0625" max_y="248622.125" name="Zürich" />
+		<zone id="26102" center_x="682245" center_y="246951.015625" min_x="680416.6875" min_y="241590.828125" max_x="683443.625" max_y="246951.015625" name="Zürich" />
+		<zone id="26103" center_x="681008" center_y="248369.875" min_x="678714.0625" min_y="243482.65625" max_x="682308.5625" max_y="248369.875" name="Zürich" />
+		<zone id="26104" center_x="681611" center_y="249410.390625" min_x="680132.9375" min_y="246951.015625" max_x="683191.375" max_y="249410.390625" name="Zürich" />
+		<zone id="26105" center_x="682047" center_y="250009.46875" min_x="680132.9375" min_y="248086.109375" max_x="683191.375" max_y="250009.46875" name="Zürich" />
+		<zone id="26106" center_x="683411" center_y="251428.34375" min_x="682056.3125" min_y="247833.859375" max_x="685367" max_y="251428.34375" name="Zürich" />
+		<zone id="26107" center_x="686205" center_y="249788.75" min_x="683853.5625" min_y="244933.0625" max_x="689623.625" max_y="249788.75" name="Zürich" />
+		<zone id="26108" center_x="684757" center_y="246698.765625" min_x="683664.375" min_y="244523.15625" max_x="686912" max_y="246698.765625" name="Zürich" />
+		<zone id="26109" center_x="678597" center_y="250860.796875" min_x="676223.1875" min_y="245658.265625" max_x="680542.8125" max_y="250860.796875" name="Zürich" />
+		<zone id="26110" center_x="680806" center_y="253130.984375" min_x="677705.125" min_y="249095.078125" max_x="682718.4375" max_y="253130.984375" name="Zürich" />
+		<zone id="26111" center_x="682456" center_y="254297.609375" min_x="678840.1875" min_y="250356.296875" max_x="684862.5" max_y="254297.609375" name="Zürich" />
+		<zone id="26112" center_x="685753" center_y="252721.09375" min_x="684294.9375" min_y="249252.734375" max_x="687479.5625" max_y="252721.09375" name="Zürich" />
+	</layer>
+
+</world>
