@@ -106,21 +106,14 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			newRoute = this.network.getFactory().createRoute(TransportMode.walk, fromAct.getLink(), toAct.getLink());
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(beeLineWalkTime);
-			newRoute.setDistance(beeLineWalkDistance);
+			newRoute.setDistance(beeLineWalkDistance * 1.5);
 			
 		} else {
 			
 			newRoute = this.network.getFactory().createRoute(TransportMode.pt, fromAct.getLink(), toAct.getLink());
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(timeInVehicle + walkAccessEgressTime);
-			
-			double dist = 0;
-			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
-				dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-			} else {
-				dist = CoordUtils.calcDistance(fromAct.getLink().getCoord(), toAct.getLink().getCoord());
-			}
-			newRoute.setDistance(dist * 1.5);
+			newRoute.setDistance(beeLineWalkDistance * 1.5);
 			
 		}
 		leg.setTravelTime(newRoute.getTravelTime());
