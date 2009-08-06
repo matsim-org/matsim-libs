@@ -28,12 +28,18 @@ import com.vividsolutions.jts.geom.Point;
  * @author jwjoubert
  */
 public class ClusterPoint{
+	private int pointId;
 	private Point point;
 	private Cluster cluster;
 	
-	public ClusterPoint(Point point, Cluster cluster){
+	public ClusterPoint(int pointId, Point point, Cluster cluster){
+		this.pointId = pointId;
 		this.point = point;
 		this.cluster = cluster;
+	}
+
+	public int getPointId() {
+		return pointId;
 	}
 
 	public Point getPoint() {

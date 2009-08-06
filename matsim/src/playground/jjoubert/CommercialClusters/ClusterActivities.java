@@ -20,6 +20,8 @@
 
 package playground.jjoubert.CommercialClusters;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -46,13 +48,13 @@ public class ClusterActivities {
 	private static String activityType = "Minor";
 
 	// Set the home directory, depending on where the job is executed.
-//	static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+	static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
 //	static String root = "/home/jjoubert/";										// IVT-Sim0
-	static String root = "/home/jjoubert/data/";								// Satawal
+//	static String root = "/home/jjoubert/data/";								// Satawal
 
 	private final static Logger log = Logger.getLogger(ClusterActivities.class);
 	private static int radius = 20;
-	private static int minPoints = 10;
+	private static int minPoints = 30;
 
 	/**
 	 * @param args
@@ -68,11 +70,13 @@ public class ClusterActivities {
 		
 		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Locations.txt";
 //		String activityFilename = root + "Gauteng/Activities/GautengMinorLocations_CityDeepSample.txt";
+		
 		MyActivityReader ar = new MyActivityReader();
-		QuadTree<Point> studyAreaPoints = ar.readActivityPointsToQuadTree(activityFilename, studyArea);
+		ArrayList<Point> studyAreaPoints = ar.readActivityPointsToArrayList(activityFilename, studyArea);
 		
 		DJCluster djc = new DJCluster(radius, minPoints, studyAreaPoints);
 		djc.clusterInput();
+		
 		String pointFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Point_" + radius + "_" + minPoints + ".txt";
 		String clusterFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Cluster_" + radius + "_" + minPoints + ".txt";
 		String lineFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Line_" + radius + "_" + minPoints + ".txt";
@@ -84,6 +88,7 @@ public class ClusterActivities {
 //		String clusterFilename = root + "Gauteng/Activities/Minor_CityDeep_Cluster_" + radius + "_" + minPoints + ".txt";
 //		String lineFilename = root + "Gauteng/Activities/Minor_CityDeep_Line_" + radius + "_" + minPoints + ".txt";
 //		String polygonFilename = root + "Gauteng/Activities/Minor_CityDeep_Polygon_" + radius + "_" + minPoints + ".txt";
+		
 		djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, polygonFilename);
 		
 //		String clusterFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Clusters.txt";

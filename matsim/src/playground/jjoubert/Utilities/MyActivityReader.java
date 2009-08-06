@@ -40,10 +40,10 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 public class MyActivityReader {
-	private final static Logger log = Logger.getLogger(MyActivityReader.class);
+	private final Logger log;
 	
 	public MyActivityReader(){
-		
+		log = Logger.getLogger(MyActivityReader.class);
 	}
 	
 	public QuadTree<Point> readActivityPointsToQuadTree(String filename){
@@ -109,59 +109,18 @@ public class MyActivityReader {
 	public QuadTree<Point> readActivityPointsToQuadTree(String filename, MultiPolygon studyArea){
 		log.info("Reading activities from " + filename);
 		log.info("Reading only points in the given study area provided.");
-		GeometryFactory gf = new GeometryFactory();
-		ArrayList<Point> points = new ArrayList<Point>();
+		ArrayList<Point> points = readActivityPointsToArrayList(filename, studyArea);
 		
-		
-		Geometry envelope = studyArea.getEnvelope();
-		
-		double x;
-		double minX = Double.POSITIVE_INFINITY;
-		double maxX = Double.NEGATIVE_INFINITY;
-		double y;
-		double minY = Double.POSITIVE_INFINITY;
-		double maxY = Double.NEGATIVE_INFINITY;
-		int activityCounter = 0;
-
-		try {
-			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( filename))));
-			int lineCounter = 0;
-			int lineMultiplier = 1;
-			
-			// Read header
-			String[] line;
-			input.nextLine();
-			
-			while(input.hasNextLine()){
-				line = input.nextLine().split(",");
-				if(line.length == 5){
-					x = Double.parseDouble(line[1]);
-					y = Double.parseDouble(line[2]);
-					minX = Math.min(minX, x);
-					maxX = Math.max(maxX, x);
-					minY = Math.min(minY, y);
-					maxY = Math.max(maxY, y);
-					
-					Point p = gf.createPoint(new Coordinate(x, y));
-					if(envelope.contains(p)){
-						points.add(p);
-						activityCounter++;
-					}
-
-					lineCounter++;
-					// Report progress
-					if(lineCounter == lineMultiplier){
-						log.info("   Lines processed: " + lineCounter);
-						lineMultiplier *= 2;
-					}
-				}
-			}
-			log.info("   Lines processed: " + lineCounter + " (Done)");
-			log.info("Total number of activities in study area: " + String.valueOf(activityCounter));
-			
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+		// Calculate the extent of the QuadTree.
+		double minX = Double.MAX_VALUE;
+		double maxX = Double.MAX_VALUE;
+		double minY = Double.MIN_VALUE;
+		double maxY = Double.MIN_VALUE;
+		for (Point point : points) {
+			minX = Math.min(minX, point.getX());
+			minY = Math.min(minY, point.getY());
+			maxX = Math.max(maxX, point.getX());
+			maxY = Math.max(maxY, point.getY());
 		}
 
 		log.info("Building QuadTree from activity points.");
@@ -173,6 +132,7 @@ public class MyActivityReader {
 		
 		return qt;
 	}
+	
 	
 	public void filterActivity(String inputFilename, String outputFilename, MultiPolygon studyArea){
 		log.info("Filtering the input file.");
@@ -221,6 +181,55 @@ public class MyActivityReader {
 			e.printStackTrace();
 		}		
 	}
+	
+	
+	public ArrayList<Point> readActivityPointsToArrayList(String filename, MultiPolygon studyArea){
+		log.info("Reading activities from " + filename);
+		log.info("Reading only points in the given study area provided.");
+		
+		GeometryFactory gf = new GeometryFactory();
+		ArrayList<Point> points = new ArrayList<Point>();
+		
+		Geometry envelope = studyArea.getEnvelope();
+		
+		double x;
+		double y;
+		int activityCounter = 0;
+		try {
+			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( filename))));
+			int lineCounter = 0;
+			int lineMultiplier = 1;
+			
+			// Read header
+			String[] line;
+			input.nextLine();
+			
+			while(input.hasNextLine()){
+				line = input.nextLine().split(",");
+				if(line.length == 5){
+					x = Double.parseDouble(line[1]);
+					y = Double.parseDouble(line[2]);
+					
+					Point p = gf.createPoint(new Coordinate(x, y));
+					if(envelope.contains(p)){
+						points.add(p);
+						activityCounter++;
+					}
 
-
+					lineCounter++;
+					// Report progress
+					if(lineCounter == lineMultiplier){
+						log.info("   Lines processed: " + lineCounter);
+						lineMultiplier *= 2;
+					}
+				}
+			}
+			log.info("   Lines processed: " + lineCounter + " (Done)");
+			log.info("Total number of activities in study area: " + String.valueOf(activityCounter));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return points;
+	}
+	
 }

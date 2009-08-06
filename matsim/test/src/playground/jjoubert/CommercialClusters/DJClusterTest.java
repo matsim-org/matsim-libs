@@ -20,6 +20,8 @@
 
 package playground.jjoubert.CommercialClusters;
 
+import java.util.ArrayList;
+
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -43,7 +45,8 @@ public class DJClusterTest extends MatsimTestCase{
 	 */		
 	 
 	public void testDJCluster(){
-		QuadTree<Point> al = buildTestQuadTree();
+//		QuadTree<Point> qt = buildTestQuadTree();
+		ArrayList<Point> al = buildTestArrayList();
 		DJCluster djc = new DJCluster(2, 3, al);
 		djc.clusterInput();
 		
@@ -52,6 +55,47 @@ public class DJClusterTest extends MatsimTestCase{
 		assertEquals("The left cluster must have 8 points.", 8, djc.getClusterList().get(0).getPoints().size());
 		assertEquals("The right cluster must have 4 points.", 4, djc.getClusterList().get(1).getPoints().size());
 		
+	}
+	private static ArrayList<Point> buildTestArrayList(){
+		// Build the test QuadTree
+		ArrayList<Point> al = new ArrayList<Point>();
+		GeometryFactory gf = new GeometryFactory();
+		
+		// Cluster 1
+		Point p1 = gf.createPoint(new Coordinate(2,1));
+		al.add(p1);
+		Point p2 = gf.createPoint(new Coordinate(1,2));
+		al.add(p2);
+		Point p3 = gf.createPoint(new Coordinate(1,3));
+		al.add(p3);
+		Point p4 = gf.createPoint(new Coordinate(1,4));
+		al.add(p4);		
+		Point p5 = gf.createPoint(new Coordinate(2,5));
+		al.add(p5);
+		Point p6 = gf.createPoint(new Coordinate(3,4));
+		al.add(p6);
+		Point p7 = gf.createPoint(new Coordinate(3,3));
+		al.add(p7);
+		Point p8 = gf.createPoint(new Coordinate(3,2));
+		al.add(p8);
+		
+		// Cluster 2
+		Point p9 = gf.createPoint(new Coordinate(7,3));
+		al.add(p9);
+		Point p10 = gf.createPoint(new Coordinate(6,4));
+		al.add(p10);
+		Point p11 = gf.createPoint(new Coordinate(7,5));
+		al.add(p11);
+		Point p12 = gf.createPoint(new Coordinate(8,4));
+		al.add(p12);
+		
+		// Cluster 3 - not enough points
+		Point p13 = gf.createPoint(new Coordinate(4,7));
+		al.add(p13);
+		Point p14 = gf.createPoint(new Coordinate(5,7));
+		al.add(p14);
+		
+		return al;
 	}
 	
 	private static QuadTree<Point> buildTestQuadTree(){

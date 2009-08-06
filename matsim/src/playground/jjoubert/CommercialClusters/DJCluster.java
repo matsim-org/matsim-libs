@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -52,11 +51,15 @@ import com.vividsolutions.jts.geom.Polygon;
  * 		created as a new cluster if no neighbor is in an existing cluster, or joined with
  * 		an existing cluster if any neighbour is in an existing cluster.''</i>
  * </ul>
- * 
+ * <h4>Reference</h4>
+ * Zhou, C., Frankowski, D., Ludford, P.m Shekar, S. and Terveen, L. (2004). Discovering 
+ * personal gazeteers: An interactive clustering approach. <i> Proceedings of the 12th annual 
+ * ACM International workshop on Geographic Information Systems</i>, p. 266-273. Washington, DC.
+ * <h4></h4>
  * @author jwjoubert
  */
 public class DJCluster {
-	private QuadTree<Point> inputPoints;
+	private ArrayList<Point> inputPoints;
 	private QuadTree<ClusterPoint> clusteredPoints;
 	private ArrayList<Cluster> clusterList;
 	private float radius;
@@ -70,18 +73,13 @@ public class DJCluster {
 	 * 			are searched.
 	 * @param minimumPoints the minimum number of points considered to constitute an
 	 * 			independent cluster.
-	 * @param points the <code>QuadTree</code> of <code>Point</code>s that were generated
+	 * @param pointsToCluster the <code>QuadTree</code> of <code>Point</code>s that were generated
 	 * 			from the activity locations file. 
 	 */
-	public DJCluster(float radius, int minimumPoints, QuadTree<Point> points){
+	public DJCluster(float radius, int minimumPoints, ArrayList<Point> pointsToCluster){
 		this.radius = radius;
 		this.minimumPoints = minimumPoints;
-		this.inputPoints = points;
-		// Create the clustered point QuadTree with the same extent as the input point QuadTree. 
-		this.clusteredPoints = new QuadTree<ClusterPoint>(points.getMinEasting(),
-													points.getMinNorthing(),
-													points.getMaxEasting(),
-													points.getMaxNorthing());
+		this.inputPoints = pointsToCluster;		
 		this.clusterList = new ArrayList<Cluster>();
 	}
 	
@@ -94,163 +92,148 @@ public class DJCluster {
 		int clusterIndex = 0;
 		int pointCounter = 0;
 		int pointMultiplier = 1;
+		int uPointCounter = 0;
+		int cPointCounter = 0;
 		
-		QuadTree<Point> copyInputPoints = new QuadTree<Point>(inputPoints.getMinEasting(),
-																inputPoints.getMinNorthing(),
-																inputPoints.getMaxEasting(),
-																inputPoints.getMaxNorthing());
-		for (Point point : inputPoints.values()) {
-			copyInputPoints.put(point.getX(), point.getY(), point);
+		/*
+		 * Determine the extent of the QuadTree. Then build a new QuadTree, and populate 
+		 * a TreeMap with unclustered points.
+		 */
+		double xMin = Double.MAX_VALUE;
+		double yMin = Double.MAX_VALUE;
+		double xMax = Double.MIN_VALUE;
+		double yMax = Double.MIN_VALUE;
+		for (Point p : this.inputPoints) {
+			xMin = Math.min(xMin, p.getX());
+			yMin = Math.min(yMin, p.getY());
+			xMax = Math.max(xMax, p.getX());
+			yMax = Math.max(yMax, p.getY());
+		}
+		QuadTree<ClusterPoint> qt = new QuadTree<ClusterPoint>(xMin, yMin, xMax, yMax);
+		ArrayList<ClusterPoint> ul = new ArrayList<ClusterPoint>();
+		for (int i = 0; i < this.inputPoints.size(); i++) {
+			double x = inputPoints.get(i).getX();
+			double y = inputPoints.get(i).getY();
+			ClusterPoint cp = new ClusterPoint(i, inputPoints.get(i), null);
+			qt.put(x, y, cp);
+			ul.add(cp);
 		}
 		
-		Point point;
-		double xPos = inputPoints.getMinEasting();
-		double yPos = inputPoints.getMinNorthing();
-		while(inputPoints.values().size() > 0){
-			point = inputPoints.get(xPos, yPos);
-			xPos = point.getX();
-			yPos = point.getY();
-
-			// Compute the density-based neighbourhood N(p) of p
-			Collection<Point> neighbourhood = copyInputPoints.get(point.getX(), point.getY(), radius);
-			Cluster djCluster = densityJoinable(neighbourhood, point);
-			ArrayList<Cluster> djClusterList = getDensityJoinableClusters(neighbourhood, point);
-			if(neighbourhood.size() < minimumPoints){
-				// Consider the point to be noise.
-				inputPoints.remove(point.getX(), point.getY(), point);
-				pointCounter++;				
-			} else if(djClusterList.size() > 0){
-				// Merge all the clusters. 
-				Map<Integer,Cluster> clusterMap = new HashMap<Integer, Cluster>();
-				Integer smallestClusterIndex = new Integer(Integer.MAX_VALUE);
-				for (Cluster cluster : djClusterList) {
-					clusterMap.put(Integer.parseInt(cluster.getClusterId()), cluster);
-					smallestClusterIndex = Math.min(smallestClusterIndex, Integer.parseInt(cluster.getClusterId()));
-				}
-				Cluster toCluster = clusterMap.get(smallestClusterIndex);
-				for (Cluster cluster : djClusterList) {
-					if(cluster == toCluster){
-						// Do nothing.
+		int unclusteredIndex = 0;
+		while(unclusteredIndex < ul.size()){
+			// Get next point.
+			ClusterPoint p = ul.get(unclusteredIndex);
+			
+			if(p.getCluster() == null){
+				// Compute the density-based neighbourhood N(p) of p
+				Collection<ClusterPoint> neighbourhood = qt.get(p.getPoint().getX(), p.getPoint().getY(), radius);
+				ArrayList<ClusterPoint> uN = new ArrayList<ClusterPoint>(neighbourhood.size());
+				ArrayList<ClusterPoint> cN = new ArrayList<ClusterPoint>(neighbourhood.size());
+				for (ClusterPoint cp : neighbourhood) {
+					if(cp.getCluster() == null){
+						uN.add(cp);
 					} else{
-						// Add all points to toCluster.
-						toCluster.getPoints().addAll(cluster.getPoints());
-						// Update the cluster Ids of the points in the QuadTree
-						for (Point p : cluster.getPoints()) {
-							ArrayList<ClusterPoint> cpList = (ArrayList<ClusterPoint>) clusteredPoints.get(p.getX(), p.getY(), 0.0);
-							for (ClusterPoint cp : cpList) {
-								cp.setCluster(toCluster);
-							}
-						}
-						clusterList.remove(cluster);
+						cN.add(cp);
 					}
 				}
-				// Add the points in the neighbourhood
-				Collection<Point> unclusteredNeighbourhood = inputPoints.get(point.getX(), point.getY(), radius);
-				for (Point p : unclusteredNeighbourhood) {
-					// Add the point as a clustered point.
-					ClusterPoint cp = new ClusterPoint(p, djCluster);
-					clusteredPoints.put(p.getX(), p.getY(), cp);
-
-					// Add the point to the cluster.
-					djCluster.getPoints().add(p);
-
-					// Remove the point from the input data.
-					inputPoints.remove(p.getX(), p.getY(), p);
-
-					pointCounter++;
-				}
-			} else{
-				// Create a new cluster.
-				Cluster newCluster = new Cluster(String.valueOf(clusterIndex));
-				clusterList.add(newCluster);
-				clusterIndex++;
-				
-				/* 
-				 * For each point in the neighbourhood, create a new ClusterPoint, 
-				 * and add it to the QuadTree.
-				 */			
-				for (Point p : neighbourhood) {
-					// Add the point as a clustered point.
-					ClusterPoint cp = new ClusterPoint(p, newCluster);
-					clusteredPoints.put(p.getX(), p.getY(), cp);
-
-					// Add the point to the cluster.
-					newCluster.getPoints().add(p);
-
-					// Remove the point from the input data.
-					inputPoints.remove(p.getX(), p.getY(), p);
-
-					pointCounter++;
+				if(neighbourhood.size() < minimumPoints){
+					// Point is considered to be noise.
+					uPointCounter++;
+				}else if(cN.size() > 0){
+					// Merge all the clusters.
+					ArrayList<Cluster> localClusters = new ArrayList<Cluster>();
+					Cluster smallestCluster = cN.get(0).getCluster();
+					for(int i = 1; i < cN.size(); i++){
+						if(Integer.parseInt(cN.get(i).getCluster().getClusterId()) < 
+								Integer.parseInt(smallestCluster.getClusterId()) ){
+							smallestCluster = cN.get(i).getCluster();
+						}
+						if(!localClusters.contains(cN.get(i).getCluster())){
+							localClusters.add(cN.get(i).getCluster());
+						}
+					}
+					for (Cluster cluster : localClusters) {
+						if(!cluster.equals(smallestCluster)){
+							ArrayList<ClusterPoint> thisClusterList = (ArrayList<ClusterPoint>) cluster.getPoints().clone();
+							for(int j = 0; j < thisClusterList.size(); j++){
+								// Change the Cluster reference of the ClusterPoint.
+								thisClusterList.get(j).setCluster(smallestCluster);
+								// Add the ClusterPoint to the new Cluster.
+								smallestCluster.getPoints().add(thisClusterList.get(j));
+								// Remove the ClusterPoint from old Cluster.
+								cluster.getPoints().remove(thisClusterList.get(j));
+							}
+						}
+					}
+					
+					// Add unclustered points.
+					for (ClusterPoint cp : uN) {
+						smallestCluster.getPoints().add(cp);
+						cp.setCluster(smallestCluster);
+						cPointCounter++;
+					}
+					
+				} else{
+					// Create new cluster and add all the points.
+					Cluster newCluster = new Cluster(String.valueOf(clusterIndex));
+					clusterIndex++;
+					
+					for (ClusterPoint cp : uN) {
+						cp.setCluster(newCluster);
+						newCluster.getPoints().add(cp);
+						cPointCounter++;
+					}					
+//					clusterList.add(newCluster);
 				}
 			}
-			
-//			if(djCluster == null){
-//				if(neighbourhood.size() < minimumPoints){
-//					// If N(p) is null, consider the point as noise (increment noisePointCounter)
-//					noisePointCounter++;
-//					inputPoints.remove(point.getX(), point.getY(), point);
-//					pointCounter++;
-//				} else{
-//					// Add the points to a new cluster
-//					Cluster newCluster = new Cluster(String.valueOf(clusterIndex));
-//					clusterList.add(newCluster);
-//					clusterIndex++;
-//					
-//					/* 
-//					 * For each point in the neighbourhood, create a new ClusterPoint, 
-//					 * and add it to the QuadTree.
-//					 */			
-//					for (Point p : neighbourhood) {
-//						// Add the point as a clustered point.
-//						ClusterPoint cp = new ClusterPoint(p, newCluster);
-//						clusteredPoints.put(p.getX(), p.getY(), cp);
-//
-//						// Add the point to the cluster.
-//						newCluster.getPoints().add(p);
-//
-//						// Remove the point from the input data.
-//						inputPoints.remove(p.getX(), p.getY(), p);
-//
-//						pointCounter++;
-//					}
-//				}			
-//			} else{
-//				/* 
-//				 * For each point in the neighbourhood, create a new ClusterPoint, 
-//				 * and add it to the QuadTree.
-//				 */
-//				Collection<Point> unclusteredNeighbourhood = inputPoints.get(point.getX(), point.getY(), radius);
-//				for (Point p : unclusteredNeighbourhood) {
-//					/* 
-//					 * Only the add the neighbourhood point if it does not ALREADY
-//					 * exist in the QuadTree.
-//					 */
-//					if(inputPoints.get(p.getX(), p.getY(), 0).contains(p)){
-//						// Add the point as a clustered point.
-//						ClusterPoint cp = new ClusterPoint(p, djCluster);
-//						clusteredPoints.put(p.getX(), p.getY(), cp);
-//
-//						// Add the point to the cluster.
-//						djCluster.getPoints().add(p);
-//
-//						// Remove the point from the input data.
-//						inputPoints.remove(p.getX(), p.getY(), p);
-//
-//						pointCounter++;
-//					}
-//				}
-//			}
-
+			pointCounter++;
 			// Report progress
-			if(pointCounter >= pointMultiplier){
+			if(pointCounter == pointMultiplier){
 				log.info("   Points clustered: " + String.valueOf(pointCounter));
 				pointMultiplier = (int) Math.max(pointCounter, pointMultiplier)*2;
 			}
+			unclusteredIndex++;
 		}
-		log.info("   Points clustered: " + String.valueOf(pointCounter) + " (Done)");
+		log.info("   Points clustered: " + String.valueOf(pointCounter) + " (Done)");	
+		log.info("Sum should add up: " + String.valueOf(cPointCounter) + " (clustered) + " 
+									   + String.valueOf(uPointCounter) + " (unclustered) = "
+									   + String.valueOf(pointCounter));
+		
+		// Clean the cluster list of all empty clusters.
+//		log.info("Start cleaning the cluster list.");
+//		ArrayList<Cluster> cleanClusters = new ArrayList<Cluster>(clusterList.size());
+//		for (Cluster c : clusterList) {
+//			if(c.getPoints().size() >= minimumPoints){
+//				cleanClusters.add(c);
+//			}
+//		}
+//		clusterList = cleanClusters;
+//		log.info("Cluster list cleaned.");
+		
+		// Build the cluster list.
+		log.info("Building the cluster list.");
+		Map<Cluster, ArrayList<ClusterPoint>> clusterMap = new TreeMap<Cluster, ArrayList<ClusterPoint>>();
+		for (ClusterPoint cp : ul) {
+			Cluster theCluster = cp.getCluster();
+			if(theCluster != null){
+				if(!clusterMap.containsKey(theCluster)){
+					ArrayList<ClusterPoint> newList = new ArrayList<ClusterPoint>();
+					clusterMap.put(theCluster, newList);
+				}
+				clusterMap.get(theCluster).add(cp);
+			}
+		}
+		for (Cluster cluster : clusterMap.keySet()) {
+			ArrayList<ClusterPoint> listOfClusterPoints = clusterMap.get(cluster);
+			if(listOfClusterPoints.size() > minimumPoints){
+				clusterList.add(cluster);
+			}
+		}
+		log.info("Cluster list built.");
 	}
 	
 	public void writeClustersToFile(String filename){
+		
 		int clusterCount = 0;
 		int clusterMultiplier = 1;
 		int totalClusters = clusterList.size();
@@ -292,50 +275,6 @@ public class DJCluster {
 
 	public ArrayList<Cluster> getClusterList() {
 		return clusterList;
-	}
-
-	private Cluster densityJoinable(Collection<Point> neighbourhood, Point p){
-		Cluster result = null;
-		ArrayList<Point> theNeighbourhood = (ArrayList<Point>) neighbourhood;
-		Map<Double,Point> map = new TreeMap<Double, Point>();
-		
-		ArrayList<Double> distanceList = new ArrayList<Double>(theNeighbourhood.size());
-		for (Point p2 : neighbourhood) {
-			Double distance = new Double(p2.distance(p));
-			distanceList.add(distance);
-			map.put(distance, p2);
-		}
-		Collections.sort(distanceList);
-		
-		int pointIndex = 0;
-		Point point;
-		while(result == null && pointIndex < distanceList.size()){
-			point = map.get(distanceList.get(pointIndex));
-			Collection<ClusterPoint> clusterLocation = clusteredPoints.get(point.getX(), point.getY(), 0.0);
-			for (ClusterPoint cp : clusterLocation) {
-				if(cp.getPoint().equals(point)){
-					result = cp.getCluster();
-					break;					
-				}
-			}
-			pointIndex++;
-		}
-		return result;
-	}
-	
-	private ArrayList<Cluster> getDensityJoinableClusters(Collection<Point> neighbourhood, Point p){
-		ArrayList<Cluster> result = new ArrayList<Cluster>();
-		for (Point np : neighbourhood) {
-			Collection<ClusterPoint> cp = clusteredPoints.get(np.getX(), np.getY(), 0.0);
-			for (ClusterPoint thisCp : cp) {
-				if(thisCp.getPoint().equals(np)){
-					if(!result.contains(thisCp.getCluster())){
-						result.add(thisCp.getCluster());
-					}
-				}
-			}
-		}		
-		return result;
 	}
 	
 	public void visualizeClusters(	String pointFilename, 
@@ -406,7 +345,8 @@ public class DJCluster {
 //					output_Polygon.write("END");
 //					output_Polygon.newLine();
 					
-					for (Point p : c.getPoints()) {
+					for (ClusterPoint cp : c.getPoints()) {
+						Point p = cp.getPoint();
 						// Write the point
 						output_Points.write(String.valueOf(pointId));
 						output_Points.write(",");
@@ -468,7 +408,8 @@ public class DJCluster {
 		QuadTree<Point> internal;
 		
 		internal = new QuadTree<Point>(envelope[0].x, envelope[0].y, envelope[2].x, envelope[2].y);
-		for (Point point : c.getPoints()) {
+		for (ClusterPoint cp : c.getPoints()) {
+			Point point = cp.getPoint();
 			Coordinate [] ca = convexHull.getCoordinates();
 			int index = 0;
 			boolean onBoundary = false;
@@ -529,7 +470,8 @@ public class DJCluster {
 
 				// Reevaluate the internal and external QuadTrees
 				internal = new QuadTree<Point>(envelope[0].x, envelope[0].y, envelope[2].x, envelope[2].y);
-				for (Point point : c.getPoints()) {
+				for (ClusterPoint cp : c.getPoints()) {
+					Point point = cp.getPoint();
 					Coordinate [] ca = convexHull.getCoordinates();
 					int index = 0;
 					boolean onBoundary = false;
@@ -597,9 +539,6 @@ public class DJCluster {
 		return result;
 	}
 
-	public QuadTree<Point> getInputPoints() {
-		return inputPoints;
-	}
 	
 	public QuadTree<ClusterPoint> getClusteredPoints() {
 		return clusteredPoints;

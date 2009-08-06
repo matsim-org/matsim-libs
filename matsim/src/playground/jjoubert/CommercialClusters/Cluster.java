@@ -36,15 +36,15 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author jwjoubert
  */
-public class Cluster {
+public class Cluster implements Comparable<Cluster>{
 	private String clusterId;
-	private ArrayList<Point> points;
+	private ArrayList<ClusterPoint> points;
 	private Point centerOfGravity;
 	private final static Logger log = Logger.getLogger(Cluster.class);
 			
 	public Cluster(String clusterId){
 		this.clusterId = clusterId;
-		this.points = new ArrayList<Point>();
+		this.points = new ArrayList<ClusterPoint>();
 	}
 	
 	/**
@@ -55,9 +55,9 @@ public class Cluster {
 		if(points.size() > 0){
 			double xTotal = 0;
 			double yTotal = 0;
-			for (Point p : points) {
-				xTotal += p.getX();
-				yTotal += p.getY();
+			for (ClusterPoint p : points) {
+				xTotal += p.getPoint().getX();
+				yTotal += p.getPoint().getY();
 			}			
 			double xCenter = xTotal / (double) points.size();
 			double yCenter = yTotal / (double) points.size();
@@ -76,8 +76,13 @@ public class Cluster {
 		return clusterId;
 	}
 	
-	public ArrayList<Point> getPoints() {
+	public ArrayList<ClusterPoint> getPoints() {
 		return points;
+	}
+
+	public int compareTo(Cluster o) {
+		int result = Integer.parseInt(this.clusterId) - Integer.parseInt(o.clusterId);
+		return result;
 	}
 	
 }
