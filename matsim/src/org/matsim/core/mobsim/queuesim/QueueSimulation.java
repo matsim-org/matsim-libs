@@ -98,8 +98,8 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  */
 public class QueueSimulation {
 
-	private int snapshotPeriod = Integer.MAX_VALUE;
-	private double snapshotTime = 0;
+	private int snapshotPeriod = 0;
+	private double snapshotTime = 0.0;
 
 	protected static final int INFO_PERIOD = 3600;
 	private double infoTime = 0;
@@ -423,9 +423,6 @@ public class QueueSimulation {
 	}
 
 	private void createSnapshotwriter() {
-		// Initialize Snapshot file
-		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
-
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
 		if (this.snapshotPeriod > 0 ) {
 			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
@@ -498,6 +495,9 @@ public class QueueSimulation {
 
 		prepareSignalSystems();
 
+		// Initialize Snapshot file
+		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
+		
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
 
