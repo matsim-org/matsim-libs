@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -40,7 +39,6 @@ import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.ExpBetaPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
@@ -159,10 +157,10 @@ public class StrategyManagerConfigLoader {
 //				// JH
 			} else if (classname.equals("LocationChoice")) {
 				strategy = new PlanStrategy(new ExpBetaPlanSelector());
-				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges()));
+				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenarioData()).getKnowledges()));
 				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());
-				/* not really happy about the following line. Imagine what happens if everybody does 
+				/* not really happy about the following line. Imagine what happens if everybody does
 				 * this, that one doesn't know at the end which removal-strategy is really used.
 				 * The removal strategy must not be tight to a replanning-strategy, but is a general
 				 * option that should be set somewhere else.  marcel/9jun2009/CLEANUP
@@ -186,6 +184,7 @@ public class StrategyManagerConfigLoader {
 						Constructor<? extends PlanStrategy> c = null;
 						try{
 							c = klas.getConstructor(args);
+							strategy = c.newInstance(controler.getScenarioData());
 						} catch(NoSuchMethodException e){
 							log.warn("Cannot find Constructor in PlanStrategy " + classname + " with single argument of type BasicScenario. " +
 									"This is not fatal, trying to find other constructor, however a constructor expecting BasicScenario as " +
@@ -194,8 +193,8 @@ public class StrategyManagerConfigLoader {
 						if (c == null){
 							args[0] = Controler.class;
 							c = klas.getConstructor(args);
+							strategy = c.newInstance(controler);
 						}
-						strategy = c.newInstance(controler);
 						log.info("Loaded PlanStrategy from class " + classname);
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
