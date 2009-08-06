@@ -21,7 +21,7 @@
 package playground.meisterk.org.matsim.population.algorithms;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
+import java.util.EnumMap;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
@@ -48,7 +48,7 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		10000.0, 20000.0, 50000.0, 100000.0, 
 		Double.MAX_VALUE};
 
-	private HashMap<TransportMode, Integer[]> legDistanceDistribution = new HashMap<TransportMode, Integer[]>();
+	private EnumMap<TransportMode, Integer[]> legDistanceDistribution = new EnumMap<TransportMode, Integer[]>(TransportMode.class);
 
 	public void run(PersonImpl person) {
 		this.run(person.getSelectedPlan());
