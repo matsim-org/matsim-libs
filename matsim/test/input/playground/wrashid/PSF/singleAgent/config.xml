@@ -77,5 +77,8 @@
 		<param name="ModuleProbability_3" value="0.8" />
 		<param name="Module_3" value="playground.wrashid.PSF.replanning.TemplatePlanStrategy" />
 	</module>
+	
+	<module name="JDEQSim">
+	</module>
 
 </config>
