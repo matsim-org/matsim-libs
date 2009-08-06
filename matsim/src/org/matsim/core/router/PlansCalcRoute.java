@@ -25,8 +25,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -71,7 +71,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	/**
 	 * if not set via constructor use the default values 
 	 */
-	private PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
+	protected PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
 	
 	private final NetworkFactory routeFactory;
 	

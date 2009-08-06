@@ -53,7 +53,6 @@ import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
  */
 public class PlansCalcRouteKti extends PlansCalcRoute {
 
-	private final PlansCalcRouteConfigGroup group;
 	private final NetworkLayer network;
 	private final Matrix ptTravelTimes;
 	private final SwissHaltestellen haltestellen;
@@ -67,7 +66,6 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			final LeastCostPathCalculatorFactory factory,
 			final PlansCalcRouteKtiInfo ptRoutingInfo) {
 		super(group, network, costCalculator, timeCalculator, factory);
-		this.group = group;
 		this.network = network;
 		this.ptTravelTimes = ptRoutingInfo.getPtTravelTimes();
 		this.haltestellen = ptRoutingInfo.getHaltestellen();
@@ -95,21 +93,35 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			throw new RuntimeException("No entry found for " + from.getId() + " --> " + to.getId());
 		}
 		final double timeInVehicle = traveltime.getValue() * 60.0;
-		final double beeLineWalkTime = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) / this.group.getWalkSpeedFactor();
+		final double beeLineWalkDistance = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+		final double beeLineWalkTime = beeLineWalkDistance / this.configGroup.getWalkSpeedFactor();
 
-		final double walkDistance = CoordUtils.calcDistance(fromAct.getCoord(), fromStop) + CoordUtils.calcDistance(toAct.getCoord(), toStop);
-		final double walkTime = walkDistance / this.group.getWalkSpeedFactor();
+		final double walkAccessEgressDistance = CoordUtils.calcDistance(fromAct.getCoord(), fromStop) + CoordUtils.calcDistance(toAct.getCoord(), toStop);
+		final double walkAccessEgressTime = walkAccessEgressDistance / this.configGroup.getWalkSpeedFactor();
 //		System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + "min + " + (walkTime / 60) + "min (" + walkDistance + "m walk); beeLine: " + beeLineWalkTime/60 + "min walk");
 
 		RouteWRefs newRoute;
-		if (beeLineWalkTime < (timeInVehicle + walkTime)) {
+		if (beeLineWalkTime < (timeInVehicle + walkAccessEgressTime)) {
+			
 			newRoute = this.network.getFactory().createRoute(TransportMode.walk, fromAct.getLink(), toAct.getLink());
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(beeLineWalkTime);
+			newRoute.setDistance(beeLineWalkDistance);
+			
 		} else {
+			
 			newRoute = this.network.getFactory().createRoute(TransportMode.pt, fromAct.getLink(), toAct.getLink());
 			leg.setRoute(newRoute);
-			newRoute.setTravelTime(timeInVehicle + walkTime);
+			newRoute.setTravelTime(timeInVehicle + walkAccessEgressTime);
+			
+			double dist = 0;
+			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
+				dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+			} else {
+				dist = CoordUtils.calcDistance(fromAct.getLink().getCoord(), toAct.getLink().getCoord());
+			}
+			newRoute.setDistance(dist * 1.5);
+			
 		}
 		leg.setTravelTime(newRoute.getTravelTime());
 //		System.out.println("cmpr:\t" + Time.writeTime(oldRoute.getTravTime()) + "\t" + Time.writeTime(leg.getRoute().getTravTime()) + "\t" + beeLineWalkTime);
