@@ -126,7 +126,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		PersonImpl person = population.getPersons().get(event.getPersonId());
 		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		
-		subNetworkTools.resetSubNetwork(person);
+//		subNetworkTools.resetSubNetwork(person);
 		
 		if (nodeKnowledge instanceof DBStorage)
 		{

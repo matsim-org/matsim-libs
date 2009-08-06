@@ -104,7 +104,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		
 		handleOffsetActivityEnds(time);
 		
-		return super.doSimStep(time);
+		return super.doSimStep(time);		
 	}
 
 /*	

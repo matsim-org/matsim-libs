@@ -43,7 +43,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -57,7 +56,6 @@ import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.KMLPersonWriter;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
-import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -81,7 +79,6 @@ import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
-import playground.scnadine.choiceSetGeneration.algorithms.FreeSpeedTravelTimeCalculator;
 
 
 /**
