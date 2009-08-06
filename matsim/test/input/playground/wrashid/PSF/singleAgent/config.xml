@@ -63,6 +63,11 @@
 		<param name="activityPriority_2"        value="1" />
 		<param name="activityTypicalDuration_2" value="00:01:00" />
 		<param name="activityMinimalDuration_2" value="00:01:00" />
+		
+		<param name="activityType_3"            value="depart" /> <!-- deaprt from parking -->
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="00:01:00" />
+		<param name="activityMinimalDuration_3" value="00:01:00" />
 	</module>
 	
 	<module name="strategy">
