@@ -32,6 +32,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -884,7 +885,13 @@ public class QueueLane {
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : QueueLane.this.queueLink.getLink().getFreespeed(now);
-				int lane = 1 + (veh.getId().hashCode() % QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
+				int tmpLane ;
+				try {
+					tmpLane = Integer.parseInt(veh.getId().toString()) ;
+				} catch ( NumberFormatException ee ) {
+					tmpLane = veh.getId().hashCode() ;
+				}
+				int lane = 1 + (tmpLane % QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), distanceOnLink,
 						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
