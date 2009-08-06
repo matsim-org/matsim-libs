@@ -47,6 +47,7 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.core.config.groups.WorldConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
@@ -90,6 +91,7 @@ public class Config {
 	private LocationChoiceConfigGroup locationchoice = null;
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
 	private ScenarioConfigGroup scenarioConfigGroup = null;
+	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup;
 
@@ -185,6 +187,10 @@ public class Config {
 		
 		this.plansCalcRoute = new PlansCalcRouteConfigGroup();
 		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, this.plansCalcRoute);
+		
+		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
+		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
+		
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -453,6 +459,10 @@ public class Config {
 
 	public PlansCalcRouteConfigGroup plansCalcRoute() {
 		return this.plansCalcRoute;
+	}
+	
+	public VspExperimentalConfigGroup vspExperimental() {
+		return this.vspExperimentalGroup;
 	}
 	
 }

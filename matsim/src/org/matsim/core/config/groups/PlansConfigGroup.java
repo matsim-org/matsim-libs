@@ -43,15 +43,11 @@ public class PlansConfigGroup extends Module {
 	private static final String INPUT_VERSION = "inputVersion";
 	private static final String OUTPUT_DTD = "outputPlansDTD";
 
-	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
-
-	
 	private double outputSample = 1.0;
 
 	private String inputFile = null;
 	private String outputFile = null;
 	private String outputVersion = "v4"; // use the newest version by default
-	private boolean useActivityDurations = true;
 
 	private static final Logger log = Logger.getLogger(PlansConfigGroup.class);
 
@@ -64,7 +60,6 @@ public class PlansConfigGroup extends Module {
 	protected Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(OUTPUT_FILE, "Path where plans file should be written to.  As far as I know, this variable is ignored when the controler is used.");
-		map.put(USE_ACTIVITY_DURATIONS, "Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
 		return map;
 	}
 
@@ -79,9 +74,6 @@ public class PlansConfigGroup extends Module {
 		} else if (OUTPUT_VERSION.equals(key)) {
 			return getOutputVersion();
 		} 
-		else if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
-			return Boolean.toString(this.isUseActivityDurations());
-		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -107,9 +99,6 @@ public class PlansConfigGroup extends Module {
 		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key)) {
 			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		}
-		else if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)){
-			this.setUseActivityDurations(Boolean.parseBoolean(value));
-		} 
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -122,7 +111,6 @@ public class PlansConfigGroup extends Module {
 		addParameterToMap(map, INPUT_FILE);
 		addParameterToMap(map, OUTPUT_FILE);
 		addParameterToMap(map, OUTPUT_VERSION);
-		map.put(USE_ACTIVITY_DURATIONS, getValue(USE_ACTIVITY_DURATIONS));
 		return map;
 	}
 
@@ -155,13 +143,4 @@ public class PlansConfigGroup extends Module {
 	public void setOutputVersion(final String outputVersion) {
 		this.outputVersion = outputVersion;
 	}
-
-	public boolean isUseActivityDurations() {
-		return useActivityDurations;
-	}
-
-	public void setUseActivityDurations(boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-	}
-	
 }

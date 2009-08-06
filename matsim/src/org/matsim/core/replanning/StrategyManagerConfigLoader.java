@@ -104,7 +104,7 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				TimeAllocationMutator tam = new TimeAllocationMutator();
-				tam.setUseActivityDurations(config.plans().isUseActivityDurations());
+				tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
 				strategy.addStrategyModule(tam);
 			} else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());

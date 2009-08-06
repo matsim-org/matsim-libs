@@ -825,7 +825,7 @@ public class Controler {
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.scenarioData, this.events);
 				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
-				sim.setUseActivityDurations(this.getConfig().plans().isUseActivityDurations());
+				sim.setUseActivityDurations(this.getConfig().vspExperimental().isUseActivityDurations());
 				if (this.config.scenario().isUseLanes()) {
 					if (this.scenarioData.getLaneDefinitions() == null) {
 						throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
