@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<!-- ====================================================================== -->
+
+	<module name="kti">
+		<param name="usePlansCalcRouteKti" value="true" />
+		<param name="pt_traveltime_matrix_filename" value="filename1" />
+		<param name="pt_haltestellen_filename" value="filename2" />
+		<param name="worldInputFilename" value="filename3" />
+		<param name="constBike" value="999.9" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+</config>
