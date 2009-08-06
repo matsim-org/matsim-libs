@@ -321,6 +321,6 @@ public class GraphBuilder {
 		writer.setDrawEdges(true);
 		writer.setVertexStyle(new KMLSnowballVertexStyle(writer.getVertexIconLink()));
 		writer.setVertexDescriptor(new KMLSnowballDescriptor());
-		writer.write(socialnet, (Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition(socialnet, 0), 10, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009-pretest/egonets.kmz");
+		writer.write(socialnet, (Set) SnowballPartitions.createSampledPartition(socialnet, 0), 10, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009-pretest/egonets.kmz");
 	}
 }

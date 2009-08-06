@@ -21,12 +21,9 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.util.Set;
 
-import org.matsim.api.basic.v01.Coord;
-
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
@@ -44,10 +41,10 @@ public class SampledGraphStatistics {
 	}
 	
 	public static Distribution edgeLenghtDistribution(SampledSocialNet<?> g) {
-		return SpatialGraphStatistics.edgeLengthDistribution((Set<? extends SpatialVertex>)SnowballPartitions.createSampledPartition(g));
+		return SpatialGraphStatistics.edgeLengthDistribution((Set)SnowballPartitions.createSampledPartition(g));
 	}
 	
 	public static Distribution normalizedEdgeLengthDistribution(SampledSocialNet<?> g, SpatialGraph g2, double descretization) {
-		return SpatialGraphStatistics.normalizedEdgeLengthDistribution((Set<? extends SpatialVertex>) SnowballPartitions.createSampledPartition(g), g2, descretization);
+		return SpatialGraphStatistics.normalizedEdgeLengthDistribution((Set) SnowballPartitions.createSampledPartition(g), g2, descretization);
 	}
 }
