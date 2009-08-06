@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 /**
+ * config group for experimental parameters. this group and its parameters should not be used outside of vsp.
  * @author dgrether
  */
 public class VspExperimentalConfigGroup extends Module {
