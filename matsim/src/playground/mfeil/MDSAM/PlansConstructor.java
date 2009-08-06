@@ -79,9 +79,9 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz/output_plans_klein.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans_klein.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/mz/model_klein.mod";
+		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -156,8 +156,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-//			if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
-			if (pl.get(i).size()>=ranking.get(ranking.size()-2)){
+			if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
+//			if (pl.get(i).size()>=ranking.get(ranking.size()-2)){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
 					PlanImpl plan = iterator.next();
