@@ -67,7 +67,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class PlansConstructor implements PlanStrategyModule{
 		
 	protected final Controler controler;
-	protected final String inputFile, outputFile, outputFileBiogeme;
+	protected final String inputFile, outputFile, outputFileBiogeme, outputFileMod;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
 	protected final NetworkLayer network;
@@ -79,8 +79,9 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
+		this.outputFile = "/home/baug/mfeil/data/mz/output_plans_klein.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans_klein.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/mz/model_klein.mod";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -113,6 +114,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.getSimilarityOfPlans();
 		this.writePlans(this.outputFile);
 		this.writePlansForBiogeme(this.outputFileBiogeme);
+		this.writeModFile(this.outputFileMod);
 	}
 	
 	
@@ -154,7 +156,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			//if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
+//			if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
 			if (pl.get(i).size()>=ranking.get(ranking.size()-2)){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
@@ -316,8 +318,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
 				for (int i=0;i<plan.getPlanElements().size();i++){
-					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()+"\t");
-					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()+"\t");
+					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
+					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()/3600+"\t");
 				}
 			}
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
@@ -329,6 +331,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		stream.close();
 		log.info("done.");
+	}
+	
+	private void writeModFile(String outputFile){
+		new ModFileMaker (this.population).write(this.outputFileMod);
 	}
 		
 }

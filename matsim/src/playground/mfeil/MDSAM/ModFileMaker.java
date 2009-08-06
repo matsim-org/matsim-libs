@@ -76,28 +76,29 @@ public class ModFileMaker {
 		
 		//Choice
 		stream.println("[Choice]");
+		stream.println("Choice");
 		stream.println();
 		
 		//Beta
 		stream.println("[Beta]");
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
-		stream.println("HomeUmax \t60  \t-10000 \t10000  \t0");
-		stream.println("WorkUmax \t55  \t-10000 \t10000  \t0");
-		stream.println("EducationUmax \t40  \t-10000 \t10000  \t0");
-		stream.println("ShoppingUmax \t35  \t-10000 \t10000  \t0");
-		stream.println("LeisureUmax \t12  \t-10000 \t10000  \t0");
+		stream.println("HomeUmax \t60  \t-50 \t50  \t0");
+		stream.println("WorkUmax \t55  \t-50 \t50  \t0");
+		stream.println("EducationUmax \t40  \t-50 \t50  \t0");
+		stream.println("ShoppingUmax \t35  \t-50 \t50  \t0");
+		stream.println("LeisureUmax \t12  \t-50 \t50  \t0");
 		
-		stream.println("HomeAlpha \t6  \t-10000 \t10000  \t0");
-		stream.println("WorkAlpha \t4  \t-10000 \t10000  \t0");
-		stream.println("EducationAlpha \t3  \t-10000 \t10000  \t0");
-		stream.println("ShoppingAlpha \t2  \t-10000 \t10000  \t0");
-		stream.println("LeisureAlpha \t1  \t-10000 \t10000  \t0");
+		stream.println("HomeAlpha \t6  \t-50 \t50  \t0");
+		stream.println("WorkAlpha \t4  \t-50 \t50  \t0");
+		stream.println("EducationAlpha \t3  \t-50 \t50  \t0");
+		stream.println("ShoppingAlpha \t2  \t-50 \t50  \t0");
+		stream.println("LeisureAlpha \t1  \t-50 \t50  \t0");
 		
-		stream.println("Ucar \t-6  \t-10000 \t10000  \t0");
-		stream.println("Upt \t-6  \t-10000 \t10000  \t0");
-		stream.println("Uwalk \t-6  \t-10000 \t10000  \t0");
-		stream.println("Ubike \t-6  \t-10000 \t10000  \t0");		
+		stream.println("Ucar \t-6  \t-50 \t50  \t0");
+		stream.println("Upt \t-6  \t-50 \t50  \t0");
+		stream.println("Uwalk \t-6  \t-50 \t50  \t0");
+		stream.println("Ubike \t-6  \t-50 \t50  \t0");		
 		stream.println();
 	
 		//Utilities
@@ -107,20 +108,25 @@ public class ModFileMaker {
 			PlanImpl plan = person.getPlans().get(i);
 			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");
 			
-			LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
-			if (leg.getMode().equals(TransportMode.car)) stream.print("Ucar * x"+(i+1)+""+(2));
-			else if (leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+(2));
-			else if (leg.getMode().equals(TransportMode.pt)) stream.print("Upt * x"+(i+1)+""+(2));
-			else if (leg.getMode().equals(TransportMode.walk)) stream.print("Uwalk * x"+(i+1)+""+(2));
-			else log.warn("Leg has no valid mode! Person: "+person);
-			
-			for (int j=1;j<plan.getPlanElements().size();j+=2){
-				LegImpl legs = (LegImpl)plan.getPlanElements().get(j);
-				if (legs.getMode().equals(TransportMode.car)) stream.print("+ Ucar * x"+(i+1)+""+(j+1));
-				else if (legs.getMode().equals(TransportMode.bike)) stream.print("+ Ubike * x"+(i+1)+""+(j+1));
-				else if (legs.getMode().equals(TransportMode.pt)) stream.print("+ Upt * x"+(i+1)+""+(j+1));
-				else if (legs.getMode().equals(TransportMode.walk)) stream.print("+ Uwalk * x"+(i+1)+""+(j+1));
+			if (plan.getPlanElements().size()>1){
+				LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
+				if (leg.getMode().equals(TransportMode.car)) stream.print("Ucar * x"+(i+1)+""+2);
+				else if (leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+2);
+				else if (leg.getMode().equals(TransportMode.pt)) stream.print("Upt * x"+(i+1)+""+2);
+				else if (leg.getMode().equals(TransportMode.walk)) stream.print("Uwalk * x"+(i+1)+""+2);
 				else log.warn("Leg has no valid mode! Person: "+person);
+				
+				for (int j=3;j<plan.getPlanElements().size();j+=2){
+					LegImpl legs = (LegImpl)plan.getPlanElements().get(j);
+					if (legs.getMode().equals(TransportMode.car)) stream.print(" + Ucar * x"+(i+1)+""+(j+1));
+					else if (legs.getMode().equals(TransportMode.bike)) stream.print(" + Ubike * x"+(i+1)+""+(j+1));
+					else if (legs.getMode().equals(TransportMode.pt)) stream.print(" + Upt * x"+(i+1)+""+(j+1));
+					else if (legs.getMode().equals(TransportMode.walk)) stream.print(" + Uwalk * x"+(i+1)+""+(j+1));
+					else log.warn("Leg has no valid mode! Person: "+person);
+				}
+			}
+			else {
+				stream.print("$NONE");
 			}
 			stream.println();
 		}		
@@ -133,19 +139,25 @@ public class ModFileMaker {
 			PlanImpl plan = person.getPlans().get(i);
 			stream.print((i+1)+"\t");
 			
-			stream.print("HomeUmax / (1 + exp(1.2 * (HomeAlpha * x"+(i+1)+""+(1)+"))");
+			stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+1+" ) )");
 						
-			for (int j=0;j<plan.getPlanElements().size();j+=2){
+			for (int j=2;j<plan.getPlanElements().size();j+=2){
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);
-				if (act.getType().toString().equals("h")) stream.print("+ HomeUmax / (1 + exp(1.2 * (HomeAlpha * x"+(i+1)+""+(j+1)+"))");
-				else if (act.getType().toString().equals("w")) stream.print("+ WorkUmax / (1 + exp(1.2 * (WorkAlpha * x"+(i+1)+""+(j+1)+"))");
-				else if (act.getType().toString().equals("e")) stream.print("+ EducationUmax / (1 + exp(1.2 * (EducationAlpha * x"+(i+1)+""+(j+1)+"))");
-				else if (act.getType().toString().equals("s")) stream.print("+ ShoppingUmax / (1 + exp(1.2 * (ShoppingAlpha * x"+(i+1)+""+(j+1)+"))");
-				else if (act.getType().toString().equals("l")) stream.print("+ LeisureUmax / (1 + exp(1.2 * (LeisureAlpha * x"+(i+1)+""+(j+1)+"))");
+				if (act.getType().toString().equals("h")) stream.print(" + HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) )");
+				else if (act.getType().toString().equals("w")) stream.print(" + WorkUmax * one / ( one + exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) )");
+				else if (act.getType().toString().equals("e")) stream.print(" + EducationUmax * one / ( one + exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+""+(j+1)+" ) )");
+				else if (act.getType().toString().equals("s")) stream.print(" + ShoppingUmax * one / ( one + exp( one_point_two * ( ShoppingAlpha * one - x"+(i+1)+""+(j+1)+" ) )");
+				else if (act.getType().toString().equals("l")) stream.print(" + LeisureUmax * one / ( one + exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+""+(j+1)+" ) )");
 				else log.warn("Act has no valid type! Person: "+person);
 			}
 			stream.println();
 		}
+		stream.println();
+		
+		//Expressions
+		stream.println("[Expressions]");
+		stream.println("one = 1");
+		stream.println("one_point_two = 1.2");
 		stream.println();
 		
 		//Model
