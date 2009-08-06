@@ -816,7 +816,7 @@ public class Controler {
 				numOfThreads = Integer.parseInt(numberOfThreads);
 			}
 
-			if (this.config.getModule(JDEQ_SIM) != null && numOfThreads > 1) {
+			if ((this.config.getModule(JDEQ_SIM) != null) && (numOfThreads > 1)) {
 				PJDEQSimulation sim = new PJDEQSimulation(this.network, this.population, this.events,numOfThreads);
 				sim.run();
 			} else if (this.config.getModule(JDEQ_SIM) != null) {
@@ -825,6 +825,7 @@ public class Controler {
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.scenarioData, this.events);
 				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
+				sim.setUseActivityDurations(this.getConfig().plans().isUseActivityDurations());
 				if (this.config.scenario().isUseLanes()) {
 					if (this.scenarioData.getLaneDefinitions() == null) {
 						throw new IllegalStateException("Lane definition have to be set if feature is enabled!");

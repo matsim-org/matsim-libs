@@ -23,7 +23,6 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -134,7 +133,7 @@ public class PersonAgent implements DriverAgent {
 		ActivityImpl firstAct = (ActivityImpl) planElements.get(0);
 		double departureTime = firstAct.getEndTime();
 		this.currentLink = firstAct.getLink();
-		if (departureTime != Time.UNDEFINED_TIME && planElements.size() > 1) {
+		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
 			SimulationTimer.updateSimStartTime(departureTime);
 			this.simulation.scheduleActivityEnd(this);
@@ -217,13 +216,13 @@ public class PersonAgent implements DriverAgent {
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */
-		if (act.getDuration() == Time.UNDEFINED_TIME && act.getEndTime() == Time.UNDEFINED_TIME) {
+		if ((act.getDuration() == Time.UNDEFINED_TIME) && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			setDepartureTime(Double.POSITIVE_INFINITY);
 		} else {
 			
 			double departure = 0;
 
-//			if ( old_logic ) {  // FIXME yyyyyy Dominik todo 5/aug/09
+			if (this.simulation.isUseActivityDurations()) { 
 				/* The person leaves the activity either 'actDur' later or
 				 * when the end is defined of the activity, whatever comes first. */
 				if (act.getDuration() == Time.UNDEFINED_TIME) {
@@ -233,9 +232,15 @@ public class PersonAgent implements DriverAgent {
 				} else {
 					departure = Math.min(act.getEndTime(), now + act.getDuration());
 				}
-//			} else {
-//				departure = act.getEndTime() ;
-//			}
+			} 
+			else {
+				if (act.getEndTime() != Time.UNDEFINED_TIME) {
+					departure = act.getEndTime() ;
+				}
+				else {
+					throw new IllegalStateException("Can not use activity end time as new departure time as it is not set for person: " + this.getPerson().getId());
+				}
+			}
 				
 			
 			

@@ -103,7 +103,9 @@ public class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				strategy.addStrategyModule(new TimeAllocationMutator());
+				TimeAllocationMutator tam = new TimeAllocationMutator();
+				tam.setUseActivityDurations(config.plans().isUseActivityDurations());
+				strategy.addStrategyModule(tam);
 			} else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator(7200));

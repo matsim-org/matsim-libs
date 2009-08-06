@@ -41,6 +41,7 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final int mutationRange;
 	private final Random random;
+	private boolean useActivityDurations;
 
 	public PlanMutateTimeAllocation(final int mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
@@ -79,13 +80,26 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					if (act.getDuration() != Time.UNDEFINED_TIME) {
-						// mutate the durations of all 'middle' activities
-						act.setDuration(mutateTime(act.getDuration()));
-						now += act.getDuration();
-						// set end time accordingly
-						act.setEndTime(now);
-					} else {
+					if (this.useActivityDurations) {
+						if (act.getDuration() != Time.UNDEFINED_TIME) {
+							// mutate the durations of all 'middle' activities
+							act.setDuration(mutateTime(act.getDuration()));
+							now += act.getDuration();
+							// set end time accordingly
+							act.setEndTime(now);
+						} else {
+							double newEndTime = mutateTime(act.getEndTime());
+							if (newEndTime < now) {
+								newEndTime = now;
+							}
+							act.setEndTime(newEndTime);
+							now = newEndTime;
+						}
+					} 
+					else {
+						if (act.getEndTime() == Time.UNDEFINED_TIME) {
+							throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
+						}
 						double newEndTime = mutateTime(act.getEndTime());
 						if (newEndTime < now) {
 							newEndTime = now;
@@ -93,7 +107,6 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 						act.setEndTime(newEndTime);
 						now = newEndTime;
 					}
-
 				// handle last activity
 				} else {
 
@@ -134,4 +147,9 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 		return t;
 	}
 
+	public void setUseActivityDurations(boolean useActivityDurations) {
+		this.useActivityDurations = useActivityDurations;
+	}
+
+	
 }

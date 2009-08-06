@@ -163,6 +163,8 @@ public class QueueSimulation {
 	private boolean teleportVehicles = true;
 	private int cntTeleportVehicle = 0;
 
+	private boolean useActivityDurations = true;
+	
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -804,6 +806,17 @@ public class QueueSimulation {
 
 	public Scenario getScenario() {
 		return this.scenario;
+	}
+
+	
+	public boolean isUseActivityDurations() {
+		return useActivityDurations;
+	}
+
+	
+	public void setUseActivityDurations(boolean useActivityDurations) {
+		this.useActivityDurations = useActivityDurations;
+		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
 	}
 
 }

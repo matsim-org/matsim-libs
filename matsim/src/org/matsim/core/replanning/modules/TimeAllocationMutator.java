@@ -43,6 +43,7 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	private final static Logger log = Logger.getLogger(TimeAllocationMutator.class);
 
 	private int mutationRange = 1800;
+	private boolean useActivityDurations = true;
 
 	/**
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
@@ -71,7 +72,13 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlanMutateTimeAllocation(mutationRange, MatsimRandom.getLocalInstance());
+		PlanMutateTimeAllocation pmta = new PlanMutateTimeAllocation(mutationRange, MatsimRandom.getLocalInstance());
+		pmta.setUseActivityDurations(this.useActivityDurations);
+		return pmta;
+	}
+
+	public void setUseActivityDurations(boolean useActivityDurations) {
+		this.useActivityDurations = useActivityDurations;
 	}
 
 }
