@@ -58,6 +58,7 @@ public class ModFileMaker {
 	}
 	
 	public void write (String outputFile){
+		log.info("Writing mod file...");
 		
 		//Choose any person
 		PersonImpl person = this.population.getPersons().values().iterator().next();
@@ -167,6 +168,7 @@ public class ModFileMaker {
 		stream.println();
 		
 		stream.close();
+		log.info("done.");
 	}
 	
 	

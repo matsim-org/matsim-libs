@@ -294,7 +294,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.print("Id\tChoice\t");
 		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
 		for (int i = 0;i<p.getPlans().size();i++){
-			for (int j =0;j<p.getPlans().get(i).getPlanElements().size();j++){
+			for (int j =0;j<p.getPlans().get(i).getPlanElements().size()-1;j++){
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
 			}
 		}
@@ -317,7 +317,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print(position+"\t");
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				for (int i=0;i<plan.getPlanElements().size();i++){
+				stream.print((((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime()+86400-((ActivityImpl)(plan.getPlanElements().get(0))).getStartTime())/3600+"\t");
+				for (int i=1;i<plan.getPlanElements().size()-1;i++){
 					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
 					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()/3600+"\t");
 				}
