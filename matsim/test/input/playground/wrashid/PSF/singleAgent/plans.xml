@@ -9,11 +9,11 @@
 					
 				</route>
 		</leg>
-		<act type="parking" facility="myHomeFacility" x="-25000" y="0" link="23" dur="00:01" />
+		<act type="depart" facility="myHomeFacility" x="-25000" y="0" link="23" dur="00:01" />
 		<leg mode="car">
 			<route>1 2 7 12</route>
 		</leg>
-		<act type="parking" x="-25000" y="0" link="20" facility="parkingAtWorkWithElectricity" dur="01:00" />
+		<act type="parking" x="-25000" y="0" link="20" facility="parkingAtWorkWithElectricity" dur="00:01" />
 		<leg mode="walk" trav_time="00:03">
 				<route trav_time="00:03">
 					
@@ -25,7 +25,7 @@
 					
 				</route>
 		</leg>
-		<act type="parking" x="-25000" y="0" link="20" facility="parkingAtWorkWithElectricity" dur="00:01" />
+		<act type="depart" x="-25000" y="0" link="20" facility="parkingAtWorkWithElectricity" dur="00:01" />
 		<leg mode="car">
 			<route>13 14 15 </route>
 		</leg>
