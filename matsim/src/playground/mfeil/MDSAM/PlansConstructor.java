@@ -156,8 +156,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
-//			if (pl.get(i).size()>=ranking.get(ranking.size()-2)){
+			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-51,0))){
+//			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-2,0))){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
 					PlanImpl plan = iterator.next();
@@ -251,7 +251,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							}
 						}
 					}
-					// if plan too long make it unvalid (set score to -100000)
+					// if plan too long make it invalid (set score to -100000)
 					if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
 						plan.setScore(-100000.0);
 					}
@@ -294,7 +294,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.print("Id\tChoice\t");
 		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
 		for (int i = 0;i<p.getPlans().size();i++){
-			for (int j =0;j<p.getPlans().get(i).getPlanElements().size()-1;j++){
+			for (int j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
 			}
 		}
@@ -317,7 +317,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print(position+"\t");
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				stream.print((((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime()+86400-((ActivityImpl)(plan.getPlanElements().get(0))).getStartTime())/3600+"\t");
+				if (plan.getPlanElements().size()==1) stream.print("24\t");
+				else stream.print((((ActivityImpl)(plan.getFirstActivity())).getEndTime()+86400-((ActivityImpl)(plan.getLastActivity())).getStartTime())/3600+"\t");
 				for (int i=1;i<plan.getPlanElements().size()-1;i++){
 					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
 					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()/3600+"\t");

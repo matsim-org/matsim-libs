@@ -84,22 +84,22 @@ public class ModFileMaker {
 		stream.println("[Beta]");
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
-		stream.println("HomeUmax \t60  \t-50 \t50  \t0");
-		stream.println("WorkUmax \t55  \t-50 \t50  \t0");
-		stream.println("EducationUmax \t40  \t-50 \t50  \t0");
-		stream.println("ShoppingUmax \t35  \t-50 \t50  \t0");
-		stream.println("LeisureUmax \t12  \t-50 \t50  \t0");
+		stream.println("HomeUmax \t60  \t0 \t100  \t0");
+		stream.println("WorkUmax \t55  \t0 \t100  \t0");
+		stream.println("EducationUmax \t40  \t0 \t100  \t0");
+		stream.println("ShoppingUmax \t35  \t0 \t100  \t0");
+		stream.println("LeisureUmax \t12  \t0 \t100  \t0");
 		
-		stream.println("HomeAlpha \t6  \t-50 \t50  \t0");
-		stream.println("WorkAlpha \t4  \t-50 \t50  \t0");
-		stream.println("EducationAlpha \t3  \t-50 \t50  \t0");
-		stream.println("ShoppingAlpha \t2  \t-50 \t50  \t0");
-		stream.println("LeisureAlpha \t1  \t-50 \t50  \t0");
+		stream.println("HomeAlpha \t6  \t0 \t20  \t0");
+		stream.println("WorkAlpha \t4  \t0 \t20  \t0");
+		stream.println("EducationAlpha \t3  \t0 \t20  \t0");
+		stream.println("ShoppingAlpha \t2  \t0 \t20  \t0");
+		stream.println("LeisureAlpha \t1  \t0 \t20  \t0");
 		
-		stream.println("Ucar \t-6  \t-50 \t50  \t0");
-		stream.println("Upt \t-6  \t-50 \t50  \t0");
-		stream.println("Uwalk \t-6  \t-50 \t50  \t0");
-		stream.println("Ubike \t-6  \t-50 \t50  \t0");		
+		stream.println("Ucar \t-6  \t-50 \t30  \t0");
+		stream.println("Upt \t-6  \t-50 \t30  \t0");
+		stream.println("Uwalk \t-6  \t-50 \t30  \t0");
+		stream.println("Ubike \t-6  \t-50 \t30  \t0");		
 		stream.println();
 	
 		//Utilities
