@@ -46,14 +46,9 @@ public class DgOtfLaneReader extends OTFDataReader {
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-//		String id = ByteBufferUtils.getString(in);
-//		this.drawer.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
-//		this.drawer.setId(id.toCharArray());
-
 		int nrToNodeLanes = in.getInt();
 		drawer.setNumberOfLanes(nrToNodeLanes);
-		log.debug("reader numberoftonodelanes: " + nrToNodeLanes);
-		
+
 		this.drawer.setMiddleOfLinkStart(in.getDouble(), in.getDouble());
 		this.drawer.setBranchPoint(in.getDouble(), in.getDouble());
 

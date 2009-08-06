@@ -66,7 +66,6 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 
 		int numberOfToNodeQueueLanes = this.src.getToNodeQueueLanes().size();
 		out.putInt(numberOfToNodeQueueLanes);
-		log.debug("numberoftoNodeQueueLanes: " + numberOfToNodeQueueLanes);
 
 		out.putDouble(mlinkStartX1);
 		out.putDouble(mlinkStartY1);
@@ -85,10 +84,10 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 			double meterFromLinkEnd = ql.getMeterFromLinkEnd();
 			double branchPointX = mlinkStartX1 + ((linkLength - meterFromLinkEnd) * deltaLinkXNorm);
 			double branchPointY = mlinkStartY1 + ((linkLength - meterFromLinkEnd) * deltaLinkYNorm);
-			log.debug("meterfromlinkend: " + meterFromLinkEnd);
-			log.debug("linkstart x " + linkStartX1 + " y " + linkStartY1);
-			log.debug("linkendx: " + linkEndX1 + " linkendy: " + linkEndY1);
-			log.debug("branchPointX: " + branchPointX + " Y " + branchPointY);
+//			log.debug("meterfromlinkend: " + meterFromLinkEnd);
+//			log.debug("linkstart x " + linkStartX1 + " y " + linkStartY1);
+//			log.debug("linkendx: " + linkEndX1 + " linkendy: " + linkEndY1);
+//			log.debug("branchPointX: " + branchPointX + " Y " + branchPointY);
 			out.putDouble(branchPointX);
 			out.putDouble(branchPointY);
 			
@@ -96,7 +95,7 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 			double distanceBtwLanes = quadWidth / (numberOfToNodeQueueLanes + 1);
 			double linkEndX2 = linkEndX1 + (normalizedOrthogonalX * quadWidth);
 			double linkEndY2 = linkEndY1 + (normalizedOrthogonalY * quadWidth);
-			log.debug("normOrtho x " + normalizedOrthogonalX + " y " + normalizedOrthogonalY);
+//			log.debug("normOrtho x " + normalizedOrthogonalX + " y " + normalizedOrthogonalY);
 			
 			double laneEndPointX, laneEndPointY;
 			int laneIncrement = 1;
@@ -104,7 +103,7 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 				ByteBufferUtils.putString(out, l.getLaneId().toString());
 				laneEndPointX = linkEndX1 + (normalizedOrthogonalX * distanceBtwLanes * laneIncrement);
 				laneEndPointY = linkEndY1 + (normalizedOrthogonalY * distanceBtwLanes * laneIncrement);
-				log.debug("laneEndPoint x " + laneEndPointX + " y " + laneEndPointY);
+//				log.debug("laneEndPoint x " + laneEndPointX + " y " + laneEndPointY);
 				laneIncrement++;
 				out.putDouble(laneEndPointX);
 				out.putDouble(laneEndPointY);

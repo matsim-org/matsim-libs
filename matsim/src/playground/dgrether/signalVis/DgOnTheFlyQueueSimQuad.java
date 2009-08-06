@@ -37,9 +37,12 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.dgrether.signalVis.drawer.DgLaneSignalDrawer;
+import playground.dgrether.signalVis.io.DgOtfLaneReader;
+import playground.dgrether.signalVis.io.DgOtfLaneWriter;
 import playground.dgrether.signalVis.io.DgOtfSignalWriter;
 import playground.dgrether.signalVis.io.DgSignalReader;
 import playground.dgrether.signalVis.layer.DgOtfLaneLayer;
+import playground.dgrether.signalVis.layer.DgOtfSignalLayer;
 
 /**
  * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
@@ -92,35 +95,53 @@ public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
 
 	private OTFConnectionManager setupConnectionManager() {
 		OTFConnectionManager connectionManager = new OTFConnectionManager();
-		// data source to writer
-		connectionManager.add(QueueLink.class, DgOtfSignalWriter.class);
-		//default network code
-		connectionManager.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		boolean drawLanes = false;
+		boolean drawSignals = true;
 		
-		// writer -> reader: from server to client
-		connectionManager
-				.add(DgOtfSignalWriter.class, DgSignalReader.class);
+		if (drawLanes){
+			// data source to writer
+			connectionManager.add(QueueLink.class, DgOtfLaneWriter.class);
+			// writer -> reader: from server to client
+			connectionManager
+			.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
+			// reader to drawer (or provider to receiver)
+			connectionManager.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
+			// drawer -> layer
+			connectionManager.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
+		}
+		else if (drawSignals) {
+			// data source to writer
+			connectionManager.add(QueueLink.class, DgOtfSignalWriter.class);
+			// writer -> reader: from server to client
+			connectionManager
+			.add(DgOtfSignalWriter.class, DgSignalReader.class);
+			// reader to drawer (or provider to receiver)
+			connectionManager.add(DgSignalReader.class, DgLaneSignalDrawer.class);
+			// drawer -> layer
+			connectionManager.add(DgLaneSignalDrawer.class, DgOtfSignalLayer.class);
+		}
+
+		//agent code
+		// reader -> drawer
+		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		//drawer -> layer
+		connectionManager.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+
+		
 		//default network code
+  	// data source to writer
+		connectionManager.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		//writer -> reader
 		connectionManager
 		.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-
-		
-		
-		// reader to drawer (or provider to receiver)
-		// this.add(OTFLinkLanesAgentsNoParkingHandler.class,
-		// SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connectionManager.add(DgSignalReader.class, DgLaneSignalDrawer.class);
-		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
-		connectionManager.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		//default network code
+		//reader -> drawer
 		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		
-		
-		// drawer -> layer
-		connectionManager.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
-
-		//default code
+		//drawer -> layer
 		connectionManager.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		
+		
+		
+
 		
 		
 		// //writer -> reader

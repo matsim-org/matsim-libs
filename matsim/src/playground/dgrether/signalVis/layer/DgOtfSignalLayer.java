@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSignalReader
+ * DgOtfSignalLayer
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis.io;
+package playground.dgrether.signalVis.layer;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgSignalReader extends DgOtfLaneReader {
+public class DgOtfSignalLayer extends SimpleSceneLayer {
 
-	/**
-	 * 
-	 */
-	public DgSignalReader() {
-	}
-	
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		int numberOfLanes = in.getInt();
-		if (numberOfLanes > 1) {
-			String id;
-			boolean green;
-			for (int i = 0; i < numberOfLanes; i++) {
-				id = ByteBufferUtils.getString(in);
-				green = (in.getInt() == 1 ? true : false);
-				this.drawer.updateGreenState(id, green);
-			}
-		}
-	}
-
-	@Override
-	public void invalidate(SceneGraph graph) {
-		super.invalidate(graph);
-		// invalidate agent receivers
-	}
-	
-//	@Override
-//	public void invalidate(SceneGraph graph) {
-////		super.invalidate(graph);
-////		graph.addItem(this.drawer);
-//	}
-	
 }

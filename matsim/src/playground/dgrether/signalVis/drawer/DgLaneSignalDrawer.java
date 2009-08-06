@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 
 
@@ -47,9 +48,9 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	}
 	
 	public void onDraw( GL gl) {
-		gl.glColor3d(1.0, 0, 0);
+		gl.glColor3d(0.0, 0.0, 1.0);
 		double zCoord = 1.0;
-		double offset = 2.0;
+		double offset = 5.0;
 		// always draw a branch point
 		gl.glBegin(GL.GL_QUADS);
 		gl.glVertex3d(branchPoint.x - offset, branchPoint.y - offset, zCoord);
@@ -67,10 +68,12 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 		if (this.numberOfQueueLanes != 1) {
 			for (LaneData ld : this.laneData.values()){
 				// draw connections between branch point and lane end
+				gl.glColor3d(0.0, 0, 1.0);
 				gl.glBegin(GL.GL_LINES);
 	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord); 
 		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
   			gl.glEnd();
+  			
 				if (ld.isGreen()) {
 					gl.glColor3d(0.0, 1.0, 0.0);
 				}
@@ -88,7 +91,10 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 		}
 	}
 	
-	
+	@Override
+	public void invalidate(SceneGraph graph) {
+		super.invalidate(graph);
+	}
 
 	public void setNumberOfLanes(int nrQueueLanes) {
 		this.numberOfQueueLanes = nrQueueLanes;
