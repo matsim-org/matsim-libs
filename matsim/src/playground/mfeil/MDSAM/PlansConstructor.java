@@ -81,9 +81,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
-	//	this.inputFile = "./plans/input_plans.xml";	
-	//	this.outputFile = "./plans/output_plans.xml.gz";	
-		this.population = new PopulationImpl();
+	/*	this.inputFile = "./plans/input_plans2.xml";	
+		this.outputFile = "./plans/output_plans.xml.gz";	
+		this.outputFileBiogeme = "./plans/output_plans.dat";
+	*/	this.population = new PopulationImpl();
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
@@ -153,7 +154,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
+			//if (pl.get(i).size()>=ranking.get(ranking.size()-51)){
+			if (pl.get(i).size()>=ranking.get(ranking.size()-2)){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
 					PlanImpl plan = iterator.next();
@@ -175,8 +177,21 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Adding links and routes to original plans...");
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			this.linker.run(person);
-			this.router.run(person);
+			PlanImpl plan = person.getSelectedPlan();
+			this.linker.run(plan);
+			//this.router.run(person);
+			for (int j=1;j<plan.getPlanElements().size();j++){
+				if (j%2==1){
+					this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+				}
+				else {
+					((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+					if (j!=plan.getPlanElements().size()-1){
+						((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
+						((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+					}
+				}
+			}
 		}
 		log.info("done.");
 	}
@@ -264,6 +279,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	protected void writePlansForBiogeme(String outputFile){
+		log.info("Writing plans for Biogeme...");
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(outputFile));
@@ -299,19 +315,20 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print(position+"\t");
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				for (int i=0;i<plan.getPlanElements().size()-1;i++){
+				for (int i=0;i<plan.getPlanElements().size();i++){
 					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()+"\t");
 					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()+"\t");
 				}
 			}
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				if (plan.getScore()==-100000.0)	stream.print(0+"\t");
+				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");
 				else stream.print(1+"\t");
 			}
 			stream.println();
 		}
 		stream.close();
+		log.info("done.");
 	}
 		
 }
