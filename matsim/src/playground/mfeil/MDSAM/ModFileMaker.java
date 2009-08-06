@@ -21,17 +21,13 @@
 package playground.mfeil.MDSAM;
 
 import java.io.File;
-import playground.mfeil.ActChainEqualityCheck;
+import org.matsim.api.basic.v01.TransportMode;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -42,7 +38,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.knowledges.Knowledges;
 
 
 /**
@@ -99,71 +94,81 @@ public class ModFileMaker {
 		stream.println("ShoppingAlpha \t2  \t-10000 \t10000  \t0");
 		stream.println("LeisureAlpha \t1  \t-10000 \t10000  \t0");
 		
-		stream.println("UCar \t-6  \t-10000 \t10000  \t0");
+		stream.println("Ucar \t-6  \t-10000 \t10000  \t0");
 		stream.println("Upt \t-6  \t-10000 \t10000  \t0");
 		stream.println("Uwalk \t-6  \t-10000 \t10000  \t0");
-		stream.println("Ubike \t-6  \t-10000 \t10000  \t0");
+		stream.println("Ubike \t-6  \t-10000 \t10000  \t0");		
+		stream.println();
 	
-	
-		
-		
-		
-		for (Iterator<PlanImpl> iterator = person.getPlans().iterator(); iterator.hasNext();){
-			PlanImpl plan = iterator.next();
-			for (int i=0;i<plan.getPlanElements().size();i++){
-				if (i%2==0){
-					
-				}
+		//Utilities
+		stream.println("[Utilities]");
+		stream.println("//Id \tName  \tAvail  \tlinear-in-parameter expression (beta1*x1 + beta2*x2 + ... )");	
+		for (int i=0;i<person.getPlans().size();i++){
+			PlanImpl plan = person.getPlans().get(i);
+			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");
+			
+			LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
+			if (leg.getMode().equals(TransportMode.car)) stream.print("Ucar * x"+(i+1)+""+(2));
+			else if (leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+(2));
+			else if (leg.getMode().equals(TransportMode.pt)) stream.print("Upt * x"+(i+1)+""+(2));
+			else if (leg.getMode().equals(TransportMode.walk)) stream.print("Uwalk * x"+(i+1)+""+(2));
+			else log.warn("Leg has no valid mode! Person: "+person);
+			
+			for (int j=1;j<plan.getPlanElements().size();j+=2){
+				LegImpl legs = (LegImpl)plan.getPlanElements().get(j);
+				if (legs.getMode().equals(TransportMode.car)) stream.print("+ Ucar * x"+(i+1)+""+(j+1));
+				else if (legs.getMode().equals(TransportMode.bike)) stream.print("+ Ubike * x"+(i+1)+""+(j+1));
+				else if (legs.getMode().equals(TransportMode.pt)) stream.print("+ Upt * x"+(i+1)+""+(j+1));
+				else if (legs.getMode().equals(TransportMode.walk)) stream.print("+ Uwalk * x"+(i+1)+""+(j+1));
+				else log.warn("Leg has no valid mode! Person: "+person);
 			}
-		}
-		
-		
-		
-		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
-		for (int i = 0;i<p.getPlans().size();i++){
-			for (int j =0;j<p.getPlans().get(i).getPlanElements().size();j++){
-				stream.print("x"+(i+1)+""+(j+1)+"\t");
-			}
-		}
+			stream.println();
+		}		
 		stream.println();
 		
-		/*
-		// Filling plans
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
-			stream.print(person.getId()+"\t");
-			int position = -1;
-			for (int i=0;i<person.getPlans().size();i++){
-				if (person.getPlans().get(i).equals(person.getSelectedPlan())) {
-					position = i+1;
-					break;
-				}
-			}
-			stream.print(position+"\t");
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
-				for (int i=0;i<plan.getPlanElements().size()-1;i++){
-					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()+"\t");
-					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()+"\t");
-				}
+		//GeneralizedUtilities
+		stream.println("[GeneralizedUtilities]");
+		stream.println("//Id \tnonlinear-in-parameter expression");	
+		for (int i=0;i<person.getPlans().size();i++){
+			PlanImpl plan = person.getPlans().get(i);
+			stream.print((i+1)+"\t");
+			
+			stream.print("HomeUmax / (1 + exp(1.2 * (HomeAlpha * x"+(i+1)+""+(1)+"))");
+						
+			for (int j=0;j<plan.getPlanElements().size();j+=2){
+				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);
+				if (act.getType().toString().equals("h")) stream.print("+ HomeUmax / (1 + exp(1.2 * (HomeAlpha * x"+(i+1)+""+(j+1)+"))");
+				else if (act.getType().toString().equals("w")) stream.print("+ WorkUmax / (1 + exp(1.2 * (WorkAlpha * x"+(i+1)+""+(j+1)+"))");
+				else if (act.getType().toString().equals("e")) stream.print("+ EducationUmax / (1 + exp(1.2 * (EducationAlpha * x"+(i+1)+""+(j+1)+"))");
+				else if (act.getType().toString().equals("s")) stream.print("+ ShoppingUmax / (1 + exp(1.2 * (ShoppingAlpha * x"+(i+1)+""+(j+1)+"))");
+				else if (act.getType().toString().equals("l")) stream.print("+ LeisureUmax / (1 + exp(1.2 * (LeisureAlpha * x"+(i+1)+""+(j+1)+"))");
+				else log.warn("Act has no valid type! Person: "+person);
 			}
 			stream.println();
 		}
-		stream.close();*/
+		stream.println();
+		
+		//Model
+		stream.println("[Model]");
+		stream.println("// Currently, only $MNL (multinomial logit), $NL (nested logit), $CNL\n//(cross-nested logit) and $NGEV (Network GEV model) are valid keywords.");
+		stream.println("$MNL");
+		stream.println();
+		
+		stream.close();
 	}
 	
 	
 
 	public static void main(final String [] args) {
-//		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-//		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-//		final String populationFilename = "/home/baug/mfeil/data/mz/plans.xml";
-		final String populationFilename = "./plans/output_plans.xml.gz";
+		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
+		final String populationFilename = "/home/baug/mfeil/data/mz/output_plans.xml";
+/*		final String populationFilename = "./plans/output_plans.xml.gz";
 		final String networkFilename = "./plans/network.xml";
 		final String facilitiesFilename = "./plans/facilities.xml.gz";
-
-//		final String outputDir = "/home/baug/mfeil/data/Zurich10";
-		final String outputFile = "./plans/model.mod";
+*/
+		final String outputFile = "/home/baug/mfeil/data/mz/model.mod";
+//		final String outputFile = "./plans/model.mod";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -172,7 +177,7 @@ public class ModFileMaker {
 
 		ModFileMaker sp = new ModFileMaker(scenario.getPopulation());
 		sp.write(outputFile);
-		log.info("Analysis of plan finished.");
+		log.info("Model finished.");
 	}
 
 }
