@@ -39,4 +39,6 @@ public interface BasicPerson<T extends BasicPlan> extends Identifiable, Serializ
 	 */
 	public boolean addPlan(final T p);
 
+	public T getSelectedPlan();
+
 }
