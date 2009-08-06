@@ -38,6 +38,7 @@ import java.util.Set;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PopulationImpl;
@@ -65,6 +66,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private static final long serialVersionUID = -4012748585344947013L;
 
+	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
+	
 	static class QuadStorage {
 		public String id;
 		public OTFServerQuad quad;
@@ -168,9 +171,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			// Bind this object instance to the name ReadableName
 			registry.bind(ReadableName, result);
 
-			System.out.println("OTFServer bound in registry");
+			log.info("OTFServer bound in RMI registry");
 		} catch (Exception e) {
-			System.out.println("OTFServer err: " + e.getMessage());
+			log.error("OTFServer err: " + e.getMessage());
 			e.printStackTrace();
 		}
 		return 	result;
@@ -229,7 +232,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public int updateStatus(double time) {
 		localTime = (int)time;
 
-		if (updateThis.size() != 0 || queryThis.size() != 0 ) {
+		if ((updateThis.size() != 0) || (queryThis.size() != 0) ) {
 			synchronized (updateFinished) {
 				updateOut(time);
 				updateFinished.notifyAll();
