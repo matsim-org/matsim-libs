@@ -25,10 +25,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree.Rect;
 
 import playground.jjoubert.Utilities.MyActivityReader;
 
@@ -36,6 +38,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class CheckPersonCluster01 {
 
@@ -58,6 +61,8 @@ public class CheckPersonCluster01 {
 //		ArrayList<Point> pointsToCluster = readRawDataToArrayList(inputFilename);
 		QuadTree<Point> qt1 = readRawDataToQuadTree(inputFilename);
 //		log.info(qt1.hashCode() + "|" + qt1.size() + "|" + qt1.values().size());
+		
+		
 		QuadTree<Point> qt2 = new QuadTree<Point>(qt1.getMinEasting(),
 												  qt1.getMinNorthing(),
 												  qt1.getMaxEasting(),
@@ -69,6 +74,17 @@ public class CheckPersonCluster01 {
 		 * counter is 54067 objects of type Point. 
 		 */
 		log.info("qt1.size() before: " + qt1.size() + "|" + qt1.values().size());
+
+		/*
+		 * To test my logic, I've collected all the points in a rectangle. The 
+		 * rectangle is exactly one unit WIDER than the extent of the QuadTree.
+		 * If I don't include this 1-unit buffer, I receive 54065 points, instead 
+		 * of the right number: 54067.
+		 */
+		Rect r = new Rect(qt1.getMinEasting()-1,qt1.getMinNorthing()-1,qt1.getMaxEasting()+1,qt1.getMaxNorthing()+1);
+		Collection<Point> allThePoints = new ArrayList<Point>();
+		qt1.get(r, allThePoints);
+		log.info("Number of points collected with rectangle: " + allThePoints.size());
 
 		int count = 0;
 		for (Point p : qt1.values()){
