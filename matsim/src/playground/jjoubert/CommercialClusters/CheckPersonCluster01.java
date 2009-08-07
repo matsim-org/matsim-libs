@@ -57,13 +57,33 @@ public class CheckPersonCluster01 {
 //		ArrayList<Point> pointsToCluster = readActivityStatistics(inputFilename);
 //		ArrayList<Point> pointsToCluster = readRawDataToArrayList(inputFilename);
 		QuadTree<Point> qt1 = readRawDataToQuadTree(inputFilename);
+//		log.info(qt1.hashCode() + "|" + qt1.size() + "|" + qt1.values().size());
 		QuadTree<Point> qt2 = new QuadTree<Point>(qt1.getMinEasting(),
 												  qt1.getMinNorthing(),
 												  qt1.getMaxEasting(),
 												  qt1.getMaxNorthing());
+		/*
+		 * Marcel, problem HERE!!
+		 * 
+		 * I want to 'duplicate', or copy, the QuadTree qt1. Before I start, the
+		 * counter is 54067 objects of type Point. 
+		 */
+		log.info("qt1.size() before: " + qt1.size() + "|" + qt1.values().size());
+
+		int count = 0;
 		for (Point p : qt1.values()){
+			/*
+			 * Here, as a check, I've added a counter to see how many points are
+			 * considered by the iterator.
+			 */
+			count++;
 			qt2.put(p.getX(), p.getY(), p);
 		}
+		/*
+		 * Only 35090 objects of type Point appear in qt2.
+		 */
+		log.info("Counter after: " + count);
+		log.info(qt2.hashCode() + "|" + qt2.size() + "|" + qt2.values().size());
 		log.info("Points in qt1: " + String.valueOf(qt1.values().size()));
 		log.info("Points in qt2: " + String.valueOf(qt2.values().size()));
 		
@@ -198,10 +218,10 @@ public class CheckPersonCluster01 {
 	}
 	
 	private static QuadTree<Point> readRawDataToQuadTree(String filename){
-		double xMin = Double.MAX_VALUE;
-		double yMin = Double.MAX_VALUE;
-		double xMax = Double.MIN_VALUE;
-		double yMax = Double.MIN_VALUE;
+		double xMin = Double.POSITIVE_INFINITY;
+		double yMin = Double.POSITIVE_INFINITY;
+		double xMax = Double.NEGATIVE_INFINITY;
+		double yMax = Double.NEGATIVE_INFINITY;
 
 		ArrayList<Point> al = readRawDataToArrayList(filename);
 		for(Point p : al){
