@@ -78,14 +78,15 @@ public class PlansConstructor implements PlanStrategyModule{
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
+	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
 		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
-	/*	this.inputFile = "./plans/input_plans2.xml";	
+	*/	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
-	*/	this.population = new PopulationImpl();
+		this.outputFileMod = "./plans/model.mod";
+		this.population = new PopulationImpl();
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
@@ -156,7 +157,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-51,0))){
+			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-100,0))){ //51
 //			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-2,0))){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
@@ -269,6 +270,16 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
 				if (plan.equals(person.getSelectedPlan())) continue;
+				System.out.println("origPlan");
+				for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i+=2){
+					System.out.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getType()+" ");
+				}
+				System.out.println();
+				System.out.println("comparePlan");
+				for (int i=0;i<plan.getPlanElements().size();i+=2){
+					System.out.print(((ActivityImpl)(plan.getPlanElements().get(i))).getType()+" ");
+				}
+				System.out.println();
 				sim.run(person.getSelectedPlan(), plan);
 			}
 		}

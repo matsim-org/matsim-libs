@@ -142,7 +142,7 @@ public class ModFileMaker {
 			
 			stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+1+" ) ) )");
 						
-			for (int j=2;j<plan.getPlanElements().size();j+=2){
+			for (int j=2;j<plan.getPlanElements().size()-1;j+=2){
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);
 				if (act.getType().toString().equals("h")) stream.print(" + HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else if (act.getType().toString().equals("w")) stream.print(" + WorkUmax * one / ( one + exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
