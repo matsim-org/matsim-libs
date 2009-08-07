@@ -156,7 +156,7 @@ public class LeaveLinkReplanner {
 		 * and still have a correct SubRoute. In normal usage we don't need
 		 * this because the SubRoute is created new anyway.
 		 */
-		subRoute.setNodes(this.vehicle.getCurrentLink(), route.getNodes().subList(currentNodeIndex - 1, route.getNodes().size()), route.getEndLink());
+		//subRoute.setNodes(this.vehicle.getCurrentLink(), route.getNodes().subList(currentNodeIndex - 1, route.getNodes().size()), route.getEndLink());
 		
 		// put the new route in a new leg
 		LegImpl newLeg = new LegImpl(leg.getMode());

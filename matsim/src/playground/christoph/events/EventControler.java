@@ -235,15 +235,16 @@ public class EventControler extends Controler{
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 	
-		travelTimeWrapper.checkNodeKnowledge(true);
-		travelCostWrapper.checkNodeKnowledge(true);
-		travelTimeWrapper.useLookupTable(false);
-		travelCostWrapper.useLookupTable(false);
+		travelTimeWrapper.checkNodeKnowledge(false);
+		travelCostWrapper.checkNodeKnowledge(false);
+		travelTimeWrapper.useLookupTable(true);
+		travelCostWrapper.useLookupTable(true);
 		
 		// Don't use Knowledge for CostCalculations
 		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper);
 */
+		
 		// Don't use Wrappers with LookupTables
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);

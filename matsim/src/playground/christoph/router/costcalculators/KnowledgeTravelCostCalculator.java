@@ -40,6 +40,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	protected TravelTime timeCalculator;
 	protected double travelCostFactor;
 	protected double marginalUtlOfDistance;
+	protected boolean checkNodeKnowledge = true;
 	
 	protected KnowledgeTools knowledgeTools;
 //	protected SubNetworkTools subNetworkTools;
@@ -60,17 +61,21 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	
 	public double getLinkTravelCost(final Link link, final double time) 
 	{	
-/*
-		// try getting NodeKnowledge from the Persons Knowledge
-		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
-		
-		// if the Person doesn't know the link -> return max costs 
-		if (!nodeKnowledge.knowsLink((LinkImpl)link))
+
+		if (checkNodeKnowledge)
 		{
-//			log.info("Link is not part of the Persons knowledge!");
-			return Double.MAX_VALUE;
+			// try getting NodeKnowledge from the Persons Knowledge
+			NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
+			
+			// if the Person doesn't know the link -> return max costs 
+			if (!nodeKnowledge.knowsLink((LinkImpl)link))
+			{
+//				log.info("Link is not part of the Persons knowledge!");
+				return Double.MAX_VALUE;
+			}
+			
 		}
-*/		
+		
 		// Person knows the link, so calculate it's costs
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 	
@@ -79,6 +84,11 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 			return travelTime * this.travelCostFactor;
 		}
 		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
+	}
+	
+	public void checkNodeKnowledge(boolean value)
+	{
+		this.checkNodeKnowledge = value;
 	}
 	
 	@Override
@@ -99,6 +109,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(timeCalculatorClone);
 		clone.marginalUtlOfDistance = this.marginalUtlOfDistance;
 		clone.travelCostFactor = this.travelCostFactor;
+		clone.checkNodeKnowledge = this.checkNodeKnowledge;
 		
 		return clone;
 	}

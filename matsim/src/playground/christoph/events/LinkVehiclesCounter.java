@@ -20,6 +20,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -58,23 +59,36 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	// Map<Id, Integer> transitVehicleStopQueueMap; // maybe later...
 	Map<Id, Integer> bufferMap;
 
-	// List of Links where the number of Cars has changed (and maybe changed back again...)
+	/*
+	 *  List of Links where the number of driving Cars has changed in the 
+	 *  current TimeStep (and maybe changed back again...)
+	 *  Is used internally and changed during a SimStep
+	 */
 	Map<Id, Integer> countChangedMap; // LinkId, CarCount driving on the Link
 	
-	Map<Id, Integer> previousCountsMap; // Counts from the previous TimeStep
-
-	int lostVehicles = 0;
+	/*
+	 * List of Links where the Number of driving has changed in the last 
+	 * TimeStep. It can for example be used by Replanners between two SimSteps
+	 * to check for which Links they have to recalculate the TravelTimes and
+	 * TravelCosts.
+	 */
+	Map<Id, Integer> countChangedInTimeStepMap; // Counts from the previous TimeStep
+	
+	Map<Id, Integer> countLastTimeStepMap; // Counts from the previous TimeStep
+	
+	int lostVehicles;
 	int initialVehicleCount;
 
-	public void setQueueNetwork(QueueNetwork queueNetwork) {
+	public void setQueueNetwork(QueueNetwork queueNetwork)
+	{
 		this.queueNetwork = queueNetwork;
 
 		// Doing this will create the Maps and fill them with "0" Entries.
-		createInitialCounts();
+//		createInitialCounts();
 	}
 
 	private void createInitialCounts() {
-
+log.info("creating initial counts");
 		// initialize the Data Structures
 		parkingMap = new HashMap<Id, Integer>();
 		waitingMap = new HashMap<Id, Integer>();
@@ -82,8 +96,12 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		bufferMap = new HashMap<Id, Integer>();
 
 		countChangedMap = new HashMap<Id, Integer>();
-		previousCountsMap = new HashMap<Id, Integer>();
-
+		countChangedInTimeStepMap = new HashMap<Id, Integer>();
+		countLastTimeStepMap = new HashMap<Id, Integer>();
+		
+		initialVehicleCount = 0;
+		lostVehicles = 0;
+		
 		// collect the Counts
 		for (QueueLink queueLink : queueNetwork.getLinks().values()) {
 			int vehCount = queueLink.getAllVehicles().size();
@@ -98,6 +116,9 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 
 			// initially every LinkCount has changed
 			countChangedMap.put(id, 0);
+			
+			// same value in the TimeStep before
+			countLastTimeStepMap.put(id, 0);
 		}
 	}
 
@@ -111,7 +132,11 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		vehCount++;
 		vehQueueMap.put(id, vehCount);
 
-		countChangedMap.put(id, vehCount);
+		int count;
+		if (countChangedMap.containsKey(id)) count = countChangedMap.get(id);
+		else count = countLastTimeStepMap.get(id);
+		
+		countChangedMap.put(id, count + 1);
 	}
 
 	public void handleEvent(BasicLinkLeaveEvent event) {
@@ -124,7 +149,11 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		vehCount--;
 		bufferMap.put(id, vehCount);
 
-		countChangedMap.put(id, vehCount);
+		int count;
+		if (countChangedMap.containsKey(id)) count = countChangedMap.get(id);
+		else count = countLastTimeStepMap.get(id);
+		
+		countChangedMap.put(id, count - 1);
 	}
 
 	public void handleEvent(BasicAgentArrivalEvent event) {
@@ -141,7 +170,11 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		vehCount++;
 		parkingMap.put(id, vehCount);
 
-		countChangedMap.put(id, vehCount);
+		int count;
+		if (countChangedMap.containsKey(id)) count = countChangedMap.get(id);
+		else count = countLastTimeStepMap.get(id);
+		
+		countChangedMap.put(id, count - 1);
 	}
 
 	/*
@@ -170,7 +203,11 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 			vehCount++;
 			waitingMap.put(id, vehCount);
 
-			countChangedMap.put(id, vehCount);
+			int count;
+			if (countChangedMap.containsKey(id)) count = countChangedMap.get(id);
+			else count = countLastTimeStepMap.get(id);
+			
+			countChangedMap.put(id, count + 1);
 			
 			/*
 			 * The QueueSimulation additionally checks "&& agent.chooseNextLink() == null"
@@ -220,9 +257,17 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 
 		lostVehicles++;
 
-		event.getLinkId();
-
-		// where to remove it?
+		// Nothing else to do here - if a Vehicles is stucked, it is removed
+		// and a LeaveLinkEvent is created!
+		
+//		Id id = event.getLinkId();
+//		
+//		int count;
+//		if (countChangedMap.containsKey(id)) count = countChangedMap.get(id);
+//		else count = countLastTimeStepMap.get(id);
+//		
+//		// where to remove it?
+//		countChangedMap.put(id, count - 1);
 	}
 
 	/*
@@ -332,11 +377,14 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		for (Iterator<Id> iterator = countChangedMap.keySet().iterator(); iterator.hasNext();)
 		{
 			Id id = iterator.next();
-			if (countChangedMap.get(id) == previousCountsMap.get(id)) iterator.remove();
+			// Same Count as in the last SimStep? -> remove it from "has changed" List
+			if (countChangedMap.get(id) == countLastTimeStepMap.get(id)) iterator.remove();
 		}
-		previousCountsMap.clear();
-		previousCountsMap.putAll(countChangedMap);
+		countChangedInTimeStepMap.clear();
+		countChangedInTimeStepMap.putAll(countChangedMap);
 
+		countLastTimeStepMap.putAll(countChangedMap);
+		
 		countChangedMap.clear();
 	}
 
@@ -344,7 +392,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * We assume that the Simulation uses MyLinkImpl instead of LinkImpl, so
 	 * we don't check this for every Link...
 	 */
-	private void setLinkVehicleCounts()
+	private void updateLinkVehicleCounts()
 	{
 		Map<Id, Integer> links2Update = getChangedLinkVehiclesCounts();
 		
@@ -359,23 +407,33 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
         {
             Id id = entry.getKey();
             Integer vehiclesCount = entry.getValue();
-            
+         
             // Assumption...
             MyLinkImpl link = (MyLinkImpl)this.queueNetwork.getNetworkLayer().getLink(id);
             
             link.setVehiclesCount(vehiclesCount);
-        }        
+        }
+        
+        for (Link link : this.queueNetwork.getNetworkLayer().getLinks().values())
+        {
+        	if (this.getLinkDrivingVehiclesCount(link.getId()) != ((MyLinkImpl)link).getVehiclesCount())
+        	{
+        		double v1 = this.getLinkDrivingVehiclesCount(link.getId());
+        		double v2 = ((MyLinkImpl)link).getVehiclesCount();
+        		log.error("Vehicles Count does not match! " + link.getId().toString() + " " + v1 + " " + v2);
+        	}
+        }
 	}
 	
 	/*
 	 * Returns a Map<LinkId, driving Vehicles on the Link>. The Map contains
-	 * only those Links, where the number of Vehicles has changed within in the
-	 * current TimeStep of the QueueSimulation. If all Links are needed, create 
-	 * Method like getLinkVehicleCounts().
+	 * only those Links, where the number of driving Vehicles has changed within 
+	 * in the current TimeStep of the QueueSimulation. If all Links are needed, 
+	 * create Method like getLinkVehicleCounts().
 	 */
 	public Map<Id, Integer> getChangedLinkVehiclesCounts()
 	{
-		return previousCountsMap;
+		return countChangedInTimeStepMap;
 	}
 
 	/*
@@ -398,16 +456,19 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		if (((int)e.getSimulationTime()) % 3600 == 0) checkVehicleCount(e);
 		
 		filterChangedLinks();
-		setLinkVehicleCounts();
+		updateLinkVehicleCounts();
 	}
 
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
+	public void notifySimulationInitialized(QueueSimulationInitializedEvent e)
+	{	
 		createInitialCounts();
-		setLinkVehicleCounts();
+		filterChangedLinks();
+		updateLinkVehicleCounts();
 	}
 
-	public void reset(int iteration) {
+	public void reset(int iteration)
+	{
 		createInitialCounts();
-		setLinkVehicleCounts();
+		updateLinkVehicleCounts();
 	}
 }

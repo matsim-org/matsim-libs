@@ -226,7 +226,7 @@ public class ActEndReplanner {
 		
 		// By doing the replanning the "betweenLeg" is replanned, so the changes are
 		// included in the previously selected plan, too!
-//		replanner.run(newPlan);
+		replanner.run(newPlan);
 		
 		// reactivate previously selected, replanned plan
 		person.setSelectedPlan(currentPlan);
