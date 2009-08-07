@@ -30,6 +30,8 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.jjoubert.Utilities.MyActivityReader;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -50,13 +52,24 @@ public class CheckPersonCluster01 {
 		
 		log.info("Reading activity statistics file");
 		String root = "/Users/johanwjoubert/Desktop/Temp/Schuessler/";
-		String inputFilename = root + "ActivityStatistics.txt";
-//		String inputFilename = root + "Raw/ID" + person + ".RAW";
-		ArrayList<Point> pointsToCluster = readActivityStatistics(inputFilename);
-//		ArrayList<Point> pointsToCluster = readRawData(inputFilename);
+//		String inputFilename = root + "ActivityStatistics.txt";
+		String inputFilename = root + "Raw/ID" + person + ".RAW";
+//		ArrayList<Point> pointsToCluster = readActivityStatistics(inputFilename);
+//		ArrayList<Point> pointsToCluster = readRawDataToArrayList(inputFilename);
+		QuadTree<Point> qt1 = readRawDataToQuadTree(inputFilename);
+		QuadTree<Point> qt2 = new QuadTree<Point>(qt1.getMinEasting(),
+												  qt1.getMinNorthing(),
+												  qt1.getMaxEasting(),
+												  qt1.getMaxNorthing());
+		for (Point p : qt1.values()){
+			qt2.put(p.getX(), p.getY(), p);
+		}
+		log.info("Points in qt1: " + String.valueOf(qt1.values().size()));
+		log.info("Points in qt2: " + String.valueOf(qt2.values().size()));
 		
-		DJCluster djc = new DJCluster(clusterRadius, clusterMinimumPoints, pointsToCluster);
-		djc.clusterInput();
+		
+//		DJCluster djc = new DJCluster(clusterRadius, clusterMinimumPoints, pointsToCluster);
+//		djc.clusterInput();
 		
 		log.info("Visualising clusters.");
 
@@ -67,7 +80,7 @@ public class CheckPersonCluster01 {
 //		String pointFilename = root + "Person" + person + "Point_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
 //		String lineFilename = root + "Person" + person + "Line_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
 //		String clusterFilename = root + "Person" + person + "Cluster_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-		djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, null);		
+//		djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, null);		
 		log.info("Completed");
 	}
 	
@@ -142,13 +155,9 @@ public class CheckPersonCluster01 {
 		}
 	}
 	
-	private static ArrayList<Point> readRawData(String filename){
+	private static ArrayList<Point> readRawDataToArrayList(String filename){
 		GeometryFactory gf = new GeometryFactory();
 		ArrayList<Point> al = new ArrayList<Point>();
-		double xMin = Double.MAX_VALUE;
-		double yMin = Double.MAX_VALUE;
-		double xMax = Double.MIN_VALUE;
-		double yMax = Double.MIN_VALUE;
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File(filename))));
 			
@@ -165,10 +174,6 @@ public class CheckPersonCluster01 {
 				String [] line = input.nextLine().split(",");
 				if(line.length == 6){
 					Point p = gf.createPoint(new Coordinate(Double.parseDouble(line[1]), Double.parseDouble(line[2])));
-					xMin = Math.min(xMin, p.getX());
-					yMin = Math.min(yMin, p.getY());
-					xMax = Math.max(xMax, p.getX());
-					yMax = Math.max(yMax, p.getY());
 					al.add(p);
 					if(p == null){
 						log.warn("   Creating a 'null' Point!!");
@@ -184,36 +189,6 @@ public class CheckPersonCluster01 {
 			}
 			log.info("   Lines processed: " + String.valueOf(lineCounter) + " (Done)");
 			log.info("Completed processing input file (" + String.valueOf(al.size()) + " points)");
-			
-			log.info("Building QuadTree from points.");
-			int qtCounter = 0;
-			int qtMultiplier = 1;
-			QuadTree<Point> qt = new QuadTree<Point>(xMin, yMin, xMax, yMax);
-			for (Point point : al) {
-				if(point.getX() == 707383 && point.getY() == 236496){
-					log.info("Found the point!!");
-				}
-				boolean added = qt.put(point.getX(), point.getY(), point);
-				if(point == null){
-					log.warn("   Adding a 'null' Point to the QuadTree!!");
-				}
-				if(added){
-					qtCounter++;
-				}
-				// Report progress
-				if(qtCounter == qtMultiplier){
-					qtMultiplier *= 2;
-					log.info("   Points added: " + String.valueOf(qtCounter));
-				}
-			}
-			log.info("   Points added: " + String.valueOf(qtCounter) + " (Done)");
-			int nullCounter = 0;
-			for (Point point : qt.values()) {
-				if(point == null){
-					nullCounter++;
-				}
-			}
-			log.info("Points in QuadTree: " + String.valueOf(qt.size()) + ", of which " + String.valueOf(nullCounter) + " are null.");
 			return al;
 			
 		} catch (FileNotFoundException e) {
@@ -221,4 +196,52 @@ public class CheckPersonCluster01 {
 			return null;
 		}
 	}
+	
+	private static QuadTree<Point> readRawDataToQuadTree(String filename){
+		double xMin = Double.MAX_VALUE;
+		double yMin = Double.MAX_VALUE;
+		double xMax = Double.MIN_VALUE;
+		double yMax = Double.MIN_VALUE;
+
+		ArrayList<Point> al = readRawDataToArrayList(filename);
+		for(Point p : al){
+			xMin = Math.min(xMin, p.getX());
+			yMin = Math.min(yMin, p.getY());
+			xMax = Math.max(xMax, p.getX());
+			yMax = Math.max(yMax, p.getY());			
+		}
+
+		log.info("Building QuadTree from points.");
+		int qtCounter = 0;
+		int qtMultiplier = 1;
+		QuadTree<Point> qt = new QuadTree<Point>(xMin, yMin, xMax, yMax);
+		for (Point point : al) {
+			if(point.getX() == 707383 && point.getY() == 236496){
+				log.info("Found the point!!");
+			}
+			boolean added = qt.put(point.getX(), point.getY(), point);
+			if(point == null){
+				log.warn("   Adding a 'null' Point to the QuadTree!!");
+			}
+			if(added){
+				qtCounter++;
+			}
+			// Report progress
+			if(qtCounter == qtMultiplier){
+				qtMultiplier *= 2;
+				log.info("   Points added: " + String.valueOf(qtCounter));
+			}
+		}
+		log.info("   Points added: " + String.valueOf(qtCounter) + " (Done)");
+		int nullCounter = 0;
+		for (Point point : qt.values()) {
+			if(point == null){
+				nullCounter++;
+			}
+		}
+		log.info("Points in input ArrayList: " + String.valueOf(al.size()));
+		log.info("Points in output QuadTree: " + String.valueOf(qt.size()));
+		return qt;
+	}
+
 }

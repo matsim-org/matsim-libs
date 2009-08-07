@@ -76,6 +76,10 @@ public class Cluster implements Comparable<Cluster>{
 		return clusterId;
 	}
 	
+	public void setClusterId(String id){
+		this.clusterId = id;
+	}
+	
 	public ArrayList<ClusterPoint> getPoints() {
 		return points;
 	}

@@ -73,7 +73,8 @@ public class DJCluster {
 	 * 			are searched.
 	 * @param minimumPoints the minimum number of points considered to constitute an
 	 * 			independent cluster.
-	 * @param pointsToCluster the <code>QuadTree</code> of <code>Point</code>s that were generated
+	 * @param pointsToCluster the <code>ArrayList</code> of <code>Point</code>s. In the 
+	 * 			case of commercial activities in South Africa, these points were generated
 	 * 			from the activity locations file. 
 	 */
 	public DJCluster(float radius, int minimumPoints, ArrayList<Point> pointsToCluster){
@@ -198,19 +199,13 @@ public class DJCluster {
 		log.info("Sum should add up: " + String.valueOf(cPointCounter) + " (clustered) + " 
 									   + String.valueOf(uPointCounter) + " (unclustered) = "
 									   + String.valueOf(pointCounter));
-		
-		// Clean the cluster list of all empty clusters.
-//		log.info("Start cleaning the cluster list.");
-//		ArrayList<Cluster> cleanClusters = new ArrayList<Cluster>(clusterList.size());
-//		for (Cluster c : clusterList) {
-//			if(c.getPoints().size() >= minimumPoints){
-//				cleanClusters.add(c);
-//			}
-//		}
-//		clusterList = cleanClusters;
-//		log.info("Cluster list cleaned.");
-		
-		// Build the cluster list.
+				
+		/* 
+		 * Build the cluster list. Once built, I rename the clusterId field so as to
+		 * start at '1', and increment accordingly. This allows me to directly use
+		 * the clusterId field as 'row' and 'column' reference in the 2D matrices
+		 * when determining adjacency in Social Network Analysis.
+		 */
 		log.info("Building the cluster list.");
 		Map<Cluster, ArrayList<ClusterPoint>> clusterMap = new TreeMap<Cluster, ArrayList<ClusterPoint>>();
 		for (ClusterPoint cp : ul) {
@@ -223,9 +218,13 @@ public class DJCluster {
 				clusterMap.get(theCluster).add(cp);
 			}
 		}
+		int clusterNumber = 1;
 		for (Cluster cluster : clusterMap.keySet()) {
 			ArrayList<ClusterPoint> listOfClusterPoints = clusterMap.get(cluster);
 			if(listOfClusterPoints.size() > minimumPoints){
+				cluster.setClusterId(String.valueOf(clusterNumber));
+				clusterNumber++;
+				cluster.setCenterOfGravity();
 				clusterList.add(cluster);
 			}
 		}

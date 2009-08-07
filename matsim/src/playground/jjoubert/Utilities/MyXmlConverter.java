@@ -27,11 +27,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
+import playground.jjoubert.CommercialClusters.ClusterActivities;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class MyXmlConverter {
 	private XStream xstream = null;
+	private final static Logger log = Logger.getLogger(MyXmlConverter.class);
 	
 	public MyXmlConverter(){
 		this.xstream = new XStream(new DomDriver());
@@ -51,6 +56,7 @@ public class MyXmlConverter {
 	 * 		  written.
 	 */
 	public void writeObjectToFile(Object object, String fileString){
+		log.info("Writing " + object.getClass().getSimpleName() + " to XML: " + fileString);
 		String xmlString = convertObjectToXmlString(object);
 		try {
 			BufferedWriter xmlOutput = new BufferedWriter(new FileWriter(new File(fileString)));
@@ -62,6 +68,7 @@ public class MyXmlConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info("XML written.");
 	}
 	
 	private String convertFileToXmlString(String fileString){
@@ -84,8 +91,10 @@ public class MyXmlConverter {
 	}
 	
 	public Object readObjectFromFile(String fileString){
+		log.info("Reading object from XML: " + fileString);
 		Object result = null;
-		result = this.xstream.fromXML( convertFileToXmlString(fileString));		
+		result = this.xstream.fromXML( convertFileToXmlString(fileString));
+		log.info("Object read.");
 		return result;
 	}
 	
