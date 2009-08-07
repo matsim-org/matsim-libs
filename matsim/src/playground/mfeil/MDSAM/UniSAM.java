@@ -22,18 +22,67 @@ package playground.mfeil.MDSAM;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 
 /**
- * Java re-implementation of Joh's uni-dimensional sequence alignment method
- * 
  * @author Matthias Feil
  */
 public class UniSAM {
 
 	private static final Logger log = Logger.getLogger(UniSAM.class);
+	private final double GW; 
 	
-	public void run(PlanImpl origPlan, PlanImpl comparePlan){
+	public UniSAM (){
+		this.GW = 1.0;
+	}
+	
+	public double run(PlanImpl origPlan, PlanImpl comparePlan){
 		
+		// Initialize table (only for act types)
+		// Length is number of acts minus last home plus 0th position
+		double [][] table = new double [origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
+		
+		// Levenshtein distance
+		for (int i=0;i<table.length;i++){
+			for (int j=0;j<table[0].length;j++){
+				if (j==0){
+					// margin orig plan
+					table[i][j]= i * this.GW;
+				}
+				else {
+					//margin compare plan
+					if (i==0) table[i][j]= j * this.GW;
+					else table[i][j] = this.minPath(((ActivityImpl)(origPlan.getPlanElements().get((i-1)*2))).getType(), ((ActivityImpl)(comparePlan.getPlanElements().get((j-1)*2))).getType(), table, i, j);
+					
+				}
+			}
+		}		
+	/*	for (int i=0;i<table.length;i++){
+			for (int j=0;j<table[0].length;j++){
+				System.out.print(table[i][j]+" ");
+			}
+			System.out.println();
+		}*/
+		return table[table.length-1][table[0].length-1];
+	}
+	
+	private double minPath(Object orig, Object compare, double[][]table, int i, int j){
+		double del = table[i-1][j]+this.GW;
+		double ins = table[i][j-1]+this.GW;
+		double sub = Double.MAX_VALUE;
+		
+		// identity (position-sensitive)
+		if (orig.equals(compare)){
+			sub =  table[i-1][j-1] + this.GW/java.lang.Math.max(table.length-1, table[0].length-1)*java.lang.Math.abs(i-j);
+		}
+		// substitution
+		else {
+			sub = table[i-1][j-1] + 2 * this.GW;	
+		}
+		// return minimum of ins, del, sub
+		del = java.lang.Math.min(del, ins);		
+		return java.lang.Math.min(del, sub);
 	}
 }
