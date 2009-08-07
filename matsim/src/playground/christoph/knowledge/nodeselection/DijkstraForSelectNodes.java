@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -190,6 +191,47 @@ public class DijkstraForSelectNodes {
 	    }
 	}
 
+	// Search shortest Path for a List of Routes. Break if distances have been found.
+	public void executeRoute(NodeImpl start, List<NodeImpl> ends)
+	{	
+		DijkstraNode startNode = dijkstraNodeMap.get(start);
+		init(startNode);
+	        
+		List<DijkstraNode> endNodes = new ArrayList<DijkstraNode>(); 
+		
+		for (NodeImpl end : ends)
+		{
+			endNodes.add(dijkstraNodeMap.get(end));
+		}
+		
+	    // the current node
+	    DijkstraNode node;
+	        
+	    // extract the node with the shortest distance
+	    while ((node = unvisitedNodes.poll()) != null)
+	    {
+	    	// catch possible error
+	    	assert !isVisited(node);
+	                
+	        for (Iterator<DijkstraNode> iterator = endNodes.iterator(); iterator.hasNext();) 
+	        {
+				DijkstraNode endNode = (DijkstraNode) iterator.next();
+				
+				if (node.getNode().equals(endNode.getNode()))
+				{
+					iterator.remove();
+					break;
+				}
+			}
+	        // reached all destination nodes -> break
+	        if (endNodes.size() == 0) break;
+	        
+	        node.setVisited(true);
+	           
+	        relaxOutgoingNode(node);
+	    }
+	}
+	
 	// Search shortest Fowardpaths to all nodes within the network.
 	public void executeForwardNetwork(NodeImpl start)
 	{		

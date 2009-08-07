@@ -237,8 +237,8 @@ public class EventControler extends Controler{
 	
 		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
-		travelTimeWrapper.useLookupTable(true);
-		travelCostWrapper.useLookupTable(true);
+		travelTimeWrapper.useLookupTable(false);
+		travelCostWrapper.useLookupTable(false);
 		
 		// Don't use Knowledge for CostCalculations
 		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);

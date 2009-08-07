@@ -414,15 +414,15 @@ log.info("creating initial counts");
             link.setVehiclesCount(vehiclesCount);
         }
         
-        for (Link link : this.queueNetwork.getNetworkLayer().getLinks().values())
-        {
-        	if (this.getLinkDrivingVehiclesCount(link.getId()) != ((MyLinkImpl)link).getVehiclesCount())
-        	{
-        		double v1 = this.getLinkDrivingVehiclesCount(link.getId());
-        		double v2 = ((MyLinkImpl)link).getVehiclesCount();
-        		log.error("Vehicles Count does not match! " + link.getId().toString() + " " + v1 + " " + v2);
-        	}
-        }
+//        for (Link link : this.queueNetwork.getNetworkLayer().getLinks().values())
+//        {
+//        	if (this.getLinkDrivingVehiclesCount(link.getId()) != ((MyLinkImpl)link).getVehiclesCount())
+//        	{
+//        		double v1 = this.getLinkDrivingVehiclesCount(link.getId());
+//        		double v2 = ((MyLinkImpl)link).getVehiclesCount();
+//        		log.error("Vehicles Count does not match! " + link.getId().toString() + " " + v1 + " " + v2);
+//        	}
+//        }
 	}
 	
 	/*
