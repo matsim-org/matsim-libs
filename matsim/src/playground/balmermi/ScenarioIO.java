@@ -39,6 +39,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scenario.ScenarioLoader;
 
+import playground.balmermi.influenza.modules.PersonNoEducLessLeisure;
 import playground.balmermi.modules.PersonFacility2Link;
 
 public class ScenarioIO {
@@ -138,6 +139,23 @@ public class ScenarioIO {
 
 		System.out.println("writing population...");
 		new PopulationWriter(population,sl.getScenario().getKnowledges()).write();
+		System.out.println("done. (writing population)");
+
+		System.out.println("running algorithms...");
+		new PersonNoEducLessLeisure(0.33).run(population);
+		Gbl.printMemoryUsage();
+		router.prepareReplanning();
+		for (PersonImpl person : population.getPersons().values()) {
+			for (PlanImpl plan : person.getPlans()) {
+				router.handlePlan(plan);
+			}
+		}
+		router.finishReplanning();
+		Gbl.printMemoryUsage();
+		System.out.println("done. (running algorithms)");
+
+		System.out.println("writing population...");
+		new PopulationWriter(population,sl.getScenario().getKnowledges()).writeFile("./output_influenza_plans.xml.gz");
 		System.out.println("done. (writing population)");
 	}
 }
