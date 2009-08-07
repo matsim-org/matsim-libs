@@ -73,6 +73,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected final NetworkLayer network;
 	protected final PlansCalcRoute router;
 	protected final XY2Links linker;
+	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	
 	                      
@@ -112,7 +113,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.reducePersons();
 		this.linkRouteOrigPlans();
 		this.enlargePlansSet();
-		this.getSimilarityOfPlans();
+		this.sims = new SimilarityInitializer(this.population).getSimilarityOfPlans();
 		this.writePlans(this.outputFile);
 		this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writeModFile(this.outputFileMod);
@@ -262,15 +263,20 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done.");
 	}
-	
+	/*
 	private void getSimilarityOfPlans () {
 		UniSAM sim = new UniSAM ();
+		this.sims = new ArrayList<List<Double>>();
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
+			this.sims.add(new ArrayList<Double>());
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				if (plan.equals(person.getSelectedPlan())) continue;
-				System.out.println("origPlan");
+				if (plan.equals(person.getSelectedPlan())) {
+					this.sims.get(this.sims.size()-1).add(0.0);
+					continue;
+				}
+		/*		System.out.println("origPlan");
 				for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i+=2){
 					System.out.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getType()+" ");
 				}
@@ -280,10 +286,10 @@ public class PlansConstructor implements PlanStrategyModule{
 					System.out.print(((ActivityImpl)(plan.getPlanElements().get(i))).getType()+" ");
 				}
 				System.out.println();
-				sim.run(person.getSelectedPlan(), plan);
+				this.sims.get(this.sims.size()-1).add(sim.run(person.getSelectedPlan(), plan));
 			}
 		}
-	}
+	}*/
 	
 	protected void writePlans(String outputFile){
 		log.info("Writing plans...");
@@ -305,9 +311,11 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.print("Id\tChoice\t");
 		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
 		for (int i = 0;i<p.getPlans().size();i++){
-			for (int j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){
+			int j=0;
+			for (j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
 			}
+			stream.print("x"+(i+1)+""+(j+1)+"\t");
 		}
 		for (int i = 0;i<p.getPlans().size();i++){
 			stream.print("av"+(i+1)+"\t");
@@ -315,8 +323,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.println();
 		
 		// Filling plans
+		int counterOut = -1;
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
+			counterOut++;
 			stream.print(person.getId()+"\t");
 			int position = -1;
 			for (int i=0;i<person.getPlans().size();i++){
@@ -326,14 +336,17 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 			stream.print(position+"\t");
+			int counterIn = -1;
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
+				counterIn++;
 				if (plan.getPlanElements().size()==1) stream.print("24\t");
 				else stream.print((((ActivityImpl)(plan.getFirstActivity())).getEndTime()+86400-((ActivityImpl)(plan.getLastActivity())).getStartTime())/3600+"\t");
 				for (int i=1;i<plan.getPlanElements().size()-1;i++){
 					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
 					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()/3600+"\t");
 				}
+				stream.print(this.sims.get(counterOut).get(counterIn)+"\t");
 			}
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
@@ -347,7 +360,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	private void writeModFile(String outputFile){
-		new ModFileMaker (this.population).write(this.outputFileMod);
+		new ModFileMaker (this.population, this.sims).write(this.outputFileMod);
 	}
 		
 }

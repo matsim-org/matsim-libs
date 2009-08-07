@@ -24,11 +24,9 @@ import java.io.File;
 import org.matsim.api.basic.v01.TransportMode;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -48,13 +46,14 @@ import org.matsim.core.population.PopulationImpl;
 public class ModFileMaker {
 
 	protected final PopulationImpl population;
-	protected ArrayList<List<PlanElement>> activityChains;
+	protected final List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(ModFileMaker.class);
 	
 
 
-	public ModFileMaker(final PopulationImpl population) {
+	public ModFileMaker(final PopulationImpl population, final List<List<Double>> sims) {
 		this.population = population;
+		this.sims = sims;
 	}
 	
 	public void write (String outputFile){
@@ -99,7 +98,9 @@ public class ModFileMaker {
 		stream.println("Ucar \t-6  \t-50 \t30  \t0");
 		stream.println("Upt \t-6  \t-50 \t30  \t0");
 		stream.println("Uwalk \t-6  \t-50 \t30  \t0");
-		stream.println("Ubike \t-6  \t-50 \t30  \t0");		
+		stream.println("Ubike \t-6  \t-50 \t30  \t0");	
+		
+		stream.println("Sim \t0 \t-100 \100 \t0");
 		stream.println();
 	
 		//Utilities
@@ -129,6 +130,8 @@ public class ModFileMaker {
 			else {
 				stream.print("$NONE");
 			}
+			
+			stream.print(" + Sim * x"+(i+1)+""+plan.getPlanElements().size());
 			stream.println();
 		}		
 		stream.println();
@@ -188,8 +191,10 @@ public class ModFileMaker {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
+		
+		List<List<Double>> sims = new SimilarityInitializer(scenario.getPopulation()).getSimilarityOfPlans();
 
-		ModFileMaker sp = new ModFileMaker(scenario.getPopulation());
+		ModFileMaker sp = new ModFileMaker(scenario.getPopulation(), sims);
 		sp.write(outputFile);
 		log.info("Model finished.");
 	}
