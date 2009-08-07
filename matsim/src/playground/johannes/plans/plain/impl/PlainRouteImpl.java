@@ -22,30 +22,25 @@ package playground.johannes.plans.plain.impl;
 import java.util.Collections;
 import java.util.List;
 
-import playground.johannes.plans.ModCount;
+import org.matsim.api.basic.v01.Id;
+
 import playground.johannes.plans.plain.PlainRoute;
 
 /**
  * @author illenberger
  *
  */
-public class PlainRouteImpl implements PlainRoute, ModCount {
+public class PlainRouteImpl extends AbstractModifiable implements PlainRoute {
 
-	private List<String> linkIds;
+	private List<Id> linkIds;
 	
-	private long modCount = 0;
-	
-	public List<String> getLinkIds() {
+	public List<Id> getLinkIds() {
 		return linkIds;
 	}
 
-	public long getModCount() {
-		return modCount;
-	}
-
-	public void setLinkIds(List<String> linkIds) {
+	public void setLinkIds(List<Id> linkIds) {
 		this.linkIds = Collections.unmodifiableList(linkIds);
-		modCount++;
+		modified();
 	}
 
 }

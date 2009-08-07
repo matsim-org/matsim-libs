@@ -19,29 +19,26 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain.impl;
 
-import playground.johannes.plans.ModCount;
+import org.matsim.api.basic.v01.Id;
+
 import playground.johannes.plans.plain.PlainActivity;
 
 /**
  * @author illenberger
  *
  */
-public class PlainActivityImpl implements PlainActivity, ModCount {
+public class PlainActivityImpl extends PlainPlanElementImpl implements PlainActivity {
 
-	public String getLinkId() {
-		return "this is a link id";
+	private Id facilityId;
+
+	public Id getFacilityId() {
+		return facilityId;
 	}
 
-	public String getFacilityId() {
-		return "this is a facility id";
+	public void setFacilityId(Id id) {
+		facilityId = id;
+		modified();
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.ModCount#getModCount()
-	 */
-	public long getModCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 }

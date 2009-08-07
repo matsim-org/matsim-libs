@@ -21,13 +21,15 @@ package playground.johannes.plans.plain;
 
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
+
 /**
  * @author illenberger
  *
  */
 public interface PlainPopulation {
 
-	public Map<String, ? extends PlainPerson> getPersons();
+	public Map<Id, ? extends PlainPerson> getPersons();
 	
 	public void addPerson(PlainPerson person);
 	

@@ -19,12 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.plans.view.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import playground.johannes.plans.plain.impl.PlainActivityImpl;
+import playground.johannes.plans.plain.impl.PlainLegImpl;
+import playground.johannes.plans.plain.impl.PlainPlanElementImpl;
 import playground.johannes.plans.plain.impl.PlainPlanImpl;
-import playground.johannes.plans.view.Activity;
-import playground.johannes.plans.view.Leg;
 import playground.johannes.plans.view.Plan;
+import playground.johannes.plans.view.PlanElement;
 
 /**
  * @author illenberger
@@ -32,39 +37,50 @@ import playground.johannes.plans.view.Plan;
  */
 public class PlanView extends AbstractView<PlainPlanImpl> implements Plan {
 
+	private List<PlanElementView<?>> planElements = new ArrayList<PlanElementView<?>>();
+
+	private List<PlanElementView<?>> unmodifiabelElements;
 	
 	public PlanView(PlainPlanImpl rawPlan) {
 		super(rawPlan);
-//		delegate = new PlainPlanImpl<Activity, Leg>();
-//		for(PlainActivity rawAct : rawPlan.getActivities()) {
-//			Activity act = new ActivityImpl(rawAct);
-//			delegate.getActivities().add(act);
-//		}
-//		for(PlainLeg<?> rawLeg : rawPlan.getLegs()) {
-//			Leg leg = new LegImpl(rawLeg);
-//			delegate.getLegs().add(leg);
-//		}
-			
+		unmodifiabelElements = Collections.unmodifiableList(planElements);
 	}
 	
-	public List<Activity> getActivities() {
-//		return delegate.getActivities();
-		return null;
-	}
-
-	
-	public List<Leg> getLegs() {
-//		return delegate.getLegs();
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.view.impl.AbstractView#update()
-	 */
 	@Override
 	protected void update() {
-		// TODO Auto-generated method stub
+		Collection<? extends PlainPlanElementImpl> newElements = synchronizeCollections(delegate.getPlanElements(), planElements);
 		
+		for(PlainPlanElementImpl e : newElements) {
+			PlanElementView<?> view;
+			if(e instanceof PlainActivityImpl) {
+				view = new ActivityView((PlainActivityImpl)e);
+			} else {
+				view = new LegView((PlainLegImpl)e);
+			}
+			planElements.add(view);
+		}
+	}
+
+	public void addPlanElement(PlanElement element) {
+		delegate.addPlanElement(((PlanElementView<?>)element).getDelegate());
+		planElements.add((PlanElementView<?>) element);
+	}
+
+	public List<? extends PlanElement> getPlanElements() {
+		return unmodifiabelElements;
+	}
+
+	public Double getScore() {
+		return delegate.getScore();
+	}
+
+	public void removePlanElement(PlanElement element) {
+		delegate.removePlanElement(((PlanElementView<?>)element).getDelegate());
+		planElements.remove(element);
+	}
+
+	public void setScore(Double score) {
+		delegate.setScore(score);
 	}
 
 }

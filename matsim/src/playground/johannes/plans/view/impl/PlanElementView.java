@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Population.java
+ * PlanElementView.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view;
+package playground.johannes.plans.view.impl;
 
-import java.util.Map;
-
-import org.matsim.api.basic.v01.Id;
+import playground.johannes.plans.plain.impl.PlainPlanElementImpl;
+import playground.johannes.plans.view.PlanElement;
 
 /**
  * @author illenberger
  *
  */
-public interface Population {
-	
-	public Map<Id, ? extends Person> getPersons();
-	
-	public void addPerson(Person person);
-	
-	public void removePerson(Person person);
+public abstract class PlanElementView<T extends PlainPlanElementImpl> extends AbstractView<T> implements PlanElement {
+
+	protected PlanElementView(T delegate) {
+		super(delegate);
+	}
+
+	public double getEndTime() {
+		return delegate.getEndTime();
+	}
+
+	public void setEndTime(double time) {
+		delegate.setEndTime(time);
+	}
 
 }

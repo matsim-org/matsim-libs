@@ -19,15 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.plans.view;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import playground.johannes.plans.plain.PlainFacility;
 
 /**
  * @author illenberger
  *
  */
-public interface Facility extends PlainFacility {
+public interface Facility {
+	
+	public Id getId();
 
 	public Link getLink();
 }

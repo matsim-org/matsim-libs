@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Population.java
+ * PlanElement.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,20 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.plans.view;
 
-import java.util.Map;
-
-import org.matsim.api.basic.v01.Id;
-
 /**
  * @author illenberger
  *
  */
-public interface Population {
-	
-	public Map<Id, ? extends Person> getPersons();
-	
-	public void addPerson(Person person);
-	
-	public void removePerson(Person person);
+public interface PlanElement {
 
+	public double getEndTime();
+	
+	public void setEndTime(double time);
+	
 }

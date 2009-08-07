@@ -21,14 +21,16 @@ package playground.johannes.plans.plain;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
+
 /**
  * @author illenberger
  *
  */
 public interface PlainRoute {
 
-	public List<String> getLinkIds();
+	public List<Id> getLinkIds();
 	
-	public void setLinkIds(List<String> linkIds);
+	public void setLinkIds(List<Id> linkIds);
 	
 }

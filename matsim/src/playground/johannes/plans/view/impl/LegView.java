@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.plans.view.impl;
 
+import org.matsim.api.basic.v01.TransportMode;
+
 import playground.johannes.plans.plain.impl.PlainLegImpl;
 import playground.johannes.plans.view.Leg;
 import playground.johannes.plans.view.Route;
@@ -27,28 +29,35 @@ import playground.johannes.plans.view.Route;
  * @author illenberger
  *
  */
-public class LegView extends AbstractView<PlainLegImpl> implements Leg {
+public class LegView extends PlanElementView<PlainLegImpl> implements Leg {
 
+	private RouteView route;
+	
 	public LegView(PlainLegImpl rawLeg) {
 		super(rawLeg);
 	}
 	
 	public Route getRoute() {
-		return null;
-//		return delegate.getRoute();
+		synchronize();
+		return route;
 	}
 
 	public void setRoute(Route route) {
-//		delegate.setRoute(route);
+		delegate.setRoute(((RouteView)route).getDelegate());
+		this.route = (RouteView) route;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.view.impl.AbstractView#update()
-	 */
 	@Override
 	protected void update() {
-		// TODO Auto-generated method stub
-		
+		route = new RouteView(delegate.getRoute());
+	}
+
+	public TransportMode getMode() {
+		return delegate.getMode();
+	}
+
+	public void setMode(TransportMode mode) {
+		delegate.setMode(mode);
 	}
 
 }

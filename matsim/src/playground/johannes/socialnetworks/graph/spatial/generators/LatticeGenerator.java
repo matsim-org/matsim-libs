@@ -87,7 +87,7 @@ public class LatticeGenerator {
 //		terms[2] = attach;
 		
 		ergm.setErgmTerms(terms);
-		ergm.init(matrix);
+//		ergm.init(matrix);
 		/*
 		 * Setup gibbs sampler.
 		 */

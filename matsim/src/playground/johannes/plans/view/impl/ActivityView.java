@@ -21,7 +21,7 @@ package playground.johannes.plans.view.impl;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.basic.v01.Id;
 
 import playground.johannes.plans.plain.impl.PlainActivityImpl;
 import playground.johannes.plans.view.Activity;
@@ -31,39 +31,24 @@ import playground.johannes.plans.view.Facility;
  * @author illenberger
  *
  */
-public class ActivityView extends AbstractView<PlainActivityImpl> implements Activity {
+public class ActivityView extends PlanElementView<PlainActivityImpl> implements Activity {
 
-	private Map<String, Link> linkMapping;
-	
-	private Map<String, Facility> facilityMapping;
+	private Map<Id, Facility> facilityMapping;
 	
 	public ActivityView(PlainActivityImpl rawAct) {
 		super(rawAct);
 	}
-	
-	public Link getLink() {
-		return linkMapping.get(getLinkId());
-	}
-
-	public String getLinkId() {
-		return delegate.getLinkId();
-	}
 
 	public Facility getFacility() {
-		return facilityMapping.get(getFacilityId());
+		return facilityMapping.get(delegate.getFacilityId());
 	}
 
-	public String getFacilityId() {
-		return delegate.getFacilityId();
+	public void setFacility(Facility facility) {
+		delegate.setFacilityId(facility.getId());
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.view.impl.AbstractView#update()
-	 */
 	@Override
 	protected void update() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

@@ -20,9 +20,11 @@
 package playground.johannes.plans.view.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.johannes.plans.plain.impl.PlainRouteImpl;
@@ -32,58 +34,37 @@ import playground.johannes.plans.view.Route;
  * @author illenberger
  *
  */
-public class RouteImpl extends AbstractView<PlainRouteImpl> implements Route {
+public class RouteView extends AbstractView<PlainRouteImpl> implements Route {
 	
-
-	private Map<String, Link> linkMappings;
+	private Map<Id, Link> linkMappings;
 	
 	private List<Link> routeView;
 	
-	public RouteImpl(PlainRouteImpl delegate) {
+	public RouteView(PlainRouteImpl delegate) {
 		super(delegate);
 	}
 	
 	public List<Link> getLinks() {
-//		updateView();
+		synchronize();
 		return routeView;
 	}
 
-	public List<String> getLinkIds() {
-		return delegate.getLinkIds();
-	}
-	
-//	private void updateView() {
-//		if(lastModCount < delegate.getModCount()) {
-//			List<Link> newRoute = new ArrayList<Link>();
-//			
-//			for(String id : getLinkIds())
-//				newRoute.add(linkMappings.get(id));
-//			
-//			routeView = Collections.unmodifiableList(newRoute);
-//			
-//			lastModCount = delegate.getModCount();
-//		}
-//	}
-
-	public void setLinkIds(List<String> linkIds) {
-		delegate.setLinkIds(linkIds);	
-	}
-
 	public void setLinks(List<Link> links) {
-		List<String> ids = new ArrayList<String>(links.size());
+		List<Id> ids = new ArrayList<Id>(links.size());
 		for(int i = 0; i < links.size(); i++)
-			ids.add(links.get(i).getId().toString());
+			ids.add(links.get(i).getId());
 		
 		delegate.setLinkIds(ids);
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.view.impl.AbstractView#update()
-	 */
 	@Override
 	protected void update() {
-		// TODO Auto-generated method stub
-		
+		List<Id> ids = delegate.getLinkIds();
+		List<Link> links = new ArrayList<Link>(ids.size());
+		for(int i = 0; i < ids.size(); i++) {
+			links.add(linkMappings.get(ids.get(i)));
+		}
+		routeView = Collections.unmodifiableList(links);
 	}
 
 }

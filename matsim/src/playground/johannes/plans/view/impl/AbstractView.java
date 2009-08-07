@@ -37,7 +37,7 @@ public abstract class AbstractView <T extends ModCount> {
 	
 	protected AbstractView(T delegate) {
 		this.delegate = delegate;
-		delegateVersion = delegate.getModCount();
+		delegateVersion = delegate.getModCount() - 1;
 	}
 	
 	protected void synchronize() {

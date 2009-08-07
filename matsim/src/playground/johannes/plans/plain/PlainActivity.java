@@ -19,14 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain;
 
+import org.matsim.api.basic.v01.Id;
+
 /**
  * @author illenberger
  *
  */
-public interface PlainActivity {
+public interface PlainActivity extends PlainPlanElement {
 
-	public String getLinkId();
+	public Id getFacilityId();
 	
-	public String getFacilityId();
+	public void setFacilityId(Id id);
 	
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Population.java
+ * PlainPlanElementImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view;
+package playground.johannes.plans.plain.impl;
 
-import java.util.Map;
-
-import org.matsim.api.basic.v01.Id;
+import playground.johannes.plans.plain.PlainPlanElement;
 
 /**
  * @author illenberger
  *
  */
-public interface Population {
+public class PlainPlanElementImpl extends AbstractModifiable implements PlainPlanElement {
+
+	private double endTime;
 	
-	public Map<Id, ? extends Person> getPersons();
-	
-	public void addPerson(Person person);
-	
-	public void removePerson(Person person);
+	public double getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(double endTime) {
+		this.endTime = endTime;
+		modified();
+	}
 
 }

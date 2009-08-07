@@ -19,9 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.plans.view.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
+
 import playground.johannes.plans.plain.impl.PlainPersonImpl;
+import playground.johannes.plans.plain.impl.PlainPlanImpl;
 import playground.johannes.plans.view.Person;
 import playground.johannes.plans.view.Plan;
 
@@ -31,20 +37,42 @@ import playground.johannes.plans.view.Plan;
  */
 public class PersonView extends AbstractView<PlainPersonImpl> implements Person {
 	
-	private List<Plan> plans;
+	private List<PlanView> plans = new ArrayList<PlanView>();
+	
+	private List<? extends PlanView> unmodifiablePlans;
 	
 	public PersonView(PlainPersonImpl plainPerson) {
 		super(plainPerson);
+		unmodifiablePlans = Collections.unmodifiableList(plans);
 	}
 	
-	public List<Plan> getPlans() {
+	public List<? extends PlanView> getPlans() {
 		synchronize();
-		return plans;
+		return unmodifiablePlans;
 	}
 
 	@Override
 	protected void update() {
+		Collection<? extends PlainPlanImpl> newPlans = synchronizeCollections(delegate.getPlans(), plans);
 		
+		for(PlainPlanImpl p : newPlans) {
+			PlanView view = new PlanView(p);
+			plans.add(view);
+		}
+	}
+
+	public void addPlan(Plan plan) {
+		delegate.addPlan(((PlanView) plan).getDelegate());
+		plans.add((PlanView)plan);
+	}
+
+	public Id getId() {
+		return delegate.getId();
+	}
+
+	public void removePlan(Plan plan) {
+		delegate.removePlan(((PlanView)plan).getDelegate());
+		plans.remove(plan);
 	}
 
 }

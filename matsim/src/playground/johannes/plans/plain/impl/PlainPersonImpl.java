@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import playground.johannes.plans.ModCount;
+import org.matsim.api.basic.v01.Id;
+
 import playground.johannes.plans.plain.PlainPerson;
 import playground.johannes.plans.plain.PlainPlan;
 
@@ -29,20 +32,47 @@ import playground.johannes.plans.plain.PlainPlan;
  * @author illenberger
  *
  */
-public class PlainPersonImpl implements PlainPerson, ModCount {
+public class PlainPersonImpl extends AbstractModifiable implements PlainPerson {
 
-	private List<PlainPlan> plans;
+	private final Id id;
 	
-	public List<PlainPlan> getPlans() {
-		return plans;
+	private List<PlainPlanImpl> plans;
+	
+	private List<PlainPlanImpl> unmodifiablePlans;
+	
+	private PlainPlanImpl selectedPlan;
+	
+	public PlainPersonImpl(Id id) {
+		this.id = id;
+		plans = new ArrayList<PlainPlanImpl>();
+		unmodifiablePlans = Collections.unmodifiableList(plans);
+	}
+	
+	public List<? extends PlainPlanImpl> getPlans() {
+		return unmodifiablePlans;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.ModCount#getModCount()
-	 */
-	public long getModCount() {
-		// TODO Auto-generated method stub
-		return 0;
+	public void addPlan(PlainPlan plan) {
+		plans.add((PlainPlanImpl) plan);
+	}
+
+	public Id getId() {
+		return id;
+	}
+
+	public PlainPlan getSelectedPlan() {
+		return selectedPlan;
+	}
+
+	public void removePlan(PlainPlan plan) {
+		plans.remove(plan);
+	}
+
+	public void setSelectedPlan(PlainPlan plan) {
+		if(plans.contains(plan))
+			selectedPlan = (PlainPlanImpl) plan;
+		else
+			throw new IllegalArgumentException("Plan is not part of the person's plan list. Add the plan to the person before!");
 	}
 
 }

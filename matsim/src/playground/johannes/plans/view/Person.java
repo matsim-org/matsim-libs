@@ -21,12 +21,20 @@ package playground.johannes.plans.view;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
+
 /**
  * @author illenberger
  *
  */
 public interface Person {
 	
-	public List<Plan> getPlans();
+	public Id getId();
+	
+	public List<? extends Plan> getPlans();
+	
+	public void addPlan(Plan plan);
+	
+	public void removePlan(Plan plan);
 	
 }

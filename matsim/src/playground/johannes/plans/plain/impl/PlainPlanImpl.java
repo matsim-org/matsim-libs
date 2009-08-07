@@ -19,36 +19,51 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import playground.johannes.plans.ModCount;
-import playground.johannes.plans.plain.PlainActivity;
-import playground.johannes.plans.plain.PlainLeg;
 import playground.johannes.plans.plain.PlainPlan;
+import playground.johannes.plans.plain.PlainPlanElement;
 
 /**
  * @author illenberger
  *
  */
-public class PlainPlanImpl implements PlainPlan, ModCount {
+public class PlainPlanImpl extends AbstractModifiable implements PlainPlan {
 	
-	private List<PlainActivity> activities;
+	private List<PlainPlanElementImpl> elements;
 
-	public List<PlainActivity> getActivities() {
-		return activities;
+	private List<PlainPlanElementImpl> unmodifiableElements;
+	
+	private Double score;
+	
+	public PlainPlanImpl() {
+		elements = new ArrayList<PlainPlanElementImpl>();
+		unmodifiableElements = Collections.unmodifiableList(elements);
+	}
+	
+	public void addPlanElement(PlainPlanElement element) {
+		elements.add((PlainPlanElementImpl) element);
+		modified();
 	}
 
-	public List<PlainLeg> getLegs() {
-		return null;
+	public List<? extends PlainPlanElementImpl> getPlanElements() {
+		return unmodifiableElements;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.ModCount#getModCount()
-	 */
-	public long getModCount() {
-		// TODO Auto-generated method stub
-		return 0;
+	public Double getScore() {
+		return score;
 	}
 
+	public void removePlanElement(PlainPlanElement element) {
+		elements.remove(element);
+		modified();
+	}
+
+	public void setScore(Double score) {
+		this.score = score;
+		modified();
+	}
 
 }

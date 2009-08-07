@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain.impl;
 
-import playground.johannes.plans.ModCount;
+import org.matsim.api.basic.v01.TransportMode;
+
 import playground.johannes.plans.plain.PlainLeg;
 import playground.johannes.plans.plain.PlainRoute;
 
@@ -27,24 +28,28 @@ import playground.johannes.plans.plain.PlainRoute;
  * @author illenberger
  *
  */
-public class PlainLegImpl implements PlainLeg, ModCount {
+public class PlainLegImpl extends PlainPlanElementImpl implements PlainLeg{
 
-	private PlainRoute route;
+	private PlainRouteImpl route;
+
+	private TransportMode mode;
 	
-	public PlainRoute getRoute() {
+	public PlainRouteImpl getRoute() {
 		return route;
 	}
 
 	public void setRoute(PlainRoute route) {
-		this.route = route;
+		this.route = (PlainRouteImpl) route;
+		modified();
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.plans.ModCount#getModCount()
-	 */
-	public long getModCount() {
-		// TODO Auto-generated method stub
-		return 0;
+	public TransportMode getMode() {
+		return mode;
+	}
+
+	public void setMode(TransportMode mode) {
+		this.mode = mode;
+		modified();
 	}
 
 }

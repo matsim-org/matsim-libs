@@ -19,12 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.plans.view;
 
+import org.matsim.api.basic.v01.TransportMode;
+
 
 /**
  * @author illenberger
  *
  */
-public interface Leg {
+public interface Leg extends PlanElement {
+	
+	public TransportMode getMode();
+	
+	public void setMode(TransportMode mode);
 	
 	public Route getRoute();
 	

@@ -23,7 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import playground.johannes.plans.ModCount;
+import org.matsim.api.basic.v01.Id;
+
 import playground.johannes.plans.plain.PlainPerson;
 import playground.johannes.plans.plain.PlainPopulation;
 
@@ -31,34 +32,28 @@ import playground.johannes.plans.plain.PlainPopulation;
  * @author illenberger
  *
  */
-public class PlainPopulationImpl implements PlainPopulation, ModCount {
+public class PlainPopulationImpl extends AbstractModifiable implements PlainPopulation {
 
-	private Map<String, PlainPersonImpl> persons;
+	private Map<Id, PlainPersonImpl> persons;
 	
-	private Map<String, PlainPersonImpl> unmodifiablePersons;
-	
-	private long modCount;
+	private Map<Id, PlainPersonImpl> unmodifiablePersons;
 	
 	public PlainPopulationImpl() {
-		persons = new HashMap<String, PlainPersonImpl>();
+		persons = new HashMap<Id, PlainPersonImpl>();
 		unmodifiablePersons = Collections.unmodifiableMap(persons);
 	}
 	
-	public Map<String, PlainPersonImpl> getPersons() {
+	public Map<Id, ? extends PlainPersonImpl> getPersons() {
 		return unmodifiablePersons;
 	}
 
-	public long getModCount() {
-		return modCount;
-	}
-
 	public void addPerson(PlainPerson person) {
-		persons.put("id", (PlainPersonImpl) person);
-		modCount++;
+		persons.put(person.getId(), (PlainPersonImpl) person);
+		modified();
 	}
 
 	public void removePerson(PlainPerson person) {
 		persons.remove((PlainPersonImpl) person);
-		modCount++;
+		modified();
 	}
 }

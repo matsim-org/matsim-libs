@@ -19,15 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.plans.view;
 
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author illenberger
  *
  */
-public interface Activity {
-	
-	public Link getLink();
+public interface Activity extends PlanElement {
 	
 	public Facility getFacility();
 	

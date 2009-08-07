@@ -28,8 +28,14 @@ import java.util.List;
  */
 public interface Plan {
 	
-	public List<Activity> getActivities();
+	public List<? extends PlanElement> getPlanElements();
 	
-	public List<Leg> getLegs();
+	public void addPlanElement(PlanElement element);
+	
+	public void removePlanElement(PlanElement element);
+	
+	public Double getScore();
+	
+	public void setScore(Double score);
 	
 }

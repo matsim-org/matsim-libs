@@ -21,12 +21,24 @@ package playground.johannes.plans.plain;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
+
 /**
  * @author illenberger
  *
  */
 public interface PlainPerson {
 
-	public List<PlainPlan> getPlans();
+	public Id getId();
+	
+	public List<? extends PlainPlan> getPlans();
+	
+	public void addPlan(PlainPlan plan);
+	
+	public void removePlan(PlainPlan plan);
+	
+	public PlainPlan getSelectedPlan();
+	
+	public void setSelectedPlan(PlainPlan plan);
 	
 }

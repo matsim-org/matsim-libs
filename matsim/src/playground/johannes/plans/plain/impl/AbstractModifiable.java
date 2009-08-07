@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Population.java
+ * AbstractModifiable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view;
+package playground.johannes.plans.plain.impl;
 
-import java.util.Map;
-
-import org.matsim.api.basic.v01.Id;
+import playground.johannes.plans.ModCount;
 
 /**
  * @author illenberger
  *
  */
-public interface Population {
+public abstract class AbstractModifiable implements ModCount {
+
+	private long modCount;
 	
-	public Map<Id, ? extends Person> getPersons();
+	protected void modified() {
+		modCount++;
+	}
 	
-	public void addPerson(Person person);
-	
-	public void removePerson(Person person);
+	public long getModCount() {
+		return modCount;
+	}
 
 }

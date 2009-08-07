@@ -32,4 +32,5 @@ public interface Route {
 	public List<Link> getLinks();
 	
 	public void setLinks(List<Link> links);
+	
 }

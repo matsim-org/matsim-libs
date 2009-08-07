@@ -27,8 +27,14 @@ import java.util.List;
  */
 public interface PlainPlan {
 
-	public List<PlainActivity> getActivities();
-
-	public List<PlainLeg> getLegs();
+	public List<? extends PlainPlanElement> getPlanElements();
+	
+	public void addPlanElement(PlainPlanElement element);
+	
+	public void removePlanElement(PlainPlanElement element);
+	
+	public Double getScore();
+	
+	public void setScore(Double score);
 	
 }

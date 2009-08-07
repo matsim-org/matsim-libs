@@ -32,5 +32,5 @@ public interface ConditionalDistribution {
 
 	public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
 	
-	public double getNormConstant(int i);
+//	public double getNormConstant(int i);
 }
