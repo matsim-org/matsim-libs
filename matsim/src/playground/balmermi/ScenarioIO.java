@@ -20,6 +20,7 @@
 
 package playground.balmermi;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -93,14 +94,29 @@ public class ScenarioIO {
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
-		exTxpes.add("0-4110-0"); // motorway
-		exTxpes.add("1-4110-0"); // motorway
-		exTxpes.add("2-4130-1"); // ferry
-		exTxpes.add("2-4130-2"); // train
-		exTxpes.add("3-4130-2"); // train
-		exTxpes.add("4-4130-1"); // ferry
-		exTxpes.add("4-4130-2"); // train
-		exTxpes.add("7-4130-1"); // ferry
+		// teleatlas
+//		exTxpes.add("0-4110-0"); // motorway
+//		exTxpes.add("1-4110-0"); // motorway
+//		exTxpes.add("2-4130-1"); // ferry
+//		exTxpes.add("2-4130-2"); // train
+//		exTxpes.add("3-4130-2"); // train
+//		exTxpes.add("4-4130-1"); // ferry
+//		exTxpes.add("4-4130-2"); // train
+//		exTxpes.add("7-4130-1"); // ferry
+		// ivtch
+		exTxpes.add("0"); exTxpes.add("1"); exTxpes.add("2"); exTxpes.add("3");
+		exTxpes.add("4"); exTxpes.add("5"); exTxpes.add("6"); exTxpes.add("7");
+		exTxpes.add("8"); exTxpes.add("9");
+		exTxpes.add("10"); exTxpes.add("11"); exTxpes.add("12"); exTxpes.add("13");
+		exTxpes.add("14"); exTxpes.add("15"); exTxpes.add("16"); exTxpes.add("17");
+		exTxpes.add("18"); exTxpes.add("19");
+		exTxpes.add("20"); exTxpes.add("21"); exTxpes.add("22"); exTxpes.add("23");
+		exTxpes.add("24"); exTxpes.add("25"); exTxpes.add("26"); exTxpes.add("27");
+		exTxpes.add("28"); exTxpes.add("29");
+		exTxpes.add("90"); exTxpes.add("91"); exTxpes.add("92"); exTxpes.add("93");
+		exTxpes.add("94"); exTxpes.add("95"); exTxpes.add("96"); exTxpes.add("97");
+		exTxpes.add("98"); exTxpes.add("99");
+		
 		Gbl.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
