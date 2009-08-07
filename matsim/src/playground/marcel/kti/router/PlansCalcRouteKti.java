@@ -93,6 +93,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			throw new RuntimeException("No entry found for " + from.getId() + " --> " + to.getId());
 		}
 		final double timeInVehicle = traveltime.getValue() * 60.0;
+		/*
+		 * TODO travel time is computed with bee-line distance, but the distance that is written into the route object is bee-line distance * 1.5
+		 * this is inconsistent
+		 */
 		final double beeLineWalkDistance = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		final double beeLineWalkTime = beeLineWalkDistance / this.configGroup.getWalkSpeedFactor();
 
@@ -113,6 +117,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			newRoute = this.network.getFactory().createRoute(TransportMode.pt, fromAct.getLink(), toAct.getLink());
 			leg.setRoute(newRoute);
 			newRoute.setTravelTime(timeInVehicle + walkAccessEgressTime);
+			/*
+			 * TODO the distance that should be used here is:
+			 * (walkAccessEgressDistance + bee-line distance(fromStop, toStop)) * 1.5
+			 */
 			newRoute.setDistance(beeLineWalkDistance * 1.5);
 			
 		}
