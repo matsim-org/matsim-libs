@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -271,7 +272,7 @@ public class QuadTree<T> implements Serializable {
 				@Override
 				public Iterator<T> iterator() {
 					Iterator<T> iterator = new Iterator<T>() {
-
+						private final int expectedModCount = QuadTree.this.modCount;
 						private Leaf<T> currentLeaf = firstLeaf();
 						private int nextIndex = 0;
 						private T next = first();
@@ -293,12 +294,15 @@ public class QuadTree<T> implements Serializable {
 							if (this.next == null) {
 								return null;
 							}
+							if (QuadTree.this.modCount != this.expectedModCount) {
+                throw new ConcurrentModificationException();
+							}
 							T current = this.next;
 							loadNext();
 							return current;
 						}
 
-						public void loadNext() {
+						private void loadNext() {
 							boolean searching = true;
 							while (searching) {
 								if (this.nextIndex < this.currentLeaf.values.size()) {
@@ -756,7 +760,6 @@ public class QuadTree<T> implements Serializable {
 
 		/* default */ boolean nextLeaf(final Leaf<T> currentLeaf, final MutableLeaf<T> nextLeaf) {
 			if (this.hasChilds) {
-				if (!this.bounds.contains(currentLeaf.x, currentLeaf.y)) return false;
 				boolean found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
 				if (found) {
 					if (nextLeaf.value == null) { nextLeaf.value = this.northwest.firstLeaf(); }
