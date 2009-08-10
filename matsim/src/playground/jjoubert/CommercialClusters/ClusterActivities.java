@@ -20,18 +20,19 @@
 
 package playground.jjoubert.CommercialClusters;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.QuadTree;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-
+import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
 import playground.jjoubert.Utilities.MyActivityReader;
 import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.MyXmlConverter;
+
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 
 public class ClusterActivities {
 	//====================================================================
@@ -41,8 +42,9 @@ public class ClusterActivities {
 	 * 		2 - Study area (with output)
 	 * 		3 - City Deep sample (no output; single vehicle SNA)
 	 * 		4 - Study area (no output; single vehicle SNA)
+	 * 		5 - Study area (no output; all vehicles)
 	 */
-	private static int scenario = 4;
+	private static int scenario = 5	;
 	//====================================================================
 	
 	/* 
@@ -132,18 +134,34 @@ public class ClusterActivities {
 			polygonFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Polygon_" + radius + "_" + minPoints + ".txt";
 			vehicleFilename = root + "Gauteng/XML/93579.xml";
 			doSNA = true;
+			break;
+
+		case 5: // Study area (no output; with ALL vehicles)
+			activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Locations.txt";
+			pointFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Point_" + radius + "_" + minPoints + ".txt";
+			clusterFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Cluster_" + radius + "_" + minPoints + ".txt";
+			lineFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Line_" + radius + "_" + minPoints + ".txt";
+			polygonFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Polygon_" + radius + "_" + minPoints + ".txt";
+			vehicleFoldername = root + "Gauteng/XML/";
+			doSNA = true;
+			break;
 
 		default:
 			log.info("An invalid scenario " + String.valueOf(scenario) + " has been selected");
 			break;
 		}
-		
-		
-		MyActivityReader ar = new MyActivityReader();
-		ArrayList<Point> studyAreaPoints = ar.readActivityPointsToArrayList(activityFilename, studyArea);
-		
-		DJCluster djc = new DJCluster(radius, minPoints, studyAreaPoints);
-		djc.clusterInput();
+
+		DJCluster djc;
+		try{
+			MyActivityReader ar = new MyActivityReader();
+			ArrayList<Point> studyAreaPoints = ar.readActivityPointsToArrayList(activityFilename, studyArea);
+
+			djc = new DJCluster(radius, minPoints, studyAreaPoints);
+
+			djc.clusterInput();
+		} finally{
+			log.info("Clustering completed successfully.");
+		}
 				
 		if(visualizeClusters){
 			djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, polygonFilename);
@@ -156,32 +174,49 @@ public class ClusterActivities {
 		}
 		
 		if(doSNA){
+			MyAdjancencyMatrixBuilder mamb = new MyAdjancencyMatrixBuilder(djc.getClusterList());
 			if(vehicleFoldername != null && vehicleFilename != null){
 				log.warn("Both a vehicle folder and vehicle filename has been supplied!");
 			} else if(vehicleFoldername != null){
-				// TODO Run the whole folder
-				log.warn("I have not implemented the vehicle folder yet!");
-			} else if(vehicleFilename != null){
-				ArrayList<Cluster> cl = djc.getClusterList();
-				MyAdjancencyMatrixBuilder mamb = new MyAdjancencyMatrixBuilder(cl);
-
-				Vehicle v = null;
-				MyXmlConverter mxc = new MyXmlConverter();
-				Object o = mxc.readObjectFromFile(vehicleFilename);
-				if(o instanceof Vehicle){
-					v = (Vehicle) o;
-				} else{
-					log.warn("Could not cast the object " + vehicleFilename + " as a type Vehicle!");
+				File folder = new File(vehicleFoldername);
+				if(folder.exists() && folder.isDirectory()){
+					File[] fileList = folder.listFiles();
+					for (File file : fileList) {
+						String extention = file.getName().substring(file.getName().length()-4);
+						if(extention.equalsIgnoreCase(".xml")){
+							ArrayList<Chain> chains = readVehicleChain(file.getAbsolutePath());
+							mamb.buildAdjacency(chains);
+						}
+					}
 				}
-				mamb.buildAdjacency(v);
+			} else if(vehicleFilename != null){
+				ArrayList<Chain> chains = readVehicleChain(vehicleFilename);
+				mamb.buildAdjacency(chains);
 			} else{
 				log.warn("SNA not performed!! No vehicle file specified.");
 			}
+			String distanceFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_DistanceAdjacency.txt";
+			String orderFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_OrderAdjacency.txt";
+			String inOrderFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_InOrderAdjacency.txt";
+			String outOrderFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_OutOrderAdjacency.txt";
+			mamb.writeAdjacenciesToFile(distanceFilename, orderFilename, inOrderFilename, outOrderFilename);
 		}
 		log.info("Process completed.");
 	}
 
+	private static ArrayList<Chain> readVehicleChain(String filename){
+		ArrayList<Chain> result = null;
+		MyXmlConverter mxc = new MyXmlConverter();
+		Object o = mxc.readObjectFromFile(filename);
+		if(o instanceof Vehicle){
+			result = ((Vehicle) o).getChains();
+		} else{
+			log.warn("Could not cast the object " + filename + " as a type Vehicle!");
+		}
+		return result;
+	}
 }
+
 
 //		QuadTree<Point> sa1 = ar.readActivityPointsToQuadTree(activityFilename, studyArea);
 //		log.info("Size of sa1: " + sa1.values().size());

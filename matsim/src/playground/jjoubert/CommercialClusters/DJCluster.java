@@ -202,7 +202,7 @@ public class DJCluster {
 				
 		/* 
 		 * Build the cluster list. Once built, I rename the clusterId field so as to
-		 * start at '1', and increment accordingly. This allows me to directly use
+		 * start at '0', and increment accordingly. This allows me to directly use
 		 * the clusterId field as 'row' and 'column' reference in the 2D matrices
 		 * when determining adjacency in Social Network Analysis.
 		 */
@@ -218,7 +218,7 @@ public class DJCluster {
 				clusterMap.get(theCluster).add(cp);
 			}
 		}
-		int clusterNumber = 1;
+		int clusterNumber = 0;
 		for (Cluster cluster : clusterMap.keySet()) {
 			ArrayList<ClusterPoint> listOfClusterPoints = clusterMap.get(cluster);
 			if(listOfClusterPoints.size() > minimumPoints){

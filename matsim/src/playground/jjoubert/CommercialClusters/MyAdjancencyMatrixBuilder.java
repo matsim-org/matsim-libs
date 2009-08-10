@@ -20,17 +20,21 @@
 
 package playground.jjoubert.CommercialClusters;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
-import playground.jjoubert.CommercialTraffic.Vehicle;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import cern.colt.matrix.impl.SparseDoubleMatrix1D;
+import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -38,29 +42,41 @@ import com.vividsolutions.jts.geom.Point;
 public class MyAdjancencyMatrixBuilder {
 	private final static Logger log = Logger.getLogger(MyAdjancencyMatrixBuilder.class);
 	private final int matrixDimension;
-	private DenseDoubleMatrix2D distanceAdjacency;
-	private DenseDoubleMatrix1D inOrderAdjacency;
-	private DenseDoubleMatrix1D outOrderAdjacency;
-	private DenseDoubleMatrix2D orderAdjacency;
+	private SparseDoubleMatrix2D distanceAdjacency;
+	private SparseDoubleMatrix1D inOrderAdjacency;
+	private SparseDoubleMatrix1D outOrderAdjacency;
+	private SparseDoubleMatrix2D orderAdjacency;
+	private QuadTree<Double> distanceAdjacencyQT;
+	private QuadTree<Integer> orderAdjacencyQT;
+	private TreeMap<String,Integer> inOrderAdjacencyTM;
+	private TreeMap<String,Integer> outOrderAdjacencyTM;
 
 	private QuadTree<ClusterPoint> clusteredPoints;
 	
 	public MyAdjancencyMatrixBuilder(ArrayList<Cluster> clusterList){
 		matrixDimension = clusterList.size();
-		distanceAdjacency = new DenseDoubleMatrix2D(matrixDimension, matrixDimension);
-		inOrderAdjacency = new DenseDoubleMatrix1D(matrixDimension);
-		outOrderAdjacency = new DenseDoubleMatrix1D(matrixDimension);
-		orderAdjacency = new DenseDoubleMatrix2D(matrixDimension, matrixDimension);
+		distanceAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
+		inOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
+		outOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
+		orderAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
+		distanceAdjacencyQT = new QuadTree<Double>(0,0,matrixDimension+1,matrixDimension+1);
+		orderAdjacencyQT = new QuadTree<Integer>(0,0,matrixDimension+1,matrixDimension+1);
+		inOrderAdjacencyTM = new TreeMap<String, Integer>();
+		outOrderAdjacencyTM = new TreeMap<String, Integer>();
 		clusteredPoints = buildQuadTree(clusterList);
 	}
 	
 	
 	public MyAdjancencyMatrixBuilder(ArrayList<Cluster> clusterList, QuadTree<ClusterPoint> clusteredPoints){
 		matrixDimension = clusterList.size();
-		distanceAdjacency = new DenseDoubleMatrix2D(matrixDimension, matrixDimension);
-		inOrderAdjacency = new DenseDoubleMatrix1D(matrixDimension);
-		outOrderAdjacency = new DenseDoubleMatrix1D(matrixDimension);
-		orderAdjacency = new DenseDoubleMatrix2D(matrixDimension, matrixDimension);
+		distanceAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
+		inOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
+		outOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
+		orderAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
+		distanceAdjacencyQT = new QuadTree<Double>(0,0,matrixDimension+1,matrixDimension+1);
+		orderAdjacencyQT = new QuadTree<Integer>(0,0,matrixDimension+1,matrixDimension+1);
+		inOrderAdjacencyTM = new TreeMap<String, Integer>();
+		outOrderAdjacencyTM = new TreeMap<String, Integer>();
 		this.clusteredPoints = clusteredPoints;
 	}
 
@@ -93,13 +109,13 @@ public class MyAdjancencyMatrixBuilder {
 	}
 
 
-	public void buildAdjacency(Vehicle vehicle){
+	public void buildAdjacency(ArrayList<Chain> chains){
 		GeometryFactory gf = new GeometryFactory();
-		log.info("Building adjacency for vehicle #" + String.valueOf(vehicle.getVehID()) + " with " + String.valueOf(vehicle.getChains().size()) + " chains.");
+		log.info("Building adjacency for " + String.valueOf(chains.size()) + " chains.");
 		int chainCounter = 0;
 		int chainMultiplier = 1;
 		
-		for(Chain chain : vehicle.getChains() ){
+		for(Chain chain : chains ){
 			ArrayList<Activity> al = chain.getActivities();
 			if(al.size() > 3){
 				for(int a = 1; a < al.size() - 2; a++){
@@ -151,13 +167,63 @@ public class MyAdjancencyMatrixBuilder {
 		return result;
 	}
 
-	public DenseDoubleMatrix2D getDistanceAdjacency() {
+	public SparseDoubleMatrix2D getDistanceAdjacency() {
 		return distanceAdjacency;
 	}
 
-	public DenseDoubleMatrix2D getOrderAdjacency() {
+	public SparseDoubleMatrix2D getOrderAdjacency() {
 		return orderAdjacency;
 	}
-
+	
+	public void writeAdjacenciesToFile( String distanceFilename, 
+										String orderFilename, 
+										String inOrderFilename,
+										String outOrderFilename){
+		try {
+			BufferedWriter outputDistance = new BufferedWriter(new FileWriter(new File(distanceFilename)));
+			BufferedWriter outputOrder = new BufferedWriter(new FileWriter(new File(orderFilename)));
+			BufferedWriter outputInOrder = new BufferedWriter(new FileWriter(new File(inOrderFilename)));
+			BufferedWriter outputOutOrder = new BufferedWriter(new FileWriter(new File(outOrderFilename)));
+			try{
+				for (int row = 0; row < matrixDimension; row++) {
+					/*
+					 * Write the in- and out-order values.
+					 */
+					outputInOrder.write(String.valueOf(row));
+					outputInOrder.write(",");
+					outputInOrder.write(String.valueOf(inOrderAdjacency.getQuick(row)));
+					outputInOrder.newLine();
+					outputOutOrder.write(String.valueOf(row));
+					outputOutOrder.write(",");
+					outputOutOrder.write(String.valueOf(outOrderAdjacency.getQuick(row)));
+					outputOutOrder.newLine();
+					
+					/*
+					 * Write the distance- and order adjacency values.
+					 */
+					for (int col = 0; col < matrixDimension; col++){
+						if(orderAdjacency.getQuick(row, col) > 0){
+							outputDistance.write(String.valueOf(distanceAdjacency.getQuick(row, col)));
+							outputOrder.write(String.valueOf(orderAdjacency.getQuick(row, col)));
+						} else{
+							outputDistance.write("NA");
+							outputOrder.write("NA");
+						}
+						outputDistance.write(",");
+						outputOrder.write(",");
+					}
+					outputDistance.newLine();
+					outputOrder.newLine();					
+				}
+			} finally{
+				outputInOrder.close();
+				outputOutOrder.close();
+				outputDistance.close();
+				outputOrder.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
 
 }

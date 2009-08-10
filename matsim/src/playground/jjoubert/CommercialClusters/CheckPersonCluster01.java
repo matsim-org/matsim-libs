@@ -58,75 +58,32 @@ public class CheckPersonCluster01 {
 //		String inputFilename = root + "ActivityStatistics.txt";
 		String inputFilename = root + "Raw/ID" + person + ".RAW";
 //		ArrayList<Point> pointsToCluster = readActivityStatistics(inputFilename);
-//		ArrayList<Point> pointsToCluster = readRawDataToArrayList(inputFilename);
-		QuadTree<Point> qt1 = readRawDataToQuadTree(inputFilename);
-//		log.info(qt1.hashCode() + "|" + qt1.size() + "|" + qt1.values().size());
+		ArrayList<Point> pointsToCluster = readRawDataToArrayList(inputFilename);
+//		QuadTree<Point> qt1 = readRawDataToQuadTree(inputFilename);		
 		
-		
-		QuadTree<Point> qt2 = new QuadTree<Point>(qt1.getMinEasting(),
-												  qt1.getMinNorthing(),
-												  qt1.getMaxEasting(),
-												  qt1.getMaxNorthing());
-		/*
-		 * Marcel, problem HERE!!
-		 * 
-		 * I want to 'duplicate', or copy, the QuadTree qt1. Before I start, the
-		 * counter is 54067 objects of type Point. 
-		 */
-		log.info("qt1.size() before: " + qt1.size() + "|" + qt1.values().size());
-
-		/*
-		 * To test my logic, I've collected all the points in a rectangle. The 
-		 * rectangle is exactly one unit WIDER than the extent of the QuadTree.
-		 * If I don't include this 1-unit buffer, I receive 54065 points, instead 
-		 * of the right number: 54067.
-		 */
-		Rect r = new Rect(qt1.getMinEasting()-1,qt1.getMinNorthing()-1,qt1.getMaxEasting()+1,qt1.getMaxNorthing()+1);
-		Collection<Point> allThePoints = new ArrayList<Point>();
-		qt1.get(r, allThePoints);
-		log.info("Number of points collected with rectangle: " + allThePoints.size());
-
-		int count = 0;
-		for (Point p : qt1.values()){
-			/*
-			 * Here, as a check, I've added a counter to see how many points are
-			 * considered by the iterator.
-			 */
-			count++;
-			qt2.put(p.getX(), p.getY(), p);
-		}
-		/*
-		 * Only 35090 objects of type Point appear in qt2.
-		 */
-		log.info("Counter after: " + count);
-		log.info(qt2.hashCode() + "|" + qt2.size() + "|" + qt2.values().size());
-		log.info("Points in qt1: " + String.valueOf(qt1.values().size()));
-		log.info("Points in qt2: " + String.valueOf(qt2.values().size()));
-		
-		
-//		DJCluster djc = new DJCluster(clusterRadius, clusterMinimumPoints, pointsToCluster);
-//		djc.clusterInput();
+		DJCluster djc = new DJCluster(clusterRadius, clusterMinimumPoints, pointsToCluster);
+		djc.clusterInput();
 		
 		log.info("Visualising clusters.");
 
-		String pointFilename = root + "Point_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-		String lineFilename = root + "Line_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-		String clusterFilename = root + "Cluster_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+//		String pointFilename = root + "Point_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+//		String lineFilename = root + "Line_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+//		String clusterFilename = root + "Cluster_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
 
-//		String pointFilename = root + "Person" + person + "Point_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-//		String lineFilename = root + "Person" + person + "Line_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-//		String clusterFilename = root + "Person" + person + "Cluster_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-//		djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, null);		
+		String pointFilename = root + "Person" + person + "Point_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+		String lineFilename = root + "Person" + person + "Line_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+		String clusterFilename = root + "Person" + person + "Cluster_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+		djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, null);		
 		log.info("Completed");
 	}
 	
 	private static ArrayList<Point> readActivityStatistics(String filename){
 		GeometryFactory gf = new GeometryFactory();
 		ArrayList<Point> al = new ArrayList<Point>();
-		double xMin = Double.MAX_VALUE;
-		double yMin = Double.MAX_VALUE;
-		double xMax = Double.MIN_VALUE;
-		double yMax = Double.MIN_VALUE;
+		double xMin = Double.POSITIVE_INFINITY;
+		double yMin = Double.POSITIVE_INFINITY;
+		double xMax = Double.NEGATIVE_INFINITY;
+		double yMax = Double.NEGATIVE_INFINITY;
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File(filename))));
 			
