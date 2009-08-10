@@ -27,7 +27,7 @@ import java.io.Serializable;
  * This generic class implements a commonly used data structure which is not present in
  * the current collection framework. Although it could be simulated with a List containing
  * two Objects, this implementation offers type safety and maximizes convenience for programmers.
- * 
+ *
  * @author dgrether
  *
  * @param <A>
@@ -35,7 +35,7 @@ import java.io.Serializable;
  */
 public class Tuple<A extends Object, B extends Object> implements Serializable{
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5006806073108429434L;
 	/**
@@ -51,7 +51,7 @@ public class Tuple<A extends Object, B extends Object> implements Serializable{
 	 * @param first
 	 * @param second
 	 */
-	public Tuple(A first, B second) {
+	public Tuple(final A first, final B second) {
 		this.first = first;
 		this.second = second;
 	}
@@ -69,9 +69,21 @@ public class Tuple<A extends Object, B extends Object> implements Serializable{
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(final Object other) {
 		if (!(other instanceof Tuple)) return false;
-		return this.first.equals(((Tuple)other).first) && this.second.equals(((Tuple)other).second);
+		Tuple o = (Tuple) other;
+		if (this.first != null && this.second != null && o.first != null && o.second != null) {
+			return (this.first.equals(o.first) && this.second.equals(o.second));
+		}
+		boolean firstEquals = (this.first == null) && (o.first == null);
+		boolean secondEquals = (this.second == null) && (o.second == null);
+		if (!firstEquals && this.first != null && o.first != null) {
+			firstEquals = this.first.equals(o.first);
+		}
+		if (!secondEquals && this.second != null && o.second != null) {
+			secondEquals = this.second.equals(o.second);
+		}
+		return firstEquals && secondEquals;
 	}
 
 	/**
@@ -79,7 +91,8 @@ public class Tuple<A extends Object, B extends Object> implements Serializable{
 	 */
 	@Override
 	public int hashCode() {
-		return this.first.hashCode() + this.second.hashCode();
+		return (this.first == null ? 0 : this.first.hashCode()) +
+				(this.second == null ? 0 : this.second.hashCode());
 	}
 
 	/**

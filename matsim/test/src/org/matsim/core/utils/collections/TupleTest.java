@@ -20,19 +20,18 @@
 
 package org.matsim.core.utils.collections;
 
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.testcases.MatsimTestCase;
+import junit.framework.TestCase;
 
-public class TupleTest extends MatsimTestCase {
+public class TupleTest extends TestCase {
 
 	public void testEquals() {
 		// the basic Tuple we will usually compare against
 		Tuple<Integer, Double> t1 = new Tuple<Integer, Double>(1, 1.1);
-		
-		// test the the Tupel is equals to itself
+
+		// test the the Tuple is equals to itself
 		assertTrue(t1.equals(t1));
-		
-		// test if other Tupels are recognized as different, or as equal
+
+		// test if other Tuples are recognized as different, or as equal
 		Tuple<Integer, Double> t2 = new Tuple<Integer, Double>(2, 2.2);
 		Tuple<Integer, Double> t3 = new Tuple<Integer, Double>(1, 1.1);
 
@@ -40,26 +39,69 @@ public class TupleTest extends MatsimTestCase {
 		assertFalse(t2.equals(t1));
 		assertTrue(t1.equals(t3));
 		assertTrue(t3.equals(t1));
-		
+
 		// ensure that not only one of the two values is compared
 		Tuple<Integer, Double> t4 = new Tuple<Integer, Double>(1, 2.2); // first entry is the same as t1
 		assertFalse(t1.equals(t4));
-		Tuple<Integer, Double> t5 = new Tuple<Integer, Double>(2, 1.1); // second entry is te same as t1
+		Tuple<Integer, Double> t5 = new Tuple<Integer, Double>(2, 1.1); // second entry is the same as t1
 		assertFalse(t1.equals(t5));
-		
+
 		// ensure that the order of the values is taken into account
 		Tuple<Double, Integer> t6 = new Tuple<Double, Integer>(1.1, 1); // switched first and second
 		assertFalse(t1.equals(t6));
-		
+
 		// ensure that the types of the values is respected as well
 		Tuple<Integer, Double> t7 = new Tuple<Integer, Double>(1, 2.0);
 		Tuple<Integer, Integer> t8 = new Tuple<Integer, Integer>(1, 2);
 		assertFalse(t7.equals(t8));
 		assertFalse(t8.equals(t7));
-		
+
 		// ensure the comparison with null and other objects
 		assertFalse(t1.equals(null));
 		assertFalse(t1.equals(Integer.valueOf(1)));
 	}
-	
+
+	public void testEquals_withNull() {
+		Integer i1 = Integer.valueOf(1);
+		Integer i2 = Integer.valueOf(2);
+		Tuple<Integer, Integer> tuple1a = new Tuple<Integer, Integer>(i1, null);
+		Tuple<Integer, Integer> tuple1b = new Tuple<Integer, Integer>(i1, null);
+		Tuple<Integer, Integer> tuple1c = new Tuple<Integer, Integer>(i2, null);
+		Tuple<Integer, Integer> tuple2a = new Tuple<Integer, Integer>(null, i1);
+		Tuple<Integer, Integer> tuple2b = new Tuple<Integer, Integer>(null, i1);
+		Tuple<Integer, Integer> tuple2c = new Tuple<Integer, Integer>(null, i2);
+		Tuple<Integer, Integer> tuple3a = new Tuple<Integer, Integer>(null, null);
+		Tuple<Integer, Integer> tuple3b = new Tuple<Integer, Integer>(null, null);
+		Tuple<Double, Double> tuple3c = new Tuple<Double, Double>(null, null);
+		Tuple<Integer, Integer> tuple4 = new Tuple<Integer, Integer>(i1, i1);
+
+		// check cases where first or second is null in both tuples
+		assertTrue(tuple1a.equals(tuple1b));
+		assertFalse(tuple1a.equals(tuple1c));
+		assertTrue(tuple2a.equals(tuple2b));
+		assertFalse(tuple2a.equals(tuple2c));
+		assertTrue(tuple3a.equals(tuple3b));
+		assertTrue(tuple3a.equals(tuple3c)); // different generic types cannot be recognized
+
+		// check cases where first or second is null in one of the tuples only
+		assertFalse(tuple4.equals(tuple1a));
+		assertFalse(tuple1a.equals(tuple4));
+		assertFalse(tuple4.equals(tuple2a));
+		assertFalse(tuple2a.equals(tuple4));
+		assertFalse(tuple4.equals(tuple3a));
+		assertFalse(tuple3a.equals(tuple4));
+	}
+
+	public void testHashCode_withNull() {
+		Integer i1 = Integer.valueOf(1);
+		Integer i2 = Integer.valueOf(2);
+		Tuple<Integer, Integer> tuple = new Tuple<Integer, Integer>(i1, i2);
+		assertEquals(3, tuple.hashCode());
+		tuple = new Tuple<Integer, Integer>(null, i2);
+		assertEquals(2, tuple.hashCode());
+		tuple = new Tuple<Integer, Integer>(i1, null);
+		assertEquals(1, tuple.hashCode());
+		tuple = new Tuple<Integer, Integer>(null, null);
+		assertEquals(0, tuple.hashCode());
+	}
 }
