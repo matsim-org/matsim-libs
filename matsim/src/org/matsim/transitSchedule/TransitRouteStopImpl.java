@@ -32,7 +32,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 public class TransitRouteStopImpl implements TransitRouteStop {
 
-	private final TransitStopFacility stop;
+	private TransitStopFacility stop;
 	private final double departureOffset;
 	private final double arrivalOffset;
 	private boolean awaitDepartureTime = false;
@@ -45,6 +45,10 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 
 	public TransitStopFacility getStopFacility() {
 		return this.stop;
+	}
+
+	public void setStopFacility(final TransitStopFacility stopFacility) {
+		this.stop = stopFacility;
 	}
 
 	public double getDepartureOffset() {
