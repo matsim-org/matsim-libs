@@ -6,11 +6,11 @@ import playground.wrashid.PSF.parking.ParkLog;
 
 public class EnergyConsumption {
 
-	private LinkedList<LinkEnergyConsumptionLog> legEnergyConsumption=new LinkedList<LinkEnergyConsumptionLog>();
+	private LinkedList<LinkEnergyConsumptionLog> linkEnergyConsumption=new LinkedList<LinkEnergyConsumptionLog>();
 	private double tempEnteranceTimeOfLastLink=0;
 	
-	public void addEnergyConsumptionLog(LinkEnergyConsumptionLog legEnergyConsumption){
-		this.legEnergyConsumption.add(legEnergyConsumption);
+	public void addEnergyConsumptionLog(LinkEnergyConsumptionLog linkEnergyConsumption){
+		this.linkEnergyConsumption.add(linkEnergyConsumption);
 	}
 
 	public double getTempEnteranceTimeOfLastLink() {
@@ -21,10 +21,20 @@ public class EnergyConsumption {
 		this.tempEnteranceTimeOfLastLink = tempEnteranceTimeOfLastLink;
 	}
 
-	public LinkedList<LinkEnergyConsumptionLog> getLegEnergyConsumption() {
-		return legEnergyConsumption;
+	public LinkedList<LinkEnergyConsumptionLog> getLinkEnergyConsumption() {
+		return linkEnergyConsumption;
 	}
 	
+	/*
+	 * get total of all link energy consumptions
+	 */
+	public double getTotalEnergyConsumption(){
+		double totalEnergyConsumption=0;
+		for (int i=0;i<linkEnergyConsumption.size();i++){
+			totalEnergyConsumption+=linkEnergyConsumption.get(i).getEnergyConsumption();
+		}
+		return totalEnergyConsumption;
+	}
 	
 	
 }

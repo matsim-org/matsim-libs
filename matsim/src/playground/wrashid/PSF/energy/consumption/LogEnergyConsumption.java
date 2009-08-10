@@ -80,4 +80,8 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 		this.controler = controler;
 	}
 
+	public HashMap<Id, EnergyConsumption> getEnergyConsumption() {
+		return energyConsumption;
+	}
+
 }
