@@ -32,7 +32,10 @@ public class BasicTests extends MatsimTestCase {
 		ParkingTimes parkingTimes=logParkingTimes.getParkingTimes().get(new IdImpl("1"));
 		
 		// allow small delta of one second (because the output time in the log file is truncated
-		assertEquals(parkingTimes.getCarLastTimeParked(),61449,1);
+		assertEquals(parkingTimes.getFirstParkingDepartTime(),21610,1);
+		assertEquals(parkingTimes.getLastParkingArrivalTime(),61449,1);
+		
+		
 		ParkLog parkLog=parkingTimes.getParkingTimes().get(0);
 		assertEquals(parkLog.getStartParkingTime(),22989,1);
 		assertEquals(parkLog.getEndParkingTime(),59349,1);
