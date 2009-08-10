@@ -158,7 +158,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-100,0))){ //51
+			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-51,0))){ //51
 //			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-2,0))){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){

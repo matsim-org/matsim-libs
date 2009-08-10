@@ -23,6 +23,8 @@ package playground.mfeil.MDSAM;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.population.PersonImpl;
@@ -59,21 +61,22 @@ public class SimilarityInitializer {
 					this.sims.get(this.sims.size()-1).add(0.0);
 					continue;
 				}
-		/*		System.out.println("origPlan");
+				/*
+				System.out.println("origPlan");
 				for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i+=2){
-					System.out.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getType()+" ");
+					System.out.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getType()+" "+((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getLinkId()+" ");
 				}
 				System.out.println();
 				System.out.println("comparePlan");
 				for (int i=0;i<plan.getPlanElements().size();i+=2){
-					System.out.print(((ActivityImpl)(plan.getPlanElements().get(i))).getType()+" ");
+					System.out.print(((ActivityImpl)(plan.getPlanElements().get(i))).getType()+" "+((ActivityImpl)(plan.getPlanElements().get(i))).getLinkId()+" ");
 				}
-				System.out.println();*/
-				this.sims.get(this.sims.size()-1).add(sim.run(person.getSelectedPlan(), plan));
+				System.out.println();
+				*/
+				this.sims.get(this.sims.size()-1).add(sim.run(person.getSelectedPlan(), plan));		
 			}
 		}
 		return this.sims;
 	}
-
 }
 
