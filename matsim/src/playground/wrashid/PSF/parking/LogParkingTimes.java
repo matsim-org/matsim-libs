@@ -57,6 +57,7 @@ public class LogParkingTimes implements BasicActivityStartEventHandler, BasicAct
 			ParkingTimes pTime = parkingTimes.get(personId);
 
 			pTime.setCarLastTimeParked(event.getTime());
+			pTime.setCarLastTimeParkedLinkId(event.getLinkId());
 		}
 	}
 
@@ -68,20 +69,6 @@ public class LogParkingTimes implements BasicActivityStartEventHandler, BasicAct
 		return parkingTimes;
 	}
 
-	/*
-	 * TODO: later read this property from a file for each parking and some
-	 * default value in config file.
-	 * 
-	 */
-	private boolean parkingHasElectricity(String facilityId) {
-		return true;
-	}
-
-	/*
-	 * TODO: get default from config file and read file for individual locations
-	 */
-	private double getParkingElectricityPower(String facilityId) {
-		return 3500; // 3.5kW is default electric plug power
-	}
+	
 
 }
