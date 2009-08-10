@@ -130,6 +130,7 @@ public class EventControler extends Controler{
 	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
 	
 	protected LinkVehiclesCounter linkVehiclesCounter;
+	protected LinkReplanningMap linkReplanningMap;
 	
 	private static final Logger log = Logger.getLogger(EventControler.class);
 	
@@ -315,7 +316,8 @@ public class EventControler extends Controler{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 		
 		sim.setControler(this);
-		
+
+		// create & add LinkVehiclesCounter
 		linkVehiclesCounter = new LinkVehiclesCounter();
 		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());
 		this.events.addHandler(linkVehiclesCounter);
@@ -324,6 +326,12 @@ public class EventControler extends Controler{
 		List<QueueSimulationListener> queueSimulationListeners = new ArrayList<QueueSimulationListener>();
 		queueSimulationListeners.add(linkVehiclesCounter);
 		sim.addQueueSimulationListeners(queueSimulationListeners);
+
+		// create & add LinkReplanningMap
+		linkReplanningMap = new LinkReplanningMap();
+		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());
+		this.events.addHandler(linkReplanningMap);
+		sim.getMyQueueNetwork().setLinkReplanningMap(linkReplanningMap);
 
 		
 		// set QueueNetwork in the Traveltime Calculator

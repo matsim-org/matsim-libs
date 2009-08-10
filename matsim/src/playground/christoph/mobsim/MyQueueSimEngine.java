@@ -2,11 +2,13 @@ package playground.christoph.mobsim;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -23,9 +25,11 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
+import playground.christoph.network.MyLinkImpl;
 
 public class MyQueueSimEngine extends QueueSimEngine{
 
@@ -175,6 +179,7 @@ public class MyQueueSimEngine extends QueueSimEngine{
 		// Do Replanning if active...
 //		log.info("Do LeaveLinkReplanning...");
 		if (leaveLinkReplanning) leaveLinkReplanning(time);
+//		if (leaveLinkReplanning) leaveLinkReplanningOld(time);
 //		log.info("done");
 		
 /* 
@@ -203,8 +208,8 @@ public class MyQueueSimEngine extends QueueSimEngine{
 		// ... and finally execute the Simulation Step.
 		super.simStep(time);	
 	}
-	
-	protected void leaveLinkReplanning(double time)
+		
+	protected void leaveLinkReplanningOld(double time)
 	{
 		Date start = new Date();
 		
@@ -264,6 +269,15 @@ public class MyQueueSimEngine extends QueueSimEngine{
 	
 	}	// leaveLinkReplanning
 	
+	protected void leaveLinkReplanning(double time)
+	{
+		ArrayList<QueueVehicle> vehiclesToReplanLeaveLink = (ArrayList<QueueVehicle>)((MyQueueNetwork)this.network).getLinkReplanningMap().getReplanningVehicles(time);
+		if (vehiclesToReplanLeaveLink.size() > 0)
+		{
+			replanningCounter = replanningCounter + vehiclesToReplanLeaveLink.size();
+			new ParallelLeaveLinkReplanner().run(vehiclesToReplanLeaveLink, time);
+		}
+	}
 	
 	/*
 	 * Creates a LookupTable that connects a Node with its incoming links

@@ -20,7 +20,6 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -88,7 +87,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	}
 
 	private void createInitialCounts() {
-log.info("creating initial counts");
+		
 		// initialize the Data Structures
 		parkingMap = new HashMap<Id, Integer>();
 		waitingMap = new HashMap<Id, Integer>();
@@ -251,7 +250,6 @@ log.info("creating initial counts");
 		bufferMap.put(id, vehCount);
 	}
 
-	// checked
 	public void handleEvent(BasicAgentStuckEvent event) {
 //		log.info("BasicAgentStuckEvent " + event.getLinkId().toString() + " " + event.getTime());
 
