@@ -6,7 +6,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 /*
  * Add to scoring function, what amount of energy has been charged.
  */
-public class ScoreEnergyCharged implements AfterMobsimListener {
+public class AddEnergyScoreListener implements AfterMobsimListener {
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// TODO Auto-generated method stub
