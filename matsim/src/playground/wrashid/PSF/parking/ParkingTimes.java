@@ -7,7 +7,8 @@ import org.matsim.api.basic.v01.Id;
 public class ParkingTimes {
 
 	private LinkedList<ParkLog> parkingTimes=new LinkedList<ParkLog>();
-	private double carLastTimeParked=0;
+	private double firstParkingDepartTime=0;
+	private double lastParkingArrivalTime=0;
 	private Id carLastTimeParkedLinkId;
 	
 	public void addParkLog(ParkLog parkLog){
@@ -18,12 +19,12 @@ public class ParkingTimes {
 		return parkingTimes;
 	}
 
-	public double getCarLastTimeParked() {
-		return carLastTimeParked;
+	public double getLastParkingArrivalTime() {
+		return lastParkingArrivalTime;
 	}
 
 	public void setCarLastTimeParked(double carLastTimeParked) {
-		this.carLastTimeParked = carLastTimeParked;
+		this.lastParkingArrivalTime = carLastTimeParked;
 	}
 
 	public Id getCarLastTimeParkedLinkId() {
@@ -32,6 +33,14 @@ public class ParkingTimes {
 
 	public void setCarLastTimeParkedLinkId(Id carLastTimeParkedLinkId) {
 		this.carLastTimeParkedLinkId = carLastTimeParkedLinkId;
+	}
+
+	public double getFirstParkingDepartTime() {
+		return firstParkingDepartTime;
+	}
+
+	public void setFirstParkingDepartTime(double firstParkingDepartTime) {
+		this.firstParkingDepartTime = firstParkingDepartTime;
 	}
 	
 }

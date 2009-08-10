@@ -8,7 +8,9 @@ public class EnergyPrice {
 	 */ 
 	
 	public double getEnergyPrice(double time, String linkId){
-		return 1.0;
+		// this means, the energy gets more expensive over the day...
+		// TODO: read 15min bins from file...
+		return time*1.0;
 	}
 	
 	/**
