@@ -28,5 +28,17 @@ public class EnergyConsumptionInfo {
 		return link.getLength()*energyConsumptionPerMeter;
 	}
 	
+	/**
+	 * TODO: This info should be read from a file initially
+	 * TODO: a person can have multiple cars, therefore a new interface may be needed later,
+	 * where we can give the car as parameter, which is being driven for a leg.
+	 * 
+	 * @param personId
+	 * @return
+	 */
+	public static int getVehicleType(Id personId){
+		return 0;
+	}
+	
 	
 }
