@@ -1,4 +1,4 @@
-package playground.wrashid.PSF.energy;
+package playground.wrashid.PSF.energy.consumption;
 
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
@@ -12,12 +12,11 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
  * => we need to assign a different such curve to each agent (we need to put this attribute to the agent)
  * 
  */
-public class LogEnergyConsumed implements BasicLinkLeaveEventHandler,
+public class LogEnergyConsumption implements BasicLinkLeaveEventHandler,
 BasicLinkEnterEventHandler {
 
 	public void handleEvent(BasicLinkLeaveEvent event) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void reset(int iteration) {
