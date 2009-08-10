@@ -1,4 +1,4 @@
-package playground.wrashid.PSF.energy;
+package playground.wrashid.PSF.energy.charging;
 
 /*
  * From the consumed energy per leg, the parking times and the energy prices, 
@@ -8,4 +8,8 @@ package playground.wrashid.PSF.energy;
  */
 public class PerformeOptimizedCharging {
 
+	//public LinkedList<EnergyConsumption> getOptimalChargingTimes(){
+	//	
+	//}
+	
 }
