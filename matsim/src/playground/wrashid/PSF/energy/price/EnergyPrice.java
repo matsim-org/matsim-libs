@@ -2,7 +2,11 @@ package playground.wrashid.PSF.energy.price;
 
 public class EnergyPrice {
 
-	// in utils...
+	/*
+	 * in utils...
+	 * TODO: read from input file...
+	 */ 
+	
 	public double getEnergyPrice(double time, String linkId){
 		return 1.0;
 	}

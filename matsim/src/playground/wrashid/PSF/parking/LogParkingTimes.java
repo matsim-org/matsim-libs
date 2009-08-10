@@ -10,9 +10,13 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
 import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.handler.ActivityStartEventHandler;
 
-public class LogParkingTimes implements BasicActivityStartEventHandler, BasicActivityEndEventHandler {
+public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	Controler controler;
 	HashMap<Id, ParkingTimes> parkingTimes = new HashMap<Id, ParkingTimes>();
@@ -22,7 +26,7 @@ public class LogParkingTimes implements BasicActivityStartEventHandler, BasicAct
 		this.controler = controler;
 	}
 
-	public void handleEvent(BasicActivityStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		// log the (start) time when the car departs
 		Id personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingDepart")) {
@@ -32,7 +36,7 @@ public class LogParkingTimes implements BasicActivityStartEventHandler, BasicAct
 				/*
 				 * this is not the first time we are departing, which means that the car was parked before 
 				 */ 
-				pTime.addParkLog(new ParkLog(event.getLinkId(),pTime.getCarLastTimeParked(),event.getTime()));
+				pTime.addParkLog(new ParkLog(event.getAct().getFacilityId(),pTime.getCarLastTimeParked(),event.getTime()));
 			} else {
 				/*
 				 * this means, that this is the first time the car departs (e.g.
@@ -47,7 +51,7 @@ public class LogParkingTimes implements BasicActivityStartEventHandler, BasicAct
 
 	}
 
-	public void handleEvent(BasicActivityEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		// log the (end) time when the car has been parked
 		Id personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingArrival")) {
@@ -57,7 +61,7 @@ public class LogParkingTimes implements BasicActivityStartEventHandler, BasicAct
 			ParkingTimes pTime = parkingTimes.get(personId);
 
 			pTime.setCarLastTimeParked(event.getTime());
-			pTime.setCarLastTimeParkedLinkId(event.getLinkId());
+			pTime.setCarLastTimeParkedLinkId(event.getAct().getFacilityId());
 		}
 	}
 
@@ -68,6 +72,8 @@ public class LogParkingTimes implements BasicActivityStartEventHandler, BasicAct
 	public HashMap<Id, ParkingTimes> getParkingTimes() {
 		return parkingTimes;
 	}
+
+	
 
 	
 
