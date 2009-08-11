@@ -18,6 +18,7 @@ public class BasicTests extends MatsimTestCase {
 	public void testLogParkingTime() {
 		Controler controler=new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
 		controler.addControlerListener(new AddEnergyScoreListener());
+		controler.setOverwriteFiles(true);
 		
 		LogParkingTimes logParkingTimes=new LogParkingTimes(controler);
 		SimulationStartupListener simulationStartupListener=new SimulationStartupListener();
@@ -44,6 +45,7 @@ public class BasicTests extends MatsimTestCase {
 	public void testLogEnergyConsumption() {
 		Controler controler=new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
 		controler.addControlerListener(new AddEnergyScoreListener());
+		controler.setOverwriteFiles(true);
 		
 		LogEnergyConsumption logEnergyConsumption=new LogEnergyConsumption(controler);
 		SimulationStartupListener simulationStartupListener=new SimulationStartupListener();
@@ -61,7 +63,7 @@ public class BasicTests extends MatsimTestCase {
 		// check the time of the entrance of the last link
 		assertEquals(energyConsumption.getTempEnteranceTimeOfLastLink(),60129,1);
 		LinkEnergyConsumptionLog energyLog=energyConsumption.getLinkEnergyConsumption().get(0);
-		assertEquals(energyLog.getEnterTime(),22029,1);
-		assertEquals(energyLog.getLeaveTime(),22389,1);
+		assertEquals(energyLog.getEnterTime(),21670,1);
+		assertEquals(energyLog.getLeaveTime(),22029,1);
 	}
 }
