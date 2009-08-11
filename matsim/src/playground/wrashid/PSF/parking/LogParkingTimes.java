@@ -69,7 +69,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 			}
 	
 			pTime.setCarLastTimeParked(event.getTime());
-			pTime.setCarLastTimeParkedLinkId(event.getAct().getFacilityId());
+			pTime.setCarLastTimeParkedFacilityId(event.getAct().getFacilityId());
 		}
 	}
 

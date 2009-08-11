@@ -1,5 +1,6 @@
 package playground.wrashid.PSF.energy.charging;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 public class EnergyChargingInfo {
@@ -8,7 +9,7 @@ public class EnergyChargingInfo {
 	 * time in seconds
 	 * - get the energy price at the specified facility and time of day
 	 */
-	public double getEnergyPrice(double time, double facility){
+	public static double getEnergyPrice(double time, Id facility){
 		
 		
 		String testingPeakHourElectricityPrice = Gbl.getConfig().findParam("PSF", "testing.peakHourElectricityPrice");

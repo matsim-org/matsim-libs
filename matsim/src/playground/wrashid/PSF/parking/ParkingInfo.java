@@ -20,13 +20,13 @@ public class ParkingInfo {
 	 */
 	public static double getParkingElectricityPower(Id facilityId) {
 		
-		// for testing only
-		String testingChargingPowerAtAllParkings = Gbl.getConfig().findParam("PSF", "testing.chargingPowerAtAllParkings");
-		if (testingChargingPowerAtAllParkings!=null){
-			return Double.parseDouble(testingChargingPowerAtAllParkings);
+		// TODO: incorporate also possibility of individual charging power plugs at each parking facility
+		String defaultChargingPowerAtParking = Gbl.getConfig().findParam("PSF", "default.chargingPowerAtParking");
+		if (defaultChargingPowerAtParking!=null){
+			return Double.parseDouble(defaultChargingPowerAtParking);
 		}
 		
-		return 3500; // 3.5kW is default electric plug power
+		return 0.0;
 	}
 	
 }

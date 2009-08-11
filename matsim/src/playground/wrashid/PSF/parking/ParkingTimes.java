@@ -9,7 +9,7 @@ public class ParkingTimes {
 	private LinkedList<ParkLog> parkingTimes=new LinkedList<ParkLog>();
 	private double firstParkingDepartTime=0;
 	private double lastParkingArrivalTime=0;
-	private Id carLastTimeParkedLinkId;
+	private Id carLastTimeParkedFacilityId;
 	
 	public void addParkLog(ParkLog parkLog){
 		parkingTimes.add(parkLog);
@@ -27,12 +27,12 @@ public class ParkingTimes {
 		this.lastParkingArrivalTime = carLastTimeParked;
 	}
 
-	public Id getCarLastTimeParkedLinkId() {
-		return carLastTimeParkedLinkId;
+	public Id getCarLastTimeParkedFacilityId() {
+		return carLastTimeParkedFacilityId;
 	}
 
-	public void setCarLastTimeParkedLinkId(Id carLastTimeParkedLinkId) {
-		this.carLastTimeParkedLinkId = carLastTimeParkedLinkId;
+	public void setCarLastTimeParkedFacilityId(Id carLastTimeParkedFacilityId) {
+		this.carLastTimeParkedFacilityId = carLastTimeParkedFacilityId;
 	}
 
 	public double getFirstParkingDepartTime() {

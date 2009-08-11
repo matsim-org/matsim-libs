@@ -47,6 +47,8 @@ public class OptimizedCharger {
 	// String testingMaxBatteryCapacity = Gbl.getConfig().findParam("PSF",
 	// "testing.maxBatteryCapacity");
 
+	
+	// TODO: this operation could be parallelized later...
 	private void performOptimizedCharging() {
 		
 		double defaultMaxBatteryCapacity = Double.parseDouble(Gbl.getConfig().findParam("PSF", "default.maxBatteryCapacity"));
