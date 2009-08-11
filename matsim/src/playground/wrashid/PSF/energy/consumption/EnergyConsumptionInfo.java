@@ -2,6 +2,7 @@ package playground.wrashid.PSF.energy.consumption;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 public class EnergyConsumptionInfo {
@@ -10,6 +11,17 @@ public class EnergyConsumptionInfo {
 	 * In [J]
 	 */
 	public static double getEnergyConsumption(Link link, double travelTime, int vehicleType){
+		
+		// if a test is running, just use this simplistic value for the energy consumption
+		String testingEnergyConsumptionPerLink = Gbl.getConfig().findParam("PSF", "testing.EnergyConsumptionPerLink");
+		if (testingEnergyConsumptionPerLink!=null){
+			return Double.parseDouble(testingEnergyConsumptionPerLink);
+		}
+		
+		
+		// TODO: The following code needs to be programmed from scratch...
+		// Make this somehow modular, so that different strategies could be used here (and different types of vehicles
+		
 		double freeSpeed=link.getFreespeed(Time.UNDEFINED_TIME); //[m/s]
 		double vehicleSpeed=link.getLength()/travelTime; //[m/s]
 		
