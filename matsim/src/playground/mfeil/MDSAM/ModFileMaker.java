@@ -100,7 +100,7 @@ public class ModFileMaker {
 		stream.println("Uwalk \t-6  \t-50 \t30  \t0");
 		stream.println("Ubike \t-6  \t-50 \t30  \t0");	
 		
-		stream.println("Sim \t0 \t-100 \100 \t0");
+		stream.println("Sim \t0 \t-100 \t100 \t0");
 		stream.println();
 	
 		//Utilities
@@ -192,7 +192,7 @@ public class ModFileMaker {
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		
-		List<List<Double>> sims = new SimilarityInitializer(scenario.getPopulation()).getSimilarityOfPlans();
+		List<List<Double>> sims = new MDSAM(scenario.getPopulation()).runPopulation();
 
 		ModFileMaker sp = new ModFileMaker(scenario.getPopulation(), sims);
 		sp.write(outputFile);

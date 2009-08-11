@@ -56,8 +56,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 
 
-
-
 /**
  * @author Matthias Feil
  * Class that reads a file of plans and either varies them or assigns to an agent as alternatives the x most frequent other activity chains.
@@ -79,10 +77,10 @@ public class PlansConstructor implements PlanStrategyModule{
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
+	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10_2.xml";	
+		this.outputFile = "/home/baug/mfeil/data/mz/output_plans_2.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans_2.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/mz/model_2.mod";
 	*/	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -113,7 +111,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.reducePersons();
 		this.linkRouteOrigPlans();
 		this.enlargePlansSet();
-		this.sims = new SimilarityInitializer(this.population).getSimilarityOfPlans();
+		this.sims = new MDSAM(this.population).runPopulation();
 		this.writePlans(this.outputFile);
 		this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writeModFile(this.outputFileMod);
