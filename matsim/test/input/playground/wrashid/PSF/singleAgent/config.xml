@@ -87,10 +87,13 @@
 	</module>
 	
 	<module name="PSF">
+		<param name="default.maxBatteryCapacity" value="36000000" /> <!-- in [J]  -->
+		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
+	
 		<param name="testing.EnergyConsumptionPerLink" value="1.0" /> <!-- in Joule [J] -->
 		<param name="testing.MaxEnergyPriceWillingToPay" value="1" /> <!-- in utils per [J]  -->
-		<param name="default.maxBatteryCapacity" value="36000000" /> <!-- in [J]  -->
-		<param name="testing.ChargingPowerAtAllParkings" value="3500" /> <!-- in [W]  -->
+		
+		
 		<param name="testing.peakHourElectricityPrice" value="0.8" /> <!-- in utils/J peakHour: from 07:00 to 20:00  -->
 		<param name="testing.lowTariffElectrictyPrice" value="0.3" /> <!-- in utils/J lowTariff: from 20:00 to 07:00  -->
 		
