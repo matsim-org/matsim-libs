@@ -28,7 +28,7 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
  *
  */
 public abstract class AdaptivePlanBasedSignalSystemControler extends
-		PlanBasedSignalSystemControler implements AdaptiveSignalSystemControler {
+		DefaultPlanBasedSignalSystemController implements AdaptiveSignalSystemControler {
 
 	public AdaptivePlanBasedSignalSystemControler(
 			BasicSignalSystemConfiguration config) {
@@ -36,6 +36,6 @@ public abstract class AdaptivePlanBasedSignalSystemControler extends
 	}
 
 	@Override
-	public abstract boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup);
+	public abstract boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup);
 	
 }

@@ -32,7 +32,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -303,7 +302,7 @@ public class QueueLane {
 	/**
 	 * updated the status of the QueueLane's signal system
 	 */
-	protected void updateGreenState(){
+	protected void updateGreenState(double time){
 		if (this.signalGroups == null) {
 			log.fatal("This should never happen, since every lane link at a signalized intersection" +
 					" should have at least one signal(group). Please check integrity of traffic light data on link " +
@@ -313,7 +312,7 @@ public class QueueLane {
 		}
 		//else everything normal...
 		for (BasicSignalGroupDefinition signalGroup : this.signalGroups.values()) {
-			this.setThisTimeStepGreen(signalGroup.isGreen());
+			this.setThisTimeStepGreen(signalGroup.isGreen(time));
 		}
 	}
 

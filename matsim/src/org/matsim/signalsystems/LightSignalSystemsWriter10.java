@@ -146,7 +146,7 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 			xmllsgd.setId(lsgd.getId().toString());
 			
 			XMLIdRefType lssdef = fac.createXMLIdRefType();
-			lssdef.setRefId(lsgd.getLightSignalSystemDefinitionId().toString());
+			lssdef.setRefId(lsgd.getSignalSystemDefinitionId().toString());
 			xmllsgd.setLightSignalSystemDefinition(lssdef);
 			
 			for (Id laneid : lsgd.getLaneIds()) {

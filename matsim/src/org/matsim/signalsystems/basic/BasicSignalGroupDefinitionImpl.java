@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.signalsystems.control.SignalSystemControler;
+import org.matsim.signalsystems.control.SignalSystemController;
 
 /**
  * @author dgrether
@@ -36,7 +36,7 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	private List<Id> toLinkIds;
 	private final Id linkRefId;
 	
-	private org.matsim.signalsystems.control.SignalSystemControler signalSystemControler = null;
+	private org.matsim.signalsystems.control.SignalSystemController signalSystemControler = null;
 
 	public BasicSignalGroupDefinitionImpl(Id linkRefId, Id id) {
 		this.linkRefId = linkRefId;
@@ -83,9 +83,9 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#getLightSignalSystemDefinitionId()
+	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#getSignalSystemDefinitionId()
 	 */
-	public Id getLightSignalSystemDefinitionId() {
+	public Id getSignalSystemDefinitionId() {
 		return lightSignalSystemDefinitionId;
 	}
 
@@ -104,17 +104,17 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#setResponsibleLSAControler(org.matsim.signalsystems.control.SignalSystemControler)
+	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#setResponsibleLSAControler(org.matsim.signalsystems.control.SignalSystemController)
 	 */
-	public void setResponsibleLSAControler(SignalSystemControler signalSystemControler) {
+	public void setResponsibleLSAControler(SignalSystemController signalSystemControler) {
 		this.signalSystemControler = signalSystemControler;		
 	}
 	
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#isGreen()
 	 */
-	public boolean isGreen(){
-		return this.signalSystemControler.givenSignalGroupIsGreen(this);
+	public boolean isGreen(double time){
+		return this.signalSystemControler.givenSignalGroupIsGreen(time, this);
 	}
 	
 }

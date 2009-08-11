@@ -28,7 +28,7 @@ import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
  * @author dgrether
  *
  */
-public abstract class AdaptiveSignalSystemControlerImpl implements AdaptiveSignalSystemControler {
+public abstract class AdaptiveSignalSystemControlerImpl extends AbstractSignalSystemController implements AdaptiveSignalSystemControler {
 
 	private BasicAdaptiveSignalSystemControlInfo controlInfo;
 

@@ -24,6 +24,6 @@ package org.matsim.signalsystems.control;
  * @author dgrether
  *
  */
-public interface AdaptiveSignalSystemControler extends  SignalSystemControler {
+public interface AdaptiveSignalSystemControler extends  SignalSystemController {
 
 }

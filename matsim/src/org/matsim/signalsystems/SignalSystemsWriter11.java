@@ -110,8 +110,8 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 			xmllsgd.setId(lsgd.getId().toString());
 			
 			XMLIdRefType lssdef = fac.createXMLIdRefType();
-			if (lsgd.getLightSignalSystemDefinitionId() != null){
-				lssdef.setRefId(lsgd.getLightSignalSystemDefinitionId().toString());
+			if (lsgd.getSignalSystemDefinitionId() != null){
+				lssdef.setRefId(lsgd.getSignalSystemDefinitionId().toString());
 				xmllsgd.setSignalSystemDefinition(lssdef);
 			}
 			else {

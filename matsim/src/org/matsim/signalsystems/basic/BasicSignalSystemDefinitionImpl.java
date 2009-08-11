@@ -27,9 +27,9 @@ import org.matsim.api.basic.v01.Id;
 public class BasicSignalSystemDefinitionImpl implements BasicSignalSystemDefinition {
 
   private Id id;
-  private double defaultCirculationTime;
-  private double syncronizationOffset;
-  private double defaultInterimTime;
+  private Double defaultCirculationTime = null;
+  private Double syncronizationOffset = null;
+  private Double defaultInterimTime = null;
 	
   public BasicSignalSystemDefinitionImpl(Id id) {
   	this.id = id;
@@ -45,42 +45,42 @@ public class BasicSignalSystemDefinitionImpl implements BasicSignalSystemDefinit
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#getDefaultCycleTime()
 	 */
-	public double getDefaultCycleTime() {
+	public Double getDefaultCycleTime() {
 		return defaultCirculationTime;
 	}
 	
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#setDefaultCycleTime(double)
 	 */
-	public void setDefaultCycleTime(double defaultCirculationTime) {
+	public void setDefaultCycleTime(Double defaultCirculationTime) {
 		this.defaultCirculationTime = defaultCirculationTime;
 	}
 	
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#getDefaultSynchronizationOffset()
 	 */
-	public double getDefaultSynchronizationOffset() {
+	public Double getDefaultSynchronizationOffset() {
 		return syncronizationOffset;
 	}
 	
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#setDefaultSynchronizationOffset(double)
 	 */
-	public void setDefaultSynchronizationOffset(double syncronizationOffset) {
+	public void setDefaultSynchronizationOffset(Double syncronizationOffset) {
 		this.syncronizationOffset = syncronizationOffset;
 	}
 	
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#getDefaultInterGreenTime()
 	 */
-	public double getDefaultInterGreenTime() {
+	public Double getDefaultInterGreenTime() {
 		return defaultInterimTime;
 	}
 	
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystemDefinition#setDefaultInterGreenTime(double)
 	 */
-	public void setDefaultInterGreenTime(double defaultInterimTime) {
+	public void setDefaultInterGreenTime(Double defaultInterimTime) {
 		this.defaultInterimTime = defaultInterimTime;
 	}
 

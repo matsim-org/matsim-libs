@@ -20,7 +20,6 @@
 package org.matsim.signalsystems.control;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
@@ -30,26 +29,25 @@ import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 
 /**
  * Implementation of SignalSystemControler for plan controled signal groups.
- * TODO check default and plan based circulation time
- * TODO check plan activation and deactivation
- * TODO check abstract class: interface would be a nicer solution
- * TODO reconsider interface: extend by giving the current second as an argument
+ * This currently considers only the first plan and ignores plan start and stop
+ * times. Furthermore it ignores intergreen times.
+ * 
+ * TODO add synchronization offset handling
  * @author dgrether
  * @author aneumann
  *
  */
-public class PlanBasedSignalSystemControler implements SignalSystemControler {
+public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystemController implements SignalSystemController {
 	
 	private static final Logger log = Logger
-			.getLogger(PlanBasedSignalSystemControler.class);
+			.getLogger(DefaultPlanBasedSignalSystemController.class);
 	
-	private double defaultCirculationTime = Double.NaN;
 	private BasicSignalSystemConfiguration config;
 
 	private BasicPlanBasedSignalSystemControlInfo plans;
 
 
-	public PlanBasedSignalSystemControler(BasicSignalSystemConfiguration config) {
+	public DefaultPlanBasedSignalSystemController(BasicSignalSystemConfiguration config) {
 		if (!(config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo)) {
 			String message = "Cannot create a PlanBasedSignalSystemControler without a PlanBasedLightSignalSystemControlInfo instance!";
 			log.error(message);
@@ -59,17 +57,10 @@ public class PlanBasedSignalSystemControler implements SignalSystemControler {
 		this.plans = (BasicPlanBasedSignalSystemControlInfo)config.getControlInfo();
 	}
 	
-	
-	public void setDefaultCirculationTime(double circulationTime) {
-		this.defaultCirculationTime = circulationTime ;
-	}
-	
-	
 	/**
-	 * TODO include time argument to avoid static call to SimulationTimer.getTime()
-	 * @see org.matsim.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
+	 * @see org.matsim.signalsystems.control.SignalSystemController#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
 	 */
-	public boolean givenSignalGroupIsGreen(
+	public boolean givenSignalGroupIsGreen(double time, 
 			BasicSignalGroupDefinition signalGroup) {
 		BasicSignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
 		if (activePlan == null) {
@@ -77,14 +68,17 @@ public class PlanBasedSignalSystemControler implements SignalSystemControler {
 			log.error(message);
 			throw new IllegalStateException(message);
 		}
-		double circulationTime;
+		double cycleTime;
 		if (activePlan.getCycleTime() != null){
-			circulationTime = activePlan.getCycleTime();
+			cycleTime = activePlan.getCycleTime();
+		}
+		else if (this.getDefaultCycleTime() != null){
+			cycleTime = this.getDefaultCycleTime();
 		}
 		else {
-			circulationTime = this.defaultCirculationTime;
+			throw new IllegalStateException("CycleTime is not set for SignalSystemConfiguration of SignalSystem Id:  " + this.config.getSignalSystemId());
 		}
-		int currentSecondInPlan = 1 + ((int) (SimulationTimer.getTime() % circulationTime));
+		int currentSecondInPlan = 1 + ((int) (time % cycleTime));
 
 		BasicSignalGroupSettings signalGroupConfig = activePlan.getGroupConfigs().get(signalGroup.getId());
 		if ( (signalGroupConfig.getRoughCast() < currentSecondInPlan) 

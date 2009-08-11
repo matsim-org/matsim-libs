@@ -42,9 +42,9 @@ public class AdaptiveController extends
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
+	 * @see org.matsim.signalsystems.control.SignalSystemController#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
 	 */
-	public boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup) {
+	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup) {
 		log.info("isGreen?");
 		
 		return true;

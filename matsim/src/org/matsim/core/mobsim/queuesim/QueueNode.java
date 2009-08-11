@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentStuckEvent;
 import org.matsim.core.gbl.Gbl;
@@ -180,7 +179,7 @@ public class QueueNode {
 		if (this.signalized) {
 			for (QueueLink link : this.inLinksArrayCache){
 				for (QueueLane lane : link.getToNodeQueueLanes()) {
-					lane.updateGreenState();
+					lane.updateGreenState(now);
 					if (lane.isThisTimeStepGreen()){
 						this.clearLaneBuffer(lane, now);
 					}

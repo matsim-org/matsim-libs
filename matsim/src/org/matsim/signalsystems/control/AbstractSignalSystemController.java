@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ * AbstractSignalSystemController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,14 +19,41 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalSystemControler {
+public  abstract class AbstractSignalSystemController implements SignalSystemController {
 
-	public boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup);
+	private Double defaultCycleTime = null;
+	private Double defaultInterGreenTime = null;
+	private Double defaultSynchronizationOffset = null;
+	
+	public Double getDefaultCycleTime() {
+		return defaultCycleTime;
+	}
+	
+	public void setDefaultCycleTime(Double defaultCycleTime) {
+		this.defaultCycleTime = defaultCycleTime;
+	}
+	
+	public Double getDefaultInterGreenTime() {
+		return defaultInterGreenTime;
+	}
+	
+	public void setDefaultInterGreenTime(Double defaultInterGreenTime) {
+		this.defaultInterGreenTime = defaultInterGreenTime;
+	}
+	
+	public Double getDefaultSynchronizationOffset() {
+		return defaultSynchronizationOffset;
+	}
+	
+	public void setDefaultSynchronizationOffset(Double defaultSynchronizationOffset) {
+		this.defaultSynchronizationOffset = defaultSynchronizationOffset;
+	}
+	
 }

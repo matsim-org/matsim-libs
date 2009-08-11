@@ -29,16 +29,16 @@ public interface BasicSignalSystemDefinition {
 
 	public Id getId();
 
-	public double getDefaultCycleTime();
+	public Double getDefaultCycleTime();
 
-	public void setDefaultCycleTime(double defaultCirculationTime);
+	public void setDefaultCycleTime(Double defaultCirculationTime);
 
-	public double getDefaultSynchronizationOffset();
+	public Double getDefaultSynchronizationOffset();
 
-	public void setDefaultSynchronizationOffset(double synchronizationOffset);
+	public void setDefaultSynchronizationOffset(Double synchronizationOffset);
 
-	public double getDefaultInterGreenTime();
+	public Double getDefaultInterGreenTime();
 
-	public void setDefaultInterGreenTime(double defaultInterimTime);
+	public void setDefaultInterGreenTime(Double defaultInterimTime);
 
 }

@@ -95,7 +95,7 @@ public class SignalSystemsReaderWriterTest extends MatsimTestCase {
   	assertNotNull(lsgd);
   	assertEquals(id42, lsgd.getLinkRefId());
   	assertEquals(id42, lsgd.getId());
-  	assertEquals(id42, lsgd.getLightSignalSystemDefinitionId());
+  	assertEquals(id42, lsgd.getSignalSystemDefinitionId());
   	assertEquals(id5, lsgd.getLaneIds().get(0));
   	assertEquals(id1, lsgd.getToLinkIds().get(0));
   	assertEquals(id2, lsgd.getToLinkIds().get(1));

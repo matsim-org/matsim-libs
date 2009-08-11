@@ -26,17 +26,17 @@ the simulation -->
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
     <xs:sequence>
-      <xs:element name="defaultCycleTime" type="matsimTimeAttributeType" minOccurs="1" maxOccurs="1" >
+      <xs:element name="defaultCycleTime" type="matsimTimeAttributeType" minOccurs="0" maxOccurs="1" >
         <xs:annotation>
           <xs:documentation>Umlaufzeit</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="defaultSynchronizationOffset" type="matsimTimeAttributeType" minOccurs="1" maxOccurs="1" >
+      <xs:element name="defaultSynchronizationOffset" type="matsimTimeAttributeType" minOccurs="0" maxOccurs="1" >
         <xs:annotation>
           <xs:documentation>Versatzzeit</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="defaultInterGreenTime" type="matsimTimeAttributeType" minOccurs="1" maxOccurs="1" >
+      <xs:element name="defaultInterGreenTime" type="matsimTimeAttributeType" minOccurs="0" maxOccurs="1" >
         <xs:annotation>
           <xs:documentation>Zwischenzeit</xs:documentation>
         </xs:annotation>

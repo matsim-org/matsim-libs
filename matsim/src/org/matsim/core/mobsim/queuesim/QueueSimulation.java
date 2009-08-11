@@ -75,8 +75,9 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
-import org.matsim.signalsystems.control.PlanBasedSignalSystemControler;
-import org.matsim.signalsystems.control.SignalSystemControler;
+import org.matsim.signalsystems.control.DefaultPlanBasedSignalSystemController;
+import org.matsim.signalsystems.control.PlanBasedSignalSystemController;
+import org.matsim.signalsystems.control.SignalSystemController;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
@@ -145,7 +146,7 @@ public class QueueSimulation {
 	 * Contains the SignalSystemControler instances which can be accessed by the
 	 * Id of the SignalSystemDefinition
 	 */
-	private SortedMap<Id, SignalSystemControler> signalSystemControlerBySystemId;
+	private SortedMap<Id, SignalSystemController> signalSystemControlerBySystemId;
 
 	private BasicSignalSystems signalSystems;
 
@@ -249,25 +250,27 @@ public class QueueSimulation {
 		}
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
-		for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getSignalGroupDefinitions()) {
-			QueueLink queueLink = this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
-			//TODO check if quueuLInk null?? or write ScenarioChecker
-			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
+		for (BasicSignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions()) {
+			QueueLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
+			if (queueLink == null) {
+				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
+			}
+			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(signalGroupDefinition.getSignalSystemDefinitionId());
 			if (list == null) {
 				list = new ArrayList<BasicSignalGroupDefinition>();
-				this.signalGroupDefinitionsBySystemId.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
+				this.signalGroupDefinitionsBySystemId.put(signalGroupDefinition.getSignalSystemDefinitionId(), list);
 			}
-			list.add(basicLightSignalGroupDefinition);
-			queueLink.addSignalGroupDefinition(basicLightSignalGroupDefinition);
+			list.add(signalGroupDefinition);
+			queueLink.addSignalGroupDefinition(signalGroupDefinition);
 			this.network.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
 		}
 	}
 
 	private void initSignalSystemController(final BasicSignalSystemConfigurations basicSignalSystemConfigurations) {
-		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemControler>();
+		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemController>();
 		for (BasicSignalSystemConfiguration config :
 			basicSignalSystemConfigurations.getSignalSystemConfigurations().values()) {
-			SignalSystemControler systemControler = null;
+			SignalSystemController systemControler = null;
 			if (this.signalSystemControlerBySystemId.containsKey(config.getSignalSystemId())){
 				throw new IllegalStateException("SignalSystemControler for SignalSystem with id: " + config.getSignalSystemId() +
 						" already exists. Cannot add second SignalSystemControler for same system. Check your" +
@@ -275,11 +278,10 @@ public class QueueSimulation {
 			}
 			if (config.getControlInfo() instanceof BasicAdaptivePlanBasedSignalSystemControlInfo) {
 				AdaptiveSignalSystemControler c = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config.getControlInfo());
-				if (!(c instanceof PlanBasedSignalSystemControler)){
-					throw new IllegalArgumentException("Class " + c.getClass().getName() + "is no PlanBasedSignalSystemControler instance. Check your configuration of the signal system control!");
+				if (!(c instanceof PlanBasedSignalSystemController)){
+					throw new IllegalArgumentException("Class " + c.getClass().getName() + "is no PlanBasedSignalSystemController instance. Check your configuration of the signal system control!");
 				}
 				AdaptivePlanBasedSignalSystemControler controler = (AdaptivePlanBasedSignalSystemControler) c;
-				this.initPlanbasedControler(controler, config);
 				systemControler = controler;
 			}
 			else if (config.getControlInfo() instanceof BasicAdaptiveSignalSystemControlInfo) {
@@ -287,11 +289,12 @@ public class QueueSimulation {
 				systemControler = controler;
 			}
 			else if (config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo){
-				PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
-				this.initPlanbasedControler(controler, config);
+				DefaultPlanBasedSignalSystemController controler = new DefaultPlanBasedSignalSystemController(config);
 				systemControler = controler;
 			}
+
 			if (systemControler != null){
+				this.initSignalSystemControlerDefaults(systemControler, config);
 				this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), systemControler);
 				//add controller to signal groups
 				List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
@@ -358,11 +361,11 @@ public class QueueSimulation {
 
 
 
-	private void initPlanbasedControler(final PlanBasedSignalSystemControler controler, final BasicSignalSystemConfiguration config){
+	private void initSignalSystemControlerDefaults(final SignalSystemController controler, final BasicSignalSystemConfiguration config){
 		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
-		//TODO [DG] set other defaults of xml
-		controler.setDefaultCirculationTime(systemDef.getDefaultCycleTime());
-
+		controler.setDefaultCycleTime(systemDef.getDefaultCycleTime());
+		controler.setDefaultInterGreenTime(systemDef.getDefaultInterGreenTime());
+		controler.setDefaultSynchronizationOffset(systemDef.getDefaultSynchronizationOffset());
 	}
 
 
@@ -766,7 +769,7 @@ public class QueueSimulation {
 	}
 
 
-	public SortedMap<Id, SignalSystemControler> getSignalSystemControlerBySystemId() {
+	public SortedMap<Id, SignalSystemController> getSignalSystemControlerBySystemId() {
 		return this.signalSystemControlerBySystemId;
 	}
 

@@ -15,13 +15,13 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
-import org.matsim.signalsystems.control.SignalSystemControler;
+import org.matsim.signalsystems.control.SignalSystemController;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
 
 public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimListener {
 
-	private SortedMap<Id, SignalSystemControler> scs;
+	private SortedMap<Id, SignalSystemController> scs;
 	private final HashMap<Id,Counter> counts = new HashMap<Id, Counter>();
 	private final HashMap<Id, Building> shelterLinkMapping;
 	private final HashMap<LinkImpl,LinkInfo> linkInfos = new HashMap<LinkImpl, LinkInfo>();

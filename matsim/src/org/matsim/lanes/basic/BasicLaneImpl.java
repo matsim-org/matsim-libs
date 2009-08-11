@@ -30,7 +30,13 @@ import org.matsim.api.basic.v01.Id;
 public class BasicLaneImpl implements BasicLane {
 
 	private Id id;
+	/**
+	 * the default according to the xml schema, never change the value if schema is not changed
+	 */
 	private int numberOfRepresentedLanes = 1;
+	/**
+	 * the default according to the xml schema, never change the value if schema is not changed
+	 */
 	private double length = 45.0;
 	private List<Id> toLinkIds;
 

@@ -51,6 +51,8 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 	private Id id5 = new IdImpl("5");
 
 	private Id id23 = new IdImpl("23");
+	
+	private Id id42 = new IdImpl("42");
 
 	public void testParser() throws IOException {
 		BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
@@ -84,7 +86,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 	}
 
 	private void checkContent(BasicLaneDefinitions lanedefs) {
-		assertEquals(1, lanedefs.getLanesToLinkAssignments().size());
+		assertEquals(2, lanedefs.getLanesToLinkAssignments().size());
 		BasicLanesToLinkAssignment l2la;
 		l2la = lanedefs.getLanesToLinkAssignments().get(0);
 		assertNotNull(l2la);
@@ -98,5 +100,17 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		assertEquals(id5, lane.getId());
 		assertEquals(60.0, lane.getLength(), EPSILON);
 		assertEquals(2, lane.getNumberOfRepresentedLanes());
+		//check a lanes2linkassignment using default values
+		l2la = lanedefs.getLanesToLinkAssignments().get(1);
+		assertNotNull(l2la);
+		assertEquals(id42, l2la.getLinkId());
+		lane = l2la.getLanes().get(0);
+		assertEquals(id1, lane.getId());
+		assertEquals(id1, lane.getToLinkIds().get(0));
+		assertEquals(45.0, lane.getLength(), EPSILON);
+		assertEquals(1, lane.getNumberOfRepresentedLanes());
+		
+		
+		
 	}
 }
