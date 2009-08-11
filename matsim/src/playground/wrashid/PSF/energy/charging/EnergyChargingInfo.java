@@ -6,6 +6,7 @@ public class EnergyChargingInfo {
 
 	/*
 	 * time in seconds
+	 * - get the energy price at the specified facility and time of day
 	 */
 	public double getEnergyPrice(double time, double facility){
 		

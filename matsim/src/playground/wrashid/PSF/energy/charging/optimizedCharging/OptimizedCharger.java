@@ -1,10 +1,13 @@
-package playground.wrashid.PSF.energy.charging;
+package playground.wrashid.PSF.energy.charging.optimizedCharging;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
+import playground.wrashid.PSF.energy.charging.ChargingTimes;
+import playground.wrashid.PSF.energy.charging.EnergyChargingInfo;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.parking.ParkingTimes;
 
@@ -28,6 +31,7 @@ public class OptimizedCharger {
 	private EnergyChargingInfo chargingInfo;
 	private HashMap<Id, EnergyConsumption> energyConsumption;
 	private HashMap<Id, ParkingTimes> parkingTimes;
+	private HashMap<Id, ChargingTimes> chargingTimes = new HashMap<Id, ChargingTimes>();
 
 	public OptimizedCharger(EnergyChargingInfo chargingInfo, HashMap<Id, EnergyConsumption> energyConsumption,
 			HashMap<Id, ParkingTimes> parkingTimes) {
@@ -44,8 +48,33 @@ public class OptimizedCharger {
 	// "testing.maxBatteryCapacity");
 
 	private void performOptimizedCharging() {
-
+		
+		double defaultMaxBatteryCapacity = Double.parseDouble(Gbl.getConfig().findParam("PSF", "default.maxBatteryCapacity"));
+		
+		Iterator<Id> iter=energyConsumption.keySet().iterator();
+		
+		
+		// iterate through all vehicles and find their optimal charging time
+		while (iter.hasNext()){
+			Id personId=iter.next();
+			
+			// initialize the Charging times
+			// TODO: later for each individual car we should be able to read the max Battery capacities
+			double maxBatteryCapacity=defaultMaxBatteryCapacity;
+			ChargingTimes chargingTimes=new ChargingTimes(maxBatteryCapacity);
+			this.chargingTimes.put(personId, chargingTimes);
+			
+			
+			
+			
+			
+		}
+		
+		
+		
 	}
+	
+	
 
 	
 	public void getChargings() {
