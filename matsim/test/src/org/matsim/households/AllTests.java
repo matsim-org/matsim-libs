@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.households;
+package org.matsim.households;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
+		suite.addTestSuite(HouseholdsIoTest.class);
 		//$JUnit-END$
 		return suite;
 	}

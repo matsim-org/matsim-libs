@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.households;
+package org.matsim.households;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,7 +40,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author dgrether
  */
-public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
+public class HouseholdsIoTest extends MatsimTestCase {
 
 	private static final String TESTHOUSEHOLDSINPUT  = "testHouseholds.xml";
 	private static final String TESTXMLOUTPUT  = "testHouseholdsOut.xml";
