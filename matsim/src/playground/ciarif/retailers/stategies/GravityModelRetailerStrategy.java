@@ -3,7 +3,7 @@ package playground.ciarif.retailers.stategies;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-//import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
+import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
@@ -101,68 +101,14 @@ public class GravityModelRetailerStrategy implements RetailerStrategy {
 	    	//}
 	    }
 		
-		
-		/*DenseDoubleMatrix1D prob_pers_shop = new DenseDoubleMatrix1D(number_of_consumers * number_of_retailer_shops);
-	    if (prob_pers_shop !=null) {log.info(" the prob_pers_shop matrix has been created");}
-	    
-	    DenseDoubleMatrix2D variables_matrix = new DenseDoubleMatrix2D(number_of_consumers, 2);
-	    if (variables_matrix !=null) {log.info(" the variables matrix has been created");}
-	    DenseDoubleMatrix1D dist_pers_shop = new DenseDoubleMatrix1D(number_of_consumers * number_of_shops);
-	    if (dist_pers_shop !=null) {log.info(" the distance persons-shops matrix has been created");}
-	    DenseDoubleMatrix1D dim_shop = new DenseDoubleMatrix1D(number_of_consumers * number_of_shops);
-	    if (dim_shop !=null) {log.info(" the shop dimension matrix has been created");}
-	    
-	    
-	    int cases = 0;
-	    for (Consumer c : consumers) {
-	      double prob_sum = 0.0D;
-	      double dist_sum = 0.0D;
-	      double dim_sum = 0.0D;
-	      int count = 0;
-	      for (ActivityFacility af:this.retailerFacilities.values()) {
-	    	  
-	        double prob = prob_zone_shop.get(Integer.parseInt(c.getRzId().toString()), count);
-	        prob_pers_shop.set(Integer.parseInt(c.getId().toString()) * number_of_retailer_shops + count, prob);
-	        prob_sum += prob;
-	        
-	        double dist = (af.getActivityOption("shop").getFacility().calcDistance(c.getPerson().getSelectedPlan().getFirstActivity().getCoord()));
-	        if (dist == 0.0D) {
-	          dist = 10.0D;
-	          cases = cases+1;
-	        }
-	        
-	        double dimension = (af.getActivityOption("shop").getCapacity().doubleValue());
-	        
-	        dist_pers_shop.set(Integer.parseInt(c.getId().toString())* number_of_shops + count, dist);
-	        dist_sum += dist;
-	        dim_shop.set(Integer.parseInt(c.getId().toString()), dimension);
-	        dim_sum += dimension;
-	        ++count;
-	      }
-	      
-	      double avg_prob_pers_shop = prob_sum / number_of_shops;
-	      double avg_dist_pers_shop = dist_sum / number_of_shops;
-	      double avg_dim_shop = dim_sum / number_of_shops;
-	      
-	      int j=0;
-	      for (ActivityFacility af:this.retailerFacilities.values()) {
-	      //for (int j = 0; j <= prob_zone_shop.columns() - 1; ++j) {
-	        int k = Integer.parseInt(c.getId().toString());
-	        regressand_matrix.set(k, prob_pers_shop.get(k + j) / avg_prob_pers_shop);
-	        variables_matrix.set(k + j, 0, Math.log(dist_pers_shop.get(k + j) / avg_dist_pers_shop));
-	        variables_matrix.set(k + j, 1, Math.log(dim_shop.get(k + j) / avg_dim_shop));
-	        ++j;
-	      }
-	    }*/
 	    log.info("A 'zero distance' has been detected and modified, in " + cases + " cases");
 	    wrm.writeRetailersMatrices(prob_zone_shop, "prob_zone_shop");
 	    wrm.writeRetailersMatrices(regressand_matrix, "regressand_matrix");
 	    wrm.writeRetailersMatrices(variables_matrix, "variables_matrix");
-	    //OLSMultipleLinearRegression olsmr = new OLSMultipleLinearRegression();
-	    //olsmr.newSampleData(sampled_regressand_matrix.toArray(), sampled_variables_matrix.toArray());
-	    //olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
-	    double[] b = {-1, 0.04};
-	    //double[] b = olsmr.estimateRegressionParameters();
+	    OLSMultipleLinearRegression olsmr = new OLSMultipleLinearRegression();
+	    olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
+	    //double[] b = {-1, 0.04};
+	    double[] b = olsmr.estimateRegressionParameters();
 	    log.info("Betas = " + b[0] + " " + b[1]);
 
 	    return b;
@@ -190,7 +136,8 @@ public class GravityModelRetailerStrategy implements RetailerStrategy {
 		for (ActivityFacility f:this.shops.values()) { 
 			shops_keys.put(f.getId(),j);
 			
-			// gets the average probability of a person from a given zone going the a given shop (it is the same for all persons of a given zone)
+			// gets the average probability of a person from a given zone going to a given shop 
+			//(it is the same for all persons of a given zone)
 			for (RetailZone rz : this.retailZones.getRetailZones().values()) {
 				//zone_count++;
 				double counter = 0;

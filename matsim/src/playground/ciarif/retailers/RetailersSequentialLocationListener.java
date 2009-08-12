@@ -143,7 +143,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		}
 		
 		//Links allowed for relocation are read or generated
-		this.retailersLinks = new LinksRetailerReader (controler, retailers).ReadLinks();
+		//this.retailersLinks = new LinksRetailerReader (controler, retailers).ReadLinks();
 		
 		
 		//Retail zones are created

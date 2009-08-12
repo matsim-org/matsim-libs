@@ -149,7 +149,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		
 		//Links allowed for relocation are read or generated
 		log.info("Retailers = "+ retailers);
-		this.retailersLinks = new LinksRetailerReader (controler, this.retailers).ReadLinks();
+		//this.retailersLinks = new LinksRetailerReader (controler, this.retailers).ReadLinks();
 		if (this.facilityIdFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");
 		}
 		
