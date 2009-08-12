@@ -25,7 +25,9 @@ import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
-public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost {
+import playground.christoph.router.util.KnowledgeTravelTime;
+
+public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, Cloneable {
 
 	protected final TravelTime timeCalculator;
 
@@ -51,5 +53,23 @@ public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost {
 	{
 		double TravelTime = this.timeCalculator.getLinkTravelTime(link, Time.UNDEFINED_TIME);
 		return TravelTime;
+	}
+	
+	@Override
+	public OnlyTimeDependentTravelCostCalculator clone()
+	{
+		OnlyTimeDependentTravelCostCalculator clone;
+		
+		if (timeCalculator instanceof KnowledgeTravelTime)
+		{
+			KnowledgeTravelTime timeCalculatorClone = ((KnowledgeTravelTime)timeCalculator).clone();
+			clone = new OnlyTimeDependentTravelCostCalculator(timeCalculatorClone);
+		}
+		else
+		{
+			clone = new OnlyTimeDependentTravelCostCalculator(timeCalculator);
+		}
+		
+		return clone;
 	}
 }

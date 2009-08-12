@@ -151,9 +151,9 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		return this.calcFreeSpeedTravelTimes;
 	}
 	
+	@Override
 	public KnowledgeTravelTimeCalculator clone()
 	{
-
 		KnowledgeTravelTimeCalculator clone = new KnowledgeTravelTimeCalculator(this.myQueueNetwork);
 
 		clone.tbuffer = this.tbuffer;

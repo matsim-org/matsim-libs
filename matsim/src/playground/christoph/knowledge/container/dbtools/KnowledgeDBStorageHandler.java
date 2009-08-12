@@ -33,8 +33,10 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 
 	public KnowledgeDBStorageHandler(PopulationImpl population)
 	{
-		this.population = population;
 		this.setDaemon(true);
+		this.setName("KnowledgeDBStorageHandler");
+		
+		this.population = population;
 		
 		knowledgeTools = new KnowledgeTools();
 		subNetworkTools = new SubNetworkTools();
@@ -126,7 +128,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		PersonImpl person = population.getPersons().get(event.getPersonId());
 		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		
-//		subNetworkTools.resetSubNetwork(person);
+		subNetworkTools.resetSubNetwork(person);
 		
 		if (nodeKnowledge instanceof DBStorage)
 		{

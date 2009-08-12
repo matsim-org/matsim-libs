@@ -30,6 +30,9 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.mobsim.MyQueueNetwork;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.util.SubNetworkCreator;
+import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 import playground.christoph.router.util.KnowledgeTravelTime;
@@ -46,16 +49,18 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	private final static Logger log = Logger.getLogger(KnowledgeTools.class);
 	
 	protected static int errorCounter = 0;
+
+	protected NetworkLayer network;
 	
 	protected Dijkstra dijkstra;
 	
 	protected TravelCost costFunction;
 	protected TravelTime timeFunction;
 
-	public DijkstraWrapper()
-	{	
-	}
-	
+	protected SubNetworkCreator subNetworkCreator;
+	protected SubNetworkTools subNetworkTools;
+	protected KnowledgeTools knowledgeTools;
+		
 	/*
 	 * The TravelCost and TravelTime objects have to be those, which were used to initialize
 	 * the Dijkstra Object.
@@ -64,11 +69,16 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	 * If the Calculators need information about the current traffic in the System, the
 	 * QueueNetwork has to be set.
 	 */
-	public DijkstraWrapper(Dijkstra dijkstra, TravelCost costFunction, TravelTime timeFunction)
+	public DijkstraWrapper(Dijkstra dijkstra, TravelCost costFunction, TravelTime timeFunction, NetworkLayer network)
 	{
 		this.dijkstra = dijkstra;
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
+		this.network = network;
+		
+		subNetworkCreator = new SubNetworkCreator(network);
+		subNetworkTools = new SubNetworkTools();
+		knowledgeTools = new KnowledgeTools();
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -98,7 +108,24 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		{
 			((KnowledgeTravelTime)timeFunction).setPerson(person);
 		}
-
+				
+		if (dijkstra instanceof MyDijkstra)
+		{
+			SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+			
+			synchronized(subNetwork)
+			{
+				if (!subNetwork.isInitialized())
+				{
+					subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
+	//				log.info("Set Network for Person " + person.getId());
+				}
+				
+				knowledgeTools.removeKnowledge(person);
+				
+				((MyDijkstra)dijkstra).setNetwork(subNetwork);
+			}
+		}
 	}
 		
 	public static int getErrorCounter()
@@ -151,7 +178,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	{
 		TravelCost costFunctionClone;
 		TravelTime timeFunctionClone;
-		NetworkLayer networkClone = this.myQueueNetwork.getNetworkLayer();
+//		NetworkLayer networkClone = this.myQueueNetwork.getNetworkLayer();
 		
 		if(this.costFunction instanceof KnowledgeTravelCost)
 		{
@@ -173,8 +200,11 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 			timeFunctionClone = timeFunction;
 		}
 		
-		Dijkstra dijkstraClone = new Dijkstra(networkClone, costFunctionClone, timeFunctionClone);
-		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, costFunctionClone, timeFunctionClone);
+		Dijkstra dijkstraClone;
+		if (this.dijkstra instanceof MyDijkstra) dijkstraClone = new MyDijkstra(network, costFunctionClone, timeFunctionClone);
+		else dijkstraClone = new Dijkstra(network, costFunctionClone, timeFunctionClone);
+				
+		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, costFunctionClone, timeFunctionClone, network);
 		clone.setMyQueueNetwork(this.myQueueNetwork);
 		//clone.queueNetwork = this.queueNetwork;
 		

@@ -7,7 +7,7 @@ public interface DBStorage {
 	public void readFromDB();
 	
 	public void clearLocalKnowledge();
-	
+
 	public void createTable();
 	
 	public void clearTable();

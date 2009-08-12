@@ -25,7 +25,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	private static String separator = "@";
 	//private static String tableName = "MapKnowledge";
-	private static String tableName = "BatchTable2_0";
+	private static String tableName = "BatchTable1_5";
 	
 	public MapKnowledgeDB()
 	{
@@ -116,7 +116,6 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 			localKnowledge = true;
 		}
 	}
-
 	
 	public synchronized void writeToDB()
 	{		
@@ -133,15 +132,13 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 			dbConnectionTool.disconnect();
 		}
 	}
-
 	
-	public void clearLocalKnowledge()
+	public synchronized void clearLocalKnowledge()
 	{
+		super.reset();
 		localKnowledge = false;
 //		super.getKnownNodes().clear();
-		super.reset();
 	}
-	
 	
 	public void clearTable()
 	{

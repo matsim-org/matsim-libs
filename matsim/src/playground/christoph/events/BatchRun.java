@@ -62,7 +62,7 @@ public class BatchRun {
 											 {9, 1, 0, 0},
 											 {10, 0, 0, 0}};
 */	
-	protected static int[][] Versuchsplan = {{0, 0, 0, 10}};
+	protected static int[][] Versuchsplan = {{0, 0, 10, 0}};
 	
 	
 	// Default Config
@@ -91,7 +91,7 @@ public class BatchRun {
 //	protected static String outbase = "mysimulations/berlin/output";
 //	protected static String inbase = "mysimulations/berlin";
 	
-		
+	
 	private final String separator = System.getProperty("file.separator");
 	
 	protected static String outputDirectory;

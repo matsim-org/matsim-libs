@@ -11,6 +11,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
+import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
 
@@ -55,7 +56,58 @@ public class SubNetworkCreator {
 		return createSubNetwork(nodeKnowledge, subNetwork);
 	}
 	
-	public SubNetwork createSubNetwork(NodeKnowledge nodeKnowledge, SubNetwork subNetwork)
+	public synchronized SubNetwork createSubNetwork(NodeKnowledge nodeKnowledge, SubNetwork subNetwork)
+	{	
+		synchronized(subNetwork)
+		{
+			synchronized(nodeKnowledge)
+			{
+				Map<Id, SubNode> nodesMapping = new TreeMap<Id, SubNode>();
+				
+				subNetwork.initialize(nodeKnowledge.getKnownNodes().size());
+				
+				// create all SubNodes
+				for (NodeImpl node : nodeKnowledge.getKnownNodes().values())
+				{
+					SubNode subNode = new SubNode(node);
+	
+					subNetwork.addSubNode(subNode);
+					
+					nodesMapping.put(node.getId(), subNode);
+				}
+				
+				// create all SubLinks
+				for (SubNode subNode : nodesMapping.values())
+				{
+					// Get all known Links from and To the Node
+					LinkImpl[] in = inLinks.get(subNode.getId());
+					for (LinkImpl link : in)
+					{
+						// Check only the Node and not the Link - should be twice as fast. 
+						//if (nodeKnowledge.knowsNode(link.getFromNode()))
+						SubNode fromNode = nodesMapping.get(link.getFromNode().getId());
+						if (fromNode != null)
+						{
+							Id fromId = link.getFromNode().getId();
+							Id toId = link.getToNode().getId();
+							SubLink subLink = new SubLink(this.network, nodesMapping.get(fromId), nodesMapping.get(toId), link);
+							
+							subNode.addInLinkNoCheck(subLink);
+							fromNode.addOutLinkNoCheck(subLink);
+	
+							subNetwork.addSubLink(subLink);
+						}
+					}		
+				}
+						
+				subNetwork.setInitialized();
+					
+				return subNetwork;
+			}
+		}
+	}	
+	
+	public SubNetwork createSubNetworkOld(NodeKnowledge nodeKnowledge, SubNetwork subNetwork)
 	{
 		subNetwork.initialize(nodeKnowledge.getKnownNodes().size());
 		
@@ -133,7 +185,7 @@ public class SubNetworkCreator {
 					if (knowsLink)
 					{
 						((SubNode)subNode).addInLinkNoCheck(in[i]);
-						subNetwork.addLink(in[i]);
+						subNetwork.addSubLink(in[i]);
 					}
 					i++;
 				}
@@ -144,7 +196,7 @@ public class SubNetworkCreator {
 					if (knowsLink)
 					{
 						((SubNode)subNode).addInLinkNoCheck(out[i]);
-						subNetwork.addLink(out[i]);
+						subNetwork.addSubLink(out[i]);
 					}
 					i++;
 				}

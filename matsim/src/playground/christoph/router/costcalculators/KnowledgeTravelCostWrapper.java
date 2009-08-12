@@ -81,8 +81,12 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	
 	public double getLinkTravelCost(final Link link, final double time) 
 	{
-		// try getting NodeKnowledge from the Persons Knowledge
-		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
+		NodeKnowledge nodeKnowledge = null;
+		if (checkNodeKnowledge && person != null)
+		{
+			// try getting NodeKnowledge from the Persons Knowledge
+			nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
+		}		
 		
 		// if the Person doesn't know the link -> return max costs 
 		if (checkNodeKnowledge && !nodeKnowledge.knowsLink((LinkImpl)link))
@@ -165,6 +169,10 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		{
 			travelCostCalculatorClone = ((KnowledgeTravelCost)this.travelCostCalculator).clone();
 		}
+		else if (this.travelCostCalculator instanceof OnlyTimeDependentTravelCostCalculator)
+		{
+			travelCostCalculatorClone = ((OnlyTimeDependentTravelCostCalculator)this.travelCostCalculator).clone();
+		}
 		else
 		{
 			log.error("Could not clone the CostCalculator - use reference to the existing Calculator and hope the best...");
@@ -178,6 +186,5 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		
 		return clone;
 	}
-
 
 }

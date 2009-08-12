@@ -9,12 +9,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.mobsim.MyQueueNetwork;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelTime;
 
@@ -87,6 +90,23 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		{
 			// try getting NodeKnowledge from the Persons Knowledge
 			nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
+			
+//			synchronized(nodeKnowledge)
+//			{
+//				SubNetworkTools subNetworkTools = new SubNetworkTools();
+//				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+//				
+//				synchronized(subNetwork)
+//				{
+//					if (!nodeKnowledge.knowsLink((LinkImpl)link))
+//					{
+//						subNetwork.getNodes().size();
+//						//log.error(person.getId() + " Asking for unknown Link! " + nodeKnowledge.getKnownNodes().size() + " "  + subNetwork.getNodes().size());
+//						if (nodeKnowledge.getKnownNodes().size() != 0) log.error(person.getId() + " Asking for unknown Link! " + nodeKnowledge.getKnownNodes().size() + " "  + subNetwork.getNodes().size());
+//					}
+//				}
+//				knowledgeTools.removeKnowledge(person);
+//			}
 		}
 		
 		// if the Person doesn't know the link -> return max costs 

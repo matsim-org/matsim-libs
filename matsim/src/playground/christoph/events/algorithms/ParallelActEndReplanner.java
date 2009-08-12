@@ -41,7 +41,8 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 	private static ThreadLocker threadLocker;
 	
 	public void run(ArrayList<ActivityImpl> fromActs, ArrayList<QueueVehicle> vehicles, double time)
-	{		
+	{	
+
 		// distribute workload between threads
 		// as long as threads are waiting we don't need synchronized data structures
 		for(int i = 0; i < vehicles.size(); i++)
@@ -104,6 +105,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		for (int i = 0; i < numOfThreads; i++) 
 		{
 			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners);
+			replannerThread.setName("ParallelActEndReplanner" + i);
 			replannerThreads[i] = replannerThread;
 			
 			replannerThread.start();

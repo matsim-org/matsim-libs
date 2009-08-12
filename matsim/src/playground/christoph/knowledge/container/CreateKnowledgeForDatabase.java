@@ -55,7 +55,7 @@ public class CreateKnowledgeForDatabase {
 	private ArrayList<SelectNodes> nodeSelectors;
 	private double dijkstraCostFactor = 1.0;
 	//private double[] dijkstraCostFactors = {1.0, 1.5, 2.0, 2.5, 3.0};
-	private double[] dijkstraCostFactors = {1.5};
+	private double[] dijkstraCostFactors = {1.1, 1.15};
 	private int parallelThreads = 2;
 	private ReplanningQueueSimulation sim;
 	private Events events;
@@ -231,7 +231,7 @@ public class CreateKnowledgeForDatabase {
 //		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
 //		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
 		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
+		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime, network);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		
 		dijkstraRouter.setMyQueueNetwork(new MyQueueNetwork(network));

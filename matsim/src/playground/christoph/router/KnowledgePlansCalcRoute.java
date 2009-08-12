@@ -104,37 +104,37 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		}
 		
 		
-		if (this.getLeastCostPathCalculator() instanceof DijkstraWrapper)
-		{
-			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
-			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
-			
-			if (dijkstra instanceof MyDijkstra)
-			{
-				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
-				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
-				
-				new KnowledgeTools().removeKnowledge(person);
-				
-				((MyDijkstra)dijkstra).setNetwork(subNetwork);
-			}
-		}
-		
-		if (this.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
-		{
-			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
-			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
-			
-			if (dijkstra instanceof MyDijkstra)
-			{
-				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
-				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
-				
-				new KnowledgeTools().removeKnowledge(person);
-				
-				((MyDijkstra)dijkstra).setNetwork(subNetwork);
-			}
-		}
+//		if (this.getLeastCostPathCalculator() instanceof DijkstraWrapper)
+//		{
+//			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
+//			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
+//			
+//			if (dijkstra instanceof MyDijkstra)
+//			{
+//				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+//				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
+//				
+//				new KnowledgeTools().removeKnowledge(person);
+//				
+//				((MyDijkstra)dijkstra).setNetwork(subNetwork);
+//			}
+//		}
+//		
+//		if (this.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
+//		{
+//			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
+//			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
+//			
+//			if (dijkstra instanceof MyDijkstra)
+//			{
+//				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
+//				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
+//				
+//				new KnowledgeTools().removeKnowledge(person);
+//				
+//				((MyDijkstra)dijkstra).setNetwork(subNetwork);
+//			}
+//		}
 	}
 	
 	public PersonImpl getPerson()

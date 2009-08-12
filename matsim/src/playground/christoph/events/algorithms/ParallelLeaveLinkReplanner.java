@@ -97,6 +97,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		for (int i = 0; i < numOfThreads; i++) 
 		{
 			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners);
+			replannerThread.setName("ParallelLeaveLinkReplanner" + i);
 			replannerThreads[i] = replannerThread;
 			
 			replannerThread.start();

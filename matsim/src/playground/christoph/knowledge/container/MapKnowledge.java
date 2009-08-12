@@ -69,15 +69,15 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		else return false;
 	}
 	
-	
-	public Map<Id, NodeImpl> getKnownNodes() 
+	public synchronized Map<Id, NodeImpl> getKnownNodes() 
 	{
 		return nodes;
 	}
 	
-	public void reset()
+	public synchronized void reset()
 	{
 		this.nodes = new HashMap<Id, NodeImpl>();
+//		this.nodes.clear();
 	}
 	
 	public void setKnownNodes(Map<Id, NodeImpl> nodes)
