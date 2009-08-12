@@ -3,7 +3,7 @@ package playground.ciarif.retailers.stategies;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
+//import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
@@ -105,10 +105,10 @@ public class GravityModelRetailerStrategy implements RetailerStrategy {
 	    wrm.writeRetailersMatrices(prob_zone_shop, "prob_zone_shop");
 	    wrm.writeRetailersMatrices(regressand_matrix, "regressand_matrix");
 	    wrm.writeRetailersMatrices(variables_matrix, "variables_matrix");
-	    OLSMultipleLinearRegression olsmr = new OLSMultipleLinearRegression();
-	    olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
-	    //double[] b = {-1, 0.04};
-	    double[] b = olsmr.estimateRegressionParameters();
+	    //OLSMultipleLinearRegression olsmr = new OLSMultipleLinearRegression();
+	    //olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
+	    double[] b = {-1, 0.04};
+	    //double[] b = olsmr.estimateRegressionParameters();
 	    log.info("Betas = " + b[0] + " " + b[1]);
 
 	    return b;
