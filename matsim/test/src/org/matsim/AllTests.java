@@ -62,6 +62,7 @@ public class AllTests {
 		suite.addTest(org.matsim.signalsystems.AllTests.suite());
 		suite.addTest(org.matsim.transitSchedule.AllTests.suite());
 		suite.addTest(org.matsim.utils.AllTests.suite());
+		suite.addTest(org.matsim.vehicles.AllTests.suite());
 		suite.addTest(org.matsim.vis.AllTests.suite());
 		suite.addTest(org.matsim.withinday.AllTests.suite());
 		suite.addTest(org.matsim.world.AllTests.suite());

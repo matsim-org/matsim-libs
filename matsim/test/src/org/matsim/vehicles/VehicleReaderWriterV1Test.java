@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.vehicles;
+package org.matsim.vehicles;
 
 import java.io.File;
 import java.io.FileNotFoundException;
