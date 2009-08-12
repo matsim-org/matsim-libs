@@ -30,10 +30,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
+import org.matsim.households.HouseholdBuilder;
 import org.matsim.households.Households;
-import org.matsim.households.basic.BasicIncome;
-import org.matsim.households.basic.HouseholdBuilder;
-import org.matsim.households.basic.HouseholdsWriterV1;
+import org.matsim.households.Income;
+import org.matsim.households.HouseholdsWriterV10;
 
 import playground.dgrether.DgPaths;
 
@@ -54,16 +54,16 @@ public class BKickHouseholdsCreator {
     HouseholdBuilder b = hhs.getBuilder();
 
     Household hh = b.createHousehold(id1);
-    hh.setIncome(b.createIncome(120000, BasicIncome.IncomePeriod.year));
+    hh.setIncome(b.createIncome(120000, Income.IncomePeriod.year));
     hh.getMemberIds().add(id1);
     hhs.getHouseholds().put(id1, hh);
     
     hh = b.createHousehold(id2);
-    hh.setIncome(b.createIncome(40000, BasicIncome.IncomePeriod.year));
+    hh.setIncome(b.createIncome(40000, Income.IncomePeriod.year));
     hh.getMemberIds().add(id2);
     hhs.getHouseholds().put(id2, hh);
     
-    HouseholdsWriterV1 hhwriter = new HouseholdsWriterV1(hhs);
+    HouseholdsWriterV10 hhwriter = new HouseholdsWriterV10(hhs);
     hhwriter.writeFile(DgPaths.SHAREDSVN + "test/input/playground/benjamin/BKickScoringTest/households.xml");
     System.out.println("Households written!");
 	}
@@ -88,14 +88,13 @@ public class BKickHouseholdsCreator {
     IncomeCalculatorKantonZurich incomeCalculator = new IncomeCalculatorKantonZurich();
     
     for (PersonImpl p : pop.getPersons().values()){
-      Household hh = b.createHousehold(p.getId());
-      hh.setIncome(b.createIncome(incomeCalculator.calculateIncome(46300), BasicIncome.IncomePeriod.year));
-      hh.getMembers().put(p.getId(), p);
-      p.setHousehold(hh);
+    	Household hh = b.createHousehold(p.getId());
+      hh.setIncome(b.createIncome(incomeCalculator.calculateIncome(46300), Income.IncomePeriod.year));
+      hh.getMemberIds().add(p.getId());
       hhs.getHouseholds().put(p.getId(), hh);
     }
     
-    HouseholdsWriterV1 hhwriter = new HouseholdsWriterV1(hhs);
+    HouseholdsWriterV10 hhwriter = new HouseholdsWriterV10(hhs);
     hhwriter.writeFile(outdir + "households.xml");
     System.out.println("Households written!");
     

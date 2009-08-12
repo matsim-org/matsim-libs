@@ -19,66 +19,50 @@
 
 package org.matsim.households;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.households.basic.BasicHouseholdImpl;
-import org.matsim.vehicles.BasicVehicle;
 
 /**
  * @author dgrether
  */
-public class HouseholdImpl extends BasicHouseholdImpl implements Household {
+public class HouseholdImpl implements Household {
 
-	private final Map<Id, PersonImpl> members;
-
-	private final Map<Id, BasicVehicle> vehicles;
-
-	public HouseholdImpl(final Id id) {
-		super(id);
-		this.members = new LinkedHashMap<Id, PersonImpl>();
-		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
+	private Id id;
+	private List<Id> memberIds = null;
+	private List<Id> vehicleDefinitionIds = null;
+	private Income income;
+	
+	public HouseholdImpl(Id id) {
+		this.id = id;
 	}
 
-	/**
-	 * @see org.matsim.core.basic.v01.households.Household#getMemberIds()
-	 */
-	@Override
+	public Id getId() {
+		return this.id;
+	}
+
+	public Income getIncome() {
+		return this.income;
+	}
+
 	public List<Id> getMemberIds() {
-		return (List<Id>) Collections.unmodifiableList(new ArrayList<Id>(this.members.keySet()));
+		return this.memberIds;
 	}
 
-	@Override
-	public void setMemberIds(final List<Id> members) {
-		throw new UnsupportedOperationException("Do not set only Ids on this level in inheritance hierarchy!" +
-				"Use method addMember(Person p) instead!");
-	}
-
-	public Map<Id, PersonImpl> getMembers() {
-		return this.members;
-	}
-
-	@Override
-	public void setVehicleIds(final List<Id> vehicleIds) {
-		throw new UnsupportedOperationException("Do not set only Ids on this level in inheritance hierarchy!" +
-		"Use method addVehicle() instead!");
-	}
-
-	/**
-	 * @see org.matsim.core.basic.v01.households.Household#getVehicleIds()
-	 */
-	@Override
 	public List<Id> getVehicleIds() {
-		return (List<Id>) Collections.unmodifiableList(new ArrayList<Id>(this.vehicles.keySet()));
+		return this.vehicleDefinitionIds;
+	}
+	
+	public void setMemberIds(List<Id> memberIds) {
+		this.memberIds = memberIds;
 	}
 
-	public Map<Id, BasicVehicle> getVehicles() {
-		return this.vehicles;
+	public void setIncome(Income income) {
+		this.income = income;
+	}
+
+	public void setVehicleIds(List<Id> vehicleIds) {
+		this.vehicleDefinitionIds = vehicleIds;
 	}
 
 }

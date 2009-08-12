@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.population.BasicPersonImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.households.Household;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**
@@ -43,8 +42,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person {
 	private final static Logger log = Logger.getLogger(PersonImpl.class);
 
 	private Customizable customizableDelegate;
-
-	private Household household;
 
 
 	public PersonImpl(final Id id) {
@@ -153,32 +150,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person {
 		return result;
 	}
 
-	public Id getHouseholdId() {
-		if (this.household != null) {
-			return this.household.getId();
-		}
-		return null;
-	}
-
-	public Household getHousehold() {
-		return this.household;
-	}
-
-	public void setHousehold(final Household hh) {
-		if (!hh.getMembers().containsKey(this.getId())) {
-			hh.getMembers().put(this.getId(), this);
-			this.household = hh;
-		}
-		else if (this.household == null) {
-			this.household = hh;
-		}
-		else if (!this.equals(hh.getMembers().get(this.getId()))) {
-			throw new IllegalStateException("The household with id: " + hh.getId() + " already has a member"
-					+ " with id: " + this.getId() + " the referenced objects however are not equal!");
-		}
-	}
-
-	
 	/**
 	 * @return "yes" if the person has a job
 	 * @deprecated use {@link #isEmployed()}

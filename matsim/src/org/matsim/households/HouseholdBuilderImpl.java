@@ -19,31 +19,25 @@
 
 package org.matsim.households;
 
+import java.util.ArrayList;
+
 import org.matsim.api.basic.v01.Id;
-import org.matsim.households.basic.BasicHouseholdBuilderImpl;
-import org.matsim.households.basic.BasicIncome;
-import org.matsim.households.basic.HouseholdBuilder;
-import org.matsim.households.basic.BasicIncome.IncomePeriod;
+import org.matsim.households.Income.IncomePeriod;
 
 /**
  * @author dgrether
  */
 public class HouseholdBuilderImpl implements HouseholdBuilder {
 
-	private BasicHouseholdBuilderImpl delegate;
-
-	public HouseholdBuilderImpl() {
-		this.delegate = new BasicHouseholdBuilderImpl();
+	public HouseholdImpl createHousehold(Id householdId) {
+		HouseholdImpl hh = new HouseholdImpl(householdId);
+		hh.setMemberIds(new ArrayList<Id>());
+		hh.setVehicleIds(new ArrayList<Id>());
+		return hh;
 	}
-
-	public Household createHousehold(Id householdId) {
-		Household h = new HouseholdImpl(householdId);
-		return h;
-	}
-
-
-	public BasicIncome createIncome(double income, IncomePeriod period) {
-		return this.delegate.createIncome(income, period);
+	
+	public Income createIncome(double income, IncomePeriod period) {
+		return new IncomeImpl(income, period);
 	}
 
 }

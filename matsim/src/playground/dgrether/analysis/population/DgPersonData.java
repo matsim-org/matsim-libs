@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.households.basic.BasicIncome;
+import org.matsim.households.Income;
 
 /**
  * @author dgrether
@@ -19,7 +19,7 @@ public class DgPersonData {
 	
 	private Id personId;
 
-	private BasicIncome income;
+	private Income income;
 	
 	public DgPersonData() {
 		this.planData = new HashMap<Id, DgPlanData>();
@@ -57,11 +57,11 @@ public class DgPersonData {
 		this.personId = personId;
 	}
 
-	public void setIncome(BasicIncome income) {
+	public void setIncome(Income income) {
 		this.income = income;
 	}
 	
-	public BasicIncome getIncome() {
+	public Income getIncome() {
 		return this.income;
 	}
 	

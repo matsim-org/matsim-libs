@@ -27,22 +27,15 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.households.basic.BasicHousehold;
-import org.matsim.households.basic.BasicHouseholds;
-import org.matsim.households.basic.BasicHouseholdsImpl;
-import org.matsim.households.basic.BasicHouseholdsReaderV10;
-import org.matsim.households.basic.HouseholdsWriterV1;
-import org.matsim.households.basic.BasicIncome.IncomePeriod;
+import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.households.Income.IncomePeriod;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.BasicVehicleType;
-import org.matsim.vehicles.BasicVehicles;
 
 /**
  * @author dgrether
@@ -61,12 +54,12 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
   private PersonImpl p23, p42, p43, p44, p45;
   
 	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
-		BasicHouseholds<BasicHousehold> households = new BasicHouseholdsImpl();
-		BasicHouseholdsReaderV10 reader = new BasicHouseholdsReaderV10(households);
+		Households households = new HouseholdsImpl();
+		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
 		reader.readFile(this.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
 		checkContent(households);
 		
-		HouseholdsWriterV1 writer = new HouseholdsWriterV1(households);
+		HouseholdsWriterV10 writer = new HouseholdsWriterV10(households);
 		String outfilename = this.getOutputDirectory() +  TESTXMLOUTPUT;
 		writer.writeFile(outfilename);
 		
@@ -74,65 +67,15 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertTrue(outFile.exists());
 		
 		//read it again to check if the same is read as at the very first beginning of test
-		households = new BasicHouseholdsImpl();
-		reader = new BasicHouseholdsReaderV10(households);
+		households = new HouseholdsImpl();
+		reader = new HouseholdsReaderV10(households);
 		reader.readFile(outfilename);
 		checkContent(households);
 	}
 	
-	public void testReaderWriter() {
-		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().scenario().setUseHouseholds(true);
-		scenario.getConfig().scenario().setUseVehicles(true); 
-		createTestPopulation(scenario);
-		createTestVehicles(scenario);
-		
-		HouseholdsReaderV10 reader = new HouseholdsReaderV10(scenario);
-		reader.readFile(this.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
-		checkContent(scenario.getHouseholds());
-		checkReferencedContent(scenario.getHouseholds());
-	}
-	
-	private void createTestVehicles(ScenarioImpl scenario) {
-		BasicVehicles v = scenario.getVehicles();
-		BasicVehicleType defaultType = v.getBuilder().createVehicleType(new IdImpl("default"));
-		v.getVehicles().put(id23, v.getBuilder().createVehicle(id23, defaultType));
-		v.getVehicles().put(id42, v.getBuilder().createVehicle(id42, defaultType));
-	}
-
-	private void createTestPopulation(ScenarioImpl scenario) {
-		PopulationImpl pop = scenario.getPopulation();
-		p23 = (PersonImpl) pop.getBuilder().createPerson(id23);
-		p42 = (PersonImpl) pop.getBuilder().createPerson(id42);
-		p43 = (PersonImpl) pop.getBuilder().createPerson(id43);
-		p44 = (PersonImpl) pop.getBuilder().createPerson(id44);
-		p45 = (PersonImpl) pop.getBuilder().createPerson(id45);
-		pop.getPersons().put(id23, p23);
-		pop.getPersons().put(id42, p42);
-		pop.getPersons().put(id43, p43);
-		pop.getPersons().put(id44, p44);
-		pop.getPersons().put(id45, p45);
-	}
-
-	private void checkReferencedContent(Households households) {
-		Household hh23 = households.getHouseholds().get(id23);
-		assertNotNull(hh23);
-		assertEquals(p23, hh23.getMembers().get(id23));
-		assertEquals(p23.getHousehold(), hh23);
-		assertEquals(p43, hh23.getMembers().get(id43));
-		assertEquals(p43.getHousehold(), hh23);
-		
-		Household hh24 = households.getHouseholds().get(id24);
-		assertNotNull(hh24);
-		assertEquals(p44, hh24.getMembers().get(id44));
-		assertEquals(p44.getHousehold(), hh24);
-		assertEquals(p45, hh24.getMembers().get(id45));
-		assertEquals(p45.getHousehold(), hh24);
-	}
-
-	private void checkContent(BasicHouseholds<? extends BasicHousehold> households) {
+	private void checkContent(Households households) {
 		assertEquals(2, households.getHouseholds().size());
-		BasicHousehold hh = households.getHouseholds().get(id23);
+		Household hh = households.getHouseholds().get(id23);
 		assertNotNull(hh);
 		assertEquals(id23, hh.getId());
 		assertEquals(3, hh.getMemberIds().size());

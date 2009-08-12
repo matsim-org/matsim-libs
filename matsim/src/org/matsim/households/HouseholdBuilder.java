@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicHouseholdBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.households.basic;
-
-import java.util.List;
+package org.matsim.households;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.households.Income.IncomePeriod;
+
 
 /**
  * @author dgrether
+ *
  */
-public interface BasicHousehold {
+public interface HouseholdBuilder {
 
-	public Id getId();
+	public Household createHousehold(Id householdId);
 	
-	public List<Id> getMemberIds();
-	
-	public BasicIncome getIncome();
-	
-	public List<Id> getVehicleIds();
-
-	public void setIncome(BasicIncome income);
+	public Income createIncome(double income, IncomePeriod period);
 
 }

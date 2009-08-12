@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * PersonHouseholdMapping
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.households;
 
-package org.matsim.households.basic;
-
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 
+
 /**
+ * Tiny helper to get the household associated with a person's id.
  * @author dgrether
+ *
  */
-public class BasicHouseholdImpl implements BasicHousehold {
+public class PersonHouseholdMapping {
 
-	private Id id;
-	private List<Id> memberIds = null;
-	private List<Id> vehicleDefinitionIds = null;
-	private BasicIncome income;
+	private Map<Id, Household> phMap = new HashMap<Id, Household>();
 	
-	public BasicHouseholdImpl(Id id) {
-		this.id = id;
+	public PersonHouseholdMapping(Households hhs) {
+		this.reinitialize(hhs);
 	}
 
-	public Id getId() {
-		return this.id;
-	}
-
-	public BasicIncome getIncome() {
-		return this.income;
-	}
-
-	public List<Id> getMemberIds() {
-		return this.memberIds;
-	}
-
-	public List<Id> getVehicleIds() {
-		return this.vehicleDefinitionIds;
+	public void reinitialize(Households hhs) {
+		this.phMap.clear();
+		for (Household h : hhs.getHouseholds().values()){
+			for (Id member : h.getMemberIds()){
+				this.phMap.put(member, h);
+			}
+		}
+		
 	}
 	
-	public void setMemberIds(List<Id> memberIds) {
-		this.memberIds = memberIds;
+	public Household getHousehold(Id personId) {
+		return this.phMap.get(personId);
 	}
-
-	public void setIncome(BasicIncome income) {
-		this.income = income;
-	}
-
-	public void setVehicleIds(List<Id> vehicleIds) {
-		this.vehicleDefinitionIds = vehicleIds;
-	}
-
+	
+	
 }

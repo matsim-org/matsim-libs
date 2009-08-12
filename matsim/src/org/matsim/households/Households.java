@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Households
+ * BasicHouseholds
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,19 +22,17 @@ package org.matsim.households;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.households.basic.BasicHouseholds;
-import org.matsim.households.basic.HouseholdBuilder;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 
 /**
  * @author dgrether
  *
  */
-public interface Households extends BasicHouseholds<Household>{
+public interface Households extends MatsimToplevelContainer {
 
 	public Map<Id, Household> getHouseholds();
 	
 	public HouseholdBuilder getBuilder();
-	
 	
 }

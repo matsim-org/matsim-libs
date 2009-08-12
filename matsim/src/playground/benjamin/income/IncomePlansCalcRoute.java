@@ -27,6 +27,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.households.PersonHouseholdMapping;
 
 
 /**
@@ -37,27 +38,30 @@ public class IncomePlansCalcRoute extends PlansCalcRoute{
 
 	
 	private BKickIncomeTravelTimeDistanceCostCalculator incomeCostCalculator;
+	private PersonHouseholdMapping hhdb;
 
 	/**
 	 * Uses the speed factors from the config group and the rerouting of the factory 
+	 * @param hhdb 
 	 */
 	public IncomePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, 
 			final TravelCost costCalculator,
-			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
+			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory, PersonHouseholdMapping hhdb){
 		super(group, network, costCalculator, timeCalculator, factory);
 		this.incomeCostCalculator = (BKickIncomeTravelTimeDistanceCostCalculator)costCalculator;
+		this.hhdb = hhdb;
 	}
 
 	@Override
 	public void run(final PersonImpl person) {
-		this.incomeCostCalculator.setIncome(person.getHousehold().getIncome());
+		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(person.getId()).getIncome());
 		super.run(person);
 	}
 	
 
 	@Override
 	public void run(PlanImpl plan){
-		this.incomeCostCalculator.setIncome(plan.getPerson().getHousehold().getIncome());
+		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(plan.getPerson().getId()).getIncome());
 		super.run(plan);
 	}
 	

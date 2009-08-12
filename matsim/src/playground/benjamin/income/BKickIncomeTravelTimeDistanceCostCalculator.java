@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.households.basic.BasicIncome;
-import org.matsim.households.basic.BasicIncome.IncomePeriod;
+import org.matsim.households.Income;
+import org.matsim.households.Income.IncomePeriod;
 
 
 /**
@@ -68,7 +68,7 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelCost {
 	}
 	
 	
-	public void setIncome(BasicIncome income) {
+	public void setIncome(Income income) {
 		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
 			this.income = income.getIncome() / (240 * 3.5);
 		}

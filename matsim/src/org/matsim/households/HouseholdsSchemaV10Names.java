@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicHouseholds
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.households.basic;
 
-import java.util.Map;
-
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-
+package org.matsim.households;
 
 /**
  * @author dgrether
- *
  */
-public interface BasicHouseholds<T extends BasicHousehold> extends MatsimToplevelContainer {
+public interface HouseholdsSchemaV10Names {
 
-	public Map<Id, T> getHouseholds();
-	
-	public BasicHouseholdBuilder getBuilder();
+	public static String HOUSEHOLDS = "households";
+	public static String HOUSEHOLD = "household";
+	public static String ID = "id";
+	public static String MEMBERS = "members";
+	public static String PERSONID = "personId";
+	public static String REFID = "refId";
+	public static String INCOME = "income";
+	public static String CURRENCY = "currency";
+	public static String PERIOD = "period";
+	public static String VEHICLEDEFINITIONID = "vehicleDefinitionId";
+	public static String VEHICLES = "vehicles";
 	
 }

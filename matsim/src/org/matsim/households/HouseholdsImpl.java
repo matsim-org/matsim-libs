@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HouseholdsImpl
+ * BasicHouseholdsImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,29 +23,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.households.basic.HouseholdBuilder;
 
 
 /**
+ * Basic implementation of the BasicHousehold container
  * @author dgrether
  *
  */
-public class HouseholdsImpl implements Households {
+public class HouseholdsImpl implements Households{
 
-	private Map<Id, Household> households;
 	private HouseholdBuilder builder;
 
+	private Map<Id, Household> households;
+	
 	public HouseholdsImpl(){
 		this.households = new HashMap<Id, Household>();
 		this.builder = new HouseholdBuilderImpl();
 	}
 	
-	public Map<Id, Household> getHouseholds() {
-		return this.households;
-	}
-
 	public HouseholdBuilder getBuilder() {
 		return this.builder;
 	}
+
+	public Map<Id, Household> getHouseholds() {
+		return this.households;
+	}
+	
+	
 
 }

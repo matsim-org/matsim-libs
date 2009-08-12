@@ -17,17 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.households.basic;
-
-import org.matsim.api.basic.v01.Id;
-import org.matsim.households.Household;
+package org.matsim.households;
 
 /**
- * Builder for household objects.
+ * Simple interface to represent an income including a time period and a currency.
  * @author dgrether
  */
-public interface HouseholdBuilder extends BasicHouseholdBuilder{
+public interface Income {
 	
-	public Household createHousehold(Id householdId);
+	public enum IncomePeriod {year, week, month, day, hour, second};
+
+	public String getCurrency();
+	
+	public IncomePeriod getIncomePeriod();
+	
+  public double getIncome();
+
+	public void setCurrency(String currency);	
 
 }

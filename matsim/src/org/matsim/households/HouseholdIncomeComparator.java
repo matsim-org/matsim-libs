@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * HouseholdIncomeComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,28 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.households;
 
-package org.matsim.households.basic;
+import java.util.Comparator;
 
-import java.util.ArrayList;
-
-import org.matsim.api.basic.v01.Id;
-import org.matsim.households.basic.BasicIncome.IncomePeriod;
 
 /**
+ * Simple comparator for households to compare them by income
  * @author dgrether
+ *
  */
-public class BasicHouseholdBuilderImpl implements BasicHouseholdBuilder {
+public class HouseholdIncomeComparator implements Comparator<Household> {
 
-	public BasicHouseholdImpl createHousehold(Id householdId) {
-		BasicHouseholdImpl hh = new BasicHouseholdImpl(householdId);
-		hh.setMemberIds(new ArrayList<Id>());
-		hh.setVehicleIds(new ArrayList<Id>());
-		return hh;
-	}
-	
-	public BasicIncome createIncome(double income, IncomePeriod period) {
-		return new BasicIncomeImpl(income, period);
+	public int compare(Household o1, Household o2) {
+		if (o1.getIncome().getIncomePeriod() != o2.getIncome().getIncomePeriod()){
+			throw new IllegalArgumentException("Can only compare Households with incomes in "
+					+ " same income period");
+		}
+		if (o1.getIncome().getIncome() < o2.getIncome().getIncome()){
+			return -1;
+		}
+		else if (o1.getIncome().getIncome() > o2.getIncome().getIncome()){
+			return 1;
+		}
+		return 0;
 	}
 
 }

@@ -27,6 +27,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.households.PersonHouseholdMapping;
 
 
 /**
@@ -37,11 +38,13 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 
 	private CharyparNagelScoringConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
+	private PersonHouseholdMapping hhdb;
 
 	public BKickIncomeScoringFunctionFactory(
-			CharyparNagelScoringConfigGroup charyparNagelScoring) {
+			CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping) {
 		this.configGroup = charyparNagelScoring;
 		this.params = new CharyparNagelScoringParameters(configGroup);
+		this.hhdb = hhmapping;
 	}
 
 	/**
@@ -53,7 +56,7 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
 
-		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(plan, params, this.hhdb));
 
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HouseholdIncomeComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +16,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.households.basic;
 
-import java.util.Comparator;
+package org.matsim.households;
+
 
 
 /**
- * Simple comparator for households to compare them by income
  * @author dgrether
- *
  */
-public class HouseholdIncomeComparator implements Comparator<BasicHousehold> {
+public class IncomeImpl implements Income {
 
-	public int compare(BasicHousehold o1, BasicHousehold o2) {
-		if (o1.getIncome().getIncomePeriod() != o2.getIncome().getIncomePeriod()){
-			throw new IllegalArgumentException("Can only compare Households with incomes in "
-					+ " same income period");
-		}
-		if (o1.getIncome().getIncome() < o2.getIncome().getIncome()){
-			return -1;
-		}
-		else if (o1.getIncome().getIncome() > o2.getIncome().getIncome()){
-			return 1;
-		}
-		return 0;
+	private String currency;
+	private IncomePeriod period;
+	private double income;
+	
+	public IncomeImpl(double income, IncomePeriod period) {
+		this.period = period;
+		this.income = income;
+	}
+	
+	public String getCurrency() {
+		return this.currency;
 	}
 
+	public double getIncome() {
+		return this.income;
+	}
+
+	public IncomePeriod getIncomePeriod() {
+		return this.period;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	public void setIncome(double income, IncomePeriod period) {
+		this.income = income;
+	}
+	
 }

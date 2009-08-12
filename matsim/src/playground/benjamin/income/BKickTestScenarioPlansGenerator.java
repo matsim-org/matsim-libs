@@ -33,8 +33,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.households.HouseholdBuilder;
 import org.matsim.households.Households;
-import org.matsim.households.basic.HouseholdBuilder;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;

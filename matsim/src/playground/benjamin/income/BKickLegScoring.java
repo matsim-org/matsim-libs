@@ -26,8 +26,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.households.basic.BasicIncome;
-import org.matsim.households.basic.BasicIncome.IncomePeriod;
+import org.matsim.households.Income;
+import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.households.Income.IncomePeriod;
 
 /**
  * @author dgrether
@@ -43,9 +44,9 @@ public class BKickLegScoring extends LegScoringFunction {
 
 	private double incomePerTrip;
 
-	public BKickLegScoring(final PlanImpl plan, final CharyparNagelScoringParameters params) {
+	public BKickLegScoring(final PlanImpl plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb) {
 		super(plan, params);
-		BasicIncome income = plan.getPerson().getHousehold().getIncome();
+		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
 		this.incomePerTrip = this.calculateIncomePerTrip(income);
 		
 //		log.info("Using BKickLegScoring...");
@@ -87,7 +88,7 @@ public class BKickLegScoring extends LegScoringFunction {
 		return tmpScore;
 	}
 
-	private double calculateIncomePerTrip(BasicIncome income) {
+	private double calculateIncomePerTrip(Income income) {
 		double ipt = Double.NaN;
 		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
 			ipt = income.getIncome() / (240 * 3.5);

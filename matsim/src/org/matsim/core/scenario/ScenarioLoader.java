@@ -24,8 +24,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.BasicScenarioLoader;
 import org.matsim.core.config.Config;
@@ -41,6 +39,7 @@ import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.world.MatsimWorldReader;
+import org.xml.sax.SAXException;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -110,7 +109,7 @@ public class ScenarioLoader extends BasicScenarioLoader {
 				String hhFileName = this.config.households().getInputFile();
 				log.info("loading households from " + hhFileName);
 				try {
-					new HouseholdsReaderV10((ScenarioImpl) this.getScenario()).parse(hhFileName);
+					new HouseholdsReaderV10(this.getScenario().getHouseholds()).parse(hhFileName);
 				} catch (SAXException e) {
 					throw new RuntimeException(e);
 				} catch (ParserConfigurationException e) {

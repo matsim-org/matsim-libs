@@ -27,12 +27,11 @@ import java.util.PriorityQueue;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.households.basic.BasicHousehold;
-import org.matsim.households.basic.BasicHouseholds;
-import org.matsim.households.basic.BasicHouseholdsImpl;
-import org.matsim.households.basic.BasicHouseholdsReaderV10;
-import org.matsim.households.basic.HouseholdIncomeComparator;
+import org.matsim.households.HouseholdsImpl;
+import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.households.HouseholdIncomeComparator;
 
 import playground.dgrether.DgPaths;
 
@@ -46,27 +45,20 @@ public class IncomeStats {
 	
 	private static final Logger log = Logger.getLogger(IncomeStats.class);
 	
-	private BasicHouseholds<BasicHousehold> households;
+	private Households households;
 	private double totalIncome;
 
 
-	public IncomeStats(BasicHouseholds<BasicHousehold> hhs){
+	public IncomeStats(Households hhs){
 		this.households = hhs;
 		this.totalIncome = calculateTotalIncome();
 		log.error("total income: " + this.totalIncome);
 
 	}
 	
-	
-	public IncomeStats(Households hhs) {
-		this.households = (BasicHouseholds)hhs;
-		this.totalIncome = calculateTotalIncome();
-		log.error("total income: " + this.totalIncome);
-	}
-	
 	private double calculateTotalIncome(){
 		double ti = 0.0;
-		for (BasicHousehold hh : this.households.getHouseholds().values()){
+		for (Household hh : this.households.getHouseholds().values()){
 			ti += hh.getIncome().getIncome();
 		}
 		return ti;
@@ -86,7 +78,7 @@ public class IncomeStats {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outdir + "hhincomes.txt");
 			writer.write("Id \t income \t incomeperiod");
 			writer.newLine();
-			for (BasicHousehold hh : this.households.getHouseholds().values()){
+			for (Household hh : this.households.getHouseholds().values()){
 				writer.write(hh.getId() + "\t" + hh.getIncome().getIncome() + "\t" + hh.getIncome().getIncomePeriod());
 				writer.newLine();
 			}
@@ -102,7 +94,7 @@ public class IncomeStats {
 
 	private void calculateLorenzCurve(String outdir) {
 		int stepSizePercent = 1;
-		PriorityQueue<BasicHousehold> hhQueue = new PriorityQueue<BasicHousehold>(this.households.getHouseholds().size(), 
+		PriorityQueue<Household> hhQueue = new PriorityQueue<Household>(this.households.getHouseholds().size(), 
 				new HouseholdIncomeComparator());
 		hhQueue.addAll(this.households.getHouseholds().values());
     int hhsPerStepSize = this.households.getHouseholds().size() / 100 * stepSizePercent;
@@ -141,8 +133,8 @@ public class IncomeStats {
 	public static void main(String[] args) {
 		String outdir = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/";
 		String hhFile = outdir + "households.xml";
-		BasicHouseholds<BasicHousehold> hhs = new BasicHouseholdsImpl();
-		new BasicHouseholdsReaderV10(hhs).readFile(hhFile);
+		Households hhs = new HouseholdsImpl();
+		new HouseholdsReaderV10(hhs).readFile(hhFile);
 		IncomeStats istats = new IncomeStats(hhs);
 		istats.calculateStatistics(outdir);
 		log.info("stats written!");

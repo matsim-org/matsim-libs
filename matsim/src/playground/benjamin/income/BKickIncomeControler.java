@@ -26,6 +26,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
+import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanCalcType;
 
@@ -36,6 +37,8 @@ import org.matsim.population.algorithms.PlanCalcType;
  *
  */
 public class BKickIncomeControler extends Controler {
+
+	private PersonHouseholdMapping hhdb;
 
 	public BKickIncomeControler(String configFileName) {
 		super(configFileName);
@@ -51,11 +54,12 @@ public class BKickIncomeControler extends Controler {
 
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickIncomeScoringFunctionFactory(this.config.charyparNagelScoring());
+		return new BKickIncomeScoringFunctionFactory(this.config.charyparNagelScoring(), this.hhdb);
 	}
 	
 	@Override
-	protected void setUp(){		
+	protected void setUp(){	
+		this.hhdb = new PersonHouseholdMapping(this.scenarioData.getHouseholds());
 		if (this.travelTimeCalculator == null) {
 			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
@@ -65,7 +69,7 @@ public class BKickIncomeControler extends Controler {
 	
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
+		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.hhdb);
 	}
 	
 

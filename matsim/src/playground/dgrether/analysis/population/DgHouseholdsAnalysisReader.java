@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.population;
 
-import org.matsim.households.basic.BasicHousehold;
-import org.matsim.households.basic.BasicHouseholds;
-import org.matsim.households.basic.BasicHouseholdsImpl;
-import org.matsim.households.basic.BasicHouseholdsReaderV10;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+import org.matsim.households.HouseholdsImpl;
+import org.matsim.households.HouseholdsReaderV10;
 
 
 public class DgHouseholdsAnalysisReader {
@@ -37,10 +37,10 @@ public class DgHouseholdsAnalysisReader {
 	
 	
 	public void readHousholds(String filename) {
-		BasicHouseholds<BasicHousehold> hhs = new BasicHouseholdsImpl();
-		BasicHouseholdsReaderV10 reader = new BasicHouseholdsReaderV10(hhs);
+		Households hhs = new HouseholdsImpl();
+		HouseholdsReaderV10 reader = new HouseholdsReaderV10(hhs);
 		reader.readFile(filename);
-		for (BasicHousehold hh : hhs.getHouseholds().values()) {
+		for (Household hh : hhs.getHouseholds().values()) {
 			DgPersonData pd = this.pop.getPersonData().get(hh.getMemberIds().get(0));
 			pd.setIncome(hh.getIncome());
 		}

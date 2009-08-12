@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.households.basic;
+package org.matsim.households;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,26 +27,21 @@ import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.households.Households;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdsWriterV1 extends MatsimXmlWriter {
+public class HouseholdsWriterV10 extends MatsimXmlWriter {
 	
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	private BasicHouseholds<BasicHousehold> households;
+	private Households households;
 	
-	public HouseholdsWriterV1(BasicHouseholds<BasicHousehold> households) {
+	public HouseholdsWriterV10(Households households) {
 		this.households = households;
 	}
 	
-	public HouseholdsWriterV1(Households hhs) {
-		this((BasicHouseholds)hhs);
-	}
-
 	public void writeFile(String filename) throws FileNotFoundException, IOException {
 		this.openFile(filename);
 		this.writeXmlHead();
@@ -54,59 +49,59 @@ public class HouseholdsWriterV1 extends MatsimXmlWriter {
 		this.close();
 	}
 	
-	private void writeHouseholds(BasicHouseholds<BasicHousehold> basicHouseholds) throws IOException {
+	private void writeHouseholds(Households basicHouseholds) throws IOException {
 		atts.clear();
 		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
 		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "households_v1.0.xsd"));
-		this.writeStartTag(HouseholdsSchemaV1Names.HOUSEHOLDS, atts);
-		for (BasicHousehold h : basicHouseholds.getHouseholds().values()) {
+		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLDS, atts);
+		for (Household h : basicHouseholds.getHouseholds().values()) {
 			this.writeHousehold(h);
 		}
-		this.writeEndTag(HouseholdsSchemaV1Names.HOUSEHOLDS);
+		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLDS);
 	}
 
-	private void writeHousehold(BasicHousehold h) throws IOException {
+	private void writeHousehold(Household h) throws IOException {
 		this.atts.clear();
-		atts.add(this.createTuple(HouseholdsSchemaV1Names.ID, h.getId().toString()));
-		this.writeStartTag(HouseholdsSchemaV1Names.HOUSEHOLD, atts);
+		atts.add(this.createTuple(HouseholdsSchemaV10Names.ID, h.getId().toString()));
+		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLD, atts);
 		if ((h.getMemberIds() != null) && !h.getMemberIds().isEmpty()){
 			this.writeMembers(h.getMemberIds());
 		}
 		if ((h.getVehicleIds() != null) && !h.getVehicleIds().isEmpty()) {
-			this.writeStartTag(HouseholdsSchemaV1Names.VEHICLES, null);
+			this.writeStartTag(HouseholdsSchemaV10Names.VEHICLES, null);
 			for (Id id : h.getVehicleIds()){
 				atts.clear();
-				atts.add(this.createTuple(HouseholdsSchemaV1Names.REFID, id.toString()));
-				this.writeStartTag(HouseholdsSchemaV1Names.VEHICLEDEFINITIONID, atts, true);
+				atts.add(this.createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
+				this.writeStartTag(HouseholdsSchemaV10Names.VEHICLEDEFINITIONID, atts, true);
 			}
-			this.writeEndTag(HouseholdsSchemaV1Names.VEHICLES);
+			this.writeEndTag(HouseholdsSchemaV10Names.VEHICLES);
 		}
 		if (h.getIncome() != null){
 			this.writeIncome(h.getIncome());
 		}
-		this.writeEndTag(HouseholdsSchemaV1Names.HOUSEHOLD);
+		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLD);
 	}
 
-	private void writeIncome(BasicIncome income) throws IOException {
+	private void writeIncome(Income income) throws IOException {
 		atts.clear();
 		if (income.getCurrency() != null) {
-			atts.add(this.createTuple(HouseholdsSchemaV1Names.CURRENCY,income.getCurrency()));
+			atts.add(this.createTuple(HouseholdsSchemaV10Names.CURRENCY,income.getCurrency()));
 		}
-		atts.add(this.createTuple(HouseholdsSchemaV1Names.PERIOD, income.getIncomePeriod().toString()));
-		this.writeStartTag(HouseholdsSchemaV1Names.INCOME, atts);
+		atts.add(this.createTuple(HouseholdsSchemaV10Names.PERIOD, income.getIncomePeriod().toString()));
+		this.writeStartTag(HouseholdsSchemaV10Names.INCOME, atts);
 		this.writeContent(Double.toString(income.getIncome()), true);
-		this.writeEndTag(HouseholdsSchemaV1Names.INCOME);
+		this.writeEndTag(HouseholdsSchemaV10Names.INCOME);
 	}
 
 	private void writeMembers(List<Id> memberIds) throws IOException {
-		this.writeStartTag(HouseholdsSchemaV1Names.MEMBERS, null);
+		this.writeStartTag(HouseholdsSchemaV10Names.MEMBERS, null);
 		for (Id id : memberIds){
 			atts.clear();
-			atts.add(this.createTuple(HouseholdsSchemaV1Names.REFID, id.toString()));
-			this.writeStartTag(HouseholdsSchemaV1Names.PERSONID, atts, true);
+			atts.add(this.createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
+			this.writeStartTag(HouseholdsSchemaV10Names.PERSONID, atts, true);
 		}
-		this.writeEndTag(HouseholdsSchemaV1Names.MEMBERS);
+		this.writeEndTag(HouseholdsSchemaV10Names.MEMBERS);
 	}
 
 
