@@ -181,9 +181,9 @@ public class QuadTreeTest extends TestCase {
 		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
 		// the 4 corners
 		qt.put(0.0, 0.0, "SW");
-		qt.put(0.0, 40.0, "SE");
-		qt.put(60.0, 0.0, "NW");
-		qt.put(60.0, 40.0, "NE");
+		qt.put(40.0, 0.0, "SE");
+		qt.put(0.0, 60.0, "NW");
+		qt.put(40.0, 60.0, "NE");
 		// the 4 sides
 		qt.put(10.0, 60.0, "N");
 		qt.put(40.0, 10.0, "E");
@@ -191,9 +191,9 @@ public class QuadTreeTest extends TestCase {
 		qt.put(0.0, 10.0, "W");
 
 		assertEquals("SW", qt.get(0.0, 0.0));
-		assertEquals("SE", qt.get(0.0, 40.0));
-		assertEquals("NW", qt.get(60.0, 0.0));
-		assertEquals("NE", qt.get(60.0, 40.0));
+		assertEquals("SE", qt.get(40.0, 0.0));
+		assertEquals("NW", qt.get(0.0, 60.0));
+		assertEquals("NE", qt.get(40.0, 60.0));
 		assertEquals("N", qt.get(10.0, 60.0));
 		assertEquals("E", qt.get(40.0, 10.0));
 		assertEquals("S", qt.get(10.0, 0.0));
@@ -221,6 +221,82 @@ public class QuadTreeTest extends TestCase {
 		assertEquals("E", qt.get(40.0, 10.0));
 		assertEquals("S", qt.get(10.0, 0.0));
 		assertEquals("W", qt.get(0.0, 10.0));
+	}
+
+	public void testGetDistance_fromOutsideExtent() {
+		QuadTree<String> qt = getTestTree();
+		assertContains(new String[] {"100.0, 0.0"}, qt.get(160.0, 0, 60.1)); // E
+		assertContains(new String[] {"15.0, 15.0", "15.0, 15.0 B"}, qt.get(15.0, 160, 145.1)); // N
+		assertContains(new String[] {"-15.0, 0.0"}, qt.get(-60.0, 0, 45.1)); // W
+		assertContains(new String[] {"100.0, 0.0"}, qt.get(100.0, -60, 60.1)); // S
+	}
+
+	public void testGetDistance_EntryOnDividingBorder() {
+		QuadTree<String> qt = new QuadTree<String>(0, 0, 40, 60);
+		qt.put(10.0, 10.0, "10.0, 10.0");
+		qt.put(20.0, 20.0, "20.0, 20.0"); // on vertical border
+		qt.put(20.0, 30.0, "20.0, 30.0"); // exactly on center
+		qt.put(30.0, 30.0, "30.0, 30.0"); // on horizontal border
+		qt.put(12.0, 15.0, "12.0, 15.0");
+		qt.put(10.0, 25.0, "10.0, 25.0");
+
+		assertContains(new String[] {"10.0, 10.0"}, qt.get(10.0, 7.0, 3.0));
+		assertContains(new String[] {"10.0, 10.0"}, qt.get(10.0, 12.0, 2.0));
+		assertContains(new String[] {"10.0, 10.0"}, qt.get(7.0, 10.0, 3.0));
+		assertContains(new String[] {"10.0, 10.0"}, qt.get(13.0, 10.0, 3.0));
+
+		assertContains(new String[] {"20.0, 20.0"}, qt.get(20.0, 23.0, 3.0));
+		assertContains(new String[] {"20.0, 30.0"}, qt.get(20.0, 27.0, 3.0));
+		assertContains(new String[] {"30.0, 30.0"}, qt.get(27.0, 30.0, 3.0));
+		assertContains(new String[] {"12.0, 15.0"}, qt.get(15.0, 15.0, 3.0));
+		assertContains(new String[] {"10.0, 25.0"}, qt.get(10.0, 28.0, 3.0));
+	}
+
+	public void testGetDistance_EntryOnOutsideBorder() {
+		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
+		// the 4 corners
+		qt.put(0.0, 0.0, "SW");
+		qt.put(40.0, 0.0, "SE");
+		qt.put(0.0, 60.0, "NW");
+		qt.put(40.0, 60.0, "NE");
+		// the 4 sides
+		qt.put(10.0, 60.0, "N");
+		qt.put(40.0, 10.0, "E");
+		qt.put(10.0, 0.0, "S");
+		qt.put(0.0, 10.0, "W");
+
+		assertContains(new String[] {"SW"}, qt.get(3.0, 0.0, 3.0));
+		assertContains(new String[] {"SE"}, qt.get(40.0, 3.0, 3.0));
+		assertContains(new String[] {"NW"}, qt.get(3.0, 60.0, 3.0));
+		assertContains(new String[] {"NE"}, qt.get(40.0, 57.0, 3.0));
+
+		assertContains(new String[] {"N"}, qt.get(7.0, 60.0, 3.0));
+		assertContains(new String[] {"E"}, qt.get(40.0, 13.0, 3.0));
+		assertContains(new String[] {"S"}, qt.get(13.0, 0.0, 3.0));
+		assertContains(new String[] {"W"}, qt.get(3.0, 10.0, 3.0));
+	}
+
+	public void testGetDistance_EntryOutsideExtent() {
+		QuadTree<String> qt = new QuadTree<String>(5.0, 5.0, 35.0, 55.0);
+		// outside the 4 corners
+		qt.put(0.0, 0.0, "SW");
+		qt.put(40.0, 0.0, "SE");
+		qt.put(0.0, 60.0, "NW");
+		qt.put(40.0, 60.0, "NE");
+		// outside the 4 sides
+		qt.put(10.0, 60.0, "N");
+		qt.put(40.0, 10.0, "E");
+		qt.put(10.0, 0.0, "S");
+		qt.put(0.0, 20.0, "W");
+
+		assertContains(new String[] {"SW", "S"}, qt.get(6.0, 6.0, 8.5));
+		assertContains(new String[] {"S"}, qt.get(6.0, 6.0, 8.0));
+		assertContains(new String[] {"NW", "N"}, qt.get(6.0, 54.0, 8.5));
+		assertContains(new String[] {"N"}, qt.get(6.0, 54.0, 8.0));
+		assertContains(new String[] {"NE"}, qt.get(34.0, 54.0, 8.5));
+		assertContains(new String[] {"SE", "E"}, qt.get(34.0, 6.0, 8.5));
+		assertContains(new String[] {"E"}, qt.get(34.0, 6.0, 8.0));
+		assertContains(new String[] {"W"}, qt.get(6.0, 21.0, 7.0));
 	}
 
 	/**
@@ -483,6 +559,20 @@ public class QuadTreeTest extends TestCase {
 		}
 		assertEquals(treeSize, counter);
 		assertEquals(treeSize, values.size());
+	}
+
+	/**
+	 * Checks that the given collection contains exactly all of the exptectedEntries, but none more.
+	 *
+	 * @param <T>
+	 * @param expectedEntries
+	 * @param collection
+	 */
+	private <T> void assertContains(final T[] expectedEntries, final Collection<T> collection) {
+		assertEquals(expectedEntries.length, collection.size());
+		for (T t : expectedEntries) {
+			assertTrue(collection.contains(t));
+		}
 	}
 
 	/**
