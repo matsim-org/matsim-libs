@@ -199,7 +199,9 @@ public class ClusterActivities {
 			String orderFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_OrderAdjacency.txt";
 			String inOrderFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_InOrderAdjacency.txt";
 			String outOrderFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_OutOrderAdjacency.txt";
+			String pajekNetworkFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "_PajekNetwork.net";
 			mamb.writeAdjacenciesToFile(distanceFilename, orderFilename, inOrderFilename, outOrderFilename);
+			mamb.writeAdjacencyAsPajekNetworkToFile(pajekNetworkFilename);
 		}
 		log.info("Process completed.");
 	}

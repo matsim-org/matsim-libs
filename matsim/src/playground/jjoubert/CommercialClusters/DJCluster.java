@@ -41,8 +41,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * <par>This class implements the DJ-Cluster density-based clustering approach suggested by
- * Zhou <i>et al</i> (2004).</par>
+ * <par>This class implements the DJ-Cluster density-based clustering approach as published
+ * by Zhou <i>et al</i> (2004).</par>
  * <ul>
  * 		<i>``The basic idea of DJ-Cluster is as follows. For each point, calculate its 
  * 		<b>neighborhood</b>: the neighborhood consists of points within distance 
@@ -97,8 +97,7 @@ public class DJCluster {
 		int cPointCounter = 0;
 		
 		/*
-		 * Determine the extent of the QuadTree. Then build a new QuadTree, and populate 
-		 * a TreeMap with unclustered points.
+		 * Determine the extent of the QuadTree. 
 		 */
 		double xMin = Double.MAX_VALUE;
 		double yMin = Double.MAX_VALUE;
@@ -110,6 +109,12 @@ public class DJCluster {
 			xMax = Math.max(xMax, p.getX());
 			yMax = Math.max(yMax, p.getY());
 		}
+		/*
+		 * Build a new QuadTree, and place each point in the QuadTree as a ClusterPoint.
+		 * The geographic coordinates of each point is used as the keys in the QuadTree.
+		 * Initially all ClusterPoints will have a NULL reference to its cluster. An 
+		 * ArrayList of Points is also kept as iterator for unclustered points.
+		 */
 		QuadTree<ClusterPoint> qt = new QuadTree<ClusterPoint>(xMin, yMin, xMax, yMax);
 		ArrayList<ClusterPoint> ul = new ArrayList<ClusterPoint>();
 		for (int i = 0; i < this.inputPoints.size(); i++) {
@@ -126,7 +131,7 @@ public class DJCluster {
 			ClusterPoint p = ul.get(unclusteredIndex);
 			
 			if(p.getCluster() == null){
-				// Compute the density-based neighbourhood N(p) of p
+				// Compute the density-based neighbourhood, N(p), of the point p
 				Collection<ClusterPoint> neighbourhood = qt.get(p.getPoint().getX(), p.getPoint().getY(), radius);
 				ArrayList<ClusterPoint> uN = new ArrayList<ClusterPoint>(neighbourhood.size());
 				ArrayList<ClusterPoint> cN = new ArrayList<ClusterPoint>(neighbourhood.size());
@@ -141,7 +146,11 @@ public class DJCluster {
 					// Point is considered to be noise.
 					uPointCounter++;
 				}else if(cN.size() > 0){
-					// Merge all the clusters.
+					/* 
+					 * Merge all the clusters. Use the cluster with the smallest clusterId
+					 * value as the remaining cluster.
+					 */
+					
 					ArrayList<Cluster> localClusters = new ArrayList<Cluster>();
 					Cluster smallestCluster = cN.get(0).getCluster();
 					for(int i = 1; i < cN.size(); i++){
@@ -167,7 +176,7 @@ public class DJCluster {
 						}
 					}
 					
-					// Add unclustered points.
+					// Add unclustered points in the neighborhood.
 					for (ClusterPoint cp : uN) {
 						smallestCluster.getPoints().add(cp);
 						cp.setCluster(smallestCluster);
@@ -184,7 +193,6 @@ public class DJCluster {
 						newCluster.getPoints().add(cp);
 						cPointCounter++;
 					}					
-//					clusterList.add(newCluster);
 				}
 			}
 			pointCounter++;
@@ -231,6 +239,22 @@ public class DJCluster {
 		log.info("Cluster list built.");
 	}
 	
+	/**
+	 * For each cluster, this method writes out the cluster id, the cluster's center of
+	 * gravity (as a longitude and latitude value), and the order of the cluster, i.e.
+	 * the number of activity points from the input data associated with the cluster.
+	 * Output is a comma-separated flat file, by default, but the delimiter can be set
+	 * using the class method <code>setDelimiter(String string)</code>.
+	 * <h5>File format:</h5>
+	 * <ul><code>
+	 * 		ClusterId,Long,Lat,NumberOfActivities<br>
+	 * 		0,28.7654,35.4576,12<br>
+	 * 		1,28.0114,31.3421,5<br>
+	 * 		...
+	 * </code></ul>
+	 * 
+	 * @param filename the absolute file path to where the cluster information is written.
+	 */
 	public void writeClustersToFile(String filename){
 		
 		int clusterCount = 0;
@@ -276,6 +300,24 @@ public class DJCluster {
 		return clusterList;
 	}
 	
+	/**
+	 * This method is used to write out cluster attributes to be imported as shapefiles 
+	 * in ArcGIS using the ET GeoWizards. The cluster attributes are:
+	 * <ul>
+	 * 		<li> the clustered points as point features;
+	 * 		<li> the clusters' center of gravity as point features;
+	 * 		<li> the lines connecting the clustered points and cluster centroids, as 
+	 * 			 polyline features;
+	 * 		<li> the convex hull of the clustered points, each as a polygon feature.
+	 * 			 (<b>NOTE:</b> This has been commented out since there is something
+	 * 			 buggy with the <code>convexHull()</code> method. I will try and fix it
+	 * 			 in future. There was also one of my attempts to <i>shrink</i> the 
+	 * 			 convex hull, but that also is not fool-proof.)
+	 * </ul> 
+	 * @see http://www.ian-ko.com/ET_GeoWizards/UserGuide/et_geowizards_userguide.htm for 
+	 * 		the format of the files.
+	 * @author jwjoubert
+	 */
 	public void visualizeClusters(	String pointFilename, 
 									String clusterFilename, 
 									String lineFilename,
@@ -550,6 +592,11 @@ public class DJCluster {
 	public int getMinimumPoints() {
 		return minimumPoints;
 	}
+	
+	public void setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
+	}
+
 	
 
 }

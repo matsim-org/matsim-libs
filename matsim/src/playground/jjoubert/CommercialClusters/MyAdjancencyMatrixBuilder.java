@@ -20,12 +20,15 @@
 
 package playground.jjoubert.CommercialClusters;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Scanner;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -179,11 +182,13 @@ public class MyAdjancencyMatrixBuilder {
 										String orderFilename, 
 										String inOrderFilename,
 										String outOrderFilename){
+		log.info("Writing adjacencies and orders to file.");
 		try {
 			BufferedWriter outputDistance = new BufferedWriter(new FileWriter(new File(distanceFilename)));
 			BufferedWriter outputOrder = new BufferedWriter(new FileWriter(new File(orderFilename)));
 			BufferedWriter outputInOrder = new BufferedWriter(new FileWriter(new File(inOrderFilename)));
 			BufferedWriter outputOutOrder = new BufferedWriter(new FileWriter(new File(outOrderFilename)));
+			int rowMultiplier = 1;
 			try{
 				for (int row = 0; row < matrixDimension; row++) {
 					/*
@@ -201,7 +206,7 @@ public class MyAdjancencyMatrixBuilder {
 					/*
 					 * Write the distance- and order adjacency values.
 					 */
-					for (int col = 0; col < matrixDimension; col++){
+					for (int col = 0; col < matrixDimension-1; col++){
 						if(orderAdjacency.getQuick(row, col) > 0){
 							outputDistance.write(String.valueOf(distanceAdjacency.getQuick(row, col)));
 							outputOrder.write(String.valueOf(orderAdjacency.getQuick(row, col)));
@@ -212,9 +217,19 @@ public class MyAdjancencyMatrixBuilder {
 						outputDistance.write(",");
 						outputOrder.write(",");
 					}
+					if(distanceAdjacency.getQuick(row, matrixDimension-1) > 0){
+						outputDistance.write(String.valueOf(distanceAdjacency.getQuick(row, matrixDimension-1)));
+						outputDistance.write(String.valueOf(orderAdjacency.getQuick(row, matrixDimension-1)));
+					}
 					outputDistance.newLine();
-					outputOrder.newLine();					
+					outputOrder.newLine();
+					
+					if(row+1 == rowMultiplier){
+						log.info("   Rows processed: " + String.valueOf(row+1));
+						rowMultiplier *= 2;
+					}
 				}
+				log.info("   Rows processed: " + String.valueOf(matrixDimension) + " (Done)");
 			} finally{
 				outputInOrder.close();
 				outputOutOrder.close();
@@ -224,6 +239,42 @@ public class MyAdjancencyMatrixBuilder {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
+	}
+	
+	public void writeAdjacencyAsPajekNetworkToFile(String outputFilename) {
+		log.info("Writing order adjacency as Pajek network file.");
+		try {
+			BufferedWriter output = new BufferedWriter(new FileWriter(new File( outputFilename)));
+			try{
+				output.write("*Vertices ");
+				output.write(String.valueOf(orderAdjacency.rows()));
+				output.newLine();
+				output.write("*Arcs");
+				output.newLine();
+				int rowMultiplier = 0;
+				for(int r = 0; r < orderAdjacency.rows(); r++){
+					for(int c = 0; c < orderAdjacency.columns(); c++){
+						if(orderAdjacency.getQuick(r, c) > 0){
+							output.write(String.valueOf(r));
+							output.write(" ");
+							output.write(String.valueOf(c));
+							output.write(" ");
+							output.write(String.valueOf(orderAdjacency.getQuick(r, c)));
+							output.newLine();
+						}
+					}
+					if(rowMultiplier == r+1){
+						log.info("   Rows processed: " + String.valueOf(r+1));
+						rowMultiplier *= 2;
+					}
+				}
+				log.info("   Rows processed: " + String.valueOf(orderAdjacency.rows()) + " (Done)");
+			} finally{
+				output.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
