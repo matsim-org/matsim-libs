@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dgAnalysisSettings
+<!--  xmlns="http://www.matsim.org/files/dtd"-->
+<!--  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/households_v1.0.xsd"-->
+  >
+  <runInfomation> <!-- could also be called metadata-->
+    <runId>721</runId>
+  </runInfomation>
+  
+  <scenario>
+    <network>
+      <inputFile>
+        <relativePath>
+        
+        </relativePath>
+      </inputFile>
+    </network>
+    <population>
+    
+    </population>
+  </scenario>
+  
+  
+</dgAnalysisSettings>
