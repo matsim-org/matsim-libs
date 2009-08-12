@@ -119,7 +119,7 @@ public class Visum2TransitSchedule {
 						List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 						//  convert route profile
 						for (VisumNetwork.TimeProfileItem tpi : this.visum.timeProfileItems.values()){
-							if (tpi.lineName.compareTo(line.id.toString()) == 0 && tpi.lineRouteName.compareTo(timeProfile.lineRouteName.toString()) == 0 && tpi.timeProfileName.compareTo(timeProfile.index.toString())==0 && tpi.DCode.compareTo(timeProfile.DCode.toString())==0){
+							if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.DCode.equals(timeProfile.DCode.toString())){
 								TransitRouteStop s = builder.createTransitRouteStop(stopFacilities.get(this.visum.lineRouteItems.get(line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.DCode).stopPointNo),Time.parseTime(tpi.arr),Time.parseTime(tpi.dep));
 								stops.add(s);
 							}
