@@ -356,6 +356,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	public void writeFile(String filename){
 		this.outfile = filename;
 		write();
+		log.info("Population written to: " + filename);
 	}
 
 	public PopulationWriterHandler getHandler() {
