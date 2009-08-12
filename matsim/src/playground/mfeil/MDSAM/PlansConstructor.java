@@ -33,7 +33,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-
+import org.matsim.core.gbl.Gbl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -64,23 +64,23 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PlansConstructor implements PlanStrategyModule{
 		
-	protected final Controler controler;
+	protected Controler controler;
 	protected final String inputFile, outputFile, outputFileBiogeme, outputFileMod;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
-	protected final NetworkLayer network;
-	protected final PlansCalcRoute router;
-	protected final XY2Links linker;
+	protected NetworkLayer network;
+	protected PlansCalcRoute router;
+	protected XY2Links linker;
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10_2.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz/output_plans_2.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans_2.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/mz/model_2.mod";
+	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
+		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
 	*/	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -90,6 +90,19 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.linker = new XY2Links (this.controler.getNetwork());
+	}
+	
+	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
+	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
+		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
+	*/	this.inputFile = "./plans/input_plans2.xml";	
+		this.outputFile = "./plans/output_plans.xml.gz";	
+		this.outputFileBiogeme = "./plans/output_plans.dat";
+		this.outputFileMod = "./plans/model.mod";
+		this.population = population;
+		this.sims = sims;
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -111,8 +124,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.reducePersons();
 		this.linkRouteOrigPlans();
 		this.enlargePlansSet();
-		this.sims = new MDSAM(this.population).runPopulation();
 		this.writePlans(this.outputFile);
+		this.sims = new MDSAM(this.population).runPopulation();
 		this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writeModFile(this.outputFileMod);
 	}
@@ -205,7 +218,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
 			counter++;
-			if (counter%10==0) log.info("Handled "+counter+" persons");
+			if (counter%10==0) {
+				log.info("Handled "+counter+" persons");
+				Gbl.printMemoryUsage();
+			}
 			for (int i=0;i<this.actChains.size();i++){
 				
 				// Add all plans with activity chains different to the one of person's current plan
@@ -289,13 +305,13 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 	}*/
 	
-	protected void writePlans(String outputFile){
+	private void writePlans(String outputFile){
 		log.info("Writing plans...");
 		new PopulationWriter(this.population, outputFile).write();
 		log.info("done.");
 	}
 	
-	protected void writePlansForBiogeme(String outputFile){
+	public void writePlansForBiogeme(String outputFile){
 		log.info("Writing plans for Biogeme...");
 		PrintStream stream;
 		try {
@@ -307,7 +323,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		// First row
 		stream.print("Id\tChoice\t");
-		PersonImpl p = this.population.getPersons().get(this.population.getPersons().keySet().iterator().next());
+		PersonImpl p = this.population.getPersons().values().iterator().next();
 		for (int i = 0;i<p.getPlans().size();i++){
 			int j=0;
 			for (j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){

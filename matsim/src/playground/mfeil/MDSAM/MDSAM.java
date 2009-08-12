@@ -26,10 +26,16 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-
+import org.matsim.core.controler.Controler;
 import org.apache.log4j.Logger;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -56,7 +62,8 @@ public class MDSAM {
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
 		this.outputFile = "./plans/plans_similarity.xls";	
-		this.printing = true;
+	//	this.outputFile = "/home/baug/mfeil/data/mz/simlog.xls";	
+		this.printing = false;
 	}
 	
 	public List<List<Double>> runPopulation () {
@@ -71,8 +78,14 @@ public class MDSAM {
 		}	
 		
 		this.sims = new ArrayList<List<Double>>();
+		int counter = 0;
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
+			counter++;
+			if (counter%10==0){
+				log.info("Handled "+counter+" persons.");
+				Gbl.printMemoryUsage();
+			}
 			this.sims.add(new ArrayList<Double>());
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
@@ -287,5 +300,28 @@ public class MDSAM {
 		del = java.lang.Math.min(del, ins);		
 		return java.lang.Math.min(del, sub);
 	}
+	
+	public static void main(final String [] args) {
+		/*		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
+				final String populationFilename = "/home/baug/mfeil/data/mz/output_plans.xml";
+		*/		final String populationFilename = "./plans/output_plans.xml";
+				final String networkFilename = "./plans/network.xml";
+				final String facilitiesFilename = "./plans/facilities.xml";
+
+		//		final String outputFile = "/home/baug/mfeil/data/mz/output_plans.dat";
+				final String outputFile = "./plans/output_plans.dat";
+
+				ScenarioImpl scenario = new ScenarioImpl();
+				new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+				new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
+				new MatsimPopulationReader(scenario).readFile(populationFilename);
+				
+				List<List<Double>> sims = new MDSAM(scenario.getPopulation()).runPopulation();
+
+				PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
+				pc.writePlansForBiogeme(outputFile);
+				log.info("Process finished.");
+			}
 }
 
