@@ -60,6 +60,7 @@ public class PseudoNetworkDemo {
 		} else {
 //			networkFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml";
 //			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
+//			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitScheduleNoLinks.xml";
 //			transitScheduleFile = "../thesis-data/examples/berta/schedule.xml";
 //			transitScheduleFile = "/Users/cello/Desktop/Mohit/berlinSchedule.xml";
 //			transitScheduleFile = "../thesis-data/application/zuerichSchedule.xml";
@@ -99,7 +100,8 @@ public class PseudoNetworkDemo {
 		network.getLinks().clear();
 		network.getNodes().clear();
 
-		new CreatePseudoNetwork(schedule, network).run();
+		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
+//		NetworkFromTransitSchedule.createNetwork(schedule, network);
 
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		LinkImpl link1 = network.getLink(scenario.createId("1"));

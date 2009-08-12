@@ -62,9 +62,9 @@ import playground.marcel.pt.utils.CreatePseudoNetwork;
 
 public class VisualizeTransitPlans {
 
-	private final static String NETWORK_FILE = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
-	private final static String TRANSIT_SCHEDULE_FILE = "../thesis-data/application/transitschedule.oevModell.xml";
-	private final static String POPULATION_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
+	private final static String NETWORK_FILE = "../thesis-data/application/network.multimodal.xml";
+	private final static String TRANSIT_SCHEDULE_FILE = "../thesis-data/application/transitschedule.oevModellZH.xml";
+	private final static String POPULATION_FILE = "../thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
 
 	private final ScenarioImpl realScenario;
 	private final ScenarioImpl visScenario;
@@ -94,8 +94,8 @@ public class VisualizeTransitPlans {
 	}
 
 	private void convertData() {
-		CreatePseudoNetwork pseudoNetCreator = new CreatePseudoNetwork(this.realScenario.getTransitSchedule(), this.visScenario.getNetwork());
-		pseudoNetCreator.run();
+		CreatePseudoNetwork pseudoNetCreator = new CreatePseudoNetwork(this.realScenario.getTransitSchedule(), this.visScenario.getNetwork(), "tr_");
+		pseudoNetCreator.createNetwork();
 
 		Population visPop = this.visScenario.getPopulation();
 		PopulationBuilder pb = visPop.getBuilder();
@@ -178,6 +178,11 @@ public class VisualizeTransitPlans {
 		}
 
 		TransitRoute tRoute = tLine.getRoutes().get(route.getRouteId());
+		if (tRoute == null) {
+			System.err.println("could not find transit route '" + route.getRouteId() + "' from route " + route.getRouteDescription());
+			return null;
+		}
+
 		TransitStopFacility accessStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getAccessStopId());
 		TransitStopFacility egressStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getEgressStopId());
 

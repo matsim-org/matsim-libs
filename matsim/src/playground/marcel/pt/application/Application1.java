@@ -24,7 +24,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +41,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
+import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 import org.xml.sax.SAXException;
@@ -49,6 +49,8 @@ import org.xml.sax.SAXException;
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.marcel.pt.router.TransitRouter;
+import playground.marcel.pt.utils.CreatePseudoNetwork;
+import playground.marcel.pt.utils.MergeNetworks;
 import playground.mohit.converter.Visum2TransitSchedule;
 import playground.mohit.converter.VisumNetwork;
 import playground.mohit.converter.VisumNetworkReader;
@@ -58,6 +60,9 @@ public class Application1 {
 	private static final Logger log = Logger.getLogger(Application1.class);
 
 	private final static String NETWORK_FILE = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
+	private final static String TRANSIT_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.oevModellZH.xml";
+	private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/transitSchedule.networkOevModellZH.xml";
+	private final static String MERGED_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.multimodal.xml";
 	private final static String DILUTED_PT_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt.xml.gz";
 	private final static String DILUTED_PT_ROUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
 
@@ -83,7 +88,7 @@ public class Application1 {
 			log.info("converting visum data to TransitSchedule.");
 			new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles()).convert();
 			log.info("writing TransitSchedule to file.");
-			new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write("../thesis-data/application/transitschedule.oevModellZH.xml");
+			new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write("../thesis-data/application/transitSchedule.oevModellZH.xml");
 			log.info("writing vehicles to file.");
 			new VehicleWriterV1(this.scenario.getVehicles()).writeFile("../thesis-data/application/vehicles.oevModellZH.xml");
 		} catch (IOException e) {
@@ -106,11 +111,51 @@ public class Application1 {
 		}
 	}
 
+	protected void createNetworkFromSchedule() {
+		NetworkLayer network = new NetworkLayer();
+		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
+		new NetworkWriter(network, TRANSIT_NETWORK_FILE).write();
+		try {
+			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void readScheduleWithNetwork() {
+		log.info("reading TransitSchedule from file.");
+		try {
+			new TransitScheduleReader(this.scenario).readFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void mergeNetworks() {
+		NetworkLayer transitNetwork = new NetworkLayer();
+		NetworkLayer streetNetwork = new NetworkLayer();
+		try {
+			new MatsimNetworkReader(transitNetwork).parse(TRANSIT_NETWORK_FILE);
+			new MatsimNetworkReader(streetNetwork).parse(NETWORK_FILE);
+			MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
+			new NetworkWriter(this.scenario.getNetwork(), MERGED_NETWORK_FILE).write();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	protected void routePopulation() {
 		PopulationImpl pop = this.scenario.getPopulation();
 		try {
-			new MatsimNetworkReader(this.scenario.getNetwork()).parse(NETWORK_FILE);
+//			new MatsimNetworkReader(this.scenario.getNetwork()).parse(NETWORK_FILE);
 			new MatsimPopulationReader(this.scenario).parse(DILUTED_PT_1PCT_PLANS_FILENAME);
 			pop.printPlansCount();
 		} catch (SAXException e) {
@@ -166,7 +211,10 @@ public class Application1 {
 		app.prepareConfig();
 		app.convertSchedule();
 //		app.readSchedule(); // either convert, or read, but not both!
-//		app.routePopulation();
+		app.createNetworkFromSchedule();
+		// app.readScheduleWithNetwork(); // either create Network from schedule, or read it in that way
+		app.mergeNetworks();
+		app.routePopulation();
 //		app.visualizeRouterNetwork();
 
 		log.info("done.");
