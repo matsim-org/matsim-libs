@@ -22,6 +22,7 @@ package playground.mohit.converter;
 
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,7 +44,7 @@ public class VisumNetwork {
 	public final Map<String, TransitLineRoute> lineRoutes = new TreeMap<String, TransitLineRoute>();
 	public final Map<String , LineRouteItem> lineRouteItems = new TreeMap<String, LineRouteItem>();
 	public final Map<String , TimeProfile> timeProfiles = new TreeMap<String, TimeProfile>();
-	public final Map<String , TimeProfileItem> timeProfileItems = new HashMap<String, TimeProfileItem>();
+	public final Map<String , TimeProfileItem> timeProfileItems = new LinkedHashMap<String, TimeProfileItem>();
 	public final Map<String , Departure> departures = new TreeMap<String, Departure>();
 	public final Map<String, TransportMode> transportModes = new HashMap<String, TransportMode>();
 	public final Map<String, VehicleUnit> vehicleUnits = new HashMap<String, VehicleUnit>();
