@@ -27,63 +27,58 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
 
-
+/**
+ * @author mrieser
+ */
 public class TransitControler extends Controler {
 
 	private final TransitConfigGroup transitConfig;
-	private final TransitSchedule schedule;
 
 	public TransitControler(final String[] args) {
 		super(args);
+
+		setOverwriteFiles(true); // FIXME [MR] debug only
 
 		this.transitConfig = new TransitConfigGroup();
 		this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
-		this.schedule = this.scenarioData.getTransitSchedule();
 
-		TransitControlerListener cl = new TransitControlerListener(this.schedule, this.scenarioData.getNetwork(), this.transitConfig);
+		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
 		addControlerListener(cl);
 	}
-
-	@Override
-	protected void runMobSim() {
-		new TransitQueueSimulation(this.scenarioData, this.events);
-	}
+//
+//	@Override
+//	protected void runMobSim() {
+//		new TransitQueueSimulation(this.scenarioData, this.events);
+//	}
 
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-				this.getLeastCostPathCalculatorFactory(), this.schedule, this.transitConfig);
+				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
 	}
 
 	public static class TransitControlerListener implements StartupListener {
 
-		private final TransitSchedule schedule;
-		private final NetworkLayer network;
 		private final TransitConfigGroup config;
 
-		public TransitControlerListener(final TransitSchedule schedule, final NetworkLayer network, final TransitConfigGroup config) {
-			this.schedule = schedule;
-			this.network = network;
+		public TransitControlerListener(final TransitConfigGroup config) {
 			this.config = config;
 		}
 
 		public void notifyStartup(final StartupEvent event) {
 			try {
-				new TransitScheduleReaderV1(this.schedule, this.network).readFile(this.config.getTransitScheduleFile());
+				new TransitScheduleReaderV1(event.getControler().getScenarioData().getTransitSchedule(), event.getControler().getScenarioData().getNetwork()).readFile(this.config.getTransitScheduleFile());
 			} catch (SAXException e) {
 				throw new RuntimeException("could not read transit schedule.", e);
 			} catch (ParserConfigurationException e) {
