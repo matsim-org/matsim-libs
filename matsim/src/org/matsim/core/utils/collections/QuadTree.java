@@ -29,11 +29,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An implementation of a QuadTree to store geometric point data. The expected
- * bounds of all added points must be given to the constructor for working
- * properly. While the data structure will still work if points outside the
- * given bounds are added, the performance is likely to drop to that of a linked
- * list.<br />
+ * An implementation of a QuadTree to store data assigned to geometric points.
+ * The expected bounds of all added points must be given to the constructor for
+ * working properly. Correct functioning of the QuadTree with elements being
+ * added outside of the given bounds cannot be guaranteed.<br />
  * At one location, several different objects can be put. An object can be put
  * to the QuadTree at different locations. But an object cannot be put more than
  * once at the same location.
