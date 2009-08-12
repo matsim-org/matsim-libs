@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 
@@ -27,7 +28,7 @@ public class FileRetailerReader {
 		this.controlerFacilities = controlerFacilities;
 		this.facilityIdFile = facilityIdFile;
 	}
-	public Retailers readRetailers() {
+	public Retailers readRetailers(Controler controler) {
 		try { 
 			FileReader fr = new FileReader(this.facilityIdFile);
 			BufferedReader br = new BufferedReader(fr);
@@ -53,6 +54,7 @@ public class FileRetailerReader {
 					else { // retailer does not exists yet
 						
 						Retailer r = new Retailer(rId, null);
+						r.addStrategy(controler, entries[2]);
 						ActivityFacility f = controlerFacilities.get(fId);
 						r.addFacility(f);
 						retailersLinks.add(f.getLink().getId());

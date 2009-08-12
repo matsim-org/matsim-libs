@@ -8,43 +8,67 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
-
-import playground.ciarif.retailers.RetailersSequentialLocationListener;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.Retailer;
 import playground.ciarif.retailers.data.Retailers;
 
 public class LinksRetailerReader {
+	
 	public final static String CONFIG_LINKS = "links";
+	public final static String CONFIG_LINKS_PAR = "freeLinksParameter";
 	public final static String CONFIG_GROUP = "Retailers";
 	private String linkIdFile;// = null;
-	protected ArrayList<LinkRetailersImpl> links = new ArrayList<LinkRetailersImpl>();
 	private Controler controler;
-	private ArrayList<Id> actualLinks = new ArrayList<Id>();
+	protected ArrayList<LinkRetailersImpl> allLinks = new ArrayList<LinkRetailersImpl>();
+	protected ArrayList<LinkRetailersImpl> freeLinks = new ArrayList<LinkRetailersImpl>();
+	private ArrayList<LinkRetailersImpl> currentLinks =  new ArrayList<LinkRetailersImpl>();
 	private Retailers retailers;
-	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
+	private final static Logger log = Logger.getLogger(LinksRetailerReader.class);
+	
+	// Constructors
 	public LinksRetailerReader (Controler controler){
 		this.controler = controler;
 	}
+	
 	
 	public LinksRetailerReader(Controler controler, Retailers retailers) {
 		this.controler = controler;
 		this.retailers = retailers;
 	}
-
-	public ArrayList<LinkRetailersImpl> ReadLinks() {
-		
+	
+	// Public methods
+	public void init() {
 		this.linkIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS);
-		if (this.linkIdFile != null) { 
-			
-			ArrayList<LinkRetailersImpl> allowed_links = new ArrayList<LinkRetailersImpl>();
+		this.detectRetailersActualLinks();
+		if (this.linkIdFile != null) {this.readFreeLinks();}
+		else {this.createFreeLinks();}	
+		this.allLinks.addAll(currentLinks);
+	}
+	
+	
+	private void createFreeLinks() {
+		String freeLinksParameter = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS_PAR);
+		Integer newLinksMax = (Math.round(this.currentLinks.size()*Integer.parseInt(freeLinksParameter)));
+		
+		while (this.freeLinks.size()<(newLinksMax)) {
+			int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
+			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],controler.getNetwork());
+			if (currentLinks.contains(link.getId())) {}
+			else {	
+				this.freeLinks.add(link);
+				this.allLinks.add(link);
+			}		
+		}
+	}
+
+	public void readFreeLinks() {
+		
 			try {
 				
 				FileReader fr = new FileReader(this.linkIdFile);
@@ -60,6 +84,7 @@ public class LinksRetailerReader {
 					LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLink(lId),controler.getNetwork());
 					// ciarif: if facilities are already on this link the number of already 
 					// existing facilities is compared with the max from the file. The larger is taken.
+					//TODO verify if it is still actual
 					if (l.getUpMapping().size()>(Integer.parseInt(entries[1]))) {
 						
 						l.setMaxFacOnLink(l.getUpMapping().size());
@@ -68,45 +93,50 @@ public class LinksRetailerReader {
 						l.setMaxFacOnLink(Integer.parseInt(entries[1]));
 					}
 					
-					allowed_links.add(l);
+					this.freeLinks.add(l);
+					this.allLinks.add(l);
 				}
-				System.out.println("Links allowed for relocation have been added");
-				this.links = allowed_links;
 			} 
 			catch (IOException e) {
 				Gbl.errorMsg(e);
 			}
 		}
-		else {//Francesco: if no file stating which links are allowed is defined
-			for (Retailer r:retailers.getRetailers().values()) {
-				for (ActivityFacility af: r.getFacilities().values()){
-					this.actualLinks.add(af.getLink().getId());
-				}
-			}
-			Integer linksMax = Integer.parseInt(String.valueOf(Math.round(this.actualLinks.size()*1.8)));//TODO note that usually the ratio links/ actual links is so large than this number doesn't really matter, but a check in this sense would be not bad! 
-			log.info("Links max= " + linksMax);
-			log.info("Actual Links= " + actualLinks);
-						int i=0;
-			while (this.links.size()<linksMax) {
-				log.info("links size= " + links.size());
-				if (this.links.size()<actualLinks.size()) {
-					LinkRetailersImpl link = new LinkRetailersImpl (controler.getNetwork().getLink(actualLinks.get(i)), controler.getNetwork());
-					this.links.add(link);
-					i=i+1;
-				}
-				else {
-					int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
-					LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],controler.getNetwork());
-					if (actualLinks.contains(link.getId())) {}
-					else {	
-						this.links.add(link);
-					}	
-				}	
-			}
-			for (LinkRetailersImpl l:this.links) {
-				log.info("This link is allowed for relocation: " + l.getId()); 
+	
+	public void detectRetailersActualLinks(){
+		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
+		for (Retailer r:retailers.getRetailers().values()) {
+			for (ActivityFacility af: r.getFacilities().values()){
+				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)af.getLink(), controler.getNetwork());
+				links.add(link);
 			}
 		}
-		return this.links;
-	}	
+		this.currentLinks=links;
+	}
+		
+	public ArrayList<LinkRetailersImpl> getFreeLinks() {
+		return this.freeLinks;
+	}
+
+
+	public void updateFreeLinks() {
+		
+		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
+		ArrayList<LinkRetailersImpl> linksToRemove =  new ArrayList<LinkRetailersImpl>();
+		this.detectRetailersActualLinks();
+		
+		for (LinkRetailersImpl link:allLinks) {
+			links.add(link);
+		}
+		for (LinkRetailersImpl link:currentLinks) {
+			Id id = link.getId();
+			for (LinkRetailersImpl link2:links){
+				Id id2 = link2.getId();
+				if (id==id2){
+					linksToRemove.add(link2);
+				}
+			}
+		}
+		links.removeAll(linksToRemove);
+		this.freeLinks=links;
+	}
 }

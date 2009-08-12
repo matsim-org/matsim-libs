@@ -9,17 +9,15 @@ public class WriteRetailersMatrices {
 	
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
-	private AbstractMatrix matrix = null;
 	
 	public WriteRetailersMatrices () {
 		//super();
 	}
 	public void writeRetailersMatrices (AbstractMatrix matrix, String filename) {
 		
-		String outfile = "/scr/baug/ciarif/output/zurich_10pc/matrices/" + filename;
-		//String outfile = "../../output/triangle/matrices/" + filename;
-		//System.out.println(file name = )
-		//this.retailers = retailers;
+		//String outfile = "/scr/baug/ciarif/output/zurich_10pc/matrices/" + filename;
+		String outfile = "../../output/triangle/matrices/" + filename;
+		
 		try {
 			fw = new FileWriter(outfile);
 			System.out.println(outfile);
@@ -31,7 +29,6 @@ public class WriteRetailersMatrices {
 		}
 		System.out.println("    done.");
 		try {
-			this.matrix = matrix;
 			out.write(matrix.toString() +"\n");
 			out.flush();
 		}

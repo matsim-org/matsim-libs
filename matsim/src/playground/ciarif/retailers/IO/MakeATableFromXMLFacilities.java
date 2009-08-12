@@ -4,14 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
-
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+
 
 public class MakeATableFromXMLFacilities {
 //////////////////////////////////////////////////////////////////////
@@ -20,7 +15,7 @@ public class MakeATableFromXMLFacilities {
 
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
-	private Object facilities;
+	//private Object facilities;
 			
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -63,7 +58,7 @@ public class MakeATableFromXMLFacilities {
 
 	public void write(Map<Id,ActivityFacility> facilities) {
 		try {
-			this.facilities = facilities;
+			//this.facilities = facilities;
 			
 			for (ActivityFacility f : facilities.values()) {
 				if (f.getActivityOption("shop")!=null){

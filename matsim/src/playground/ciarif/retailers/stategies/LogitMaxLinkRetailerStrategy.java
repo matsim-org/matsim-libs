@@ -88,5 +88,10 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			Map<Id, FacilityRetailersImpl> facilities) {
 		// TODO Auto-generated method stub
 	}
+
+	public ArrayList<LinkRetailersImpl> findAvailableLinks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

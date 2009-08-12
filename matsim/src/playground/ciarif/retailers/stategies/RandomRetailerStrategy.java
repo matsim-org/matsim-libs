@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.network.BasicLinkImpl;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
@@ -39,5 +40,10 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 			Map<Id, FacilityRetailersImpl> facilities) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public ArrayList<LinkRetailersImpl> findAvailableLinks() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

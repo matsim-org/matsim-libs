@@ -12,6 +12,11 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 public class FacilityRetailersImpl extends ActivityFacilityImpl implements ActivityFacility {
 //>>>>>>> .r6943
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected FacilityRetailersImpl(ActivityFacilitiesImpl layer, Id id, Coord center) {
 		super(layer, id, center);
 		// TODO Auto-generated constructor stub

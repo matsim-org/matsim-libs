@@ -1,8 +1,9 @@
-package playground.ciarif.retailers.stategies;
+package playground.ciarif.retailers.models;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
@@ -12,7 +13,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.population.PersonImpl;
 
-import playground.ciarif.retailers.data.Consumer;
+//import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
 
@@ -28,26 +29,23 @@ public class GravityModel
   public final static String CONFIG_SAMPLE_PERSONS = "samplingRatePersons";
   private double[] betas;
   private Controler controler;
-  private ArrayList<ActivityFacility> retailers_shops = new ArrayList<ActivityFacility>();
-  private ArrayList<ActivityFacility> shops;
-  private ArrayList<Consumer> consumers;
+  private Map<Id,ActivityFacility> shops = new TreeMap<Id,ActivityFacility>();
   private Collection<ActivityFacility> controlerFacilities;
   private Map<Id, PersonImpl> persons;
-  private RetailZones retailZones;
-  private ArrayList<ActivityFacility> sampledShops;
+  private RetailZones retailZones = new RetailZones();
+  private Map<Id, ActivityFacility> retailersFacilities;
 
-  public GravityModel(Controler controler, double[] b, ArrayList<ActivityFacility> retailers_shops, ArrayList<Consumer> consumers)
+  public GravityModel(Controler controler, Map<Id, ActivityFacility> retailerFacilities)
   {
-    this.betas = b;
     this.controler = controler;
-    this.retailers_shops = retailers_shops;
+    this.retailersFacilities = retailerFacilities;
     this.controlerFacilities = controler.getFacilities().getFacilities().values();
     this.shops = this.findScenarioShops(this.controlerFacilities);
-    this.consumers = consumers;
     this.persons = (controler.getPopulation().getPersons());
     
   }
-  public void init() {
+ 
+public void init() {
 	  
 	String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
 	int number_of_zones =0;
@@ -57,31 +55,14 @@ public class GravityModel
 	else {throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" at the moment can only take the value 'symmetric'!"); }
 	//TODO Define the asymmetric version, at the moment only the symmetric is possible
 	if (number_of_zones == 0) { throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" not defined!");}
-
-	double samplingRateShops = 1;
-	double samplingNumberShops = 1;
-	boolean zoneBasedSampling = true;
-	if (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE__TYPE_SHOPS).equals("zoneBasedSampling")) {
-		samplingNumberShops = Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_NUMBER_SHOPS));
-		if (samplingRateShops>1 || samplingRateShops<0) { throw new RuntimeException("In config file, param = "+CONFIG_SAMPLE__TYPE_SHOPS+" in module = "+CONFIG_GROUP+" must be set to a value between 0 and 1!!!");}
-	}
-	else if (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE__TYPE_SHOPS).equals("randomSampling")){
-	}
-	else { } //TODO put a warning here
-	double samplingRatePersons = 1;
-	if (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_PERSONS) != null) {
-		samplingRatePersons = Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP, CONFIG_SAMPLE_PERSONS));
-		if (samplingRatePersons>1 || samplingRatePersons<0) { throw new RuntimeException("In config file, param = "+CONFIG_SAMPLE_PERSONS+" in module = "+CONFIG_GROUP+" must be set to a value between 0 and 1!!!");}
-	}
-	else {} //TODO put a warning here
+	this.createZones(persons, controlerFacilities, n);
+	this.findScenarioShops(controlerFacilities);
 }
 
-	
-  
-  public double computePotential(ArrayList<Integer> solution){
+public double computePotential(ArrayList<Integer> solution){
     double global_likelihood = 0;
     int a = 0;
-    for (ActivityFacility c : this.retailers_shops) {
+    for (ActivityFacility c : this.retailersFacilities.values()) {
       Coord coord = this.controler.getNetwork().getLink(((Integer)solution.get(a)).toString()).getCoord();
       ++a;
       double loc_likelihood = 0.0D;
@@ -97,28 +78,30 @@ public class GravityModel
         }
         pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
 
-        for (ActivityFacility s : this.shops) {
+        for (ActivityFacility s : this.shops.values()) {
           double dist = 0.0D;
-
-          if (this.retailers_shops.contains(s)){
-        	  
-            int index = this.retailers_shops.indexOf(s);
-            Coord coord1 = this.controler.getNetwork().getLink(((Integer)solution.get(index)).toString()).getCoord();
-            if (p.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1) == 0.0D) {
-            	dist = 10.0D;
-            }
-            else {
-              dist = p.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1);
-            }
-
-          }
-          else if (s.calcDistance(p.getSelectedPlan().getFirstActivity().getCoord()) == 0.0D) {
-        	  dist = 10.0D;
+          int count=0;
+          for (ActivityFacility af: this.retailersFacilities.values()){
+	          if (af.equals(s)){
+	            int index = count;
+	            Coord coord1 = this.controler.getNetwork().getLink(((Integer)solution.get(index)).toString()).getCoord();
+	            if (p.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1) == 0.0D) {
+	            	dist = 10.0D;
+	            }
+	            else {
+	              dist = p.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1);
+	            }
+	
+	          }
+	          else if (s.calcDistance(p.getSelectedPlan().getFirstActivity().getCoord()) == 0.0D) {
+	        	  dist = 10.0D;
+	          } 
+	          
+	          else {
+	            dist = s.calcDistance(p.getSelectedPlan().getFirstActivity().getCoord());
+	          }
+	          ++count;
           } 
-          
-          else {
-            dist = s.calcDistance(p.getSelectedPlan().getFirstActivity().getCoord());
-          }
 
           double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
 
@@ -126,7 +109,6 @@ public class GravityModel
         }
 
         pers_likelihood = pers_potential / pers_sum_potential;
-
         loc_likelihood += pers_likelihood;
       }
 
@@ -135,31 +117,30 @@ public class GravityModel
     return global_likelihood;
   }
   
-  private ArrayList<ActivityFacility> findScenarioShops (Collection<ActivityFacility> controlerFacilities) {
+  private Map<Id,ActivityFacility> findScenarioShops (Collection<ActivityFacility> controlerFacilities) {
 	  
-		ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
+		Map<Id,ActivityFacility> shops = new TreeMap<Id,ActivityFacility>();
 		for (ActivityFacility f : controlerFacilities) {
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
-				shops.add(f);
-				log.info("The shop " + f.getId() + " has been added to the file 'shops'");
+				this.shops.put(f.getId(),f);
 			}
 			else {}
 		}
 		return shops;
 	}
-  private void createZones (Collection<PersonImpl> persons, ArrayList<ActivityFacility> controlerFacilities, int n, double samplingRatePersons, double samplingRateShops) {
+  private void createZones (Map<Id,PersonImpl> persons, Collection<ActivityFacility> controlerFacilities, int n) {
 		
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (PersonImpl p : persons) {
+		for (PersonImpl p : persons.values()) {
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() < miny) { miny = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() > maxx) { maxx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
 			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() > maxy) { maxy = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
 		}
-		for (ActivityFacility shop : shops) {
+		for (ActivityFacility shop : shops.values()) {
 			if (shop.getCoord().getX() < minx) { minx = shop.getCoord().getX(); }
 			if (shop.getCoord().getY() < miny) { miny = shop.getCoord().getY(); }
 			if (shop.getCoord().getX() > maxx) { maxx = shop.getCoord().getX(); }
@@ -183,26 +164,35 @@ public class GravityModel
 				double x2= x1 + x_width;
 				double y1= miny + j*y_width;
 				double y2= y1 + y_width;
-				RetailZone rz = new RetailZone (id, x1, y1, x2, y2, samplingRateShops, samplingRatePersons);
-				for (PersonImpl p : persons ) {
+				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
+				for (PersonImpl p : persons.values() ) {
 					Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
 					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 						rz.addPersonToQuadTree(c,p);
 					}		
 				} 
-				for (ActivityFacility af : shops) {
+				for (ActivityFacility af : shops.values()) {
 					Coord c = af.getCoord();
 					if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
 						rz.addShopToQuadTree(c,af);
 					}
 				}	
 				this.retailZones.addRetailZone(rz);
-				log.info("In the zone " + rz.getId() + ", " + rz.getSampledShops().size() + " have been sampled");
-				this.sampledShops.addAll(rz.getSampledShops());
 				a=a+1;
 				j=j+1;
 			}
 			i=i+1;
-		}
+		} 
 	}
+  
+  public Map<Id,ActivityFacility> getScenarioShops () {
+	  return this.shops;
+  }
+  public RetailZones getRetailZones() {
+	  return this.retailZones;
+  }
+  public boolean setBetas (double [] betas){
+	  this.betas=betas;
+	  return true;
+  }
 }

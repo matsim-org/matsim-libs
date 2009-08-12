@@ -84,6 +84,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	private RetailZones retailZones = new RetailZones();
 	private Map<Id,ActivityFacility> controlerFacilities = null;
 	ArrayList<ActivityFacility> sampledShops = new ArrayList<ActivityFacility>();
+
+	private Controler controler;
 	
 	public RetailersSequentialLocationListener() {
 	
@@ -91,7 +93,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 
 	public void notifyStartup(StartupEvent event) {
 
-		Controler controler = event.getControler();
+		this.controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
@@ -137,7 +139,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
 		if (this.facilityIdFile == null) {throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_ZONES+" not defined!");}
 		else { 
-			this.retailers = new FileRetailerReader (this.controlerFacilities, this.facilityIdFile).readRetailers();
+			this.retailers = new FileRetailerReader (this.controlerFacilities, this.facilityIdFile).readRetailers(this.controler);
 		}
 		
 		//Links allowed for relocation are read or generated
@@ -235,7 +237,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				double x2= x1 + x_width;
 				double y1= miny + j*y_width;
 				double y2= y1 + y_width;
-				RetailZone rz = new RetailZone (id, x1, y1, x2, y2, samplingRateShops, samplingRatePersons);
+				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
 				for (PersonImpl p : persons ) {
 					Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
 					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
@@ -249,8 +251,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 					}
 				}	
 				this.retailZones.addRetailZone(rz);
-				log.info("In the zone " + rz.getId() + ", " + rz.getSampledShops().size() + " have been sampled");
-				this.sampledShops.addAll(rz.getSampledShops()); //TODO change this!!! The sampling should happen after the model has been estimated
+				log.info("In the zone " + rz.getId() + ", " + rz.getShops().size() + " have been sampled");
+				this.sampledShops.addAll(rz.getShops()); //TODO change this!!! The sampling should happen after the model has been estimated
 				a=a+1;
 				j=j+1;
 			}

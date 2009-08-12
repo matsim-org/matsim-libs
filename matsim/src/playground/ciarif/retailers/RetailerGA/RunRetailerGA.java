@@ -7,7 +7,7 @@ import java.io.IOException;
 //import java.io.PrintStream;
 import java.util.ArrayList;
 
-import playground.ciarif.retailers.stategies.GravityModel;
+import playground.ciarif.retailers.models.GravityModel;
 import playground.jjoubert.Utilities.DateString;
 
 public class RunRetailerGA
@@ -47,7 +47,7 @@ public class RunRetailerGA
     System.out.printf("\tAverage time per generation (ms):  %6.2f\n", new Object[] { Double.valueOf(avgTime) });
 
     DateString ds = new DateString();
-    String fileName = "C:/Documents and Settings/ciarif/My Documents/Francesco/Projects/Agent Based Retailers/Runs/GA-Progress-" + ds.toString() + ".txt";
+    String fileName = "C:/Documents and Settings/ciarif/My Documents/output/triangle/GA_results/GA-Progress-" + ds.toString() + ".txt";
 
     writeSolutionProgressToFile(solutionProgress, fileName);
     ArrayList<Integer> solution = ga.getIncumbent().getGenome();

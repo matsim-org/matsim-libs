@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
@@ -21,7 +21,7 @@ import playground.ciarif.retailers.stategies.RetailerStrategy;
 public class Retailer {
 	private final Id id;
 	private final Map<Id,ActivityFacility> facilities = new LinkedHashMap<Id,ActivityFacility>();
-	private final static Logger log = Logger.getLogger(Retailer.class);
+	//private final static Logger log = Logger.getLogger(Retailer.class);
 	private RetailerStrategy strategy;
 	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 		
@@ -78,10 +78,11 @@ public class Retailer {
 		return this.facilities;
 	}
 
-	public final Map<Id,ActivityFacility> runStrategy(ArrayList<LinkRetailersImpl> links) {
-		log.info("facilities = " + facilities);
-		log.info("strategy = " + strategy);
+	public final void runStrategy(ArrayList<LinkRetailersImpl> links) {
 		this.movedFacilities = strategy.moveFacilities(this.facilities, links);
+	}
+	
+	public Map<Id,ActivityFacility> getMovedFacilities () {
 		return this.movedFacilities;
 	}
 }

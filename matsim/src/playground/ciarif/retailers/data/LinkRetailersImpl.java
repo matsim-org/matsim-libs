@@ -3,7 +3,6 @@ package playground.ciarif.retailers.data;
 
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 

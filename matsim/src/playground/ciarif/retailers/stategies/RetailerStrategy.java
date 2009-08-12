@@ -10,5 +10,6 @@ import playground.ciarif.retailers.data.LinkRetailersImpl;
 
 public interface RetailerStrategy {
 	
+
 	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> links);
 }

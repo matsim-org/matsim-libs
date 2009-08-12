@@ -15,15 +15,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
-
-import playground.ciarif.retailers.RetailersSequentialLocationListener;
 import playground.ciarif.retailers.data.FacilityRetailersImpl;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
 
 public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 	
-	private final static Logger log = Logger.getLogger(RetailersSequentialLocationListener.class);
+	private final static Logger log = Logger.getLogger(CatchmentAreaRetailerStrategy.class);
 	
 	public static final String NAME = "catchmentAreaRetailerStrategy";
 	public final static String CONFIG_GROUP = "Retailers";
@@ -94,4 +92,8 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 			
 		}
 
+		public ArrayList<LinkRetailersImpl> findAvailableLinks() {
+			// TODO Auto-generated method stub
+			return null;
+		}	
 }
