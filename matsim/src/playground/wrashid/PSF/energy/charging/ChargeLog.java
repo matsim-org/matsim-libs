@@ -28,4 +28,12 @@ public class ChargeLog {
 		this.endChargingTime = endChargingTime;
 	}
 
+
+	
+	
+	
+	public void print(){
+		System.out.println("startChargingTime: " + startChargingTime + ", endChargingTime: " + endChargingTime + ", facilityId: " + facilityId);
+	}
+	
 }

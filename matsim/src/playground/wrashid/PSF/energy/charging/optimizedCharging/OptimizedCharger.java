@@ -28,17 +28,15 @@ public class OptimizedCharger {
 	//	
 	// }
 
-	private EnergyChargingInfo chargingInfo;
+	// TODO: perhaps add EnergyChargeInfo later here as an object...
+
 	private HashMap<Id, EnergyConsumption> energyConsumption;
 	private HashMap<Id, ParkingTimes> parkingTimes;
 	private HashMap<Id, ChargingTimes> chargingTimes = new HashMap<Id, ChargingTimes>();
 
-	public OptimizedCharger(EnergyChargingInfo chargingInfo, HashMap<Id, EnergyConsumption> energyConsumption,
-			HashMap<Id, ParkingTimes> parkingTimes) {
-		this.chargingInfo = chargingInfo;
+	public OptimizedCharger(HashMap<Id, EnergyConsumption> energyConsumption, HashMap<Id, ParkingTimes> parkingTimes) {
 		this.energyConsumption = energyConsumption;
 		this.parkingTimes = parkingTimes;
-		
 		performOptimizedCharging();
 	}
 
@@ -47,40 +45,37 @@ public class OptimizedCharger {
 	// String testingMaxBatteryCapacity = Gbl.getConfig().findParam("PSF",
 	// "testing.maxBatteryCapacity");
 
-	
 	// TODO: this operation could be parallelized later...
 	private void performOptimizedCharging() {
-		
+
 		double defaultMaxBatteryCapacity = Double.parseDouble(Gbl.getConfig().findParam("PSF", "default.maxBatteryCapacity"));
-		
-		Iterator<Id> iter=energyConsumption.keySet().iterator();
-		
-		
+
+		Iterator<Id> iter = energyConsumption.keySet().iterator();
+
 		// iterate through all vehicles and find their optimal charging time
-		while (iter.hasNext()){
-			Id personId=iter.next();
-			
+		while (iter.hasNext()) {
+			Id personId = iter.next();
+
 			// initialize the Charging times
-			// TODO: later for each individual car we should be able to read the max Battery capacities
-			double maxBatteryCapacity=defaultMaxBatteryCapacity;
-			ChargingTimes chargingTimes=new ChargingTimes(maxBatteryCapacity);
+			// TODO: later for each individual car we should be able to read the
+			// max Battery capacities
+			double maxBatteryCapacity = defaultMaxBatteryCapacity;
+			ChargingTimes chargingTimes = new ChargingTimes();
 			this.chargingTimes.put(personId, chargingTimes);
-			
-			
-			
-			
-			
+
+			EnergyBalance eb = new EnergyBalance(parkingTimes.get(personId), energyConsumption.get(personId), maxBatteryCapacity,
+					chargingTimes);
+
+			chargingTimes = eb.getChargingTimes();
+
+			chargingTimes.print();
+
 		}
-		
-		
-		
+
 	}
-	
-	
 
-	
-	public void getChargings() {
-
+	public HashMap<Id, ChargingTimes> getChargingTimes() {
+		return chargingTimes;
 	}
 
 	// TODO: also check at parking, if we can really charge there...
