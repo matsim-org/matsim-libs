@@ -73,7 +73,7 @@ public class PopulationCreation {
 		System.out.println("done. (running modules)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(population,knowledges).writeFile(args[2]);
+		new PopulationWriter(population,knowledges,args[2],"v4",1.0).write();
 		System.out.println("done. (writing population)");
 	}
 }

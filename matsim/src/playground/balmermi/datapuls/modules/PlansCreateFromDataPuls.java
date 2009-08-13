@@ -68,7 +68,7 @@ public class PlansCreateFromDataPuls {
 	//////////////////////////////////////////////////////////////////////
 	
 	private final void parse(Population population) {
-		int line_cnt = 0;
+		int line_cnt = 1;
 		try {
 			FileReader fr = new FileReader(infile);
 			BufferedReader br = new BufferedReader(fr);
@@ -80,7 +80,9 @@ public class PlansCreateFromDataPuls {
 				String[] entries = curr_line.split("\t", -1);
 
 				Id id = new IdImpl(entries[0].trim());
-				int age = 2008-Integer.parseInt(entries[9].trim());
+				int age;
+				try { age = 2005-Integer.parseInt(entries[9].trim()); }
+				catch (Exception e) { age = random.nextInt(81); }
 				if (age < 0) { age = 0; }
 				int gender = Integer.parseInt(entries[12].trim());
 				if (gender == 0) { gender = random.nextInt(2)+1; }
@@ -95,7 +97,7 @@ public class PlansCreateFromDataPuls {
 				ActivityOption a = af.getActivityOption("home");
 				if (a == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" does not contain 'home'."); }
 				
-				PersonImpl p = (PersonImpl)population.getPopulationBuilder().createPerson(id);
+				PersonImpl p = (PersonImpl)population.getBuilder().createPerson(id);
 				Knowledge k = kn.getKnowledgesByPersonId().get(p.getId());
 				if (k != null) { throw new RuntimeException("pid="+p.getId()+": knowledge already exist."); }
 				k = kn.getBuilder().createKnowledge(p.getId(),null);
