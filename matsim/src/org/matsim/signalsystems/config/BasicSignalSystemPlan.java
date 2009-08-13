@@ -50,5 +50,12 @@ public interface BasicSignalSystemPlan {
 	public Integer getSynchronizationOffset();
 
 	public Integer getCycleTime();
-
+	
+	public Integer getPowerOnTime();
+	
+	public void setPowerOnTime(Integer powerOnTime);
+	
+	public Integer getPowerOffTime();
+	
+	public void setPowerOffTime(Integer powerOffTime);
 }

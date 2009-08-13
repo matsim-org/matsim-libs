@@ -48,7 +48,6 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsBuilder;
 import org.matsim.signalsystems.config.BasicSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalSystemPlan;
-
 import org.xml.sax.SAXException;
 
 
@@ -142,6 +141,12 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 		}
 		if (xmlplan.getSynchronizationOffset() != null) {
 			plan.setSynchronizationOffset(xmlplan.getSynchronizationOffset().getSec());
+		}
+		if (xmlplan.getPowerOnTime() != null) {
+			plan.setPowerOnTime(xmlplan.getPowerOnTime().getSec());
+		}
+		if (xmlplan.getPowerOffTime() != null) {
+			plan.setPowerOffTime(xmlplan.getPowerOffTime().getSec());
 		}
 		for (XMLSignalGroupSettingsType xmlgroupconfig : xmlplan.getSignalGroupSettings()) {
 			BasicSignalGroupSettings groupConfig = builder.createSignalGroupSettings(new IdImpl(xmlgroupconfig.getRefId()));

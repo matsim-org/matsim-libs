@@ -33,9 +33,11 @@ public class BasicSignalSystemPlanImpl implements BasicSignalSystemPlan {
 	private double startTime;
 	private double endTime;
 	private Map<Id, BasicSignalGroupSettings> groupConfigs;
-	private Integer syncronizationOffset = null;
+	private Integer syncronizationOffset = 0;
 	private Integer circulationTime = null;
-
+	private Integer powerOnTime = null;
+  private Integer powerOffTime = null;
+	
 	public BasicSignalSystemPlanImpl(Id id) {
 		this.id = id;
 	}
@@ -119,6 +121,26 @@ public class BasicSignalSystemPlanImpl implements BasicSignalSystemPlan {
 	 */
 	public Integer getCycleTime() {
 		return circulationTime;
+	}
+
+	
+	public Integer getPowerOnTime() {
+		return powerOnTime;
+	}
+
+	
+	public void setPowerOnTime(Integer powerOnTime) {
+		this.powerOnTime = powerOnTime;
+	}
+
+	
+	public Integer getPowerOffTime() {
+		return powerOffTime;
+	}
+
+	
+	public void setPowerOffTime(Integer powerOffTime) {
+		this.powerOffTime = powerOffTime;
 	}
 
 }

@@ -44,6 +44,8 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType.XMLInterGreenTimeDropping;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLCycleTime;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLPowerOffTime;
+import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLPowerOnTime;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStart;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLStop;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType.XMLSynchronizationOffset;
@@ -161,6 +163,14 @@ public class SignalSystemConfigurationsWriter11 extends MatsimJaxbXmlWriter{
 		XMLStop stop = new XMLStop();
 		stop.setDaytime(getXmlGregorianCalendar(plan.getEndTime()));
 		xmlplan.setStop(stop);
+		
+		XMLPowerOnTime on = new XMLPowerOnTime();
+		on.setSec(plan.getPowerOnTime());
+		xmlplan.setPowerOnTime(on);
+		
+		XMLPowerOffTime off = new XMLPowerOffTime();
+		off.setSec(plan.getPowerOffTime());
+		xmlplan.setPowerOffTime(off);
 		
 		XMLCycleTime xmlct = new XMLCycleTime();
 		if (plan.getCycleTime() != null) {
