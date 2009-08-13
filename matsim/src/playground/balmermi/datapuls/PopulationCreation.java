@@ -41,7 +41,7 @@ public class PopulationCreation {
 		System.out.println();
 		System.out.println("PopulationCreation");
 		System.out.println();
-		System.out.println("Usage1: PopulationCreation inputFacilitiesFile outputPlansFile");
+		System.out.println("Usage1: PopulationCreation inputFacilitiesFile datapulsPersonsFile outputPlansFile");
 		System.out.println();
 		System.out.println("---------------------");
 		System.out.println("2009, matsim.org");
@@ -73,7 +73,7 @@ public class PopulationCreation {
 		System.out.println("done. (running modules)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(population,knowledges).write();
+		new PopulationWriter(population,knowledges).writeFile(args[2]);
 		System.out.println("done. (writing population)");
 	}
 }
