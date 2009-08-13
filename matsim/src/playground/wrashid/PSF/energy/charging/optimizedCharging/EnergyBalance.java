@@ -164,14 +164,33 @@ public class EnergyBalance {
 		
 		// after the last parking, we must have reached 'minEnergyLevelToCharge'
 		while (maxChargableEnergy.get(maxChargableEnergy.size()-1)>0){
-			FacilityChargingPrice bestEnergyPrice=chargingPrice.peek();
+			FacilityChargingPrice bestEnergyPrice=chargingPrice.poll();
+			
+			if (bestEnergyPrice==null){
+				break;
+			}
 			
 			int parkingIndex=bestEnergyPrice.getEnergyBalanceParkingIndex();
 			Id facilityId=parkingTimes.get(parkingIndex).getFacilityId();
 			
-			double maximumEnergyThatNeedsToBeCharged=maxChargableEnergy.get(bestEnergyPrice.getEnergyBalanceParkingIndex());
+			
+			
+			double maximumEnergyThatNeedsToBeCharged=maxChargableEnergy.get(parkingIndex);
+			
+			// skip the charging slot, if no charging at the current parking is needed
+			// TODO: this can be made more efficient later (perhaps)
+			if (maximumEnergyThatNeedsToBeCharged==0){
+				continue;
+			}
 			
 			double energyCharged=bestEnergyPrice.getEnergyCharge(maximumEnergyThatNeedsToBeCharged);
+			
+			// set energyCharged to maximumEnergyThatNeedsToBeCharged, if they are very close, to counter 
+			// rounding errors.
+			int precision=100000;
+			if (Math.abs(maximumEnergyThatNeedsToBeCharged*precision-energyCharged*precision)<1){
+				energyCharged=maximumEnergyThatNeedsToBeCharged;
+			}
 			
 			ChargeLog chargeLog=bestEnergyPrice.getChargeLog(maximumEnergyThatNeedsToBeCharged);
 			

@@ -77,11 +77,11 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	/*
 	 * find out the end time of the charge
 	 */
-	private double getEndTimeOfCharge(double maxChargableEnergy) {
+	private double getEndTimeOfCharge(double energyNeeded) {
 
 		// how much time would be needed to charge the car fully at the current
 		// parking
-		double durationNeededForMaxCharging = maxChargableEnergy / ParkingInfo.getParkingElectricityPower(facilityId);
+		double durationNeededForRequiredCharging = energyNeeded / ParkingInfo.getParkingElectricityPower(facilityId);
 
 		// by default, we use the whole slot for charging
 		double endTimeOfCharge = slotStartTime + 900;
@@ -93,8 +93,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 
 		// still, we do not need the whole slot for charging (car needs less
 		// energy)
-		if (endParkingTime > slotStartTime + durationNeededForMaxCharging) {
-			endTimeOfCharge = slotStartTime + durationNeededForMaxCharging;
+		if (endParkingTime > slotStartTime + durationNeededForRequiredCharging) {
+			endTimeOfCharge = slotStartTime + durationNeededForRequiredCharging;
 		}
 
 		return endTimeOfCharge;
