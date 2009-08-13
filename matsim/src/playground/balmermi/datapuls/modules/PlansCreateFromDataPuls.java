@@ -41,6 +41,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
@@ -258,25 +259,41 @@ public class PlansCreateFromDataPuls {
 	//////////////////////////////////////////////////////////////////////
 
 	private final void mapDemand(PersonImpl dPerson, Knowledge dKnowledge, PersonImpl cPerson, Knowledge cKnowledge) {
+		// demographics
 		dPerson.setCarAvail(cPerson.getCarAvail());
 		dPerson.setEmployed(cPerson.getEmployed());
 		dPerson.setLicence(cPerson.getLicense());
-		if (cPerson.getTravelcards() != null) { dPerson.getTravelcards().addAll(cPerson.getTravelcards()); }
+		// travel cards
+		if (cPerson.getTravelcards() != null) {
+			for (String card : cPerson.getTravelcards()) { dPerson.addTravelcard(card); }
+		}
+		// desires
 		Desires dDesires = dPerson.createDesires(null);
 		for (String type : cPerson.getDesires().getActivityDurations().keySet()) {
 			dDesires.putActivityDuration(type,cPerson.getDesires().getActivityDurations().get(type));
 		}
+		// knowledge
 		for (ActivityOption cActivityOption : cKnowledge.getActivities(true)) {
 			if (!cActivityOption.getType().equals("home")) {
-				// TODO: find the facility
-				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),cActivityOption.getFacility());
+				ActivityFacility cFacility = cActivityOption.getFacility();
+				ActivityFacility dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
+				if (dFacility == null) { throw new RuntimeException("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+": no dFacility found."); }
+				if (CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord()) > 100.0) {
+					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+" with distance greater than 100 meters.");
+				}
+				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,true);
 			}
 		}
 		for (ActivityOption cActivityOption : cKnowledge.getActivities(false)) {
 			if (!cActivityOption.getType().equals("home")) {
-				// TODO: find the facility
-				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),cActivityOption.getFacility());
+				ActivityFacility cFacility = cActivityOption.getFacility();
+				ActivityFacility dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
+				if (dFacility == null) { throw new RuntimeException("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+": no dFacility found."); }
+				if (CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord()) > 100.0) {
+					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+" with distance greater than 100 meters.");
+				}
+				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,false);
 			}
 		}
