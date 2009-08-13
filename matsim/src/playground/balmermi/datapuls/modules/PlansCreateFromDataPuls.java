@@ -24,7 +24,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
@@ -34,6 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -51,18 +54,24 @@ public class PlansCreateFromDataPuls {
 	private final static Logger log = Logger.getLogger(PlansCreateFromDataPuls.class);
 	private final String infile;
 	private final Random random = MatsimRandom.getRandom();
-	private final PopulationImpl popCensus;
-	private final Knowledges knCensus;
+	private final PopulationImpl censusPopulation;
+	private final ArrayList<QuadTree<PersonImpl>> censusPersonGroups;
+	private final Knowledges censusKnowledges;
+	private final ActivityFacilities datapulsFacilities;
+	private final Map<String,QuadTree<ActivityFacility>> datapulsFacilityGroups;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCreateFromDataPuls(String infile, ScenarioImpl censusScenario) {
+	public PlansCreateFromDataPuls(String infile, ScenarioImpl censusScenario, ActivityFacilities datapulsFacilities) {
 		log.info("init " + this.getClass().getName() + " module...");
 		this.infile = infile;
-		this.popCensus = censusScenario.getPopulation();
-		this.knCensus = censusScenario.getKnowledges();
+		this.censusPopulation = censusScenario.getPopulation();
+		this.censusKnowledges = censusScenario.getKnowledges();
+		this.censusPersonGroups = buildPersonGroups(this.censusPopulation);
+		this.datapulsFacilities = datapulsFacilities;
+		this.datapulsFacilityGroups = buildFacilityGroups(this.datapulsFacilities);
 		random.nextInt();
 		log.info("done.");
 	}
@@ -71,7 +80,7 @@ public class PlansCreateFromDataPuls {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private ArrayList<QuadTree<PersonImpl>> buildQuadTrees(PopulationImpl population) {
+	private ArrayList<QuadTree<PersonImpl>> buildPersonGroups(PopulationImpl population) {
 		log.info("  building a quadtree for each person group...");
 		log.info("    calc spatial extent...");
 		double minx = Double.POSITIVE_INFINITY;
@@ -121,7 +130,43 @@ public class PlansCreateFromDataPuls {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void parse(PopulationImpl population, Knowledges kn, ActivityFacilities facilities) {
+	private Map<String,QuadTree<ActivityFacility>> buildFacilityGroups(ActivityFacilities facilities) {
+		log.info("  building a quadtree for each activity option group...");
+		String[] types = { "education_higher","education_kindergarten","education_other","education_primary",
+				"education_secondary","home","leisure","shop","tta","work_sector2","work_sector3" };
+		Map<String,QuadTree<ActivityFacility>> facilityGroups = new TreeMap<String,QuadTree<ActivityFacility>>();
+		for (int i=0; i<types.length; i++) {
+			log.info("    building a quadtree for type '"+types[i]+"'...");
+			double minx = Double.POSITIVE_INFINITY;
+			double miny = Double.POSITIVE_INFINITY;
+			double maxx = Double.NEGATIVE_INFINITY;
+			double maxy = Double.NEGATIVE_INFINITY;
+			for (ActivityFacility f : facilities.getFacilities().values()) {
+				if (f.getActivityOption(types[i]) != null) {
+					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+					if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+					if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+				}
+			}
+			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
+			log.info("    => type="+types[i]+": xrange("+minx+","+maxx+"); yrange("+miny+","+maxy+")");
+			QuadTree<ActivityFacility> qt = new QuadTree<ActivityFacility>(minx,miny,maxx,maxy);
+			for (ActivityFacility f : facilities.getFacilities().values()) {
+				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+			}
+			log.info("    => "+qt.size()+" facilities of type="+types[i]+" added.");
+			facilityGroups.put(types[i],qt);
+			log.info("    => number of quad trees: "+facilityGroups.size());
+			log.info("    done.");
+		}
+		log.info("  done.");
+		return facilityGroups;
+	}
+
+	//////////////////////////////////////////////////////////////////////
+
+	private final void parse(PopulationImpl population, Knowledges kn) {
 		log.info("  creating plans from "+infile+"...");
 		int line_cnt = 1;
 		try {
@@ -146,7 +191,7 @@ public class PlansCreateFromDataPuls {
 				else if (gender == 2) { sex = "f"; }
 				else { throw new RuntimeException("line "+line_cnt+": gender is not 0,1 or 2."); }
 				Id fid = new IdImpl(entries[19].trim());
-				ActivityFacility af = facilities.getFacilities().get(fid);
+				ActivityFacility af = datapulsFacilities.getFacilities().get(fid);
 				if (af == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" not found in facilities."); }
 				if (af.getActivityOptions().size() != 1) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" must have only one activity option."); }
 				ActivityOption a = af.getActivityOption("home");
@@ -174,25 +219,25 @@ public class PlansCreateFromDataPuls {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignCensus2datapuls(PopulationImpl population, Knowledges kn, ActivityFacilities facilities, ArrayList<QuadTree<PersonImpl>> personGroups) {
+	private final void assignCensus2datapuls(PopulationImpl population, Knowledges kn) {
 		log.info("  assing Census demand to datapuls population...");
 		double maxDistance = 0;
 		for (PersonImpl p : population.getPersons().values()) {
 			Coord c = kn.getKnowledgesByPersonId().get(p.getId()).getActivities("home").get(0).getFacility().getCoord();
 			QuadTree<PersonImpl> personGroup = null;
 			if (p.getSex().equals("m")) {
-				if (p.getAge()<7) { personGroup = personGroups.get(0); }
-				else if (p.getAge()<15) { personGroup = personGroups.get(1); }
-				else if (p.getAge()<18) { personGroup = personGroups.get(2); }
-				else if (p.getAge()<66) { personGroup = personGroups.get(3); }
-				else { personGroup = personGroups.get(4); }
+				if (p.getAge()<7) { personGroup = censusPersonGroups.get(0); }
+				else if (p.getAge()<15) { personGroup = censusPersonGroups.get(1); }
+				else if (p.getAge()<18) { personGroup = censusPersonGroups.get(2); }
+				else if (p.getAge()<66) { personGroup = censusPersonGroups.get(3); }
+				else { personGroup = censusPersonGroups.get(4); }
 			}
 			else if (p.getSex().equals("f")) {
-				if (p.getAge()<7) { personGroup = personGroups.get(5); }
-				else if (p.getAge()<15) { personGroup = personGroups.get(6); }
-				else if (p.getAge()<18) { personGroup = personGroups.get(7); }
-				else if (p.getAge()<66) { personGroup = personGroups.get(8); }
-				else { personGroup = personGroups.get(9); }
+				if (p.getAge()<7) { personGroup = censusPersonGroups.get(5); }
+				else if (p.getAge()<15) { personGroup = censusPersonGroups.get(6); }
+				else if (p.getAge()<18) { personGroup = censusPersonGroups.get(7); }
+				else if (p.getAge()<66) { personGroup = censusPersonGroups.get(8); }
+				else { personGroup = censusPersonGroups.get(9); }
 			}
 			double distance = 100;
 			ArrayList<PersonImpl> censusPersons = (ArrayList<PersonImpl>)personGroup.get(c.getX(),c.getY(),distance);
@@ -204,7 +249,7 @@ public class PlansCreateFromDataPuls {
 			
 			PersonImpl censusPerson = censusPersons.get(random.nextInt(censusPersons.size()));
 			log.info("    datapuls pid="+p.getId()+": mapped with census pid="+censusPerson.getId());
-			mapDemand(p,kn.getKnowledgesByPersonId().get(p.getId()),censusPerson,this.knCensus.getKnowledgesByPersonId().get(censusPerson.getId()));
+			mapDemand(p,kn.getKnowledgesByPersonId().get(p.getId()),censusPerson,this.censusKnowledges.getKnowledgesByPersonId().get(censusPerson.getId()));
 		}
 		
 		log.info("  done.");
@@ -217,19 +262,34 @@ public class PlansCreateFromDataPuls {
 		dPerson.setEmployed(cPerson.getEmployed());
 		dPerson.setLicence(cPerson.getLicense());
 		if (cPerson.getTravelcards() != null) { dPerson.getTravelcards().addAll(cPerson.getTravelcards()); }
-		Desires d = dPerson.createDesires(null);
-		d.getActivityDurations().putAll(cPerson.getDesires().getActivityDurations());
+		Desires dDesires = dPerson.createDesires(null);
+		for (String type : cPerson.getDesires().getActivityDurations().keySet()) {
+			dDesires.putActivityDuration(type,cPerson.getDesires().getActivityDurations().get(type));
+		}
+		for (ActivityOption cActivityOption : cKnowledge.getActivities(true)) {
+			if (!cActivityOption.getType().equals("home")) {
+				// TODO: find the facility
+				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),cActivityOption.getFacility());
+				dKnowledge.addActivity(dActivityOption,true);
+			}
+		}
+		for (ActivityOption cActivityOption : cKnowledge.getActivities(false)) {
+			if (!cActivityOption.getType().equals("home")) {
+				// TODO: find the facility
+				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),cActivityOption.getFacility());
+				dKnowledge.addActivity(dActivityOption,false);
+			}
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(PopulationImpl population, Knowledges kn, ActivityFacilities facilities) {
+	public void run(PopulationImpl population, Knowledges kn) {
 		log.info("running " + this.getClass().getName() + " module...");
-		parse(population,kn,facilities);
-		ArrayList<QuadTree<PersonImpl>> personGroups = buildQuadTrees(this.popCensus);
-		assignCensus2datapuls(population,kn,facilities,personGroups);
+		parse(population,kn);
+		assignCensus2datapuls(population,kn);
 		log.info("done.");
 	}
 }
