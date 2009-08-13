@@ -27,12 +27,15 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 
 public class PlansCreateFromDataPuls {
@@ -64,7 +67,7 @@ public class PlansCreateFromDataPuls {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void parse(PopulationImpl population) {
+	private final void parse(Population population) {
 		int line_cnt = 0;
 		try {
 			FileReader fr = new FileReader(infile);
@@ -88,8 +91,16 @@ public class PlansCreateFromDataPuls {
 				Id fid = new IdImpl(entries[19].trim());
 				ActivityFacility af = facilities.getFacilities().get(fid);
 				if (af == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" not found in facilities."); }
+				if (af.getActivityOptions().size() != 1) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" must have only one activity option."); }
+				ActivityOption a = af.getActivityOption("home");
+				if (a == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" does not contain 'home'."); }
 				
 				PersonImpl p = (PersonImpl)population.getPopulationBuilder().createPerson(id);
+				Knowledge k = kn.getKnowledgesByPersonId().get(p.getId());
+				if (k != null) { throw new RuntimeException("pid="+p.getId()+": knowledge already exist."); }
+				k = kn.getBuilder().createKnowledge(p.getId(),null);
+				kn.getKnowledgesByPersonId().put(p.getId(),k);
+				k.addActivity(a,true);
 				population.addPerson(p);
 				p.setAge(age);
 				p.setSex(sex);
@@ -109,6 +120,7 @@ public class PlansCreateFromDataPuls {
 
 	public void run(final PopulationImpl plans) {
 		log.info("running " + this.getClass().getName() + " module...");
+		parse(plans);
 		log.info("done.");
 	}
 }
