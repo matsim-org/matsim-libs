@@ -28,7 +28,6 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -118,12 +117,10 @@ public class MultiNodeDijkstra extends Dijkstra {
 
 		nodes.add(0, toNode);
 		Link tmpLink = getData(toNode).getPrevLink();
-		if (tmpLink != null) {
-			while (tmpLink != null) {
-				links.add(0, tmpLink);
-				nodes.add(0, tmpLink.getFromNode());
-				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
-			}
+		while (tmpLink != null) {
+			links.add(0, tmpLink);
+			nodes.add(0, tmpLink.getFromNode());
+			tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
 		}
 		double startTime = getData(nodes.get(0)).getTime();
 		DijkstraNodeData toNodeData = getData(toNode);

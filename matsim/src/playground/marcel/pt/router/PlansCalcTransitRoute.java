@@ -50,7 +50,7 @@ import playground.marcel.pt.routes.ExperimentalTransitRoute;
  * @author mrieser
  */
 public class PlansCalcTransitRoute extends PlansCalcRoute {
-	
+
 	public final static String TRANSIT_ACTIVITY_TYPE = "pt interaction";
 
 	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
@@ -75,7 +75,6 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 
 	@Override
 	public void handlePlan(final PlanImpl plan) {
-//		System.out.println("Person: " + plan.getPerson().getId());
 		this.transitLegsRemover.run(plan);
 		this.currentPlan = plan;
 		this.legReplacements.clear();

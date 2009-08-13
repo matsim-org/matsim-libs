@@ -50,6 +50,8 @@ import org.matsim.world.Layer;
  */
 /*package*/ class TransitRouterNetwork implements Network {
 
+	private static final long serialVersionUID = 1L;
+
 	private final Map<Id, TransitRouterNetworkLink> links = new LinkedHashMap<Id, TransitRouterNetworkLink>();
 	private final Map<Id, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id, TransitRouterNetworkNode>();
 	private QuadTree<TransitRouterNetworkNode> qtNodes = null;
@@ -62,6 +64,9 @@ import org.matsim.world.Layer;
 	}
 
 	/*package*/ static class TransitRouterNetworkNode implements Node {
+
+		private static final long serialVersionUID = 1L;
+		
 		final TransitRouteStop stop;
 		final TransitRoute route;
 		final TransitLine line;
@@ -102,6 +107,9 @@ import org.matsim.world.Layer;
 	}
 
 	/*package*/ static class TransitRouterNetworkLink implements Link {
+
+		private static final long serialVersionUID = 1L;
+		
 		final TransitRouterNetworkNode fromNode;
 		final TransitRouterNetworkNode toNode;
 		final TransitRoute route;

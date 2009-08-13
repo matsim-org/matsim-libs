@@ -27,20 +27,12 @@ import junit.framework.TestCase;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.events.Events;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.marcel.pt.demo.ScenarioPlayer;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class TransitRouterTest extends TestCase {
-
-	public void visualizeFixture() {
-		Fixture f = new Fixture();
-		f.init();
-		ScenarioPlayer.play(f.scenario, new Events());
-	}
 
 	public void testSingleLine() {
 		Fixture f = new Fixture();
@@ -233,26 +225,6 @@ public class TransitRouterTest extends TestCase {
 		assertEquals(f.scenario.createId("16"), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
 		assertEquals(f.scenario.createId("blue A > I"), ptRoute.getRouteId());
-	}
-
-	private void printLegs(final List<Leg> legs) {
-		System.out.println("---");
-
-		for (Leg leg : legs) {
-			System.out.print(leg.getMode());
-			System.out.print("  ");
-			System.out.print(leg.getTravelTime());
-			System.out.print("  ");
-			if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-				ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-				System.out.print(route.getRouteDescription());
-			}
-			System.out.println();
-		}
-	}
-
-	public static void main(final String[] args) {
-		new TransitRouterTest().visualizeFixture();
 	}
 
 }

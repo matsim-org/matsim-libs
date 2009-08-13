@@ -20,7 +20,6 @@
 
 package playground.marcel.pt.fakes;
 
-import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitStopFacility;
@@ -35,12 +34,12 @@ import playground.marcel.pt.queuesim.PassengerAgent;
  */
 public class FakePassengerAgent implements PassengerAgent {
 
-	private final ActivityFacility exitStop;
+	private final TransitStopFacility exitStop;
 
 	/**
 	 * @param exitStop can be <code>null</code>
 	 */
-	public FakePassengerAgent(final ActivityFacility exitStop) {
+	public FakePassengerAgent(final TransitStopFacility exitStop) {
 		this.exitStop = exitStop;
 	}
 
