@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.jjoubert.Utilities.Clustering.DJCluster;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
