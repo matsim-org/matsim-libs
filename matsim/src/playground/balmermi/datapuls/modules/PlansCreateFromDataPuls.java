@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -38,7 +39,9 @@ import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -295,6 +298,21 @@ public class PlansCreateFromDataPuls {
 				}
 				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,false);
+			}
+		}
+		// plan
+		PlanImpl cPlan = cPerson.getSelectedPlan();
+		PlanImpl dPlan = dPerson.createPlan(true);
+		cPlan.copyPlan(dPlan);
+		dPlan.setPerson(dPerson);
+		for (PlanElement e : dPlan.getPlanElements()) {
+			if (e instanceof ActivityImpl) {
+				ActivityImpl a = (ActivityImpl)e;
+				ArrayList<ActivityOption> acts = dKnowledge.getActivities(a.getType());
+				if (acts.isEmpty()) { throw new RuntimeException("pid="+dPerson.getId()+", aType="+a.getType()+": not defined in knowledge!"); }
+				ActivityFacility f = acts.get(random.nextInt(acts.size())).getFacility();
+				a.setCoord(f.getCoord());
+				a.setFacility(f);
 			}
 		}
 	}
