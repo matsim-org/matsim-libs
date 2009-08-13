@@ -40,6 +40,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
+import org.matsim.population.Desires;
 
 public class PlansCreateFromDataPuls {
 
@@ -175,11 +176,49 @@ public class PlansCreateFromDataPuls {
 
 	private final void assignCensus2datapuls(PopulationImpl population, Knowledges kn, ActivityFacilities facilities, ArrayList<QuadTree<PersonImpl>> personGroups) {
 		log.info("  assing Census demand to datapuls population...");
+		double maxDistance = 0;
 		for (PersonImpl p : population.getPersons().values()) {
 			Coord c = kn.getKnowledgesByPersonId().get(p.getId()).getActivities("home").get(0).getFacility().getCoord();
+			QuadTree<PersonImpl> personGroup = null;
+			if (p.getSex().equals("m")) {
+				if (p.getAge()<7) { personGroup = personGroups.get(0); }
+				else if (p.getAge()<15) { personGroup = personGroups.get(1); }
+				else if (p.getAge()<18) { personGroup = personGroups.get(2); }
+				else if (p.getAge()<66) { personGroup = personGroups.get(3); }
+				else { personGroup = personGroups.get(4); }
+			}
+			else if (p.getSex().equals("f")) {
+				if (p.getAge()<7) { personGroup = personGroups.get(5); }
+				else if (p.getAge()<15) { personGroup = personGroups.get(6); }
+				else if (p.getAge()<18) { personGroup = personGroups.get(7); }
+				else if (p.getAge()<66) { personGroup = personGroups.get(8); }
+				else { personGroup = personGroups.get(9); }
+			}
+			double distance = 100;
+			ArrayList<PersonImpl> censusPersons = (ArrayList<PersonImpl>)personGroup.get(c.getX(),c.getY(),distance);
+			while (censusPersons.isEmpty()) {
+				distance = 2*distance; censusPersons = (ArrayList<PersonImpl>)personGroup.get(c.getX(),c.getY(),distance);
+			}
+			// some logging info
+			if (maxDistance < distance) { maxDistance = distance; log.info("    pid="+p.getId()+": distance="+distance); }
 			
+			PersonImpl censusPerson = censusPersons.get(random.nextInt(censusPersons.size()));
+			log.info("    datapuls pid="+p.getId()+": mapped with census pid="+censusPerson.getId());
+			mapDemand(p,kn.getKnowledgesByPersonId().get(p.getId()),censusPerson,this.knCensus.getKnowledgesByPersonId().get(censusPerson.getId()));
 		}
+		
 		log.info("  done.");
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+
+	private final void mapDemand(PersonImpl dPerson, Knowledge dKnowledge, PersonImpl cPerson, Knowledge cKnowledge) {
+		dPerson.setCarAvail(cPerson.getCarAvail());
+		dPerson.setEmployed(cPerson.getEmployed());
+		dPerson.setLicence(cPerson.getLicense());
+		if (cPerson.getTravelcards() != null) { dPerson.getTravelcards().addAll(cPerson.getTravelcards()); }
+		Desires d = dPerson.createDesires(null);
+		d.getActivityDurations().putAll(cPerson.getDesires().getActivityDurations());
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -190,6 +229,7 @@ public class PlansCreateFromDataPuls {
 		log.info("running " + this.getClass().getName() + " module...");
 		parse(population,kn,facilities);
 		ArrayList<QuadTree<PersonImpl>> personGroups = buildQuadTrees(this.popCensus);
+		assignCensus2datapuls(population,kn,facilities,personGroups);
 		log.info("done.");
 	}
 }
