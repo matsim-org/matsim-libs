@@ -25,20 +25,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.QuadTree.Rect;
 
-import playground.jjoubert.Utilities.MyActivityReader;
+import playground.jjoubert.Utilities.Clustering.DJCluster;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class CheckPersonCluster01 {
 
@@ -124,8 +121,8 @@ public class CheckPersonCluster01 {
 					lineMultiplier *= 2;
 				}
 			}
-			log.info("   Lines read: " + String.valueOf(lineCounter) + " (Done)");
-			log.info("Completed processing input file (" + String.valueOf(al.size()) + " points)");
+			log.info("   Lines read: " + lineCounter + " (Done)");
+			log.info("Completed processing input file (" + al.size() + " points)");
 			
 			log.info("Building QuadTree from points.");
 			int qtCounter = 0;
@@ -137,10 +134,10 @@ public class CheckPersonCluster01 {
 				// Report progress
 				if(qtCounter == qtMultiplier){
 					qtMultiplier *= 2;
-					log.info("   Points added: " + String.valueOf(qtCounter));
+					log.info("   Points added: " + qtCounter);
 				}
 			}
-			log.info("   Points added: " + String.valueOf(qtCounter) + " (Done)");
+			log.info("   Points added: " + qtCounter + " (Done)");
 			return al;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -168,20 +165,17 @@ public class CheckPersonCluster01 {
 				if(line.length == 6){
 					Point p = gf.createPoint(new Coordinate(Double.parseDouble(line[1]), Double.parseDouble(line[2])));
 					al.add(p);
-					if(p == null){
-						log.warn("   Creating a 'null' Point!!");
-					}
 				}
 				
 				lineCounter++;
 				// Report progress
 				if(lineCounter == lineMultiplier){
-					log.info("   Lines processed: " + String.valueOf(lineCounter));
+					log.info("   Lines processed: " + lineCounter);
 					lineMultiplier *= 2;
 				}
 			}
-			log.info("   Lines processed: " + String.valueOf(lineCounter) + " (Done)");
-			log.info("Completed processing input file (" + String.valueOf(al.size()) + " points)");
+			log.info("   Lines processed: " + lineCounter + " (Done)");
+			log.info("Completed processing input file (" + al.size() + " points)");
 			return al;
 			
 		} catch (FileNotFoundException e) {
@@ -209,31 +203,17 @@ public class CheckPersonCluster01 {
 		int qtMultiplier = 1;
 		QuadTree<Point> qt = new QuadTree<Point>(xMin, yMin, xMax, yMax);
 		for (Point point : al) {
-			if(point.getX() == 707383 && point.getY() == 236496){
-				log.info("Found the point!!");
-			}
 			boolean added = qt.put(point.getX(), point.getY(), point);
-			if(point == null){
-				log.warn("   Adding a 'null' Point to the QuadTree!!");
-			}
 			if(added){
 				qtCounter++;
 			}
 			// Report progress
 			if(qtCounter == qtMultiplier){
 				qtMultiplier *= 2;
-				log.info("   Points added: " + String.valueOf(qtCounter));
+				log.info("   Points added: " + qtCounter);
 			}
 		}
-		log.info("   Points added: " + String.valueOf(qtCounter) + " (Done)");
-		int nullCounter = 0;
-		for (Point point : qt.values()) {
-			if(point == null){
-				nullCounter++;
-			}
-		}
-		log.info("Points in input ArrayList: " + String.valueOf(al.size()));
-		log.info("Points in output QuadTree: " + String.valueOf(qt.size()));
+		log.info("   Points added: " + qtCounter + " (Done)");
 		return qt;
 	}
 

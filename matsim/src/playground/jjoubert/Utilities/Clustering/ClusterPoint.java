@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialClusters;
+package playground.jjoubert.Utilities.Clustering;
 
 import com.vividsolutions.jts.geom.Point;
 

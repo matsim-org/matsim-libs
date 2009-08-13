@@ -20,15 +20,12 @@
 
 package playground.jjoubert.CommercialClusters;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Scanner;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -36,6 +33,8 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
+import playground.jjoubert.Utilities.Clustering.Cluster;
+import playground.jjoubert.Utilities.Clustering.ClusterPoint;
 import cern.colt.matrix.impl.SparseDoubleMatrix1D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
@@ -107,14 +106,13 @@ public class MyAdjancencyMatrixBuilder {
 				inputPointCounter++;
 			}
 		}
-		log.info("QuadTree built. Input points: " + String.valueOf(inputPointCounter) + "; Output points: " + qt.size() + " (with .size()); " + qt.values().size() + " (with .values.size())");
 		return qt;
 	}
 
 
 	public void buildAdjacency(ArrayList<Chain> chains){
 		GeometryFactory gf = new GeometryFactory();
-		log.info("Building adjacency for " + String.valueOf(chains.size()) + " chains.");
+		log.info("Building adjacency for " + chains.size() + " chains.");
 		int chainCounter = 0;
 		int chainMultiplier = 1;
 		
@@ -229,7 +227,7 @@ public class MyAdjancencyMatrixBuilder {
 						rowMultiplier *= 2;
 					}
 				}
-				log.info("   Rows processed: " + String.valueOf(matrixDimension) + " (Done)");
+				log.info("   Rows processed: " + matrixDimension + " (Done)");
 			} finally{
 				outputInOrder.close();
 				outputOutOrder.close();
@@ -268,7 +266,7 @@ public class MyAdjancencyMatrixBuilder {
 						rowMultiplier *= 2;
 					}
 				}
-				log.info("   Rows processed: " + String.valueOf(orderAdjacency.rows()) + " (Done)");
+				log.info("   Rows processed: " + orderAdjacency.rows() + " (Done)");
 			} finally{
 				output.close();
 			}

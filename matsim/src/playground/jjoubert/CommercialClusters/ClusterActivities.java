@@ -30,6 +30,7 @@ import playground.jjoubert.CommercialTraffic.Vehicle;
 import playground.jjoubert.Utilities.MyActivityReader;
 import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.MyXmlConverter;
+import playground.jjoubert.Utilities.Clustering.DJCluster;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;

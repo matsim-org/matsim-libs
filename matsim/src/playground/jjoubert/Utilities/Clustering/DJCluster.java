@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialClusters;
+package playground.jjoubert.Utilities.Clustering;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -198,15 +198,15 @@ public class DJCluster {
 			pointCounter++;
 			// Report progress
 			if(pointCounter == pointMultiplier){
-				log.info("   Points clustered: " + String.valueOf(pointCounter));
+				log.info("   Points clustered: " + pointCounter);
 				pointMultiplier = (int) Math.max(pointCounter, pointMultiplier)*2;
 			}
 			unclusteredIndex++;
 		}
-		log.info("   Points clustered: " + String.valueOf(pointCounter) + " (Done)");	
-		log.info("Sum should add up: " + String.valueOf(cPointCounter) + " (clustered) + " 
-									   + String.valueOf(uPointCounter) + " (unclustered) = "
-									   + String.valueOf(pointCounter));
+		log.info("   Points clustered: " + pointCounter + " (Done)");	
+		log.info("Sum should add up: " + cPointCounter + " (clustered) + " 
+									   + uPointCounter + " (unclustered) = "
+									   + pointCounter);
 				
 		/* 
 		 * Build the cluster list. Once built, I rename the clusterId field so as to
@@ -283,11 +283,11 @@ public class DJCluster {
 					clusterCount++;
 					// Report progress
 					if(clusterCount == clusterMultiplier){
-						log.info("   Clusters written: " + String.valueOf(clusterCount));
+						log.info("   Clusters written: " + clusterCount);
 						clusterMultiplier *= 2;
 					}
 				}
-				log.info("   Clusters written: " + String.valueOf(clusterCount) + " (Done)" );
+				log.info("   Clusters written: " + clusterCount + " (Done)" );
 			} finally{
 				output.close();
 			}
@@ -322,7 +322,7 @@ public class DJCluster {
 									String clusterFilename, 
 									String lineFilename,
 									String polygonFilename){
-		log.info("Processing clusters for visualization (" + String.valueOf(this.getClusterList().size()) + " clusters)");
+		log.info("Processing clusters for visualization (" + this.getClusterList().size() + " clusters)");
 		GeometryFactory gf = new GeometryFactory();
 		int clusterCount = 0;
 		int clusterMultiplier = 1;
@@ -418,11 +418,11 @@ public class DJCluster {
 					clusterCount++;
 					// Report progress.
 					if(clusterCount == clusterMultiplier){
-						log.info("   Clusters completed: " + String.valueOf(clusterCount));
+						log.info("   Clusters completed: " + clusterCount);
 						clusterMultiplier *= 2;
 					}
 				}
-				log.info("   Clusters completed: " + String.valueOf(clusterCount) + " (Done)");
+				log.info("   Clusters completed: " + clusterCount + " (Done)");
 				
 			} finally{
 				output_Points.write("END");
