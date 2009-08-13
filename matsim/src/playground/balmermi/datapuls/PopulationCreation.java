@@ -20,12 +20,15 @@
 
 package playground.balmermi.datapuls;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 
@@ -41,7 +44,11 @@ public class PopulationCreation {
 		System.out.println();
 		System.out.println("PopulationCreation");
 		System.out.println();
-		System.out.println("Usage1: PopulationCreation inputFacilitiesFile datapulsPersonsFile outputPlansFile");
+		System.out.println("Usage1: PopulationCreation censusConfig inputDataPulsFacilitiesFile datapulsPersonsFile outputPlansFile");
+		System.out.println();
+		System.out.println("Note: config file should at least contain the following parameters:");
+		System.out.println("      inputFacilitiesFile");
+		System.out.println("      inputPlansFile");
 		System.out.println();
 		System.out.println("---------------------");
 		System.out.println("2009, matsim.org");
@@ -53,27 +60,39 @@ public class PopulationCreation {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
-		if (args.length != 3) { printUsage(); return; }
+		if (args.length != 4) { printUsage(); return; }
+		
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
 
-		System.out.println("loading facilities...");
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
-		new MatsimFacilitiesReader(facilities).readFile(args[0]);
+		System.out.println("loading census facilities...");
+		sl.loadActivityFacilities();
 		Gbl.printMemoryUsage();
-		System.out.println("done. (loading facilities)");
+		System.out.println("done. (census facilities)");
+		
+		System.out.println("loading census population...");
+		sl.loadPopulation();
+		Gbl.printMemoryUsage();
+		System.out.println("done. (census population)");
+		
+		System.out.println("loading datapuls facilities...");
+		ActivityFacilities datapulsFacilities = new ActivityFacilitiesImpl();
+		new MatsimFacilitiesReader(datapulsFacilities).readFile(args[1]);
+		Gbl.printMemoryUsage();
+		System.out.println("done. (loading datapuls facilities).");
 
-		System.out.println("creating population...");
-		PopulationImpl population = new PopulationImpl();
-		Knowledges knowledges = new KnowledgesImpl();
+		System.out.println("creating datapuls population...");
+		PopulationImpl datapulsPopulation = new PopulationImpl();
+		Knowledges datapulsKnowledges = new KnowledgesImpl();
 		Gbl.printMemoryUsage();
-		System.out.println("done. (loading population)");
+		System.out.println("done. (creating datapuls population)");
 
 		System.out.println("running modules...");
-		new PlansCreateFromDataPuls(args[1],facilities,knowledges).run(population);
+		new PlansCreateFromDataPuls(args[2],sl.getScenario()).run(datapulsPopulation,datapulsKnowledges,datapulsFacilities);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (running modules)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(population,knowledges,args[2],"v4",1.0).write();
+		new PopulationWriter(datapulsPopulation,datapulsKnowledges,args[3],"v4",1.0).write();
 		System.out.println("done. (writing population)");
 	}
 }
