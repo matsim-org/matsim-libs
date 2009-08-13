@@ -210,9 +210,6 @@ public class PlansCreateFromDataPuls {
 				population.addPerson(p);
 				p.setAge(age);
 				p.setSex(sex);
-				
-				// progress report
-				if (line_cnt % 100000 == 0) { log.info("  line " + line_cnt); }
 				line_cnt++;
 			}
 		} catch (IOException e) {
@@ -249,13 +246,11 @@ public class PlansCreateFromDataPuls {
 				distance = 2*distance; censusPersons = (ArrayList<PersonImpl>)personGroup.get(c.getX(),c.getY(),distance);
 			}
 			// some logging info
-			if (maxDistance < distance) { maxDistance = distance; log.info("    pid="+p.getId()+": distance="+distance); }
+			if (maxDistance < distance) { maxDistance = distance; log.info("    pid="+p.getId()+": censusHome2datapulsHome distance="+distance); }
 			
 			PersonImpl censusPerson = censusPersons.get(random.nextInt(censusPersons.size()));
-			log.info("    datapuls pid="+p.getId()+": mapped with census pid="+censusPerson.getId());
 			mapDemand(p,kn.getKnowledgesByPersonId().get(p.getId()),censusPerson,this.censusKnowledges.getKnowledgesByPersonId().get(censusPerson.getId()));
 		}
-		
 		log.info("  done.");
 	}
 	
@@ -281,8 +276,9 @@ public class PlansCreateFromDataPuls {
 				ActivityFacility cFacility = cActivityOption.getFacility();
 				ActivityFacility dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
 				if (dFacility == null) { throw new RuntimeException("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+": no dFacility found."); }
-				if (CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord()) > 100.0) {
-					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+" with distance greater than 100 meters.");
+				double distance = CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord());
+				if (distance > 500.0) {
+					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
 				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,true);
@@ -293,8 +289,9 @@ public class PlansCreateFromDataPuls {
 				ActivityFacility cFacility = cActivityOption.getFacility();
 				ActivityFacility dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
 				if (dFacility == null) { throw new RuntimeException("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+": no dFacility found."); }
-				if (CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord()) > 100.0) {
-					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+" with distance greater than 100 meters.");
+				double distance = CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord());
+				if (distance > 500.0) {
+					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
 				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,false);
