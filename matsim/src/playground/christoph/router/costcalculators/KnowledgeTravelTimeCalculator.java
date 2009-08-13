@@ -23,9 +23,11 @@ package playground.christoph.router.costcalculators;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.LinkImpl;
 
 import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.network.MyLinkImpl;
+import playground.christoph.network.SubLink;
 import playground.christoph.router.util.KnowledgeTravelTime;
 
 public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
@@ -135,7 +137,18 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 //		double vehicles2 = myQueueNetwork.getLinkVehiclesCounter().getLinkDrivingVehiclesCount(link.getId());
 	
 		// now we have MyLinkImpls that have a VehiclesCount variable :)
-		double vehicles = ((MyLinkImpl)link).getVehiclesCount();
+		double vehicles;
+		
+		// Do we use SubNetworks?
+		if (link instanceof SubLink)
+		{
+			LinkImpl parentLink = ((SubLink)link).getParentLink();
+			vehicles = ((MyLinkImpl)parentLink).getVehiclesCount();
+		}
+		else
+		{
+			vehicles = ((MyLinkImpl)link).getVehiclesCount();
+		}
 		
 		return vehicles;
 	}

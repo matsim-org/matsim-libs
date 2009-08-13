@@ -28,14 +28,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -43,7 +41,7 @@ import playground.christoph.router.util.DeadEndRemover;
 
 public class CreateKnownNodesMap {
 
-	public static boolean removeDeadEnds = true;
+	public static boolean removeDeadEnds = false;
 	
 	private final static Logger log = Logger.getLogger(CreateKnownNodesMap.class);
 	
@@ -130,11 +128,9 @@ public class CreateKnownNodesMap {
 			}
 			
 			for(int j = 1; j < acts.size(); j++)
-			{	
-				//Node startNode = acts.get(j-1).getLink().getToNode();
-				NodeImpl startNode = acts.get(j-1).getLink().getFromNode();
-				//Node endNode = acts.get(j).getLink().getFromNode();
-				NodeImpl endNode = acts.get(j).getLink().getToNode();
+			{			
+				NodeImpl startNode = acts.get(j-1).getLink().getToNode();
+				NodeImpl endNode = acts.get(j).getLink().getFromNode();
 				
 				((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
 				((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);
@@ -144,6 +140,16 @@ public class CreateKnownNodesMap {
 				nodeSelector.addNodesToMap(newNodes);
 				
 				if (newNodes.size() == 0) log.error("No new known Nodes found?!");
+				
+				/*
+				 *  Add additionally all Start & End Nodes of Links that contains Activity.
+				 *  This ensures that a Person knows at least the Link where the Activity
+				 *  takes place.
+				 */
+				NodeImpl startNodeFrom = acts.get(j-1).getLink().getFromNode();			
+				NodeImpl endNodeTo = acts.get(j).getLink().getToNode();
+				newNodes.put(startNodeFrom.getId(), startNodeFrom);
+				newNodes.put(endNodeTo.getId(), endNodeTo);
 				
 				nodesMap.putAll(newNodes);
 			}

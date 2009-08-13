@@ -27,6 +27,7 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.core.events.ActivityEndEvent;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -34,7 +35,11 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.knowledge.container.NodeKnowledge;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.util.KnowledgeTools;
 
 /*
  * This is a EventHandler that replans the Route of a Person every time an
@@ -213,7 +218,7 @@ public class ActEndReplanner {
 		
 		// We still want to go there...
 		newPlan.addActivity(toAct);
-			
+		
 		/*
 		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
 		 *  The router may need their knowledge (activity room, ...).
@@ -223,10 +228,46 @@ public class ActEndReplanner {
 			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
 			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
 		}
+			
+//		NodeImpl startNode = fromAct.getLink().getToNode();	// start at the end of the "current" link
+//		NodeImpl endNode = toAct.getLink().getFromNode(); // the target is the start of the link
+//		
+//		SubNetwork subNetwork = new SubNetworkTools().getSubNetwork(person);
+//		
+//		if(subNetwork.person.getId() != person.getId())
+//		{
+//			log.error("Wrong SubNetwork!");
+//		}
+//		if(!subNetwork.getNodes().containsKey(startNode.getId()))
+//		{
+//			log.error("Key not Contained!");
+//		}
+//		if(!subNetwork.getNodes().containsKey(startNode.getId()))
+//		{
+//			log.error("Key not Contained!");
+//		}
+//		
+//		if(!new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().containsKey(startNode.getId()))
+//		{
+//			log.error("Key never was Contained! " + person.getId() + " " + startNode.getId());
+//			log.error("Size: " + new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().size());
+//
+//			for(NodeImpl node : new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().values())
+//			{
+//				log.info(node.getId());
+//			}
+//		}
+//		NodeKnowledge nodeKnowledge = new KnowledgeTools().getNodeKnowledge(person);
+//		if(!new KnowledgeTools().getNodeKnowledge(person).getKnownNodes().containsKey(endNode.getId()))
+//		{
+//			log.error("Key never was Contained! " + person.getId() + " " + startNode.getId());
+//		}
 		
 		// By doing the replanning the "betweenLeg" is replanned, so the changes are
 		// included in the previously selected plan, too!
 		replanner.run(newPlan);
+		
+		new SubNetworkTools().resetSubNetwork(person);
 		
 		// reactivate previously selected, replanned plan
 		person.setSelectedPlan(currentPlan);

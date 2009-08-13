@@ -83,11 +83,6 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
-/*		log.info(this);
-		log.info(fromNode);
-		log.info(toNode);
-		log.info(time);
-*/
 		return dijkstra.calcLeastCostPath(fromNode, toNode, startTime);
 	}
 	
@@ -120,8 +115,8 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 					subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
 	//				log.info("Set Network for Person " + person.getId());
 				}
-				
-				knowledgeTools.removeKnowledge(person);
+	
+//				knowledgeTools.removeKnowledge(person);
 				
 				((MyDijkstra)dijkstra).setNetwork(subNetwork);
 			}

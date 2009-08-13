@@ -17,53 +17,32 @@ public class MapKnowledge extends BasicNodeKnowledge{
 	{
 		this.nodes = new HashMap<Id, NodeImpl>();
 	}
-/*
-	public MapKnowledge(Map<Id, NodeImpl> nodes)
-	{
-		int nodeCount = this.getNetwork().getNodes().size();
-		
-		// knows more than half of all nodes
-		if (nodes.size() > nodeCount/2)
-		{
-			this.isWhiteList = false;
-			
-			Map<Id, NodeImpl> blackList = new HashMap<Id, NodeImpl>();
-			blackList.putAll(this.network.getNodes());
-			
-			for (Id id : nodes.keySet())
-			{
-				blackList.remove(id);
-			}
-			this.nodes = blackList;
-		}
-		else
-		{
-			this.nodes = nodes;
-		}
-	}
-*/	
+	
 	public void addNode(NodeImpl node)
 	{
-		nodes.put(node.getId(), node);
+		if (isWhiteList) nodes.put(node.getId(), node);
+		else nodes.remove(node.getId());
 	}
 	
 	public void removeNode(NodeImpl node)
 	{
-		nodes.remove(node.getId());
+		if (isWhiteList) nodes.remove(node.getId());
+		else nodes.put(node.getId(), node);
 	}
 	
 	
 	public boolean knowsNode(NodeImpl node)
 	{
-		return nodes.containsKey(node.getId());
+		boolean knowsNode = nodes.containsKey(node.getId());
+		if (isWhiteList) return knowsNode;
+		else return !knowsNode;
 	}
-
 	
 	public boolean knowsLink(LinkImpl link)
 	{
 		// if no Map found or the Map is empty -> Person knows the entire network, return true
 		if ( nodes == null ) return true;
-		if ( nodes.size() == 0) return true;
+		if ( nodes.size() == 0) return !isWhiteList;
 				
 		if ( this.knowsNode(link.getFromNode()) && this.knowsNode(link.getToNode()) ) return true;
 		else return false;
@@ -71,7 +50,20 @@ public class MapKnowledge extends BasicNodeKnowledge{
 	
 	public synchronized Map<Id, NodeImpl> getKnownNodes() 
 	{
-		return nodes;
+		if (isWhiteList) return nodes;
+		else
+		{
+			Map<Id, NodeImpl> invertedNodes = new HashMap<Id, NodeImpl>();
+			
+			invertedNodes.putAll(this.network.getNodes());
+			
+			for(NodeImpl node : nodes.values())
+			{
+				invertedNodes.remove(node.getId());
+			}
+			
+			return invertedNodes;
+		}
 	}
 	
 	public synchronized void reset()

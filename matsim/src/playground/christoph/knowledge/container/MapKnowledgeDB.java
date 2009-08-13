@@ -32,13 +32,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		super();
 		localKnowledge = false;
 	}
-/*
-	public MapKnowledgeDB(Map<Id, NodeImpl> nodes)
-	{
-		super(nodes);
-		localKnowledge = true;
-	}
-*/	
+
 	public static void setTableName(String name)
 	{
 		tableName = name;
@@ -95,8 +89,13 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 			{			
 				while (rs.next())
 				{	
-					boolean listType = Boolean.valueOf(rs.getString("WhiteList"));
-					this.isWhiteList = listType;
+					/*
+					 *  Initially we say it is a WhiteList.
+					 *  Now we can add all Nodes from the DB directly to the
+					 *  KnowledgeMap. If the KnowledgeMap Object would think
+					 *  it is a BlackList, it would invert all added Nodes...
+					 */
+					this.isWhiteList = true;
 					
 					String[] nodeIds = rs.getString("NodeIds").split(separator);
 			
@@ -104,8 +103,13 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 					{								
 						//NodeImpl node = this.network.getNode(new IdImpl(id));
 						NodeImpl node = this.network.getNodes().get(new IdImpl(id));
-						super.getKnownNodes().put(node.getId(), node);
+						super.addNode(node);
 					}
+					
+					// Finally we set The ListType
+					
+					String listType = rs.getString("WhiteList");
+					this.isWhiteList = listType.equals("1") || listType.equalsIgnoreCase("true") || listType.equalsIgnoreCase("yes");
 				}
 			}
 			catch (SQLException e)

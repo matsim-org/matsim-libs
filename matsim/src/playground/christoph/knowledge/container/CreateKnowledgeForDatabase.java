@@ -55,7 +55,7 @@ public class CreateKnowledgeForDatabase {
 	private ArrayList<SelectNodes> nodeSelectors;
 	private double dijkstraCostFactor = 1.0;
 	//private double[] dijkstraCostFactors = {1.0, 1.5, 2.0, 2.5, 3.0};
-	private double[] dijkstraCostFactors = {1.1, 1.15};
+	private double[] dijkstraCostFactors = {1.25};
 	private int parallelThreads = 2;
 	private ReplanningQueueSimulation sim;
 	private Events events;
@@ -274,8 +274,8 @@ public class CreateKnowledgeForDatabase {
 	{
 		List<PersonImpl> personsToReplan = new ArrayList<PersonImpl>();
 		
-		personsToReplan.addAll(population .getPersons().values());
-				
+		personsToReplan.addAll(population.getPersons().values());
+		
 		double time = 0.0;
 		
 		// Run Replanner

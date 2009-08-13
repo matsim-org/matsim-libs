@@ -284,7 +284,7 @@ public class EventControler extends Controler {
 	 */
 	protected void initParallelReplanningModules() {
 		ParallelReplanner.init(replanners);
-		ParallelReplanner.setNumberOfThreads(4);
+		ParallelReplanner.setNumberOfThreads(2);
 
 		ParallelActEndReplanner.init();
 		ParallelLeaveLinkReplanner.init();

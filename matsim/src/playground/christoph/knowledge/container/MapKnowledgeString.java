@@ -83,11 +83,10 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 			{					
 				//NodeImpl node = this.network.getNode(new IdImpl(id));
 				NodeImpl node = this.network.getNodes().get(new IdImpl(id));
-				super.getKnownNodes().put(node.getId(), node);
+				super.addNode(node);
 			}
 		}
 	}
-
 	
 	public synchronized void writeToDB()
 	{

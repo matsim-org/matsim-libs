@@ -90,23 +90,6 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		{
 			// try getting NodeKnowledge from the Persons Knowledge
 			nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
-			
-//			synchronized(nodeKnowledge)
-//			{
-//				SubNetworkTools subNetworkTools = new SubNetworkTools();
-//				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
-//				
-//				synchronized(subNetwork)
-//				{
-//					if (!nodeKnowledge.knowsLink((LinkImpl)link))
-//					{
-//						subNetwork.getNodes().size();
-//						//log.error(person.getId() + " Asking for unknown Link! " + nodeKnowledge.getKnownNodes().size() + " "  + subNetwork.getNodes().size());
-//						if (nodeKnowledge.getKnownNodes().size() != 0) log.error(person.getId() + " Asking for unknown Link! " + nodeKnowledge.getKnownNodes().size() + " "  + subNetwork.getNodes().size());
-//					}
-//				}
-//				knowledgeTools.removeKnowledge(person);
-//			}
 		}
 		
 		// if the Person doesn't know the link -> return max costs 

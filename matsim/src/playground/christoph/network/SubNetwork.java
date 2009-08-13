@@ -9,16 +9,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkBuilder;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 
 public class SubNetwork implements Network {
 
 	protected Map<Id, Node> nodes;
-	//protected Map<Id, LinkImpl> links;
 	protected Map<Id, Link> links;
 	
 	protected Network network;
-	
+
 	protected boolean isInitialized = false;
 	
 	public SubNetwork(Network network)
@@ -29,14 +27,12 @@ public class SubNetwork implements Network {
 	public void initialize()
 	{
 		nodes = new TreeMap<Id, Node>();
-		//links = new TreeMap<Id, LinkImpl>();
 		links = new TreeMap<Id, Link>();
 	}
 	
 	public void initialize(int nodesCount)
 	{
 		nodes = new HashMap<Id, Node>((int)(nodesCount * 1.1), 0.95f);
-		//links = new TreeMap<Id, LinkImpl>();
 		links = new TreeMap<Id, Link>();
 	}
 	
@@ -56,7 +52,7 @@ public class SubNetwork implements Network {
 //		this.links.clear();
 		this.nodes = new HashMap<Id, Node>();
 		this.links = new HashMap<Id, Link>();
-		//this.links = new HashMap<Id, LinkImpl>();
+
 		this.isInitialized = false;
 	}
 	
@@ -75,7 +71,6 @@ public class SubNetwork implements Network {
 		return network.getEffectiveLaneWidth();
 	}
 
-	//public Map<Id, LinkImpl> getLinks()
 	public Map<Id, Link> getLinks()
 	{
 		return links;
@@ -91,7 +86,6 @@ public class SubNetwork implements Network {
 		nodes.put(subNode.getId(), subNode);
 	}
 	
-	//public void addLink(LinkImpl link)
 	public void addSubLink(Link link)
 	{
 		links.put(link.getId(), link);

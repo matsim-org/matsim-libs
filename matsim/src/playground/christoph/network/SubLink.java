@@ -16,6 +16,11 @@ public class SubLink extends BasicLinkImpl implements Link{
 		this.parentLink = link;
 	}
 	
+	public LinkImpl getParentLink()
+	{
+		return parentLink;
+	}
+	
 	@Override
 	public SubNode getFromNode()
 	{ 

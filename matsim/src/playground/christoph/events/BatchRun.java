@@ -18,7 +18,7 @@ public class BatchRun {
 	//protected static String[] knowledgeFactors = {"1.05", "1.10", "1.15", "1.20", "1.25", "1.50", "1.75", "2.00", "2.50", "3.00", "full"}; 
 	protected static String[] knowledgeFactors = {"2.0"};
 	//protected static double[] probabilityFactors = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
-	protected static double[] probabilityFactors = { 0.65};
+	protected static double[] probabilityFactors = {0.65};
 	
 	protected static double[] tbuffers = {15, 20, 25};
 	
