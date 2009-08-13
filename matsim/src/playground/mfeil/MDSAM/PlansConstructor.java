@@ -77,15 +77,15 @@ public class PlansConstructor implements PlanStrategyModule{
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
-	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
+		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
 		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
-	*/	this.inputFile = "./plans/input_plans2.xml";	
+	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
 		this.outputFileMod = "./plans/model.mod";
-		this.population = new PopulationImpl();
+	*/	this.population = new PopulationImpl();
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
@@ -93,15 +93,15 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
-	/*	this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
+		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
 		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
-	*/	this.inputFile = "./plans/input_plans2.xml";	
+	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
 		this.outputFileMod = "./plans/model.mod";
-		this.population = population;
+	*/	this.population = population;
 		this.sims = sims;
 	}
 	

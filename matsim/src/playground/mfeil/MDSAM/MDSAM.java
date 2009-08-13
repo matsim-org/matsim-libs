@@ -33,7 +33,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.controler.Controler;
 import org.apache.log4j.Logger;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -61,9 +60,9 @@ public class MDSAM {
 		this.GWact = 2.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
-		this.outputFile = "./plans/plans_similarity.xls";	
-	//	this.outputFile = "/home/baug/mfeil/data/mz/simlog.xls";	
-		this.printing = false;
+	//	this.outputFile = "./plans/plans_similarity.xls";	
+		this.outputFile = "/home/baug/mfeil/data/mz/simlog.xls";	
+		this.printing = true;
 	}
 	
 	public List<List<Double>> runPopulation () {
@@ -78,17 +77,13 @@ public class MDSAM {
 		}	
 		
 		this.sims = new ArrayList<List<Double>>();
-		int counter = 0;
+		
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			counter++;
-			if (counter%10==0){
-				log.info("Handled "+counter+" persons.");
-				Gbl.printMemoryUsage();
-			}
 			this.sims.add(new ArrayList<Double>());
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
+				
 				if (plan.equals(person.getSelectedPlan())) {
 					this.sims.get(this.sims.size()-1).add(0.0);
 					continue;
@@ -148,6 +143,7 @@ public class MDSAM {
 		
 		// Calculate tables per attribute dimension
 		// Length is number of acts minus last home plus 0th position, or number of legs respectively
+		
 		double [][][] table = new double [3][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
 		
 		for (int k=0;k<table.length;k++){
@@ -196,10 +192,12 @@ public class MDSAM {
 			}
 			stream.println();
 		}
-		
+	
 		// Find one optimal trajectory close to the diagonal, for each attribute dimension
 		ArrayList<int[]> oset = new ArrayList<int[]>();	// contains the operation and position
 		ArrayList<ArrayList<Integer>> dimensions = new ArrayList<ArrayList<Integer>>(); // contains the attribute dimensions of operation and position
+		
+		/*
 		for (int k=0;k<table.length;k++){
 			//System.out.println("k = "+k);
 			int i=0;
@@ -243,6 +241,72 @@ public class MDSAM {
 					dimensions.add(l);
 					i++;
 					goRight = true;
+					//System.out.println("New deletion.");
+				}
+			}
+		}
+		*/
+		
+		for (int k=0;k<table.length;k++){
+			double GW = 0;
+			if (k==0) GW = this.GWact;
+			else if (k==1) GW = this.GWmode;
+			else GW = this.GWlocation;
+			int i=table[k].length-1;
+			int j=table[k][0].length-1;
+			boolean goLeft = true;
+			while (i!=0 || j!=0){
+				if (i>0 && j>0 && table[k][i-1][j-1]>=table[k][i][j]-GW){
+					//System.out.println("Identity.");
+					i--;
+					j--;
+				}
+				// check insertion {1,x}
+				else if (j>0 &&	table[k][i][j-1]==table[k][i][j]-GW && osetContains(oset,dimensions,k,1,j)){
+					//System.out.println("Insertion.");
+					j--;
+				}
+				// check deletion {2,x}
+				else if (i>0 &&	table[k][i-1][j]==table[k][i][j]-GW && osetContains(oset,dimensions,k,2,i)){
+					//System.out.println("Deletion.");
+					i--;
+				}
+				// go new path (insertion) in zick zack
+				else if (goLeft && j>0) {
+					oset.add(new int[]{1,j});
+					ArrayList<Integer> l = new ArrayList<Integer>();
+					l.add(k);
+					dimensions.add(l);
+					j--;
+					goLeft = false;
+					//System.out.println("New insertion.");
+				}
+				// go new path (deletion) in zick zack
+				else if (!goLeft && i>0){
+					oset.add(new int[]{2,i});
+					ArrayList<Integer> l = new ArrayList<Integer>();
+					l.add(k);
+					dimensions.add(l);
+					i--;
+					goLeft = true;
+					//System.out.println("New deletion.");
+				}
+				// go new path (insertion) 
+				else if (j>0) {
+					oset.add(new int[]{1,j});
+					ArrayList<Integer> l = new ArrayList<Integer>();
+					l.add(k);
+					dimensions.add(l);
+					j--;
+					//System.out.println("New insertion.");
+				}
+				// go new path (deletion)
+				else {
+					oset.add(new int[]{2,i});
+					ArrayList<Integer> l = new ArrayList<Integer>();
+					l.add(k);
+					dimensions.add(l);
+					i--;
 					//System.out.println("New deletion.");
 				}
 			}
@@ -302,15 +366,15 @@ public class MDSAM {
 	}
 	
 	public static void main(final String [] args) {
-		/*		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 				final String populationFilename = "/home/baug/mfeil/data/mz/output_plans.xml";
-		*/		final String populationFilename = "./plans/output_plans.xml";
+		/*		final String populationFilename = "./plans/output_plans.xml";
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
-
-		//		final String outputFile = "/home/baug/mfeil/data/mz/output_plans.dat";
-				final String outputFile = "./plans/output_plans.dat";
+		*/
+				final String outputFile = "/home/baug/mfeil/data/mz/output_plans.dat";
+		//		final String outputFile = "./plans/output_plans.dat";
 
 				ScenarioImpl scenario = new ScenarioImpl();
 				new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);

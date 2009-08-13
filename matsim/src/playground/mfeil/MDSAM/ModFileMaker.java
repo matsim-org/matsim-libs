@@ -177,15 +177,15 @@ public class ModFileMaker {
 	
 
 	public static void main(final String [] args) {
-/*		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/mz/output_plans.xml";
-	*/	final String populationFilename = "./plans/output_plans.xml.gz";
+	/*	final String populationFilename = "./plans/output_plans.xml.gz";
 		final String networkFilename = "./plans/network.xml";
 		final String facilitiesFilename = "./plans/facilities.xml.gz";
-
-//		final String outputFile = "/home/baug/mfeil/data/mz/model.mod";
-		final String outputFile = "./plans/model.mod";
+	*/
+		final String outputFile = "/home/baug/mfeil/data/mz/model.mod";
+	//	final String outputFile = "./plans/model.mod";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
