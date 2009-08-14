@@ -193,7 +193,7 @@
                   <exclude>org/matsim/**/*SimpleTests.java</exclude>
                   <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
                   <exclude>org/matsim/mobsim/jdeqsim/util/TestHandlerDetailedEventChecker</exclude>
-                  <exclude>org/matsim/mobsim/jdeqsim/TestDESStarter*.java</exclude>
+                  <exclude>org/matsim/mobsim/jdeqsim/TestDESStarter_Berlin.java</exclude>
           </excludes>
           <forkMode>once</forkMode>
           <!-- avoid out of memory errors: -->
