@@ -168,7 +168,7 @@
             <Xmaxwarns>4000</Xmaxwarns>
             <Xmaxerrs>100</Xmaxerrs>
           </compilerArguments>
-          <compilerArgument>-Djava.endorsed.dirs=${basedir}/libs/endorsed -Djava.awt.headless=true</compilerArgument>
+          <!--<compilerArgument>-Djava.endorsed.dirs=${basedir}/libs/endorsed -Djava.awt.headless=true</compilerArgument>-->
           <!-- Uncommenting the following lines can be used to in- or exclude
           sources from compilation -->
           <includes>
