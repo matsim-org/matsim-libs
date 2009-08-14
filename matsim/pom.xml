@@ -143,6 +143,70 @@
     </repository>
   </repositories>
   
+  <profiles>
+    <profile>
+      <id>jdk16profile</id>
+      <activation>
+        <jdk>1.6</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <showWarnings>false</showWarnings>
+          <showDeprecation>false</showDeprecation>
+          <!-- configure initial and maximal memory for compiling -->
+          <fork>true</fork>
+          <meminitial>128m</meminitial>
+          <maxmem>512m</maxmem>
+          <compilerArguments>
+            <Xmaxwarns>4000</Xmaxwarns>
+            <Xmaxerrs>100</Xmaxerrs>
+          </compilerArguments>
+          <compilerArgument>-Djava.endorsed.dirs=${basedir}/libs/endorsed -Djava.awt.headless=true</compilerArgument>
+          <!-- Uncommenting the following lines can be used to in- or exclude
+          sources from compilation -->
+          <includes>
+            <include>org/matsim/**/*.java</include>
+            <include>tutorial/**/*.java</include>
+             <include>playground/**/*.java</include>
+            <include>de/schlichtherle/**/*.java</include>
+          </includes>    
+        </configuration>
+            </configuration>
+          </plugin>
+          <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.4</version>
+              <configuration>
+                <excludes>
+                  <exclude>**/*$*</exclude> <!-- exclude all inner classes -->
+                  <exclude>org/matsim/testcases/TestDepth.java</exclude>
+                  <exclude>playground/wrashid/test/**/*.java</exclude>-->
+                  <exclude>playground/**/*.java</exclude>
+                  <exclude>org/matsim/**/*AllTests*.java</exclude>
+                  <exclude>org/matsim/**/*SimpleTests.java</exclude>
+                  <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
+                  <exclude>org/matsim/mobsim/jdeqsim/util/TestHandlerDetailedEventChecker</exclude>
+                  <exclude>org/matsim/mobsim/jdeqsim/TestDESStarter*.java</exclude>
+          </excludes>
+          <forkMode>once</forkMode>
+          <!-- avoid out of memory errors: -->
+          <argLine>-Xmx600m -Djava.endorsed.dirs=${basedir}/libs/endorsed -Djava.awt.headless=true</argLine>
+          <enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
+        </configuration>
+          </plugin>
+        </plugins>      
+      </build>
+    </profile>
+  </profiles>
+  
+  
   <dependencies>
     <!--todo: take care about the library as it is not a registered
     dependency shipped with the geotools maven version we use -->
