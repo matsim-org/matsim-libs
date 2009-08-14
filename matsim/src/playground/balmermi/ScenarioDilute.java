@@ -106,8 +106,14 @@ public class ScenarioDilute {
 		System.out.println("done. (complete world)");
 		
 		System.out.println("calculate area of interest and extract its links...");
+
+		// dilZrh
+//		double radius = 30000.0;
+//		final CoordImpl center = new CoordImpl(683518.0,246836.0);
+		// dilTburg
 		double radius = 30000.0;
-		final CoordImpl center = new CoordImpl(683518.0,246836.0);
+		final CoordImpl center = new CoordImpl(733400.0,243600.0);
+
 		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
 		System.out.println("=> area of interest (aoi): center=" + center + "; radius=" + radius);
 		for (LinkImpl link : network.getLinks().values()) {
