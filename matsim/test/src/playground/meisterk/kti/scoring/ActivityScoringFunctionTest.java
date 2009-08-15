@@ -66,8 +66,6 @@ import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.meisterk.kti.scoring.ActivityScoringFunction;
-import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
 
@@ -79,12 +77,13 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	private KtiConfigGroup ktiConfigGroup;
 	private ActivityFacilities facilities;
 	private NetworkLayer network;
-	
+
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunctionTest.class);
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		// generate config
 		this.config = super.loadConfig(null);
 		CharyparNagelScoringConfigGroup scoring = this.config.charyparNagelScoring();
@@ -96,12 +95,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		scoring.setTravelingPt(0.0);
 		scoring.setMarginalUtlOfDistanceCar(0.0);
 		scoring.setWaiting(0.0);
-		
+
 		this.config.planomat().setDoLogging(false);
 
 		this.ktiConfigGroup = new KtiConfigGroup();
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
-		
+
 		// generate person
 		this.population = new PopulationImpl();
 //		Id personId = new IdImpl("123");
@@ -118,10 +117,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		facilityLeisure.createActivityOption("leisure");
 		ActivityFacility facilityShop = this.facilities.createFacility(new IdImpl(7), new CoordImpl(500.0, 0.0));
 		facilityShop.createActivityOption("shop");
-		
+
 		// generate network
 		this.network = new NetworkLayer();
-		
+
 		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
 		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
 		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
@@ -135,14 +134,14 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		network.createLink(new IdImpl(4030), node4, node3, 500, 25, 3600, 1);
 		network.createLink(new IdImpl(4050), node4, node5, 500, 25, 3600, 1);
 		network.createLink(new IdImpl(5040), node5, node4, 500, 25, 3600, 1);
-		
+
 		// generate desires
 		Desires desires = person.createDesires("test desires");
 		desires.putActivityDuration("home", Time.parseTime("15:40:00"));
 		desires.putActivityDuration("work_sector3", Time.parseTime("07:00:00"));
 		desires.putActivityDuration("leisure", Time.parseTime("01:00:00"));
 		desires.putActivityDuration("shop", Time.parseTime("00:20:00"));
-		
+
 		// generate plan
 		plan = person.createPlan(true);
 
@@ -181,7 +180,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("00:30:00"));
-		
+
 		act = plan.createActivity("home", facilityHome);
 		link = this.network.getLink("2030");
 		act.setLink(link);
@@ -222,11 +221,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, this.config.travelTimeCalculator().getTraveltimeBinSize());
 
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCostEstimator, tTravelEstimator);
-		
+
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 
 		FixedRouteLegTravelTimeEstimator ltte = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
@@ -236,43 +235,43 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				this.config.charyparNagelScoring(), 
+				this.config.charyparNagelScoring(),
 				facilityPenalties,
 				this.ktiConfigGroup);
 		// init Planomat, which loads config!
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.config.planomat());
 
 		Random random = MatsimRandom.getLocalInstance();
-		
+
 		int check = 1;
 		for (int i = 0; i < 1000; i++) {
 			testee.getSeedGenerator().setSeed(random.nextLong());
 			tTravelEstimator.reset(0);
 			depDelayCalc.resetDepartureDelays();
-			
+
 			// actual test
 			testee.run(testPlan);
-			
+
 			if (i % check == 0) {
 				logger.info("Processed test person " + check + " times.");
 				check *= 2;
-				
+
 			}
 		}
 		// write out the test person and the modified plan into a file
 		PopulationImpl outputPopulation = new PopulationImpl();
 		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
-		
+
 		logger.info("Writing plans file...");
 		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
 		plans_writer.write();
 		logger.info("Writing plans file...DONE.");
 
-		
+
 	}
-	
+
 	public void testAlwaysOpen() {
-		
+
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
 		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:10:00", "02:40:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00"};
@@ -283,16 +282,16 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("shop", new String[]{null, null, null, null, null, "06:00:00", "06:00:00", "06:00:00", null});
 		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "-02:00:00", "00:00:00"};
 		this.runTest(
-				expectedTooShortDurationsSequence, 
-				expectedWaitingTimeSequence, 
+				expectedTooShortDurationsSequence,
+				expectedWaitingTimeSequence,
 				expectedAccumulatedActivityDurations,
 				expectedNegativeDurationsSequence);
 	}
 
 	public void testOpenLongEnough() {
-		
+
 		ActivityOption actOpt = null;
-		
+
 		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("18:00:00")));
 
@@ -309,13 +308,13 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("shop", new String[]{null, null, null, null, null, "06:00:00", "06:00:00", "06:00:00", null});
 		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "-02:00:00", "00:00:00"};
 		this.runTest(
-				expectedTooShortDurationsSequence, 
-				expectedWaitingTimeSequence, 
+				expectedTooShortDurationsSequence,
+				expectedWaitingTimeSequence,
 				expectedAccumulatedActivityDurations,
 				expectedNegativeDurationsSequence);
 
 	}
-	
+
 	public void testWaiting() {
 
 		ActivityOption actOpt = null;
@@ -323,7 +322,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
-		
+
 		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
@@ -337,28 +336,28 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("shop", new String[]{null, null, null, null, null, "06:00:00", "06:00:00", "06:00:00", null});
 		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "-02:00:00", "00:00:00"};
 		this.runTest(
-				expectedTooShortDurationsSequence, 
-				expectedWaitingTimeSequence, 
+				expectedTooShortDurationsSequence,
+				expectedWaitingTimeSequence,
 				expectedAccumulatedActivityDurations,
 				expectedNegativeDurationsSequence);
 
 	}
-	
+
 	public void testOverlapping() {
-		
+
 		ActivityOption actOpt = null;
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("10:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("10:30:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
-		
+
 		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("7")).getActivityOption("shop");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("12:00:00"), Time.parseTime("27:00:00")));
-		
+
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
 		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:30:00", "03:00:00", "00:00:00"};
 		String[] expectedWaitingTimeSequence = new String[]{"00:00:00", "01:00:00", "01:20:00", "01:35:00", "01:35:00", "04:35:00", "04:35:00", "04:35:00", "00:00:00"};
@@ -369,33 +368,33 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedAccumulatedActivityDurations.put("shop", new String[]{null, null, null, null, null, "03:00:00", "03:00:00", "03:00:00", null});
 		String[] expectedNegativeDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "00:00:00", "-02:00:00", "00:00:00"};
 		this.runTest(
-				expectedTooShortDurationsSequence, 
-				expectedWaitingTimeSequence, 
+				expectedTooShortDurationsSequence,
+				expectedWaitingTimeSequence,
 				expectedAccumulatedActivityDurations,
 				expectedNegativeDurationsSequence);
-		
+
 	}
-	
+
 	protected void runTest(
-			String[] expectedTooShortDurationsSequence, 
-			String[] expectedWaitingTimeSequence, 
+			String[] expectedTooShortDurationsSequence,
+			String[] expectedWaitingTimeSequence,
 			HashMap<String, String[]> expectedAccumulatedActivityDurations,
 			String[] expectedNegativeDurationsSequence) {
-		
+
 		TreeMap<Id, FacilityPenalty> emptyFacilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
-				this.config.charyparNagelScoring(), 
+				this.config.charyparNagelScoring(),
 				emptyFacilityPenalties,
 				this.ktiConfigGroup);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
 		testee.endActivity(Time.parseTime("08:00:00"));
-		
+
 		assertEquals(0, factory.getActivities().getAccumulatedDurations().size());
 		assertEquals(expectedTooShortDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[0], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
-		
+
 		testee.startLeg(Time.parseTime("08:00:00"), (LegImpl) this.plan.getPlanElements().get(1));
 		testee.endLeg(Time.parseTime("08:30:00"));
 		testee.startActivity(Time.parseTime("08:30:00"), (ActivityImpl) this.plan.getPlanElements().get(2));
@@ -423,7 +422,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedTooShortDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[2], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
-		
+
 		testee.startLeg(Time.parseTime("14:55:00"), (LegImpl) this.plan.getPlanElements().get(5));
 		testee.endLeg(Time.parseTime("15:00:00"));
 		testee.startActivity(Time.parseTime("15:00:00"), (ActivityImpl) this.plan.getPlanElements().get(6));
@@ -478,7 +477,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedTooShortDurationsSequence[6], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
 		assertEquals(expectedWaitingTimeSequence[6], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
 		assertEquals(expectedNegativeDurationsSequence[6], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
-		
+
 		testee.finish();
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
@@ -506,10 +505,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 				// check zero utility durations
 				assertEquals(zeroUtilityDuration, factory.getActivities().getZeroUtilityDurations().get(actType), MatsimTestCase.EPSILON);
-				
+
 			}
 		}
-		
+
 		// score legs
 		for (PlanElement pe : this.plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
@@ -519,10 +518,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 				}
 			}
 		}
-		assertEquals(expectedScore, testee.getScore());
-		
+		assertEquals(expectedScore, testee.getScore(), EPSILON);
+
 	}
-	
+
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
@@ -532,5 +531,5 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.facilities = null;
 		this.network = null;
 	}
-	
+
 }
