@@ -20,12 +20,8 @@
 
 package org.matsim.core.router;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -39,6 +35,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+
 
 /**
  * Implementation of <a
@@ -121,7 +119,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * Comparator that defines how to order the nodes in the pending nodes queue
 	 * during routing.
 	 */
-	protected ComparatorDijkstraCost comparator;
 
 	private final PreProcessDijkstra preProcessData;
 
@@ -162,7 +159,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 		this.preProcessData = preProcessData;
 
 		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
-		this.comparator = new ComparatorDijkstraCost(this.nodeData);
 
 		if (preProcessData != null) {
 			if (preProcessData.containsData() == false) {
@@ -217,7 +213,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
 		}
 
-		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
+		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
 		while (stillSearching) {
@@ -272,7 +268,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The pending nodes so far.
 	 */
 	/*package*/ void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PriorityQueue<Node> pendingNodes) {
+			final PseudoRemovePriorityQueue<Node> pendingNodes) {
 		DijkstraNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 	}
@@ -288,7 +284,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	protected void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -342,7 +338,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * 		(e.g. when the same node already has an earlier visiting time).
 	 */
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PriorityQueue<Node> pendingNodes, final double currTime,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
@@ -398,12 +394,12 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The link from which we came visiting n.
 	 */
 	void revisitNode(final Node n, final DijkstraNodeData data,
-			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
 		pendingNodes.remove(n);
 
 		data.visit(outLink, cost, time, getIterationId());
-		pendingNodes.add(n);
+		pendingNodes.add(n, getPriority(data));
 	}
 
 	/**
@@ -424,10 +420,10 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The node from which we came visiting n.
 	 */
 	protected void visitNode(final Node n, final DijkstraNodeData data,
-			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
-		pendingNodes.add(n);
+		pendingNodes.add(n, getPriority(data));
 	}
 
 	/**
@@ -458,6 +454,15 @@ public class Dijkstra implements LeastCostPathCalculator {
 			DijkstraNodeData data = getData(node);
 			data.resetVisited();
 		}
+	}
+
+	/**
+	 * The value used to sort the pending nodes during routing.
+	 * This implementation compares the total effective travel cost
+	 * to sort the nodes in the pending nodes queue during routing.
+	 */
+	protected double getPriority(final DijkstraNodeData data) {
+		return data.getCost();
 	}
 
 	/**
@@ -521,34 +526,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 
 		public Link getPrevLink() {
 			return this.prev;
-		}
-	}
-
-	static class ComparatorDijkstraCost implements Comparator<Node>, Serializable {
-
-		private static final long serialVersionUID = 1L;
-
-		protected Map<Id, ? extends DijkstraNodeData> nodeData;
-
-		ComparatorDijkstraCost(final Map<Id, ? extends DijkstraNodeData> nodeData) {
-			this.nodeData = nodeData;
-		}
-
-		public int compare(final Node n1, final Node n2) {
-			double c1 = getCost(n1);
-			double c2 = getCost(n2);
-
-			return compare(n1, c1, n2, c2);
-		}
-
-		private int compare(final Node n1, final double c1, final Node n2, final double c2) {
-			if (c1 < c2) return -1;
-			if (c1 > c2) return +1;
-			return n1.getId().compareTo(n2.getId());
-		}
-
-		protected double getCost(final Node node) {
-			return this.nodeData.get(node.getId()).getCost();
 		}
 	}
 

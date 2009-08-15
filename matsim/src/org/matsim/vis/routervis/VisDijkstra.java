@@ -21,7 +21,6 @@
 package org.matsim.vis.routervis;
 
 import java.io.IOException;
-import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -29,6 +28,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+
 
 /**
  * @author laemmel
@@ -48,7 +49,7 @@ public class VisDijkstra extends Dijkstra implements VisLeastCostPathCalculator 
 		this.explCounter = 0;
 		this.dumpCounter = 0;
 	}
-	
+
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		doSnapshot();
@@ -65,7 +66,7 @@ public class VisDijkstra extends Dijkstra implements VisLeastCostPathCalculator 
 
 	@Override
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PriorityQueue<Node> pendingNodes, final double currTime,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
 		final boolean succ = super.addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
 

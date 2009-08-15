@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -35,6 +34,8 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+
 
 /**
  * A variant of Dijkstra's algorithm for route finding that supports multiple
@@ -65,7 +66,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 
 		augmentIterationId();
 
-		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
+		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
 		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
 			DijkstraNodeData data = getData(entry.getKey());
 			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);

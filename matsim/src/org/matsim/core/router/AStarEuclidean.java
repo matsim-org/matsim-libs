@@ -21,8 +21,6 @@
 package org.matsim.core.router;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +29,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.geometry.CoordUtils;
+
 
 /**
  * Implements the <a href="http://en.wikipedia.org/wiki/A%2A">A* router algorithm</a>
@@ -89,8 +89,8 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param preProcessData
 	 * @param timeFunction
 	 */
-	public AStarEuclidean(Network network, PreProcessEuclidean preProcessData,
-			TravelTime timeFunction) {
+	public AStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
+			final TravelTime timeFunction) {
 		this(network, preProcessData, timeFunction, 1);
 	}
 
@@ -104,8 +104,8 @@ public class AStarEuclidean extends Dijkstra {
 	 * overdo factor > 1, it is not guaranteed that the router returns the
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
 	 */
-	public AStarEuclidean(Network network, PreProcessEuclidean preProcessData,
-			TravelTime timeFunction, double overdoFactor) {
+	public AStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
+			final TravelTime timeFunction, final double overdoFactor) {
 		this(network, preProcessData, preProcessData.getCostFunction(),
 				timeFunction, overdoFactor);
 
@@ -122,15 +122,14 @@ public class AStarEuclidean extends Dijkstra {
 	 * overdo factor > 1, it is not guaranteed that the router returns the
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
 	 */
-	public AStarEuclidean(Network network,
-			PreProcessEuclidean preProcessData,
-			TravelCost costFunction, TravelTime timeFunction, double overdoFactor) {
+	public AStarEuclidean(final Network network,
+			final PreProcessEuclidean preProcessData,
+			final TravelCost costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, costFunction, timeFunction, preProcessData);
 
 		setMinTravelCostPerLength(preProcessData.getMinTravelCostPerLength());
 
 		this.nodeData = new HashMap<Id, AStarNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
-		this.comparator = new ComparatorAStarNodeCost(this.nodeData);
 		this.overdoFactor = overdoFactor;
 	}
 
@@ -149,7 +148,7 @@ public class AStarEuclidean extends Dijkstra {
 	 *            The time we start routing.
 	 */
 	@Override
-	protected void initFromNode(final Node fromNode, final Node toNode, final double startTime, final PriorityQueue<Node> pendingNodes) {
+	protected void initFromNode(final Node fromNode, final Node toNode, final double startTime, final PseudoRemovePriorityQueue<Node> pendingNodes) {
 		AStarNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 		data.setExpectedRemainingCost(estimateRemainingTravelCost(fromNode, toNode));
@@ -157,7 +156,7 @@ public class AStarEuclidean extends Dijkstra {
 
 	@Override
 	protected
-	boolean addToPendingNodes(final Link l, final Node n, final PriorityQueue<Node> pendingNodes,
+	boolean addToPendingNodes(final Link l, final Node n, final PseudoRemovePriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
@@ -190,7 +189,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param outLink The link from which we came visiting n.
 	 */
 	private void visitNode(final Node n, final AStarNodeData data,
-			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final double expectedRemainingCost, final Link outLink) {
 		data.setExpectedRemainingCost(expectedRemainingCost);
 		visitNode(n, data, pendingNodes, time, cost, outLink);
@@ -210,7 +209,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param toNode The second node.
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
-	double estimateRemainingTravelCost(Node fromNode, Node toNode) {
+	double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
 		double dist = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord())
 				* getMinTravelCostPerLength();
 		return dist * this.overdoFactor;
@@ -224,7 +223,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @return The data to the given Node
 	 */
 	@Override
-	protected AStarNodeData getData(Node n) {
+	protected AStarNodeData getData(final Node n) {
 		AStarNodeData r = this.nodeData.get(n.getId());
 		if (null == r) {
 			r = new AStarNodeData();
@@ -238,7 +237,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param minTravelCostPerLength
 	 *            the minTravelCostPerLength to set
 	 */
-	void setMinTravelCostPerLength(double minTravelCostPerLength) {
+	void setMinTravelCostPerLength(final double minTravelCostPerLength) {
 		this.minTravelCostPerLength = minTravelCostPerLength;
 	}
 
@@ -250,6 +249,16 @@ public class AStarEuclidean extends Dijkstra {
 	 */
 	public double getMinTravelCostPerLength() {
 		return this.minTravelCostPerLength;
+	}
+
+	/**
+	 * The value used to sort the pending nodes during routing.
+	 * This implementation compares the total estimated remaining travel cost
+	 * to sort the nodes in the pending nodes queue during routing.
+	 */
+	@Override
+	protected double getPriority(final DijkstraNodeData data) {
+		return ((AStarNodeData) data).getExpectedCost();
 	}
 
 	/**
@@ -275,7 +284,7 @@ public class AStarEuclidean extends Dijkstra {
 		 *
 		 * @param expectedCost the expected cost
 		 */
-		public void setExpectedRemainingCost(double expectedCost) {
+		public void setExpectedRemainingCost(final double expectedCost) {
 			this.expectedRemainingCost = expectedCost;
 		}
 
@@ -288,29 +297,4 @@ public class AStarEuclidean extends Dijkstra {
 		}
 	}
 
-	/**
-	 * The comparator used to sort the pending nodes during routing.
-	 * This comparator compares the total estimated remaining travel cost
-	 * to sort the nodes in the pending nodes queue during routing.
-	 * @author lnicolas
-	 */
-	public static class ComparatorAStarNodeCost extends ComparatorDijkstraCost {
-
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * @param data A map to look up the data with information about cost.
-		 */
-		public ComparatorAStarNodeCost(Map<Id, AStarNodeData> data) {
-			super(data);
-		}
-
-		/**
-		 * @see org.matsim.core.router.Dijkstra.ComparatorDijkstraCost#getCost(org.matsim.core.network.Node)
-		 */
-		@Override
-		protected double getCost(final Node node) {
-			return ((AStarNodeData)this.nodeData.get(node.getId())).getExpectedCost();
-		}
-	}
 }
