@@ -23,11 +23,12 @@ package org.matsim.core.utils.collections;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllTests {
+public abstract class AllTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
+		suite.addTestSuite(PseudoRemovePriorityQueueTest.class);
 		suite.addTestSuite(QuadTreeTest.class);
 		suite.addTestSuite(TupleTest.class);
 		//$JUnit-END$
