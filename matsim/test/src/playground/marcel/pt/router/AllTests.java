@@ -32,6 +32,7 @@ public abstract class AllTests {
 		suite.addTestSuite(TransitActsRemoverTest.class);
 		suite.addTestSuite(TransitRouterNetworkTravelTimeCostTest.class);
 		suite.addTestSuite(TransitRouterTest.class);
+		suite.addTestSuite(PlansCalcTransitRouteTest.class);
 
 		return suite;
 	}

@@ -133,7 +133,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 						Leg lastLeg = currentTuple.getSecond().get(currentTuple.getSecond().size() - 1);
 						toLink = ((ActivityImpl) planElements.get(i+1)).getLink();
 						if (currentTuple.getSecond().size() > 1) { // at least one pt leg available
-							fromLink = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getStartLink();
+							fromLink = ((RouteWRefs) currentTuple.getSecond().get(currentTuple.getSecond().size() - 2).getRoute()).getEndLink();
 						}
 						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));
 
