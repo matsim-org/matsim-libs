@@ -24,6 +24,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -31,10 +33,13 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
+import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 
 /**
  * @author mrieser
@@ -53,14 +58,21 @@ public class TransitControler extends Controler {
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
 
+		ActivityParams params = new ActivityParams(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE);
+		params.setTypicalDuration(120.0);
+		config.charyparNagelScoring().addActivityParams(params);
+		
+		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		
 		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
 		addControlerListener(cl);
 	}
-//
-//	@Override
-//	protected void runMobSim() {
-//		new TransitQueueSimulation(this.scenarioData, this.events);
-//	}
+
+	@Override
+	protected void runMobSim() {
+		new TransitQueueSimulation(this.scenarioData, this.events).run();
+//		new QueueSimulation(this.scenarioData, this.events).run();
+	}
 
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
@@ -79,6 +91,15 @@ public class TransitControler extends Controler {
 		public void notifyStartup(final StartupEvent event) {
 			try {
 				new TransitScheduleReaderV1(event.getControler().getScenarioData().getTransitSchedule(), event.getControler().getScenarioData().getNetwork()).readFile(this.config.getTransitScheduleFile());
+			} catch (SAXException e) {
+				throw new RuntimeException("could not read transit schedule.", e);
+			} catch (ParserConfigurationException e) {
+				throw new RuntimeException("could not read transit schedule.", e);
+			} catch (IOException e) {
+				throw new RuntimeException("could not read transit schedule.", e);
+			}
+			try {
+				new BasicVehicleReaderV1(event.getControler().getScenarioData().getVehicles()).parse(this.config.getVehiclesFile());
 			} catch (SAXException e) {
 				throw new RuntimeException("could not read transit schedule.", e);
 			} catch (ParserConfigurationException e) {

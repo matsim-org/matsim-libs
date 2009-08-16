@@ -13,11 +13,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.multimodal.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;/plans.census2000ivtch1pct.dilZh30km.miv.xml.gz" />
+		<param name="inputPlansFile" value="&INPUTBASE;/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz" />
 	</module>
 	
 	<module name="controler">
@@ -67,7 +67,7 @@
 	</module>
 
 	<module name="transit">
-		<param name="transitScheduleFile" value="&INPUTBASE;/transitSchedule.oevModellZH.xml" />
+		<param name="transitScheduleFile" value="&INPUTBASE;/transitSchedule.networkOevModellZH.xml" />
 		<param name="vehiclesFile" value="&INPUTBASE;/vehicles.oevModellZH.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
