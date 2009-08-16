@@ -181,7 +181,8 @@ public class Controler {
 	private String externalMobsim = null;
 
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
-	protected ScenarioImpl scenarioData = null;
+	final protected ScenarioImpl scenarioData;
+	private boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
@@ -247,26 +248,24 @@ public class Controler {
 	 *            used in the configuration file.
 	 */
 	public Controler(final String[] args) {
-		this(args.length > 0 ? args[0] : null, args.length > 1 ? args[1] : null, null);
+		this(args.length > 0 ? args[0] : null, args.length > 1 ? args[1] : null, null, null);
 	}
 
 	public Controler(final String configFileName) {
-		this(configFileName, null, null);
+		this(configFileName, null, null, null);
 	}
 
 	public Controler(final Config config) {
-		this(null, null, config);
+		this(null, null, config, null);
 	}
 
 	public Controler(ScenarioImpl scenario) {
-		this(null, null, scenario.getConfig());
-		this.scenarioData = scenario;
+		this(null, null, null, scenario);
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 	}
 
-	private Controler(final String configFileName, final String dtdFileName, final Config config) {
-		super();
+	private Controler(final String configFileName, final String dtdFileName, final Config config, final ScenarioImpl scenario) {
 		// catch logs before doing something
 		this.collectLogMessagesAppender = new CollectLogMessagesAppender();
 		Logger.getRootLogger().addAppender(this.collectLogMessagesAppender);
@@ -274,17 +273,27 @@ public class Controler {
 		Gbl.printBuildInfo();
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
-		if (configFileName == null) {
-			if (config == null) {
-				throw new IllegalArgumentException(
-						"Either the config or the filename of a configfile must be set to initialize the Controler.");
-			}
-			this.config = config;
+		
+		// now do other stuff
+		if (scenario != null) {
+			this.scenarioLoaded = true;
+			this.scenarioData = scenario;
+			this.config = scenario.getConfig();
 		} else {
-			this.config = new Config();
-			this.config.addCoreModules();
-			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
+			if (configFileName == null) {
+				if (config == null) {
+					throw new IllegalArgumentException(
+					"Either the config or the filename of a configfile must be set to initialize the Controler.");
+				}
+				this.config = config;
+			} else {
+				this.config = new Config();
+				this.config.addCoreModules();
+				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
+			}
+			this.scenarioData = new ScenarioImpl(this.config);
 		}
+
 		Gbl.setConfig(this.config);
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 	}
@@ -504,8 +513,8 @@ public class Controler {
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 
-		// use writeEventsInterval from config file, only if not already
-		// initialized programmatically
+		/* use writeEventsInterval from config file, only if not already
+		 * initialized programmatically */
 		if (writeEventsInterval == -1) {
 			this.writeEventsInterval = config.controler().getWriteEventsInterval();
 		}
@@ -563,13 +572,13 @@ public class Controler {
 	 * not given in the Constructor.
 	 */
 	private void loadData() {
-		if (this.scenarioData == null) {
-			this.scenarioData = new ScenarioImpl(this.config);
-			((NetworkLayer) this.scenarioData.getNetwork()).setFactory(this.getNetworkFactory());
+		if (!this.scenarioLoaded) {
+			this.scenarioData.getNetwork().setFactory(this.getNetworkFactory());
 			this.loader = new ScenarioLoader(this.scenarioData);
 			this.loader.loadScenario();
 			this.network = loadNetwork();
 			this.population = loadPopulation();
+			this.scenarioLoaded = true;
 
 			if (this.getWorld() != null) {
 				new WorldCheck().run(this.getWorld());
