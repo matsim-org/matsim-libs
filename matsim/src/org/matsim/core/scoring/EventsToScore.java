@@ -37,6 +37,7 @@ import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -72,27 +73,45 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, AgentDepart
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		getScoringFunctionForAgent(event.getPersonId()).startLeg(event.getTime(), event.getLeg());
+		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
+		if (sf != null) {
+			sf.startLeg(event.getTime(), event.getLeg());
+		}
 	}
 
 	public void handleEvent(final BasicAgentArrivalEvent event) {
-		getScoringFunctionForAgent(event.getPersonId()).endLeg(event.getTime());
+		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
+		if (sf != null) {
+			sf.endLeg(event.getTime());
+		}
 	}
 
 	public void handleEvent(final BasicAgentStuckEvent event) {
-		getScoringFunctionForAgent(event.getPersonId()).agentStuck(event.getTime());
+		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
+		if (sf != null) {
+			sf.agentStuck(event.getTime());
+		}
 	}
 
 	public void handleEvent(final BasicAgentMoneyEvent event) {
-		getScoringFunctionForAgent(event.getPersonId()).addMoney(event.getAmount());
+		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
+		if (sf != null) {
+			sf.addMoney(event.getAmount());
+		}
 	}
 
 	public void handleEvent(final ActivityStartEvent event) {
-		getScoringFunctionForAgent(event.getPersonId()).startActivity(event.getTime(), event.getAct());
+		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
+		if (sf != null) {
+			sf.startActivity(event.getTime(), event.getAct());
+		}
 	}
 
 	public void handleEvent(final BasicActivityEndEvent event) {
-		getScoringFunctionForAgent(event.getPersonId()).endActivity(event.getTime());
+		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
+		if (sf != null) {
+			sf.endActivity(event.getTime());
+		}
 	}
 
 	/**
@@ -165,7 +184,11 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, AgentDepart
 	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
-			sf = this.sfFactory.getNewScoringFunction(this.population.getPersons().get(agentId).getSelectedPlan());
+			PersonImpl person = this.population.getPersons().get(agentId);
+			if (person == null) {
+				return null;
+			}
+			sf = this.sfFactory.getNewScoringFunction(person.getSelectedPlan());
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;
