@@ -1,7 +1,6 @@
 package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -11,7 +10,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -119,7 +117,8 @@ public class Matsim4Urbansim {
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 
-		Controler controler = new Controler(config,network,newPop) ;
+		scenarioData.setPopulation(newPop);
+		Controler controler = new Controler(scenarioData) ;
 		controler.setOverwriteFiles(true) ;
 
 		// The following lines register what should be done _after_ the iterations were run:

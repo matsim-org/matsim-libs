@@ -21,6 +21,7 @@
 package org.matsim.integration.replanning;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -31,9 +32,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -49,6 +48,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 	public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = loadConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		final StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
 		strategySettings.setModuleName("ChangeLegMode");
 		strategySettings.setProbability(1.0);
@@ -56,13 +56,13 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		config.setParam("changeLegMode", "modes", "car,walk");
 
 		// setup network
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
 		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
 		LinkImpl link = network.createLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
 
 		// setup population with one person
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		population.getPersons().put(person.getId(), person);
 		PlanImpl plan = person.createPlan(true);
@@ -74,7 +74,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		act.setLink(link);
 
 		// setup strategy manager and load from config
-		Controler controler = new Controler(config, network, population);
+		Controler controler = new Controler(scenario);
 //		controler.setFreespeedTravelTimeCost(new FreespeedTravelTimeCost());
 		controler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
 		final StrategyManager manager = new StrategyManager();

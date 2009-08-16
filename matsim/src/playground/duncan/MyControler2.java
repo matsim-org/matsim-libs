@@ -37,12 +37,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -57,10 +54,9 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyControler2 {
 	private static final Logger log = Logger.getLogger(MyControler2.class);
 
-	private static PopulationImpl createPlansFromShp(final FeatureSource n) {
+	private static PopulationImpl createPlansFromShp(final FeatureSource n, final PopulationImpl population) {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
 
-		PopulationImpl population = new PopulationImpl() ;
 		int popCnt = 0 ;
 
 		FeatureIterator it = null; try {
@@ -123,21 +119,6 @@ public class MyControler2 {
 
 	public static void main(final String[] args) {
 
-		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
-
-		PopulationImpl plans=null ;
-		try {
-			plans = createPlansFromShp( ShapeFileReader.readDataFile(shpFile) );
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// write the population for debugging purposes
-		PopulationWriter popWriter = new PopulationWriter(plans,"pop.xml.gz","v4",1) ;
-		popWriter.write();
-
-		log.info("### DONE with demand generation from urbansim ###") ;
-
 		// parse the config arguments so we have a config.  generate scenario data from this
 		if ( args.length==0 ) {
 			Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
@@ -148,6 +129,22 @@ public class MyControler2 {
 		loader.loadNetwork();
 		ScenarioImpl scenarioData = loader.getScenario();
 
+		// create population
+		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
+
+		try {
+			createPlansFromShp( ShapeFileReader.readDataFile(shpFile), scenarioData.getPopulation() );
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// write the population for debugging purposes
+		PopulationWriter popWriter = new PopulationWriter(scenarioData.getPopulation(),"pop.xml.gz","v4",1) ;
+		popWriter.write();
+
+		log.info("### DONE with demand generation from urbansim ###") ;
+
+
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.
 		NetworkLayer network = scenarioData.getNetwork() ;
@@ -157,7 +154,7 @@ public class MyControler2 {
 		log.info("... finished cleaning network.") ; log.info("") ;
 
 		// start the control(l)er with the network and plans as defined above
-		Controler controler = new Controler(Gbl.getConfig(),(NetworkLayer)network,plans) ;
+		Controler controler = new Controler(scenarioData) ;
 
 		// this means existing files will be over-written.  Be careful!
 		controler.setOverwriteFiles(true);

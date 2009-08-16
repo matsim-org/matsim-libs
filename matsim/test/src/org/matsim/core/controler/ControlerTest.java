@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -55,14 +56,12 @@ public class ControlerTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testTravelTimeCalculation() {
-
 		Config config = loadConfig(null);
-
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(config);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = f.scenario.getPopulation();
 		PersonImpl person1 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
@@ -102,7 +101,7 @@ public class ControlerTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(0);
 
 		// Now run the simulation
-		Controler controler = new Controler(config, f.network, population);
+		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
@@ -119,7 +118,7 @@ public class ControlerTest extends MatsimTestCase {
 		strategyParams.addParam("ModuleProbability_1", "1.0");
 		strategyParams.addParam("Module_1", "ReRoute");
 		// Run the simulation again
-		controler = new Controler(config, f.network, population);
+		controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEventsInterval(0);
@@ -140,14 +139,14 @@ public class ControlerTest extends MatsimTestCase {
 		final Config config = loadConfig(null);
 		config.controler().setLastIteration(0);
 
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		// create a very simple network with one link only and an empty population
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
 		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
 		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
-		PopulationImpl population = new PopulationImpl();
 
-		final Controler controler = new Controler(config, network, population);
+		final Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
@@ -167,10 +166,10 @@ public class ControlerTest extends MatsimTestCase {
 	 */
 	public void testCalcMissingRoutes() {
 		Config config = loadConfig(null);
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = f.scenario.getPopulation();
 		PersonImpl person1 = null;
 		LegImpl leg1 = null;
 		LegImpl leg2 = null;
@@ -205,7 +204,7 @@ public class ControlerTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(1);
 
 		// Now run the simulation
-		Controler controler = new Controler(config, f.network, population);
+		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
@@ -224,10 +223,10 @@ public class ControlerTest extends MatsimTestCase {
 	 */
 	public void testCalcMissingActLinks() {
 		Config config = loadConfig(null);
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = f.scenario.getPopulation();
 		PersonImpl person1 = null;
 		ActivityImpl act1a = null;
 		ActivityImpl act1b = null;
@@ -265,7 +264,7 @@ public class ControlerTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(1);
 
 		// Now run the simulation
-		Controler controler = new Controler(config, f.network, population);
+		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
@@ -441,7 +440,8 @@ public class ControlerTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private static class Fixture {
-		NetworkLayer network = new NetworkLayer();
+		final ScenarioImpl scenario;
+		final NetworkLayer network;
 		NodeImpl node1 = null;
 		NodeImpl node2 = null;
 		NodeImpl node3 = null;
@@ -450,7 +450,10 @@ public class ControlerTest extends MatsimTestCase {
 		LinkImpl link2 = null;
 		LinkImpl link3 = null;
 
-		protected Fixture() {
+		protected Fixture(final Config config) {
+			this.scenario = new ScenarioImpl(config);
+			this.network = scenario.getNetwork();
+			
 			/* Create a simple network with 4 nodes and 3 links:
 			 *
 			 * (1)---1---(2)-----------2-------------(3)---3---(4)
@@ -462,7 +465,6 @@ public class ControlerTest extends MatsimTestCase {
 			 * the average travel time on that link should be 150sec for the two cars
 			 * (one having 100secs, the other having 200secs to cross the link).
 			 */
-			this.network = new NetworkLayer();
 			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
 			this.node1 = this.network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 			this.node2 = this.network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));

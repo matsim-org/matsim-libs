@@ -254,67 +254,14 @@ public class Controler {
 		this(configFileName, null, null);
 	}
 
-	public Controler(final String configFileName, final String dtdFileName) {
-		this(configFileName, dtdFileName, null);
-	}
-
 	public Controler(final Config config) {
 		this(null, null, config);
 	}
 
-	/**
-	 * (Obviously) instantiates the controler with config, network, and
-	 * population given. This is more tricky than it looks, since a full
-	 * population needs to be referenced to the network, and the population
-	 * reader knows about the network as a side effect.
-	 * </p>
-	 * 
-	 * <i> However,</i> if the population does not contain references to the
-	 * network (e.g. activity locations given by coordinates, and legs empty),
-	 * then the referencing seems to be done automagically by the Controler. It
-	 * is, however, still necessary to give a network ...
-	 * </p>
-	 * 
-	 * If, for whatever reason, you want the controler to do something, then
-	 * stop and do some of your code, then resume, you need to look into the
-	 * concept of ControlerListeners, which are explained by example in
-	 * src/tutorials/... .
-	 * 
-	 * Kai, feb'08
-	 * </p>
-	 * 
-	 * <p>
-	 * Using this constructor will disable the creation of the scenario data
-	 * instance used to load consistent scenarios. Lanes and SingalSystems won't
-	 * be initialized automatically even if set in config! Take care that this
-	 * is done by yourself.
-	 * 
-	 * dg, march 09
-	 * <p>
-	 * 
-	 * @param config
-	 * @param network
-	 * @param population
-	 */
-	public Controler(final Config config, final NetworkLayer network, final PopulationImpl population) {
-		this(null, null, config);
-		this.scenarioData = new ScenarioImpl(config);
-		this.scenarioData.setNetwork(network);
-		this.scenarioData.setPopulation(population);
-		this.network = network;
-		this.population = population;
-		// FIXME dg march 09: this warning should not be needed if there
-		// wouldn't be a
-		// world without any humanthinkable concept
-		log.warn("Using this constructor will disable the creation of the scenario data instance used for"
-				+ "to ensure consistent scenarios. Lanes and SingalSystems won't be initialized automatically even"
-				+ "if set in config! " + "Take care that this is done by yourself.");
-	}
-
 	public Controler(ScenarioImpl scenario) {
 		this(null, null, scenario.getConfig());
-		this.scenarioData = (ScenarioImpl) scenario;
-		this.network = (NetworkLayer) this.scenarioData.getNetwork();
+		this.scenarioData = scenario;
+		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 	}
 
@@ -637,11 +584,10 @@ public class Controler {
 	 * This method should be private, but is only protected at the moment
 	 * because of backward-compatibility with the old Controler class. In
 	 * general, it is recommended to pass a custom network and population using
-	 * the special
-	 * {@link #Controler(Config, QueueNetwork, PopulationImpl) Constructor}.
+	 * the special {@link #Controler(ScenarioImpl) Constructor}.
 	 * 
 	 * @deprecated Use the constructor
-	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)}
+	 *             {@link #Controler(ScenarioImpl)}
 	 *             instead.
 	 * @return The network to be used for the simulation.
 	 */
@@ -656,11 +602,10 @@ public class Controler {
 	 * This method should be private, but is only protected at the moment
 	 * because of backward-compatibility with the old Controler class. In
 	 * general, it is recommended to pass a custom network and population using
-	 * the special
-	 * {@link #Controler(Config, QueueNetwork, PopulationImpl) Constructor}.
+	 * the special {@link #Controler(ScenarioImpl) Constructor}.
 	 * 
 	 * @deprecated Use the constructor
-	 *             {@link #Controler(Config, NetworkLayer, PopulationImpl)}
+	 *             {@link #Controler(ScenarioImpl)}
 	 *             instead.
 	 * @return The population to be used for the simulation.
 	 */
