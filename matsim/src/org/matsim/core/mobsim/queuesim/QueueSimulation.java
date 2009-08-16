@@ -410,10 +410,6 @@ public class QueueSimulation {
 		}
 	}
 
-//	protected void prepareNetwork() {
-//		this.network.beforeSim();
-//	}
-
 	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
 		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
 		 * In my eyes, the configuration should usually be a read-only object in general, but
@@ -513,7 +509,11 @@ public class QueueSimulation {
 		createAgents();
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
-		double simStartTime = Math.floor(Math.max(startTime, SimulationTimer.getSimStartTime()));
+		double simStartTime = 0;
+		DriverAgent firstAgent = this.activityEndsList.peek();
+		if (firstAgent != null) {
+			simStartTime = Math.floor(Math.max(startTime, firstAgent.getDepartureTime()));
+		}
 		this.infoTime = Math.floor(simStartTime / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(simStartTime / this.snapshotPeriod) * this.snapshotPeriod;
 		if (this.snapshotTime < simStartTime) {

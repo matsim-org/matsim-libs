@@ -35,8 +35,14 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEvent;
@@ -50,6 +56,7 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -57,6 +64,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -918,6 +926,61 @@ public class QueueSimulationTest extends MatsimTestCase {
 		return logger;
 	}
 
+	public void testStartAndEndTime() {
+		Config config = loadConfig(null);
+		ScenarioImpl scenario = new ScenarioImpl(config);
+
+		// build simple network with 1 link
+		NetworkImpl network = scenario.getNetwork();
+		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
+		node1.setCoord(scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(scenario.createId("2"));
+		node2.setCoord(scenario.createCoord(1000.0, 0.0));
+		network.getNodes().put(node1.getId(), node1);
+		network.getNodes().put(node2.getId(), node2);
+		LinkImpl link = (LinkImpl) network.getBuilder().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		link.setFreespeed(10.0);
+		link.setCapacity(2000.0);
+		network.getLinks().put(link.getId(), link);
+
+		// build simple population with 1 person with 1 plan with 1 leg
+		PopulationImpl population = scenario.getPopulation();
+		PopulationBuilder pb = population.getBuilder();
+		Person person = pb.createPerson(scenario.createId("1"));
+		Plan plan = pb.createPlan();
+		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
+		act1.setEndTime(7.0*3600);
+		Leg leg = pb.createLeg(TransportMode.walk);
+		GenericRoute route = new GenericRouteImpl(link, link);
+		leg.setRoute(route);
+		leg.setTravelTime(5.0*3600);
+		Activity act2 = pb.createActivityFromLinkId("w", link.getId());
+		plan.addActivity(act1);
+		plan.addLeg(leg);
+		plan.addActivity(act2);
+		person.addPlan(plan);
+		population.addPerson(person);
+
+		Events events = new Events();
+		FirstLastEventCollector collector = new FirstLastEventCollector();
+		events.addHandler(collector);
+		
+		// first test without special settings
+		QueueSimulation sim = new QueueSimulation(scenario, events);
+		sim.run();
+		assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), EPSILON);
+		assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), EPSILON);
+		collector.reset(0);
+		
+		// second test with special start/end times
+		config.simulation().setStartTime(8.0*3600);
+		config.simulation().setEndTime(11.0*3600);
+		sim = new QueueSimulation(scenario, events);
+		sim.run();
+		assertEquals(8.0*3600, collector.firstEvent.getTime(), EPSILON);
+		assertEquals(11.0*3600, collector.lastEvent.getTime(), EPSILON);
+	}
+
 	/**
 	 * A simple events handler that counts the number of enter link events on one specific link.
 	 * Used by some tests in the class.
@@ -941,6 +1004,23 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		public int getCounter() {
 			return this.counter;
+		}
+	}
+
+	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
+		public BasicEvent firstEvent = null;
+		public BasicEvent lastEvent = null;
+		
+		public void handleEvent(final BasicEvent event) {
+			if (firstEvent == null) {
+				firstEvent = event;
+			}
+			lastEvent = event;
+		}
+
+		public void reset(final int iteration) {
+			firstEvent = null;
+			lastEvent = null;
 		}
 	}
 

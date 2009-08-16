@@ -66,13 +66,6 @@ public class SimulationTimer {
 		return SIM_TICK_TIME_S;
 	}
 
-	/**
-	 * @param newStartTime The new start time for the simulation.
-	 */
-	synchronized public static final void updateSimStartTime(final double newStartTime) {
-		SimulationTimer.simStartTime = Math.min(SimulationTimer.simStartTime, newStartTime);
-	}
-
 	synchronized public static final void setSimStartTime(final double newStartTime) {
 		SimulationTimer.simStartTime = newStartTime;
 	}

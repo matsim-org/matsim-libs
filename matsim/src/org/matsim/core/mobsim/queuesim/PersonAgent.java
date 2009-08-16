@@ -135,7 +135,7 @@ public class PersonAgent implements DriverAgent {
 		this.currentLink = firstAct.getLink();
 		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
-			SimulationTimer.updateSimStartTime(departureTime);
+//			SimulationTimer.updateSimStartTime(departureTime);
 			this.simulation.scheduleActivityEnd(this);
 			Simulation.incLiving();
 			return true;

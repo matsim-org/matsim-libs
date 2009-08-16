@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,15 +38,21 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -63,6 +70,7 @@ import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehicleBuilder;
 
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
+import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 /**
  * @author mrieser
@@ -454,4 +462,95 @@ public class TransitQueueSimulationTest extends TestCase {
 		}
 	}
 
+	public void testStartAndEndTime() {
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
+
+		// build simple network with 1 link
+		NetworkImpl network = scenario.getNetwork();
+		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
+		node1.setCoord(scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(scenario.createId("2"));
+		node2.setCoord(scenario.createCoord(1000.0, 0.0));
+		NodeImpl node3 = (NodeImpl) network.getBuilder().createNode(scenario.createId("3"));
+		node3.setCoord(scenario.createCoord(2000.0, 0.0));
+		network.getNodes().put(node1.getId(), node1);
+		network.getNodes().put(node2.getId(), node2);
+		network.getNodes().put(node3.getId(), node3);
+		LinkImpl link1 = (LinkImpl) network.getBuilder().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		link1.setFreespeed(10.0);
+		link1.setCapacity(2000.0);
+		link1.setLength(1000.0);
+		LinkImpl link2 = (LinkImpl) network.getBuilder().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		link2.setFreespeed(10.0);
+		link2.setCapacity(2000.0);
+		link2.setLength(1000.0);
+		network.getLinks().put(link1.getId(), link1);
+		network.getLinks().put(link2.getId(), link2);
+		node2.addInLink(link1);
+		node2.addOutLink(link2);
+
+		// build simple schedule with a single line
+		config.scenario().setUseTransit(true);
+		config.scenario().setUseVehicles(true);
+		double depTime = 7.0*3600;
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleBuilder sb = schedule.getBuilder();
+		TransitStopFacility stopFacility1 = sb.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(1000, 0), false);
+		TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
+		schedule.addStopFacility(stopFacility1);
+		schedule.addStopFacility(stopFacility2);
+		stopFacility1.setLink(link1);
+		stopFacility2.setLink(link2);
+		TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
+		NetworkRoute route = new LinkNetworkRoute(link1, link2);
+		TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
+		TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
+		stops.add(stop1);
+		stops.add(stop2);
+		TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, TransportMode.bus);
+		Departure dep = sb.createDeparture(scenario.createId("1"), depTime);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
+		schedule.addTransitLine(tLine);
+		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+
+		// prepare test
+		Events events = new Events();
+		FirstLastEventCollector collector = new FirstLastEventCollector();
+		events.addHandler(collector);
+		
+		// first test without special settings
+		TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		sim.run();
+		assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
+		assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		collector.reset(0);
+		
+		// second test with special start/end times
+		config.simulation().setStartTime(depTime + 20.0);
+		config.simulation().setEndTime(depTime + 90.0);
+		sim = new TransitQueueSimulation(scenario, events);
+		sim.run();
+		assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
+		assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+	}
+	
+	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
+		public BasicEvent firstEvent = null;
+		public BasicEvent lastEvent = null;
+		
+		public void handleEvent(final BasicEvent event) {
+			if (firstEvent == null) {
+				firstEvent = event;
+			}
+			lastEvent = event;
+		}
+
+		public void reset(final int iteration) {
+			firstEvent = null;
+			lastEvent = null;
+		}
+	}
 }
