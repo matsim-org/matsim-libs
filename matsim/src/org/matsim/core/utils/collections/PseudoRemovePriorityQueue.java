@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.collections;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -158,7 +159,8 @@ public class PseudoRemovePriorityQueue<E> {
 		}
 	}
 
-	/*package*/ static class PseudoComparator<T> implements Comparator<PseudoEntry<T>> {
+	/*package*/ static class PseudoComparator<T> implements Comparator<PseudoEntry<T>>, Serializable {
+		private static final long serialVersionUID = 1L;
 		public int compare(final PseudoEntry<T> o1, final PseudoEntry<T> o2) {
 			return Double.compare(o1.priority, o2.priority);
 		}
