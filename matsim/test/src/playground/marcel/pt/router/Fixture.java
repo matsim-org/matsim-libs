@@ -41,6 +41,38 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
+/**
+ * Network:
+ * <pre>
+ * 
+ * (n) node                              K(12)-------------(13)L
+ * [s] stop facilities                   / [19]    21     [20]\
+ *  l  link                             /                      \
+ *  A  stop name                     20/                        \22
+ *                                    /                          \
+ *           A        B        C [18]/    D       E        F      \[21]G      H       J
+ *      0   [0]  1   [2]  2   [4](11) 3  [6]  4  [8]  5  [10]  6 (14)[12] 7  [14] 8  [16]
+ * (0)------(1)======(2)======(3)=======(4)======(5)======(6)======(7)======(8)======(9)------(10)
+ *          [1]  17  [3]  16  [5]  \ 15  [7] 14  [9]  13 [11]  12 /[13] 11 [15] 10  [17]  9
+ *                                  \                            /
+ *                                 25\                          /
+ *                                    \                        /23
+ *                                     \[23]       24    [22] /
+ *                                     N(16)--------------(15)M
+ * 
+ * </pre>
+ * Coordinates: 4km between two stops along x-axis, 5km along y-axis. Thus: A is at 4000/5000,
+ * C at 12000/5000, N at 16000/0, L at 24000/10000, J at 36000/5000.
+ * 
+ * Transit Lines:
+ * <ul>
+ * <li>red line: express line once an hour from C to G and back without stop</li>
+ * <li>blue line: regular line every 20 minutes from A to J with stop on all facilities</li>
+ * <li>green line: circular line every 10 minutes C-K-L-G-M-N-C</li>
+ * </ul>
+ * 
+ * @author mrieser
+ */
 /*package*/ class Fixture {
 
 	/*package*/ final ScenarioImpl scenario;
