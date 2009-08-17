@@ -23,16 +23,21 @@ package playground.marcel.pt.queuesim;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.events.AgentDepartureEvent;
 import org.matsim.core.events.Events;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -49,6 +54,8 @@ import playground.marcel.pt.routes.ExperimentalTransitRoute;
  */
 public class TransitQueueSimulation extends QueueSimulation {
 
+	private static final Logger log = Logger.getLogger(TransitQueueSimulation.class);
+	
 	private OnTheFlyServer otfServer = null;
 
 	private TransitSchedule schedule = null;
@@ -125,7 +132,26 @@ public class TransitQueueSimulation extends QueueSimulation {
 	public void agentDeparts(final DriverAgent agent, final Link link) {
 		LegImpl leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
+			if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+				log.error("pt-leg has no TransitRoute. Removing agent from simulation.");
+				log.info("route: " + leg.getRoute().getClass().getCanonicalName() + " " + ((GenericRoute) leg.getRoute()).getRouteDescription());
+				Simulation.decLiving();
+				Simulation.incLost();
+				return;
+			}
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			if (route.getAccessStopId() == null) {
+				// looks like this agent has a bad transit route, likely no route could be calculated for it
+				Simulation.decLiving();
+				Simulation.incLost();
+				log.error(
+						"Agent has bad transit route! agentId=" + agent.getPerson().getId()
+								+ " route=" + route.getRouteDescription()
+								+ ". The agent is removed from the simulation.");
+				return;
+			}
+			getEvents().processEvent(new AgentDepartureEvent(SimulationTimer.getTime(), agent.getPerson(), (LinkImpl) link, leg));
+
 			TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 			this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
 		} else {
