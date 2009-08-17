@@ -23,6 +23,7 @@ package playground.meisterk.kti;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import playground.meisterk.kti.config.KtiConfigGroupTest;
+import playground.meisterk.kti.scoring.ActivityScoringFunctionTest;
 
 public class AllTests {
 
@@ -31,7 +32,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(KtiConfigGroupTest.class);
 //		suite.addTestSuite(KtiControlerTest.class);
-//		suite.addTestSuite(ActivityScoringFunctionTest.class);
+		suite.addTestSuite(ActivityScoringFunctionTest.class);
 		//$JUnit-END$
 		return suite;
 	}

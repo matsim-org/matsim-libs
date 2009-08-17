@@ -53,6 +53,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -388,12 +389,17 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 				this.ktiConfigGroup);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
+		assertTrue(testee instanceof ScoringFunctionAccumulator);
+		assertEquals(1, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().size());
+		assertEquals(ActivityScoringFunction.class, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0).getClass());
+		ActivityScoringFunction asf = (ActivityScoringFunction) ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0);
+		
 		testee.endActivity(Time.parseTime("08:00:00"));
 
-		assertEquals(0, factory.getActivities().getAccumulatedDurations().size());
-		assertEquals(expectedTooShortDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[0], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[0], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(0, asf.getAccumulatedDurations().size());
+		assertEquals(expectedTooShortDurationsSequence[0], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[0], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[0], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("08:00:00"), (LegImpl) this.plan.getPlanElements().get(1));
 		testee.endLeg(Time.parseTime("08:30:00"));
@@ -401,13 +407,13 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.endActivity(Time.parseTime("14:30:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[1], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[1], Time.writeTime(asf.getAccumulatedDurations().get(actType)));
 			}
 		}
-		assertEquals(expectedTooShortDurationsSequence[1], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[1], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[1], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(expectedTooShortDurationsSequence[1], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[1], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[1], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("14:30:00"), (LegImpl) this.plan.getPlanElements().get(3));
 		testee.endLeg(Time.parseTime("14:35:00"));
@@ -415,13 +421,13 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.endActivity(Time.parseTime("14:55:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[2], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[2], Time.writeTime(asf.getAccumulatedDurations().get(actType)));
 			}
 		}
-		assertEquals(expectedTooShortDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[2], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[2], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(expectedTooShortDurationsSequence[2], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[2], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[2], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("14:55:00"), (LegImpl) this.plan.getPlanElements().get(5));
 		testee.endLeg(Time.parseTime("15:00:00"));
@@ -429,13 +435,13 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.endActivity(Time.parseTime("17:00:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[3], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[3], Time.writeTime(asf.getAccumulatedDurations().get(actType)));
 			}
 		}
-		assertEquals(expectedTooShortDurationsSequence[3], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[3], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[3], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(expectedTooShortDurationsSequence[3], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[3], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[3], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("17:00:00"), (LegImpl) this.plan.getPlanElements().get(7));
 		testee.endLeg(Time.parseTime("17:30:00"));
@@ -443,13 +449,13 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.endActivity(Time.parseTime("20:00:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[4], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[4], Time.writeTime(asf.getAccumulatedDurations().get(actType)));
 			}
 		}
-		assertEquals(expectedTooShortDurationsSequence[4], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[4], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[4], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(expectedTooShortDurationsSequence[4], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[4], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[4], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("20:00:00"), (LegImpl) this.plan.getPlanElements().get(9));
 		testee.endLeg(Time.parseTime("24:00:00"));
@@ -457,37 +463,37 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.endActivity(Time.parseTime("30:00:00"));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[5], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[5], Time.writeTime(asf.getAccumulatedDurations().get(actType)));
 			}
 		}
-		assertEquals(expectedTooShortDurationsSequence[5], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[5], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[5], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(expectedTooShortDurationsSequence[5], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[5], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[5], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		testee.startLeg(Time.parseTime("30:00:00"), (LegImpl) this.plan.getPlanElements().get(11));
 		testee.endLeg(Time.parseTime("34:00:00"));
 		testee.startActivity(Time.parseTime("34:00:00"), (ActivityImpl) this.plan.getPlanElements().get(12));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[6], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[6], Time.writeTime(asf.getAccumulatedDurations().get(actType)));
 			}
 		}
-		assertEquals(expectedTooShortDurationsSequence[6], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[6], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[6], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(expectedTooShortDurationsSequence[6], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[6], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[6], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		testee.finish();
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
-				assertEquals(expectedAccumulatedActivityDurations.get(actType)[7], Time.writeTime(factory.getActivities().getAccumulatedDurations().get(actType)));
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
+				assertEquals(expectedAccumulatedActivityDurations.get(actType)[7], Time.writeTime(asf.getAccumulatedDurations().get(actType)));
 			}
 		}
-		assertEquals(expectedTooShortDurationsSequence[7], Time.writeTime(factory.getActivities().getAccumulatedTooShortDuration()));
-		assertEquals(expectedWaitingTimeSequence[7], Time.writeTime(factory.getActivities().getTimeSpentWaiting()));
-		assertEquals(expectedNegativeDurationsSequence[7], Time.writeTime(factory.getActivities().getAccumulatedNegativeDuration()));
+		assertEquals(expectedTooShortDurationsSequence[7], Time.writeTime(asf.getAccumulatedTooShortDuration()));
+		assertEquals(expectedWaitingTimeSequence[7], Time.writeTime(asf.getTimeSpentWaiting()));
+		assertEquals(expectedNegativeDurationsSequence[7], Time.writeTime(asf.getAccumulatedNegativeDuration()));
 
 		double expectedScore = 0.0;
 		expectedScore += factory.getParams().marginalUtilityOfEarlyDeparture * Time.parseTime(expectedTooShortDurationsSequence[7]);
@@ -495,7 +501,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		expectedScore += factory.getParams().marginalUtilityOfLateArrival * 2 * Time.parseTime(expectedNegativeDurationsSequence[7]);
 		double duration, zeroUtilityDuration, typicalDuration;
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
-			if (factory.getActivities().getAccumulatedDurations().containsKey(actType)) {
+			if (asf.getAccumulatedDurations().containsKey(actType)) {
 				typicalDuration = this.population.getPersons().get(TEST_PERSON_ID).getDesires().getActivityDuration(actType);
 				duration = Time.parseTime(expectedAccumulatedActivityDurations.get(actType)[7]);
 				zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
@@ -504,7 +510,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 				expectedScore += Math.max(0, Math.max(utilPerf, utilWait));
 
 				// check zero utility durations
-				assertEquals(zeroUtilityDuration, factory.getActivities().getZeroUtilityDurations().get(actType), MatsimTestCase.EPSILON);
+				assertEquals(zeroUtilityDuration, asf.getZeroUtilityDurations().get(actType), MatsimTestCase.EPSILON);
 
 			}
 		}
