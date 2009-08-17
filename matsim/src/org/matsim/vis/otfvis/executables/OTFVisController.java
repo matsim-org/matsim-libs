@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
@@ -87,8 +88,9 @@ public class OTFVisController extends Controler {
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);
 		sim.setServer(myOTFServer);
-		
-		sim.addQueueSimulationListeners(this.getQueueSimulationListener());
+		for (QueueSimulationListener l : this.getQueueSimulationListener()) {
+			sim.addQueueSimulationListeners(l);
+		}
 		myOTFServer.setControllerStatus(RUNNING + getIteration());
 		sim.run();
 		myOTFServer.setControllerStatus(REPLANNING + getIteration()+1);

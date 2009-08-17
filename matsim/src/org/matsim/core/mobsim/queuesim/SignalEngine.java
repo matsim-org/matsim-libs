@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ * SignalEngine
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.control;
+package org.matsim.core.mobsim.queuesim;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.mobsim.queuesim.SignalEngine;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.core.events.Events;
+import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
+import org.matsim.signalsystems.control.SignalSystemController;
 
+public interface SignalEngine {
 
-/**
- * @author dgrether
- *
- */
-public interface SignalSystemController {
+	public SortedMap<Id, SignalSystemController> getSignalSystemControlerBySystemId();
 
-	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup);
-	
-	public void setDefaultCycleTime(Double seconds);
-	
-	public void setDefaultSynchronizationOffset(Double seconds);
-	
-	public void setDefaultInterGreenTime(Double seconds);
-	
-	public Map<Id, BasicSignalGroupDefinition> getSignalGroups();
+	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
 
-	public SignalEngine getSignalEngine();
+	public Events getEvents();
 	
-	public void setSignalEngine(SignalEngine signalEngine);
 }

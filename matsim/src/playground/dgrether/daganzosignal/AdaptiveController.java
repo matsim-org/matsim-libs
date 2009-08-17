@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
@@ -48,6 +49,11 @@ public class AdaptiveController extends
 		log.info("isGreen?");
 		
 		return true;
+	}
+
+	public SignalGroupState getSignalGroupState(double time, BasicSignalGroupDefinition signalGroup) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -20,9 +20,6 @@
 
 package org.matsim.core.mobsim.queuesim.listener;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
@@ -41,10 +38,8 @@ public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioLoader(config).loadScenario();
 		QueueSimulation qsim = new QueueSimulation(scenario, new Events());
 		
-		List<QueueSimulationListener> listeners = new LinkedList<QueueSimulationListener>();
 		MockQueueSimStepListener mockListener = new MockQueueSimStepListener(1.0);
-		listeners.add(mockListener);
-		qsim.addQueueSimulationListeners(listeners);
+		qsim.addQueueSimulationListeners(mockListener);
 		qsim.run();
 		assertEquals("wrong number of invocations.", 11, mockListener.getCount());
 		
@@ -55,10 +50,8 @@ public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
 		scenario = new ScenarioLoader(config).loadScenario();
 		qsim = new QueueSimulation(scenario, new Events());
 		
-		listeners = new LinkedList<QueueSimulationListener>();
 		mockListener = new MockQueueSimStepListener(10.0);
-		listeners.add(mockListener);
-		qsim.addQueueSimulationListeners(listeners);
+		qsim.addQueueSimulationListeners(mockListener);
 		qsim.run();
 		assertEquals("wrong number of invocations.", 6, mockListener.getCount());
 	}

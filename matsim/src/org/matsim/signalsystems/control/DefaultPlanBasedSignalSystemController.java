@@ -20,6 +20,12 @@
 package org.matsim.signalsystems.control;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.events.SignalGroupStateChangedEventImpl;
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
@@ -30,14 +36,14 @@ import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 /**
  * Implementation of SignalSystemControler for plan controled signal groups.
  * This currently considers only the first plan and ignores plan start and stop
- * times. Furthermore it ignores intergreen times.
+ * times. 
  * 
  * TODO add synchronization offset handling
  * @author dgrether
  * @author aneumann
  *
  */
-public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystemController implements SignalSystemController {
+public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystemController implements SignalSystemController, QueueSimulationAfterSimStepListener, QueueSimulationInitializedListener {
 	
 	private static final Logger log = Logger
 			.getLogger(DefaultPlanBasedSignalSystemController.class);
@@ -62,6 +68,15 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 	 */
 	public boolean givenSignalGroupIsGreen(double time, 
 			BasicSignalGroupDefinition signalGroup) {
+		SignalGroupState state = this.getSignalGroupStates().get(signalGroup);
+		if (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW)){
+			return true;
+		}
+		return false;
+	}
+	
+	
+	private void updateSignalGroupStates(double time) {
 		BasicSignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
 		if (activePlan == null) {
 			String message = "No active plan for signalsystem id " + config.getSignalSystemId();
@@ -78,14 +93,44 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 		else {
 			throw new IllegalStateException("CycleTime is not set for SignalSystemConfiguration of SignalSystem Id:  " + this.config.getSignalSystemId());
 		}
+		//TODO remove 1 + and set therefore <= comparison
 		int currentSecondInPlan = 1 + ((int) (time % cycleTime));
 
-		BasicSignalGroupSettings signalGroupConfig = activePlan.getGroupConfigs().get(signalGroup.getId());
-		if ( (signalGroupConfig.getRoughCast() < currentSecondInPlan) 
-				&& (currentSecondInPlan <= signalGroupConfig.getDropping())){
-			return true;
+		int roughcast, dropping, endIntergreenRc, endIntergreenDrop;
+		SignalGroupState currentState, newState;
+		for (BasicSignalGroupDefinition g : this.getSignalGroups().values()){
+			BasicSignalGroupSettings sgc = activePlan.getGroupConfigs().get(g.getId());
+			currentState = this.getSignalGroupStates().get(g);
+			roughcast = sgc.getRoughCast();
+			dropping = sgc.getDropping();
+			endIntergreenRc = roughcast + sgc.getInterimGreenTimeRoughcast();
+			endIntergreenDrop = dropping + sgc.getInterGreenTimeDropping();
+			if ((roughcast < currentSecondInPlan) && 
+					(currentSecondInPlan <=  endIntergreenRc)) {
+				newState = SignalGroupState.REDYELLOW;
+			}
+			else if ((endIntergreenRc < currentSecondInPlan) && (currentSecondInPlan <= dropping)) {
+				newState = SignalGroupState.GREEN;
+			}
+			else if ((dropping < currentSecondInPlan) && (currentSecondInPlan <= endIntergreenDrop)) {
+				newState = SignalGroupState.YELLOW;
+			}
+			else {
+				newState = SignalGroupState.RED;
+			}
+			this.getSignalGroupStates().put(g, newState);
+			if (newState != currentState){
+				this.getSignalEngine().getEvents().processEvent(new SignalGroupStateChangedEventImpl(time, g.getSignalSystemDefinitionId(), g.getId(), newState));
+			}
 		}
-		return false;
 	}
 
+	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) { 
+		//+1 to update the green state for the next timestep
+		this.updateSignalGroupStates(e.getSimulationTime() + 1.0);
+	}
+
+	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
+		this.updateSignalGroupStates(SimulationTimer.getSimStartTime());
+	}
 }

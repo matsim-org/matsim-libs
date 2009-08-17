@@ -778,7 +778,9 @@ public class Controler {
 				sim.run();
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.scenarioData, this.events);
-				sim.addQueueSimulationListeners(this.getQueueSimulationListener());
+				for (QueueSimulationListener l : this.getQueueSimulationListener()) {
+					sim.addQueueSimulationListeners(l);
+				}
 				sim.setUseActivityDurations(this.getConfig().vspExperimental().isUseActivityDurations());
 				if (this.config.scenario().isUseLanes()) {
 					if (this.scenarioData.getLaneDefinitions() == null) {

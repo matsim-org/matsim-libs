@@ -23,16 +23,12 @@ package org.matsim.core.mobsim.queuesim;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -62,22 +58,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
-import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.control.AdaptivePlanBasedSignalSystemControler;
-import org.matsim.signalsystems.control.AdaptiveSignalSystemControler;
-import org.matsim.signalsystems.control.DefaultPlanBasedSignalSystemController;
-import org.matsim.signalsystems.control.PlanBasedSignalSystemController;
-import org.matsim.signalsystems.control.SignalSystemController;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
@@ -133,38 +117,21 @@ public class QueueSimulation {
 
 	private AgentFactory agentFactory;
 
-	/**
-	 * The SignalSystemDefinitions accessible by their Id
-	 */
-	private SortedMap<Id, BasicSignalSystemDefinition> signalSystemDefinitions;
-	/**
-	 * The SignalGroupDefinitions accessible by the Id of the SignalSystem they belong
-	 * to.
-	 */
-	private SortedMap<Id, List<BasicSignalGroupDefinition>> signalGroupDefinitionsBySystemId;
-	/**
-	 * Contains the SignalSystemControler instances which can be accessed by the
-	 * Id of the SignalSystemDefinition
-	 */
-	private SortedMap<Id, SignalSystemController> signalSystemControlerBySystemId;
-
-	private BasicSignalSystems signalSystems;
-
-	private BasicSignalSystemConfigurations signalSystemsConfig;
-
-	private BasicLaneDefinitions laneDefintions;
-
 	private QueueSimListenerManager listenerManager;
 
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
 	protected Scenario scenario = null;
 
+	private BasicLaneDefinitions laneDefintions;
+	
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
 	private int cntTeleportVehicle = 0;
 
 	private boolean useActivityDurations = true;
+	
+	private QueueSimSignalEngine signalEngine = null;
 	
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -199,18 +166,14 @@ public class QueueSimulation {
 	}
 
 	/**
-	 * Adds all QueueSimulation listener instances in the List given as parameters as
-	 * listeners to this QueueSimulation instance.
+	 * Adds the QueueSimulationListener instance  given as parameters as
+	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
-	public void addQueueSimulationListeners(final List<QueueSimulationListener> listeners){
-		if (listeners != null){
-			for (QueueSimulationListener l : listeners){
-				this.listenerManager.addQueueSimulationListener(l);
-			}
-		}
+	public void addQueueSimulationListeners(QueueSimulationListener listener){
+				this.listenerManager.addQueueSimulationListener(listener);
 	}
-
+	
 	/**
 	 * Set the lanes used in the simulation
 	 * @param laneDefs
@@ -225,149 +188,9 @@ public class QueueSimulation {
 	 * @param basicSignalSystemConfigurations
 	 */
 	public void setSignalSystems(final BasicSignalSystems signalSystems, final BasicSignalSystemConfigurations basicSignalSystemConfigurations){
-		this.signalSystems = signalSystems;
-		this.signalSystemsConfig = basicSignalSystemConfigurations;
+		this.signalEngine  = new QueueSimSignalEngine(this);
+		this.signalEngine.setSignalSystems(signalSystems, basicSignalSystemConfigurations);
 	}
-
-
-	private void initLanes(final BasicLaneDefinitions lanedefs) {
-		for (BasicLanesToLinkAssignment laneToLink : lanedefs.getLanesToLinkAssignments()){
-			QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
-			if (link == null) {
-				String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
-				log.error(message);
-				throw new IllegalStateException(message);
-			}
-			link.createLanes(laneToLink.getLanes());
-		}
-	}
-
-	private void initSignalSystems(final BasicSignalSystems signalSystems) {
-		//store the signalSystemDefinitions in a Map
-		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
-		for (BasicSignalSystemDefinition signalSystem : signalSystems.getSignalSystemDefinitions()) {
-			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
-		}
-		//init the signalGroupDefinitions
-		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
-		for (BasicSignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions()) {
-			QueueLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
-			if (queueLink == null) {
-				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
-			}
-			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(signalGroupDefinition.getSignalSystemDefinitionId());
-			if (list == null) {
-				list = new ArrayList<BasicSignalGroupDefinition>();
-				this.signalGroupDefinitionsBySystemId.put(signalGroupDefinition.getSignalSystemDefinitionId(), list);
-			}
-			list.add(signalGroupDefinition);
-			queueLink.addSignalGroupDefinition(signalGroupDefinition);
-			this.network.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
-		}
-	}
-
-	private void initSignalSystemController(final BasicSignalSystemConfigurations basicSignalSystemConfigurations) {
-		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemController>();
-		for (BasicSignalSystemConfiguration config :
-			basicSignalSystemConfigurations.getSignalSystemConfigurations().values()) {
-			SignalSystemController systemControler = null;
-			if (this.signalSystemControlerBySystemId.containsKey(config.getSignalSystemId())){
-				throw new IllegalStateException("SignalSystemControler for SignalSystem with id: " + config.getSignalSystemId() +
-						" already exists. Cannot add second SignalSystemControler for same system. Check your" +
-						" signal system's configuration file.");
-			}
-			if (config.getControlInfo() instanceof BasicAdaptivePlanBasedSignalSystemControlInfo) {
-				AdaptiveSignalSystemControler c = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config.getControlInfo());
-				if (!(c instanceof PlanBasedSignalSystemController)){
-					throw new IllegalArgumentException("Class " + c.getClass().getName() + "is no PlanBasedSignalSystemController instance. Check your configuration of the signal system control!");
-				}
-				AdaptivePlanBasedSignalSystemControler controler = (AdaptivePlanBasedSignalSystemControler) c;
-				systemControler = controler;
-			}
-			else if (config.getControlInfo() instanceof BasicAdaptiveSignalSystemControlInfo) {
-				AdaptiveSignalSystemControler controler = createAdaptiveControler((BasicAdaptiveSignalSystemControlInfo)config.getControlInfo());
-				systemControler = controler;
-			}
-			else if (config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo){
-				DefaultPlanBasedSignalSystemController controler = new DefaultPlanBasedSignalSystemController(config);
-				systemControler = controler;
-			}
-
-			if (systemControler != null){
-				this.initSignalSystemControlerDefaults(systemControler, config);
-				this.signalSystemControlerBySystemId.put(config.getSignalSystemId(), systemControler);
-				//add controller to signal groups
-				List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
-				if ((groups == null) || groups.isEmpty()) {
-					String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
-					log.warn(message);
-				}
-				else {
-					for (BasicSignalGroupDefinition group : groups){
-						group.setResponsibleLSAControler(systemControler);
-					}
-				}
-			}
-			else {
-				log.error("Could not initialize signal system controler for signal system with id: " + config.getSignalSystemId() + " " +
-						"Check stacktrace for details.");
-			}
-		}
-	}
-
-	private AdaptiveSignalSystemControler createAdaptiveControler(
-			final BasicAdaptiveSignalSystemControlInfo config) {
-		String controllerName = config.getAdaptiveControlerClass();
-		AdaptiveSignalSystemControler controler = null;
-		if (controllerName == null){
-			throw new IllegalArgumentException("controler class must be given");
-		}
-		if (controllerName.startsWith("org.matsim")){
-			//when we have standardized code for adaptive control
-			//within org.matsim here is the point to create those controlers
-			throw new IllegalArgumentException("Loading classes by name within the org.matsim packages is not allowed!");
-		}
-		else if (controllerName.equalsIgnoreCase("SheltersDoorBlockerController")){
-			controler = new SheltersDoorBlockerController(config);
-		}
-		else {
-			try {
-				Class<? extends AdaptiveSignalSystemControler> klas = (Class<? extends AdaptiveSignalSystemControler>) Class.forName(config.getAdaptiveControlerClass());
-				Class[] args = new Class[1];
-				args[0] = BasicAdaptiveSignalSystemControlInfo.class;
-				Constructor<? extends AdaptiveSignalSystemControler> c = klas.getConstructor(args);
-				controler = c.newInstance(config);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
-		if (controler == null){
-			throw new IllegalStateException("Cannot create AdaptiveSignalSystemControler for class name: " + config.getAdaptiveControlerClass());
-		}
-		return controler;
-	}
-
-
-
-	private void initSignalSystemControlerDefaults(final SignalSystemController controler, final BasicSignalSystemConfiguration config){
-		BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getSignalSystemId());
-		controler.setDefaultCycleTime(systemDef.getDefaultCycleTime());
-		controler.setDefaultInterGreenTime(systemDef.getDefaultInterGreenTime());
-		controler.setDefaultSynchronizationOffset(systemDef.getDefaultSynchronizationOffset());
-	}
-
 
 	public final void run() {
 		prepareSim();
@@ -409,6 +232,10 @@ public class QueueSimulation {
 			}
 		}
 	}
+
+//	protected void prepareNetwork() {
+//		this.network.beforeSim();
+//	}
 
 	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
 		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
@@ -492,7 +319,9 @@ public class QueueSimulation {
 
 		prepareLanes();
 
-		prepareSignalSystems();
+		if (this.signalEngine != null) {
+			this.signalEngine.prepareSignalSystems();
+		}
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
@@ -529,19 +358,15 @@ public class QueueSimulation {
 
 	private void prepareLanes(){
 		if (this.laneDefintions != null){
-			initLanes(this.laneDefintions);
-		}
-	}
-
-	/**
-	 * Initialize the signal systems
-	 */
-	private void prepareSignalSystems() {
-		if (this.signalSystems != null) {
-			initSignalSystems(this.signalSystems);
-		}
-		if (this.signalSystemsConfig != null) {
-			initSignalSystemController(this.signalSystemsConfig);
+			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignments()){
+				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
+				if (link == null) {
+					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
+					log.error(message);
+					throw new IllegalStateException(message);
+				}
+				link.createLanes(laneToLink.getLanes());
+			}	
 		}
 	}
 
@@ -769,15 +594,6 @@ public class QueueSimulation {
 	}
 
 
-	public SortedMap<Id, SignalSystemController> getSignalSystemControlerBySystemId() {
-		return this.signalSystemControlerBySystemId;
-	}
-
-
-	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
-		return this.signalSystemDefinitions;
-	}
-
 	/** Specifies whether the simulation should track vehicle usage and throw an Exception
 	 * if an agent tries to use a car on a link where the car is not available, or not.
 	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a
@@ -815,11 +631,14 @@ public class QueueSimulation {
 	public boolean isUseActivityDurations() {
 		return useActivityDurations;
 	}
-
 	
 	public void setUseActivityDurations(boolean useActivityDurations) {
 		this.useActivityDurations = useActivityDurations;
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
+	}
+	
+	public SignalEngine getQueueSimSignalEngine() {
+		return this.signalEngine;
 	}
 
 }

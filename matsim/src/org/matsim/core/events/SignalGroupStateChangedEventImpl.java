@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ * SignalSystemStateChangedEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.control;
+package org.matsim.core.events;
 
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.mobsim.queuesim.SignalEngine;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalSystemController {
+public class SignalGroupStateChangedEventImpl extends BasicEventImpl implements SignalGroupStateChangedEvent {
+	private SignalGroupState newState;
+	private Id signalGroupId;
+	private Id signalSystemId;
 
-	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup);
-	
-	public void setDefaultCycleTime(Double seconds);
-	
-	public void setDefaultSynchronizationOffset(Double seconds);
-	
-	public void setDefaultInterGreenTime(Double seconds);
-	
-	public Map<Id, BasicSignalGroupDefinition> getSignalGroups();
+	public SignalGroupStateChangedEventImpl(double time, Id systemId, Id groupId, SignalGroupState newState) {
+		super(time);
+		this.signalSystemId = systemId;
+		this.signalGroupId = groupId;
+		this.newState = newState;
+	}
 
-	public SignalEngine getSignalEngine();
+	public SignalGroupState getNewState() {
+		return this.newState;
+	}
 	
-	public void setSignalEngine(SignalEngine signalEngine);
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> m = super.getAttributes();
+		m.put(ATTRIBUTE_SIGNALSYSTEM_ID, this.signalSystemId.toString());
+		m.put(ATTRIBUTE_SIGNALGROUP_ID, this.signalGroupId.toString());
+		m.put(ATTRIBUTE_SIGNALGROUP_STATE, this.newState.toString());
+		return m;
+	}
+
+	@Override
+	public String getEventType() {
+		return SignalGroupStateChangedEvent.EVENT_TYPE;
+	}
+
+	
+	public Id getSignalGroupId() {
+		return signalGroupId;
+	}
+
+	
+	public Id getSignalSystemId() {
+		return signalSystemId;
+	}
 }

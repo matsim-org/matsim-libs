@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ * SignalSystemStateChangedEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.control;
-
-import java.util.Map;
+package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.mobsim.queuesim.SignalEngine;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
+import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
+ * Event to indicate that a signal system's signal group has changed its color.
  * @author dgrether
  *
  */
-public interface SignalSystemController {
+public interface SignalGroupStateChangedEvent extends BasicEvent{
 
-	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup);
+	public final static String EVENT_TYPE = "signalGroupStateChangedEvent";
 	
-	public void setDefaultCycleTime(Double seconds);
+	public final static String ATTRIBUTE_SIGNALSYSTEM_ID = "signalSystemId";
+	public final static String ATTRIBUTE_SIGNALGROUP_ID = "signalGroupId";
+	public final static String ATTRIBUTE_SIGNALGROUP_STATE = "signalGroupState";
 	
-	public void setDefaultSynchronizationOffset(Double seconds);
+	public SignalGroupState getNewState();
 	
-	public void setDefaultInterGreenTime(Double seconds);
+	public Id getSignalGroupId();
 	
-	public Map<Id, BasicSignalGroupDefinition> getSignalGroups();
-
-	public SignalEngine getSignalEngine();
+	public Id getSignalSystemId();
 	
-	public void setSignalEngine(SignalEngine signalEngine);
 }

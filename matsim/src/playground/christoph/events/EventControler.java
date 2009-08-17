@@ -22,27 +22,21 @@ package playground.christoph.events;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -73,7 +67,6 @@ import playground.christoph.router.MyDijkstra;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
-import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
@@ -331,9 +324,7 @@ public class EventControler extends Controler {
 		this.events.addHandler(linkVehiclesCounter);
 		sim.getMyQueueNetwork().setLinkVehiclesCounter(linkVehiclesCounter);
 
-		List<QueueSimulationListener> queueSimulationListeners = new ArrayList<QueueSimulationListener>();
-		queueSimulationListeners.add(linkVehiclesCounter);
-		sim.addQueueSimulationListeners(queueSimulationListeners);
+		sim.addQueueSimulationListeners(linkVehiclesCounter);
 
 		// create & add LinkReplanningMap
 		linkReplanningMap = new LinkReplanningMap();
@@ -428,8 +419,8 @@ public class EventControler extends Controler {
 			}
 
 			// Initial Replanning
-			else if (probability > pNoReplanning
-					&& probability <= pNoReplanning + pInitialReplanning) {
+			else if ((probability > pNoReplanning)
+					&& (probability <= pNoReplanning + pInitialReplanning)) {
 				initialReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(true));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
@@ -438,9 +429,9 @@ public class EventControler extends Controler {
 			}
 
 			// Act End Replanning
-			else if (probability > pNoReplanning + pInitialReplanning
-					&& probability <= pNoReplanning + pInitialReplanning
-							+ pActEndReplanning) {
+			else if ((probability > pNoReplanning + pInitialReplanning)
+					&& (probability <= pNoReplanning + pInitialReplanning
+							+ pActEndReplanning)) {
 				actEndReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));

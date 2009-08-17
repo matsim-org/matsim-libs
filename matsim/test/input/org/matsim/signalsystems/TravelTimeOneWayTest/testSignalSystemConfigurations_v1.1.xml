@@ -10,8 +10,8 @@
                 <signalGroupSettings refId="100">
                     <roughcast sec="0"/>
                     <dropping sec="60"/>
-                    <interGreenTimeRoughcast sec="2"/>
-                    <interGreenTimeDropping sec="3"/>
+                    <interGreenTimeRoughcast sec="0"/>
+                    <interGreenTimeDropping sec="0"/>
                 </signalGroupSettings>
             </signalSystemPlan>
         </signalSystemControlInfo>
