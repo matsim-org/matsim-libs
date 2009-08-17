@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -37,6 +39,7 @@ import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -56,7 +59,7 @@ import playground.marcel.pt.fakes.FakeAgent;
 /**
  * @author mrieser
  */
-public class TransitDriverTest extends MatsimTestCase {
+public class TransitDriverTest extends TestCase {
 
 	public void testInitializationNetworkRoute() {
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
@@ -147,14 +150,16 @@ public class TransitDriverTest extends MatsimTestCase {
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 		driver.setVehicle(new TransitQueueVehicle(vehicle, 3.0));
 
+		new TransitQueueSimulation(new ScenarioImpl(), new Events()); // required for Events to be set
+		
 		assertEquals(stop1, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop1, 60), EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
 		assertEquals(stop2, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop2, 160), EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop2, 160), MatsimTestCase.EPSILON);
 		assertEquals(stop3, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop3, 260), EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop3, 260), MatsimTestCase.EPSILON);
 		assertEquals(stop4, driver.getNextTransitStop());
-		assertEquals(0, driver.handleTransitStop(stop4, 360), EPSILON);
+		assertEquals(0, driver.handleTransitStop(stop4, 360), MatsimTestCase.EPSILON);
 		assertEquals(null, driver.getNextTransitStop());
 	}
 
@@ -229,6 +234,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
+		stop1.setLink(new FakeLink(new IdImpl("dummy")));
+		stop2.setLink(new FakeLink(new IdImpl("dummy")));
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		NetworkRoute route = new NodeNetworkRoute(null, null);
