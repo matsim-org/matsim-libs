@@ -37,9 +37,21 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentWait2LinkEvent;
 import org.matsim.core.events.Events;
+import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -49,11 +61,13 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -69,6 +83,7 @@ import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehicleBuilder;
 
+import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
@@ -466,7 +481,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 		Config config = scenario.getConfig();
 
-		// build simple network with 1 link
+		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
 		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
 		node1.setCoord(scenario.createCoord(0.0, 0.0));
@@ -552,5 +567,145 @@ public class TransitQueueSimulationTest extends TestCase {
 			firstEvent = null;
 			lastEvent = null;
 		}
+	}
+	
+	public void testEvents() {
+		ScenarioImpl scenario = new ScenarioImpl();
+		Config config = scenario.getConfig();
+
+		// build simple network with 2 links
+		NetworkImpl network = scenario.getNetwork();
+		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
+		node1.setCoord(scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(scenario.createId("2"));
+		node2.setCoord(scenario.createCoord(1000.0, 0.0));
+		NodeImpl node3 = (NodeImpl) network.getBuilder().createNode(scenario.createId("3"));
+		node3.setCoord(scenario.createCoord(2000.0, 0.0));
+		network.getNodes().put(node1.getId(), node1);
+		network.getNodes().put(node2.getId(), node2);
+		network.getNodes().put(node3.getId(), node3);
+		LinkImpl link1 = (LinkImpl) network.getBuilder().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		link1.setFreespeed(10.0);
+		link1.setCapacity(2000.0);
+		link1.setLength(1000.0);
+		LinkImpl link2 = (LinkImpl) network.getBuilder().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		link2.setFreespeed(10.0);
+		link2.setCapacity(2000.0);
+		link2.setLength(1000.0);
+		network.getLinks().put(link1.getId(), link1);
+		network.getLinks().put(link2.getId(), link2);
+		node2.addInLink(link1);
+		node2.addOutLink(link2);
+
+		// build simple schedule with a single line
+		config.scenario().setUseTransit(true);
+		config.scenario().setUseVehicles(true);
+		double depTime = 7.0*3600;
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleBuilder sb = schedule.getBuilder();
+		TransitStopFacility stopFacility1 = sb.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(1000, 0), false);
+		TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
+		schedule.addStopFacility(stopFacility1);
+		schedule.addStopFacility(stopFacility2);
+		stopFacility1.setLink(link1);
+		stopFacility2.setLink(link2);
+		TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
+		NetworkRoute route = new LinkNetworkRoute(link1, link2);
+		TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
+		TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
+		stops.add(stop1);
+		stops.add(stop2);
+		TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, TransportMode.bus);
+		Departure dep = sb.createDeparture(scenario.createId("1"), depTime);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
+		schedule.addTransitLine(tLine);
+		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+		
+		// build population with 1 person
+		Population population = scenario.getPopulation();
+		PopulationBuilder pb = population.getBuilder();
+		Person person = pb.createPerson(scenario.createId("1"));
+		Plan plan = pb.createPlan();
+		Activity act1 = pb.createActivityFromLinkId("h", link1.getId());
+		act1.setEndTime(depTime - 60.0);
+		Leg leg1 = pb.createLeg(TransportMode.walk);
+		Route route1 = new GenericRouteImpl(link1, link1);
+		route1.setTravelTime(10.0);
+		leg1.setRoute(route1);
+		Activity act2 = pb.createActivityFromLinkId(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, link1.getId());
+		act2.setEndTime(0.0);
+		Leg leg2 = pb.createLeg(TransportMode.pt);
+		Route route2 = new ExperimentalTransitRoute(stopFacility1, tLine, tRoute, stopFacility2);
+		route2.setTravelTime(100.0);
+		leg2.setRoute(route2);
+		Activity act3 = pb.createActivityFromLinkId(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, link1.getId());
+		act3.setEndTime(0.0);
+		Leg leg3 = pb.createLeg(TransportMode.walk);
+		Route route3 = new GenericRouteImpl(link2, link2);
+		route3.setTravelTime(10.0);
+		leg3.setRoute(route3);
+		Activity act4 = pb.createActivityFromLinkId("w", link2.getId());
+		
+		plan.addActivity(act1);
+		plan.addLeg(leg1);
+		plan.addActivity(act2);
+		plan.addLeg(leg2);
+		plan.addActivity(act3);
+		plan.addLeg(leg3);
+		plan.addActivity(act4);
+		person.addPlan(plan);
+		population.addPerson(person);
+		
+		// run sim
+		Events events = new Events();
+		EventsCollector collector = new EventsCollector();
+		events.addHandler(collector);
+		new TransitQueueSimulation(scenario, events).run();
+		List<BasicEvent> allEvents = collector.getEvents();
+		
+		for (BasicEvent event : allEvents) {
+			System.out.println(event.toString());
+		}
+
+//		assertEquals(23, allEvents.size());
+		
+		assertTrue(allEvents.get(0) instanceof ActivityEndEvent);
+		assertEquals("h", ((ActivityEndEvent) allEvents.get(0)).getActType());
+		assertTrue(allEvents.get(1) instanceof AgentDepartureEvent);
+		assertTrue(allEvents.get(2) instanceof AgentArrivalEvent);
+		assertTrue(allEvents.get(3) instanceof ActivityStartEvent);
+		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEvent) allEvents.get(3)).getActType());
+		assertTrue(allEvents.get(4) instanceof ActivityEndEvent); // zero activity duration, waiting at stop is considered as leg
+		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEvent) allEvents.get(4)).getActType());
+		assertTrue(allEvents.get(5) instanceof AgentDepartureEvent);
+		
+		assertTrue(allEvents.get(6) instanceof AgentDepartureEvent); // pt-driver
+		assertTrue(allEvents.get(7) instanceof AgentWait2LinkEvent); // pt-vehicle
+		
+		assertTrue(allEvents.get(8) instanceof BasicVehicleArrivesAtFacilityEvent);
+		assertTrue(allEvents.get(9) instanceof PersonEntersVehicleEvent);
+		assertTrue(allEvents.get(10) instanceof BasicVehicleDepartsAtFacilityEvent);
+		
+		assertTrue(allEvents.get(11) instanceof LinkLeaveEvent); // pt-vehicle
+		assertTrue(allEvents.get(12) instanceof LinkEnterEvent); // pt-vehicle
+		
+		assertTrue(allEvents.get(13) instanceof BasicVehicleArrivesAtFacilityEvent); // pt-vehicle
+		assertTrue(allEvents.get(14) instanceof PersonLeavesVehicleEvent);
+		
+		assertTrue(allEvents.get(15) instanceof AgentArrivalEvent);
+		assertTrue(allEvents.get(16) instanceof ActivityStartEvent);
+		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEvent) allEvents.get(16)).getActType());
+		assertTrue(allEvents.get(17) instanceof ActivityEndEvent); // zero activity duration, waiting at stop is considered as leg
+		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEvent) allEvents.get(17)).getActType());
+		
+		assertTrue(allEvents.get(18) instanceof AgentDepartureEvent); // walk
+		assertTrue(allEvents.get(19) instanceof AgentArrivalEvent);
+		assertTrue(allEvents.get(20) instanceof ActivityStartEvent);
+		assertEquals("w", ((ActivityStartEvent) allEvents.get(20)).getActType());
+		
+		assertTrue(allEvents.get(21) instanceof BasicVehicleDepartsAtFacilityEvent);
+		assertTrue(allEvents.get(22) instanceof AgentArrivalEvent); // pt-driver
 	}
 }
