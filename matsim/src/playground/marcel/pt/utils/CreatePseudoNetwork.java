@@ -21,12 +21,15 @@
 package playground.marcel.pt.utils;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -65,6 +68,8 @@ public class CreatePseudoNetwork {
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
 
+	private Set<TransportMode> transitModes = EnumSet.of(TransportMode.pt);
+	
 	public CreatePseudoNetwork(final TransitSchedule schedule, final NetworkLayer network, final String networkIdPrefix) {
 		this.schedule = schedule;
 		this.network = network;
@@ -133,6 +138,7 @@ public class CreatePseudoNetwork {
 		LinkImpl link = this.links.get(connection);
 		if (link == null) {
 			link = this.network.createLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 30.0 / 3.6, 500, 1);
+			link.setAllowedModes(transitModes);
 			this.links.put(connection, link);
 
 			if (toFacility.getLink() == null) {
