@@ -103,7 +103,7 @@ public class EnergyBalance {
 			int minTimeSlotNumber = Math.round(i * offSet + (float) parkingTimes.get(i).getStartParkingTime() / 900);
 			int maxTimeSlotNumber = Math.round(i * offSet + (float) parkingTimes.get(i).getEndParkingTime() / 900);
 
-			addCharingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, i);
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, i);
 		}
 
 		// if we need to handle the last (night parking)
@@ -116,7 +116,7 @@ public class EnergyBalance {
 			int maxTimeSlotNumber = Math.round(offSetOfEarlyNightHours + (float) parkingTimes.get(maxIndex).getEndParkingTime()
 					/ 900);
 
-			addCharingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, maxIndex);
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, maxIndex);
 
 			if (parkingTimes.get(maxIndex).getStartParkingTime() < 86400) {
 				// only handle the first part of the last parking, if the day is
@@ -126,14 +126,14 @@ public class EnergyBalance {
 				maxTimeSlotNumber = Math.round(maxIndex * offSet + (float) 86399 / 900); 
 				// this is just one second before mid night to get the right end slot
 				
-				addCharingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, maxIndex);
+				addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, maxIndex);
 			}
 		}
 
 		return chargingPrice;
 	}
 
-	private void addCharingPriceToPriorityQueue(PriorityQueue<FacilityChargingPrice> chargingPrice, int minTimeSlotNumber,
+	private void addChargingPriceToPriorityQueue(PriorityQueue<FacilityChargingPrice> chargingPrice, int minTimeSlotNumber,
 			int maxTimeSlotNumber, int parkingIndex) {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
@@ -167,7 +167,7 @@ public class EnergyBalance {
 			FacilityChargingPrice bestEnergyPrice=chargingPrice.poll();
 			
 			if (bestEnergyPrice==null){
-				break;
+				System.out.println();
 			}
 			
 			int parkingIndex=bestEnergyPrice.getEnergyBalanceParkingIndex();

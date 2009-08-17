@@ -43,7 +43,7 @@ public class BasicTests extends MatsimTestCase {
 		ChargeLog chargeLogOfAgentOne=chargingTimesOfAgentOne.getChargingTimes().get(0);
 		
 		
-		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989);
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989,1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 1111111111); // don't know this year, must calculate it...
 		
 	}
