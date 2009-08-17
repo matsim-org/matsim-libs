@@ -20,11 +20,13 @@
 
 package playground.marcel.pt.router;
 
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -36,7 +38,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -71,6 +75,15 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;
 		this.transitRouter = new TransitRouter(schedule, this.routerConfig);
+		
+		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
+		if (routeAlgo instanceof Dijkstra) {
+			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		}
+		routeAlgo = super.getPtFreeflowLeastCostPathCalculator();
+		if (routeAlgo instanceof Dijkstra) {
+			((Dijkstra) routeAlgo).setModeRestriction(EnumSet.of(TransportMode.car));
+		}
 	}
 
 	@Override
