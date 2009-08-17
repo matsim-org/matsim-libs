@@ -21,11 +21,14 @@
 package playground.marcel.pt.controler;
 
 import java.io.IOException;
+import java.util.EnumSet;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -57,6 +60,9 @@ public class TransitControler extends Controler {
 		this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
+		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
+		formats.add(EventsFileFormat.xml);
+		this.config.controler().setEventsFileFormats(formats);
 
 		ActivityParams params = new ActivityParams(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE);
 		params.setTypicalDuration(120.0);
