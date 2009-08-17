@@ -25,8 +25,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -38,16 +36,14 @@ import org.matsim.core.events.Events;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.utils.EventsCollector;
 import org.xml.sax.SAXException;
 
 /**
@@ -101,8 +97,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile(networkFile);
 
 		Events events = new Events();
-		List<BasicEvent> eventsList = new LinkedList<BasicEvent>();
-		events.addHandler(new EventsCollector(eventsList));
+		EventsCollector collector = new EventsCollector();
+		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
 		
@@ -112,7 +108,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		ttcalc.setTravelTimeAggregator(aggregator);
 		ttcalc.setTravelTimeDataFactory(ttDataFactory);
 		events2.addHandler(ttcalc);
-		for (BasicEvent e : eventsList){
+		for (BasicEvent e : collector.getEvents()) {
 			events2.processEvent(e);
 		}
 		
@@ -165,9 +161,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testLongTravelTimeInEmptySlot() {
-		ScenarioImpl scenario = new ScenarioImpl(loadConfig(null));
+		ScenarioImpl scenario = new ScenarioImpl();
 
-		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
+		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
 		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
@@ -217,7 +213,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String eventsFilename = getClassInputDirectory() + "link10_events.txt";
 		String networkFile = "test/scenarios/equil/network.xml";
 		
-		Config config = super.loadConfig(null);
+		Config config = new Config();
+		config.addCoreModules();
 		
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse(networkFile);
@@ -234,22 +231,5 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTime(link10, 6.0 * 3600), EPSILON);
 		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTime(link10, 6.25 * 3600), EPSILON);
 	}
-	
-	private static class EventsCollector implements BasicEventHandler {
-		 
-		private List<BasicEvent> eventsList;
-		
-		public EventsCollector(List<BasicEvent> eventsList) {
-			this.eventsList = eventsList;
-		}
-
-		public void reset(int iteration) {
-		}
-
-		public void handleEvent(BasicEvent event) {
-			this.eventsList.add(event);
-		}
-	}
- 
 
 }

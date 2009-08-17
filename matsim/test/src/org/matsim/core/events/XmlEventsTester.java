@@ -21,15 +21,13 @@
 package org.matsim.core.events;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.testcases.utils.EventsCollector;
 
 /**
  * An abstract class providing static methods to verify that events are correctly
@@ -60,8 +58,8 @@ public abstract class XmlEventsTester extends TestCase {
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);
 
-		assertEquals("there must be 1 event.", 1, collector.events.size());
-		BasicEvent readEvent = collector.events.iterator().next();
+		assertEquals("there must be 1 event.", 1, collector.getEvents().size());
+		BasicEvent readEvent = collector.getEvents().iterator().next();
 		assertEquals("event has wrong class.", event.getClass(), readEvent.getClass());
 
 		Map<String, String> writtenAttributes = event.getAttributes();
@@ -74,20 +72,4 @@ public abstract class XmlEventsTester extends TestCase {
 		return (T) readEvent;
 	}
 
-	/**
-	 * Helper class that stores all handled events in a collection.
-	 *
-	 * @author mrieser
-	 */
-	/*package*/ static class EventsCollector implements BasicEventHandler {
-		/*package*/ final Collection<BasicEvent> events = new LinkedList<BasicEvent>();
-
-		public void handleEvent(final BasicEvent event) {
-			this.events.add(event);
-		}
-
-		public void reset(final int iteration) {
-			this.events.clear();
-		}
-	}
 }
