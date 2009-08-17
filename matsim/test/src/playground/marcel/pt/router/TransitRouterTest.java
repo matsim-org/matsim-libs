@@ -20,15 +20,28 @@
 
 package playground.marcel.pt.router;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.LinkNetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
@@ -225,6 +238,161 @@ public class TransitRouterTest extends TestCase {
 		assertEquals(f.scenario.createId("16"), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
 		assertEquals(f.scenario.createId("blue A > I"), ptRoute.getRouteId());
+	}
+	
+	/**
+	 * In rare cases, Dijkstra may choose to go along two walk links to get from one location to another.
+	 * Test, that still only one walk leg with the correct start and end points/links is returned.
+	 * 
+	 * Generates the following network for testing:
+	 * <pre>
+	 *                (5)
+	 *                 |
+	 *                 3
+	 *                 |
+	 * (1)---1---(2)  (4)  (6)---4---(7)
+	 *                 |
+	 *                 2
+	 *                 |
+	 *                (3)
+	 * </pre>
+	 * Each link represents a transit line. Between the stops (2) and (4) and also
+	 * between (4) and (6) agents must walk.
+	 */
+	public void testDoubleWalk() {
+		ScenarioImpl scenario = new ScenarioImpl();
+		scenario.getConfig().scenario().setUseTransit(true);
+		TransitRouterConfig routerConfig = new TransitRouterConfig();
+		routerConfig.searchRadius = 500.0;
+		routerConfig.beelineWalkConnectionDistance = 100.0;
+		routerConfig.beelineWalkSpeed = 10.0; // so the agents can walk the distance in 10 seconds
+		
+		double x = 0;
+		Coord coord1 = scenario.createCoord(x, 0);
+		x += 1000;
+		Coord coord2 = scenario.createCoord(x, 0);
+		x += (routerConfig.beelineWalkConnectionDistance * 0.75);
+		Coord coord3 = scenario.createCoord(x, -1000);
+		Coord coord4 = scenario.createCoord(x, 0);
+		Coord coord5 = scenario.createCoord(x, 1000);
+		x += (routerConfig.beelineWalkConnectionDistance * 0.75);
+		Coord coord6 = scenario.createCoord(x, 0);
+		x += 1000;
+		Coord coord7 = scenario.createCoord(x, 0);
+		
+		// network
+		NetworkImpl network = scenario.getNetwork();
+		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
+		node1.setCoord(coord1);
+		NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(scenario.createId("2"));
+		node2.setCoord(coord2);
+		NodeImpl node3 = (NodeImpl) network.getBuilder().createNode(scenario.createId("3"));
+		node3.setCoord(coord3);
+		NodeImpl node4 = (NodeImpl) network.getBuilder().createNode(scenario.createId("4"));
+		node4.setCoord(coord4);
+		NodeImpl node5 = (NodeImpl) network.getBuilder().createNode(scenario.createId("5"));
+		node5.setCoord(coord5);
+		NodeImpl node6 = (NodeImpl) network.getBuilder().createNode(scenario.createId("6"));
+		node6.setCoord(coord6);
+		NodeImpl node7 = (NodeImpl) network.getBuilder().createNode(scenario.createId("7"));
+		node7.setCoord(coord7);
+		network.getNodes().put(node1.getId(), node1);
+		network.getNodes().put(node2.getId(), node2);
+		network.getNodes().put(node3.getId(), node3);
+		network.getNodes().put(node4.getId(), node4);
+		network.getNodes().put(node5.getId(), node5);
+		network.getNodes().put(node6.getId(), node6);
+		network.getNodes().put(node7.getId(), node7);
+		LinkImpl link1 = (LinkImpl) network.getBuilder().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		LinkImpl link2 = (LinkImpl) network.getBuilder().createLink(scenario.createId("2"), node3.getId(), node4.getId());
+		LinkImpl link3 = (LinkImpl) network.getBuilder().createLink(scenario.createId("3"), node4.getId(), node5.getId());
+		LinkImpl link4 = (LinkImpl) network.getBuilder().createLink(scenario.createId("4"), node6.getId(), node7.getId());
+		network.getLinks().put(link1.getId(), link1);
+		network.getLinks().put(link2.getId(), link2);
+		network.getLinks().put(link3.getId(), link3);
+		network.getLinks().put(link4.getId(), link4);
+		
+		// schedule
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleBuilder sb = schedule.getBuilder();
+		
+		TransitStopFacility stop1 = sb.createTransitStopFacility(scenario.createId("1"), coord1, false);
+		TransitStopFacility stop2 = sb.createTransitStopFacility(scenario.createId("2"), coord2, false);
+		TransitStopFacility stop3 = sb.createTransitStopFacility(scenario.createId("3"), coord3, false);
+		TransitStopFacility stop4 = sb.createTransitStopFacility(scenario.createId("4"), coord4, false);
+		TransitStopFacility stop5 = sb.createTransitStopFacility(scenario.createId("5"), coord5, false);
+		TransitStopFacility stop6 = sb.createTransitStopFacility(scenario.createId("6"), coord6, false);
+		TransitStopFacility stop7 = sb.createTransitStopFacility(scenario.createId("7"), coord7, false);
+		stop1.setLink(link1);
+		stop2.setLink(link1);
+		stop3.setLink(link2);
+		stop4.setLink(link2);
+		stop5.setLink(link3);
+		stop6.setLink(link4);
+		stop7.setLink(link4);
+		
+		{ // line 1
+			TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
+			{
+				NetworkRoute netRoute = new LinkNetworkRoute(link1, link1);
+				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
+				stops.add(sb.createTransitRouteStop(stop1, 0, 0));
+				stops.add(sb.createTransitRouteStop(stop2, 100, 100));
+				TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1a"), netRoute, stops, TransportMode.bus);
+				tRoute.addDeparture(sb.createDeparture(scenario.createId("1a1"), 1000));
+				tLine.addRoute(tRoute);
+			}
+			schedule.addTransitLine(tLine);
+		}
+
+		{ // line 2
+			TransitLine tLine = sb.createTransitLine(scenario.createId("2"));
+			{
+				NetworkRoute netRoute = new LinkNetworkRoute(link2, link3);
+				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(3);
+				stops.add(sb.createTransitRouteStop(stop3, 0, 0));
+				stops.add(sb.createTransitRouteStop(stop4, 100, 100));
+				stops.add(sb.createTransitRouteStop(stop5, 200, 200));
+				TransitRoute tRoute = sb.createTransitRoute(scenario.createId("2a"), netRoute, stops, TransportMode.bus);
+				tRoute.addDeparture(sb.createDeparture(scenario.createId("2a1"), 1000));
+				tLine.addRoute(tRoute);
+			}
+			schedule.addTransitLine(tLine);
+		}
+		
+		{ // line 3
+			TransitLine tLine = sb.createTransitLine(scenario.createId("3"));
+			{
+				NetworkRoute netRoute = new LinkNetworkRoute(link4, link4);
+				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
+				stops.add(sb.createTransitRouteStop(stop6, 0, 0));
+				stops.add(sb.createTransitRouteStop(stop7, 100, 100));
+				TransitRoute tRoute = sb.createTransitRoute(scenario.createId("3a"), netRoute, stops, TransportMode.train);
+				tRoute.addDeparture(sb.createDeparture(scenario.createId("3a1"), 1020));
+				tLine.addRoute(tRoute);
+			}
+			schedule.addTransitLine(tLine);
+		}
+		
+		// test
+		TransitRouter router = new TransitRouter(schedule, routerConfig);
+		List<Leg> legs = router.calcRoute(coord1, coord7, 990);
+		assertEquals(5, legs.size());
+		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		assertEquals(TransportMode.pt, legs.get(1).getMode());
+		assertEquals(stop1.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getAccessStopId());
+		assertEquals(stop2.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getEgressStopId());
+		assertEquals(stop1.getLinkId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getStartLinkId());
+		assertEquals(stop2.getLinkId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getEndLinkId());
+		assertEquals(TransportMode.walk, legs.get(2).getMode());
+		assertEquals(TransportMode.pt, legs.get(3).getMode());
+		assertEquals(stop2.getLinkId(), legs.get(2).getRoute().getStartLinkId());
+		assertEquals(stop6.getLinkId(), legs.get(2).getRoute().getEndLinkId());
+		assertEquals(stop6.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getAccessStopId());
+		assertEquals(stop7.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getEgressStopId());
+		assertEquals(stop6.getLinkId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getStartLinkId());
+		assertEquals(stop7.getLinkId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getEndLinkId());
+		assertEquals(TransportMode.walk, legs.get(4).getMode());
 	}
 
 }

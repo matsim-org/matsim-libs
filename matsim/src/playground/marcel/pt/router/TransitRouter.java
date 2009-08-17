@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +75,6 @@ public class TransitRouter {
 
 		this.ttCalculator = new TransitRouterNetworkTravelTimeCost(this.config);
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
-//		new NetworkWriter(transitNetwork, "transitNetwork.xml").write();
 	}
 
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
@@ -144,8 +144,8 @@ public class TransitRouter {
 					time = arrivalTime;
 					legs.add(leg);
 					transitLegCnt++;
+					accessStop = egressStop;
 				}
-				accessStop = egressStop;
 				line = null;
 				route = null;
 				transitRouteStart = null;
@@ -232,17 +232,22 @@ public class TransitRouter {
 		}
 		network.finishInit(); // not nice to call "finishInit" here before we added all links...
 
-		// connect all stops with walking links if they're located less than 100m from each other
+		List<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>> toBeAdded = new LinkedList<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>>();
+		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
 		for (TransitRouterNetworkNode node : network.getNodes().values()) {
 			if (node.getInLinks().size() > 0) { // only add links from this node to other nodes if agents actually can arrive here
-				for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCoord(), 100)) {
+				for (TransitRouterNetworkNode node2 : network.getNearestNodes(node.stop.getStopFacility().getCoord(), this.config.beelineWalkConnectionDistance)) {
 					if ((node != node2) && (node2.getOutLinks().size() > 0)) { // only add links to other nodes when agents can depart there
 						if ((node.line != node2.line) || (node.stop.getStopFacility() != node2.stop.getStopFacility())) {
-							network.createLink(node, node2, null, null);
+							// do not yet add them to the network, as this would change in/out-links
+							toBeAdded.add(new Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>(node, node2));
 						}
 					}
 				}
 			}
+		}
+		for (Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode> tuple : toBeAdded) {
+			network.createLink(tuple.getFirst(), tuple.getSecond(), null, null);
 		}
 
 		System.out.println("transit router network statistics:");
