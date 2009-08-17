@@ -1,7 +1,7 @@
 package playground.ciarif.retailers.data;
 
 import java.util.ArrayList;
-//import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.facilities.ActivityFacility;
@@ -10,7 +10,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 public class RetailZone {
 	
-	//private final static Logger log = Logger.getLogger(RetailZone.class);
+	private final static Logger log = Logger.getLogger(RetailZone.class);
 	
 	private Id id;
 	private QuadTree<PersonImpl> personsQuadTree;   

@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -29,13 +27,9 @@ public class LinksRetailerReader {
 	protected ArrayList<LinkRetailersImpl> freeLinks = new ArrayList<LinkRetailersImpl>();
 	private ArrayList<LinkRetailersImpl> currentLinks =  new ArrayList<LinkRetailersImpl>();
 	private Retailers retailers;
-	private final static Logger log = Logger.getLogger(LinksRetailerReader.class);
+	//private final static Logger log = Logger.getLogger(LinksRetailerReader.class);
 	
-	// Constructors
-	public LinksRetailerReader (Controler controler){
-		this.controler = controler;
-	}
-	
+	//Constructors
 	
 	public LinksRetailerReader(Controler controler, Retailers retailers) {
 		this.controler = controler;
@@ -52,72 +46,6 @@ public class LinksRetailerReader {
 	}
 	
 	
-	private void createFreeLinks() {
-		String freeLinksParameter = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS_PAR);
-		Integer newLinksMax = (Math.round(this.currentLinks.size()*Integer.parseInt(freeLinksParameter)));
-		
-		while (this.freeLinks.size()<(newLinksMax)) {
-			int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
-			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],controler.getNetwork());
-			if (currentLinks.contains(link.getId())) {}
-			else {	
-				this.freeLinks.add(link);
-				this.allLinks.add(link);
-			}		
-		}
-	}
-
-	public void readFreeLinks() {
-		
-			try {
-				
-				FileReader fr = new FileReader(this.linkIdFile);
-				BufferedReader br = new BufferedReader(fr);
-				// Skip header
-				String curr_line = br.readLine();
-				
-				while ((curr_line = br.readLine()) != null) {
-					String[] entries = curr_line.split("\t", -1);
-					// header: l_id  max_fac
-					// index:   0       1 
-					Id lId = new IdImpl (entries[0]);
-					LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLink(lId),controler.getNetwork());
-					// ciarif: if facilities are already on this link the number of already 
-					// existing facilities is compared with the max from the file. The larger is taken.
-					//TODO verify if it is still actual
-					if (l.getUpMapping().size()>(Integer.parseInt(entries[1]))) {
-						
-						l.setMaxFacOnLink(l.getUpMapping().size());
-					}
-					else {
-						l.setMaxFacOnLink(Integer.parseInt(entries[1]));
-					}
-					
-					this.freeLinks.add(l);
-					this.allLinks.add(l);
-				}
-			} 
-			catch (IOException e) {
-				Gbl.errorMsg(e);
-			}
-		}
-	
-	public void detectRetailersActualLinks(){
-		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
-		for (Retailer r:retailers.getRetailers().values()) {
-			for (ActivityFacility af: r.getFacilities().values()){
-				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)af.getLink(), controler.getNetwork());
-				links.add(link);
-			}
-		}
-		this.currentLinks=links;
-	}
-		
-	public ArrayList<LinkRetailersImpl> getFreeLinks() {
-		return this.freeLinks;
-	}
-
-
 	public void updateFreeLinks() {
 		
 		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
@@ -138,5 +66,75 @@ public class LinksRetailerReader {
 		}
 		links.removeAll(linksToRemove);
 		this.freeLinks=links;
+	}
+	
+	//private methods
+	
+	private void readFreeLinks() {
+		
+		try {
+			
+			FileReader fr = new FileReader(this.linkIdFile);
+			BufferedReader br = new BufferedReader(fr);
+			// Skip header
+			String curr_line = br.readLine();
+			
+			while ((curr_line = br.readLine()) != null) {
+				String[] entries = curr_line.split("\t", -1);
+				// header: l_id  max_fac
+				// index:   0       1 
+				Id lId = new IdImpl (entries[0]);
+				LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLink(lId),controler.getNetwork());
+				// ciarif: if facilities are already on this link the number of already 
+				// existing facilities is compared with the max from the file. The larger is taken.
+				//TODO verify if it is still actual
+				if (l.getUpMapping().size()>(Integer.parseInt(entries[1]))) {
+					
+					l.setMaxFacOnLink(l.getUpMapping().size());
+				}
+				else {
+					l.setMaxFacOnLink(Integer.parseInt(entries[1]));
+				}
+				
+				this.freeLinks.add(l);
+				this.allLinks.add(l);
+			}
+		} 
+		catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	private void detectRetailersActualLinks(){
+		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
+		for (Retailer r:retailers.getRetailers().values()) {
+			for (ActivityFacility af: r.getFacilities().values()){
+				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)af.getLink(), controler.getNetwork());
+				links.add(link);
+			}
+		}
+		this.currentLinks=links;
+	}
+		
+
+	private void createFreeLinks() {
+		String freeLinksParameterString = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS_PAR);
+		Double freeLinksParameterInt=Double.parseDouble(freeLinksParameterString);
+		Integer newLinksMax = (int)(Math.round(this.currentLinks.size()*freeLinksParameterInt));
+		
+		while (this.freeLinks.size()<(newLinksMax)) {
+			int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
+			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],controler.getNetwork());
+			if (currentLinks.contains(link.getId())) {}
+			else {	
+				this.freeLinks.add(link);
+				this.allLinks.add(link);
+			}		
+		}
+	}
+	
+	// get methods
+	public ArrayList<LinkRetailersImpl> getFreeLinks() {
+		return this.freeLinks;
 	}
 }

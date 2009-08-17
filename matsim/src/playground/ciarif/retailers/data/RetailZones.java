@@ -16,11 +16,7 @@ public class RetailZones {
 		if (retailZone == null) { return false; }
 		if (this.retailZones.containsKey(retailZone.getId())) { return false; }
 		this.retailZones.put(retailZone.getId(),retailZone);
-		//log.info("The zone " + retailZone.getId() + " has been added");
 		log.info("In the retail zone " + retailZone.getId() + " are living " + retailZone.getPersonsQuadTree().size() + " persons, and are based " + retailZone.getShopsQuadTree().size() + " shops");
-		//log.info("The number of sampled persons for this retail zone is " + retailZone.getSampledPersons().size() );*/
-		//log.info("In the retail zone " + retailZone.getId() + " are based " + retailZone.getShopsQuadTree().size() + " shops");
-		//log.info("The number of sampled shops for this retail zone is " + retailZone.getSampledShops().size() );
 		return true;
 	}
 	

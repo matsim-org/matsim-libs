@@ -48,14 +48,10 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRoute pcrl = null;
-	//private boolean sequential = false;
 	private boolean parallel = false;
-	private Map<Id, ActivityFacility> controlerFacilities;
 	private String facilityIdFile = null;
 	private Retailers retailers;
-	//private ArrayList<ActivityFacility> retailersFacilities = new ArrayList<ActivityFacility>();
 	private Controler controler;
-	private Map<Id, PersonImpl> persons;
 	private LinksRetailerReader lrr;
 	
 	// public methods
@@ -63,19 +59,15 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	public void notifyStartup(StartupEvent event) {
 		
 		this.controler = event.getControler();
-		this.controlerFacilities = controler.getFacilities().getFacilities();
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRoute(controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(preprocess));
-
-		this.controler = event.getControler();
-		this.controlerFacilities = controler.getFacilities().getFacilities();
-		this.persons = controler.getPopulation().getPersons();
+;
 		
 		//The characteristics of retailers are read
 		this.facilityIdFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_RETAILERS);
 		if (this.facilityIdFile == null) {throw new RuntimeException("In config file, param = "+CONFIG_RETAILERS+" in module = "+CONFIG_GROUP+" not defined!");}
 		else { 
-			this.retailers = new FileRetailerReader (this.controlerFacilities, this.facilityIdFile).readRetailers(this.controler);
+			this.retailers = new FileRetailerReader (controler.getFacilities().getFacilities(), this.facilityIdFile).readRetailers(this.controler);
 		}
 		
 		this.lrr = new LinksRetailerReader (controler, retailers);
@@ -92,12 +84,12 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
 		// The model is run only every "n" iterations
-		if (controler.getIteration()%30==0 && controler.getIteration()>0){
+		if (controler.getIteration()%2==0 && controler.getIteration()>0){
 			// TODO maybe need to add if sequential statement
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				r.runStrategy(lrr.getFreeLinks());
 				lrr.updateFreeLinks();
-				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), persons, pcrl);  
+				new ReRoutePersons().run(r.getMovedFacilities(), controler.getNetwork(), controler.getPopulation().getPersons(), pcrl);  
 			}
 		}
 	}

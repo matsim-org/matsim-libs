@@ -3,18 +3,16 @@ package playground.ciarif.retailers.stategies;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-//import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
+import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
-//import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-//import playground.ciarif.retailers.IO.WriteRetailersMatrices;
-import playground.ciarif.retailers.IO.WriteRetailersMatrices;
+//mport playground.ciarif.retailers.IO.WriteRetailersMatrices;
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
@@ -22,15 +20,16 @@ import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
 import playground.ciarif.retailers.models.GravityModel;
 import playground.ciarif.retailers.utils.Utils;
-//import playground.ciarif.retailers.utils.Utils;
-//import playground.jjoubert.Utilities.DateString;
-
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+//import playground.ciarif.retailers.utils.Utils;
+//import playground.jjoubert.Utilities.DateString;
+//import playground.ciarif.retailers.IO.WriteRetailersMatrices;
 
-public class GravityModelRetailerStrategy implements RetailerStrategy {
+public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO check the arguments that are passed from this class to 
+	//the GravityModel class, in particular if it is really necessary to pass the controler. 
 
-
+	//TODO have a look to variables here, it shouldn't happen that field here are the same as in the GravityModel class
 	public static final String NAME = "gravityModelRetailerStrategy";
 	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
 	private Controler controler;
@@ -39,10 +38,11 @@ public class GravityModelRetailerStrategy implements RetailerStrategy {
 	private Map<Id, ActivityFacility> retailerFacilities;
 	private Map<Id, ActivityFacility> movedFacilities = new TreeMap<Id, ActivityFacility>();
 
-	public GravityModelRetailerStrategy(Controler controler) {
+	public GravityModelRetailerStrategy(Controler controler) { //TODO think better if it is necessary to give to all strategies the controler
+		
 		this.controler = controler;
 	}
-
+	
 	private ArrayList<Integer> createInitialLocationsForGA (ArrayList<LinkRetailersImpl> links) {
 		
 		ArrayList<Integer> locations = new ArrayList<Integer> ();
@@ -67,7 +67,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy {
 		
 		int number_of_consumers = consumers.size();
 		int number_of_retailer_shops = retailerFacilities.size();
-		WriteRetailersMatrices wrm = new WriteRetailersMatrices ();
+		//WriteRetailersMatrices wrm = new WriteRetailersMatrices ();
 		DenseDoubleMatrix1D regressand_matrix = new DenseDoubleMatrix1D(number_of_consumers);
 	    if (regressand_matrix !=null) {log.info(" the regressand matrix has been created");}
 	    DenseDoubleMatrix2D variables_matrix = new DenseDoubleMatrix2D(number_of_consumers, 2);
@@ -102,13 +102,13 @@ public class GravityModelRetailerStrategy implements RetailerStrategy {
 	    }
 		
 	    log.info("A 'zero distance' has been detected and modified, in " + cases + " cases");
-	    wrm.writeRetailersMatrices(prob_zone_shop, "prob_zone_shop");
-	    wrm.writeRetailersMatrices(regressand_matrix, "regressand_matrix");
-	    wrm.writeRetailersMatrices(variables_matrix, "variables_matrix");
-	    //OLSMultipleLinearRegression olsmr = new OLSMultipleLinearRegression();
-	    //olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
-	    double[] b = {-1, 0.04};
-	    //double[] b = olsmr.estimateRegressionParameters();
+	    //wrm.writeRetailersMatrices(prob_zone_shop, "prob_zone_shop");
+	    //wrm.writeRetailersMatrices(regressand_matrix, "regressand_matrix");
+	    //wrm.writeRetailersMatrices(variables_matrix, "variables_matrix");
+	    OLSMultipleLinearRegression olsmr = new OLSMultipleLinearRegression();
+	    olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
+	    //double[] b = {-1, 0.04};
+	    double[] b = olsmr.estimateRegressionParameters();
 	    log.info("Betas = " + b[0] + " " + b[1]);
 
 	    return b;

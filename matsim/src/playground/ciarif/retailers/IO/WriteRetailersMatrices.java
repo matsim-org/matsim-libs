@@ -15,8 +15,8 @@ public class WriteRetailersMatrices {
 	}
 	public void writeRetailersMatrices (AbstractMatrix matrix, String filename) {
 		
-		//String outfile = "/scr/baug/ciarif/output/zurich_10pc/matrices/" + filename;
-		String outfile = "../../output/triangle/matrices/" + filename;
+		String outfile = "/scr_stardust/baug/ciarif/output/zurich_10pc/matrices/" + filename;
+		//String outfile = "../../output/triangle/matrices/" + filename;
 		
 		try {
 			fw = new FileWriter(outfile);
