@@ -36,6 +36,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * Leg distances are classified.
  * Only selected plans are considered.
  * 
+ * TODO use frequency distribution package from apache commons math for this analysis instead of implementing everything on my own
+ * 
  * @author meisterk
  *
  */
