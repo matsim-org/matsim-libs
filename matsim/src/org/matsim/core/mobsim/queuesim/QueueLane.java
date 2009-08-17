@@ -341,6 +341,9 @@ public class QueueLane {
 				return;
 			}
 
+			QueueSimulation.getEvents().processEvent(
+					new AgentWait2LinkEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
+			
 			boolean addToBuffer = true;
 			if (veh.getDriver() instanceof TransitDriverAgent) {
 				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
@@ -361,8 +364,6 @@ public class QueueLane {
 			if (addToBuffer) {
 				addToBuffer(veh, now);
 			}
-			QueueSimulation.getEvents().processEvent(
-					new AgentWait2LinkEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
 		}
 	}
 
