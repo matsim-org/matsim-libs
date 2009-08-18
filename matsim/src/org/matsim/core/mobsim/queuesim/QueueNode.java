@@ -106,7 +106,19 @@ public class QueueNode {
 				throw new RuntimeException("Cannot move vehicle " + veh.getId() +
 						" from link " + currentLink.getId() + " to link " + nextLink.getId());
 			}
-
+			if ((!currentLane.isOriginalLane()) && (!currentLane.getDestinationLinks().contains(nextLink))) {
+				StringBuilder b = new StringBuilder();
+				b.append("Link Id ");
+				b.append(nextLink.getId());
+				b.append(" is not accessible from lane id ");
+				b.append(currentLane.getLaneId());
+				b.append(" on Link Id " );
+				b.append(currentLink.getId());
+				b.append(". Check the definition of the lane and add the link as toLink!");
+				log.error(b.toString());
+				throw new IllegalStateException(b.toString());
+			}
+			
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
 
 			if (nextQueueLink.hasSpace()) {

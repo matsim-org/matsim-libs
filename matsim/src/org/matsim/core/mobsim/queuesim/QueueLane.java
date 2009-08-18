@@ -622,6 +622,10 @@ public class QueueLane {
 	public Queue<QueueVehicle> getVehiclesInBuffer() {
 		return this.buffer;
 	}
+	
+	protected boolean isOriginalLane() {
+		return this.originalLane;
+	}
 
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
