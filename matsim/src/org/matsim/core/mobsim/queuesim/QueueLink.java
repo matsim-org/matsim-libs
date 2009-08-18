@@ -247,8 +247,8 @@ public class QueueLink {
 		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
 		for (QueueLane lane : this.queueLanes) {
 			int laneNumber = 1;
-			for (Link link : result.values()) {
-				if (lane.getDestinationLinks().contains(link)){
+			for (Link l : result.values()) {
+				if (lane.getDestinationLinks().contains(l)){
 					lane.setVisualizerLane(laneNumber);
 					break;
 				}
