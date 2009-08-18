@@ -43,7 +43,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
-	public EventsToFacilityLoad(final ActivityFacilities facilities, int scaleNumberOfPersons,
+	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super();
 		

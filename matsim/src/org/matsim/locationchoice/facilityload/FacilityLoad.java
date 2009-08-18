@@ -28,31 +28,31 @@ public class FacilityLoad {
 	
 	private int [] arrivals = null;
 	private int [] departures = null;
-	private int [] load = null;
+	private double [] load = null;
 	
 	private int numberOfTimeBins = 0;
 	
 	// visitors which are included in the penalty calculation (arrival before 24:00)
-	private int numberOfVisitorsPerDay = 0;
+	private double numberOfVisitorsPerDay = 0.0;
 	
 	// including also visitors which arrive after 24:00
-	private int allVisitors = 0;
+	private double allVisitors = 0.0;
 	
-	private int scaleNumberOfPersons = 1;
+	private double scaleNumberOfPersons = 1.0;
 	
 	// ----------------------------------------------------------------------
 		
-	FacilityLoad(int numberOfTimeBins, int scaleNumberOfPersons) {
+	FacilityLoad(int numberOfTimeBins, double scaleNumberOfPersons) {
 		this.numberOfTimeBins = numberOfTimeBins;
 		this.arrivals = new int [numberOfTimeBins];
 		this.departures = new int [numberOfTimeBins];
-		this.load = new int [numberOfTimeBins];
+		this.load = new double [numberOfTimeBins];
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 
 		for (int i = 0; i < numberOfTimeBins; i++){
 			this.arrivals[i] = 0;
 			this.departures[i] = 0;
-			this.load[i] = 0;
+			this.load[i] = 0.0;
 		}
 	}
 	
@@ -92,19 +92,15 @@ public class FacilityLoad {
 		//log.info("departure at: " + time + " bin: " + timeBinIndex);
 	}
 	
-	public void addToAllVisitors(int scaleNumberOfPersons) {
+	public void addToAllVisitors(double scaleNumberOfPersons) {
 		this.allVisitors += scaleNumberOfPersons;
 	}
 	
-	public void addToVisitorsPerDay(int scaleNumberOfPersons) {
+	public void addToVisitorsPerDay(double scaleNumberOfPersons) {
 		this.numberOfVisitorsPerDay += scaleNumberOfPersons;
 	}
 
-	public void setLoad(int [] load) {
-		this.load = load;
-	}
-
-	public int [] getLoad() {
+	public double [] getLoad() {
 		return load;
 	}
 	
@@ -118,20 +114,12 @@ public class FacilityLoad {
 		return hourlyLoad/4;
 	}
 	
-	public int getNumberOfVisitorsPerDay() {
+	public double getNumberOfVisitorsPerDay() {
 		return numberOfVisitorsPerDay;
 	}
 
-	public void setNumberOfVisitorsPerDay(int numberOfVisitorsPerDay) {
-		this.numberOfVisitorsPerDay = numberOfVisitorsPerDay;
-	}
-
-	public int getAllVisitors() {
+	public double getAllVisitors() {
 		return this.allVisitors;
-	}
-
-	public void setAllVisitors(int allVisitors) {
-		this.allVisitors = allVisitors;
 	}
 
 	public void finish() {
@@ -143,10 +131,10 @@ public class FacilityLoad {
 		for (int i=0; i<this.numberOfTimeBins; i++) {
 			this.arrivals[i] = 0;
 			this.departures[i] = 0;
-			this.load[i] = 0;
+			this.load[i] = 0.0;
 		}
-		this.numberOfVisitorsPerDay = 0;
-		this.allVisitors = 0;
+		this.numberOfVisitorsPerDay = 0.0;
+		this.allVisitors = 0.0;
 	}
 	
 	/* 

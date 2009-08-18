@@ -49,12 +49,6 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	private EventsToFacilityLoad eventsToFacilityLoad;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
 	
-	/* 
-	 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers 
-	 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
-	 */ 
-	private int scaleNumberOfPersons = 1;
-	
 	//--------------------------------------------------------------------------------------------------
 
 	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
@@ -64,8 +58,12 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.scaleNumberOfPersons = Integer.parseInt(Gbl.getConfig().locationchoice().getScaleFactor());
-		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons,
+		/* 
+		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers 
+		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
+		 */ 
+		double scaleNumberOfPersons = Double.parseDouble(Gbl.getConfig().locationchoice().getScaleFactor());
+		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), scaleNumberOfPersons,
 				this.facilityPenalties);
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
 	}

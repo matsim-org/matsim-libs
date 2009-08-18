@@ -43,12 +43,12 @@ public class FacilityPenalty {
 	private FacilityLoad facilityLoad;
 	private double capacity = 0.0;
 	private static int numberOfTimeBins = 4*24;
-	private int scaleNumberOfPersons = 1;
+	private double scaleNumberOfPersons = 1;
 	private double sumCapacityPenaltyFactor = 0.0;	
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;
 	
-	FacilityPenalty(double minCapacity, int scaleNumberOfPersons) {
+	FacilityPenalty(double minCapacity, double scaleNumberOfPersons) {
 		this.capacity = minCapacity;
 		this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
 		this.scaleNumberOfPersons = scaleNumberOfPersons;		
@@ -58,7 +58,7 @@ public class FacilityPenalty {
 		
 	private double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 		
-		int [] facilityload = this.facilityLoad.getLoad();
+		double [] facilityload = this.facilityLoad.getLoad();
 		double capPenaltyFactor = 0.0;
 				
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
