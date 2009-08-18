@@ -32,8 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -61,7 +59,7 @@ public class AnalyzeFacilities {
 		
 	public void run(ActivityFacilities facilities) {
 		this.facilities = facilities;
-		this.write("./output/valid/facilities/");
+		this.write("./output/facilities/");
 		log.info("finished");
 	}
 	
