@@ -93,8 +93,7 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 		else {
 			throw new IllegalStateException("CycleTime is not set for SignalSystemConfiguration of SignalSystem Id:  " + this.config.getSignalSystemId());
 		}
-		//TODO remove 1 + and set therefore <= comparison
-		int currentSecondInPlan = 1 + ((int) (time % cycleTime));
+		int currentSecondInPlan = ((int) (time % cycleTime));
 
 		int roughcast, dropping, endIntergreenRc, endIntergreenDrop;
 		SignalGroupState currentState, newState;
@@ -105,14 +104,14 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 			dropping = sgc.getDropping();
 			endIntergreenRc = roughcast + sgc.getInterimGreenTimeRoughcast();
 			endIntergreenDrop = dropping + sgc.getInterGreenTimeDropping();
-			if ((roughcast < currentSecondInPlan) && 
-					(currentSecondInPlan <=  endIntergreenRc)) {
+			if ((roughcast <= currentSecondInPlan) && 
+					(currentSecondInPlan <  endIntergreenRc)) {
 				newState = SignalGroupState.REDYELLOW;
 			}
-			else if ((endIntergreenRc < currentSecondInPlan) && (currentSecondInPlan <= dropping)) {
+			else if ((endIntergreenRc <= currentSecondInPlan) && (currentSecondInPlan < dropping)) {
 				newState = SignalGroupState.GREEN;
 			}
-			else if ((dropping < currentSecondInPlan) && (currentSecondInPlan <= endIntergreenDrop)) {
+			else if ((dropping <= currentSecondInPlan) && (currentSecondInPlan < endIntergreenDrop)) {
 				newState = SignalGroupState.YELLOW;
 			}
 			else {
