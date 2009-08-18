@@ -7,18 +7,22 @@ import org.matsim.core.gbl.Gbl;
 public class ParametersPSF {
 
 	private static final Logger log = Logger.getLogger(ParametersPSF.class);
-	
+
 	private static String PSFModule = "PSF";
 
 	// default parameters
-	private static String default_maxBatteryCapacity = "default.maxBatteryCapacity"; 
+	private static String default_maxBatteryCapacity = "default.maxBatteryCapacity";
 	private static double defaultMaxBatteryCapacity;
 	// in [J]
 	private static String default_chargingPowerAtParking = "default.chargingPowerAtParking";
 	private static double defaultChargingPowerAtParking;
 	// in [W]
-	
+
 	// testing parameters
+
+	private static String testing_ModeOn = "testingModeOn";
+	private static boolean testingModeOn = false;
+
 	private static String testing_energyConsumptionPerLink = "testing.energyConsumptionPerLink";
 	private static double testingEnergyConsumptionPerLink;
 	// in [J]
@@ -31,97 +35,120 @@ public class ParametersPSF {
 	private static String testing_lowTariffElectrictyPrice = "testing.lowTariffElectrictyPrice";
 	private static double testingLowTariffElectrictyPrice;
 	// in utils/J lowTariff: from 20:00 to 07:00
-	
-	public static void readConfigParamters() {
+
+	public static void readConfigParamters(Controler controler) {
 		String tempStringValue;
-		
-		tempStringValue = Gbl.getConfig().findParam(PSFModule, default_maxBatteryCapacity);
-		if (tempStringValue!=null){
-			defaultMaxBatteryCapacity =  Double.parseDouble(tempStringValue);
+
+		tempStringValue = controler.getConfig().findParam(PSFModule, default_maxBatteryCapacity);
+		if (tempStringValue != null) {
+			defaultMaxBatteryCapacity = Double.parseDouble(tempStringValue);
 		} else {
 			errorReadingParameter(default_maxBatteryCapacity);
 		}
-		
-		tempStringValue = Gbl.getConfig().findParam(PSFModule, default_chargingPowerAtParking);
-		if (tempStringValue!=null){
-			defaultChargingPowerAtParking =  Double.parseDouble(tempStringValue);
+
+		tempStringValue = controler.getConfig().findParam(PSFModule, default_chargingPowerAtParking);
+		if (tempStringValue != null) {
+			defaultChargingPowerAtParking = Double.parseDouble(tempStringValue);
 		} else {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
-		
-		tempStringValue = Gbl.getConfig().findParam(PSFModule, testing_energyConsumptionPerLink);
-		if (tempStringValue!=null){
-			testingEnergyConsumptionPerLink =  Double.parseDouble(tempStringValue);
+
+		tempStringValue = controler.getConfig().findParam(PSFModule, testing_ModeOn);
+		if (tempStringValue != null) {
+			testingModeOn = Boolean.parseBoolean(tempStringValue);
 		} else {
-			errorReadingParameter(testing_energyConsumptionPerLink);
+			errorReadingParameter(default_chargingPowerAtParking);
 		}
-		
-		tempStringValue = Gbl.getConfig().findParam(PSFModule, testing_maxEnergyPriceWillingToPay);
-		if (tempStringValue!=null){
-			testingMaxEnergyPriceWillingToPay =  Double.parseDouble(tempStringValue);
-		} else {
-			errorReadingParameter(testing_maxEnergyPriceWillingToPay);
-		}
-		
-		tempStringValue = Gbl.getConfig().findParam(PSFModule, testing_peakHourElectricityPrice);
-		if (tempStringValue!=null){
-			testingPeakHourElectricityPrice =  Double.parseDouble(tempStringValue);
-		} else {
-			errorReadingParameter(testing_peakHourElectricityPrice);
-		}
-		
-		tempStringValue = Gbl.getConfig().findParam(PSFModule, testing_lowTariffElectrictyPrice);
-		if (tempStringValue!=null){
-			testingLowTariffElectrictyPrice =  Double.parseDouble(tempStringValue);
-		} else {
-			errorReadingParameter(testing_lowTariffElectrictyPrice);
+
+		if (testingModeOn) {
+			tempStringValue = controler.getConfig().findParam(PSFModule, testing_energyConsumptionPerLink);
+			if (tempStringValue != null) {
+				testingEnergyConsumptionPerLink = Double.parseDouble(tempStringValue);
+			} else {
+				errorReadingParameter(testing_energyConsumptionPerLink);
+			}
+
+			tempStringValue = controler.getConfig().findParam(PSFModule, testing_maxEnergyPriceWillingToPay);
+			if (tempStringValue != null) {
+				testingMaxEnergyPriceWillingToPay = Double.parseDouble(tempStringValue);
+			}else {
+				errorReadingParameter(testing_maxEnergyPriceWillingToPay);
+			}
+
+			tempStringValue = controler.getConfig().findParam(PSFModule, testing_peakHourElectricityPrice);
+			if (tempStringValue != null) {
+				testingPeakHourElectricityPrice = Double.parseDouble(tempStringValue);
+			}else {
+				errorReadingParameter(testing_peakHourElectricityPrice);
+			}
+
+			tempStringValue = controler.getConfig().findParam(PSFModule, testing_lowTariffElectrictyPrice);
+			if (tempStringValue != null) {
+				testingLowTariffElectrictyPrice = Double.parseDouble(tempStringValue);
+			}else {
+				errorReadingParameter(testing_lowTariffElectrictyPrice);
+			}
 		}
 	}
-	
-	private static void errorReadingParameter(String parameterName){
-		log.error("parameter '"+ parameterName +"' could not be read");
+
+	private static void errorReadingParameter(String parameterName) {
+		log.error("parameter '" + parameterName + "' could not be read");
 	}
 
-
-
-	public String getPSFModule() {
-		return PSFModule;
-	}
-	
-
-
-	public double getDefaultMaxBatteryCapacity() {
+	public static double getDefaultMaxBatteryCapacity() {
 		return defaultMaxBatteryCapacity;
 	}
 
+	public static void setDefaultMaxBatteryCapacity(double defaultMaxBatteryCapacity) {
+		ParametersPSF.defaultMaxBatteryCapacity = defaultMaxBatteryCapacity;
+	}
 
-
-	public double getDefaultChargingPowerAtParking() {
+	public static double getDefaultChargingPowerAtParking() {
 		return defaultChargingPowerAtParking;
 	}
 
+	public static void setDefaultChargingPowerAtParking(double defaultChargingPowerAtParking) {
+		ParametersPSF.defaultChargingPowerAtParking = defaultChargingPowerAtParking;
+	}
 
+	public static boolean isTestingModeOn() {
+		return testingModeOn;
+	}
 
-	public double getTestingEnergyConsumptionPerLink() {
+	public static void setTestingModeOn(boolean testingModeOn) {
+		ParametersPSF.testingModeOn = testingModeOn;
+	}
+
+	public static double getTestingEnergyConsumptionPerLink() {
 		return testingEnergyConsumptionPerLink;
 	}
 
+	public static void setTestingEnergyConsumptionPerLink(double testingEnergyConsumptionPerLink) {
+		ParametersPSF.testingEnergyConsumptionPerLink = testingEnergyConsumptionPerLink;
+	}
 
-
-	public double getTestingMaxEnergyPriceWillingToPay() {
+	public static double getTestingMaxEnergyPriceWillingToPay() {
 		return testingMaxEnergyPriceWillingToPay;
 	}
 
+	public static void setTestingMaxEnergyPriceWillingToPay(double testingMaxEnergyPriceWillingToPay) {
+		ParametersPSF.testingMaxEnergyPriceWillingToPay = testingMaxEnergyPriceWillingToPay;
+	}
 
-
-	public double getTestingPeakHourElectricityPrice() {
+	public static double getTestingPeakHourElectricityPrice() {
 		return testingPeakHourElectricityPrice;
 	}
 
+	public static void setTestingPeakHourElectricityPrice(double testingPeakHourElectricityPrice) {
+		ParametersPSF.testingPeakHourElectricityPrice = testingPeakHourElectricityPrice;
+	}
 
-
-	public double getTestingLowTariffElectrictyPrice() {
+	public static double getTestingLowTariffElectrictyPrice() {
 		return testingLowTariffElectrictyPrice;
+	}
+
+	public static void setTestingLowTariffElectrictyPrice(double testingLowTariffElectrictyPrice) {
+		ParametersPSF.testingLowTariffElectrictyPrice = testingLowTariffElectrictyPrice;
 	}
 
 }

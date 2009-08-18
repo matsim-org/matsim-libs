@@ -3,6 +3,8 @@ package playground.wrashid.PSF.parking;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
+import playground.wrashid.PSF.ParametersPSF;
+
 public class ParkingInfo {
 
 	/*
@@ -20,11 +22,12 @@ public class ParkingInfo {
 	 */
 	public static double getParkingElectricityPower(Id facilityId) {
 		
-		// TODO: incorporate also possibility of individual charging power plugs at each parking facility
-		String defaultChargingPowerAtParking = Gbl.getConfig().findParam("PSF", "default.chargingPowerAtParking");
-		if (defaultChargingPowerAtParking!=null){
-			return Double.parseDouble(defaultChargingPowerAtParking);
+		// testing scenario
+		if (ParametersPSF.isTestingModeOn()){
+			return ParametersPSF.getDefaultChargingPowerAtParking();
 		}
+		
+		// TODO: incorporate also possibility of individual charging power plugs at each parking facility
 		
 		return 0.0;
 	}

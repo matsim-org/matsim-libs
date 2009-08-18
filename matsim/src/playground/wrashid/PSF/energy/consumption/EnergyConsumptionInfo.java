@@ -5,6 +5,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
+import playground.wrashid.PSF.ParametersPSF;
+
 public class EnergyConsumptionInfo {
 
 	/*
@@ -12,10 +14,9 @@ public class EnergyConsumptionInfo {
 	 */
 	public static double getEnergyConsumption(Link link, double travelTime, int vehicleType){
 		
-		// if a test is running, just use this simplistic value for the energy consumption
-		String testingEnergyConsumptionPerLink = Gbl.getConfig().findParam("PSF", "testing.EnergyConsumptionPerLink");
-		if (testingEnergyConsumptionPerLink!=null){
-			return Double.parseDouble(testingEnergyConsumptionPerLink);
+		// testing scenrario
+		if (ParametersPSF.isTestingModeOn()){
+			return ParametersPSF.getTestingEnergyConsumptionPerLink();
 		}
 		
 		

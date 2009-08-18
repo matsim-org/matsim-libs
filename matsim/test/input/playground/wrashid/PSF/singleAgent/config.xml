@@ -90,8 +90,11 @@
 		<param name="default.maxBatteryCapacity" value="36000000" /> <!-- in [J]  -->
 		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
 	
-		<param name="testing.EnergyConsumptionPerLink" value="100000" /> <!-- in Joule [J] -->
-		<param name="testing.MaxEnergyPriceWillingToPay" value="1" /> <!-- in utils per [J]  -->
+		<param name="testingModeOn" value="true" /> <!-- this is the main switch for all testing values -->
+		
+	
+		<param name="testing.energyConsumptionPerLink" value="100000" /> <!-- in Joule [J] -->
+		<param name="testing.maxEnergyPriceWillingToPay" value="1" /> <!-- in utils per [J]  -->
 		
 		
 		<param name="testing.peakHourElectricityPrice" value="0.8" /> <!-- in utils/J peakHour: from 07:00 to 20:00  -->
