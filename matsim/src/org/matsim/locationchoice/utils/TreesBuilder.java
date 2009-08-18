@@ -139,6 +139,7 @@ public class TreesBuilder {
 		}
 		log.info("    done");
 		Gbl.printRoundTime();
+		Gbl.printMemoryUsage();
 		return quadtree;
 	}
 
