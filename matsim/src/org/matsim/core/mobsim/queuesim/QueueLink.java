@@ -206,9 +206,10 @@ public class QueueLink {
 					throw new IllegalStateException(message);
 			}
 		}
+		initToNodeQueueLanes();
+		Collections.sort(this.queueLanes, QueueLink.fromLinkEndComparator);
 		findLayout();
 		addUTurn();
-		resortQueueLanes();
 	}
 
 	public List<QueueLane> getToNodeQueueLanes() {
@@ -261,7 +262,7 @@ public class QueueLink {
 		for (LinkImpl outLink : this.getLink().getToNode().getOutLinks().values()) {
 			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
 				QueueLane tempLane = null;
-				for (QueueLane l : this.queueLanes) {
+				for (QueueLane l : this.toNodeQueueLanes) {
 					if ((tempLane == null) ||
 							((l.getVisualizerLane() == 1) && (l.getMeterFromLinkEnd() == 0))) {
 						tempLane = l;
@@ -273,14 +274,13 @@ public class QueueLink {
 		}
 	}
 
-	private void resortQueueLanes() {
+	private void initToNodeQueueLanes() {
 		this.toNodeQueueLanes = new ArrayList<QueueLane>();
-		for (QueueLane pseudoLink : this.queueLanes) {
-			if (pseudoLink.getMeterFromLinkEnd() == 0.0) {
-				this.toNodeQueueLanes.add(pseudoLink);
+		for (QueueLane l : this.queueLanes) {
+			if (l.getMeterFromLinkEnd() == 0.0) {
+				this.toNodeQueueLanes.add(l);
 			}
 		}
-		Collections.sort(this.queueLanes, QueueLink.fromLinkEndComparator);
 	}
 
 	/** Is called after link has been read completely */
