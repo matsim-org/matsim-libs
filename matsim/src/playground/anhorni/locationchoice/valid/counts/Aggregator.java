@@ -12,7 +12,7 @@ public class Aggregator {
 	
 	//private final static Logger log = Logger.getLogger(Aggregator.class);
 	
-	private TreeMap<Integer, List<Double>> volumes;
+	private TreeMap<Integer, List<Double>> volumes = new TreeMap<Integer, List<Double>>();
 		
 	private double [] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
