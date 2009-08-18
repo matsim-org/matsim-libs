@@ -137,11 +137,11 @@ public class EnergyBalance {
 			int maxTimeSlotNumber, int parkingIndex) {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
-			double time=parkingTimes.get(parkingIndex).getStartParkingTime() + j * 900;
+			double time= Math.floor(parkingTimes.get(parkingIndex).getStartParkingTime()/900)*900 + j * 900;
 			tempPrice = EnergyChargingInfo.getEnergyPrice(time,
 					parkingTimes.get(parkingIndex).getFacilityId());
 
-			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j,parkingIndex,time, parkingTimes.get(parkingIndex).getFacilityId(), parkingTimes.get(parkingIndex).getEndParkingTime());
+			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j,parkingIndex,time, parkingTimes.get(parkingIndex).getFacilityId(),parkingTimes.get(parkingIndex).getStartParkingTime(), parkingTimes.get(parkingIndex).getEndParkingTime());
 			chargingPrice.add(tempFacilityChPrice);
 		}
 	}
@@ -162,7 +162,7 @@ public class EnergyBalance {
 		// TODO: this needs to come from input parameter...
 		double minEnergyLevelToCharge=batteryCapacity;
 		
-		// after the last parking, we must have reached 'minEnergyLevelToCharge'
+		// at home the car must have reached 'minEnergyLevelToCharge'
 		while (maxChargableEnergy.get(maxChargableEnergy.size()-1)>0){
 			FacilityChargingPrice bestEnergyPrice=chargingPrice.poll();
 			

@@ -14,6 +14,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	private double slotStartTime; // for finding out the bin / charge log
 	private Id facilityId;
 	private double endParkingTime;
+	private double startParkingTime;
 
 	/*
 	 * the time starts with the first car leg of the person. When the car is
@@ -34,7 +35,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	}
 
 	public FacilityChargingPrice(double price, int timeSlotNumber, int energyBalanceParkingIndex, double slotStartTime,
-			Id facilityId, double endParkingTime) {
+			Id facilityId, double startParkingTime, double endParkingTime) {
 		super();
 		this.price = price;
 		this.timeSlotNumber = timeSlotNumber;
@@ -42,6 +43,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		this.slotStartTime = slotStartTime;
 		this.facilityId = facilityId;
 		this.endParkingTime = endParkingTime;
+		this.startParkingTime = startParkingTime;
 	}
 
 	public int compareTo(FacilityChargingPrice otherChargingPrice) {
@@ -64,14 +66,16 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	}
 
 	public ChargeLog getChargeLog(double maxChargableEnergy) {
-		double startChargingTime = slotStartTime;
+		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
 
 		return new ChargeLog(facilityId, startChargingTime, getEndTimeOfCharge(maxChargableEnergy));
 	}
 
 	// how much energy will be charged through this slot and facility
 	public double getEnergyCharge(double maxChargableEnergy) {
-		return ParkingInfo.getParkingElectricityPower(facilityId) * (getEndTimeOfCharge(maxChargableEnergy) - slotStartTime);
+		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
+		
+		return ParkingInfo.getParkingElectricityPower(facilityId) * (getEndTimeOfCharge(maxChargableEnergy) - startChargingTime);
 	}
 
 	/*
@@ -79,23 +83,45 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	 */
 	private double getEndTimeOfCharge(double energyNeeded) {
 
+		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
+		
 		// how much time would be needed to charge the car fully at the current
 		// parking
 		double durationNeededForRequiredCharging = energyNeeded / ParkingInfo.getParkingElectricityPower(facilityId);
 
 		// by default, we use the whole slot for charging
-		double endTimeOfCharge = slotStartTime + 900;
+		double endTimeOfCharge = startChargingTime + 900;
 
-		// we cannot charge longer than we are parked there
-		if (endParkingTime < endTimeOfCharge) {
-			endTimeOfCharge = endParkingTime;
-		}
+		
+		// the last (home) parking - parking ending after midnight
+		if (slotStartTime>endParkingTime){
+			
+			// the full time slot is available for charging, we do not need to make the check
+			
+			// if still, we do not need the whole slot for charging (car needs less
+			// energy)
+			if (endTimeOfCharge > startChargingTime + durationNeededForRequiredCharging) {
+				endTimeOfCharge = startChargingTime + durationNeededForRequiredCharging;
+			}
+			
+			
+		} else {
+		
+			// all other parking during the day
+			
+			// we cannot charge longer than we are parked there
+			if (endParkingTime < endTimeOfCharge) {
+				endTimeOfCharge = endParkingTime;
+			}
 
-		// still, we do not need the whole slot for charging (car needs less
-		// energy)
-		if (endParkingTime > slotStartTime + durationNeededForRequiredCharging) {
-			endTimeOfCharge = slotStartTime + durationNeededForRequiredCharging;
+			// if still, we do not need the whole slot for charging (car needs less
+			// energy)
+			if (endParkingTime > startChargingTime + durationNeededForRequiredCharging) {
+				endTimeOfCharge = startChargingTime + durationNeededForRequiredCharging;
+			}
 		}
+		
+		
 
 		return endTimeOfCharge;
 	}

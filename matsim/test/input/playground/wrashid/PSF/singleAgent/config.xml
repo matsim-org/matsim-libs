@@ -90,7 +90,7 @@
 		<param name="default.maxBatteryCapacity" value="36000000" /> <!-- in [J]  -->
 		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
 	
-		<param name="testing.EnergyConsumptionPerLink" value="1.0" /> <!-- in Joule [J] -->
+		<param name="testing.EnergyConsumptionPerLink" value="100000" /> <!-- in Joule [J] -->
 		<param name="testing.MaxEnergyPriceWillingToPay" value="1" /> <!-- in utils per [J]  -->
 		
 		

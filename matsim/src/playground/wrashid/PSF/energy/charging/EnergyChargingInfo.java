@@ -23,7 +23,7 @@ public class EnergyChargingInfo {
 		String testingPeakHourElectricityPrice = Gbl.getConfig().findParam("PSF", "testing.peakHourElectricityPrice");
 		String testingLowTariffElectrictyPrice = Gbl.getConfig().findParam("PSF", "testing.lowTariffElectrictyPrice");
 		if (testingPeakHourElectricityPrice!=null || testingLowTariffElectrictyPrice!=null){
-			if (time<25200 || time>72000){
+			if (time<25200 || time>=72000){
 				// if low tariff
 				return Double.parseDouble(testingLowTariffElectrictyPrice) ;
 			} else{

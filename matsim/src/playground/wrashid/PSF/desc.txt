@@ -1,2 +1,9 @@
 Change name of framework to TESF (Transportation Energy Simulation Framework) or 
 MESF (Mobility Energy Simulation Framework).
+
+
+
+next:
+- use static parameters, which can be set in an initialization routine => this way new tests can be added easily.
+
+- add general charging cases also...

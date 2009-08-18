@@ -42,10 +42,16 @@ public class BasicTests extends MatsimTestCase {
 		ChargingTimes chargingTimesOfAgentOne=chargingTimes.get(new IdImpl("1"));
 		ChargeLog chargeLogOfAgentOne=chargingTimesOfAgentOne.getChargingTimes().get(0);
 		
-		
+		// the first charging opportunity at work is used (it has low tariff)
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989,1);
-		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 1111111111); // don't know this year, must calculate it...
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 23104,1);
 		
+		chargeLogOfAgentOne=chargingTimesOfAgentOne.getChargingTimes().get(1);
+		
+		// when the vehicle arrives at home, there is high tariff, therefore the vehicle doesn't start charging
+		// immediately, but waits until low tariff starts)
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 72000,1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 72085,1);
 	}
 	
 	public void testLogParkingTime() {
@@ -68,6 +74,8 @@ public class BasicTests extends MatsimTestCase {
 		// allow small delta of one second (because the output time in the log file is truncated
 		assertEquals(parkingTimes.getFirstParkingDepartTime(),21610,1);
 		assertEquals(parkingTimes.getLastParkingArrivalTime(),61449,1);
+		
+		
 		
 		
 		ParkLog parkLog=parkingTimes.getParkingTimes().get(0);
