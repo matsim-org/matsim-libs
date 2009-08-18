@@ -23,11 +23,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -151,7 +153,7 @@ public class QueueLane {
 	/**
 	 * Contains all Link instances which are reachable from this lane
 	 */
-	private final List<Link> destinationLinks = new ArrayList<Link>();
+	private final Set<Link> destinationLinks = new LinkedHashSet<Link>();
 
 	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
 
@@ -488,22 +490,38 @@ public class QueueLane {
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
 			QueueVehicle veh = this.buffer.peek();
 			Link nextLink = veh.getDriver().chooseNextLink();
-			if (nextLink != null) {
-				for (QueueLane toQueueLane : this.toLanes) {
-					for (Link qLink : toQueueLane.getDestinationLinks()) {
-						if (qLink.equals(nextLink)) {
-							if (toQueueLane.hasSpace()) {
-								this.buffer.poll();
-								QueueSimulation.getEvents().processEvent(
-										new LaneLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
-								toQueueLane.add(veh, now);
-							} else
-								moveOn = false;
-						}
-					}
+			QueueLane toQueueLane = null;
+			for (QueueLane l : this.toLanes) {
+				if (l.getDestinationLinks().contains(nextLink)) {
+					toQueueLane = l;
 				}
 			}
-		}
+			if (toQueueLane != null) {
+				if (toQueueLane.hasSpace()) {
+					this.buffer.poll();
+					QueueSimulation.getEvents().processEvent(
+							new LaneLeaveEvent(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
+					toQueueLane.add(veh, now);
+				}
+				else {
+					moveOn = false;
+				}
+			}
+			else {
+				StringBuilder b = new StringBuilder();
+				b.append("Person Id: ");
+				b.append(veh.getDriver().getPerson().getId());
+				b.append(" is on Lane Id ");
+				b.append(this.laneId);
+				b.append(" on Link Id ");
+				b.append(this.queueLink.getLink().getId());
+				b.append(" and wants to go on to Link Id ");
+				b.append(nextLink.getId());
+				b.append(" but there is no Lane leading to that Link!");
+				log.error(b.toString());
+				throw new IllegalStateException(b.toString());
+			}
+		} // end while
 	}
 
 	private void updateBufferCapacity() {
@@ -956,7 +974,7 @@ public class QueueLane {
 		this.destinationLinks.add(l);
 	}
 
-	protected List<Link> getDestinationLinks(){
+	protected Set<Link> getDestinationLinks(){
 		return this.destinationLinks;
 	}
 
