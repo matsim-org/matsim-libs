@@ -21,6 +21,8 @@ package org.matsim.core.config.consistency;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 
 
 /**
@@ -34,31 +36,52 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 			.getLogger(ConfigConsistencyCheckerImpl.class);
 	
 	public void checkConsistency(Config config) {
+		this.checkScenarioFeaturesEnabled(config);
+		this.checkEventsFormatLanesSignals(config);
 		this.checkTravelTimeCalculationRoutingConfiguration(config);
 		this.checkLaneDefinitionRoutingConfiguration(config);
 		this.checkSignalSystemConfiguration(config);
 	}
 	
-	private void checkSignalSystemConfiguration(Config config) {
-		if ((config.signalSystems().getSignalSystemFile() != null) &&
-				(config.signalSystems().getSignalSystemConfigFile() == null)){
-			log.error("Signal systems are defined in config however there is no" +
-					"configuration file for the systems. This may not be fatal if " +
-					"incode custom configuration is implemented. ");
+	private void checkEventsFormatLanesSignals(Config c) {
+		ScenarioConfigGroup scg = c.scenario();
+		if (scg.isUseLanes() || scg.isUseSignalSystems()) {
+			if (!c.controler().getEventsFileFormats().contains(EventsFileFormat.xml)){
+				log.error("Xml events are not enabled, but lanes and eventually signal systems" +
+						"are enalbed. Events from this features will only be written to the xml format, consider" +
+						"to add xml events in the controler config module");
+			}
 		}
-		
-		if ((config.signalSystems().getSignalSystemFile() == null) &&
-				(config.signalSystems().getSignalSystemConfigFile() != null)){
-			throw new IllegalStateException("SignalSystemConfigurations are set " +
-					"in config but no input file for the SignalSystems is specified.!");
-		}
-		
-		if ((config.network().getLaneDefinitionsFile() == null) &&
-				(config.signalSystems().getSignalSystemFile() != null) && 
-				(config.signalSystems().getSignalSystemConfigFile() != null)) {
+	}
+
+	private void checkScenarioFeaturesEnabled(Config c) {
+		ScenarioConfigGroup scg = c.scenario();
+		if (!scg.isUseLanes() && scg.isUseSignalSystems()) {
 			throw new IllegalStateException("Cannot use the signal systems framework without" +
-					"a definition of lanes.");
+			"using lanes. Please enable lanes in scenario config group");
 		}
+	}
+
+	private void checkSignalSystemConfiguration(Config config) {
+			if ((config.signalSystems().getSignalSystemFile() != null) &&
+					(config.signalSystems().getSignalSystemConfigFile() == null)){
+				log.error("Signal systems are defined in config however there is no" +
+						"configuration file for the systems. This may not be fatal if " +
+				"incode custom configuration is implemented. ");
+			}
+			
+			if ((config.signalSystems().getSignalSystemFile() == null) &&
+					(config.signalSystems().getSignalSystemConfigFile() != null)){
+				throw new IllegalStateException("SignalSystemConfigurations are set " +
+				"in config but no input file for the SignalSystems is specified.!");
+			}
+			
+			if ((config.network().getLaneDefinitionsFile() == null) &&
+					(config.signalSystems().getSignalSystemFile() != null) && 
+					(config.signalSystems().getSignalSystemConfigFile() != null)) {
+				throw new IllegalStateException("Cannot use the signal systems framework without" +
+				"a definition of lanes.");
+			}
 	}
 
 
