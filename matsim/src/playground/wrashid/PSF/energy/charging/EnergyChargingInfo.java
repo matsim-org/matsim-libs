@@ -23,7 +23,7 @@ public class EnergyChargingInfo {
 
 		// testing scenario
 		if (ParametersPSF.isTestingModeOn()) {
-			if (time < 25200 || time >= 72000) {
+			if (time < ParametersPSF.getTestingPeakPriceStartTime() || time >= ParametersPSF.getTestingPeakPriceEndTime()) {
 				// if low tariff
 				return ParametersPSF.getTestingLowTariffElectrictyPrice();
 			} else {

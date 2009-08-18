@@ -35,6 +35,9 @@ public class ParametersPSF {
 	private static String testing_lowTariffElectrictyPrice = "testing.lowTariffElectrictyPrice";
 	private static double testingLowTariffElectrictyPrice;
 	// in utils/J lowTariff: from 20:00 to 07:00
+	
+	private static double testingPeakPriceStartTime = 25200;
+	private static double testingPeakPriceEndTime = 72000;
 
 	public static void readConfigParamters(Controler controler) {
 		String tempStringValue;
@@ -149,6 +152,22 @@ public class ParametersPSF {
 
 	public static void setTestingLowTariffElectrictyPrice(double testingLowTariffElectrictyPrice) {
 		ParametersPSF.testingLowTariffElectrictyPrice = testingLowTariffElectrictyPrice;
+	}
+
+	public static double getTestingPeakPriceStartTime() {
+		return testingPeakPriceStartTime;
+	}
+
+	public static void setTestingPeakPriceStartTime(double testingPeakPriceStartTime) {
+		ParametersPSF.testingPeakPriceStartTime = testingPeakPriceStartTime;
+	}
+
+	public static double getTestingPeakPriceEndTime() {
+		return testingPeakPriceEndTime;
+	}
+
+	public static void setTestingPeakPriceEndTime(double testingPeakPriceEndTime) {
+		ParametersPSF.testingPeakPriceEndTime = testingPeakPriceEndTime;
 	}
 
 }
