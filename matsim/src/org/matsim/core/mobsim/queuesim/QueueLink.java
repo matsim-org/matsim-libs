@@ -31,6 +31,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentArrivalEvent;
 import org.matsim.core.events.LinkEnterEvent;
 import org.matsim.core.gbl.Gbl;
@@ -243,10 +244,10 @@ public class QueueLink {
 	}
 	
 	private void findLayout(){
-		SortedMap<Double, LinkImpl> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
+		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
 		for (QueueLane lane : this.queueLanes) {
 			int laneNumber = 1;
-			for (LinkImpl link : result.values()) {
+			for (Link link : result.values()) {
 				if (lane.getDestinationLinks().contains(link)){
 					lane.setVisualizerLane(laneNumber);
 					break;

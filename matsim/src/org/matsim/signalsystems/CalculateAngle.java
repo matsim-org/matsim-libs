@@ -20,7 +20,8 @@ package org.matsim.signalsystems;
 
 import java.util.TreeMap;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -39,9 +40,9 @@ public class CalculateAngle {
 	 * @param inLink The inLink given
 	 * @return outLink, or null if there is only one outLink back to the inLinks fromNode.
 	 */
-	public static LinkImpl getLeftLane(LinkImpl inLink){
+	public static Link getLeftLane(Link inLink){
 		
-		TreeMap<Double, LinkImpl> result = getOutLinksSortedByAngle(inLink);
+		TreeMap<Double, Link> result = getOutLinksSortedByAngle(inLink);
 
 		if (result.size() == 0){
 			return null;
@@ -58,17 +59,17 @@ public class CalculateAngle {
 	 * @return Collection of outLinks, or an empty collection, if there is only
 	 * one outLink back to the inLinks fromNode.
 	 */
-	public static TreeMap<Double, LinkImpl> getOutLinksSortedByAngle(LinkImpl inLink){
-		CoordImpl coordInLink = getVector(inLink);
+	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
+		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		
-		TreeMap<Double, LinkImpl> leftLane = new TreeMap<Double, LinkImpl>();
+		TreeMap<Double, Link> leftLane = new TreeMap<Double, Link>();
 						
-		for (LinkImpl outLink : inLink.getToNode().getOutLinks().values()) {
+		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
 			
 			if (!(outLink.getToNode().equals(inLink.getFromNode()))){
 				
-				CoordImpl coordOutLink = getVector(outLink);
+				Coord coordOutLink = getVector(outLink);
 				double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
 				
 				double thetaDiff = thetaOutLink - thetaInLink;
@@ -87,7 +88,7 @@ public class CalculateAngle {
 		return leftLane;
 	}	
 	
-	private static CoordImpl getVector(LinkImpl link){
+	private static Coord getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();		
 		return new CoordImpl(x, y);
