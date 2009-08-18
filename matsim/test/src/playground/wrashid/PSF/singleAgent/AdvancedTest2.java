@@ -50,7 +50,6 @@ public class AdvancedTest2 extends MatsimTestCase implements ParametersPSFMutato
 		ChargingTimes chargingTimesOfAgentOne=chargingTimes.get(new IdImpl("1"));
 		ChargeLog chargeLogOfAgentOne=chargingTimesOfAgentOne.getChargingTimes().get(0);
 		
-		// the first charging opportunity at work is used (it has low tariff)
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 72000,1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 72200,1);
 		
