@@ -945,7 +945,7 @@ public class QueueLane {
 		}
 	}
 
-	public void addToLane(final QueueLane lane) {
+	 protected void addToLane(final QueueLane lane) {
 		if (this.toLanes == null) {
 			this.toLanes = new LinkedList<QueueLane>();
 		}
