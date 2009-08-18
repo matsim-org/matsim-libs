@@ -142,7 +142,7 @@ public class CreateKnownNodesMap {
 				if (newNodes.size() == 0) log.error("No new known Nodes found?!");
 				
 				/*
-				 *  Add additionally all Start & End Nodes of Links that contains Activity.
+				 *  Add additionally all Start & End Nodes of Links that contains Activities.
 				 *  This ensures that a Person knows at least the Link where the Activity
 				 *  takes place.
 				 */

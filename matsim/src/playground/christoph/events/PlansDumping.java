@@ -9,6 +9,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
@@ -55,6 +56,8 @@ public class PlansDumping {
 		for (PersonImpl person : population.getPersons().values())
 		{
 			person.removeUnselectedPlans();
+			//person.getSelectedPlan().setScore(PlanImpl.UNDEF_SCORE);
+			person.getSelectedPlan().setScore(null);
 		}
 		
 		new PopulationWriter(population, populationOutFile, config.plans().getOutputVersion()).write();

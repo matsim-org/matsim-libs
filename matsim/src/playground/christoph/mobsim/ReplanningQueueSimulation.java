@@ -44,20 +44,22 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 	
 	/*
-	 * Basically a 1:1 copy of the activityEndsList of the Queuesimulation.
+	 * Basically a 1:1 copy of the activityEndsList of the QueueSimulation.
 	 * The difference is, that this implementation uses a Time Offset. That means
 	 * that we are informed that an activity will end a few Time Steps before it
 	 * really ends. This allows us for example to read the known nodes of a Person
 	 * from a Database before they are needed what should speed up the Simulation.
 	 */
 	protected final PriorityBlockingQueue<DriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
-	protected final double timeOffset = 60.0;
+	protected final double timeOffset = 120.0;
 	
 	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final Events events)
 	{
 		super(network, population, events);
 		
-		// eigenes Queuenetwork hinterlegen, welches MyQueueNodes enthaelt -> noetig fuer das Replanning!
+		/*
+		 * Use a MyQueueNetwork with MyQueueNodes - we need it for our Replanning! 
+		 */
 		this.network = new MyQueueNetwork(network);
 		this.networkLayer = network;
 		

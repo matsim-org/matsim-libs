@@ -16,7 +16,7 @@ public class SubNetwork implements Network {
 	protected Map<Id, Link> links;
 	
 	protected Network network;
-
+	
 	protected boolean isInitialized = false;
 	
 	public SubNetwork(Network network)

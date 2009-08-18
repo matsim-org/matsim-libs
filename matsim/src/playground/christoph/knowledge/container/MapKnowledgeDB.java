@@ -3,6 +3,8 @@ package playground.christoph.knowledge.container;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -20,12 +22,16 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	private final static Logger log = Logger.getLogger(MapKnowledgeDB.class);
 	
+	public static int DBReadCounter = 0;
+	
 	private boolean localKnowledge;
 	private DBConnectionTool dbConnectionTool = new DBConnectionTool();
 	
 	private static String separator = "@";
 	//private static String tableName = "MapKnowledge";
-	private static String tableName = "BatchTable1_5";
+	private static String tableName = "BatchTable1_0";
+	
+	private Lock lock = new ReentrantLock();
 	
 	public MapKnowledgeDB()
 	{
@@ -72,11 +78,23 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		this.writeToDB();
 	}
 	
+	public boolean tryReadFromDB()
+	{
+		if (lock.tryLock())
+		{
+			lock.unlock();
+			readFromDB();
+			return true;
+		}
+		return false;
+	}
+	
 	public synchronized void readFromDB()
 	{	
+		lock.lock();
 		// If Knowledge is currently not in Memory, get it from the DataBase
 		if (!localKnowledge)
-		{	
+		{	DBReadCounter++;
 			ResultSet rs;
 			synchronized(dbConnectionTool)
 			{
@@ -100,7 +118,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 					String[] nodeIds = rs.getString("NodeIds").split(separator);
 			
 					for (String id : nodeIds)
-					{								
+					{
 						//NodeImpl node = this.network.getNode(new IdImpl(id));
 						NodeImpl node = this.network.getNodes().get(new IdImpl(id));
 						super.addNode(node);
@@ -119,11 +137,16 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 			
 			localKnowledge = true;
 		}
+		lock.unlock();
 	}
 	
 	public synchronized void writeToDB()
 	{		
-		Map<Id, NodeImpl> nodes = super.getKnownNodes();
+		/*
+		 *  We want the Nodes "as they are" -
+		 *  as White- or as BlackList.
+		 */
+		Map<Id, NodeImpl> nodes = super.getNodes();
 		
 		String nodesString = createNodesString(nodes);
 //		Insert Into MapKnowledge SET NodeId='2', PersonId='12'

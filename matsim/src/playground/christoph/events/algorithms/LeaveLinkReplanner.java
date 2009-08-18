@@ -183,7 +183,7 @@ public class LeaveLinkReplanner {
 		 */
 		if (replanner instanceof KnowledgePlansCalcRoute)
 		{
-			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
+//			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
 			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
 		}	
 
@@ -278,7 +278,7 @@ public class LeaveLinkReplanner {
 		 */
 		if (replanner instanceof KnowledgePlansCalcRoute)
 		{
-			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
+//			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
 			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
 		}
 			

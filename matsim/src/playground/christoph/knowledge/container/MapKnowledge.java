@@ -3,13 +3,16 @@ package playground.christoph.knowledge.container;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 
 public class MapKnowledge extends BasicNodeKnowledge{
 
-	protected boolean isWhiteList = true;
+	private static final Logger log = Logger.getLogger(MapKnowledge.class);
+	
+	public boolean isWhiteList = true;
 	
 	private Map<Id, NodeImpl> nodes;
 	
@@ -29,8 +32,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		if (isWhiteList) nodes.remove(node.getId());
 		else nodes.put(node.getId(), node);
 	}
-	
-	
+		
 	public boolean knowsNode(NodeImpl node)
 	{
 		boolean knowsNode = nodes.containsKey(node.getId());
@@ -64,6 +66,16 @@ public class MapKnowledge extends BasicNodeKnowledge{
 			
 			return invertedNodes;
 		}
+	}
+	
+	/*
+	 * Returns the Map of Nodes that describe the Knowledge.
+	 * Please note: this Map could be a White- or a BlackList.
+	 * To get always a WhiteList please use getKnownNodes()
+	 */
+	protected Map<Id, NodeImpl> getNodes()
+	{
+		return nodes;
 	}
 	
 	public synchronized void reset()
@@ -100,6 +112,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		}
 		else
 		{
+			log.warn("No Network found");
 			this.nodes = nodes;
 		}
 	}

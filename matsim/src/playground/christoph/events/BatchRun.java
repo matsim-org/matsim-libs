@@ -71,11 +71,6 @@ public class BatchRun {
 //	protected static String outbase = "output/scenarios/berlin";
 //	protected static String inbase = "test/scenarios/berlin";
 	
-//	protected static String outbase = "G:/mysimulations/kt-zurich/output";
-//	protected static String inbase = "G:/mysimulations/kt-zurich/input";
-//	protected static String configFilePath = "G:/mysimulations/kt-zurich";
-//	protected static String configFileName = "config10pct_factor_0.10_long_replanning.xml";
-
 	protected static String outbase = "mysimulations/kt-zurich/output";
 	protected static String inbase = "mysimulations/kt-zurich/input";
 	protected static String configFilePath = "mysimulations/kt-zurich";

@@ -10,9 +10,11 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
+import playground.christoph.router.util.KnowledgeTools;
 
 public class MyDijkstra extends Dijkstra{
 	
@@ -29,7 +31,7 @@ public class MyDijkstra extends Dijkstra{
 	/*
 	 * The handed over fromNode and toNode are Nodes from the
 	 * underlying, full Network. We have to replace them with
-	 * their children in the Person´s SubNetwork.
+	 * their children in the Person's SubNetwork.
 	 */
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime)
@@ -45,7 +47,7 @@ public class MyDijkstra extends Dijkstra{
 //		if (newFromNode == null) System.out.println("NewFromNode Null!");
 //		else if (newFromNode.getId() == null) System.out.println("NewFromNodeId Null!");
 //		
-//		if (newToNode == null) System.out.println("NewToNode Null!");
+//		if (newToNode == null) 	System.out.println("NewToNode Null!");
 //		else if (newToNode.getId() == null) System.out.println("NewToNodeId Null!");
 		
 		Path path = super.calcLeastCostPath(newFromNode, newToNode, startTime);

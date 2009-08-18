@@ -162,7 +162,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 				 */
 				if (replanner instanceof KnowledgePlansCalcRoute)
 				{
-					((KnowledgePlansCalcRoute)replanner).setPerson(person);
+//					((KnowledgePlansCalcRoute)replanner).setPerson(person);
 					((KnowledgePlansCalcRoute)replanner).setTime(this.time);
 				}
 				

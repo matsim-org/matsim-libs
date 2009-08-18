@@ -61,10 +61,10 @@ public class SubNetworkCreator {
 		synchronized(subNetwork)
 		{
 			synchronized(nodeKnowledge)
-			{
-				Map<Id, SubNode> nodesMapping = new TreeMap<Id, SubNode>();
-		
+			{	
 				Map<Id, NodeImpl> knownNodes = nodeKnowledge.getKnownNodes();
+			
+				Map<Id, SubNode> nodesMapping = new HashMap<Id, SubNode>((int)(knownNodes.size() * 1.1), 0.95f);//new TreeMap<Id, SubNode>();
 				
 				subNetwork.initialize(knownNodes.size());
 				

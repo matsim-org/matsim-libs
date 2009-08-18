@@ -15,6 +15,7 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.mobsim.MyQueueNetwork;
+import playground.christoph.network.SubLink;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 
@@ -80,7 +81,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	}
 	
 	public double getLinkTravelCost(final Link link, final double time) 
-	{
+	{	
 		NodeKnowledge nodeKnowledge = null;
 		if (checkNodeKnowledge && person != null)
 		{

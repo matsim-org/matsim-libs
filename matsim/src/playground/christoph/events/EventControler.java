@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -60,6 +61,7 @@ import playground.christoph.mobsim.MyQueueSimEngine;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.SubNetwork;
+import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -138,8 +140,19 @@ public class EventControler extends Controler {
 	 */
 	public EventControler(String[] args) {
 		super(args);
-		// config.global().setNumberOfThreads(2);
 
+		setConstructorParameters();
+	}
+
+	// only for Batch Runs
+	public EventControler(Config config) {
+		super(config);
+
+		setConstructorParameters();
+	}
+
+	private void setConstructorParameters()
+	{
 		// Use MyLinkImpl. They can carry some additional Information like their
 		// TravelTime or VehicleCount.
 		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
@@ -147,35 +160,15 @@ public class EventControler extends Controler {
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 
-		knowledgeTravelTime = new KnowledgeTravelTimeCalculator();
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(knowledgeTravelTime);
-
-		// KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-
-		this.setTravelCostCalculator(travelCost);
-
+		// Use knowledge when Re-Routing
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
+		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+		travelCostWrapper.checkNodeKnowledge(true);
+		travelCostWrapper.useLookupTable(false);
+		
+		this.setTravelCostCalculator(travelCostWrapper);
 	}
-
-	// only for Batch Runs
-	public EventControler(Config config) {
-		super(config);
-
-		// Use MyLinkImpl. They can carry some additional Information like their
-		// TravelTime or VehicleCount.
-		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
-
-		// Use a Scoring Function, that only scores the travel times!
-		this
-				.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
-
-		knowledgeTravelTime = new KnowledgeTravelTimeCalculator();
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(knowledgeTravelTime);
-		// KnowledgeTravelCostWrapper travelCostWrapper = new
-		// KnowledgeTravelCostWrapper(travelCost);
-
-		this.setTravelCostCalculator(travelCost);
-	}
-
+	
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
@@ -232,14 +225,14 @@ public class EventControler extends Controler {
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
-		travelTimeWrapper.checkNodeKnowledge(false);
-		travelCostWrapper.checkNodeKnowledge(false);
+		travelTimeWrapper.checkNodeKnowledge(true);
+		travelCostWrapper.checkNodeKnowledge(true);
 		travelTimeWrapper.useLookupTable(false);
 		travelCostWrapper.useLookupTable(false);
 
 		// Don't use Knowledge for CostCalculations
-		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
-//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTimeWrapper);
+//		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
+		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTimeWrapper);
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
 
 /*
@@ -289,7 +282,6 @@ public class EventControler extends Controler {
 		 * 
 		 * // more Modules to come...
 		 */
-
 	}
 
 	/*
@@ -768,6 +760,16 @@ public class EventControler extends Controler {
 
 	}
 
+	/**
+	 * @return A fully initialized StrategyManager for the plans replanning.
+	 */
+	@Override
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
+		MyStrategyManagerConfigLoader.load(this, this.config, manager);
+		return manager;
+	}
+	
 	@Override
 	protected void shutdown(final boolean unexpected) {
 		if (calcWardrop) {

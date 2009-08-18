@@ -136,7 +136,7 @@ public class TestSubNetwork {
 		travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		
-		travelTimeWrapper.checkNodeKnowledge(true);
+		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
 		travelTimeWrapper.useLookupTable(false);
 		travelCostWrapper.useLookupTable(false);
@@ -205,7 +205,7 @@ public class TestSubNetwork {
 	
 	private void replanRoute(PersonImpl person)
 	{
-		dijkstraRouter.setPerson(person);
+//		dijkstraRouter.setPerson(person);
 		dijkstraRouter.setTime(Time.UNDEFINED_TIME);
 		
 		dijkstraRouter.run(person.getSelectedPlan());

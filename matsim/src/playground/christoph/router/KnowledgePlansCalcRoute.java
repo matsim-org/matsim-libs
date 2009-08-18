@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -33,7 +33,6 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.mobsim.MyQueueNetwork;
-import playground.christoph.network.SubNetwork;
 import playground.christoph.network.util.SubNetworkCreator;
 import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.util.KnowledgeTools;
@@ -85,11 +84,26 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		subNetworkCreator = new SubNetworkCreator(network);
 	}
 	
+	@Override
+	public void run(final PersonImpl person)
+	{
+		setPerson(person);
+		
+		super.run(person);
+	}
+
+	@Override
+	public void run(final PlanImpl plan)
+	{
+		setPerson(plan.getPerson());
+		
+		super.run(plan);
+	}
 	
 	/*
 	 * We have to hand over the person to the Cost- and TimeCalculators of the Router.
 	 */
-	public void setPerson(PersonImpl person)
+	private void setPerson(PersonImpl person)
 	{
 		this.person = person;
 		
@@ -102,39 +116,6 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		{
 			((PersonLeastCostPathCalculator)this.getPtFreeflowLeastCostPathCalculator()).setPerson(person);
 		}
-		
-		
-//		if (this.getLeastCostPathCalculator() instanceof DijkstraWrapper)
-//		{
-//			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
-//			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
-//			
-//			if (dijkstra instanceof MyDijkstra)
-//			{
-//				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
-//				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
-//				
-//				new KnowledgeTools().removeKnowledge(person);
-//				
-//				((MyDijkstra)dijkstra).setNetwork(subNetwork);
-//			}
-//		}
-//		
-//		if (this.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
-//		{
-//			DijkstraWrapper dijkstraWrapper = (DijkstraWrapper) this.getLeastCostPathCalculator();
-//			Dijkstra dijkstra = dijkstraWrapper.getDijkstra();
-//			
-//			if (dijkstra instanceof MyDijkstra)
-//			{
-//				SubNetwork subNetwork = subNetworkTools.getSubNetwork(person);
-//				if (!subNetwork.isInitialized()) subNetworkCreator.createSubNetwork(knowledgeTools.getNodeKnowledge(person), subNetwork);
-//				
-//				new KnowledgeTools().removeKnowledge(person);
-//				
-//				((MyDijkstra)dijkstra).setNetwork(subNetwork);
-//			}
-//		}
 	}
 	
 	public PersonImpl getPerson()
