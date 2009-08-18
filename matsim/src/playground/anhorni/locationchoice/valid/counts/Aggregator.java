@@ -130,24 +130,10 @@ public class Aggregator {
 	public double[] getAvg() {
 		return avg;
 	}
-
-	public void setAvg(double[] avg) {
-		this.avg = avg;
-	}
-
 	public double[] getMedian() {
 		return median;
 	}
-
-	public void setMedian(double[] median) {
-		this.median = median;
-	}
-
 	public double[] getStandarddev() {
 		return standarddev;
-	}
-
-	public void setStandarddev(double[] standarddev) {
-		this.standarddev = standarddev;
 	}	
 }
