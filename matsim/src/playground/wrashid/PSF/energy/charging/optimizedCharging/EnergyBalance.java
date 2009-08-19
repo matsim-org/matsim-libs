@@ -25,24 +25,23 @@ public class EnergyBalance {
 	LinkedList<Double> maxChargableEnergy = new LinkedList<Double>(); // in
 
 	// [J]
-	
-	ChargingTimes chargingTimes;
-//	private double minEnergyToCharge;
-	private double batteryCapacity;
-	
 
-	public EnergyBalance(ParkingTimes parkTimes, EnergyConsumption energyConsumption, 
-			double batteryCapacity, ChargingTimes chargingTimes) {
-		
-		this.chargingTimes=chargingTimes;
-		//this.minEnergyToCharge=minEnergyToCharge;
-		this.batteryCapacity=batteryCapacity;
-		
+	ChargingTimes chargingTimes;
+	// private double minEnergyToCharge;
+	private double batteryCapacity;
+
+	public EnergyBalance(ParkingTimes parkTimes, EnergyConsumption energyConsumption, double batteryCapacity,
+			ChargingTimes chargingTimes) {
+
+		this.chargingTimes = chargingTimes;
+		// this.minEnergyToCharge=minEnergyToCharge;
+		this.batteryCapacity = batteryCapacity;
+
 		// prepare parking times
 		parkingTimes = (LinkedList<ParkLog>) parkTimes.getParkingTimes().clone();
 		// add the last parking event of the day to the queue
-		parkingTimes.add(new ParkLog(parkTimes.getCarLastTimeParkedFacilityId(), parkTimes.getLastParkingArrivalTime(),
-				parkTimes.getFirstParkingDepartTime()));
+		parkingTimes.add(new ParkLog(parkTimes.getCarLastTimeParkedFacilityId(), parkTimes.getLastParkingArrivalTime(), parkTimes
+				.getFirstParkingDepartTime()));
 
 		int maxIndex = parkingTimes.size();
 
@@ -58,7 +57,8 @@ public class EnergyBalance {
 
 		for (int i = 0; i < maxIndex; i++) {
 			sumEnergyConsumption = 0;
-			while (energyConsumptionLog.peek()!=null && energyConsumptionLog.peek().getEnterTime() < parkingTimes.get(i).getStartParkingTime()) {
+			while (energyConsumptionLog.peek() != null
+					&& energyConsumptionLog.peek().getEnterTime() < parkingTimes.get(i).getStartParkingTime()) {
 				tempEnergyConsumptionLog = energyConsumptionLog.poll();
 				sumEnergyConsumption += tempEnergyConsumptionLog.getEnergyConsumption();
 			}
@@ -82,54 +82,47 @@ public class EnergyBalance {
 	}
 
 	/*
-	 * This method adds the parking prices of the specified parking (index) to the priority list.
+	 * This method adds the parking prices of the specified parking (index) to
+	 * the priority list.
 	 */
-	private PriorityQueue<FacilityChargingPrice> getChargingPrice() {
-		PriorityQueue<FacilityChargingPrice> chargingPrice = new PriorityQueue<FacilityChargingPrice>();
-		int maxIndex = parkingTimes.size() - 1;
+	private PriorityQueue<FacilityChargingPrice> addNewParkingChargingPrices(int parkingIndex,
+			PriorityQueue<FacilityChargingPrice> chargingPrice) {
 
-		double timeOfFirstParkingStart = parkingTimes.get(0).getStartParkingTime();
-		// FacilityChargingPrice tempPrice;
+		boolean isLastParking = parkingTimes.size() - 1 == parkingIndex ? true : false;
 
-		// find out, if we were driving at 0:00 in the night or the car was
-		// parked
-		if (parkingTimes.get(maxIndex).getStartParkingTime() > parkingTimes.get(maxIndex).getEndParkingTime()) {
-			// we did have the car parked in the night and need to handle that
-			// specially
-			maxIndex = maxIndex - 1;
-		}
-
-		// the last parking needs to be handled specially
 		int offSet = 10000;
-		int offSetOfEarlyNightHours = 100000000;
-		for (int i = 0; i <= maxIndex; i++) {
-			int minTimeSlotNumber = Math.round(i * offSet + (float) parkingTimes.get(i).getStartParkingTime() / 900);
-			int maxTimeSlotNumber = Math.round(i * offSet + (float) parkingTimes.get(i).getEndParkingTime() / 900);
+		if (!isLastParking) {
+			// find out the slots which need to be put in the priority queue
+			
+			
+			int minTimeSlotNumber = Math.round(parkingIndex * offSet + (float) parkingTimes.get(parkingIndex).getStartParkingTime()
+					/ 900);
+			int maxTimeSlotNumber = Math.round(parkingIndex * offSet + (float) parkingTimes.get(parkingIndex).getEndParkingTime()
+					/ 900);
 
-			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, i);
-		}
-
-		// if we need to handle the last (night parking)
-		if (maxIndex < parkingTimes.size() - 1) {
-
-			maxIndex = parkingTimes.size() - 1;
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex);
+		} else {
+			// if we need to handle the last (night parking)
+			int offSetOfEarlyNightHours = 100000000;
 
 			// create time/price slots for morning parking part after 0:00
 			int minTimeSlotNumber = Math.round(offSetOfEarlyNightHours);
-			int maxTimeSlotNumber = Math.round(offSetOfEarlyNightHours + (float) parkingTimes.get(maxIndex).getEndParkingTime()
+			int maxTimeSlotNumber = Math.round(offSetOfEarlyNightHours + (float) parkingTimes.get(parkingIndex).getEndParkingTime()
 					/ 900);
 
-			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, maxIndex);
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex);
 
-			if (parkingTimes.get(maxIndex).getStartParkingTime() < 86400) {
+			if (parkingTimes.get(parkingIndex).getStartParkingTime() < 86400) {
 				// only handle the first part of the last parking, if the day is
 				// less than 24 hours long
 
-				minTimeSlotNumber = Math.round(maxIndex * offSet + (float) parkingTimes.get(maxIndex).getStartParkingTime() / 900);
-				maxTimeSlotNumber = Math.round(maxIndex * offSet + (float) 86399 / 900); 
-				// this is just one second before mid night to get the right end slot
-				
-				addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, maxIndex);
+				minTimeSlotNumber = Math.round(parkingIndex * offSet + (float) parkingTimes.get(parkingIndex).getStartParkingTime()
+						/ 900);
+				maxTimeSlotNumber = Math.round(parkingIndex * offSet + (float) 86399 / 900);
+				// this is just one second before mid night to get the right end
+				// slot
+
+				addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex);
 			}
 		}
 
@@ -140,78 +133,82 @@ public class EnergyBalance {
 			int maxTimeSlotNumber, int parkingIndex) {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
-			double time= Math.floor(parkingTimes.get(parkingIndex).getStartParkingTime()/900)*900 + j * 900;
-			tempPrice = EnergyChargingInfo.getEnergyPrice(time,
-					parkingTimes.get(parkingIndex).getFacilityId());
+			double time = Math.floor(parkingTimes.get(parkingIndex).getStartParkingTime() / 900) * 900 + j * 900;
+			tempPrice = EnergyChargingInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getFacilityId());
 
-			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j,parkingIndex,time, parkingTimes.get(parkingIndex).getFacilityId(),parkingTimes.get(parkingIndex).getStartParkingTime(), parkingTimes.get(parkingIndex).getEndParkingTime());
+			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j, parkingIndex,
+					time, parkingTimes.get(parkingIndex).getFacilityId(), parkingTimes.get(parkingIndex).getStartParkingTime(),
+					parkingTimes.get(parkingIndex).getEndParkingTime());
 			chargingPrice.add(tempFacilityChPrice);
 		}
 	}
 
-	// assuming, there is enough electricity in the car for driving the whole day
+	// assuming, there is enough electricity in the car for driving the whole
+	// day
 	// TODO: for more general case
 	// TODO: need to take min Energy into consideration!!!
 	public ChargingTimes getChargingTimes() {
-		
-		// this should only be called once (return immediatly if already populated)
-		
-		if (chargingTimes.getChargingTimes().size()>0){
+
+		// this should only be called once (return immediatly if already
+		// populated)
+
+		if (chargingTimes.getChargingTimes().size() > 0) {
 			return chargingTimes;
 		}
-		
-		PriorityQueue<FacilityChargingPrice> chargingPrice=getChargingPrice();
-		
+
+		PriorityQueue<FacilityChargingPrice> chargingPrice = new PriorityQueue<FacilityChargingPrice>();
+		chargingPrice= addNewParkingChargingPrices(0,chargingPrice);
+		chargingPrice= addNewParkingChargingPrices(1,chargingPrice);
+
 		// TODO: this needs to come from input parameter...
-		double minEnergyLevelToCharge=batteryCapacity;
-		
+		double minEnergyLevelToCharge = batteryCapacity;
+
 		// at home the car must have reached 'minEnergyLevelToCharge'
-		while (maxChargableEnergy.get(maxChargableEnergy.size()-1)>0){
-			FacilityChargingPrice bestEnergyPrice=chargingPrice.poll();
-			
-			if (bestEnergyPrice==null){
+		while (maxChargableEnergy.get(maxChargableEnergy.size() - 1) > 0) {
+			FacilityChargingPrice bestEnergyPrice = chargingPrice.poll();
+
+			if (bestEnergyPrice == null) {
 				System.out.println();
 			}
-			
-			int parkingIndex=bestEnergyPrice.getEnergyBalanceParkingIndex();
-			Id facilityId=parkingTimes.get(parkingIndex).getFacilityId();
-			
-			
-			
-			double maximumEnergyThatNeedsToBeCharged=maxChargableEnergy.get(parkingIndex);
-			
-			// skip the charging slot, if no charging at the current parking is needed
+
+			int parkingIndex = bestEnergyPrice.getEnergyBalanceParkingIndex();
+			Id facilityId = parkingTimes.get(parkingIndex).getFacilityId();
+
+			double maximumEnergyThatNeedsToBeCharged = maxChargableEnergy.get(parkingIndex);
+
+			// skip the charging slot, if no charging at the current parking is
+			// needed
 			// TODO: this can be made more efficient later (perhaps)
-			if (maximumEnergyThatNeedsToBeCharged==0){
+			if (maximumEnergyThatNeedsToBeCharged == 0) {
 				continue;
 			}
-			
-			double energyCharged=bestEnergyPrice.getEnergyCharge(maximumEnergyThatNeedsToBeCharged);
-			
-			// set energyCharged to maximumEnergyThatNeedsToBeCharged, if they are very close, to counter 
+
+			double energyCharged = bestEnergyPrice.getEnergyCharge(maximumEnergyThatNeedsToBeCharged);
+
+			// set energyCharged to maximumEnergyThatNeedsToBeCharged, if they
+			// are very close, to counter
 			// rounding errors.
-			int precision=100000;
-			if (Math.abs(maximumEnergyThatNeedsToBeCharged*precision-energyCharged*precision)<1){
-				energyCharged=maximumEnergyThatNeedsToBeCharged;
+			int precision = 100000;
+			if (Math.abs(maximumEnergyThatNeedsToBeCharged * precision - energyCharged * precision) < 1) {
+				energyCharged = maximumEnergyThatNeedsToBeCharged;
 			}
-			
-			ChargeLog chargeLog=bestEnergyPrice.getChargeLog(maximumEnergyThatNeedsToBeCharged);
-			
+
+			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(maximumEnergyThatNeedsToBeCharged);
+
 			chargingTimes.addChargeLog(chargeLog);
-			
-			updateMaxChargableEnergy(parkingIndex,energyCharged);
-			
+
+			updateMaxChargableEnergy(parkingIndex, energyCharged);
+
 		}
-		
-		
+
 		return chargingTimes;
 	}
-	
-	private void updateMaxChargableEnergy(int indexOfUsedParkingToCharge, double amountOfEnergy){
-		for (int i=indexOfUsedParkingToCharge;i<maxChargableEnergy.size();i++){
-			double oldValue=maxChargableEnergy.get(i);
+
+	private void updateMaxChargableEnergy(int indexOfUsedParkingToCharge, double amountOfEnergy) {
+		for (int i = indexOfUsedParkingToCharge; i < maxChargableEnergy.size(); i++) {
+			double oldValue = maxChargableEnergy.get(i);
 			maxChargableEnergy.remove(i);
-			maxChargableEnergy.add(i, oldValue-amountOfEnergy);
+			maxChargableEnergy.add(i, oldValue - amountOfEnergy);
 		}
 	}
 
