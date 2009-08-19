@@ -92,6 +92,13 @@ public class ParametersPSF {
 				errorReadingParameter(testing_lowTariffElectrictyPrice);
 			}
 		}
+		
+		resetInternalParameters();
+	}
+	
+	private static void resetInternalParameters(){
+		testingPeakPriceStartTime = 25200;
+		testingPeakPriceEndTime = 72000;
 	}
 
 	private static void errorReadingParameter(String parameterName) {
