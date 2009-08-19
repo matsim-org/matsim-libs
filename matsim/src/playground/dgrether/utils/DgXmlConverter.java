@@ -39,6 +39,8 @@ import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
 
+import playground.dgrether.DgPaths;
+
 
 /**
  * @author dgrether
@@ -48,7 +50,8 @@ public class DgXmlConverter {
 	
 	private static final Logger log = Logger.getLogger(DgXmlConverter.class);
 	
-	private String baseDir = "test/input/org/matsim/signalsystems";
+//	private String baseDir = "test/input/org/matsim/signalsystems";
+	private String baseDir = DgPaths.STUDIESDG + "lsaZurich/";
 	
 	
 	public DgXmlConverter() throws IOException{
