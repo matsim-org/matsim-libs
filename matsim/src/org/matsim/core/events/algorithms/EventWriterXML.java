@@ -21,12 +21,12 @@
 package org.matsim.core.events.algorithms;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.utils.io.IOUtils;
 
 public class EventWriterXML implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
@@ -50,7 +50,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		closeFile();
 
 		try {
-			this.out = new BufferedWriter( new FileWriter (outfilename));
+			this.out = IOUtils.getBufferedWriter(outfilename);
 			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
 		} catch (IOException e) {
 			e.printStackTrace();
