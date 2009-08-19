@@ -17,30 +17,27 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NodeNetworkRoute;
 
 /**
- * Creates a representation of a special adjacency matrix [StopFacilities X TransitRoutes]
+ * Creates a representation of a special adjacency List [StopFacilities X TransitRoutes]
  * @author manuel
  */
-
-public class AdjMatrix {
+public class AdjList {
 	private TransitSchedule transitSchedule;
-	private Map <Id, List<Id>> AdjMap = new TreeMap <Id, List<Id>>();   //idStopFacility, <IdRoutes>
+	private Map <Id, List<TransitRoute>> AdjMap = new TreeMap <Id, List<TransitRoute>>();   //idStopFacility, <IdRoutes>
 	private NetworkLayer plainNet;
-	private Map <Id, TransitRoute> transitRouteMap = new TreeMap <Id, TransitRoute>();   
 	
-	/**constructor*/
-	public AdjMatrix(final TransitSchedule transitSchedule, NetworkLayer plainNet ) {
+	public AdjList(final TransitSchedule transitSchedule, final NetworkLayer plainNet ) {
 		this.plainNet = plainNet;
 		this.transitSchedule= transitSchedule;
-		createAdjMatrix();
+		createAdjList();
 	}
 	
-	private void createAdjMatrix(){
+	private void createAdjList(){
 		
 		//-->validate the relation of Stopfacilities and transitRoute.route.Stopfacilities
 		
-		/**fill up matrix with StopFacilities Ids and empty route lists*/
+		/**fill up adjList with StopFacilities Ids and empty route lists*/
 		for (Id idFacility : transitSchedule.getFacilities().keySet()){
-			List<Id> TransitRouteIdList = new ArrayList<Id>();
+			List<TransitRoute> TransitRouteIdList = new ArrayList<TransitRoute>();
 			AdjMap.put(idFacility, TransitRouteIdList);
 		}
 
@@ -48,12 +45,9 @@ public class AdjMatrix {
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				List<Node> nodeList = new ArrayList<Node>();
-				Id routeId = transitRoute.getId();
-
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()){
 					Id stopId = transitRouteStop.getStopFacility().getId();
-					AdjMap.get(stopId).add(routeId);
-					
+					AdjMap.get(stopId).add(transitRoute);
 					Node node = plainNet.getNode(stopId);
 					nodeList.add(node);
 				}
@@ -62,28 +56,23 @@ public class AdjMatrix {
 				NetworkRoute nodeRoute = new NodeNetworkRoute(null, null);
 				nodeRoute.setNodes(null, nodeList, null);
 				transitRoute.setRoute(nodeRoute);
-				transitRouteMap.put(routeId, transitRoute);
 			}
 		}
 	}
 
 	/**returns the transitRoutes that travel through a given node. Node = stopFacility */
-	public List<Id> getAdjTransitRoutes (Node node){
+	public List<TransitRoute> getAdjTransitRoutes (Node node){
 		return AdjMap.get(node.getId());	
 	}
 	
-	public TransitRoute getTransitRoute (Id id){
-		return transitRouteMap.get(id);
-	}
-	
-	/**prints all stopFacilities and their adjacent TransitRoutes*/
+	/**prints all stopFacilities and their correspondent adjacent TransitRoutes*/
 	public void printMap(){
-		for(Map.Entry <Id,List<Id>> entry: AdjMap.entrySet() ){
+		for(Map.Entry <Id,List<TransitRoute>> entry: AdjMap.entrySet() ){
 			Id key = entry.getKey(); 
-			List<Id> value = entry.getValue();
+			List<TransitRoute> value = entry.getValue();
 			System.out.print(key+ ": [" );
-			for (Id id : value){
-				System.out.print(id + ", " );
+			for (TransitRoute transitRoute : value){
+				System.out.print(transitRoute.getId()+ ", " );
 			}
 			System.out.println("]");
 		}

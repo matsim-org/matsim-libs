@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTActWriter;
 import playground.mmoyo.PTRouter.PTRouter;
+import playground.mmoyo.precalculation.PrecalRoutes;
 
 /**
  * This class contains the options to route with a TransitSchedule object 
@@ -43,7 +44,6 @@ public class Main {
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		PTActWriter ptActWriter;
-		NetworkLayer plainNetwork;
 		
 		/***************reads the transitSchedule file**********/
 		new MatsimNetworkReader(network).readFile(NETWORK);
@@ -59,8 +59,9 @@ public class Main {
 		/*******************************************************/
 	
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
+		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
-		int option =3;
+		int option =7;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -107,7 +108,14 @@ public class Main {
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
 				ptActWriter.SimplifyPtLegs();
 				break;
-					
+			case 7:
+				PrecalRoutes precalRoutes = new PrecalRoutes(transitSchedule, plainNetwork);
+				coord1 = new CoordImpl(682711, 237595);
+				coord2 = new CoordImpl(682308, 242093);
+				double startTime = System.currentTimeMillis();
+				precalRoutes.findPTPath(coord1, coord2, 400);
+				System.out.println("duration: " + (System.currentTimeMillis()-startTime));
+				break;
 		}
 	}
 }
