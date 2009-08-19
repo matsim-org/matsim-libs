@@ -18,17 +18,12 @@ public class DBConnectionTool {
 	private static String user = "MATSim";
 	private static String password ="MATSim";
 	private static String db_name = "MATSimKnowledge";
-/*	
-	private static MysqlConnectionPoolDataSource cpds;
-	private static PooledConnection poledCon;
-*/	
+
 	private static MysqlConnectionPoolDataSource[] cpdsArray;
-	private static PooledConnection[] poledConArray;
+	private static MyPooledConnection[] poledConArray;
 	private static int roundRobin = 0;
-	private static int conCount = 4;
-	
-//	private int max_connections = 10;
-//	private int inactivity_timeout = 30;
+	private static int conCount = 10;
+	private static Object monitor;
 	
 	public static void main(String[] args)
 	{
@@ -36,27 +31,14 @@ public class DBConnectionTool {
 	}
 	
 	private Connection con;
+	private MyPooledConnection myPooledCon;
 	
 	static
-	{
-		/*
-		cpds = new MysqlConnectionPoolDataSource();
-		cpds.setUser(user);
-		cpds.setPassword(password);
-		cpds.setURL("jdbc:mysql://localhost:3306/" + db_name);
-		
-		try {
-			poledCon = cpds.getPooledConnection();
-		} 
-		catch (SQLException e) 
-		{
-			log.error("SQL Exception when trying to get Pooled Connection");
-			e.printStackTrace();
-		}
-		 */
+	{	
+		monitor = new Object();
 		
 		cpdsArray = new MysqlConnectionPoolDataSource[conCount];
-		poledConArray = new PooledConnection[conCount];
+		poledConArray = new MyPooledConnection[conCount];
 		
 		for (int i = 0; i < conCount; i++)
 		{
@@ -64,9 +46,12 @@ public class DBConnectionTool {
 			cpdsArray[i].setUser(user);
 			cpdsArray[i].setPassword(password);
 			cpdsArray[i].setURL("jdbc:mysql://localhost:3306/" + db_name);
-			
-			try {
-				poledConArray[i] = cpdsArray[i].getPooledConnection();
+						
+			try 
+			{
+				poledConArray[i] = new DBConnectionTool().new MyPooledConnection();
+				poledConArray[i].setPooledConnection(cpdsArray[i].getPooledConnection());
+				poledConArray[i].inUse(false);
 			} 
 			catch (SQLException e) 
 			{
@@ -76,19 +61,55 @@ public class DBConnectionTool {
 		}
 	}
 	
-	public static synchronized Connection getConnection() throws SQLException
+	private static synchronized MyPooledConnection getConnection() throws SQLException
 	{	
-		//return poledCon.getConnection();
-		roundRobin++;
-		if (roundRobin >= conCount) roundRobin = 0;
+		// searching for not used Connection
+		boolean searching = true;
 		
-		return poledConArray[roundRobin].getConnection();
+		while (searching)
+		{
+			synchronized(monitor)
+			{
+				for (int i = 0; i < conCount; i++)
+				{
+					roundRobin++;
+					if (roundRobin >= conCount) roundRobin = 0;
+					
+					// if the Connection is not in Use
+					if (!poledConArray[roundRobin].inUse())
+					{
+						searching = false;
+						break;
+					}
+				}	// for
+				
+				// if no free connection was found - wait until one is released
+				if (searching) 
+				{
+					log.warn("No free Connection was found - waiting until one is released!");
+					try 
+					{
+						monitor.wait();
+					} 
+					catch (InterruptedException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} 	// if
+			}	// synchronized
+		}	// searching
+		
+		poledConArray[roundRobin].inUse(true);
+		return poledConArray[roundRobin];
 	}
 	
 	public void connect()
 	{
-		try {
-			con = getConnection();
+		try
+		{
+			myPooledCon = getConnection();
+			con = myPooledCon.getPooledConnection().getConnection();
 		} 
 		catch (SQLException e) 
 		{
@@ -103,6 +124,12 @@ public class DBConnectionTool {
 		{
 			con.close();
 			con = null;
+			
+			synchronized(monitor)
+			{
+				myPooledCon.inUse(false);
+				monitor.notify();
+			}
 		} 
 		catch (SQLException e) 
 		{
@@ -198,6 +225,32 @@ public class DBConnectionTool {
 		catch (NullPointerException npe)
 		{
 			log.error("Connection Object is null!");
+		}
+	}
+	
+	protected class MyPooledConnection
+	{
+		private PooledConnection connection = null;
+		private boolean inUse = false;
+		
+		public void setPooledConnection(PooledConnection con)
+		{
+			connection = con;
+		}
+		
+		public PooledConnection getPooledConnection()
+		{
+			return connection;
+		}
+		
+		public void inUse(boolean value)
+		{
+			this.inUse = value;
+		}
+		
+		public boolean inUse()
+		{
+			return inUse;
 		}
 	}
 }
