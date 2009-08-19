@@ -10,7 +10,8 @@ public class AllTests {
 
 		suite.addTest(playground.wrashid.PHEV.Utility.AllTests.suite());
 		suite.addTest(playground.wrashid.tryouts.performance.AllTests.suite());
-
+		suite.addTest(playground.wrashid.PSF.singleAgent.AllTests.suite());
+		
 		return suite;
 	}
 }
