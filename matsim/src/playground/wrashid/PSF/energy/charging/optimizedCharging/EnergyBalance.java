@@ -29,6 +29,11 @@ public class EnergyBalance {
 	ChargingTimes chargingTimes;
 	// private double minEnergyToCharge;
 	private double batteryCapacity;
+	
+	/**
+	 * The last parking (index), which has been added to the priority queue for charging price
+	 */
+	private int lastChargingPriceParkingIndex=0;
 
 	public EnergyBalance(ParkingTimes parkTimes, EnergyConsumption energyConsumption, double batteryCapacity,
 			ChargingTimes chargingTimes) {
@@ -93,8 +98,7 @@ public class EnergyBalance {
 		int offSet = 10000;
 		if (!isLastParking) {
 			// find out the slots which need to be put in the priority queue
-			
-			
+
 			int minTimeSlotNumber = Math.round(parkingIndex * offSet + (float) parkingTimes.get(parkingIndex).getStartParkingTime()
 					/ 900);
 			int maxTimeSlotNumber = Math.round(parkingIndex * offSet + (float) parkingTimes.get(parkingIndex).getEndParkingTime()
@@ -143,6 +147,19 @@ public class EnergyBalance {
 		}
 	}
 
+	/**
+	 * Try
+	 * @return
+	 */
+	private PriorityQueue<FacilityChargingPrice> updateChargingPrice(PriorityQueue<FacilityChargingPrice> chargingPrice) {
+		while (lastChargingPriceParkingIndex < maxChargableEnergy.size() && maxChargableEnergy.get(lastChargingPriceParkingIndex)<batteryCapacity) {
+			chargingPrice = addNewParkingChargingPrices(lastChargingPriceParkingIndex, chargingPrice);
+			
+			lastChargingPriceParkingIndex++;
+		}
+		return chargingPrice;
+	}
+
 	// assuming, there is enough electricity in the car for driving the whole
 	// day
 	// TODO: for more general case
@@ -152,25 +169,33 @@ public class EnergyBalance {
 		// this should only be called once (return immediatly if already
 		// populated)
 
+		int indexOfLastParking = parkingTimes.size() - 1;
+
 		if (chargingTimes.getChargingTimes().size() > 0) {
 			return chargingTimes;
 		}
 
-		PriorityQueue<FacilityChargingPrice> chargingPrice = new PriorityQueue<FacilityChargingPrice>();
-		chargingPrice= addNewParkingChargingPrices(0,chargingPrice);
-		chargingPrice= addNewParkingChargingPrices(1,chargingPrice);
+		// initialize chargingPrice
+
+		PriorityQueue<FacilityChargingPrice> chargingPrice = updateChargingPrice(new PriorityQueue<FacilityChargingPrice>());
 
 		// TODO: this needs to come from input parameter...
 		double minEnergyLevelToCharge = batteryCapacity;
 
 		// at home the car must have reached 'minEnergyLevelToCharge'
-		while (maxChargableEnergy.get(maxChargableEnergy.size() - 1) > 0) {
+		// or the priority queue must be empty but this should be reported,
+		// because it means, the car could not charge fully
+		// see below
+		while (maxChargableEnergy.get(indexOfLastParking) > 0) {
 			FacilityChargingPrice bestEnergyPrice = chargingPrice.poll();
 
 			if (bestEnergyPrice == null) {
-				System.out.println();
+				// TODO: report, that the current vehicle could not reach the
+				// destination, because the electricity was finished
+				// there should be some input here to the utility function
 			}
 
+			// get the parking index, where this car will charge
 			int parkingIndex = bestEnergyPrice.getEnergyBalanceParkingIndex();
 			Id facilityId = parkingTimes.get(parkingIndex).getFacilityId();
 
@@ -199,6 +224,7 @@ public class EnergyBalance {
 
 			updateMaxChargableEnergy(parkingIndex, energyCharged);
 
+			updateChargingPrice(chargingPrice);
 		}
 
 		return chargingTimes;

@@ -53,9 +53,16 @@ public class AdvancedTest4 extends MatsimTestCase implements ParametersPSFMutato
 		ChargingTimes chargingTimesOfAgentOne=chargingTimes.get(new IdImpl("1"));
 		ChargeLog chargeLogOfAgentOne=chargingTimesOfAgentOne.getChargingTimes().get(0);
 		
-		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 20000, 1);
-		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 111111, 1);
+		// the vehicle should start charging immediately at work 20M Joules, which are needed
+		// at least to reach home again. It requires 5714.28 seconds to charge this amount of
+		// energy (at 3500W)
+		
+		// the first charging duration should be till 23400 (because of 900 second bins)
+		// 
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989, 1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 23400, 1);
 
+		
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(1);
 
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 72000, 1);
