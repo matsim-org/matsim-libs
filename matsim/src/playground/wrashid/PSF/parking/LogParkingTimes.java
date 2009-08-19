@@ -29,7 +29,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 	public void handleEvent(ActivityStartEvent event) {
 		// log the (start) time when the car departs
 		Id personId = event.getPersonId();
-		if (event.getActType().equalsIgnoreCase("parkingDepart")) {
+		if (event.getActType().equalsIgnoreCase("parkingDeparture")) {
 			ParkingTimes pTime = parkingTimes.get(personId);
 
 			if (pTime != null) {

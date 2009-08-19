@@ -33,5 +33,11 @@
 		<!-- make this a public parking without electricity -->
 		</activity>
 	</facility>
+	
+	<facility id="parkingAtWorkWithElectricity2" x="-7500" y="-10000">
+		<activity type="parking">
+		<!-- make this a public parking with electricity -->
+		</activity>
+	</facility>
 
 </facilities>
