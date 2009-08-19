@@ -61,7 +61,7 @@
     <param name="enableLinkToLinkRouting" value="true" />
     <!-- Specifies the file format for writing events. Currently supported: txt,
       xml. Multiple values can be specified separated by commas (','). -->
-    <param name="eventsFileFormat" value="txt" />
+    <param name="eventsFileFormat" value="xml" />
     <param name="firstIteration" value="0" />
     <param name="lastIteration" value="10" />
     <!-- The type of routing (least cost path) algorithm used, may have the values:
