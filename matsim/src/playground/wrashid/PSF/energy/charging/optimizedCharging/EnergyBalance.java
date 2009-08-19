@@ -29,11 +29,12 @@ public class EnergyBalance {
 	ChargingTimes chargingTimes;
 	// private double minEnergyToCharge;
 	private double batteryCapacity;
-	
+
 	/**
-	 * The last parking (index), which has been added to the priority queue for charging price
+	 * The last parking (index), which has been added to the priority queue for
+	 * charging price
 	 */
-	private int lastChargingPriceParkingIndex=0;
+	private int lastChargingPriceParkingIndex = 0;
 
 	public EnergyBalance(ParkingTimes parkTimes, EnergyConsumption energyConsumption, double batteryCapacity,
 			ChargingTimes chargingTimes) {
@@ -148,17 +149,42 @@ public class EnergyBalance {
 	}
 
 	/**
-	 * Try
+	 * Add the parking prices to the priority list as far as needed (only if the
+	 * car would run out of energy).
+	 * 
 	 * @return
 	 */
 	private PriorityQueue<FacilityChargingPrice> updateChargingPrice(PriorityQueue<FacilityChargingPrice> chargingPrice) {
-		while (lastChargingPriceParkingIndex < maxChargableEnergy.size() && maxChargableEnergy.get(lastChargingPriceParkingIndex)<batteryCapacity) {
+		while (lastChargingPriceParkingIndex < maxChargableEnergy.size() && getMinimumEnergyThatNeedsToBeCharged() < 0) {
 			chargingPrice = addNewParkingChargingPrices(lastChargingPriceParkingIndex, chargingPrice);
-			
+
 			lastChargingPriceParkingIndex++;
 		}
 		return chargingPrice;
 	}
+
+	/*
+	 * - positive value: the energy, that needs to be charged - negative value:
+	 * only little energy is needed for driving, therefore the next parking station could be reached without problems
+	 */
+	private double getMinimumEnergyThatNeedsToBeCharged() {
+
+		if (lastChargingPriceParkingIndex == maxChargableEnergy.size()) {
+			// if last parking reached, then we must recharge the car fully
+			return maxChargableEnergy.get(lastChargingPriceParkingIndex-1);
+		} else {
+			// find out how much we would run out of electricity, if we would go
+			// to the next parking
+			return maxChargableEnergy.get(lastChargingPriceParkingIndex)- batteryCapacity;
+		}
+	}
+
+	/**
+	 * TODO: Test also, if the first parking is already so far, that we would
+	 * run out of electricity, if we can handle this case properly...
+	 * 
+	 * @return
+	 */
 
 	// assuming, there is enough electricity in the car for driving the whole
 	// day
@@ -179,9 +205,6 @@ public class EnergyBalance {
 
 		PriorityQueue<FacilityChargingPrice> chargingPrice = updateChargingPrice(new PriorityQueue<FacilityChargingPrice>());
 
-		// TODO: this needs to come from input parameter...
-		double minEnergyLevelToCharge = batteryCapacity;
-
 		// at home the car must have reached 'minEnergyLevelToCharge'
 		// or the priority queue must be empty but this should be reported,
 		// because it means, the car could not charge fully
@@ -199,26 +222,33 @@ public class EnergyBalance {
 			int parkingIndex = bestEnergyPrice.getEnergyBalanceParkingIndex();
 			Id facilityId = parkingTimes.get(parkingIndex).getFacilityId();
 
-			double maximumEnergyThatNeedsToBeCharged = maxChargableEnergy.get(parkingIndex);
+			// the maximum energy, that can be charged at a parking (because we
+			// can only charge as much as the car has driven previously)
+			double maximumEnergyThatCanBeCharged = maxChargableEnergy.get(parkingIndex);
 
+			// the minimum energy that needs to be charged, either to reach the next parking or
+			// to fillup the electricity at the end of the day
+			double minimumEnergyThatNeedsToBeCharged = getMinimumEnergyThatNeedsToBeCharged();
+			
 			// skip the charging slot, if no charging at the current parking is
 			// needed
 			// TODO: this can be made more efficient later (perhaps)
-			if (maximumEnergyThatNeedsToBeCharged == 0) {
+			if (maxChargableEnergy.get(parkingIndex) == 0) {
 				continue;
 			}
 
-			double energyCharged = bestEnergyPrice.getEnergyCharge(maximumEnergyThatNeedsToBeCharged);
+			double energyCharged = bestEnergyPrice.getEnergyCharge(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
 
 			// set energyCharged to maximumEnergyThatNeedsToBeCharged, if they
 			// are very close, to counter
 			// rounding errors.
+			double estimatedAmountOfEnergyCharged=Math.min(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
 			int precision = 100000;
-			if (Math.abs(maximumEnergyThatNeedsToBeCharged * precision - energyCharged * precision) < 1) {
-				energyCharged = maximumEnergyThatNeedsToBeCharged;
+			if (Math.abs(estimatedAmountOfEnergyCharged * precision - energyCharged * precision) <= 1) {
+				energyCharged = estimatedAmountOfEnergyCharged;
 			}
 
-			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(maximumEnergyThatNeedsToBeCharged);
+			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
 
 			chargingTimes.addChargeLog(chargeLog);
 

@@ -65,29 +65,34 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		return timeSlotNumber;
 	}
 
-	public ChargeLog getChargeLog(double maxChargableEnergy) {
+	public ChargeLog getChargeLog(double minimumEnergyThatNeedsToBeCharged,double maxChargableEnergy) {
 		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
 
-		return new ChargeLog(facilityId, startChargingTime, getEndTimeOfCharge(maxChargableEnergy));
+		return new ChargeLog(facilityId, startChargingTime, getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy));
 	}
 
 	// how much energy will be charged through this slot and facility
-	public double getEnergyCharge(double maxChargableEnergy) {
+	public double getEnergyCharge(double minimumEnergyThatNeedsToBeCharged, double maxChargableEnergy) {
 		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
 		
-		return ParkingInfo.getParkingElectricityPower(facilityId) * (getEndTimeOfCharge(maxChargableEnergy) - startChargingTime);
+		return ParkingInfo.getParkingElectricityPower(facilityId) * (getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy) - startChargingTime);
 	}
 
 	/*
 	 * find out the end time of the charge
 	 */
-	private double getEndTimeOfCharge(double energyNeeded) {
+	private double getEndTimeOfCharge(double minimumEnergyThatNeedsToBeCharged,double maxChargableEnergy) {
 
 		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
 		
 		// how much time would be needed to charge the car fully at the current
 		// parking
-		double durationNeededForRequiredCharging = energyNeeded / ParkingInfo.getParkingElectricityPower(facilityId);
+		
+		// normally, minimum energy that needs to be charged should be smaller than the maximum energy that can be charged
+		// but this is not always the case: when the car reaches the last parking, then the overall goal is to charge the car fully
+		// till the end of the iteration. In this case minimumEnergyThatNeedsToBeCharged can be bigger than maxChargableEnergy
+		// therefore the min of these values is should be taken
+		double durationNeededForRequiredCharging = Math.min(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy) / ParkingInfo.getParkingElectricityPower(facilityId);
 
 		// by default, we can charge till the end of the charging slot
 		double endTimeOfCharge = slotStartTime + 900;
