@@ -52,8 +52,8 @@ public class SignalSystemsIntegrationTest extends MatsimTestCase {
 		
 		String iterationOutput = this.getOutputDirectory() + "/ITERS/it.10/";
 		assertEquals("different events files", 
-				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.events.txt.gz"), 
-				CRCChecksum.getCRCFromFile(iterationOutput + "10.events.txt.gz"));
+				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.events.xml.gz"), 
+				CRCChecksum.getCRCFromFile(iterationOutput + "10.events.xml.gz"));
 
 		assertEquals("different population files", 
 				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.plans.xml.gz"), 

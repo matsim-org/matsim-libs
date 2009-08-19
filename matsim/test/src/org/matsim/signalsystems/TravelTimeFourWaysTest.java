@@ -23,7 +23,7 @@ package org.matsim.signalsystems;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.Events;
-import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -35,6 +35,8 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class TravelTimeFourWaysTest extends MatsimTestCase {
 
+	private static final String EVENTSFILE = "events.xml.gz";
+	
 	public void testTrafficLightIntersection4arms() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String laneDefinitions = this.getClassInputDirectory()
@@ -53,17 +55,16 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		ScenarioLoader loader = new ScenarioLoader(data);
 		loader.loadScenario();
 		
-		
+		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
 		Events events = new Events();
-		String tempout = this.getOutputDirectory() + "events.txt.gz";
-		EventWriterTXT eWriter = new EventWriterTXT(tempout);
-		events.addHandler(eWriter);
+		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
+		events.addHandler(eventsXmlWriter);
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();
-		eWriter.closeFile();
-		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + "events.txt.gz"), CRCChecksum.getCRCFromFile(tempout));
+		eventsXmlWriter.closeFile();
+		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
 	}
 
 	public void testTrafficLightIntersection4armsWithUTurn() {
@@ -84,15 +85,16 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		ScenarioLoader loader = new ScenarioLoader(data);
 		loader.loadScenario();
 
+		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
 		Events events = new Events();
-		String tempout = this.getOutputDirectory() + "events.txt";
-		EventWriterTXT eWriter = new EventWriterTXT(tempout);
-		events.addHandler(eWriter);
+		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
+		events.addHandler(eventsXmlWriter);
+		
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
 		sim.setLaneDefinitions(data.getLaneDefinitions());
 		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemConfigurations());
 		sim.run();
-		eWriter.closeFile();
-		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getClassInputDirectory() + "reference_uturn.txt"), CRCChecksum.getCRCFromFile(tempout));
+		eventsXmlWriter.closeFile();
+		assertEquals("different events files", CRCChecksum.getCRCFromFile(this.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
 	}
 }
