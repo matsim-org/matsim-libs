@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateSelectedPlansTables.java
+ * AnalyzePlans.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,31 +20,34 @@
 
 package playground.anhorni.locationchoice.preprocess.plans.analyzePlans;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.utils.charts.BarChart;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
 import org.matsim.world.World;
+import playground.anhorni.locationchoice.preprocess.helper.Bins;
+import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 public class AnalyzePlans {
 
@@ -52,56 +55,38 @@ public class AnalyzePlans {
 	private ActivityFacilities facilities;
 	private NetworkLayer network;
 	
-	private String plansfilePath;
-	private String facilitiesfilePath;
-	private String networkfilePath;
-	
+	String plansfilePath;
+		
 	private DecimalFormat formatter = new DecimalFormat("0.0");
-	
 	private final static Logger log = Logger.getLogger(AnalyzePlans.class);
 	
 	
-	public static void main(final String[] args) {
-
-		Gbl.startMeasurement();
+	public static void main(final String[] args) {		
 		final AnalyzePlans analyzer = new AnalyzePlans();
-		
-		String pathsFile = "./input/trb/valid/paths.txt";
-		analyzer.readInputFile(pathsFile);
-		
-		String outpath = "output/valid/plans/";
-		
-		analyzer.init();
-		analyzer.analyze1(outpath);
-		
-		analyzer.analyze2("shop", outpath);
-		analyzer.analyze2("leisure", outpath);
-		
-		analyzer.analyze3(outpath);
-		analyzer.analyze4(outpath);
-		
+		analyzer.init(args[0], args[1], args[2]);
+		analyzer.run(args[2]);	
+	}
+	
+	public void run(String plansfilePath) {			
+		log.info("Analyzig plans ...");		
+		Gbl.startMeasurement();
+		this.plansfilePath = plansfilePath;
+		String outpath = "output/plans/analysis/";
+		this.analyze1(outpath);
+		this.analyzeDesiredDuration("shop", outpath);
+		this.analyzeDesiredDuration("leisure", outpath);
+		this.analyze3(outpath);
+		this.analyze4(outpath);	
+		this.analyzeLeisureDistancesCar(outpath, "leisure");
+		this.analyzeLeisureDistancesCar(outpath, "shop");
+		this.analyzeLeisureDistancesCar(outpath, "work");
+		this.analyzeLeisureDistancesCar(outpath, "education");
+		this.analyzeLeisureDistances(outpath);
+		this.analyzeTripSharesAccording2MZ(outpath);
 		Gbl.printElapsedTime();
 	}
-	
-	private void readInputFile(final String inputFile) {
-		try {
-			FileReader fileReader = new FileReader(inputFile);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-			this.networkfilePath = bufferedReader.readLine();
-			this.facilitiesfilePath = bufferedReader.readLine();
-			this.plansfilePath = bufferedReader.readLine();
-
-			bufferedReader.close();
-			fileReader.close();
-
-		} catch (IOException e) {
-			Gbl.errorMsg(e);
-		}
-	}
-	
-	
-	private void init() {
+		
+	private void init(String networkfilePath, String facilitiesfilePath, String plansfilePath) {
 		
 		World world = Gbl.getWorld();
 				
@@ -128,6 +113,8 @@ public class AnalyzePlans {
 			double totalDesiredShoppingDuration = 0.0;
 			int numberOfLeisureActs = 0;
 			double totalDesiredLeisureDuration = 0.0;
+			int numberOfWorkActs = 0;
+			int numberOfEducationActs = 0;
 			
 			Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
 			while (person_it.hasNext()) {
@@ -152,6 +139,12 @@ public class AnalyzePlans {
 						desiredLeisurePerPerson += person.getDesires().getActivityDuration("leisure");
 						numberOfLeisureActsPerPerson++;
 					}
+					else if (act.getType().startsWith("work")) {
+						numberOfWorkActs++;
+					}
+					else if (act.getType().startsWith("education")) {
+						numberOfEducationActs++;
+					}
 				}
 				if (numberOfShoppingActsPerPerson > 0) {
 					totalDesiredShoppingDuration += (desiredShopPerPerson / numberOfShoppingActsPerPerson);
@@ -171,7 +164,10 @@ public class AnalyzePlans {
 			out.write("Total desired duration of leisure activities: \t" + 
 					formatter.format(1/3600.0 * totalDesiredLeisureDuration) + " [h] \n");
 			out.write("Avg. desired leisure duration: \t" + 
-					formatter.format(1/3600.0 * (totalDesiredLeisureDuration / numberOfLeisureActs)) + " [h] \n");
+					formatter.format(1/3600.0 * (totalDesiredLeisureDuration / numberOfLeisureActs)) + " [h] \n\n");
+			
+			out.write("Number of work activities: \t" + numberOfWorkActs + "\n");
+			out.write("Number of education activities: \t" + numberOfEducationActs + "\n");
 			out.flush();
 			out.close();
 		}
@@ -180,7 +176,66 @@ public class AnalyzePlans {
 		}
 	}
 	
-	private void analyze2(final String type, String outpath) {
+	private void analyzeTripSharesAccording2MZ(String outpath) {
+
+		try {
+			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "plan_trips_summary.txt");
+			
+			int numberOfShoppingTrips = 0;
+			int numberOfLeisureTrips = 0;
+			int numberOfWorkTrips = 0;
+			int numberOfEducationTrips = 0;
+			int numberOfReturningTrips = 0;
+			
+			Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
+			while (person_it.hasNext()) {
+				PersonImpl person = person_it.next();
+				PlanImpl selectedPlan = person.getSelectedPlan();
+								
+				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+				for (int j = 2; j < actslegs.size(); j=j+2) {
+					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+					
+					String actType = act.getType();
+					
+					if (actType.startsWith("home")) {
+						numberOfReturningTrips++;
+						actType = Utils.getActType(selectedPlan, act);
+					}
+					
+					if (actType.startsWith("shop")) {
+						numberOfShoppingTrips++;
+					}
+					else if (actType.startsWith("leisure")) {
+						numberOfLeisureTrips++;
+					}
+					else if (actType.startsWith("work")) {
+						numberOfWorkTrips++;
+					}
+					else if (actType.startsWith("education")) {
+						numberOfEducationTrips++;
+					}
+					else {
+						log.info("Something wrong ...");
+					}
+				}				
+			}
+			out.write("Plans file: " + this.plansfilePath +"\n");
+			out.write("Number of shopping trips: " +  numberOfShoppingTrips  + "\n");
+			out.write("Number of leisure trips: " +  numberOfLeisureTrips  + "\n");
+			out.write("Number of work trips: " +  numberOfWorkTrips  + "\n");
+			out.write("Number of education trips: " +  numberOfEducationTrips  + "\n");
+			out.write("Number of returning home trips: " +  numberOfReturningTrips  + "\n");
+
+			out.flush();
+			out.close();
+		}
+		catch (final IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	private void analyzeDesiredDuration(final String type, String outpath) {
 		try {
 			final String header="Person_id\tActDuration\tDesiredDuration";
 			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "personActDurations_" + type + ".txt");
@@ -190,10 +245,8 @@ public class AnalyzePlans {
 			int numberOfPersonsDoingType = 0;
 
 			Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
-			Counter counter = new Counter(" person # ");
 			while (person_iter.hasNext()) {
 				PersonImpl person = person_iter.next();
-				counter.incCounter();
 				boolean personSet = false;
 
 				PlanImpl selectedPlan = person.getSelectedPlan();
@@ -202,8 +255,8 @@ public class AnalyzePlans {
 				for (int j = 0; j < actslegs.size(); j=j+2) {
 					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 					if (act.getType().startsWith(type)) {
-						out.write(person.getId().toString()+"\t"+
-								String.valueOf(act.getDuration())+"\t"+
+						out.write(person.getId().toString() + "\t" +
+								String.valueOf(act.getDuration()) + "\t" +
 								person.getDesires().getActivityDuration(type));
 						out.newLine();
 
@@ -234,12 +287,9 @@ public class AnalyzePlans {
 			out.write(header);
 			out.newLine();
 
-
 			Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
-			Counter counter = new Counter(" person # ");
 			while (person_iter.hasNext()) {
 				PersonImpl person = person_iter.next();
-				counter.incCounter();
 				PlanImpl selectedPlan = person.getSelectedPlan();
 				final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 
@@ -272,10 +322,8 @@ public class AnalyzePlans {
 		int numberOfTrips = 0;
 
 		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
-		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
 			PersonImpl person = person_iter.next();
-			counter.incCounter();
 			boolean personSet = false;
 
 			PlanImpl selectedPlan = person.getSelectedPlan();
@@ -306,8 +354,9 @@ public class AnalyzePlans {
 			final BufferedWriter out = IOUtils.getBufferedWriter(outpath + "summary2.txt");
 			out.write("Total number of Primary Activities: \t"+ countPrim + "\n");
 			out.write("Number of Persons Doing Shop or Leisure: \t"+ numberOfPersonsDoingSL + "\n");
+			
 			double avgNumberOfTrips = (double)numberOfTrips/(double)this.plans.getPersons().size();
-			out.write("Number of persons: \t" + this.plans.getPersons().size());
+			out.write("Number of persons: \t" + this.plans.getPersons().size() + "\n");
 			out.write("Avg number of trips per person: \t" + avgNumberOfTrips);
 			out.flush();
 			out.close();
@@ -315,5 +364,160 @@ public class AnalyzePlans {
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
 		}	
+	}
+	
+	private void analyzeLeisureDistancesCar(String outpath, String type) {
+		
+		int cntAssigned = 0;
+		double distAssigned = 0;
+		int cnt = 0;
+		double dist = 0;
+		int cntWayThere = 0;
+		double distWayThere = 0;
+		
+		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
+		while (person_iter.hasNext()) {
+			PersonImpl person = person_iter.next();
+			PlanImpl selectedPlan = person.getSelectedPlan();
+			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+			ActivityImpl actPre = (ActivityImpl)actslegs.get(0);
+			
+			for (int j = 0; j < actslegs.size(); j=j+2) {
+				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+				
+				if (j > 0) {
+					if (act.getType().startsWith(type + "_") && act.getType().startsWith("leisure")) {	
+						distAssigned += Double.parseDouble(act.getType().substring(8));
+						cntAssigned++;	
+					}
+					if (Utils.getActType(selectedPlan, act).startsWith(type)) {							
+						dist += (int)Math.round(((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()));
+						cnt++;	
+					}
+					if (act.getType().startsWith(type)) {						
+						distWayThere += (int)Math.round(((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()));
+						cntWayThere++;
+					}
+				}
+				actPre = act;
+			}
+		}
+		try {			
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + this.plansfilePath + "_" + type +"_assigned_distance.txt");
+			if (cntAssigned > 0) {
+				out.write(type + ": average assigned distance: "  + distAssigned / cntAssigned +"\n");
+			}
+			out.write(type + ": average distance crowfly: "  + dist / cnt + "\n");
+			out.write(type + ": average distance HINWEGE: "  + distWayThere / cntWayThere);
+			out.flush();			
+			out.close();
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void analyzeLeisureDistances(String outpath) {
+		
+		int carDistanceUnit = 1000;
+		int ptDistanceUnit = 1000;
+		int bikeDistanceUnit = 500;
+		int walkDistanceUnit = 200;
+		
+		int carMaxDistance = 100 * 1000;
+		int ptMaxDistance = 100 * 1000;
+		int bikeMaxDistance = 50 * 1000;
+		int walkMaxDistance = 20 * 1000;
+		
+		TreeMap<String, Bins> distanceBins = new TreeMap<String, Bins>();
+		distanceBins.put("car", new Bins((int)(carDistanceUnit), carMaxDistance));			
+		distanceBins.put("pt", new Bins((int)(ptDistanceUnit), ptMaxDistance));
+		distanceBins.put("bike", new Bins((int)(bikeDistanceUnit), bikeMaxDistance));
+		distanceBins.put("walk", new Bins((int)(walkDistanceUnit), walkMaxDistance));
+								
+		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
+		while (person_iter.hasNext()) {
+			PersonImpl person = person_iter.next();
+			PlanImpl selectedPlan = person.getSelectedPlan();
+			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+
+			ActivityImpl actPre = (ActivityImpl)actslegs.get(0);
+			
+			for (int j = 0; j < actslegs.size(); j=j+2) {
+				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+				
+				if (act.getType().startsWith("leisure")) {	
+					
+					if (j + 1 < actslegs.size()) {  // see figure above
+						final LegImpl leg = (LegImpl)actslegs.get(j+1);	
+						
+						if (!leg.getMode().equals(TransportMode.ride)) {							
+							int dist = (int)Math.round(((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()));
+							distanceBins.get(leg.getMode().toString()).addVal(dist, 1.0);
+						}
+					}
+				}
+				actPre = act;
+			}
+		}
+		DecimalFormat formatter = new DecimalFormat("0.00");
+		
+		String [] modes = {"pt", "car", "bike", "walk"};				
+		int [] distanceUnits = {ptDistanceUnit, carDistanceUnit, bikeDistanceUnit, walkDistanceUnit};
+		for (int i = 0; i < 4; i++) {	
+			String [] categories  = new String[distanceBins.get(modes[i]).getSizes().length];
+			for (int j = 0; j < categories.length; j++) {
+				categories[j] = Integer.toString(j);
+			}
+			BarChart chartDistancesLeisureSize = new BarChart(modes[i] + " : leisure trip distances", 
+					"distance bin [" + distanceUnits[i]/1000.0 + "km]", "seize", categories);
+			chartDistancesLeisureSize.addSeries(
+					"Seize per bin", distanceBins.get(modes[i]).getSizes());
+			chartDistancesLeisureSize.saveAsPng(outpath  + "/" + modes[i] + "_leisure" + " bin unit = " + 
+					formatter.format(distanceUnits[i]/1000.0) + "_TripDistances.png", 1600, 800);
+		}			
+		for (int i = 0; i < 4; i++) {
+			
+			try {			
+				BufferedWriter outLeisure = IOUtils.getBufferedWriter(outpath + modes[i] 
+				        + "_leisure" + " bin unit = " + 
+						formatter.format(distanceUnits[i]/1000.0) + "_TripDistances.txt");
+				outLeisure.write("Distance bin [" + distanceUnits[i]/1000.0 + "km]" + "\tSize\n");
+				for (int j = 0; j < distanceBins.get(modes[i]).getMedian().size();  j++) {
+					outLeisure.write(j + "\t" + distanceBins.get(modes[i]).getSizes()[j] + "\n");
+				}					
+				outLeisure.flush();			
+				outLeisure.close();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	public PopulationImpl getPlans() {
+		return plans;
+	}
+
+	public void setPlans(PopulationImpl plans) {
+		this.plans = plans;
+	}
+
+	public ActivityFacilities getFacilities() {
+		return facilities;
+	}
+
+	public void setFacilities(ActivityFacilities facilities) {
+		this.facilities = facilities;
+	}
+
+	public NetworkLayer getNetwork() {
+		return network;
+	}
+
+	public void setNetwork(NetworkLayer network) {
+		this.network = network;
 	}	
 }
