@@ -81,6 +81,9 @@ public class EnergyBalance {
 		}
 	}
 
+	/*
+	 * This method adds the parking prices of the specified parking (index) to the priority list.
+	 */
 	private PriorityQueue<FacilityChargingPrice> getChargingPrice() {
 		PriorityQueue<FacilityChargingPrice> chargingPrice = new PriorityQueue<FacilityChargingPrice>();
 		int maxIndex = parkingTimes.size() - 1;
