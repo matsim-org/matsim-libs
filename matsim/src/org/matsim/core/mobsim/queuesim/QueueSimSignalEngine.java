@@ -175,7 +175,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 				//add controller to signal groups
 				List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getSignalSystemId());
 				if ((groups == null) || groups.isEmpty()) {
-					String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + "without any SignalGroups defined in SignalSystemConfiguration!";
+					String message = "SignalSystemControler for SignalSystem Id: " + config.getSignalSystemId() + " without any SignalGroups defined in SignalSystemConfiguration!";
 					log.warn(message);
 				}
 				else {
