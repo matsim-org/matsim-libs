@@ -155,7 +155,7 @@ public class EnergyBalance {
 	 * @return
 	 */
 	private PriorityQueue<FacilityChargingPrice> updateChargingPrice(PriorityQueue<FacilityChargingPrice> chargingPrice) {
-		while (lastChargingPriceParkingIndex < maxChargableEnergy.size() && getMinimumEnergyThatNeedsToBeCharged() < 0) {
+		while (lastChargingPriceParkingIndex < maxChargableEnergy.size() && getMinimumEnergyThatNeedsToBeCharged() <= 0) {
 			chargingPrice = addNewParkingChargingPrices(lastChargingPriceParkingIndex, chargingPrice);
 
 			lastChargingPriceParkingIndex++;
@@ -164,7 +164,7 @@ public class EnergyBalance {
 	}
 
 	/*
-	 * - positive value: the energy, that needs to be charged - negative value:
+	 * - positive value: the energy, that mus be charged, so that the car does not run out of gasoline on its way - negative value:
 	 * only little energy is needed for driving, therefore the next parking station could be reached without problems
 	 */
 	private double getMinimumEnergyThatNeedsToBeCharged() {

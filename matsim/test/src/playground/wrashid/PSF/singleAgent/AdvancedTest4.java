@@ -77,18 +77,31 @@ public class AdvancedTest4 extends MatsimTestCase implements ParametersPSFMutato
 		// get(4) should be: 27000
 		// get(5) should be: 27900
 
-		// the agent charges till the end of the slot, although he could 
+		// the agent just charges as much at work as he needs to charge (for driving home)
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(6);
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 27900, 1);
-		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 28703, 1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 28704, 1);
 		
-		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(1);
-
+		// the agent continues charging at home as soon as the off peak tariff starts
+		// actually, when the agent arrives at home, his battery is empty and 10285.714 seconds
+		// are needed at 3500W to recharge it.
+		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(7);
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 72000, 1);
-		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 111111, 1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 72900, 1);
 
-		// the agent should charge twice.
-		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
+		// skipping 10 some checks
+		
+		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(17);
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 81000, 1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 81900, 1);
+		
+		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(18);
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 81900, 1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 82285, 1);
+		
+		
+		// make sure, this is the last charging of the agent
+		assertEquals(19, chargingTimesOfAgentOne.getChargingTimes().size());
 	}
 
 }
