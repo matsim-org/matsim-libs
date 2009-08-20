@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
@@ -24,28 +25,42 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
 
 public class GenerateZuerrichOutput {
 
+	private static final Logger log = Logger.getLogger(GenerateZuerrichOutput.class);
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
-		// rausschreiben
-		HashMap<Integer, BasicSignalSystemDefinition> basicLightSignalSystemDefinition = LSASystemsReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/lsa_tu.txt");
+		String inputDir = "D:/ampel/generateOutputFile/";
 		
-		Map<Integer, BasicSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/sg_greentime.txt");
+		String lsaTu = inputDir + "lsa_tu.txt";
+		String sgGreentime = inputDir  + "sg_greentime.txt";
+		String spurLinkMapping = inputDir + "spur_link_mapping_ivtch.txt";
+		String lsaSpurMappingFile = inputDir + "lsa_spur_mapping.txt";
+		String spurSpurMappingFile = inputDir + "spur_spur_mapping.txt";
+		
+		String signalConfigOutputFile = inputDir +  "lsa_config.xml";
+		String signalSystemsOutputFile = inputDir + "lsa.xml";
+
+		
+		// rausschreiben
+		HashMap<Integer, BasicSignalSystemDefinition> basicLightSignalSystemDefinition = LSASystemsReader.readBasicLightSignalSystemDefinition(lsaTu);
+		
+		Map<Integer, BasicSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
 		BasicSignalSystemConfigurations bssc = new BasicSignalSystemConfigurationsImpl();
 		for (BasicSignalSystemConfiguration ssc : basicLightSignalSystemConfiguration.values()){
 			bssc.getSignalSystemConfigurations().put(ssc.getSignalSystemId(), ssc);
 		}
 		MatsimSignalSystemConfigurationsWriter matsimLightSignalSystemConfigurationWriter 
 		= new MatsimSignalSystemConfigurationsWriter(bssc);
-		matsimLightSignalSystemConfigurationWriter.writeFile("lsa_config.xml");
+		matsimLightSignalSystemConfigurationWriter.writeFile(signalConfigOutputFile);
 		
 		// sortieren
-		HashMap<Integer, HashMap<Integer, String>> laneLinkMapping = LaneLinkMappingReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/spur_link_mapping_ivtch.txt");
+		HashMap<Integer, HashMap<Integer, String>> laneLinkMapping = LaneLinkMappingReader.readBasicLightSignalSystemDefinition(spurLinkMapping);
 		
-		HashMap<Integer, HashMap<Integer,  List<Integer>>> lsaSpurMapping = LSASpurMappingReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/lsa_spur_mapping.txt");
-		HashMap<Integer, HashMap<Integer,  List<Integer>>> spurSpurMapping = SpurSpurMappingReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/spur_spur_mapping.txt");
+		HashMap<Integer, HashMap<Integer,  List<Integer>>> lsaSpurMapping = LSASpurMappingReader.readBasicLightSignalSystemDefinition(lsaSpurMappingFile);
+		HashMap<Integer, HashMap<Integer,  List<Integer>>> spurSpurMapping = SpurSpurMappingReader.readBasicLightSignalSystemDefinition(spurSpurMappingFile);
 	
 		
 				
@@ -147,10 +162,10 @@ public class GenerateZuerrichOutput {
 
 		
 		MatsimSignalSystemsWriter signalSytemswriter = new MatsimSignalSystemsWriter(laneDefs, basicLightSignalSystems);
-		signalSytemswriter.writeFile("lsa.xml");
+		signalSytemswriter.writeFile(signalSystemsOutputFile );
 		
-		RemoveDuplicates.readBasicLightSignalSystemDefinition("lsa_config.xml");
-		RemoveDuplicates.readBasicLightSignalSystemDefinition("lsa.xml");
+		RemoveDuplicates.readBasicLightSignalSystemDefinition(signalConfigOutputFile);
+		RemoveDuplicates.readBasicLightSignalSystemDefinition(signalSystemsOutputFile);
 		
 		System.out.println("Everything finshed");
 
