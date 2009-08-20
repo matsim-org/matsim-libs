@@ -239,6 +239,8 @@ public class EnergyBalance {
 
 			double energyCharged = bestEnergyPrice.getEnergyCharge(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
 
+			
+			
 			// set energyCharged to maximumEnergyThatNeedsToBeCharged, if they
 			// are very close, to counter
 			// rounding errors.
@@ -248,12 +250,32 @@ public class EnergyBalance {
 				energyCharged = estimatedAmountOfEnergyCharged;
 			}
 
+			
+		
+			
+			
 			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
 
 			chargingTimes.addChargeLog(chargeLog);
 
 			updateMaxChargableEnergy(parkingIndex, energyCharged);
 
+			/*
+			 * We want to make sure, that unused parts of a slot can later be used.
+			 * 
+			 * This means, if getEndTimeOfCharge < getEndTimeOfSlot then we should put this FacilityChargingPrice 
+			 * again into the queue and update its 
+			 */
+			
+			double endTimeOfCharge=bestEnergyPrice.getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged, maximumEnergyThatCanBeCharged);
+			
+			if (endTimeOfCharge<bestEnergyPrice.getEndTimeOfSlot()){
+				bestEnergyPrice.setSlotStartTime(endTimeOfCharge);
+				chargingPrice.add(bestEnergyPrice);
+			}
+			
+			
+			// if possible, more parkings should be taken into consideration
 			updateChargingPrice(chargingPrice);
 		}
 

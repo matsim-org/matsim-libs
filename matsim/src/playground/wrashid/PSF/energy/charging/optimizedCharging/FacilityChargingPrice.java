@@ -15,7 +15,9 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	private Id facilityId;
 	private double endParkingTime;
 	private double startParkingTime;
-
+	
+	private double endTimeOfSlot;
+	
 	/*
 	 * the time starts with the first car leg of the person. When the car is
 	 * parked, determine all the time slots, for the duration of the parking and
@@ -44,6 +46,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		this.facilityId = facilityId;
 		this.endParkingTime = endParkingTime;
 		this.startParkingTime = startParkingTime;
+		endTimeOfSlot=slotStartTime+900;
 	}
 
 	public int compareTo(FacilityChargingPrice otherChargingPrice) {
@@ -81,7 +84,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	/*
 	 * find out the end time of the charge
 	 */
-	private double getEndTimeOfCharge(double minimumEnergyThatNeedsToBeCharged,double maxChargableEnergy) {
+	public double getEndTimeOfCharge(double minimumEnergyThatNeedsToBeCharged,double maxChargableEnergy) {
 
 		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
 		
@@ -95,7 +98,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		double durationNeededForRequiredCharging = Math.min(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy) / ParkingInfo.getParkingElectricityPower(facilityId);
 
 		// by default, we can charge till the end of the charging slot
-		double endTimeOfCharge = slotStartTime + 900;
+		double endTimeOfCharge = endTimeOfSlot;
 
 		
 		// the last (home) parking - parking ending after midnight
@@ -130,5 +133,24 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 
 		return endTimeOfCharge;
 	}
+
+	
+	public double getSlotStartTime() {
+		return slotStartTime;
+	}
+
+	public double getEndTimeOfSlot() {
+		return endTimeOfSlot;
+	}
+
+	public void setEndTimeOfSlot(double endTimeOfSlot) {
+		this.endTimeOfSlot = endTimeOfSlot;
+	}
+
+	public void setSlotStartTime(double slotStartTime) {
+		this.slotStartTime = slotStartTime;
+	}
+	
+	
 
 }
