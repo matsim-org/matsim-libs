@@ -19,11 +19,11 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 
 public class AdvancedTest1 extends MatsimTestCase implements ParametersPSFMutator {
 
-	// now the car arrives earlier at home, than the peak time starts
+	// now the car arrives earlier at home, than the off peak time starts
 	// this means, the car should start charging immediately at home upon arrival
 	public void mutateParameters() {
 		ParametersPSF.setTestingPeakPriceEndTime(60000);
-	}
+	} 
 	
 	public void testOptimizedCharger() {
 		Controler controler=new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
