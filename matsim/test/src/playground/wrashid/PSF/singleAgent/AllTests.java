@@ -15,8 +15,10 @@ public class AllTests {
 		suite.addTestSuite(AdvancedTest2.class);
 		suite.addTestSuite(AdvancedTest3.class);
 		suite.addTestSuite(AdvancedTest4.class);
+		suite.addTestSuite(AdvancedTest5.class);
 
 		return suite;
 	}
 
 }
+           
