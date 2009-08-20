@@ -20,20 +20,25 @@
 
 package playground.christoph.router.costcalculators;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
+import playground.christoph.events.EventControler;
 import playground.christoph.router.util.KnowledgeTravelTime;
 
 public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, Cloneable {
 
+	private static final Logger log = Logger.getLogger(EventControler.class);
+	
 	protected final TravelTime timeCalculator;
 
 	public OnlyTimeDependentTravelCostCalculator(final TravelTime timeCalculator)
 	{
 		this.timeCalculator = timeCalculator;
+		if (timeCalculator == null) log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
 	}
 
 	public double getLinkTravelCost(final Link link, final double time) 

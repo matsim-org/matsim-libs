@@ -167,6 +167,7 @@ public class EventControler extends Controler {
 		travelCostWrapper.useLookupTable(false);
 		
 		this.setTravelCostCalculator(travelCostWrapper);
+//		this.setTravelCostCalculator(travelCost);
 	}
 	
 	/*
@@ -305,8 +306,7 @@ public class EventControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		sim = new ReplanningQueueSimulation(this.network, this.population,
-				this.events);
+		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 
 		sim.setControler(this);
 
@@ -328,8 +328,8 @@ public class EventControler extends Controler {
 		if (knowledgeTravelTime != null)
 			knowledgeTravelTime.setMyQueueNetwork(sim.getMyQueueNetwork());
 
-		log.info("Remove not selected Plans");
-		clearPlans();
+//		log.info("Remove not selected Plans");
+//		clearPlans();
 
 		// log.info("Read known Nodes Maps from a File");
 		// readKnownNodesMap();

@@ -29,7 +29,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	private static String separator = "@";
 	//private static String tableName = "MapKnowledge";
-	private static String tableName = "BatchTable1_0";
+	private static String tableName = "BatchTable1_2";
 	
 	private Lock lock = new ReentrantLock();
 	
@@ -258,21 +258,5 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 			
 		return string;
 	}
-	
-/*	
-	private Map<Id, Node> createNodesMap(String string)
-	{
-		Map<Id, Node> nodesMap = new HashMap<Id, Node>();
-		
-		String[] nodeIds = string.split(this.separator);
-		
-		for (String id : nodeIds)
-		{
-			Node node = this.network.getNode(new IdImpl(id));
-			this.getKnownNodes().put(node.getId(), node);
-		}
-		
-		return nodesMap;
-	}
-*/
+
 }
