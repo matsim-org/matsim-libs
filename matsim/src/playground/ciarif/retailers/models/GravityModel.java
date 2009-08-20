@@ -72,15 +72,19 @@ public void init() {
 }
 
 public double computePotential(ArrayList<Integer> solution){
-    double global_likelihood = 0;
+	
+	System.out.println("The current solution is " + solution);
+	
+	double global_likelihood = 0;
     int a = 0;
+    
     for (ActivityFacility c : this.retailersFacilities.values()) {
     String linkId = (solution.get(a)).toString();
-    System.out.println("The current solution is " + solution);
     System.out.println("The link " + linkId + " is now processed");
     Coord coord = this.controler.getNetwork().getLink(linkId).getCoord();
 	++a;
 	double loc_likelihood = 0.0D;
+	
 	for (PersonRetailersImpl pr : this.retailersPersons.values()) {
         
 		double pers_sum_potential = 0.0D;
@@ -93,15 +97,20 @@ public double computePotential(ArrayList<Integer> solution){
           dist1 = pr.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord);
         }
         pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
+        
         if (pr.getGlobalShopsUtility()==0) {
         	this.processPerson();//System.out.println("The global utility is computed for the person " + pr.getId());
+        	
         	for (ActivityFacility s : this.shops.values()) {
 	          double dist = 0.0D;
 	          int count=0;
+	         
 	          for (ActivityFacility af: this.retailersFacilities.values()){
-		          if (af.equals(s)){
+		          
+	        	  if (af.equals(s)){
 		            int index = count;
 		            Coord coord1 = this.controler.getNetwork().getLink(((Integer)solution.get(index)).toString()).getCoord();
+		            
 		            if (pr.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1) == 0.0D) {
 		            	dist = 10.0D;
 		            }

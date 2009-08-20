@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-//import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -27,7 +27,7 @@ public class LinksRetailerReader {
 	protected ArrayList<LinkRetailersImpl> freeLinks = new ArrayList<LinkRetailersImpl>();
 	private ArrayList<LinkRetailersImpl> currentLinks =  new ArrayList<LinkRetailersImpl>();
 	private Retailers retailers;
-	//private final static Logger log = Logger.getLogger(LinksRetailerReader.class);
+	private final static Logger log = Logger.getLogger(LinksRetailerReader.class);
 	
 	//Constructors
 	
@@ -128,6 +128,7 @@ public class LinksRetailerReader {
 			if (currentLinks.contains(link.getId())) {}
 			else {	
 				this.freeLinks.add(link);
+				log.info("the link " + link.getId() + " has been added to the free links" ); 
 				this.allLinks.add(link);
 			}		
 		}

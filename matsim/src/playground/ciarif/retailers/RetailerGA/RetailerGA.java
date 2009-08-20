@@ -37,7 +37,7 @@ public class RetailerGA {
 	private double best;
 	private double average;
 	private double worst;
-	private final int numberOfMutationsToMutant = 3;
+	private final int numberOfMutationsToMutant = 5;
 	private final double diversityThreshold = 0.25;
 	private final double diversityMutationFraction = 0.25;
 	

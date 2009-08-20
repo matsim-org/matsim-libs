@@ -107,7 +107,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	    //wrm.writeRetailersMatrices(variables_matrix, "variables_matrix");
 	    OLSMultipleLinearRegression olsmr = new OLSMultipleLinearRegression();
 	    olsmr.newSampleData(regressand_matrix.toArray(), variables_matrix.toArray());
-	    //double[] b = {-1, 0.04};
+	    
 	    double[] b = olsmr.estimateRegressionParameters();
 	    log.info("Betas = " + b[0] + " " + b[1]);
 
@@ -172,6 +172,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		}	
 
 		double [] b= this.computeParameters (prob_i_j, consumers, shops_keys);
+		//double[] b = {-1, 1};
 		gm.setBetas(b);
 		RunRetailerGA rrGA = new RunRetailerGA();
 		ArrayList<Integer> solution = rrGA.runGA(this.createInitialLocationsForGA(this.mergeLinks(freeLinks)),gm);		
