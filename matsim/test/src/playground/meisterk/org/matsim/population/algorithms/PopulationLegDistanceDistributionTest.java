@@ -39,7 +39,7 @@ import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanc
 public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
 	public static final double[] distanceClasses = new double[]{
-		0, 
+		0.0, 
 		100, 200, 500, 
 		1000, 2000, 5000, 
 		10000, 20000, 50000, 

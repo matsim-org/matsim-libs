@@ -45,6 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonAlgorithm {
 
 	private static final NumberFormat kmFormat, percentFormat;
+	private static final double DUMMY_NEGATIVE_DISTANCE = -1000.0;
 	
 	static {
 
@@ -193,11 +194,11 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 			for (TransportMode mode : this.frequencies.keySet()) {
 				System.out.print("\t");
 				if (isCumulative) {
-					numberOfLegs = this.getNumberOfLegs(mode, Double.MIN_VALUE, distanceClasses[i]);
+					numberOfLegs = this.getNumberOfLegs(mode, DUMMY_NEGATIVE_DISTANCE, distanceClasses[i]);
 				} else {
 					numberOfLegs = this.getNumberOfLegs(
 							mode, 
-							( (i == 0) ? Double.MIN_VALUE : distanceClasses[i - 1]), 
+							( (i == 0) ? DUMMY_NEGATIVE_DISTANCE : distanceClasses[i - 1]), 
 							distanceClasses[i]);
 				}
 				switch(crosstabFormat) {
@@ -211,10 +212,10 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 			}
 			System.out.print("\t");
 			if (isCumulative) {
-				numberOfLegs = this.getNumberOfLegs(Double.MIN_VALUE, distanceClasses[i]);
+				numberOfLegs = this.getNumberOfLegs(DUMMY_NEGATIVE_DISTANCE, distanceClasses[i]);
 			} else {
 				numberOfLegs = this.getNumberOfLegs(
-						( (i == 0) ? Double.MIN_VALUE : distanceClasses[i - 1]), 
+						( (i == 0) ? DUMMY_NEGATIVE_DISTANCE : distanceClasses[i - 1]), 
 						distanceClasses[i]);
 			}
 			switch(crosstabFormat) {
