@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -62,7 +63,7 @@ public class LSASpurMappingReader implements TabularFileHandler {
 		return this.lsaMap;
 	}
 	
-	public static HashMap<Integer, HashMap<Integer,  List<Integer>>> readBasicLightSignalSystemDefinition(String filename){
+	public static Map<Integer, Map<Integer,  List<Integer>>> readBasicLightSignalSystemDefinition(String filename){
 		
 		LSASpurMappingReader myLSAFileParser = new LSASpurMappingReader();
 		try {			
@@ -73,7 +74,7 @@ public class LSASpurMappingReader implements TabularFileHandler {
 			e.printStackTrace();
 		}
 		
-		return myLSAFileParser.lsaMap;
+		return (Map)myLSAFileParser.lsaMap;
 	}
 	
 }

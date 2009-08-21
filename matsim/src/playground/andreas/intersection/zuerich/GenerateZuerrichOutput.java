@@ -1,22 +1,19 @@
 package playground.andreas.intersection.zuerich;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.lanes.basic.BasicLaneImpl;
 import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignmentImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinitionImpl;
-import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
@@ -27,148 +24,184 @@ public class GenerateZuerrichOutput {
 
 	private static final Logger log = Logger.getLogger(GenerateZuerrichOutput.class);
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		String inputDir = "D:/ampel/generateOutputFile/";
-		
-		String lsaTu = inputDir + "lsa_tu.txt";
-		String sgGreentime = inputDir  + "sg_greentime.txt";
-		String spurLinkMapping = inputDir + "spur_link_mapping_ivtch.txt";
-		String lsaSpurMappingFile = inputDir + "lsa_spur_mapping.txt";
-		String spurSpurMappingFile = inputDir + "spur_spur_mapping.txt";
-		
-		String signalConfigOutputFile = inputDir +  "lsa_config.xml";
-		String signalSystemsOutputFile = inputDir + "lsa.xml";
-
-		
-		// rausschreiben
-		HashMap<Integer, BasicSignalSystemDefinition> basicLightSignalSystemDefinition = LSASystemsReader.readBasicLightSignalSystemDefinition(lsaTu);
-		
-		Map<Integer, BasicSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
-		BasicSignalSystemConfigurations bssc = new BasicSignalSystemConfigurationsImpl();
-		for (BasicSignalSystemConfiguration ssc : basicLightSignalSystemConfiguration.values()){
-			bssc.getSignalSystemConfigurations().put(ssc.getSignalSystemId(), ssc);
-		}
-		MatsimSignalSystemConfigurationsWriter matsimLightSignalSystemConfigurationWriter 
-		= new MatsimSignalSystemConfigurationsWriter(bssc);
-		matsimLightSignalSystemConfigurationWriter.writeFile(signalConfigOutputFile);
-		
-		// sortieren
-		HashMap<Integer, HashMap<Integer, String>> laneLinkMapping = LaneLinkMappingReader.readBasicLightSignalSystemDefinition(spurLinkMapping);
-		
-		HashMap<Integer, HashMap<Integer,  List<Integer>>> lsaSpurMapping = LSASpurMappingReader.readBasicLightSignalSystemDefinition(lsaSpurMappingFile);
-		HashMap<Integer, HashMap<Integer,  List<Integer>>> spurSpurMapping = SpurSpurMappingReader.readBasicLightSignalSystemDefinition(spurSpurMappingFile);
 	
-		
-				
-		HashMap<Id, BasicLanesToLinkAssignment> basicLaneToLinkAs = new HashMap<Id, BasicLanesToLinkAssignment>();
-		
-		for (Integer nodeId : spurSpurMapping.keySet()) {
-			
-			HashMap<Integer,  List<Integer>> nodeCombos = spurSpurMapping.get(nodeId);
-			
-			for (Integer fromLaneId : nodeCombos.keySet()) {
 
-				BasicLanesToLinkAssignment assignment = basicLaneToLinkAs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromLaneId)));
-				
-				if (assignment == null){
-					assignment = new BasicLanesToLinkAssignmentImpl(new IdImpl(laneLinkMapping.get(nodeId).get(fromLaneId)));
+	
+	/**
+	 * 
+	 * @param spurSpurMapping knotennummer -> (vonspur 1->n nachspur)	
+	 * @param knotenSpurLinkMapping knotennummer -> (spurnummer -> linkid)
+	 * @return
+	 */
+	private static BasicLaneDefinitions processLaneDefinitions(Map<Integer, Map<Integer, List<Integer>>> spurSpurMapping, Map<Integer, Map<Integer, String>> knotenSpurLinkMapping) {
+		//create the lanes ...
+		BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
+		for (Integer nodeId : spurSpurMapping.keySet()) {
+			//for all 
+			Map<Integer,  List<Integer>> vonSpurToSpurMap = spurSpurMapping.get(nodeId);
+			for (Integer fromLaneId : vonSpurToSpurMap.keySet()) {
+				//create the id from ???
+				String linkIdString = knotenSpurLinkMapping.get(nodeId).get(fromLaneId);
+				if (!linkIdString.matches("[\\d]+")) {
+					log.error("cannot create link id from string " + linkIdString + " for nodeId: " + nodeId + " and laneId " + fromLaneId);
+					continue;
 				}
-				
-//				assignment = basicLaneToLinkAs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromLaneId)));
-				
-				List<Integer> toLanes = nodeCombos.get(fromLaneId);
-				
-				BasicLaneImpl lane = new BasicLaneImpl(new IdImpl(fromLaneId.intValue()));
+				Id linkId = new IdImpl(linkIdString);
+				BasicLanesToLinkAssignment assignment = laneDefs.getLanesToLinkAssignments().get(linkId);
+				if (assignment == null){
+					assignment = laneDefs.getBuilder().createLanesToLinkAssignment(linkId);
+				}
+
+				Id laneId = new IdImpl(fromLaneId.intValue());
+				BasicLaneImpl lane = new BasicLaneImpl(laneId);
 				lane.setLength(45.0);
 				lane.setNumberOfRepresentedLanes(1);
-
-
+				
+				List<Integer> toLanes = vonSpurToSpurMap.get(fromLaneId);
 				for (Integer toLaneId : toLanes) {
-					if (!laneLinkMapping.get(nodeId).get(toLaneId).equalsIgnoreCase("-")){
-						lane.addToLinkId(new IdImpl(laneLinkMapping.get(nodeId).get(toLaneId)));	
+					if (!knotenSpurLinkMapping.get(nodeId).get(toLaneId).equalsIgnoreCase("-")){
+						lane.addToLinkId(new IdImpl(knotenSpurLinkMapping.get(nodeId).get(toLaneId)));	
 					}								
 				}
-				
 				if(lane.getToLinkIds() != null){
 					assignment.addLane(lane);
 				}
-				
-				if (assignment.getLanes() != null){
-					basicLaneToLinkAs.put(new IdImpl(laneLinkMapping.get(nodeId).get(fromLaneId)), assignment);
+				if (assignment.getLanesList() != null){
+					if (!assignment.getLinkId().toString().equalsIgnoreCase("-")){
+						laneDefs.addLanesToLinkAssignment(assignment);
+					}
 				}
-
 			}			
 		}
-		
-		HashMap<Id, BasicSignalGroupDefinition> basicSGs = new HashMap<Id, BasicSignalGroupDefinition>();
-		
+		return laneDefs;
+	}
+	
+	
+	private static void processSignalSystems(Map<Integer, Map<Integer, List<Integer>>> lsaSpurMapping, Map<Integer, Map<Integer, String>> laneLinkMapping, BasicSignalSystems signalSystems){
+		//create the signal groups
 		for (Integer nodeId : lsaSpurMapping.keySet()) {
-			
-			HashMap<Integer,  List<Integer>> nodeCombos = lsaSpurMapping.get(nodeId);
+			Map<Integer,  List<Integer>> nodeCombos = lsaSpurMapping.get(nodeId);
 			
 			for (Integer fromSGId : nodeCombos.keySet()) {
-
-				if (laneLinkMapping.get(nodeId).get(fromSGId) != null){
-
-					BasicSignalGroupDefinition sg = basicSGs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromSGId)));
-
+				String signalGroupDefIdString = laneLinkMapping.get(nodeId).get(fromSGId);
+				if ((signalGroupDefIdString != null) && signalGroupDefIdString.matches("[\\d]+")){
+					Id signalGroupDefId = new IdImpl(signalGroupDefIdString);
+					BasicSignalGroupDefinition sg = signalSystems.getSignalGroupDefinitions().get(signalGroupDefId);
 					if (sg == null){
-						sg = new BasicSignalGroupDefinitionImpl(new IdImpl(laneLinkMapping.get(nodeId).get(lsaSpurMapping.get(nodeId).get(fromSGId).get(0))), new IdImpl(fromSGId.intValue()));
-						sg.setLightSignalSystemDefinitionId(new IdImpl(fromSGId.intValue()));
+						Id linkRefId = new IdImpl(laneLinkMapping.get(nodeId).get(lsaSpurMapping.get(nodeId).get(fromSGId).get(0)));
+						//old signalGroupDefId was new IdImpl(fromSGId.intValue())
+						sg = signalSystems.getBuilder().createSignalGroupDefinition(linkRefId, signalGroupDefId);
+						//TODO check if exists
+						sg.setSignalSystemDefinitionId(new IdImpl(fromSGId.intValue()));
 					}
-
+					
+					//add lanes and toLinks
 //					sg = basicSGs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromSGId)));
-
 					List<Integer> toLanes = nodeCombos.get(fromSGId);
-
 					for (Integer toLaneId : toLanes) {
 						if (!laneLinkMapping.get(nodeId).get(toLaneId).equalsIgnoreCase("-")){
-							
 							if((sg.getLaneIds() == null) || !sg.getLaneIds().contains(new IdImpl(toLaneId.intValue()))){
 								sg.addLaneId(new IdImpl(toLaneId.intValue()));
 							}
 							if((sg.getToLinkIds() == null) || !sg.getToLinkIds().contains(new IdImpl(laneLinkMapping.get(nodeId).get(toLaneId)))){
 								sg.addToLinkId(new IdImpl(laneLinkMapping.get(nodeId).get(toLaneId)));	
 							}
-							
 						}
 					}
-					
 					if(sg.getLaneIds() != null){
-							basicSGs.put(new IdImpl(laneLinkMapping.get(nodeId).get(fromSGId)), sg);
+							signalSystems.addSignalGroupDefinition(sg);
 					}
+				} //end if
+				else {
+					log.error("Cannot create signalGroupDefinition for id string " + signalGroupDefIdString);
 				}
-			}			
+			} //end for			
 		}
-		BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
-		BasicSignalSystems basicLightSignalSystems = new BasicSignalSystemsImpl();
-		for (BasicLanesToLinkAssignment basicAssignment : basicLaneToLinkAs.values()) {
-			if (!basicAssignment.getLinkId().toString().equalsIgnoreCase("-")){
-				laneDefs.addLanesToLinkAssignment(basicAssignment);
-			} else System.err.println("Removed an assignment");			
+	}
+	
+	private static BasicSignalSystemConfigurations processSignalSystemConfigurations(String sgGreentime) {
+		Map<Integer, BasicSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
+		BasicSignalSystemConfigurations bssc = new BasicSignalSystemConfigurationsImpl();
+		for (BasicSignalSystemConfiguration ssc : basicLightSignalSystemConfiguration.values()){
+			bssc.getSignalSystemConfigurations().put(ssc.getSignalSystemId(), ssc);
 		}
-		for (BasicSignalGroupDefinition basicSignalGroup : basicSGs.values()) {
-//			if (basicSignalGroup.getLinkRefId() != null){
-				basicLightSignalSystems.addSignalGroupDefinition(basicSignalGroup);
-//			} else System.err.println("Removed a SignalGroup");
-		}
-		for (BasicSignalSystemDefinition basicSignalSystem : basicLightSignalSystemDefinition.values()) {
-			basicLightSignalSystems.addSignalSystemDefinition(basicSignalSystem);
+		return bssc;
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		String inputDir = "/media/data/work/scmWorkspace/shared-svn/studies/dgrether/lsaZurich/mappingNeu/";
+		String outputDir = "/media/data/work/scmWorkspace/shared-svn/studies/dgrether/signalSystemsZh/";
+		// lsa id \t cycle time
+		String lsaTu = inputDir + "lsa_tu.txt";
+//		lsa id (=node id) \t signal group id \t start red 
+		String sgGreentime = inputDir  + "sg_greentime.txt";
+		// node id \t suprnr \t linkid teleatlas \t linkid navteq \t linkid ivtch
+		String spurLinkMappingFile = inputDir + "spur_link_mapping.txt";
+		//node id \t lsanr??? \t spurnr
+		String lsaSpurMappingFile = inputDir + "lsa_spur_mapping.txt";
+		//node id \t vonspur \t nachspur
+		String spurSpurMappingFile = inputDir + "spur_spur_mapping.txt";
+		
+		String lanesOutputFile = outputDir + "laneDefinitions.xml";
+		String signalConfigOutputFile = outputDir +  "signalSystemsConfig.xml";
+		String signalSystemsOutputFile = outputDir + "signalSystems.xml";
+		
+		boolean generateLanes = true;
+		boolean generateSignalSystems = true;
+		boolean generateSignalSystemsConfig = false;
+		boolean removeDuplicates = false;
+		
+		Map<Integer, Map<Integer,  List<Integer>>> spurSpurMapping = null;
+		Map<Integer, Map<Integer, String>> spurLinkMapping = null;
+		BasicLaneDefinitions laneDefs = null;
+		if (generateLanes){
+			//knotennummer -> (vonspur 1->n nachspur)
+			spurSpurMapping = SpurSpurMappingReader.readBasicLightSignalSystemDefinition(spurSpurMappingFile);
+			//knotennummer -> (spurnummer -> linkid)
+			spurLinkMapping = new SpurLinkMappingReader().readBasicLightSignalSystemDefinition(spurLinkMappingFile);
+			
+			//create the lanes
+			laneDefs = processLaneDefinitions(spurSpurMapping, spurLinkMapping);
+			//write data
+			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(laneDefs);
+			laneWriter.writeFile(lanesOutputFile);
 		}
 
-		
-		MatsimSignalSystemsWriter signalSytemswriter = new MatsimSignalSystemsWriter(laneDefs, basicLightSignalSystems);
-		signalSytemswriter.writeFile(signalSystemsOutputFile );
-		
-		RemoveDuplicates.readBasicLightSignalSystemDefinition(signalConfigOutputFile);
-		RemoveDuplicates.readBasicLightSignalSystemDefinition(signalSystemsOutputFile);
-		
-		System.out.println("Everything finshed");
+		if (generateSignalSystems){
+			BasicSignalSystems signalSystems = new BasicSignalSystemsImpl();
+			//read the mappings
+			//read the system id <-> cycle time mapping
+			new LSASystemsReader(signalSystems).readBasicLightSignalSystemDefinition(lsaTu);			
+			//node id \t lsanr??? \t spurnr
+			Map<Integer, Map<Integer,  List<Integer>>> lsaSpurMapping = LSASpurMappingReader.readBasicLightSignalSystemDefinition(lsaSpurMappingFile);
+			//create the signals
+			processSignalSystems(lsaSpurMapping, spurLinkMapping, signalSystems);
+			MatsimSignalSystemsWriter signalSytemswriter = new MatsimSignalSystemsWriter(signalSystems);
+			signalSytemswriter.writeFile(signalSystemsOutputFile );
+
+		}
+
+		if (generateSignalSystemsConfig){
+			// signal system configs
+			BasicSignalSystemConfigurations signalSystemConfig = processSignalSystemConfigurations(sgGreentime);
+			MatsimSignalSystemConfigurationsWriter matsimLightSignalSystemConfigurationWriter 
+			= new MatsimSignalSystemConfigurationsWriter(signalSystemConfig);
+			matsimLightSignalSystemConfigurationWriter.writeFile(signalConfigOutputFile);
+		}
+
+		if (removeDuplicates){
+			//remove duplicates
+			RemoveDuplicates.readBasicLightSignalSystemDefinition(signalConfigOutputFile);
+			RemoveDuplicates.readBasicLightSignalSystemDefinition(signalSystemsOutputFile);
+		}
+		log.info("Everything finshed");
 
 	}
+	
+
 
 }
