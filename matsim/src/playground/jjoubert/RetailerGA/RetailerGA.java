@@ -23,6 +23,7 @@ package playground.jjoubert.RetailerGA;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.jfree.util.Log;
 import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
 public class RetailerGA {
@@ -72,10 +73,8 @@ public class RetailerGA {
 				 * swaps from the original genome. This might be too many for short
 				 * genomes, but too FEW for large genomes.
 				 */
-				ArrayList<Integer> newSolution = this.initialSolution.clone();
-				for(int j = 0; j < numberOfMutationsToMutant; j++){
-					newSolution = this.mutate(newSolution);
-				}
+				ArrayList<Integer> newSolution = this.mutate(this.initialSolution.getGenome());
+
 				double newSolutionFitness = this.fitnessFunction.evaluate(newSolution);
 				RetailerGenome newGenome = new RetailerGenome(newSolutionFitness, 
 											this.fitnessFunction.isMax(),
@@ -100,23 +99,31 @@ public class RetailerGA {
 		buildCDF();
 	}
 	
-	
+	/**
+	 * The method receives a genome; randomly selects two positions in the genome; and
+	 * swaps the two objects (alleles) in those positions.
+	 * @param genome, an <code>ArrayList</code> of <code>Integer</code>s.
+	 * @return a mutated <code>ArrayList</code> of <code>Integer</code>s.
+	 */
 	public ArrayList<Integer> mutate(ArrayList<Integer> genome){
 		/*
-		 * Create a copy of the original solution.
+		 * Create a copy of the original solution. Use the SAME integer objects, though,
+		 * otherwise the PMX Crossover will not be able to identify the correct positions
+		 * for crossover operations.
 		 */
 		ArrayList<Integer> result = new ArrayList<Integer>(this.genomeLength);
 		for (Integer integer : genome) {
-			int i = Integer.valueOf(integer);
-			result.add(i);
+			result.add(integer);
 		}
-		/*
-		 * Perform a random swap of two values.
-		 */
-		ArrayList<Integer> strip = permutator.permutate(genomeLength);
-		int pos1 = strip.get(0)-1;
-		int pos2 = strip.get(1)-1;
-		Collections.swap(result, pos1, pos2);
+		for(int i = 0; i < numberOfMutationsToMutant; i++){
+			/*
+			 * Perform a random swap of two values.
+			 */
+			ArrayList<Integer> strip = permutator.permutate(genomeLength);
+			int pos1 = strip.get(0)-1;
+			int pos2 = strip.get(1)-1;
+			Collections.swap(result, pos1, pos2);
+		}
 		
 		return result;
 	}
@@ -125,7 +132,6 @@ public class RetailerGA {
 		return populationSize;
 	}
 	
-
 	private void checkIncumbent(RetailerGenome genome){
 		if(this.fitnessFunction.isMax()){
 			if(genome.getFitness() > this.incumbent.getFitness()){
@@ -238,13 +244,7 @@ public class RetailerGA {
 		 */
 		for(int i = 0; i < numMutants; i++){
 			int pos = (int) this.cdf.sampleFromCDF();
-			ArrayList<Integer> al = generation.get(pos).clone();
-			for(int j = 0; j < numberOfMutationsToMutant; j++){
-				ArrayList<Integer> newAl = this.mutate(al);
-				for(int k = 0; k < genomeLength; k++){
-					al.set(k, newAl.get(k));
-				}
-			}
+			ArrayList<Integer> al = this.mutate(generation.get(pos).getGenome());
 			RetailerGenome newGn = new RetailerGenome(this.fitnessFunction.evaluate(al), 
 													  this.fitnessFunction.isMax(), 
 													  al);
@@ -295,8 +295,8 @@ public class RetailerGA {
 			int i = 0;
 			while(i < numCrossovers){
 
-				ArrayList<Integer> P1 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
-				ArrayList<Integer> P2 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
+				ArrayList<Integer> P1 = this.generation.get((int) this.cdf.sampleFromCDF()).getGenome();
+				ArrayList<Integer> P2 = this.generation.get((int) this.cdf.sampleFromCDF()).getGenome();
 				
 				ArrayList<RetailerGenome> offspring = this.performPMX(P1, P2);				
 				
@@ -336,6 +336,7 @@ public class RetailerGA {
 		buildCDF();
 	}
 	
+	
 	private void calculateStats() {
 		double total = 0;
 		for (RetailerGenome rg : this.generation) {
@@ -346,6 +347,7 @@ public class RetailerGA {
 		setWorst(generation.get(populationSize-1).getFitness());		
 	}
 
+	
 	public ArrayList<RetailerGenome> performPMX(ArrayList<Integer> P1,
 												ArrayList<Integer> P2){
 		
@@ -370,12 +372,20 @@ public class RetailerGA {
 			c1.set(j, P2.get(j));
 			c2.set(j, P1.get(j));
 		}
+		
+		if(P1.toString().equalsIgnoreCase("[2, 8, 5, 5, 4, 3, 9, 1, 2, 10]") &&
+		   P2.toString().equalsIgnoreCase("[4, 9, 5, 5, 8, 3, 2, 2, 1, 10]")){
+			System.out.println("Here is the problem situation!");
+		}
 
 		// Finish first offspring
-		int pos = 0;
-		while(pos < this.genomeLength){
+//		int pos = 0;
+		int pos = pointA-1;
+//		while(pos < this.genomeLength){
+		while(pos < pointB){
 			// Find out if C1 contains P1(pos)
-			if(c1.contains(P1.get(pos))){
+			if(myContain(c1, P1.get(pos))){
+//			if(c1.contains(P1.get(pos))){
 				pos++;
 			} else{
 				int thePos = findPmxPosition(pos, c1, P1);
@@ -383,11 +393,20 @@ public class RetailerGA {
 				pos++;
 			}
 		}
+		for(int i = 0; i < this.genomeLength; i++){
+			if(c1.get(i).equals(Integer.MIN_VALUE)){
+				c1.set(i, P1.get(i));
+			}
+		}
+		
 		// Finish second offspring
-		pos = 0;
-		while(pos < this.genomeLength){
+//		pos = 0;
+		pos = pointA-1;
+//		while(pos < this.genomeLength){
+		while(pos < pointB){
 			// Find out if C2 contains P2(pos)
-			if(c2.contains(P2.get(pos))){
+			if(myContain(c2, P2.get(pos))){
+//			if(c2.contains(P2.get(pos))){
 				pos++;
 			} else{
 				int thePos = findPmxPosition(pos, c2, P2);
@@ -395,6 +414,12 @@ public class RetailerGA {
 				pos++;
 			}
 		}
+		for(int i = 0; i < this.genomeLength; i++){
+			if(c2.get(i).equals(Integer.MIN_VALUE)){
+				c2.set(i, P2.get(i));
+			}
+		}
+
 		RetailerGenome offspring1 = new RetailerGenome(this.fitnessFunction.evaluate(c1), 
 													   this.fitnessFunction.isMax(),
 													   c1);
@@ -405,6 +430,35 @@ public class RetailerGA {
 		offspring.add(offspring2);
 		
 		return offspring;		
+	}
+	
+	private boolean myContain(ArrayList<Integer> list, Integer i){
+		boolean result = false;
+		int pos = 0;
+		while(pos < list.size() && !result){
+			if(list.get(pos) == i){
+				result = true;
+			} else{
+				pos++;
+			}
+		}
+		return result;
+	}
+	
+	private int myFindPosition(ArrayList<Integer> list, Integer i){
+		Integer result = null;
+		int pos = 0;
+		while(pos < list.size() && result==null){
+			if(list.get(pos) == i){
+				result = pos;
+			} else{
+				pos++;
+			}
+		}
+		if(result==null){
+			Log.warn("We have a problem, there is no result!");
+		}
+		return result;
 	}
 	
 	private RetailerGenome performMX(ArrayList<Integer> p1,
@@ -435,14 +489,17 @@ public class RetailerGA {
 
 	private int findPmxPosition(int position, ArrayList<Integer> thisList, ArrayList<Integer> parentList){
 		int result = Integer.MIN_VALUE;
-		if(thisList.get(position) == Integer.MIN_VALUE){
+		if(thisList.get(position).equals(Integer.MIN_VALUE)){
 			result = position;
 		} else{
-			int filledPoint = thisList.get(position);
-			int filledPointPosition = parentList.indexOf(filledPoint);
+			Integer filledPoint = thisList.get(position);
+//			int filledPointPosition = parentList.indexOf(filledPoint);
+			int filledPointPosition = myFindPosition(parentList, filledPoint);
 			result = findPmxPosition(filledPointPosition, thisList, parentList);			
 		}
-		
+		if(result == Integer.MIN_VALUE){
+			Log.info("Problem here");
+		}
 		return result;
 	}
 

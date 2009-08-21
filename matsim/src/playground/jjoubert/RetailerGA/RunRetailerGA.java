@@ -33,8 +33,8 @@ public class RunRetailerGA {
 	public static void main(String[] args) {
 		
 		int genomeLength = 10;
-		int populationSize = 10;
-		int numberOfGenerations = 1000;
+		int populationSize = 20;
+		int numberOfGenerations = 100;
 		double elites = 0.10;
 		double mutants = 0.05;
 		/*
@@ -51,6 +51,17 @@ public class RunRetailerGA {
 		 */
 		MyPermutator p = new MyPermutator();
 		ArrayList<Integer> first = p.permutate(genomeLength);
+		
+		Integer firstDuplicate = new Integer(first.get(2));
+		first.set(3, firstDuplicate);
+		System.out.println("Object " + first.get(2) + " == " + first.get(3) + " : " + String.valueOf(first.get(2) == first.get(3)));
+		Integer secondDuplicate = new Integer(first.get(7));
+		first.set(8, secondDuplicate);
+		System.out.println("Object " + first.get(7) + " == " + first.get(8) + " : " + String.valueOf(first.get(7) == first.get(8)));
+		Integer thirdDuplicate = new Integer(secondDuplicate);
+		first.set(9, thirdDuplicate);
+		System.out.println(first.toString());
+		
 		
 		MyFitnessFunction ff = new MyFitnessFunction(false, genomeLength);
 		RetailerGA ga = new RetailerGA(populationSize, genomeLength, ff, first);
@@ -80,10 +91,10 @@ public class RunRetailerGA {
 		/*
 		 * Print out the solution progress to a file for R-graph.
 		 */
-		DateString ds = new DateString();
-		String fileName = "C:/Documents and Settings/ciarif/My Documents/Francesco/Projects/Agent Based Retailers/Runs/GA-Progress-" + ds.toString() + ".txt";
-		//String fileName = "/Users/johanwjoubert/R-Source/Input/GA-Progress-" + ds.toString() + ".txt";		
-		writeSolutionProgressToFile(solutionProgress, fileName);
+//		DateString ds = new DateString();
+//		String fileName = "C:/Documents and Settings/ciarif/My Documents/Francesco/Projects/Agent Based Retailers/Runs/GA-Progress-" + ds.toString() + ".txt";
+//		String fileName = "/Users/johanwjoubert/R-Source/Input/GA-Progress-" + ds.toString() + ".txt";		
+//		writeSolutionProgressToFile(solutionProgress, fileName);
 	}
 
 	/**
