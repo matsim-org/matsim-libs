@@ -45,7 +45,7 @@ import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
  */
 
 
-public class BellmanFordVertexIntervalls {
+public class BellmanFordIntervallBased {
 	
 	
 
@@ -119,7 +119,7 @@ public class BellmanFordVertexIntervalls {
 	 * Constructor using all the data initialized in the Flow object use recommended
 	 * @param flow 
 	 */
-	public BellmanFordVertexIntervalls( Flow flow) {
+	public BellmanFordIntervallBased( Flow flow) {
 		this._flow = flow;
 		this.network = flow.getNetwork();
 		this._flowlabels = flow.getFlow();
@@ -135,7 +135,7 @@ public class BellmanFordVertexIntervalls {
 	 * @param debug > 0 is debug mode is on
 	 */
 	public static void debug(int debug){
-		BellmanFordVertexIntervalls._debug = debug;
+		BellmanFordIntervallBased._debug = debug;
 	}
 	
 	/**
@@ -143,21 +143,37 @@ public class BellmanFordVertexIntervalls {
 	 * @param warmstart > 0 is warmstart mode is on
 	 */
 	public static void warmstart(int warmstart){
-		BellmanFordVertexIntervalls._warmstart = warmstart;
+		BellmanFordIntervallBased._warmstart = warmstart;
+	}
+	
+	private class IntervallNode{
+		VertexIntervall _ival;
+		Node _node;
+		
+		IntervallNode(VertexIntervall ival, Node node){
+			this._ival = ival;
+			this._node = node; 
+			
+		}
+		Boolean equals(IntervallNode node){
+			return(node._node.equals(this._node) && node._ival.equals(this._ival));
+		}
+		
 	}
 	
 	/**
 	 * refreshes all dist labels before one run of the algorithm
 	 * @return returns all active sources
 	 */
-	private LinkedList<Node> refreshLabels(){
-		LinkedList<Node> nodes = new LinkedList<Node>();
+	private LinkedList<IntervallNode> refreshLabels(){
+		LinkedList<IntervallNode> nodes = new LinkedList<IntervallNode>();
 		for(Node node: network.getNodes().values()){
 			VertexIntervalls label = new VertexIntervalls();
 			_labels.put(node, label);
 			if(isActiveSource(node)){
-				nodes.add(node);
-				_labels.get(node).getIntervallAt(0).setDist(true);
+				VertexIntervall temp = _labels.get(node).getIntervallAt(0);
+				temp.setDist(true);
+				nodes.add(new IntervallNode(temp,node));
 			}
 		}
 		return nodes;
@@ -237,23 +253,29 @@ public class BellmanFordVertexIntervalls {
 	 * @param forward indicates, weather we use a forward or backwards edge
 	 * @return true if any label of Node to has changed
 	 */
-	private boolean relabel(Node from, Node to, Link over,boolean forward){
-		VertexIntervalls labelfrom = _labels.get(from);
+	private LinkedList<IntervallNode> relabel(IntervallNode from, Node to, Link over,boolean forward){
+		VertexIntervalls labelfrom = _labels.get(from._node);
 		VertexIntervalls labelto = _labels.get(to);
 		EdgeIntervalls	flowover = _flowlabels.get(over);
-		boolean changed=false;
-		int t=0;
-		VertexIntervall i;
-		do{
-			i = labelfrom.getIntervallAt(t);
-			t=i.getHighBound();
+		LinkedList<IntervallNode> changed = new LinkedList<IntervallNode>();
+		//int t=0;
+		VertexIntervall i = from._ival;
+		
+		
+		
+		
+		
+		
+		//do{
+			//i = labelfrom.getIntervallAt(t);
+			//t=i.getHighBound();
 			if(i.getDist()){
 				if(_debug>0){
-					System.out.println("wir kommen los:"+ from.getId());
+					System.out.println("wir kommen los:"+ from._node.getId());
 				}	//TODO cast to int capacity handling!!!
-				if((int)over.getCapacity(1.)==0){
-					continue;
-				}
+				//if((int)over.getCapacity(1.)==0){
+			//		continue;
+				//}
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
 					if(_debug>0){
@@ -263,10 +285,17 @@ public class BellmanFordVertexIntervalls {
 							System.out.println(inter);
 						}
 					}
-					boolean temp = labelto.setTrue( arrive , over );
-					if(temp){
-						changed = true;
+					
+					for(Intervall possible : arrive){
+						LinkedList<VertexIntervall> temp = labelto.setTrue( possible , over );
+						for(VertexIntervall tempint : temp ){
+							changed.add(new IntervallNode(tempint,to));
+						}
 					}
+					//boolean temp = labelto.setTrue( arrive , over );
+					//if(temp){
+					//	changed = true;
+					//}
 				}else{
 					if(_debug>0){
 						System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
@@ -274,7 +303,7 @@ public class BellmanFordVertexIntervalls {
 				}
 					
 			}
-		}while(!labelfrom.isLast(i));
+		//}while(!labelfrom.isLast(i));
 		return changed;
 	}
 	
@@ -284,27 +313,31 @@ public class BellmanFordVertexIntervalls {
 	 */
 	public TimeExpandedPath doCalculations() {
 		// queue to save nodes we have to scan
-		Queue<Node> queue = new LinkedList<Node>();
+		Queue<IntervallNode> queue = new LinkedList<IntervallNode>();
 		//set the startLabels and add active sources to to the queue
-		LinkedList<Node> activesources = this.refreshLabels();
-		if(_warmstart>0 && _warmstartlist!=null){
+		LinkedList<IntervallNode> activesources = this.refreshLabels();
+		
+		
+		
+		/*if(_warmstart>0 && _warmstartlist!=null){
 			queue.addAll(_warmstartlist);					
-			/* for( Node node : activesources){
+			 for( Node node : activesources){
 				if(!queue.contains(node)){
 					queue.add(node);
 				}
 				
-			}*/
+			}
 			queue.addAll(activesources);
 		}else{
 			queue.addAll(activesources);
-		}
-				
+		}*/
+		queue.addAll(activesources);
 
 		// v is first vertex in the queue
 		// w is the vertex we probably want to insert to the queue and 
 		// decrease its distance
-		Node v, w;
+		Node w;
+		IntervallNode v;
 		// dist is the distance from the source to w over v
 
 		// main loop
@@ -318,25 +351,34 @@ public class BellmanFordVertexIntervalls {
 			this._totalpolls++;
 			// Clean Up before we do anything!
 			//System.out.println("cleanupnode:"+v.getId().toString()+"\n old: \n"+_labels.get(v).toString());
-			gain += _labels.get(v).cleanup();
+			gain += _labels.get(v._node).cleanup();
 			//System.out.println("new: \n"+_labels.get(v).toString());
 
 			// visit neighbors
-			
+			//TODO
 			// link is outgoing edge of v => forward edge
-			for (Link link : v.getOutLinks().values()) {
+			for (Link link : v._node.getOutLinks().values()) {
 				w=link.getToNode();
-				boolean changed = relabel(v,w,link,true);
-				if (changed && !queue.contains(w)) {
-					queue.add(w);
+				LinkedList<IntervallNode> changed = relabel(v,w,link,true);
+				if(!changed.isEmpty()){
+					for(IntervallNode changednode : changed){
+						if(!queue.contains(changednode)){
+							queue.add(changednode);
+						}
+					}
 				}
+				
 			}
 			// link is incoming edge of v => backward edge
-			for (Link link : v.getInLinks().values()) {
+			for (Link link : v._node.getInLinks().values()) {
 				w=link.getFromNode();
-				boolean changed = relabel(v,w,link,false);
-				if (changed && !queue.contains(w)) {
-					queue.add(w);
+				LinkedList<IntervallNode> changed = relabel(v,w,link,false);
+				if(!changed.isEmpty()){
+					for(IntervallNode changednode : changed){
+						if(!queue.contains(changednode)){
+							queue.add(changednode);
+						}
+					}
 				}
 			}
 			if(_debug>3){

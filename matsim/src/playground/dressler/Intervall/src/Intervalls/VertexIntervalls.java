@@ -25,8 +25,11 @@ package playground.dressler.Intervall.src.Intervalls;
 
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.network.Link;
+
+//import playground.dressler.ea_flow.BellmanFordIntervallBased.IntervallNode;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
@@ -302,7 +305,7 @@ public class VertexIntervalls {
 			rem+=arrive.size()-arrivecondensed.size();
 			
 			for(int i=0; i< arrivecondensed.size(); i++){
-				boolean temp=setTrue(arrivecondensed.get(i),link);
+				boolean temp= !setTrue(arrivecondensed.get(i),link).isEmpty();
 				if(temp){
 					changed=true;
 				}
@@ -324,8 +327,9 @@ public class VertexIntervalls {
 	 * @param arrive Intervall at which node is reachable
 	 * @return true iff anything was changed
 	 */
-	public boolean setTrue(Intervall arrive,Link link){
+	public LinkedList<VertexIntervall> setTrue(Intervall arrive,Link link){
 		boolean changed = false;
+		LinkedList<VertexIntervall> change = new LinkedList<VertexIntervall>();
 		VertexIntervall test = this.getIntervallAt(arrive.getLowBound());
 		int t= test.getHighBound();
 		while(test.getLowBound()<arrive.getHighBound()){
@@ -336,6 +340,7 @@ public class VertexIntervalls {
 					test.setDist(true);
 					test.setPredecessor(link);
 					changed=true;
+					change.add(test);
 					if(VertexIntervalls._debug){
 						System.out.println("blub1");
 					}	
@@ -346,6 +351,7 @@ public class VertexIntervalls {
 						temp.setDist(true);
 						temp.setPredecessor(link);
 						changed=true;
+						change.add(temp);
 						if(VertexIntervalls._debug){
 							System.out.println("blub2");
 						}
@@ -358,6 +364,7 @@ public class VertexIntervalls {
 							temp.setDist(true);
 							temp.setPredecessor(link);
 							changed=true;
+							change.add(temp);
 							if(VertexIntervalls._debug){
 								System.out.println("blub3");
 							}
@@ -372,6 +379,7 @@ public class VertexIntervalls {
 								temp.setDist(true);
 								temp.setPredecessor(link);
 								changed=true;
+								change.add(temp);
 								if(VertexIntervalls._debug){
 									System.out.println("blub4");
 								}
@@ -386,7 +394,7 @@ public class VertexIntervalls {
 			}
 			test= this.getIntervallAt(t);
 		}	
-		return changed;
+		return change;
 	}
 	
 

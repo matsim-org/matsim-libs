@@ -151,8 +151,8 @@ public class MultiSourceEAF {
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
 		//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
-		//networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
-		networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
+		networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
+		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
 		
 		String plansfile = null;		
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
@@ -160,7 +160,7 @@ public class MultiSourceEAF {
 		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 		//plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
-		plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
+		//plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
 
 
 		String demandsfile = null;
@@ -177,7 +177,7 @@ public class MultiSourceEAF {
 		//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
 		outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
 		
-		int uniformDemands = 5;
+		int uniformDemands = 50;
 
 		//set parameters
 		int timeHorizon = 200000;
@@ -252,7 +252,7 @@ public class MultiSourceEAF {
 			//main loop for calculations
 			if(vertexAlgo){
 				BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
-
+				//BellmanFordIntervallBased routingAlgo = new BellmanFordIntervallBased(fluss);
 				int i;
 				int gain = 0;
 				for (i=0; i<rounds; i++){
