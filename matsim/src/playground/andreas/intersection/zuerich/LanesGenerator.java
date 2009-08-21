@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
@@ -39,6 +41,7 @@ import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 public class LanesGenerator {
 	
 	private static final Logger log = Logger.getLogger(LanesGenerator.class);
+	private Network network;
 	
 	/**
 	 * 
@@ -70,6 +73,15 @@ public class LanesGenerator {
 				}
 				//and the lane
 				BasicLane lane = createLaneWithDefaults(fromLaneId);
+				//reset the length if there is a network available
+				if (this.network != null){
+					Link link = this.network.getLinks().get(linkId);
+					double linkLaneFraction = 0.5 * link.getLength();
+					if (lane.getLength() > linkLaneFraction){
+						lane.setLength(linkLaneFraction);
+						log.info("Reset lane length of lane Id : " + lane.getId() + " of Link Id " + linkId + " to " + linkLaneFraction);
+					}
+				}
 				
 				//add the toLinks
 				List<Integer> toLanes = vonSpurToSpurMap.get(fromLaneId);
@@ -85,6 +97,9 @@ public class LanesGenerator {
 				if((lane.getToLinkIds() != null) && !lane.getToLinkIds().isEmpty()){
 					assignment.addLane(lane);
 				}
+				else if (assignment.getLanes().isEmpty()){
+					laneDefs.getLanesToLinkAssignments().remove(assignment.getLinkId());
+				}
 			} //end for vonSpurToSpurMap			
 		}
 		return laneDefs;
@@ -96,6 +111,10 @@ public class LanesGenerator {
 		lane.setLength(45.0);
 		lane.setNumberOfRepresentedLanes(1);
 		return lane;
+	}
+
+	public void setNetwork(Network net) {
+		this.network = net;
 	}
 
 }

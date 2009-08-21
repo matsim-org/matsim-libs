@@ -64,7 +64,9 @@ public class GenerateZuerrichOutput {
 			spurLinkMapping = new SpurLinkMappingReader().readBasicLightSignalSystemDefinition(spurLinkMappingFile);
 			
 			//create the lanes
-			laneDefs = new LanesGenerator().processLaneDefinitions(spurSpurMapping, spurLinkMapping);
+			LanesGenerator laneGeneratior = new LanesGenerator();
+			laneGeneratior.setNetwork(net);
+			laneDefs = laneGeneratior.processLaneDefinitions(spurSpurMapping, spurLinkMapping);
 			
 			new LanesConsistencyChecker(net, laneDefs).checkConsistency();
 			
