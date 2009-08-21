@@ -124,6 +124,14 @@ public class MyRuns {
 
 	public void analyzeLegDistanceDistribution(Config config) {
 
+		double[] distanceClasses = new double[]{
+			0, 
+			100, 200, 500, 
+			1000, 2000, 5000, 
+			10000, 20000, 50000, 
+			100000, 200000, 500000,
+			1000000};
+
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
@@ -159,10 +167,11 @@ public class MyRuns {
 
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				throw new RuntimeException("commented code out as it references a test-class. see code."); // marcel,21aug2009
-//				pa.printCrosstab(crosstabFormat, isCumulative, PopulationLegDistanceDistributionTest.distanceClasses);
+				pa.printDistanceClasses(crosstabFormat, isCumulative, distanceClasses);
 			}
 		}
+		
+		pa.printDeciles(true);
 		
 	}
 	

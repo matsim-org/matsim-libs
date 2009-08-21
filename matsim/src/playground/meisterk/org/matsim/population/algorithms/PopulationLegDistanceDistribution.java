@@ -24,6 +24,8 @@ import java.text.NumberFormat;
 import java.util.EnumMap;
 
 import org.apache.commons.math.stat.Frequency;
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
@@ -42,7 +44,19 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonAlgorithm {
 
-	private EnumMap<TransportMode, Frequency> legDistanceDistribution = new EnumMap<TransportMode, Frequency>(TransportMode.class);
+	private static final NumberFormat kmFormat, percentFormat;
+	
+	static {
+
+		kmFormat = NumberFormat.getInstance();
+		kmFormat.setMaximumFractionDigits(1);
+		percentFormat = NumberFormat.getPercentInstance();
+		percentFormat.setMaximumFractionDigits(2);
+		
+	}
+	
+	private EnumMap<TransportMode, Frequency> frequencies = new EnumMap<TransportMode, Frequency>(TransportMode.class);
+	private EnumMap<TransportMode, ResizableDoubleArray> rawData = new EnumMap<TransportMode, ResizableDoubleArray>(TransportMode.class);
 	
 	public void run(PersonImpl person) {
 		this.run(person.getSelectedPlan());
@@ -56,22 +70,26 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 				TransportMode mode = leg.getMode();
 
 				Frequency frequency = null;
-				if (!this.legDistanceDistribution.containsKey(mode)) {
+				ResizableDoubleArray rawData = null;
+				if (!this.frequencies.containsKey(mode)) {
 					frequency = new Frequency();
-					this.legDistanceDistribution.put(mode, frequency);
+					this.frequencies.put(mode, frequency);
+					rawData = new ResizableDoubleArray();
+					this.rawData.put(mode, rawData);
 				} else {
-					frequency = this.legDistanceDistribution.get(mode);
+					frequency = this.frequencies.get(mode);
+					rawData = this.rawData.get(mode);
 				}
 
-				// round distance to meters
 				frequency.addValue(leg.getRoute().getDistance());
+				rawData.addElement(leg.getRoute().getDistance());
 			}
 		}
 
 	}
 
 	public int getNumberOfModes() {
-		return this.legDistanceDistribution.keySet().size();
+		return this.frequencies.keySet().size();
 	}
 	
 	/**
@@ -85,8 +103,8 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 	public long getNumberOfLegs(TransportMode mode, double oneBound, double theOtherBound) {
 		
 		return 
-		this.legDistanceDistribution.get(mode).getCumFreq((oneBound > theOtherBound) ? oneBound : theOtherBound) - 
-		this.legDistanceDistribution.get(mode).getCumFreq((oneBound < theOtherBound) ? oneBound : theOtherBound);
+		this.frequencies.get(mode).getCumFreq((oneBound > theOtherBound) ? oneBound : theOtherBound) - 
+		this.frequencies.get(mode).getCumFreq((oneBound < theOtherBound) ? oneBound : theOtherBound);
 		
 	}
 	
@@ -99,8 +117,8 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 
 		long numberOfLegs = 0;
 
-		if (this.legDistanceDistribution.containsKey(mode)) {
-			numberOfLegs = this.legDistanceDistribution.get(mode).getSumFreq();
+		if (this.frequencies.containsKey(mode)) {
+			numberOfLegs = this.frequencies.get(mode).getSumFreq();
 		}
 
 		return numberOfLegs;
@@ -116,7 +134,7 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 
 		long numberOfLegs = 0;
 
-		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+		for (TransportMode mode : this.frequencies.keySet()) {
 			numberOfLegs += this.getNumberOfLegs(mode, oneBound, theOtherBound);
 		}
 
@@ -131,7 +149,7 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 
 		long numberOfLegs = 0;
 
-		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+		for (TransportMode mode : this.frequencies.keySet()) {
 			numberOfLegs += this.getNumberOfLegs(mode);
 		}
 
@@ -146,23 +164,18 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 	 *
 	 * @param crosstabFormat indicates if absolute numbers or percentage of all legs are printed
 	 * @param isCumulative indicates if cumulative numbers are printed
+	 * @param distanceClasses the classification of distances
 	 */
-	public void printCrosstab(CrosstabFormat crosstabFormat, boolean isCumulative, double[] distanceClasses) {
+	public void printDistanceClasses(CrosstabFormat crosstabFormat, boolean isCumulative, double[] distanceClasses) {
 
 		long numberOfLegs;
 		
-		NumberFormat kmFormat = NumberFormat.getInstance();
-		kmFormat.setMaximumFractionDigits(1);
-		
-		NumberFormat percentFormat = NumberFormat.getPercentInstance();
-		percentFormat.setMaximumFractionDigits(2);
-
 		System.out.println();
 		/*
 		 * header - start
 		 */
 		System.out.print("#i\td [km]");
-		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+		for (TransportMode mode : this.frequencies.keySet()) {
 			System.out.print("\t" + mode);
 		}
 		System.out.print("\tsum");
@@ -177,7 +190,7 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		for (int i=0; i < distanceClasses.length; i++) {
 			System.out.print(Integer.toString(i) + "\t");
 			System.out.print(kmFormat.format(distanceClasses[i] / 1000));
-			for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+			for (TransportMode mode : this.frequencies.keySet()) {
 				System.out.print("\t");
 				if (isCumulative) {
 					numberOfLegs = this.getNumberOfLegs(mode, Double.MIN_VALUE, distanceClasses[i]);
@@ -222,7 +235,7 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		 * sum - start
 		 */
 		System.out.print("#sum\t");
-		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
+		for (TransportMode mode : this.frequencies.keySet()) {
 			System.out.print("\t");
 			numberOfLegs = this.getNumberOfLegs(mode);
 			switch(crosstabFormat) {
@@ -253,4 +266,53 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 
 	}
 
+	public void printDeciles(boolean isCumulative) {
+		this.printQuantiles(isCumulative, 10);
+	}
+	
+	/**
+	 * @param crosstabFormat indicates if absolute numbers or percentage of all legs are printed
+	 * @param isCumulative indicates if cumulative numbers are printed
+	 * @param numberOfQuantiles number of quantiles desired
+	 */
+	public void printQuantiles(boolean isCumulative, int numberOfQuantiles) {
+
+		System.out.println();
+
+		/*
+		 * header - start
+		 */
+		System.out.print("#p");
+		for (TransportMode mode : this.frequencies.keySet()) {
+			System.out.print("\t" + mode);
+		}
+		System.out.println();
+		/*
+		 * header - end
+		 */
+		
+		/*
+		 * table - start
+		 */
+		double[] quantiles = new double[numberOfQuantiles];
+		for (int ii = 0; ii < numberOfQuantiles; ii++) {
+			quantiles[ii] = ((double) ii + 1) / ((double) numberOfQuantiles);
+		}
+		
+		for (int ii = 0; ii < numberOfQuantiles; ii++) {
+			System.out.print(percentFormat.format(quantiles[ii]));
+			for (TransportMode mode : this.frequencies.keySet()) {
+				System.out.print("\t");
+				System.out.print(kmFormat.format(StatUtils.percentile(this.rawData.get(mode).getInternalValues(), quantiles[ii] * 100.0)));
+			}
+			System.out.println();
+		}
+		/*
+		 * table - end
+		 */
+	
+		System.out.println();
+
+	}
+	
 }
