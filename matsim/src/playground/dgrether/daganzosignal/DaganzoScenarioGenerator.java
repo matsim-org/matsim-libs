@@ -309,7 +309,7 @@ public class DaganzoScenarioGenerator {
 		groupLink4.addLaneId(id1);
 		groupLink4.addToLinkId(id6);
 		//assing the group to the system
-		groupLink4.setLightSignalSystemDefinitionId(id1);
+		groupLink4.setSignalSystemDefinitionId(id1);
 		//add the signalGroupDefinition to the container
 		systems.addSignalGroupDefinition(groupLink4);
 		
@@ -318,7 +318,7 @@ public class DaganzoScenarioGenerator {
 		groupLink5.addLaneId(id1);
 		groupLink5.addToLinkId(id6);
 		//assing the group to the system
-		groupLink5.setLightSignalSystemDefinitionId(id1);
+		groupLink5.setSignalSystemDefinitionId(id1);
 		
 		//add the signalGroupDefinition to the container
 		systems.addSignalGroupDefinition(groupLink5);
