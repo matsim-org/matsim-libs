@@ -45,7 +45,7 @@ public class ClusterActivities {
 	 * 		4 - Study area (no output; single vehicle SNA)
 	 * 		5 - Study area (no output; all vehicles)
 	 */
-	private static int scenario = 5	;
+	private static int scenario = 2	;
 	//====================================================================
 	
 	/* 
@@ -91,7 +91,9 @@ public class ClusterActivities {
 		String polygonFilename = null;
 		String vehicleFilename = null;
 		String vehicleFoldername = null;
+		String clusterOutputFilename = null;
 		boolean visualizeClusters = false;
+		boolean writeClusters = false;
 		boolean writeXml = false;
 		boolean doSNA = false;
 		
@@ -112,7 +114,9 @@ public class ClusterActivities {
 			clusterFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Cluster_" + radius + "_" + minPoints + ".txt";
 			lineFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Line_" + radius + "_" + minPoints + ".txt";
 			polygonFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Polygon_" + radius + "_" + minPoints + ".txt";
+			clusterOutputFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "ClusterOutput_" + radius + "_" + minPoints + ".txt";
 			visualizeClusters = true;
+			writeClusters = true;
 			writeXml = false;			
 			break;
 			
@@ -137,7 +141,7 @@ public class ClusterActivities {
 			doSNA = true;
 			break;
 
-		case 5: // Study area (no output; with ALL vehicles)
+		case 5: // Study area (no output; with ALL vehicles SNA)
 			activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + activityType + "Locations.txt";
 			pointFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Point_" + radius + "_" + minPoints + ".txt";
 			clusterFilename = root + "Gauteng/Activities/" + studyAreaName + activityType + "Cluster_" + radius + "_" + minPoints + ".txt";
@@ -166,6 +170,10 @@ public class ClusterActivities {
 				
 		if(visualizeClusters){
 			djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, polygonFilename);
+		}
+		
+		if(writeClusters){
+			djc.writeClustersToFile(clusterOutputFilename);
 		}
 		
 		if(writeXml){
