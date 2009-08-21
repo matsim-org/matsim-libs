@@ -23,18 +23,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
+import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.consistency.ConsistencyChecker;
@@ -53,50 +54,19 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	private boolean removeMalformed = false;
 
 	private BasicSignalSystems signals;
+
+	private BasicSignalSystemConfigurations signalConfig;
 	
-	public SignalSystemsConfigurationConsistencyChecker(Network net, BasicLaneDefinitions laneDefs, BasicSignalSystems signals) {
+	public SignalSystemsConfigurationConsistencyChecker(Network net, BasicLaneDefinitions laneDefs, BasicSignalSystems signals, BasicSignalSystemConfigurations signalConfig) {
 		this.network = net;
 		this.lanes = laneDefs;
 		this.signals = signals;
+		this.signalConfig = signalConfig;
 	}
 	
 	public void checkConsistency() {
 		log.info("checking consistency...");
 		Set<BasicSignalGroupDefinition> malformedGroups = new HashSet<BasicSignalGroupDefinition>();
-		//check link
-		for (BasicSignalGroupDefinition sg : this.signals.getSignalGroupDefinitions().values()){
-			if (!this.network.getLinks().containsKey(sg.getLinkRefId())){
-				log.error("No link in network with id " + sg.getLinkRefId() + " for attached signalGroup id " + sg.getId());
-				malformedGroups.add(sg);
-			}
-			// check toLinks
-			for (Id id : sg.getToLinkIds()){
-				if (!this.network.getLinks().containsKey(id)){
-					log.error("No link in network with id " + id + " set as toLink of signalGroup id " + sg.getId());
-					malformedGroups.add(sg);
-				}
-			}
-			//check signalsystem
-			if (!this.signals.getSignalSystemDefinitions().containsKey(sg.getSignalSystemDefinitionId())){
-				log.error("No signalSystemDefinition with Id " + sg.getSignalSystemDefinitionId() + " set as system of signalGroup id " + sg.getId());
-				malformedGroups.add(sg);
-			}
-			//check lanes
-			if (!this.lanes.getLanesToLinkAssignments().containsKey(sg.getLinkRefId())){
-				log.error("No LanesToLinkAssignment found in lane definitions for referenced link id " + sg.getLinkRefId() + " set as Link of signalGroup id " + sg.getId());
-				malformedGroups.add(sg);
-			} 
-			else {
-				BasicLanesToLinkAssignment l2l = this.lanes.getLanesToLinkAssignments().get(sg.getLinkRefId());
-				for (Id id : sg.getLaneIds()){
-					if (!l2l.getLanes().containsKey(id)){
-						log.error("No lane defined in laneDefinitions with id " + id + " set in signalGroup id " + sg.getId());
-						malformedGroups.add(sg);
-					}
-
-				}
-			}
-		}
 		
 		if (this.removeMalformed){
 			for (BasicSignalGroupDefinition id : malformedGroups) {
@@ -125,6 +95,7 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 		String netFile = DgPaths.IVTCHBASE + "baseCase/network/ivtch-osm.xml";
 		String lanesFile = DgPaths.STUDIESDG + "signalSystemsZh/laneDefinitions.xml";
 		String signalSystemsFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystems.xml";
+		String signalSystemsConfigFile = DgPaths.STUDIESDG + "signalSystemsZh/signalSystemsConfig.xml";
 		NetworkLayer net = new NetworkLayer();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(net);
 		netReader.readFile(netFile);
@@ -139,7 +110,11 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	  MatsimSignalSystemsReader signalReader = new MatsimSignalSystemsReader(signals);
 	  signalReader.readFile(signalSystemsFile);
 	  
-	  SignalSystemsConfigurationConsistencyChecker sscc = new SignalSystemsConfigurationConsistencyChecker((Network)net, laneDefs, signals);
+	  BasicSignalSystemConfigurations signalConfig = new BasicSignalSystemConfigurationsImpl();
+	  MatsimSignalSystemConfigurationsReader signalConfigReader = new MatsimSignalSystemConfigurationsReader(signalConfig);
+	  signalConfigReader.readFile(signalSystemsConfigFile);
+	  
+	  SignalSystemsConfigurationConsistencyChecker sscc = new SignalSystemsConfigurationConsistencyChecker((Network)net, laneDefs, signals, signalConfig);
 		sscc.setRemoveMalformed(true);
 		sscc.checkConsistency();
 
