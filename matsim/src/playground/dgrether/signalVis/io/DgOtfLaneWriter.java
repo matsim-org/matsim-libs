@@ -33,8 +33,9 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
 
 public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink>{
 	
-	
 	private static final Logger log = Logger.getLogger(DgOtfLaneWriter.class);
+	
+  public static final boolean DRAW_LINK_TO_LINK_LINES = true;	
 	
 	@Override
 	public void writeConstData(ByteBuffer out) throws IOException {
