@@ -171,13 +171,12 @@ public class QueueLink {
 	 */
 	/*package*/ void createLanes(List<BasicLane> lanes) {
 		this.hasLanes = true;
-		//TODO dg remove this assumption/warning
-		if (this.getLink().getLength() < 60.0){
-			log.warn("Link " + this.getLink().getId() + " is signalized by traffic light, but its length is less than 60m. This is not recommended.");
-		}
 		boolean firstNodeLinkInitialized = false;
 		
 		for (BasicLane signalLane : lanes) {
+			if (signalLane.getLength() > this.link.getLength()) {
+				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
+			}
 			QueueLane lane = null;
 			lane = new QueueLane(this, false);
 			lane.setLaneData(signalLane);
