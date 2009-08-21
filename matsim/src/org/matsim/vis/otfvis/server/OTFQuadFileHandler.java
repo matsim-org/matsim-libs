@@ -87,12 +87,22 @@ public class OTFQuadFileHandler {
 		private boolean isOpen = false;
 
 		private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
+		private OTFConnectionManager connect;
 
 		public Writer(final double intervall_s, final QueueNetwork network,
 				final String fileName) {
 			this.net = network;
 			this.interval_s = intervall_s;
 			this.fileName = fileName;
+			this.connect = initConnectionManager();
+		}
+
+		private OTFConnectionManager initConnectionManager() {
+			OTFConnectionManager c = new OTFConnectionManager();
+			c.add(QueueLink.class,
+					OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+			c.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+			return c;
 		}
 
 		public boolean dump(final int time_s) throws IOException {
@@ -129,14 +139,10 @@ public class OTFQuadFileHandler {
 			Gbl.printElapsedTime();
 
 			Gbl.startMeasurement();
-			OTFConnectionManager connect = new OTFConnectionManager();
-			connect.add(QueueLink.class,
-					OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-			connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
 
-			onAdditionalQuadData(connect);
+			onAdditionalQuadData(this.connect);
 			
-			this.quad.fillQuadTree(connect);
+			this.quad.fillQuadTree(this.connect);
 			System.out.print("fill writer Quad on Server: ");
 			Gbl.printElapsedTime();
 			Gbl.startMeasurement();
@@ -144,7 +150,7 @@ public class OTFQuadFileHandler {
 			this.zos.closeEntry();
 			// this is new, write connect into the mvi as well
 			this.zos.putNextEntry(new ZipEntry("connect.bin"));
-			new ObjectOutputStream(this.zos).writeObject(connect);
+			new ObjectOutputStream(this.zos).writeObject(this.connect);
 			this.zos.closeEntry();
 		}
 
@@ -227,6 +233,10 @@ public class OTFQuadFileHandler {
 
 		public void finish() {
 			close();
+		}
+
+		public OTFConnectionManager getConnectionManager() {
+			return this.connect;
 		}
 	}
 
