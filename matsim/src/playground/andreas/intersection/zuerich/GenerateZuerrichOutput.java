@@ -11,9 +11,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
-import org.matsim.lanes.basic.BasicLaneImpl;
-import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
@@ -53,8 +50,6 @@ public class GenerateZuerrichOutput {
 	private 	boolean removeDuplicates = false;
 	
 	public GenerateZuerrichOutput() {
-
-		
 		Network net = new NetworkLayer();
 		MatsimNetworkReader netReader = new MatsimNetworkReader((NetworkLayer) net);
 		netReader.readFile(DgPaths.IVTCHNET);
@@ -69,7 +64,7 @@ public class GenerateZuerrichOutput {
 			spurLinkMapping = new SpurLinkMappingReader().readBasicLightSignalSystemDefinition(spurLinkMappingFile);
 			
 			//create the lanes
-			laneDefs = processLaneDefinitions(spurSpurMapping, spurLinkMapping);
+			laneDefs = new LanesGenerator().processLaneDefinitions(spurSpurMapping, spurLinkMapping);
 			
 			new LanesConsistencyChecker(net, laneDefs).checkConsistency();
 			
@@ -108,59 +103,6 @@ public class GenerateZuerrichOutput {
 		log.info("Everything finshed");
 
 	}
-	
-	
-
-	
-	/**
-	 * 
-	 * @param spurSpurMapping knotennummer -> (vonspur 1->n nachspur)	
-	 * @param knotenSpurLinkMapping knotennummer -> (spurnummer -> linkid)
-	 * @return
-	 */
-	private BasicLaneDefinitions processLaneDefinitions(Map<Integer, Map<Integer, List<Integer>>> spurSpurMapping, Map<Integer, Map<Integer, String>> knotenSpurLinkMapping) {
-		//create the lanes ...
-		BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
-		for (Integer nodeId : spurSpurMapping.keySet()) {
-			//for all 
-			Map<Integer,  List<Integer>> vonSpurToSpurMap = spurSpurMapping.get(nodeId);
-			for (Integer fromLaneId : vonSpurToSpurMap.keySet()) {
-				//create the id from ???
-				String linkIdString = knotenSpurLinkMapping.get(nodeId).get(fromLaneId);
-				if (!linkIdString.matches("[\\d]+")) {
-					log.error("cannot create link id from string " + linkIdString + " for nodeId: " + nodeId + " and laneId " + fromLaneId);
-					continue;
-				}
-				Id linkId = new IdImpl(linkIdString);
-				BasicLanesToLinkAssignment assignment = laneDefs.getLanesToLinkAssignments().get(linkId);
-				if (assignment == null){
-					assignment = laneDefs.getBuilder().createLanesToLinkAssignment(linkId);
-				}
-
-				Id laneId = new IdImpl(fromLaneId.intValue());
-				BasicLaneImpl lane = new BasicLaneImpl(laneId);
-				lane.setLength(45.0);
-				lane.setNumberOfRepresentedLanes(1);
-				
-				List<Integer> toLanes = vonSpurToSpurMap.get(fromLaneId);
-				for (Integer toLaneId : toLanes) {
-					if (!knotenSpurLinkMapping.get(nodeId).get(toLaneId).equalsIgnoreCase("-")){
-						lane.addToLinkId(new IdImpl(knotenSpurLinkMapping.get(nodeId).get(toLaneId)));	
-					}								
-				}
-				if(lane.getToLinkIds() != null){
-					assignment.addLane(lane);
-				}
-				if (assignment.getLanesList() != null){
-					if (!assignment.getLinkId().toString().equalsIgnoreCase("-")){
-						laneDefs.addLanesToLinkAssignment(assignment);
-					}
-				}
-			}			
-		}
-		return laneDefs;
-	}
-	
 	
 	private void processSignalSystems(Map<Integer, Map<Integer, List<Integer>>> lsaSpurMapping, Map<Integer, Map<Integer, String>> laneLinkMapping, BasicSignalSystems signalSystems){
 		//create the signal groups
