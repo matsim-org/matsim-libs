@@ -31,11 +31,14 @@ import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
+import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
+import org.matsim.signalsystems.config.BasicSignalGroupSettings;
+import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
+import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.consistency.ConsistencyChecker;
@@ -66,11 +69,32 @@ public class SignalSystemsConfigurationConsistencyChecker implements Consistency
 	
 	public void checkConsistency() {
 		log.info("checking consistency...");
-		Set<BasicSignalGroupDefinition> malformedGroups = new HashSet<BasicSignalGroupDefinition>();
+		Set<BasicSignalSystemConfiguration> malformedGroups = new HashSet<BasicSignalSystemConfiguration>();
+
+		for (BasicSignalSystemConfiguration ssc : this.signalConfig.getSignalSystemConfigurations().values()){
+			//check signal system reference
+			if (!this.signals.getSignalSystemDefinitions().containsKey(ssc.getSignalSystemId())){
+				log.error("No signal system found with id " + ssc.getSignalSystemId() + " signal system configuration not valid");
+				malformedGroups.add(ssc);
+			}
+			//check signal groups of plan based control
+			if (ssc.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo){
+				BasicPlanBasedSignalSystemControlInfo pbci = (BasicPlanBasedSignalSystemControlInfo) ssc.getControlInfo();
+				for (BasicSignalSystemPlan plan : pbci.getPlans().values()){
+					for (BasicSignalGroupSettings settings : plan.getGroupConfigs().values()){
+						if (!this.signals.getSignalGroupDefinitions().containsKey(settings.getReferencedSignalGroupId())){
+							log.error("Plan id " + plan.getId() + " of signalSystemConfiguration for signal system id " + ssc.getSignalSystemId() +
+									" references signalGroup id " + settings.getReferencedSignalGroupId() + " that is not defined.");
+							malformedGroups.add(ssc);
+						}
+					}
+				}
+			}
+		} //end for
 		
 		if (this.removeMalformed){
-			for (BasicSignalGroupDefinition id : malformedGroups) {
-				this.lanes.getLanesToLinkAssignments().remove(id);
+			for (BasicSignalSystemConfiguration id : malformedGroups) {
+				this.signalConfig.getSignalSystemConfigurations().remove(id.getSignalSystemId());
 			}
 		}
 		log.info("checked consistency.");
