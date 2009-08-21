@@ -20,6 +20,7 @@
 
 package playground.marcel.pt.utils;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkBuilder;
@@ -46,15 +47,18 @@ public class MergeNetworks {
 			mergedNetwork.getNodes().put(node2.getId(), node2);
 		}
 		for (Link link : networkA.getLinks().values()) {
+			Id fromNodeId = new IdImpl(prefixA + link.getFromNode().getId().toString());
+			Id toNodeId = new IdImpl(prefixA + link.getToNode().getId().toString());
 			Link link2 = builder.createLink(new IdImpl(prefixA + link.getId().toString()),
-					new IdImpl(prefixA + link.getFromNode().getId().toString()),
-					new IdImpl(prefixA + link.getToNode().getId().toString()));
+					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
 			link2.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
 			mergedNetwork.getLinks().put(link2.getId(), (LinkImpl) link2);
+			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
+			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
 		}
 		for (Node node : networkB.getNodes().values()) {
 			NodeImpl node2 = (NodeImpl) builder.createNode(new IdImpl(prefixB + node.getId().toString()));
@@ -62,15 +66,18 @@ public class MergeNetworks {
 			mergedNetwork.getNodes().put(node2.getId(), node2);
 		}
 		for (Link link : networkB.getLinks().values()) {
+			Id fromNodeId = new IdImpl(prefixB + link.getFromNode().getId().toString());
+			Id toNodeId = new IdImpl(prefixB + link.getToNode().getId().toString());
 			Link link2 = builder.createLink(new IdImpl(prefixB + link.getId().toString()),
-					new IdImpl(prefixB + link.getFromNode().getId().toString()),
-					new IdImpl(prefixB + link.getToNode().getId().toString()));
+					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
 			link2.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
 			mergedNetwork.getLinks().put(link2.getId(), (LinkImpl) link2);
+			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
+			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
 		}
 	}
 }
