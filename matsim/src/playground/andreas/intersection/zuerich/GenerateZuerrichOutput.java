@@ -34,7 +34,7 @@ public class GenerateZuerrichOutput {
 //	lsa id (=node id) \t signal group id \t start red 
 	private 	String sgGreentime = inputDir  + "sg_greentime.txt";
 	// node id \t suprnr \t linkid teleatlas \t linkid navteq \t linkid ivtch
-	private 	String spurLinkMappingFile = inputDir + "spur_link_mapping.txt";
+	private 	String spurLinkMappingFile = inputDir + "spur_link_mapping_ivtch.txt";
 	//node id \t lsanr??? \t spurnr
 	private 	String lsaSpurMappingFile = inputDir + "lsa_spur_mapping.txt";
 	//node id \t vonspur \t nachspur

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.basic.BasicLane;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.lanes.basic.BasicLaneImpl;
@@ -45,47 +46,56 @@ public class LanesGenerator {
 	 * @param knotenSpurLinkMapping knotennummer -> (spurnummer -> linkid)
 	 * @return
 	 */
-	public BasicLaneDefinitions processLaneDefinitions(Map<Integer, Map<Integer, List<Integer>>> spurSpurMapping, Map<Integer, Map<Integer, String>> knotenSpurLinkMapping) {
+	public BasicLaneDefinitions processLaneDefinitions(Map<Integer, Map<Integer, List<Integer>>> spurSpurMapping, 
+			Map<Integer, Map<Integer, String>> knotenSpurLinkMapping) {
 		//create the lanes ...
 		BasicLaneDefinitions laneDefs = new BasicLaneDefinitionsImpl();
 		for (Integer nodeId : spurSpurMapping.keySet()) {
 			//for all 
 			Map<Integer,  List<Integer>> vonSpurToSpurMap = spurSpurMapping.get(nodeId);
+			
 			for (Integer fromLaneId : vonSpurToSpurMap.keySet()) {
-				//create the id from ???
+				//get and check the linkId
 				String linkIdString = knotenSpurLinkMapping.get(nodeId).get(fromLaneId);
 				if (!linkIdString.matches("[\\d]+")) {
 					log.error("cannot create link id from string " + linkIdString + " for nodeId: " + nodeId + " and laneId " + fromLaneId);
 					continue;
 				}
 				Id linkId = new IdImpl(linkIdString);
+				//create the assignment
 				BasicLanesToLinkAssignment assignment = laneDefs.getLanesToLinkAssignments().get(linkId);
 				if (assignment == null){
 					assignment = laneDefs.getBuilder().createLanesToLinkAssignment(linkId);
+					laneDefs.addLanesToLinkAssignment(assignment);
 				}
-
-				Id laneId = new IdImpl(fromLaneId.intValue());
-				BasicLaneImpl lane = new BasicLaneImpl(laneId);
-				lane.setLength(45.0);
-				lane.setNumberOfRepresentedLanes(1);
+				//and the lane
+				BasicLane lane = createLaneWithDefaults(fromLaneId);
 				
+				//add the toLinks
 				List<Integer> toLanes = vonSpurToSpurMap.get(fromLaneId);
 				for (Integer toLaneId : toLanes) {
-					if (!knotenSpurLinkMapping.get(nodeId).get(toLaneId).equalsIgnoreCase("-")){
-						lane.addToLinkId(new IdImpl(knotenSpurLinkMapping.get(nodeId).get(toLaneId)));	
-					}								
+					String toLinkIdString = knotenSpurLinkMapping.get(nodeId).get(toLaneId);
+					if (!toLinkIdString.matches("[\\d]+")){
+						log.error("cannot create toLink id from string " + toLinkIdString + " for nodeId: " + nodeId + " and toLaneId " + toLaneId);
+						continue;
+					}
+					Id toLinkId = new IdImpl(toLinkIdString);
+					lane.addToLinkId(toLinkId);
 				}
-				if(lane.getToLinkIds() != null){
+				if((lane.getToLinkIds() != null) && !lane.getToLinkIds().isEmpty()){
 					assignment.addLane(lane);
 				}
-				if (assignment.getLanesList() != null){
-					if (!assignment.getLinkId().toString().equalsIgnoreCase("-")){
-						laneDefs.addLanesToLinkAssignment(assignment);
-					}
-				}
-			}			
+			} //end for vonSpurToSpurMap			
 		}
 		return laneDefs;
+	}
+	
+	private BasicLane createLaneWithDefaults(Integer fromLaneId) {
+		Id laneId = new IdImpl(fromLaneId);
+		BasicLane lane = new BasicLaneImpl(laneId);
+		lane.setLength(45.0);
+		lane.setNumberOfRepresentedLanes(1);
+		return lane;
 	}
 
 }
