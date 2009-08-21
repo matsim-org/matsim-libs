@@ -44,6 +44,13 @@ public class IdImpl implements Id, Serializable {
 
 	@Override
 	public boolean equals(final Object other) {
+		/*
+		 * This is not consistent with compareTo(Id)! compareTo(Id) states that
+		 * o1 and o2 are equal (in terms of order) if toString() returns the
+		 * same character sequence. However equals() can return false even if
+		 * other.toString() equals this.id (in case other is not of type IdImpl)!
+		 * joh aug09
+		 */
 		if (!(other instanceof IdImpl)) return false;
 		if (other == this) return true;
 		return this.id.equals(((IdImpl)other).id);
