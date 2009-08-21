@@ -296,7 +296,22 @@ public class QueueSimulation {
 			}
 			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
-				this.snapshotWriters.add(new OTFQuadFileHandler.Writer(this.snapshotPeriod, this.network, snapshotFile));
+				OTFQuadFileHandler.Writer writer = null;
+				writer = new OTFQuadFileHandler.Writer(this.snapshotPeriod, this.network, snapshotFile);
+//				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
+//					OTFConnectionManager connect = writer.getConnectionManager();
+//					// data source to writer
+//					connect.add(QueueLink.class, DgOtfLaneWriter.class);
+//					// writer -> reader: from server to client
+//					connect
+//					.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
+//					// reader to drawer (or provider to receiver)
+//					connect.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
+//					// drawer -> layer
+//					connect.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
+//				
+//				}
+				this.snapshotWriters.add(writer);
 			}
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
 	}
@@ -358,14 +373,14 @@ public class QueueSimulation {
 
 	private void prepareLanes(){
 		if (this.laneDefintions != null){
-			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignments()){
+			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignmentsList()){
 				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
 				if (link == null) {
 					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
 					log.error(message);
 					throw new IllegalStateException(message);
 				}
-				link.createLanes(laneToLink.getLanes());
+				link.createLanes(laneToLink.getLanesList());
 			}	
 		}
 	}

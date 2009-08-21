@@ -19,16 +19,31 @@
 package org.matsim.signalsystems.basic;
 
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 public interface BasicSignalSystems extends MatsimToplevelContainer {
 	
 	public BasicSignalSystemsBuilder getBuilder();
 
-	public List<BasicSignalSystemDefinition> getSignalSystemDefinitions();
+	public Map<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
 
-	public List<BasicSignalGroupDefinition> getSignalGroupDefinitions();
+	public Map<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions();
+
+	/**
+	 * 
+	 * @deprecated use getSignalSystemDefinitions()
+	 */
+	@Deprecated
+	public List<BasicSignalSystemDefinition> getSignalSystemDefinitionsList();
+	/**
+	 * 
+	 * @deprecated use getSignalGroupDefinitions()
+	 */
+	@Deprecated
+	public List<BasicSignalGroupDefinition> getSignalGroupDefinitionsList();
 
 	/**
 	 * @param lssdef

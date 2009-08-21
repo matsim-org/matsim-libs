@@ -92,11 +92,11 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 		ObjectFactory fac = new ObjectFactory();
 		XMLLightSignalSystems xmllss = fac.createXMLLightSignalSystems();
 		
-		for (BasicLanesToLinkAssignment ltla : this.lanes.getLanesToLinkAssignments()) {
+		for (BasicLanesToLinkAssignment ltla : this.lanes.getLanesToLinkAssignmentsList()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 			
-			for (BasicLane bl : ltla.getLanes()) {
+			for (BasicLane bl : ltla.getLanesList()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 				
@@ -120,7 +120,7 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 		} //end writing lanesToLinkAssignments
 		
 		//writing lightSignalSystemDefinitions
-		for (BasicSignalSystemDefinition lssd : this.blss.getSignalSystemDefinitions()) {
+		for (BasicSignalSystemDefinition lssd : this.blss.getSignalSystemDefinitionsList()) {
 			XMLLightSignalSystemDefinitionType xmllssd = fac.createXMLLightSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
@@ -140,7 +140,7 @@ public class LightSignalSystemsWriter10 extends MatsimJaxbXmlWriter {
 		}
 		
 		//writing lightSignalGroupDefinitions
-		for (BasicSignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitions()) {
+		for (BasicSignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitionsList()) {
 			XMLLightSignalGroupDefinitionType xmllsgd = fac.createXMLLightSignalGroupDefinitionType();
 			xmllsgd.setLinkIdRef(lsgd.getLinkRefId().toString());
 			xmllsgd.setId(lsgd.getId().toString());

@@ -44,9 +44,9 @@ public class BasicSignalGroupDefinitionImpl implements BasicSignalGroupDefinitio
 	}
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#setLightSignalSystemDefinitionId(org.matsim.core.basic.v01.IdImpl)
+	 * @see org.matsim.signalsystems.basic.BasicSignalGroupDefinition#setSignalSystemDefinitionId(org.matsim.core.basic.v01.IdImpl)
 	 */
-	public void setLightSignalSystemDefinitionId(Id id) {
+	public void setSignalSystemDefinitionId(Id id) {
 		this.lightSignalSystemDefinitionId = id;
 	}
 

@@ -90,11 +90,11 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter {
 		ObjectFactory fac = new ObjectFactory();
 		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
 		
-		for (BasicLanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignments()) {
+		for (BasicLanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignmentsList()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 			
-			for (BasicLane bl : ltla.getLanes()) {
+			for (BasicLane bl : ltla.getLanesList()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 				

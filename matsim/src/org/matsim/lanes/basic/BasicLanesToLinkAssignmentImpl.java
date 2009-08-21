@@ -20,7 +20,10 @@
 package org.matsim.lanes.basic;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 
@@ -31,7 +34,7 @@ public class BasicLanesToLinkAssignmentImpl implements BasicLanesToLinkAssignmen
 
 	private Id linkId;
 
-	private List<BasicLane> lanes;
+	private Map<Id, BasicLane> lanes = new LinkedHashMap<Id, BasicLane>();
 	
 	/**
 	 * @param linkId
@@ -41,20 +44,19 @@ public class BasicLanesToLinkAssignmentImpl implements BasicLanesToLinkAssignmen
 	}
 
 	/**
-	 * @see org.matsim.lanes.basic.BasicLanesToLinkAssignment#getLanes()
+	 * @see org.matsim.lanes.basic.BasicLanesToLinkAssignment#getLanesList()
 	 */
-	public List<BasicLane> getLanes() {
-		return this.lanes;
+	public List<BasicLane> getLanesList() {
+		List<BasicLane> r = new ArrayList<BasicLane>();
+		r.addAll(this.lanes.values());
+		return Collections.unmodifiableList(r);
 	}
 	
 	/**
 	 * @see org.matsim.lanes.basic.BasicLanesToLinkAssignment#addLane(org.matsim.lanes.basic.BasicLane)
 	 */
 	public void addLane(BasicLane lane) {
-		if (this.lanes == null) {
-			this.lanes = new ArrayList<BasicLane>();
-		}
-		this.lanes.add(lane); 
+		this.lanes.put(lane.getId(), lane); 
 	}
 	
 	/**
@@ -62,6 +64,10 @@ public class BasicLanesToLinkAssignmentImpl implements BasicLanesToLinkAssignmen
 	 */
 	public Id getLinkId() {
 		return linkId;
+	}
+
+	public Map<Id, BasicLane> getLanes() {
+		return this.lanes;
 	}
 
 }

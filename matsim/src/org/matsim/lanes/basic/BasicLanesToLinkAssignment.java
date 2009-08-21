@@ -21,6 +21,7 @@ import org.matsim.interfaces.basic.v01.Id;
 package org.matsim.lanes.basic;
 
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 /**
@@ -30,7 +31,14 @@ import org.matsim.api.basic.v01.Id;
  */
 public interface BasicLanesToLinkAssignment {
 
-	public List<BasicLane> getLanes();
+	public Map	<Id, BasicLane> getLanes();
+	
+	/**
+	 * 
+	 * @deprecated use getLanes()
+	 */
+	@Deprecated
+	public List<BasicLane> getLanesList();
 
 	/**
 	 * @param lane

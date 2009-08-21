@@ -118,12 +118,12 @@ public class QueueSimSignalEngine implements SignalEngine {
 	private void initSignalSystems(final BasicSignalSystems signalSystems) {
 		//store the signalSystemDefinitions in a Map
 		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
-		for (BasicSignalSystemDefinition signalSystem : signalSystems.getSignalSystemDefinitions()) {
+		for (BasicSignalSystemDefinition signalSystem : signalSystems.getSignalSystemDefinitionsList()) {
 			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
 		}
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
-		for (BasicSignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions()) {
+		for (BasicSignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitionsList()) {
 			QueueLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());

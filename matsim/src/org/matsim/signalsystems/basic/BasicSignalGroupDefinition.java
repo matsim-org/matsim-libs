@@ -29,7 +29,7 @@ import org.matsim.signalsystems.control.SignalSystemController;
  */
 public interface BasicSignalGroupDefinition {
 
-	public void setLightSignalSystemDefinitionId(Id id);
+	public void setSignalSystemDefinitionId(Id id);
 
 	public void addLaneId(Id laneId);
 

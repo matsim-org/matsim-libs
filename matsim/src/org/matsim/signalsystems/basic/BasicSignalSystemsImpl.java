@@ -19,7 +19,12 @@
 package org.matsim.signalsystems.basic;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.basic.v01.Id;
 
 
 /**
@@ -30,22 +35,28 @@ public class BasicSignalSystemsImpl implements BasicSignalSystems {
 
 	private BasicSignalSystemsBuilder builder = new BasicSignalSystemsBuilder();
 	
-	private List<BasicSignalSystemDefinition> lightSignalSystemDefinitions;
-	private List<BasicSignalGroupDefinition> lightSignalGroupDefinitions;
+	private Map<Id, BasicSignalSystemDefinition> signalSystemDefinitions = new LinkedHashMap<Id, BasicSignalSystemDefinition>();
+	private Map<Id, BasicSignalGroupDefinition> signalGroupDefinitions = new LinkedHashMap<Id, BasicSignalGroupDefinition>();;
 
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalSystemDefinitions()
+	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalSystemDefinitionsList()
 	 */
-	public List<BasicSignalSystemDefinition> getSignalSystemDefinitions() {
-		return lightSignalSystemDefinitions;
+	public List<BasicSignalSystemDefinition> getSignalSystemDefinitionsList() {
+		List<BasicSignalSystemDefinition> r = new ArrayList<BasicSignalSystemDefinition>();
+		r.addAll(this.signalSystemDefinitions.values());
+		Collections.unmodifiableList(r);
+		return Collections.unmodifiableList(r);
 	}
 
 	
 	/**
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalGroupDefinitions()
+	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalGroupDefinitionsList()
 	 */
-	public List<BasicSignalGroupDefinition> getSignalGroupDefinitions() {
-		return lightSignalGroupDefinitions;
+	public List<BasicSignalGroupDefinition> getSignalGroupDefinitionsList() {
+		List<BasicSignalGroupDefinition> r = new ArrayList<BasicSignalGroupDefinition>();
+		r.addAll(this.signalGroupDefinitions.values());
+		Collections.unmodifiableList(r);
+		return Collections.unmodifiableList(r);
 	}
 
 	/**
@@ -53,25 +64,29 @@ public class BasicSignalSystemsImpl implements BasicSignalSystems {
 	 */
 	public void addSignalSystemDefinition(
 			BasicSignalSystemDefinition lssdef) {
-		if (this.lightSignalSystemDefinitions == null) {
-			this.lightSignalSystemDefinitions = new ArrayList<BasicSignalSystemDefinition>();
-		}
-		this.lightSignalSystemDefinitions.add(lssdef);
+		this.signalSystemDefinitions.put(lssdef.getId(), lssdef);
 	}
 	
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#addSignalGroupDefinition(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
 	 */
 	public void addSignalGroupDefinition(BasicSignalGroupDefinition lsgdef) {
-		if (this.lightSignalGroupDefinitions == null) {
-			this.lightSignalGroupDefinitions = new ArrayList<BasicSignalGroupDefinition>();
-		}
-		this.lightSignalGroupDefinitions.add(lsgdef);
+		this.signalGroupDefinitions.put(lsgdef.getId(), lsgdef);
 	}
 
 
 	public BasicSignalSystemsBuilder getBuilder() {
 		return this.builder;
+	}
+
+
+	public Map<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
+		return this.signalSystemDefinitions;
+	}
+
+
+	public Map<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions() {
+		return this.signalGroupDefinitions;
 	}
 
 	

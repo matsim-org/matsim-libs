@@ -135,7 +135,7 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 					.getLightSignalGroupDefinition()) {
 				lsgdef = builder.createSignalGroupDefinition(new IdImpl(xmllsgdef
 						.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
-				lsgdef.setLightSignalSystemDefinitionId(new IdImpl(xmllsgdef
+				lsgdef.setSignalSystemDefinitionId(new IdImpl(xmllsgdef
 						.getLightSignalSystemDefinition().getRefId()));
 				for (XMLIdRefType refIds : xmllsgdef.getLane()) {
 					lsgdef.addLaneId(new IdImpl(refIds.getRefId()));
