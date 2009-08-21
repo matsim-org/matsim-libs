@@ -62,7 +62,6 @@ import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
-import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistributionTest;
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution.CrosstabFormat;
 
 public class MyRuns {
@@ -160,7 +159,8 @@ public class MyRuns {
 
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				pa.printCrosstab(crosstabFormat, isCumulative, PopulationLegDistanceDistributionTest.distanceClasses);
+				throw new RuntimeException("commented code out as it references a test-class. see code."); // marcel,21aug2009
+//				pa.printCrosstab(crosstabFormat, isCumulative, PopulationLegDistanceDistributionTest.distanceClasses);
 			}
 		}
 		
