@@ -20,8 +20,6 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
-import java.util.HashMap;
-
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
@@ -40,23 +38,14 @@ import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanc
 
 public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+	public static final double[] distanceClasses = new double[]{
+		0, 
+		100, 200, 500, 
+		1000, 2000, 5000, 
+		10000, 20000, 50000, 
+		100000, 200000, 500000,
+		1000000};
 
-	public void testGetDistanceClassIndex() {
-		
-		HashMap<Double, Integer> candidates = new HashMap<Double, Integer>();
-		candidates.put(333.3, 3);
-		candidates.put(0.0, 0);
-		candidates.put(120345.1, 11);
-		
-		for (Double distance : candidates.keySet()) {
-			assertEquals(candidates.get(distance).intValue(), PopulationLegDistanceDistribution.getDistanceClassIndex(distance));
-		}
-		
-	}
-	
 	public void testGenerationDistribution() {
 		
 		NetworkLayer testNetwork = new NetworkLayer();
@@ -89,7 +78,9 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		pop.addPerson(testPerson);
 		
 		assertEquals(1, testee.getNumberOfModes());
-		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 5));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[4], distanceClasses[5]));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[5], distanceClasses[4]));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[4], distanceClasses[5]));
 
 		leg.setMode(TransportMode.pt);
 		route.setDistance(13456.7);
@@ -97,8 +88,8 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		pop.addPerson(testPerson);
 		
 		assertEquals(2, testee.getNumberOfModes());
-		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 5));
-		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, 8));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[4], distanceClasses[5]));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, distanceClasses[7], distanceClasses[8]));
 		
 		leg.setMode(TransportMode.car);
 		route.setDistance(0.0);
@@ -106,20 +97,20 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		pop.addPerson(testPerson);
 		
 		assertEquals(2, testee.getNumberOfModes());
-		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 0));
-		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, 5));
-		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, 8));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, -1000.0, distanceClasses[0]));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, distanceClasses[5], distanceClasses[4]));
+		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, distanceClasses[7], distanceClasses[8]));
 
 		assertEquals(3, testee.getNumberOfLegs());
 		assertEquals(2, testee.getNumberOfLegs(TransportMode.car));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt));
-		assertEquals(1, testee.getNumberOfLegs(0));
-		assertEquals(1, testee.getNumberOfLegs(5));
-		assertEquals(1, testee.getNumberOfLegs(8));
+		assertEquals(1, testee.getNumberOfLegs(-1000.0, distanceClasses[0]));
+		assertEquals(1, testee.getNumberOfLegs(distanceClasses[5], distanceClasses[4]));
+		assertEquals(1, testee.getNumberOfLegs(distanceClasses[7], distanceClasses[8]));
 		
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				testee.printCrosstab(crosstabFormat, isCumulative);
+				testee.printCrosstab(crosstabFormat, isCumulative, distanceClasses);
 			}
 		}
 		

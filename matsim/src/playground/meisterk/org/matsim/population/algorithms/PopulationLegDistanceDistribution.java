@@ -23,6 +23,7 @@ package playground.meisterk.org.matsim.population.algorithms;
 import java.text.NumberFormat;
 import java.util.EnumMap;
 
+import org.apache.commons.math.stat.Frequency;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
@@ -36,23 +37,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * Leg distances are classified.
  * Only selected plans are considered.
  * 
- * TODO use frequency distribution package from apache commons math for this analysis instead of implementing everything on my own
- * 
  * @author meisterk
  *
  */
 public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonAlgorithm {
 
-	public static final double[] distanceClasses = new double[]{
-		0.0, 
-		100.0,	200.0, 500.0, 
-		1000.0, 2000.0, 5000.0, 
-		10000.0, 20000.0, 50000.0, 
-		100000.0, 200000.0, 500000.0,
-		1000000.0};
-
-	private EnumMap<TransportMode, Integer[]> legDistanceDistribution = new EnumMap<TransportMode, Integer[]>(TransportMode.class);
-
+	private EnumMap<TransportMode, Frequency> legDistanceDistribution = new EnumMap<TransportMode, Frequency>(TransportMode.class);
+	
 	public void run(PersonImpl person) {
 		this.run(person.getSelectedPlan());
 	}
@@ -60,39 +51,22 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 	public void run(PlanImpl plan) {
 
 		for (PlanElement pe : plan.getPlanElements()) {
-
 			if (pe instanceof LegImpl) {
-
 				LegImpl leg = (LegImpl) pe;
 				TransportMode mode = leg.getMode();
 
-				Integer[] distanceDistro = null;
+				Frequency frequency = null;
 				if (!this.legDistanceDistribution.containsKey(mode)) {
-					distanceDistro = new Integer[distanceClasses.length];
-					for (int ii=0; ii < distanceDistro.length; ii++) {
-						distanceDistro[ii] = 0;
-					}
-					this.legDistanceDistribution.put(mode, distanceDistro);
+					frequency = new Frequency();
+					this.legDistanceDistribution.put(mode, frequency);
 				} else {
-					distanceDistro = this.legDistanceDistribution.get(mode);
+					frequency = this.legDistanceDistribution.get(mode);
 				}
 
-				int index = getDistanceClassIndex(leg.getRoute().getDistance());
-				distanceDistro[index]++;
+				// round distance to meters
+				frequency.addValue(leg.getRoute().getDistance());
 			}
-
 		}
-
-	}
-
-	public static int getDistanceClassIndex(double distance) {
-
-		int index = 0;
-		while (distance > distanceClasses[index]) {
-			index++;
-		}
-
-		return index;
 
 	}
 
@@ -100,23 +74,33 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		return this.legDistanceDistribution.keySet().size();
 	}
 	
-	public int getNumberOfLegs(TransportMode mode, int distanceClassIndex) {
-		return this.legDistanceDistribution.get(mode)[distanceClassIndex];
+	/**
+	 * Returns the number of legs of a mode of a distance within a given range.
+	 * 
+	 * @param mode legs of which mode
+	 * @param oneBound the one (usually lower) distance bound
+	 * @param theOtherBound the other (usually the higher) distance bound
+	 * @return
+	 */
+	public long getNumberOfLegs(TransportMode mode, double oneBound, double theOtherBound) {
+		
+		return 
+		this.legDistanceDistribution.get(mode).getCumFreq((oneBound > theOtherBound) ? oneBound : theOtherBound) - 
+		this.legDistanceDistribution.get(mode).getCumFreq((oneBound < theOtherBound) ? oneBound : theOtherBound);
+		
 	}
 	
 	/**
 	 * 
-	 * @param mode
-	 * @return the number of legs of a mode over all distance classes.
+	 * @param mode legs of which mode
+	 * @return the overall frequency of legs of a mode
 	 */
-	public int getNumberOfLegs(TransportMode mode) {
+	public long getNumberOfLegs(TransportMode mode) {
 
-		int numberOfLegs = 0;
+		long numberOfLegs = 0;
 
 		if (this.legDistanceDistribution.containsKey(mode)) {
-			for (Integer i : this.legDistanceDistribution.get(mode)) {
-				numberOfLegs += i;
-			}
+			numberOfLegs = this.legDistanceDistribution.get(mode).getSumFreq();
 		}
 
 		return numberOfLegs;
@@ -128,12 +112,12 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 	 * @param distanceClassIndex
 	 * @return the number of legs in a distance class.
 	 */
-	public int getNumberOfLegs(int distanceClassIndex) {
+	public long getNumberOfLegs(double oneBound, double theOtherBound) {
 
-		int numberOfLegs = 0;
+		long numberOfLegs = 0;
 
 		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
-			numberOfLegs += this.legDistanceDistribution.get(mode)[distanceClassIndex];
+			numberOfLegs += this.getNumberOfLegs(mode, oneBound, theOtherBound);
 		}
 
 		return numberOfLegs;
@@ -143,14 +127,12 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 	/**
 	 * @return the overall number of legs.
 	 */
-	public int getNumberOfLegs() {
+	public long getNumberOfLegs() {
 
-		int numberOfLegs = 0;
+		long numberOfLegs = 0;
 
 		for (TransportMode mode : this.legDistanceDistribution.keySet()) {
-			for (Integer i : this.legDistanceDistribution.get(mode)) {
-				numberOfLegs += i;
-			}
+			numberOfLegs += this.getNumberOfLegs(mode);
 		}
 
 		return numberOfLegs;
@@ -165,9 +147,9 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 	 * @param crosstabFormat indicates if absolute numbers or percentage of all legs are printed
 	 * @param isCumulative indicates if cumulative numbers are printed
 	 */
-	public void printCrosstab(CrosstabFormat crosstabFormat, boolean isCumulative) {
+	public void printCrosstab(CrosstabFormat crosstabFormat, boolean isCumulative, double[] distanceClasses) {
 
-		int numberOfLegs;
+		long numberOfLegs;
 		
 		NumberFormat kmFormat = NumberFormat.getInstance();
 		kmFormat.setMaximumFractionDigits(1);
@@ -198,18 +180,16 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 			for (TransportMode mode : this.legDistanceDistribution.keySet()) {
 				System.out.print("\t");
 				if (isCumulative) {
-					numberOfLegs = 0;
-					for (int j=0; j<=i; j++) {
-						numberOfLegs += this.getNumberOfLegs(mode, j);
-					}
-					
+					numberOfLegs = this.getNumberOfLegs(mode, Double.MIN_VALUE, distanceClasses[i]);
 				} else {
-					numberOfLegs = this.getNumberOfLegs(mode, i);
-					
+					numberOfLegs = this.getNumberOfLegs(
+							mode, 
+							( (i == 0) ? Double.MIN_VALUE : distanceClasses[i - 1]), 
+							distanceClasses[i]);
 				}
 				switch(crosstabFormat) {
 				case ABSOLUTE:
-					System.out.print(Integer.toString(numberOfLegs));
+					System.out.print(Long.toString(numberOfLegs));
 					break;
 				case PERCENTAGE:
 					System.out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
@@ -218,16 +198,15 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 			}
 			System.out.print("\t");
 			if (isCumulative) {
-				numberOfLegs = 0;
-				for (int j=0; j<=i; j++) {
-					numberOfLegs += this.getNumberOfLegs(j);
-				}
+				numberOfLegs = this.getNumberOfLegs(Double.MIN_VALUE, distanceClasses[i]);
 			} else {
-				numberOfLegs = this.getNumberOfLegs(i);
+				numberOfLegs = this.getNumberOfLegs(
+						( (i == 0) ? Double.MIN_VALUE : distanceClasses[i - 1]), 
+						distanceClasses[i]);
 			}
 			switch(crosstabFormat) {
 			case ABSOLUTE:
-				System.out.print(Integer.toString(numberOfLegs));
+				System.out.print(Long.toString(numberOfLegs));
 				break;
 			case PERCENTAGE:
 				System.out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
@@ -260,7 +239,7 @@ public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonA
 		numberOfLegs = this.getNumberOfLegs();
 		switch(crosstabFormat) {
 		case ABSOLUTE:
-			System.out.print(Integer.toString(numberOfLegs));
+			System.out.print(Long.toString(numberOfLegs));
 			break;
 		case PERCENTAGE:
 			System.out.print(percentFormat.format(1.0));
