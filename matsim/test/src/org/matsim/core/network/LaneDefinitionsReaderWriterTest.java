@@ -86,25 +86,25 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 	}
 
 	private void checkContent(BasicLaneDefinitions lanedefs) {
-		assertEquals(2, lanedefs.getLanesToLinkAssignments().size());
+		assertEquals(2, lanedefs.getLanesToLinkAssignmentsList().size());
 		BasicLanesToLinkAssignment l2la;
-		l2la = lanedefs.getLanesToLinkAssignments().get(0);
+		l2la = lanedefs.getLanesToLinkAssignmentsList().get(0);
 		assertNotNull(l2la);
 		assertEquals(id23, l2la.getLinkId());
-		BasicLane lane = l2la.getLanes().get(0);
+		BasicLane lane = l2la.getLanesList().get(0);
 		assertEquals(id3, lane.getId());
 		assertEquals(id1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getLength(), EPSILON);
 		assertEquals(1, lane.getNumberOfRepresentedLanes());
-		lane = l2la.getLanes().get(1);
+		lane = l2la.getLanesList().get(1);
 		assertEquals(id5, lane.getId());
 		assertEquals(60.0, lane.getLength(), EPSILON);
 		assertEquals(2, lane.getNumberOfRepresentedLanes());
 		//check a lanes2linkassignment using default values
-		l2la = lanedefs.getLanesToLinkAssignments().get(1);
+		l2la = lanedefs.getLanesToLinkAssignmentsList().get(1);
 		assertNotNull(l2la);
 		assertEquals(id42, l2la.getLinkId());
-		lane = l2la.getLanes().get(0);
+		lane = l2la.getLanesList().get(0);
 		assertEquals(id1, lane.getId());
 		assertEquals(id1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getLength(), EPSILON);
