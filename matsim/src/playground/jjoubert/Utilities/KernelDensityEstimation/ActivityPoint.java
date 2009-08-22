@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ActivityPoint.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.Utilities.KernelDensityEstimation;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import com.vividsolutions.jts.geom.Point;
 
-
-public class AllTests {
-		
-	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
-		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		
-		return suite;
+public class ActivityPoint{
+	
+	private Point point;
+	private int hour;
+	
+	public ActivityPoint(Point point, int hour){
+		this.point = point;
+		this.hour = hour;
 	}
+
+	public Point getPoint() {
+		return point;
+	}
+
+	public int getHour() {
+		return hour;
+	}
+
 }

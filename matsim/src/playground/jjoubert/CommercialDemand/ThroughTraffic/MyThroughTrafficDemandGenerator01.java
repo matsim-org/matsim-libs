@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyCell.java
+ * MyThroughTrafficDemandGenerator01.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,63 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.CommercialDemand.ThroughTraffic;
 
-import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
-import com.vividsolutions.jts.geom.Envelope;
-
-public class MyGridCell extends Envelope{
+public class MyThroughTrafficDemandGenerator01 {
+	private final Logger log;
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private int id;
-	private double count;
-	private ArrayList<Double> hourCount;
+	public MyThroughTrafficDemandGenerator01() {
+		log = Logger.getLogger(MyThroughTrafficDemandGenerator01.class);
 
-	public ArrayList<Double> getHourCount() {
-		return hourCount;
-	}
-
-	public MyGridCell(int id, double xMin, double xMax, double yMin, double yMax, Integer numberOfTimeBins){
-		super(xMin, xMax, yMin, yMax);
-		this.id = id;
-		this.count = 0;
-		if(numberOfTimeBins != null){
-			this.setHourlyCounts(numberOfTimeBins);
-		} else{
-			hourCount = null;
-		}
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	private void setHourlyCounts(int hourBins){
-		hourCount = new ArrayList<Double>(hourBins);
-		for(int i = 0; i < hourBins; i++){
-			hourCount.add(Double.valueOf(0.0));
-		}
 	}
 	
-	public double getCount() {
-		return count;
-	}
-	
-	public void addToTotalCount(double value){
-		this.count += value;
-	}
-	
-	public void addToHourCount(int hour, double value){
-		Double oldValue = this.hourCount.get(hour);
-		this.hourCount.set(hour, oldValue + value);
-	}
-	
-	public boolean equals(MyGridCell mgc){
-		return super.equals(mgc);
-	}
+
 
 }

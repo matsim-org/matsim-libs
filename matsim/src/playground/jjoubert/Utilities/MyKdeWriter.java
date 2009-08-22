@@ -27,8 +27,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import playground.jjoubert.CommercialDemand.MyGrid;
-import playground.jjoubert.CommercialDemand.MyGridCell;
+import playground.jjoubert.Utilities.KernelDensityEstimation.MyGrid;
+import playground.jjoubert.Utilities.KernelDensityEstimation.MyGridCell;
 
 /**
  * A class to write the kernel density estimation results to a text file that is readable

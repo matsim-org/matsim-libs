@@ -18,20 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.CommercialDemand;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-
 public class AllTests {
-		
+
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.CommercialDemand");
 		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
+		suite.addTestSuite(MyCommercialDemandGenerator01Test.class);
 		
 		return suite;
 	}
+
 }

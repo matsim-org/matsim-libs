@@ -18,18 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.Utilities.KernelDensityEstimation;
 
 import org.apache.log4j.Logger;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-
-import playground.jjoubert.Utilities.DateString;
-import playground.jjoubert.Utilities.MyKdeWriter;
 import playground.jjoubert.Utilities.MyShapefileReader;
 
+import com.vividsolutions.jts.geom.MultiPolygon;
 
-public class MyKernelDensityEstimator {
+
+public class MyKernelDensityEstimator2 {
 
 	/* 
 	 * String value that must be set. Allowed area names are:
@@ -54,21 +52,21 @@ public class MyKernelDensityEstimator {
 		log.info("  using the activities from " + studyAreaName);
 		log.info("=======================================================================");
 		log.info(null);
-		DateString ds = new DateString();
+//		DateString ds = new DateString();
 		
 		String mainAreaShapefileName = root + "Shapefiles/" + mainAreaName + "/" + mainAreaName + "_UTM35S.shp";
 		MyShapefileReader msr = new MyShapefileReader(mainAreaShapefileName);
 		MultiPolygon studyArea = msr.readMultiPolygon();
-		MyGrid grid = new MyGrid(studyArea, 1000, 1000, 24);
-		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + "MinorLocations.txt";
-		grid.estimateActivities(activityFilename, 5000);
-		
-		String kdeOutputFilename = root + studyAreaName + "/Activities/" + studyAreaName + "MinorKDE_" + ds.toString() + ".txt";
-		log.info("Writing minor activities to " + kdeOutputFilename);
-		MyKdeWriter kw = new MyKdeWriter();
-		kw.writeKdeToFile(grid, kdeOutputFilename);
-		
-		log.info("Completed kernel density estimation.");		
+		String activityFilename = root + studyAreaName + "/Activities/" + studyAreaName + "MajorLocations.txt";
+
+//		MyGrid grid = new MyGrid(studyArea, 1000, 1000, 24);
+		MyGrid2 grid = new MyGrid2(studyArea, 500, 500, 24, activityFilename);
+		grid.readPoints();
+		grid.processCells(root + studyAreaName + "/Activities/" + studyAreaName + "KDE.txt", 5000);
+
+//		QuadTree<ActivityPoint> qt = grid.getPointTree();
+				
+		log.info("Completed.");		
 	}
 
 }

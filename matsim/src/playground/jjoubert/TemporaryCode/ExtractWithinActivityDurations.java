@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.TemporaryCode;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,6 +32,8 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
+import playground.jjoubert.Utilities.MyVehicleIdentifier;
+
 
 public class ExtractWithinActivityDurations {
 
@@ -42,15 +44,14 @@ public class ExtractWithinActivityDurations {
 	private final static Logger log = Logger.getLogger(ExtractWithinActivityDurations.class);
 
 	public static void main(String[] args) {
-		final double withinThreshold = 0.90;
-		
 		ArrayList<Integer> withinVehicles = new ArrayList<Integer>();
 		ArrayList<Integer> withinDurations = new ArrayList<Integer>();
 		
 		// build ArrayList of 'within' vehicles
 		String fileToRead = ROOT + "Gauteng/Activities/GautengVehiclestats.txt";
 		
-		withinVehicles = buildWithinVehicleIdList(fileToRead, withinThreshold);
+		MyVehicleIdentifier mvi = new MyVehicleIdentifier(0.9, 1.0);
+		withinVehicles = mvi.buildVehicleList(fileToRead, ",");
 		
 		log.info("Building ArrayList of 'within' activity durations... ");
 		
@@ -91,27 +92,6 @@ public class ExtractWithinActivityDurations {
 		}
 		log.info("Done.");
 		log.info("Completed successfully!");
-	}
-
-	public static ArrayList<Integer> buildWithinVehicleIdList(String fileToRead, double thresHold) {
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		try {
-			log.info("Building an ArrayList of 'within' vehicle IDs... ");
-			Scanner withinScan = new Scanner(new BufferedReader(new FileReader(new File(fileToRead))));
-			withinScan.nextLine();
-			while(withinScan.hasNextLine()){
-				String [] line = withinScan.nextLine().split(",");
-				int vehicleId = Integer.parseInt(line[0]);
-				double percentage = Double.parseDouble(line[8]);
-				if(percentage >= thresHold){
-					list.add(vehicleId);
-				}
-			}		
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		log.info("Done (" + list.size() + " vehicles)");
-		return list;
 	}
 
 }

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.Utilities.KernelDensityEstimation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -33,6 +33,7 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
+
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

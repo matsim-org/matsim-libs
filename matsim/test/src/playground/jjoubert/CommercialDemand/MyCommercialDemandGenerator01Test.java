@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * MyCommercialDemandGenerator01Test.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.CommercialDemand;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.testcases.MatsimTestCase;
 
 
-public class AllTests {
+public class MyCommercialDemandGenerator01Test extends MatsimTestCase{
+	
+	public void testMyCommercialDemandGeneratorConstructor(){
 		
-	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
-		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		
-		return suite;
+		/*
+		 * Test the constructor.
+		 */
+		String tempPlansFolder = "ABC";
+		Integer numberOfPlans = Integer.valueOf(2);
+		Double threshold = 0.9;
+		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(tempPlansFolder, numberOfPlans, threshold);
+		assertEquals("Folder name not correct.",tempPlansFolder, mcdg.getPlansFolder());
+		assertEquals("Number of plans files to create not correct", numberOfPlans, Integer.valueOf(mcdg.getNumberOfSamples()));
+		assertEquals("Threshold not correct.", threshold, mcdg.getActivityThreshold());
+				
+		/*
+		 * I don't have to test whether the right 'within' and 'through' vehicles are
+		 * identified; assuming the jjoubert.Utilities.MyVehicleIdentifier test will
+		 * do a sufficient job.
+		 */		
 	}
+	
+	public void testSomethingElse(){
+		
+	}
+
 }

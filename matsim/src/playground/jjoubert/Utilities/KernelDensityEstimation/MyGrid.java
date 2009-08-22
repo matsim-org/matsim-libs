@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.Utilities.KernelDensityEstimation;
 
 import java.io.BufferedReader;
 import java.io.File;

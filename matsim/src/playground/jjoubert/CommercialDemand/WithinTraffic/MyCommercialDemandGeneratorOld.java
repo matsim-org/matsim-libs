@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialDemand;
+package playground.jjoubert.CommercialDemand.WithinTraffic;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +46,13 @@ import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
+import playground.jjoubert.Utilities.MyVehicleIdentifier;
 import playground.jjoubert.Utilities.MyXmlConverter;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-public class MyCommercialDemandGenerator {
+public class MyCommercialDemandGeneratorOld {
 	// String value that must be set
 	final static String PROVINCE = "Gauteng";
 	// Mac
@@ -68,7 +69,7 @@ public class MyCommercialDemandGenerator {
 	private final static int dimensionActivities = 21; 	// index '0' should never be used
 	private final static int dimensionDuration = 49; 	// index '0' should never be used
 
-	private final static Logger log = Logger.getLogger(MyCommercialDemandGenerator.class);
+	private final static Logger log = Logger.getLogger(MyCommercialDemandGeneratorOld.class);
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args){
@@ -372,9 +373,9 @@ public class MyCommercialDemandGenerator {
 		// Build ArrayList with 'within' vehicles
 		String vehicleSource = ROOT + PROVINCE + "/Activities/" + PROVINCE + "VehicleStats.txt";
 //		String vehicleSource = ROOT + "/Temp/TempVehicleStats.txt";
-		ArrayList<Integer> withinVehicles = 
-			ExtractWithinActivityDurations.buildWithinVehicleIdList(vehicleSource, WITHIN_THRESHOLD);
-		
+		MyVehicleIdentifier mvi = new MyVehicleIdentifier(WITHIN_THRESHOLD, 1.0);
+		ArrayList<Integer> withinVehicles = mvi.buildVehicleList(vehicleSource, ",");
+
 		// Build the three-dimensional array
 
 		ArrayList<ArrayList<ArrayList<Integer>>> matrix = new ArrayList<ArrayList<ArrayList<Integer>>>();

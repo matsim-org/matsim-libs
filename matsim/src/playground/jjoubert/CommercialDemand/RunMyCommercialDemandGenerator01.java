@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityPoint.java
+ * RunMyCommercialDemandGenerator01.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,24 +20,18 @@
 
 package playground.jjoubert.CommercialDemand;
 
-import com.vividsolutions.jts.geom.Point;
+public class RunMyCommercialDemandGenerator01 {
 
-public class ActivityPoint{
-	
-	private Point point;
-	private int hour;
-	
-	public ActivityPoint(Point point, int hour){
-		this.point = point;
-		this.hour = hour;
-	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 
-	public Point getPoint() {
-		return point;
-	}
-
-	public int getHour() {
-		return hour;
+		String plansFolder = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/";
+		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(plansFolder, 1, 0.9);
+		String vehicleStatistics = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/Activities/GautengVehicleStats	.txt";
+		mcdg.createPlans(vehicleStatistics);
+		
 	}
 
 }

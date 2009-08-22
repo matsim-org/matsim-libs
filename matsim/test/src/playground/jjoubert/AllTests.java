@@ -31,6 +31,7 @@ public class AllTests {
 		
 		suite.addTest(playground.jjoubert.Utilities.AllTests.suite());
 		suite.addTest(playground.jjoubert.CommercialClusters.AllTests.suite());
+		suite.addTest(playground.jjoubert.CommercialDemand.AllTests.suite());
 		
 		return suite;
 	}
