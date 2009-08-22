@@ -3,6 +3,7 @@ package playground.jjoubert.CommercialTraffic;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -38,9 +40,9 @@ public class ActivityLocations {
 	 static String studyAreaName = "WesternCape";
 
 	// Set the home directory, depending on where the job is executed.
-//	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
-//	final static String ROOT = "/home/jjoubert/";									// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/data/";								// Satawal
+//	final static String ROOT = "~/MATSim/workspace/MATSimData/"; 	// Mac
+//	final static String ROOT = "~/";								// IVT-Sim0
+	final static String ROOT = "~/data/";							// Satawal
 
 	// Derived string values.
 	private static String sourceFolderName = ROOT + "DigiCore/SortedVehicles/";
@@ -68,7 +70,8 @@ public class ActivityLocations {
 	static ArrayList<Integer> durationBuckets;
 	// a 'BoinkPoint' is an activity that starts and ends at different locations. Currently I don't do anything with them.
 	//TODO Sort out how to handle these 'BoinkPoint's.
-	public static int numberOfBoinkPoints = 0; 
+	protected static int numberOfBoinkPoints = 0; 
+	private final static Logger log = Logger.getLogger(ActivityLocations.class);
 
 	/**
 	 * The main method calls various other methods, both within the class and from other 
@@ -111,9 +114,9 @@ public class ActivityLocations {
 	 * @param args
 	 */
 	public static void main( String args[] ) {
-		System.out.println("==========================================================================================");
-		System.out.println("Identifying vehicle activity locations for vehicles travelling through: " + studyAreaName );
-		System.out.println();
+		log.info("==========================================================================================");
+		log.info("Identifying vehicle activity locations for vehicles travelling through: " + studyAreaName );
+		log.info("==========================================================================================");
 		long startTime = System.currentTimeMillis();
 		final File inFolder = new File( sourceFolderName );
 		final File vehicles[] = inFolder.listFiles();
@@ -130,15 +133,12 @@ public class ActivityLocations {
 		
 		MathTransform mt = getMathTransform(); // Prepare for geometric transformations
 		
-		System.out.println("Reading study area: " + studyAreaName );
+		log.info("Reading study area: " + studyAreaName );
 		MyShapefileReader msr = new MyShapefileReader(shapeFileSource);
 		studyArea = msr.readMultiPolygon();
 		studyArea.getCentroid();
-		System.out.println("Done");
-		System.out.println();
-		
-		System.out.println("Processing vehicle files in " + destinationFolderName + "...");
-		System.out.println();
+		log.info("Done rreading study area.");
+		log.info("Processing vehicle files in " + destinationFolderName + "...");
 		
 		ProgressBar pb = new ProgressBar('*', totalVehicles);
 		pb.printProgressBar();
@@ -147,7 +147,10 @@ public class ActivityLocations {
 			File outFolder = new File( destinationFolderName );
 			outFolder.mkdirs();
 			File vehFolder = new File( vehicleFolderName );
-			vehFolder.mkdirs();
+			boolean checkCreate = vehFolder.mkdirs();
+			if(!checkCreate){
+				log.warn("Could not create " + vehicleFolderName.toString() + ", or it already exists!");
+			}
 			
 			// Create all the output file writers, and write each's header.
 			BufferedWriter vehicleStats = new BufferedWriter(new FileWriter(new File(destinationFolderName + studyAreaName + "VehicleStats.txt")));
@@ -213,19 +216,17 @@ public class ActivityLocations {
 			e.printStackTrace();
 		}
 		
-		System.out.printf("\n\n");
-		
 		long endTime = System.currentTimeMillis();
 		
-		System.out.println("--------------------------------------");
-		System.out.println("Summary for: " + studyAreaName );
-		System.out.println("--------------------------------------");
-		System.out.println("Number of vehicles processed: " + numberOfVehicles );
-		System.out.println("Total home locations: " + numberOfMajorActivities );
-		System.out.println("Total activity locations: " + numberOfMinorActivities );
-		System.out.println("Total time (sec): " + ((int)(((double)(endTime - startTime)) / 1000) ) );
-		System.out.println("Boink points: " + numberOfBoinkPoints );
-		System.out.println("--------------------------------------");
+		log.info("--------------------------------------");
+		log.info("Summary for: " + studyAreaName );
+		log.info("--------------------------------------");
+		log.info("Number of vehicles processed: " + numberOfVehicles );
+		log.info("Total home locations: " + numberOfMajorActivities );
+		log.info("Total activity locations: " + numberOfMinorActivities );
+		log.info("Total time (sec): " + ((int)(((double)(endTime - startTime)) / 1000) ) );
+		log.info("Boink points: " + numberOfBoinkPoints );
+		log.info("--------------------------------------");
 		
 	}
 
@@ -487,34 +488,37 @@ public class ActivityLocations {
 		double longitude;
 		double latitude;
 		int status;
-		
-		ArrayList<GPSPoint> log = new ArrayList<GPSPoint>();
-		try {
 
-			Scanner input = new Scanner(new BufferedReader(new FileReader(thisFile) ) );
-			while( input.hasNextLine() ){
-				String [] inputString = input.nextLine().split(delimiter);
-				if( inputString.length > 5){
-					try{
-						vehID = Integer.parseInt( inputString[0] );
-						time =  Long.parseLong( inputString[1] );
-						longitude = Double.parseDouble( inputString[2] );
-						latitude = Double.parseDouble( inputString[3] );
-						status = Integer.parseInt( inputString[4] );
-						Coordinate c = new Coordinate( longitude, latitude );
-						JTS.transform(c, c, mt);
-						log.add( new GPSPoint(vehID, time, status, c) );
-					} catch(NumberFormatException e2){
-						System.out.print("");
-					} catch(Exception e3){
-						// Points with coordinates outside the range (±90¼) are ignored.
-						System.out.print("");						
+		ArrayList<GPSPoint> log = new ArrayList<GPSPoint>();
+		Scanner input;
+		try {
+			input = new Scanner(new BufferedReader(new FileReader(thisFile) ) );
+			try{
+				while( input.hasNextLine() ){
+					String [] inputString = input.nextLine().split(delimiter);
+					if( inputString.length > 5){
+						try{
+							vehID = Integer.parseInt( inputString[0] );
+							time =  Long.parseLong( inputString[1] );
+							longitude = Double.parseDouble( inputString[2] );
+							latitude = Double.parseDouble( inputString[3] );
+							status = Integer.parseInt( inputString[4] );
+							Coordinate c = new Coordinate( longitude, latitude );
+							JTS.transform(c, c, mt);
+							log.add( new GPSPoint(vehID, time, status, c) );
+						} catch(NumberFormatException e2){
+							System.out.print("");
+						} catch(Exception e3){
+							// Points with coordinates outside the range (±90¼) are ignored.
+							System.out.print("");						
+						}
 					}
 				}
+			} finally{
+				input.close();
 			}
-			input.close();						
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		return log;
 	}

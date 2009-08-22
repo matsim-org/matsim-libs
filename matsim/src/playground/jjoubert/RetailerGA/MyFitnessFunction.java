@@ -49,8 +49,7 @@ public class MyFitnessFunction {
 		fitness += this.points.get(solution.get(solution.size()-1)-1).distance(this.points.get(solution.get(0)-1));
 		
 		if(fitness == null){
-			System.err.println("Could not evaluate solution!");
-			System.exit(0);
+			throw new RuntimeException("Could not evaluate solution!");
 		} 
 		return fitness;
 	}

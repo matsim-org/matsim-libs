@@ -10,13 +10,15 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 public class QueryWithinAndThroughTraffic {
 
 	// String value that must be set
 	final static String PROVINCE = "WesternCape";
 	final static double THRESHOLD = 0.9;
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "~/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
 //	final static String ROOT = "/home/jjoubert/";
 	// Derived string values:
@@ -33,6 +35,8 @@ public class QueryWithinAndThroughTraffic {
 	final static String WITHIN_VEHICLE_OUT = OUT_FOLDER + PROVINCE + "WithinVehicleStats.txt";
 	final static String THOUGH_VEHICLE_OUT = OUT_FOLDER + PROVINCE + "ThroughVehicleStats.txt";
 	
+	private final static Logger log = Logger.getLogger(QueryWithinAndThroughTraffic.class);
+
 	
 	static TreeSet<Integer> withinTree;
 
@@ -46,12 +50,15 @@ public class QueryWithinAndThroughTraffic {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("==========================================================================================");
-		System.out.println("Extracting 'within' and 'through' vehicles for: " + PROVINCE );
-		System.out.println();
+		log.info("==========================================================================================");
+		log.info("Extracting 'within' and 'through' vehicles for: " + PROVINCE );
+		log.info("==========================================================================================");
 		
-		File OutFolder = new File ( OUT_FOLDER );
-		OutFolder.mkdirs();
+		File outFolder = new File ( OUT_FOLDER );
+		boolean checkCreate = outFolder.mkdirs();
+		if(!checkCreate){
+			log.warn("Could not create " + outFolder.toString() + ", or it already exists!");
+		}
 		
 		withinTree = new TreeSet<Integer>();
 		
@@ -69,13 +76,12 @@ public class QueryWithinAndThroughTraffic {
 	}
 
 	private static void buildTreeSet() {
-		System.out.print("Building TreeSet... ");
+		log.info("Building TreeSet... ");
 		long start = System.currentTimeMillis();
 		
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( VEHICLE ) ) ) );
-			@SuppressWarnings("unused")
-			String header = input.nextLine();
+			input.nextLine();
 
 			while(input.hasNextLine() ){
 				String [] line = input.nextLine().split( "," );
@@ -90,11 +96,11 @@ public class QueryWithinAndThroughTraffic {
 		} 
 		
 		long end = System.currentTimeMillis();
-		System.out.printf("Done, with %d leaves, in %d millisec.\n",withinTree.size(), end-start );
+		log.info("Done, with " + withinTree.size() + " leaves, in " + (end-start) + " millisec.");
 	}
 
 	private static void splitInputFile(String type, String inputFile, String withinOut, String throughOut ) {
-		System.out.printf("Processing %s activities... ", type );
+		log.info("Processing " + type + " activities... ");
 		long start = System.currentTimeMillis();
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( inputFile ) ) ) );
@@ -128,6 +134,7 @@ public class QueryWithinAndThroughTraffic {
 			} finally{
 				withinOutput.close();
 				throughOutput.close();
+				input.close();
 			}
 			
 			
@@ -138,15 +145,14 @@ public class QueryWithinAndThroughTraffic {
 		}
 		
 		long end = System.currentTimeMillis();
-		System.out.printf("Done, in %d millisec\n", end-start);
+		log.info("Done, in " + (end-start) + " millisec");
 	}
 	
 	private static void splitVehicleStatsFile() {
-		System.out.print("Splitting vehicle statistics file... ");
+		log.info("Splitting vehicle statistics file... ");
 
-		Scanner input;
 		try {
-			input = new Scanner(new BufferedReader(new FileReader(new File( VEHICLE ) ) ) );
+			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( VEHICLE ) ) ) );
 			String header = input.nextLine();
 			BufferedWriter withinVehicle = new BufferedWriter(new FileWriter(new File( WITHIN_VEHICLE_OUT ) ) );
 			BufferedWriter throughVehicle = new BufferedWriter(new FileWriter(new File( THOUGH_VEHICLE_OUT ) ) );
@@ -171,13 +177,14 @@ public class QueryWithinAndThroughTraffic {
 			} finally{
 				withinVehicle.close();
 				throughVehicle.close();
+				input.close();
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.printf("Done. \n\n");
+		log.info("Done.");
 	}
 
 

@@ -35,7 +35,7 @@ import org.matsim.core.network.NetworkLayer;
 public class MyCommercialActivityDensityListener implements IterationStartsListener, IterationEndsListener{
 	
 	private BufferedWriter outputCommercialActivityDensity = null;
-	private final String DELIMITER = ",";
+	private static final String DELIMITER = ",";
 	private MyCommercialActivityDensityWriter cs = null;
 
 	public MyCommercialActivityDensityListener() {

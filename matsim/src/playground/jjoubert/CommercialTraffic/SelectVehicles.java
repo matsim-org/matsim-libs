@@ -9,10 +9,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.ProgressBar;
@@ -42,8 +44,8 @@ public class SelectVehicles {
 	 * Set the home directory, depending on where the job is executed.
 	 */
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
-//	final static String ROOT = "/home/jjoubert/";									// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/data/";								// Satawal
+//	final static String ROOT = "~/";												// IVT-Sim0
+	final static String ROOT = "~/data/";											// Satawal
 	
 	// Derived string values
 	final static String shapeFileSource = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
@@ -54,11 +56,13 @@ public class SelectVehicles {
 	private final static String WGS84 = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]],PRIMEM[\"Greenwich\", 0.0],UNIT[\"degree\", 0.017453292519943295],AXIS[\"Lon\", EAST],AXIS[\"Lat\", NORTH]]";
 	private final static String WGS84_UTM35S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 
+	private final static Logger log = Logger.getLogger(SelectVehicles.class);
+	
 	public static void main(String[] args) {
-		System.out.println("===========================================================================================");
-		System.out.println("Selecting vehicles from the DigiCore data set that are within: " + PROVINCE );
-		System.out.println();
-		System.out.println("Initializing... ");
+		log.info("===========================================================================================");
+		log.info("Selecting vehicles from the DigiCore data set that are within: " + PROVINCE );
+		log.info("===========================================================================================");
+		log.info("Initializing... ");
 		long startTime = System.currentTimeMillis();
 		
 		MyShapefileReader msr = new MyShapefileReader(shapeFileSource);
@@ -68,15 +72,18 @@ public class SelectVehicles {
 		
 		File originFolder = new File( vehicleSource );
 		File destinationFolder = new File( vehicleDestination );
-		destinationFolder.mkdirs();
+		boolean checkCreate = destinationFolder.mkdirs();
+		if(!checkCreate){
+			log.warn("Could not create " + destinationFolder.toString() + ", or it already exists!");
+		}
 		final int files = countVehicleFiles(originFolder);
 		int inFiles = 0;
 		int outFiles = 0;
 		
 		File vehicleFile[] = originFolder.listFiles();
-		System.out.println("Done\n" );
+		log.info("Done" );
 		
-		System.out.println("Processing vehicle files.");
+		log.info("Processing vehicle files.");
 		ProgressBar pb = new ProgressBar('*', files);
 		pb.printProgressBar();
 		
@@ -96,11 +103,11 @@ public class SelectVehicles {
 		}
 		long endTime = System.currentTimeMillis();
 		long seconds = ((long)(endTime - startTime)/1000);
-		System.out.printf("\nDone\n\n");
-		System.out.println("              Total number of files: " + (inFiles + outFiles) );
-		System.out.println("Total number of files in study area: " + inFiles );
+		log.info("Done");
+		log.info("              Total number of files: " + (inFiles + outFiles) );
+		log.info("Total number of files in study area: " + inFiles );
 		
-		System.out.printf ("\n                       Total time: %d (sec)", seconds);
+		log.info("                       Total time: " + seconds + " (sec)");
 	}
 
 	private static boolean getVehicleStatus(MultiPolygon mp, File file, MathTransform mt) {
@@ -109,7 +116,7 @@ public class SelectVehicles {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(file) ) );
 			GeometryFactory gf = new GeometryFactory();
 			
-			while((input.hasNextLine() ) & !(inStatus) ){
+			while((input.hasNextLine() ) && !(inStatus) ){
 				String [] inputString = input.nextLine().split(" ");
 				if(inputString.length > 5){
 					double x = Double.valueOf(inputString[2]).doubleValue();
@@ -117,13 +124,11 @@ public class SelectVehicles {
 					//TODO Create a more general "check" for point validity
 					if( (x > 0) && (x < 90) && (y > -90) && (y < 0) ){
 						Coordinate c = new Coordinate(x, y);
-						try {
-							JTS.transform(c, c, mt);
-						} catch (Exception e) {
-							// Points with coordinates outside the range (±90¼) are ignored, but is not removed.
-//							e.printStackTrace();
-							;
-						}
+							try {
+								JTS.transform(c, c, mt);
+							} catch (TransformException e) {
+								e.printStackTrace();
+							}
 						Point p = gf.createPoint(c);
 
 						inStatus = testPolygon(mp, p);
@@ -148,7 +153,7 @@ public class SelectVehicles {
 
 		FileInputStream from = null;
 		FileOutputStream to = null;
-		try {
+		try{
 			from = new FileInputStream(fromFile);
 			to = new FileOutputStream(toFile);
 			byte[] buffer = new byte[4096];
@@ -156,8 +161,10 @@ public class SelectVehicles {
 
 			while ((bytesRead = from.read(buffer)) != -1)
 				to.write(buffer, 0, bytesRead); // write
-		} catch(Exception e1){
-			e1.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
 			if (from != null){
 				try {

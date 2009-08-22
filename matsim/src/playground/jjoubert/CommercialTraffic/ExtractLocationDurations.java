@@ -15,7 +15,7 @@ public class ExtractLocationDurations {
 	// String value that must be set
 	final static String PROVINCE = "SouthAfrica";
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "~/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
 //	final static String ROOT = "/home/jjoubert/";
 	// Derived string values:
@@ -67,8 +67,7 @@ public class ExtractLocationDurations {
 	private static void processFile(String inputFile)
 			throws FileNotFoundException {
 		Scanner input = new Scanner(new BufferedReader(new FileReader(new File( inputFile ))));
-		@SuppressWarnings("unused")
-		String header = input.nextLine();
+		input.nextLine();
 		while(input.hasNextLine()){
 			String nextLine = input.nextLine();
 			if(nextLine.length() > 5){

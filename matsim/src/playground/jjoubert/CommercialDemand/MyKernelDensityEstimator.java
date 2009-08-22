@@ -42,9 +42,9 @@ public class MyKernelDensityEstimator {
 	static String studyAreaName = "Gauteng";
 
 	// Set the home directory, depending on where the job is executed.
-//	static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
-//	static String root = "/home/jjoubert/";									// IVT-Sim0
-	static String root = "/home/jjoubert/data/";								// Satawal
+//	static String root = "~/MATSim/workspace/MATSimData/"; // Mac
+//	static String root = "~/";									// IVT-Sim0
+	static String root = "~/data/";								// Satawal
 
 	private final static Logger log = Logger.getLogger(MyGrid.class);
 

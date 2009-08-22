@@ -56,7 +56,7 @@ public class MyGridCell extends Envelope{
 	private void setHourlyCounts(int hourBins){
 		hourCount = new ArrayList<Double>(hourBins);
 		for(int i = 0; i < hourBins; i++){
-			hourCount.add(new Double(0.0));
+			hourCount.add(Double.valueOf(0.0));
 		}
 	}
 	
@@ -71,6 +71,10 @@ public class MyGridCell extends Envelope{
 	public void addToHourCount(int hour, double value){
 		Double oldValue = this.hourCount.get(hour);
 		this.hourCount.set(hour, oldValue + value);
+	}
+	
+	public boolean equals(MyGridCell mgc){
+		return super.equals(mgc);
 	}
 
 }

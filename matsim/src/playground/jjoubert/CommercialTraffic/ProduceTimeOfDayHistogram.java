@@ -12,9 +12,9 @@ public class ProduceTimeOfDayHistogram {
 	final static String [] areaList = { "Gauteng", "KZN", "WesternCape" };
 	final static String [] fileType = { "MinorWithin", "MinorThrough", "MajorWithin", "MajorThrough" };
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "~/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "~/";
 	// Derived string values:
 	final static String OUTPUT = ROOT + "Temp/TimeOfDayHistogram.txt";
 	

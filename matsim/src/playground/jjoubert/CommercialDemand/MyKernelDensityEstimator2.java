@@ -21,9 +21,7 @@
 package playground.jjoubert.CommercialDemand;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.QuadTree;
 
-import playground.jjoubert.Utilities.DateString;
 import playground.jjoubert.Utilities.MyShapefileReader;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -42,9 +40,9 @@ public class MyKernelDensityEstimator2 {
 	static String studyAreaName = "Gauteng";
 
 	// Set the home directory, depending on where the job is executed.
-//	static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
-//	static String root = "/home/jjoubert/";									// IVT-Sim0
-	static String root = "/home/jjoubert/data/";								// Satawal
+//	static String root = "~/MATSim/workspace/MATSimData/"; // Mac
+//	static String root = "~/";									// IVT-Sim0
+	static String root = "~/data/";								// Satawal
 
 	private final static Logger log = Logger.getLogger(MyGrid.class);
 
@@ -54,7 +52,7 @@ public class MyKernelDensityEstimator2 {
 		log.info("  using the activities from " + studyAreaName);
 		log.info("=======================================================================");
 		log.info(null);
-		DateString ds = new DateString();
+//		DateString ds = new DateString();
 		
 		String mainAreaShapefileName = root + "Shapefiles/" + mainAreaName + "/" + mainAreaName + "_UTM35S.shp";
 		MyShapefileReader msr = new MyShapefileReader(mainAreaShapefileName);
@@ -66,7 +64,7 @@ public class MyKernelDensityEstimator2 {
 		grid.readPoints();
 		grid.processCells(root + studyAreaName + "/Activities/" + studyAreaName + "KDE.txt", 5000);
 
-		QuadTree<ActivityPoint> qt = grid.getPointTree();
+//		QuadTree<ActivityPoint> qt = grid.getPointTree();
 				
 		log.info("Completed.");		
 	}

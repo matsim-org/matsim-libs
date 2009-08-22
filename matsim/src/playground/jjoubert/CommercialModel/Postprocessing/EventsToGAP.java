@@ -25,9 +25,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
@@ -51,9 +53,9 @@ public class EventsToGAP {
 	 */
 	
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "~/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "~/";
 	// Derived string values
 	final static String GAP_SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "GAP_UTM35S.shp";
 	final static String SHAPEFILE = ROOT + "ShapeFiles/" + PROVINCE + "/" + PROVINCE + "_UTM35S.shp";
@@ -63,12 +65,13 @@ public class EventsToGAP {
 
 	public static final String DELIMITER = ",";
 	final static int GAP_SEARCH_AREA = 20000; // in METERS
-	
+	private final static Logger log = Logger.getLogger(EventsToGAP.class);
+
 
 	public static void main( String args[] ) {
-		System.out.println("==========================================================================================");
-		System.out.println("   Converting " + PROVINCE + " MATSim simulation events ('minor') to GAP densities" );
-		System.out.println();
+		log.info("==========================================================================================");
+		log.info("   Converting " + PROVINCE + " MATSim simulation events ('minor') to GAP densities" );
+		log.info("==========================================================================================");
 		
 		DateString date = new DateString();
 		date.setTimeInMillis(System.currentTimeMillis());
@@ -112,13 +115,13 @@ public class EventsToGAP {
 			}
 			allZones.add(thisZone);
 		}		
-		System.out.printf("Done.\n\n");
+		log.info("Done.");
 		return allZones;
 	}
 
 
 	private static void assignActivityToZone(ArrayList<SAZone> list, QuadTree<SAZone> tree ){
-		System.out.println("Assigning activity locations to GAP mesozones.");
+		log.info("Assigning activity locations to GAP mesozones.");
 
 		GeometryFactory gf = new GeometryFactory();
 		int events = 0;
@@ -127,8 +130,7 @@ public class EventsToGAP {
 		
 		try { // Minor activities
 			Scanner inputMinor = new Scanner(new BufferedReader(new FileReader(new File( INPUT ) ) ) );
-			@SuppressWarnings("unused")
-			String header = inputMinor.nextLine();
+			inputMinor.nextLine();
 
 			try {
 				while(inputMinor.hasNextLine() ){
@@ -146,12 +148,11 @@ public class EventsToGAP {
 							minorZone.incrementMinorActivityCountDetail( timeOfDay );
 						} else{
 							eventsOut++;
-//							System.err.println("The event is not inside the study area");		
 						}
 					}
 					// Report progress
 					if( events == eventProgress){
-						System.out.printf("     ...minor events %8d\n", events );
+						log.info("     ...minor events " + events );
 						eventProgress*=2;
 					}
 					events++;
@@ -159,16 +160,16 @@ public class EventsToGAP {
 			} finally {
 				inputMinor.close();
 			}		
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.printf("     ...minor events %8d. Done (%d (%3.4f%%) was outside the study area)\n\n", events, eventsOut, ((float)eventsOut / (float)events)*100 );
+		log.info("     ...minor events " + events + ". Done (" + eventsOut + " was outside the study area)");
 	}
 
 	private static SAZone findZoneInArrayList(Point p, ArrayList<SAZone> list ) {
 	SAZone zone = null;
 	int i = 0;
-	while( (i < list.size() ) & (zone == null) ){
+	while( (i < list.size() ) && (zone == null) ){
 		SAZone thisZone = list.get(i);
 		if( thisZone.contains( p ) ){
 			zone = thisZone;				
@@ -177,15 +178,16 @@ public class EventsToGAP {
 		}
 	}
 	return zone;
-}
-	
+	}
+
 	private static void writeZoneStatsToFile(ArrayList<ArrayList<Double>> allZones, String output) {
-		System.out.print("Writing mesozone statistics to file... ");
-		try{
-			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( output ) ) );
-			
+		log.info("Writing mesozone statistics to file... ");
+		BufferedWriter outputMinor;
+		try {
+			outputMinor = new BufferedWriter(new FileWriter( new File ( output ) ) );
+
 			String header = createHeaderString();
-	
+
 			// Write minor activities
 			try{
 				/*
@@ -193,31 +195,33 @@ public class EventsToGAP {
 				 */
 				outputMinor.write( header );
 				outputMinor.newLine();
+				StringBuffer sb = new StringBuffer();
 				for (ArrayList<Double> thisZone : allZones) {
-					String thisLine = new String();
 					/*
 					 * Convert the GAP_ID to integer, and add to output string.
 					 */
 					int gapID = (int) Math.floor(thisZone.get(0));
-					thisLine += Integer.valueOf(gapID) + DELIMITER;	
+					sb.append(String.valueOf(gapID));
+					sb.append(DELIMITER);	
 					/*
 					 * Add the double values for hours 0 through 22 to output string.
 					 */
 					for(int i = 1; i < thisZone.size()-1; i++ ){
-						thisLine += thisZone.get(i).toString() + DELIMITER;
+						sb.append(thisZone.get(i).toString());
+						sb.append(DELIMITER);
 					}
-					thisLine += thisZone.get(thisZone.size()-1);
-					outputMinor.write( thisLine );
+					sb.append(thisZone.get(thisZone.size()-1));
+					outputMinor.write( sb.toString() );
 					outputMinor.newLine();
 				}
 			} finally{
 				outputMinor.close();
 			}
-			
-		} catch(Exception e){
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.print("Done.\n\n");
+
+		log.info("Done writing statistics.");
 	}
 		
 	/*
@@ -226,13 +230,17 @@ public class EventsToGAP {
 	 * 		One column for each hour, starting with 0 and ending with 23. 
 	 */
 	public static String createHeaderString(){
-		String headerString = "Name" + DELIMITER;
+		StringBuffer sb = new StringBuffer();
+		sb.append("Name");
+		sb.append(DELIMITER);
 		for(int i = 0; i < 23; i++){
-			headerString += "H" + i + DELIMITER;
+			sb.append("H");
+			sb.append(String.valueOf(i));
+			sb.append(DELIMITER);
 		}
-		headerString += "H23";
+		sb.append("H23");
 		
-		return headerString;
+		return sb.toString();
 	}
 	
 }

@@ -36,9 +36,9 @@ public class CompareGAPV01 {
 	final static String PROVINCE = "Gauteng";
 
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "~/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "~/";
 	// Derived string values
 	final static String IN_ACTUAL = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorGapStats_Normalized.txt";
 	final static String IN_SIMULATED = ROOT + "Commercial/PostProcess/AverageSimulatedCommercialMinorGAP_Normalized.txt";
@@ -113,8 +113,7 @@ public class CompareGAPV01 {
 						 * Checks at every line if the two input files have the same GAP_ID; aborts the 
 						 * run if not. 
 						 */
-						System.err.println("Two GAP_IDs are not the same!!");
-						System.exit(0);
+						throw new RuntimeException("Two GAP_IDs are not the same!!");
 					} else{
 						/*
 						 * Writes the GAP_ID

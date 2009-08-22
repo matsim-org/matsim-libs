@@ -3,6 +3,7 @@ package playground.jjoubert.CommercialTraffic;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,9 +39,9 @@ public class AnalyseGAPDensity {
 	static String studyAreaName = "KZN";
 
 	// Set the home directory, depending on where the job is executed.
-	//	 static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
-	//	 static String ROOT = "/home/jjoubert/";									// IVT-Sim0
-	static String ROOT = "/home/jjoubert/data/";								// Satawal
+	//	 static String ROOT = "~/MATSim/workspace/MATSimData/"; 	// Mac
+	//	 static String ROOT = "~/";									// IVT-Sim0
+	static String ROOT = "~/data/";									// Satawal
 
 	// Derived string values
 	static String gapShapefileName = ROOT + "Shapefiles/" + studyAreaName + "/" + studyAreaName + "GAP_UTM35S.shp";
@@ -51,7 +52,7 @@ public class AnalyseGAPDensity {
 	static String outputFilenameMajor = ROOT + studyAreaName + "/Activities/" + studyAreaName + "MajorGapStats.txt";
 
 	private final static Logger log = Logger.getLogger(AnalyseGAPDensity.class);
-	public static String delimiter = ",";
+	public final static String delimiter = ",";
 	static int gapSearchRadius = 20000; // in METERS
 	static int progressCounter = 0;
 	static int progressMultiplier = 1;
@@ -80,11 +81,11 @@ public class AnalyseGAPDensity {
 		log.info("Start assigning activity locations to GAP mesozones.");
 
 		GeometryFactory gf = new GeometryFactory();
-		
-		try { // Minor activities
-			Scanner inputMinor = new Scanner(new BufferedReader(new FileReader(new File( inputFilenameMinor ) ) ) );
-			@SuppressWarnings("unused")
-			String header = inputMinor.nextLine();
+
+		Scanner inputMinor;
+		try {
+			inputMinor = new Scanner(new BufferedReader(new FileReader(new File( inputFilenameMinor ) ) ) );
+			inputMinor.nextLine();
 
 			try {
 				while(inputMinor.hasNextLine() ){
@@ -117,8 +118,8 @@ public class AnalyseGAPDensity {
 			} finally {
 				inputMinor.close();
 			}		
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
 		}
 		log.info("... Minor activities processed: " + String.valueOf(progressCounter));
 
@@ -127,8 +128,7 @@ public class AnalyseGAPDensity {
 		progressMultiplier = 1;
 		try { // Major activities
 			Scanner inputMajor = new Scanner(new BufferedReader(new FileReader(new File( inputFilenameMajor ) ) ) );
-			@SuppressWarnings("unused")
-			String header = inputMajor.nextLine();
+			inputMajor.nextLine();
 
 			try {
 				while(inputMajor.hasNextLine() ){
@@ -172,7 +172,7 @@ public class AnalyseGAPDensity {
 	private static SAZone findZoneInArrayList(Point p, ArrayList<SAZone> list ) {
 	SAZone zone = null;
 	int i = 0;
-	while( (i < list.size() ) & (zone == null) ){
+	while( (i < list.size() ) && (zone == null) ){
 		SAZone thisZone = list.get(i);
 		if( thisZone.contains( p ) ){
 			zone = thisZone;				
@@ -182,13 +182,13 @@ public class AnalyseGAPDensity {
 	}
 	return zone;
 }
-	
+
 	private static void writeZoneStatsToFile(ArrayList<SAZone> zoneList) {
 		log.info("Start writing mesozone statistics to file.");
-		try{
+		try {
 			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( outputFilenameMinor ) ) );
 			BufferedWriter outputMajor = new BufferedWriter(new FileWriter( new File ( outputFilenameMajor ) ) );
-			
+
 			// Update zone activity counts.
 			for (SAZone zone : zoneList) {
 				zone.updateSAZoneCounts(true); // Update minor
@@ -210,13 +210,13 @@ public class AnalyseGAPDensity {
 				outputMinor.close();
 				outputMajor.close();
 			}
-
-		} catch(Exception e){
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		log.info("Completed writing to file.");
 	}
-		
+
 	/**
 	 * Writes a standard header string for the GAP statistics file.
 	 */

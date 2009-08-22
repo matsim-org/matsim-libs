@@ -30,13 +30,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+
 
 public class ExtractWithinActivityDurations {
 
 	/**
 	 * @param args
 	 */
-	private static final String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	private static final String ROOT = "~/MATSim/workspace/MATSimData/";
+	private final static Logger log = Logger.getLogger(ExtractWithinActivityDurations.class);
 
 	public static void main(String[] args) {
 		final double withinThreshold = 0.90;
@@ -49,14 +52,13 @@ public class ExtractWithinActivityDurations {
 		
 		withinVehicles = buildWithinVehicleIdList(fileToRead, withinThreshold);
 		
-		System.out.print("Building ArrayList of 'within' activity durations... ");
+		log.info("Building ArrayList of 'within' activity durations... ");
 		
 		try {
 			File activityFile = new File(ROOT + "Gauteng/Activities/GautengMinorLocations.txt");
 //			File activityFile = new File(ROOT + "CommercialDemand/InputData/Test.txt");
 			Scanner durationScan = new Scanner(new BufferedReader(new FileReader(activityFile)));
-			@SuppressWarnings("unused")
-			String header = durationScan.nextLine();
+			durationScan.nextLine();
 
 			while(durationScan.hasNextLine()){
 				String [] line = durationScan.nextLine().split(",");
@@ -71,9 +73,9 @@ public class ExtractWithinActivityDurations {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		System.out.printf("Done. (%d activities)\n", withinDurations.size());
+		log.info("Done. (" + withinDurations.size() + " activities)");
 		
-		System.out.print("Writing 'within' activity durations to file... ");
+		log.info("Writing 'within' activity durations to file... ");
 		try {
 			BufferedWriter output = new BufferedWriter(new FileWriter(new File(ROOT + "CommercialDemand/Inputdata/gautengWithindurations.txt")));
 			try{
@@ -87,17 +89,16 @@ public class ExtractWithinActivityDurations {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.printf("Done.\n\nCompleted successfully!");
+		log.info("Done.");
+		log.info("Completed successfully!");
 	}
 
 	public static ArrayList<Integer> buildWithinVehicleIdList(String fileToRead, double thresHold) {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		try {
-			System.out.print("Building an ArrayList of 'within' vehicle IDs... ");
+			log.info("Building an ArrayList of 'within' vehicle IDs... ");
 			Scanner withinScan = new Scanner(new BufferedReader(new FileReader(new File(fileToRead))));
-			
-			@SuppressWarnings("unused")
-			String header = withinScan.nextLine();
+			withinScan.nextLine();
 			while(withinScan.hasNextLine()){
 				String [] line = withinScan.nextLine().split(",");
 				int vehicleId = Integer.parseInt(line[0]);
@@ -109,7 +110,7 @@ public class ExtractWithinActivityDurations {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		System.out.printf("Done (%d vehicles)\n", list.size());
+		log.info("Done (" + list.size() + " vehicles)");
 		return list;
 	}
 

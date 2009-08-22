@@ -29,6 +29,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.jfree.util.Log;
+
 import playground.jjoubert.Utilities.DateString;
 
 public class ProcessVehicles {
@@ -89,11 +91,14 @@ public class ProcessVehicles {
 		long linesRead = 0;
 		long reportValue = 1;
 
-		File outputFoler = new File(root + "Vehicles/");
-		if(outputFoler.exists()){
-			System.err.printf("The folder %s already exists! Delete, and rerun.", outputFoler.getPath());
+		File outputFolder = new File(root + "Vehicles/");
+		if(outputFolder.exists()){
+			System.err.printf("The folder %s already exists! Delete, and rerun.", outputFolder.getPath());
 		} else{
-			outputFoler.mkdirs();
+			boolean checkDirectory = outputFolder.mkdirs();
+			if(!checkDirectory){
+				Log.warn("Could not make " + outputFolder.toString() + ", or it already exists!");
+			}
 		}		
 
 		Scanner input = null;

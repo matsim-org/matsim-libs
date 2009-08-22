@@ -71,17 +71,14 @@ public class MyGapReader {
 				  this.areaName.equalsIgnoreCase("WesternCape")){
 			this.gapIdField = 2;
 		} else{
-			LOG.error("The given area name does not have a known ID field!!");
-			System.exit(0);
+			throw new RuntimeException("The given area name does not have a known ID field!!");
 		}
 		
 		File file = new File(filename);
 		if(file.exists()){
 		this.shapefile = filename;
 		} else{
-			Log.error("The shapefile " + filename + " does not exist!!" );
-			Log.error("Shutting down");
-			System.exit(0);
+			throw new RuntimeException("The shapefile " + filename + " does not exist!!");
 		}
 		
 		readGapShapefile();

@@ -103,7 +103,7 @@ public class CheckPersonCluster01 {
 						} else{
 							p = ls.getCentroid();
 						}
-						Double pX = new Double(p.getX());
+						Double pX = Double.valueOf(p.getX());
 						if(pX.isNaN()){
 							log.info("A NaN found!!");
 						}

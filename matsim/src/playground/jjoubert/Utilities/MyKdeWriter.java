@@ -56,8 +56,7 @@ public class MyKdeWriter {
 		File outputFile = new File(outputFilename);
 		if(outputFile.exists()){
 			log.error("The file " + outputFilename + " already exists!!");
-			log.error("Since the files are appended, please delete and start over.");
-			System.exit(0);
+			throw new RuntimeException("Since the files are appended, please delete and start over.");
 		}
 	
 		try {

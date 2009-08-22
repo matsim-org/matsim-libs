@@ -15,7 +15,7 @@ public class FixMinorLocationsOutput {
 	// Mac
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/";
+	final static String ROOT = "~/";
 	// Derived string values:
 	final static String IN_FILE = ROOT + PROVINCE + "/Activities/" + PROVINCE + "MinorLocations.txt";
 	final static String OUT_FILE = ROOT + PROVINCE + "/Activities/new" + PROVINCE + "MinorLocations.txt";

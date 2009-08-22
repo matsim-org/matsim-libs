@@ -27,7 +27,7 @@ public class ReadOneVehicle {
 			
 			if (vehID == 102076) {
 				writtenRecords += 1;
-				output.format("%d %d %f %f\n", vehID, time, xCoord, yCoord);					
+				output.format("%d %d %f %f %d %d\n", vehID, time, xCoord, yCoord, status, speed);					
 			}
 		}
 		

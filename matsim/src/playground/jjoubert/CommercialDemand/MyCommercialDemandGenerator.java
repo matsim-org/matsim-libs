@@ -26,12 +26,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -47,18 +44,20 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
-import playground.jjoubert.CommercialTraffic.ActivityLocations;
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.Vehicle;
 import playground.jjoubert.Utilities.MyXmlConverter;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGenerator {
 	// String value that must be set
 	final static String PROVINCE = "Gauteng";
 	// Mac
-	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
+	final static String ROOT = "~MATSim/workspace/MATSimData/";
 	// IVT-Sim0
-//	final static String ROOT = "/home/jjoubert/";
+//	final static String ROOT = "~/";
 	
 	private static final int populationSize = 5000;
 	private static final int firstIndex = 100000;
@@ -69,13 +68,14 @@ public class MyCommercialDemandGenerator {
 	private final static int dimensionActivities = 21; 	// index '0' should never be used
 	private final static int dimensionDuration = 49; 	// index '0' should never be used
 
+	private final static Logger log = Logger.getLogger(MyCommercialDemandGenerator.class);
+
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args){
-		System.out.println();
-		System.out.println("*****************************************************************************************");
-		System.out.printf("  Generating %d 'plans.xml' files for %s, each with %d commercial agents.\n", numberOfSamples, PROVINCE, populationSize);
-		System.out.println("*****************************************************************************************");
-		System.out.println();
+		log.info("*****************************************************************************************");
+		log.info("  Generating " + numberOfSamples + " 'plans.xml' files for " + PROVINCE + ", each with " + populationSize + " commercial agents.");
+		log.info("*****************************************************************************************");
+		log.info("");
 
 		// Analyze vehicle chains, but only if the matrix does NOT exist
 		String matrixFileName = ROOT + "Commercial/Input/matrixFile.txt";
@@ -94,16 +94,14 @@ public class MyCommercialDemandGenerator {
 		// Build empty CDF for number of activities
 		ArrayList<CumulativeDistribution> cdfNumberOfActivities = new ArrayList<CumulativeDistribution>();
 		for(int a = 0; a < matrix.size(); a++){
-			CumulativeDistribution cdf = null;
-			cdfNumberOfActivities.add(cdf);
+			cdfNumberOfActivities.add(null);
 		}
 		// Build an empty CDF for chain duration
 		ArrayList<ArrayList<CumulativeDistribution>> cdfDuration = new ArrayList<ArrayList<CumulativeDistribution>>();
 		for(int a = 0; a < matrix.size(); a++){
 			ArrayList<CumulativeDistribution> cdfDurationn = new ArrayList<CumulativeDistribution>();
 			for(int b = 0; b < matrix.get(a).size(); b++){
-				CumulativeDistribution cdf = null;
-				cdfDurationn.add(cdf);
+				cdfDurationn.add(null);
 			}
 			cdfDuration.add(cdfDurationn);
 		}
@@ -172,7 +170,7 @@ public class MyCommercialDemandGenerator {
 				endTime = Math.min(startTime + (Math.max(1, durationBin) * 3600), 172800);
 
 				// Establish time 'gaps' based on the number of activities
-				double gap = (endTime - startTime) / (activitiesPerChain + 1); // (Duration) / (n+1)
+				double gap = (endTime - startTime) / (double) (activitiesPerChain + 1); // (Duration) / (n+1)
 				double activityEndTime = startTime + gap;
 
 				for(int activity = 0; activity < activitiesPerChain; activity++){
@@ -413,15 +411,14 @@ public class MyCommercialDemandGenerator {
 					if(obj instanceof Vehicle){
 						vehicle = (Vehicle) obj;
 					}else{
-						System.err.println("Could not convert vehicle XML file to type: Vehicle!");
+						log.warn("Could not convert vehicle XML file to type: Vehicle!");
 					}
 
 					// Analyze each chain
 					for (Chain chain : vehicle.getChains()) {
 						// Chain start time
-						Integer index1 = null;
 						GregorianCalendar chainStart = chain.getActivities().get(0).getEndTime();
-						index1 = chainStart.get(Calendar.HOUR_OF_DAY);
+						Integer index1 = chainStart.get(Calendar.HOUR_OF_DAY);
 						
 						// Number of activities
 						Integer index2 = null;
@@ -431,7 +428,7 @@ public class MyCommercialDemandGenerator {
 						Integer index3 = null;
 						GregorianCalendar chainEnd = chain.getActivities().get(chain.getActivities().size() - 1).getStartTime();
 						Long durationMilliseconds = chainEnd.getTimeInMillis() - chainStart.getTimeInMillis();
-						Integer durationHours = Math.round(durationMilliseconds / (1000 * 60 * 60) );
+						Integer durationHours = (int) (durationMilliseconds / (1000 * 60 * 60) );
 						index3 = Math.min(47, durationHours);						
 						
 						assert( (index1 != null) && (index2 != null) && (index3 != null) ) : "One of the indices are null!!";
@@ -441,12 +438,12 @@ public class MyCommercialDemandGenerator {
 				}
 				// Update progress
 				if(++filesProcessed == processLimit){
-					System.out.printf("   ... Files processed: %6d\n", filesProcessed);
+					log.info("   ... Files processed: " + filesProcessed);
 					processLimit *= 2;
 				}
 			}
 		}
-		System.out.printf("   ... Done (%d files)\n", filesProcessed);
+		log.info("   ... Files processed: " + filesProcessed + " (Done)");
 		return matrix;
 	}
 

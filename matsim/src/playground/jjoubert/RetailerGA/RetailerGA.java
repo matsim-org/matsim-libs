@@ -38,9 +38,9 @@ public class RetailerGA {
 	private double best;
 	private double average;
 	private double worst;
-	private final int numberOfMutationsToMutant = 3;
-	private final double diversityThreshold = 0.25;
-	private final double diversityMutationFraction = 0.25;
+	private static int numberOfMutationsToMutant = 3;
+	private static double diversityThreshold = 0.25;
+	private static double diversityMutationFraction = 0.25;
 	
 
 	public RetailerGA(	int populationSize, 
@@ -62,8 +62,7 @@ public class RetailerGA {
 	
 	public void generateFirstGeneration(){
 		if(this.generation.size() > 0){
-			System.err.println("Trying to overwrite an existing generation!!");
-			System.exit(0);
+			throw new RuntimeException("Trying to overwrite an existing generation!!");
 		} else{
 			this.generation.add(this.initialSolution);
 
@@ -207,19 +206,24 @@ public class RetailerGA {
 
 	public String toString(){
 		Collections.sort(this.generation);
-		String result = new String();
+		String result = "";
+		StringBuffer sb = new StringBuffer();
 		for(int i = 0; i < populationSize; i++){
-			result += String.valueOf(i+1) + ":\t";
+			sb.append(String.valueOf(i+1));
+			sb.append(":\t");
 			for (int j = 0; j < genomeLength-1; j++) {
-				result += String.valueOf(generation.get(i).getGenome().get(j)) + " -> ";
+				sb.append(String.valueOf(generation.get(i).getGenome().get(j)));
+				sb.append(" -> ");
 			}
-			result += String.valueOf(generation.get(i).getGenome().get(genomeLength-1)) + 
-			"\t\t" + String.valueOf(generation.get(i).getFitness());
+			sb.append(String.valueOf(generation.get(i).getGenome().get(genomeLength-1)));
+			sb.append("\t\t");
+			sb.append(String.valueOf(generation.get(i).getFitness()));
 			if(this.incumbent == this.generation.get(i)){
-				result += "*";
+				sb.append("*");
 			}
-			result += "\n";
+			sb.append("\n");
 		}		
+		result = sb.toString();
 		return result;
 	}
 
@@ -274,16 +278,15 @@ public class RetailerGA {
 			if(precedenceVector != null){
 				int i = 0;
 				while(i < numCrossovers){
-					ArrayList<Integer> P1 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
-					ArrayList<Integer> P2 = this.generation.get((int) this.cdf.sampleFromCDF()).clone();
+					ArrayList<Integer> P1 = this.generation.get((int) this.cdf.sampleFromCDF()).getGenome();
+					ArrayList<Integer> P2 = this.generation.get((int) this.cdf.sampleFromCDF()).getGenome();
 
 					RetailerGenome offspring = this.performMX(P1, P2, precedenceVector);
 					newGeneration.add(offspring);
 					i++;				
 				}
 			} else{
-				System.err.println("Trying to perform Merged Crossover without a precedence vector!");
-				System.exit(0);
+				throw new RuntimeException("Trying to perform Merged Crossover without a precedence vector!");
 			}
 			
 			break;
@@ -454,9 +457,6 @@ public class RetailerGA {
 			} else{
 				pos++;
 			}
-		}
-		if(result==null){
-			Log.warn("We have a problem, there is no result!");
 		}
 		return result;
 	}

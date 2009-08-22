@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.jfree.util.Log;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -53,7 +54,10 @@ public class VehicleReport {
 
 		// Ensure the output directory exist 
 		File outputFolder = new File( OUPUT_FOLDER );
-		outputFolder.mkdirs();
+		boolean checkDirectory = outputFolder.mkdirs();
+		if(!checkDirectory){
+			Log.warn("Could not make " + outputFolder.toString() + ", or it already exists!");
+		}
 
 		// Convert the vehicle file to the essential, and WGS84_UMT35S, format
 		convertRawInput(mt);

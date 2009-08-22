@@ -135,9 +135,7 @@ public class MyGrid {
 		int lineMultiplier = 1;
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File(filename))));
-			
-			@SuppressWarnings("unused")
-			String header = input.nextLine();
+			input.nextLine();
 			
 			while(input.hasNextLine()){
 				if(lineCounter == lineMultiplier){

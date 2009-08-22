@@ -9,7 +9,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+
 public class JoinOutput {
+
+	private final static Logger log = Logger.getLogger(JoinOutput.class);
 
 	/**
 	 * @param args
@@ -18,12 +22,12 @@ public class JoinOutput {
 		// Simple class to join the output files for all vehicles
 		String fileType = "MinorLocations";
 		
-		System.out.println("Joining the two '" + fileType + "' files:");
-		System.out.print("   Part 1... ");
+		log.info("Joining the two '" + fileType + "' files:");
+		log.info("Part 1...");
 		
-		String inputFile1 = "/Users/johanwjoubert/MATSim/workspace/MATSimData/SouthAfrica/Part1/SouthAfrica" + fileType + ".txt";
-		String inputFile2 = "/Users/johanwjoubert/MATSim/workspace/MATSimData/SouthAfrica/Part2/SouthAfrica" + fileType + ".txt";
-		String outputFile = "/Users/johanwjoubert/MATSim/workspace/MATSimData/SouthAfrica/Activities/SouthAfrica" + fileType + ".txt";
+		String inputFile1 = "~/MATSim/workspace/MATSimData/SouthAfrica/Part1/SouthAfrica" + fileType + ".txt";
+		String inputFile2 = "~/MATSim/workspace/MATSimData/SouthAfrica/Part2/SouthAfrica" + fileType + ".txt";
+		String outputFile = "~/MATSim/workspace/MATSimData/SouthAfrica/Activities/SouthAfrica" + fileType + ".txt";
 		int count = 0;
 
 		try {
@@ -46,9 +50,9 @@ public class JoinOutput {
 						count++;
 					}
 				}
-				System.out.println("Done.");
-				System.out.print("   Part 2... ");
-				header = input2.nextLine();
+				log.info("Done with Part 1.");
+				log.info("Part 2... ");
+				input2.nextLine();
 				while(input2.hasNextLine()){
 					String line = input2.nextLine();
 					if(line.length() > 5){
@@ -57,7 +61,7 @@ public class JoinOutput {
 						count++;
 					}
 				}
-				System.out.println("Done.");
+				log.info("Done with Part 2.");
 			} finally{
 				output.close();
 			}
@@ -67,6 +71,6 @@ public class JoinOutput {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
-		System.out.printf("\nTotal number of records: %d\n", count);
+		log.info("Total number of records: " + count);
 	}
 }

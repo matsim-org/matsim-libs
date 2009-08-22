@@ -32,8 +32,7 @@ public class MyPermutator {
 	public ArrayList<Integer> permutate(int size){
 		ArrayList<Integer> unused = new ArrayList<Integer>();
 		for(int i = 0; i < size; i++){
-			Integer newInt = new Integer(i+1);
-			unused.add(newInt);
+			unused.add(Integer.valueOf(i+1));
 		}
 		ArrayList<Integer> solution = new ArrayList<Integer>();
 		for(int j = 0; j < size-1; j++){

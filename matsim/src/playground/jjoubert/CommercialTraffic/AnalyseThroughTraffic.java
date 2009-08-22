@@ -86,8 +86,7 @@ public class AnalyseThroughTraffic {
 		TreeSet<Integer> tree = new TreeSet<Integer>();
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File( theFile ) ) ) );
-			@SuppressWarnings("unused")
-			String header = input.nextLine();
+			input.nextLine();
 			
 			while(input.hasNextLine() ){
 				String [] lineSplit = input.nextLine().split( "," );

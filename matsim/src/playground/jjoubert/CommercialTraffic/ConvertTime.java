@@ -17,13 +17,14 @@ public class ConvertTime {
 	}
 
 	private static int[] convertSecToDHMS(long durationS) {
-		float daysF = durationS/DAY;
+		int duration = (int) durationS;
+		float daysF = duration / (float) DAY;
 		int days = (int) daysF;
-		float hoursF = (durationS - (days*DAY) )/HOUR;
+		float hoursF = (duration - (days*DAY) ) / (float) HOUR;
 		int hours = (int) hoursF;
-		float minutesF = (durationS - (days*DAY) - (hours*HOUR) )/MIN;
+		float minutesF = (duration - (days*DAY) - (hours*HOUR) ) / (float) MIN;
 		int minutes = (int) minutesF;
-		int seconds = (int) (durationS  - (days*DAY) - (hours*HOUR)  - (minutes*MIN));
+		int seconds = (int) (duration  - (days*DAY) - (hours*HOUR)  - (minutes*MIN));
 		int newDuration[] = {days, hours, minutes, seconds};
 		return newDuration;
 	}

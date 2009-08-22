@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
+import org.jfree.util.Log;
+
 import playground.jjoubert.CommercialTraffic.GPSPoint;
 import playground.jjoubert.Utilities.ProgressBar;
 
@@ -25,8 +27,8 @@ import playground.jjoubert.Utilities.ProgressBar;
 public class SortVehicleLogs {
 	// Set the home directory, depending on where the job is executed.
 //	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; // Mac
-//	final static String ROOT = "/home/jjoubert/";									// IVT-Sim0
-	final static String ROOT = "/home/jjoubert/data/DigiCore/";						// Satawal
+//	final static String ROOT = "~/";												// IVT-Sim0
+	final static String ROOT = "~/data/DigiCore/";									// Satawal
 	
 	// Derived string values
 	final static String SOURCEFOLDER = ROOT + "Vehicles/";
@@ -47,7 +49,10 @@ public class SortVehicleLogs {
 		System.out.println();
 		
 		File outFolder = new File(DESTFOLDER);
-		outFolder.mkdir();
+		boolean checkDirectory = outFolder.mkdir();
+		if(!checkDirectory){
+			Log.warn("Could nor create " + outFolder.toString() + ", or it already exists.");
+		}
 		
 		File files = new File(SOURCEFOLDER);
 		File vehicleFiles[] = files.listFiles();
@@ -105,24 +110,27 @@ public class SortVehicleLogs {
 		ArrayList<GPSRecord> log = new ArrayList<GPSRecord>();
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(file) ) );
-			while( input.hasNextLine() ){
-				String [] inputString = input.nextLine().split(DELIMITER);
-				if( inputString.length == 6){
-					try{
-						vehID = Integer.parseInt( inputString[0] );
-						time =  Long.parseLong( inputString[1] );
-						longitude = Double.parseDouble( inputString[2] );
-						latitude = Double.parseDouble( inputString[3] );
-						status = Integer.parseInt( inputString[4] );
-						speed = Integer.parseInt( inputString[5] );
+			try{
+				while( input.hasNextLine() ){
+					String [] inputString = input.nextLine().split(DELIMITER);
+					if( inputString.length == 6){
+						try{
+							vehID = Integer.parseInt( inputString[0] );
+							time =  Long.parseLong( inputString[1] );
+							longitude = Double.parseDouble( inputString[2] );
+							latitude = Double.parseDouble( inputString[3] );
+							status = Integer.parseInt( inputString[4] );
+							speed = Integer.parseInt( inputString[5] );
 
-						log.add( new GPSRecord(vehID, time, longitude, latitude, status, speed) );
-					} catch(NumberFormatException e){
-						e.printStackTrace();
-					} 
+							log.add( new GPSRecord(vehID, time, longitude, latitude, status, speed) );
+						} catch(NumberFormatException e){
+							e.printStackTrace();
+						} 
+					}
 				}
+			} finally{
+				input.close();
 			}
-			input.close();						
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

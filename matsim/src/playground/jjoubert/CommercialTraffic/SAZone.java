@@ -250,12 +250,5 @@ public class SAZone extends MultiPolygon{
 	public Integer[] getSpeedCount() {
 		return speedCount;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 }

@@ -195,18 +195,14 @@ public class Vehicle {
 					ArrayList<Activity> thisMajorLocation = majorLocationList.get(j);
 					int k = 0;
 					while( (!duplicate) && (k < thisMajorLocation.size() ) ){
-						try{
-							Activity a2 = thisMajorLocation.get(k);
-							Coordinate c2 = a2.getLocation().getCoordinate();
-							int distance = (int)( c1.distance(c2) );
-							if( distance < DISTANCE_THRESHOLD ){
-								duplicate = true;
-								majorLocationList.get(j).add(a1);
-							} else{
-								k++;
-							}
-						} catch(Exception e){
-							System.out.print("");
+						Activity a2 = thisMajorLocation.get(k);
+						Coordinate c2 = a2.getLocation().getCoordinate();
+						int distance = (int)( c1.distance(c2) );
+						if( distance < DISTANCE_THRESHOLD ){
+							duplicate = true;
+							majorLocationList.get(j).add(a1);
+						} else{
+							k++;
 						}
 					}
 					j++;

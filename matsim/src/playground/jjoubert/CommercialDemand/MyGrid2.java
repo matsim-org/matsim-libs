@@ -220,10 +220,10 @@ public class MyGrid2 {
 		
 	}
 
-	private double triangularKernel(double distance, double radius) {
-		double result = ((-1 / radius) * distance) + 1;
-		return result;
-	}
+//	private double triangularKernel(double distance, double radius) {
+//		double result = ((-1 / radius) * distance) + 1;
+//		return result;
+//	}
 
 	private double exponentialKernel(double distance, double radius) {
 		double A = 1;
@@ -232,42 +232,42 @@ public class MyGrid2 {
 		return result;
 	}
 	
-	private void buildGrid(){
-		//TODO Build a grid
-		double minX = this.gridEnvelope.getMinX();
-		double minY = this.gridEnvelope.getMinY();
-		int numberOfLongitudeCells = (int) Math.ceil(this.gridEnvelope.getWidth() / gridLongitude);
-		int numberOfLatitudeCells = (int) Math.ceil(this.gridEnvelope.getHeight() / gridLatitude);
-		long totalCells = numberOfLongitudeCells * numberOfLatitudeCells;
-		log.info("Total number of cells to create: " + String.valueOf(totalCells));
-		log.info("Building QuadTree of cells... this may take a while.");
-		long cellMultiplier = 1;
-		int cellId = 0;
-		for(int x = 0; x < numberOfLongitudeCells; x++){
-			for(int y = 0; y < numberOfLatitudeCells; y++){
-				if(cellId == cellMultiplier){
-					log.info("Cells added: " + String.valueOf(cellId));
-					cellMultiplier *= 2;
-				}
-				MyGridCell newCell = new MyGridCell(cellId,
-													minX + ((x)  *gridLongitude),
-													minX + ((x+1)*gridLongitude),
-													minY + ((y)  *gridLatitude),
-													minY + ((y+1)*gridLatitude),
-													numberOfTimeBins);
-				/*
-				 * TODO For now I am going to just create all the grid cells within the 
-				 * envelope. At a later stage I can, IF IT IS EFFICIENT, only add
-				 * grid cells that are WITHIN the study area. The final grid can then be
-				 * 'clipped' in ArcGIS, if you want.
-				 */
-				this.grid.put(newCell.centre().x, newCell.centre().y, newCell);
-				
-				cellId++;
-			}
-		}
-		log.info("Cells added: " + String.valueOf(cellId) + " (Complete)");
-	}
+//	private void buildGrid(){
+//		//TODO Build a grid
+//		double minX = this.gridEnvelope.getMinX();
+//		double minY = this.gridEnvelope.getMinY();
+//		int numberOfLongitudeCells = (int) Math.ceil(this.gridEnvelope.getWidth() / gridLongitude);
+//		int numberOfLatitudeCells = (int) Math.ceil(this.gridEnvelope.getHeight() / gridLatitude);
+//		long totalCells = numberOfLongitudeCells * numberOfLatitudeCells;
+//		log.info("Total number of cells to create: " + String.valueOf(totalCells));
+//		log.info("Building QuadTree of cells... this may take a while.");
+//		long cellMultiplier = 1;
+//		int cellId = 0;
+//		for(int x = 0; x < numberOfLongitudeCells; x++){
+//			for(int y = 0; y < numberOfLatitudeCells; y++){
+//				if(cellId == cellMultiplier){
+//					log.info("Cells added: " + String.valueOf(cellId));
+//					cellMultiplier *= 2;
+//				}
+//				MyGridCell newCell = new MyGridCell(cellId,
+//													minX + ((x)  *gridLongitude),
+//													minX + ((x+1)*gridLongitude),
+//													minY + ((y)  *gridLatitude),
+//													minY + ((y+1)*gridLatitude),
+//													numberOfTimeBins);
+//				/*
+//				 * TODO For now I am going to just create all the grid cells within the 
+//				 * envelope. At a later stage I can, IF IT IS EFFICIENT, only add
+//				 * grid cells that are WITHIN the study area. The final grid can then be
+//				 * 'clipped' in ArcGIS, if you want.
+//				 */
+//				this.grid.put(newCell.centre().x, newCell.centre().y, newCell);
+//				
+//				cellId++;
+//			}
+//		}
+//		log.info("Cells added: " + String.valueOf(cellId) + " (Complete)");
+//	}
 	
 	/**
 	 * Assumes a comma-separated file format.
@@ -278,9 +278,7 @@ public class MyGrid2 {
 		int lineMultiplier = 1;
 		try {
 			Scanner input = new Scanner(new BufferedReader(new FileReader(new File(filename))));
-			
-			@SuppressWarnings("unused")
-			String header = input.nextLine();
+			input.nextLine();
 			
 			while(input.hasNextLine()){
 				if(lineCounter == lineMultiplier){
