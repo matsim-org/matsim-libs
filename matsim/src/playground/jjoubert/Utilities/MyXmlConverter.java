@@ -29,8 +29,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import playground.jjoubert.CommercialClusters.ClusterActivities;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 

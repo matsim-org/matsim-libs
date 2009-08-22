@@ -109,20 +109,20 @@ public class RunRetailerSA {
 	 */
 	private static void writeLogReport(long tDuration,
 			ArrayList<Double> incumbent, double incumbentObjective) {
-		log.info("Took " + String.valueOf(tDuration) + "ms for " + String.valueOf(numberOfIterations) + " iterations.");
+		log.info("Took " + tDuration + "ms for " + numberOfIterations + " iterations.");
 		log.info("=============================================================================");
 		log.info("Algorithm parameters:");
 		log.info("");
-		log.info("     Initial temperature: " + String.valueOf(initialTemperature));
-		log.info("     Temperature reduction frequency: " + String.valueOf(temperatureReductionFrequency));
-		log.info("     Temperature reduction factor: " + String.valueOf(temperatureReductionFactor));
-		log.info("     Number of iterations: " + String.valueOf(numberOfIterations));
+		log.info("     Initial temperature: " + initialTemperature);
+		log.info("     Temperature reduction frequency: " + temperatureReductionFrequency);
+		log.info("     Temperature reduction factor: " + temperatureReductionFactor);
+		log.info("     Number of iterations: " + numberOfIterations);
 		log.info("=============================================================================");
 		log.info("Solution parameters:");
 		log.info("");
-		log.info("     Beta1: " + String.valueOf(incumbent.get(0)));
-		log.info("     Beta2: " + String.valueOf(incumbent.get(1)));
-		log.info("     Square error: " + String.valueOf(incumbentObjective));
+		log.info("     Beta1: " + incumbent.get(0));
+		log.info("     Beta2: " + incumbent.get(1));
+		log.info("     Square error: " + incumbentObjective);
 		log.info("=============================================================================");
 		log.info("Done.");
 	}
@@ -167,7 +167,7 @@ public class RunRetailerSA {
 		}
 		int people = data1.size() / shops;
 		
-		log.info("Read " + String.valueOf(data1.size()) + " values from each matrix. Includes " + String.valueOf(shops) + " shops and " + String.valueOf(people) + " people.");
+		log.info("Read " + data1.size() + " values from each matrix. Includes " + shops + " shops and " + people + " people.");
 		ArrayList<Double> data2 = new ArrayList<Double>();
 		try {
 			Scanner input2 = new Scanner(new BufferedReader(new FileReader(new File("/Users/johanwjoubert/Desktop/Temp/Ciari/matrix2.txt"))));

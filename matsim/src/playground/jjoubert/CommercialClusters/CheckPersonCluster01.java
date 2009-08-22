@@ -63,13 +63,13 @@ public class CheckPersonCluster01 {
 		
 		log.info("Visualising clusters.");
 
-//		String pointFilename = root + "Point_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-//		String lineFilename = root + "Line_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-//		String clusterFilename = root + "Cluster_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+//		String pointFilename = root + "Point_" + ((int)clusterRadius) + "_" + clusterMinimumPoints + ".txt";
+//		String lineFilename = root + "Line_" + ((int)clusterRadius) + "_" + clusterMinimumPoints + ".txt";
+//		String clusterFilename = root + "Cluster_" + ((int)clusterRadius) + "_" + clusterMinimumPoints + ".txt";
 
-		String pointFilename = root + "Person" + person + "Point_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-		String lineFilename = root + "Person" + person + "Line_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
-		String clusterFilename = root + "Person" + person + "Cluster_" + String.valueOf((int)clusterRadius) + "_" + String.valueOf(clusterMinimumPoints) + ".txt";
+		String pointFilename = root + "Person" + person + "Point_" + ((int)clusterRadius) + "_" + clusterMinimumPoints + ".txt";
+		String lineFilename = root + "Person" + person + "Line_" + ((int)clusterRadius) + "_" + clusterMinimumPoints + ".txt";
+		String clusterFilename = root + "Person" + person + "Cluster_" + ((int)clusterRadius) + "_" + clusterMinimumPoints + ".txt";
 		djc.visualizeClusters(pointFilename, clusterFilename, lineFilename, null);		
 		log.info("Completed");
 	}
@@ -117,7 +117,7 @@ public class CheckPersonCluster01 {
 				lineCounter++;
 				// Report progress.
 				if(lineCounter == lineMultiplier){
-					log.info("   Lines read: " + String.valueOf(lineCounter));
+					log.info("   Lines read: " + lineCounter);
 					lineMultiplier *= 2;
 				}
 			}

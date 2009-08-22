@@ -126,7 +126,7 @@ public class MyCommercialDemandGenerator {
 			//TODO Check if it is 'better' to create 'i' truck agents, and split them into dummy agents
 			// if the duration is greater than 24 hours - thus probably ending with more than 'i' agents;
 			// or create agents UNTIL you have 'i' - including the dummies.
-			System.out.printf("Building sample %d of %d population plans...\n", sampleNumber, numberOfSamples);
+			log.info("Building sample " + sampleNumber + " of " + numberOfSamples + " population plans...");
 			int populationComplete = 0;
 			int populationLimit = 1;
 			int agentId  = firstIndex;
@@ -206,19 +206,19 @@ public class MyCommercialDemandGenerator {
 				
 				// Report progress
 				if(++populationComplete == populationLimit){
-					System.out.printf("   ... Agents built: %6d\n", populationComplete);
+					log.info("   ... Agents built: " + populationComplete);
 					populationLimit *= 2;
 				}
 			}
-			System.out.printf("   ... Done (%d agents)\n", populationComplete);
+			log.info("   ... Agents built: " + populationComplete + " (Done)");
 
 			// Write plans.xml file
-			System.out.print("   Writing plans to XML file... ");
+			log.info("Writing plans to XML file... ");
 			PopulationWriter pw = new PopulationWriter(population, ROOT + "Commercial/plans" + 
-					PROVINCE + String.valueOf(populationSize) + "_Sample" + sampleNumber + ".xml");
+					PROVINCE + populationSize + "_Sample" + sampleNumber + ".xml");
 			pw.write();
-			System.out.println("Done!");
-			System.out.printf("Plans generation: Completed for sample %d of %d\n\n", sampleNumber, numberOfSamples);
+			log.info("Done writing plans to XML file.");
+			log.info("Plans generation: Completed for sample " + sampleNumber + " of " + numberOfSamples);
 		}
 	}
 

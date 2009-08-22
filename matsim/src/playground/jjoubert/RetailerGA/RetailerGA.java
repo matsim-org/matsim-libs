@@ -23,6 +23,7 @@ package playground.jjoubert.RetailerGA;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
@@ -41,7 +42,8 @@ public class RetailerGA {
 	private static int numberOfMutationsToMutant = 3;
 	private static double diversityThreshold = 0.25;
 	private static double diversityMutationFraction = 0.25;
-	
+	private final static Logger log = Logger.getLogger(RetailerGA.class);
+
 
 	public RetailerGA(	int populationSize, 
 						int genomeLength, 
@@ -312,13 +314,12 @@ public class RetailerGA {
 				}
 			}
 			if(newGeneration.size() != this.populationSize){
-				System.err.printf("After PMX the new generation is of size %d, and not %d", newGeneration.size(), this.populationSize);
-				System.exit(0);
+				throw new RuntimeException("After PMX the new generation is of size " + newGeneration.size() + " and not " + this.populationSize);
 			}
 			break;
 			
 		default:
-			System.err.printf("Crossover type %d not implemented!", crossoverType);
+			log.error("Crossover type " + crossoverType + " not implemented!");
 			break;
 		}		
 
@@ -376,11 +377,6 @@ public class RetailerGA {
 			c2.set(j, P1.get(j));
 		}
 		
-		if(P1.toString().equalsIgnoreCase("[2, 8, 5, 5, 4, 3, 9, 1, 2, 10]") &&
-		   P2.toString().equalsIgnoreCase("[4, 9, 5, 5, 8, 3, 2, 2, 1, 10]")){
-			System.out.println("Here is the problem situation!");
-		}
-
 		// Finish first offspring
 //		int pos = 0;
 		int pos = pointA-1;

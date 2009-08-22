@@ -22,10 +22,10 @@ package playground.jjoubert.CommercialDemand;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -40,8 +40,9 @@ import org.matsim.core.population.PlanImpl;
  */
 public class PlanWrapper {
 	private final int tw;						// Time window
-	private final int squeezeThreshold;			// Threshold 
-	
+	private final int squeezeThreshold;			// Threshold 	
+	private final Logger log = Logger.getLogger(PlanWrapper.class);
+
 	/**
 	 * Constructor to create a <i>plan wrapper</i>
 	 * 
@@ -93,7 +94,8 @@ public class PlanWrapper {
 			} else if( la.getStartTime() > this.tw && la.getStartTime() <= (this.tw + this.squeezeThreshold)){
 				/*
 				 * TODO Squeeze the plan.
-				 */				
+				 */	
+				log.info("Squeeze the plan.");
 			} else if(la.getStartTime() > (this.tw + this.squeezeThreshold)){
 				/*
 				 * Wrap the plan

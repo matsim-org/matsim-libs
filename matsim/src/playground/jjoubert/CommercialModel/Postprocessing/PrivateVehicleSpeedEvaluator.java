@@ -123,12 +123,12 @@ public class PrivateVehicleSpeedEvaluator {
 
 			linkCounter++;
 			if(linkCounter == linkMultiplier){
-				log.info("   Links completed... " + String.valueOf(linkCounter));
+				log.info("   Links completed... " + linkCounter);
 				linkMultiplier *= 2;
 			}
 
 		}
-		log.info("   Links completed... " + linkCounter + " (resolved: " + String.valueOf(linksFound) + "; unresolved: " + String.valueOf(linksNotFound) + ").");
+		log.info("   Links completed... " + linkCounter + " (resolved: " + linksFound + "; unresolved: " + linksNotFound + ").");
 
 
 		/*

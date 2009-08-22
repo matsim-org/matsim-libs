@@ -192,7 +192,7 @@ public class ActivityLocations {
 							
 							// Writing the vehicle as an XML file
 							MyXmlConverter mxc = new MyXmlConverter();
-							String vehicleFilenameXml = vehicleFolderName + String.valueOf(thisVehicle.getVehID()) + ".xml"; 
+							String vehicleFilenameXml = vehicleFolderName + thisVehicle.getVehID() + ".xml"; 
 							mxc.writeObjectToFile(thisVehicle, vehicleFilenameXml);
 						}
 						numberOfVehicles++;				
@@ -361,13 +361,12 @@ public class ActivityLocations {
 	private static void processVehicleActivities( Vehicle thisVehicle, File file, ArrayList<GPSPoint> log) {
 		
 		findNextVehicleStop(log); // Clean all points until first start		
-		ArrayList<Activity> activityList = extractActivities(file, log); // Find all the activities
+		ArrayList<Activity> activityList = extractActivities(log); // Find all the activities
 		extractChains(thisVehicle, activityList);
 		thisVehicle.updateVehicleStatistics(studyArea);		
 	}
 
-	private static ArrayList<Activity> extractActivities(File file,
-			ArrayList<GPSPoint> log) {
+	private static ArrayList<Activity> extractActivities(ArrayList<GPSPoint> log) {
 		
 		ArrayList<Activity> activityList = new ArrayList<Activity>(); // for the actual activities
 		ArrayList<GPSPoint> locationList = new ArrayList<GPSPoint>(); // for the possible activity locations

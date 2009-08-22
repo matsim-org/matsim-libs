@@ -48,10 +48,10 @@ public class MyAdjancencyMatrixBuilder {
 	private SparseDoubleMatrix1D inOrderAdjacency;
 	private SparseDoubleMatrix1D outOrderAdjacency;
 	private SparseDoubleMatrix2D orderAdjacency;
-	private QuadTree<Double> distanceAdjacencyQT;
-	private QuadTree<Integer> orderAdjacencyQT;
-	private TreeMap<String,Integer> inOrderAdjacencyTM;
-	private TreeMap<String,Integer> outOrderAdjacencyTM;
+//	private QuadTree<Double> distanceAdjacencyQT;
+//	private QuadTree<Integer> orderAdjacencyQT;
+//	private TreeMap<String,Integer> inOrderAdjacencyTM;
+//	private TreeMap<String,Integer> outOrderAdjacencyTM;
 
 	private QuadTree<ClusterPoint> clusteredPoints;
 	
@@ -61,10 +61,10 @@ public class MyAdjancencyMatrixBuilder {
 		inOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
 		outOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
 		orderAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
-		distanceAdjacencyQT = new QuadTree<Double>(0,0,matrixDimension+1,matrixDimension+1);
-		orderAdjacencyQT = new QuadTree<Integer>(0,0,matrixDimension+1,matrixDimension+1);
-		inOrderAdjacencyTM = new TreeMap<String, Integer>();
-		outOrderAdjacencyTM = new TreeMap<String, Integer>();
+//		distanceAdjacencyQT = new QuadTree<Double>(0,0,matrixDimension+1,matrixDimension+1);
+//		orderAdjacencyQT = new QuadTree<Integer>(0,0,matrixDimension+1,matrixDimension+1);
+//		inOrderAdjacencyTM = new TreeMap<String, Integer>();
+//		outOrderAdjacencyTM = new TreeMap<String, Integer>();
 		clusteredPoints = buildQuadTree(clusterList);
 	}
 	
@@ -75,10 +75,10 @@ public class MyAdjancencyMatrixBuilder {
 		inOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
 		outOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
 		orderAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
-		distanceAdjacencyQT = new QuadTree<Double>(0,0,matrixDimension+1,matrixDimension+1);
-		orderAdjacencyQT = new QuadTree<Integer>(0,0,matrixDimension+1,matrixDimension+1);
-		inOrderAdjacencyTM = new TreeMap<String, Integer>();
-		outOrderAdjacencyTM = new TreeMap<String, Integer>();
+//		distanceAdjacencyQT = new QuadTree<Double>(0,0,matrixDimension+1,matrixDimension+1);
+//		orderAdjacencyQT = new QuadTree<Integer>(0,0,matrixDimension+1,matrixDimension+1);
+//		inOrderAdjacencyTM = new TreeMap<String, Integer>();
+//		outOrderAdjacencyTM = new TreeMap<String, Integer>();
 		this.clusteredPoints = clusteredPoints;
 	}
 
@@ -90,7 +90,6 @@ public class MyAdjancencyMatrixBuilder {
 		double xMax = Double.MIN_VALUE;
 		double yMax = Double.MIN_VALUE;
 
-		int inputPointCounter = 0;
 		for(Cluster c : clusterList){
 			for(ClusterPoint p : c.getPoints()){
 				xMin = Math.min(xMin, p.getPoint().getX());
@@ -103,7 +102,6 @@ public class MyAdjancencyMatrixBuilder {
 		for(Cluster c : clusterList){
 			for(ClusterPoint p : c.getPoints()){
 				qt.put(p.getPoint().getX(), p.getPoint().getY(), p);
-				inputPointCounter++;
 			}
 		}
 		return qt;
@@ -223,7 +221,7 @@ public class MyAdjancencyMatrixBuilder {
 					outputOrder.newLine();
 					
 					if(row+1 == rowMultiplier){
-						log.info("   Rows processed: " + String.valueOf(row+1));
+						log.info("   Rows processed: " + (row+1));
 						rowMultiplier *= 2;
 					}
 				}
@@ -262,7 +260,7 @@ public class MyAdjancencyMatrixBuilder {
 						}
 					}
 					if(rowMultiplier == r+1){
-						log.info("   Rows processed: " + String.valueOf(r+1));
+						log.info("   Rows processed: " + (r+1));
 						rowMultiplier *= 2;
 					}
 				}

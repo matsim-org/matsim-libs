@@ -4,37 +4,47 @@ package playground.jjoubert.CommercialTraffic;
 import java.io.*;
 import java.util.ArrayList;
 
+import org.jfree.util.Log;
 import org.matsim.testcases.MatsimTestCase;
 import com.vividsolutions.jts.geom.*;
 
 public class SelectVehiclesTest extends MatsimTestCase{
 
 	public void testCountFiles() {
-		File testFolder = new File("/Users/johanwjoubert/MATSim/workspace/MATSimTestData/");
+		File testFolder = new File("~/MATSim/workspace/MATSimTestData/");
 		assertTrue(emptyFolder(testFolder) );
-		testFolder.mkdir();
+		boolean checkFolder = testFolder.mkdirs();
+		if(!checkFolder){
+			Log.warn("Could not create " + testFolder.toString() + ", or it already exists!");
+		}
 		assertEquals("Folder should be empty", 0, SelectVehicles.countVehicleFiles(testFolder) );
 		
 		createTestFiles(testFolder, 4);
 		assertEquals("Folder should contain 4 files.", 4, SelectVehicles.countVehicleFiles(testFolder) );
 		
 		File folderFiles[] = testFolder.listFiles();
-		folderFiles[0].delete();
+		boolean checkDelete = folderFiles[0].delete();
+		if(!checkDelete){
+			Log.warn("Could not delete " + folderFiles[0].toString());
+		}
 		assertEquals("Folder should contain 3 files.", 3, SelectVehicles.countVehicleFiles(testFolder) );
 		
 		assertTrue(emptyFolder(testFolder) );
 	}	
 	
 	public void testMoveFile() {
-		File testFolder = new File("/Users/johanwjoubert/MATSim/workspace/MATSimTestData/");
+		File testFolder = new File("~/MATSim/workspace/MATSimTestData/");
 		assertTrue("Folder should be empty", emptyFolder(testFolder) );
-		testFolder.mkdirs();
+		boolean checkFolder = testFolder.mkdirs();
+		if(!checkFolder){
+			Log.warn("Could not create " + testFolder.toString() + ", or it already exists!");
+		}
 		
 		createTestFiles(testFolder, 3);
 		File files[] = testFolder.listFiles();
 		File fileOne = files[0];
 		File fileTwo = files[1];
-		File copyFolder = new File("/Users/johanwjoubert/MATSim/workspace/MATSimTestData/CopyFolder");
+		File copyFolder = new File("~/MATSim/workspace/MATSimTestData/CopyFolder");
 		assertTrue("Copy folder should have been created", copyFolder.mkdirs() );
 		
 		assertTrue("First file should have been copied.", SelectVehicles.copyVehicleFile(copyFolder, fileOne) );
@@ -124,7 +134,11 @@ public class SelectVehiclesTest extends MatsimTestCase{
 			File theFile = new File(theFileName);
 			try {
 				FileWriter fw = new FileWriter(theFile);
-				fw.toString();
+				try{
+					fw.toString();
+				} finally{
+					fw.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}		
@@ -140,7 +154,10 @@ public class SelectVehiclesTest extends MatsimTestCase{
 					if(aFile.isDirectory() ){
 						emptyFolder(aFile);
 					}else{
-						aFile.delete();
+						boolean checkDelete = aFile.delete();
+						if(!checkDelete){
+							Log.warn("Could not delete " + aFile.toString());
+						}
 					}
 				}
 			}

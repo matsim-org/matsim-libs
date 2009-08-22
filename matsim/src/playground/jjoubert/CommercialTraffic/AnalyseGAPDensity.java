@@ -109,9 +109,10 @@ public class AnalyseGAPDensity {
 						if ( minorZone != null ){
 							minorZone.incrementMinorActivityCountDetail( timeOfDay );
 							minorZone.increaseMinorActivityDurationDetail( timeOfDay, duration );
-						} else{
-							// Point is not is study area		
-						}
+						} 
+//						else{
+//							 log.info(Point is not is study area);		
+//						}
 					}
 					progressCounter++;
 				} 
@@ -121,7 +122,7 @@ public class AnalyseGAPDensity {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		log.info("... Minor activities processed: " + String.valueOf(progressCounter));
+		log.info("... Minor activities processed: " + progressCounter);
 
 		// Reset the progress counters
 		progressCounter = 0;
@@ -134,7 +135,7 @@ public class AnalyseGAPDensity {
 				while(inputMajor.hasNextLine() ){
 					// Report progress
 					if( progressCounter == progressMultiplier){
-						log.info("... Major activities processed: " + String.valueOf(progressCounter));
+						log.info("... Major activities processed: " + progressCounter);
 						progressMultiplier *= 2;
 					}
 					String[] thisLine = inputMajor.nextLine().split( delimiter );
@@ -152,9 +153,10 @@ public class AnalyseGAPDensity {
 						if ( majorZone != null ){
 							majorZone.incrementMajorActivityCountDetail( timeOfDay );
 							majorZone.increaseMajorActivityDurationDetail( timeOfDay, duration );
-						} else{
+						} 
+//						else{
 							// Point is not is study area		
-						}
+//						}
 					}
 					progressCounter++;
 				} 
@@ -164,9 +166,7 @@ public class AnalyseGAPDensity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		log.info("... Major activities processed: " + String.valueOf(progressCounter));
-		
-		log.info("Activity assignment completed.");		
+		log.info("... Major activities processed: " + progressCounter + " (Done)");
 	}
 
 	private static SAZone findZoneInArrayList(Point p, ArrayList<SAZone> list ) {

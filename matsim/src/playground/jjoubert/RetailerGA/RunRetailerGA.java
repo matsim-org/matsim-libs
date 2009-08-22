@@ -26,9 +26,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import playground.jjoubert.Utilities.DateString;
+import org.apache.log4j.Logger;
 
 public class RunRetailerGA {
+	private final static Logger log = Logger.getLogger(RunRetailerGA.class);
 
 	public static void main(String[] args) {
 		
@@ -54,13 +55,13 @@ public class RunRetailerGA {
 		
 		Integer firstDuplicate = new Integer(first.get(2));
 		first.set(3, firstDuplicate);
-		System.out.println("Object " + first.get(2) + " == " + first.get(3) + " : " + String.valueOf(first.get(2) == first.get(3)));
+		log.info("Object " + first.get(2) + " == " + first.get(3) + " : " + (first.get(2) == first.get(3)));
 		Integer secondDuplicate = new Integer(first.get(7));
 		first.set(8, secondDuplicate);
-		System.out.println("Object " + first.get(7) + " == " + first.get(8) + " : " + String.valueOf(first.get(7) == first.get(8)));
+		log.info("Object " + first.get(7) + " == " + first.get(8) + " : " + (first.get(7) == first.get(8)));
 		Integer thirdDuplicate = new Integer(secondDuplicate);
 		first.set(9, thirdDuplicate);
-		System.out.println(first.toString());
+		log.info(first.toString());
 		
 		
 		MyFitnessFunction ff = new MyFitnessFunction(false, genomeLength);

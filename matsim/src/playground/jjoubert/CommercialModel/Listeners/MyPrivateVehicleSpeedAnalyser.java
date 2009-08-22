@@ -154,9 +154,7 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 		 * TODO Maybe consider also keeping track of the min, median, and max? But that might be a 
 		 * separate analysis for select zones.
 		 */
-		if(this.weighLinksByUse){
-			//TODO Must rewrite the addSpeedToZone method so that analysis can be done HERE.
-		} else{
+		if(!this.weighLinksByUse){
 			//TODO Calculate the average speed, or assign free speed if no events were recorded.
 			for (Id linkKey : linkSpeeds.keySet()) {
 				SAZone theZone = map.get(linkKey);
@@ -170,17 +168,17 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 							total += speed;
 						}
 						avgSpeed = total / speeds.size();
-					} else{
-						
+					} else{			
 						avgSpeed = this.networkLayer.getLink(linkKey).getFreespeed(System.currentTimeMillis()) * (3600/1000);
 					}
 					theZone.addToSpeedDetail(hour, avgSpeed);
 					theZone.incrementSpeedCount(hour);
 				}
 			}
-			
-
-		}
+		} 
+//		else{
+//			//TODO Must rewrite the addSpeedToZone method so that analysis can be done HERE.
+//		}
 		
 	}
 

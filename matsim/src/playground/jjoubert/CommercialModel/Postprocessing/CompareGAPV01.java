@@ -140,17 +140,21 @@ public class CompareGAPV01 {
 							 * file for THIS hour only. Afterwards, a new line is created, and the current
 							 * GAP_ID is written to the new line.
 							 */
-							String writeActual = String.valueOf(valueActual);
-							String writeSimulated = String.valueOf(valueSim);
-							outputScatter.write( String.valueOf(a-1) + DELIMITER );
-							outputScatter.write(writeActual + DELIMITER + writeSimulated );
+							String writeActual = valueActual.toString();
+							String writeSimulated = valueSim.toString();
+							outputScatter.write( String.valueOf(a-1));
+							outputScatter.write(DELIMITER);
+							outputScatter.write(writeActual);
+							outputScatter.write(DELIMITER);
+							outputScatter.write(writeSimulated);
 							outputScatter.newLine();
-							outputScatter.write( String.valueOf(lineActual[0]) + DELIMITER);
+							outputScatter.write( String.valueOf(lineActual[0]));
+							outputScatter.write(DELIMITER);
 							/*
 							 * Writes the difference to the box plot output file; similar to the GIS file. 
 							 * BUT, if both the actual and the simulated values are zero, write 'NA'. 
 							 */
-							String writeDifference = (valueActual == 0 && valueSim == 0) ? "NA" : String.valueOf(difference);
+							String writeDifference = (valueActual == 0 && valueSim == 0) ? "NA" : difference.toString();
 							outputBoxHour.write( writeDifference + DELIMITER );
 						}
 						/*
@@ -159,7 +163,7 @@ public class CompareGAPV01 {
 						valueActual = Double.parseDouble(lineActual[lineActual.length - 1]);
 						valueSim = Double.parseDouble(lineSim[lineSim.length - 1]);
 						difference = valueSim - valueActual;
-						String diff = String.valueOf(difference);
+						String diff = difference.toString();
 						/*
 						 * GIS output
 						 */
@@ -168,15 +172,15 @@ public class CompareGAPV01 {
 						/*
 						 * Scatter plot
 						 */
-						String writeActual = String.valueOf(valueActual);
-						String writeSimulated = String.valueOf(valueSim);
+						String writeActual = valueActual.toString();
+						String writeSimulated = valueSim.toString();
 						outputScatter.write( String.valueOf(lineActual.length - 2 ) + DELIMITER );
 						outputScatter.write(writeActual + DELIMITER + writeSimulated );
 						outputScatter.newLine();
 						/*
 						 * Boxplot
 						 */
-						String writeDifference23 = (valueActual == 0 && valueSim == 0) ? "NA" : String.valueOf(difference);
+						String writeDifference23 = (valueActual == 0 && valueSim == 0) ? "NA" : difference.toString();
 						outputBoxHour.write( writeDifference23 );
 						outputBoxHour.newLine();
 					}

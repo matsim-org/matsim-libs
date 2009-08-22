@@ -87,11 +87,11 @@ public class RetailerSA {
 			}
 			// Report progress
 			if(iterationCounter == iterationMultiplier){
-				log.info("   Iteration: " + String.valueOf(iterationCounter));
+				log.info("   Iteration: " + iterationCounter);
 				iterationMultiplier *= 2;
 			}
 		}
-		log.info("   Iteration: " + String.valueOf(iterationCounter) + " (Done)");
+		log.info("   Iteration: " + iterationCounter + " (Done)");
 	}
 
 	private void performNeighbourhoodMove(){
@@ -120,9 +120,10 @@ public class RetailerSA {
 			if(!moveFound){
 				log.warn("   Could not find an acceptable neighborhood move. Double the step-size.");
 				currentStepSize *= 2;
-			} else{
+			} 
+//			else{
 //				currentStepSize *= 0.5;
-			}
+//			}
 		}
 		if(!moveFound){
 			log.warn("   Could not find an acceptable neighborhood move. Return to original stepsize.");

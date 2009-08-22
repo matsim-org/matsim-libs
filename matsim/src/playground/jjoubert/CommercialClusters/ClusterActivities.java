@@ -152,7 +152,7 @@ public class ClusterActivities {
 			break;
 
 		default:
-			log.info("An invalid scenario " + String.valueOf(scenario) + " has been selected");
+			log.info("An invalid scenario " + scenario + " has been selected");
 			break;
 		}
 

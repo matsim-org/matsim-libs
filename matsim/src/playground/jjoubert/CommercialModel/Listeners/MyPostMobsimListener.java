@@ -27,7 +27,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 public class MyPostMobsimListener implements AfterMobsimListener{
 	
 	private final Logger log = Logger.getLogger(MyPostMobsimListener.class);
-	private long counter = 0;
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		log.info("  --> My PostMobsimListener works too!!");

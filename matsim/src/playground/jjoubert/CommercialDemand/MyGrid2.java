@@ -111,11 +111,12 @@ public class MyGrid2 {
 						Point p = gf.createPoint(new Coordinate(x, y));
 						ActivityPoint ap = new ActivityPoint(p, Integer.valueOf(hour));
 						this.pointTree.put(x, y, ap);
-					} else{
-						/*
-						 * This point is outside the envelope... drop it ;-)
-						 */
-					}
+					} 
+//					else{
+//						/*
+//						 * This point is outside the envelope... drop it ;-)
+//						 */
+//					}
 					lineCounter++;
 				}
 			}

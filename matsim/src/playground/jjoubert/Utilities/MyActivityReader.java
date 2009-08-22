@@ -225,7 +225,7 @@ public class MyActivityReader {
 				}
 			}
 			log.info("   Lines processed: " + lineCounter + " (Done)");
-			log.info("Total number of activities in study area: " + String.valueOf(activityCounter));
+			log.info("Total number of activities in study area: " + activityCounter);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

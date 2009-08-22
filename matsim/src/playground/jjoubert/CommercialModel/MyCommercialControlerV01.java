@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
 import playground.jjoubert.CommercialModel.Listeners.MyCommercialActivityDensityListener;
-import playground.jjoubert.CommercialModel.Listeners.MyCommercialLegHistogramListener;
 
 public class MyCommercialControlerV01 {
 	
