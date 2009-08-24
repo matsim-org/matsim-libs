@@ -20,84 +20,20 @@
 package playground.ciarif.retailers;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 
-import playground.ciarif.carpooling.CarPoolingListener;
-import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.meisterk.kti.controler.KTIControler;
 
-public class RetailersControler extends Controler {
-	
-	protected static final String SVN_INFO_FILE_NAME = "svninfo.txt";
-	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
-	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
-	//private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
-	private final KtiConfigGroup ktiConfigGroup;
-	
+public class RetailersControler extends KTIControler {
+
 	public RetailersControler(String[] args) {
 		super(args);
-		this.ktiConfigGroup = new KtiConfigGroup();
-		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 	}
-
-	@Override
-	protected void shutdown(final boolean unexpected) {
-		super.shutdown(unexpected);
-	}
-	
-	/*//@Override
-	protected void setUp() {
-
-		RetailersScoringFunctionFactory retailersScoringFunctionFactory = new RetailersScoringFunctionFactory(
-				super.config.charyparNagelScoring(), 
-				this.getFacilityPenalties());
-				//this.ktiConfigGroup);
-		this.setScoringFunctionFactory(retailersScoringFunctionFactory);
-
-		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-			this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, this.getNetwork());
-		}
-		
-		super.setUp();
-	}*/
 
 	@Override
 	protected void loadControlerListeners() {
-		
 		super.loadControlerListeners();
-		
-		// the scoring function processes facility loads
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
-		/*this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
-		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME));
-		this.addControlerListener(new SaveRevisionInfo(SVN_INFO_FILE_NAME));*/
 		this.addControlerListener(new RetailersLocationListener());
-		
-		
 	}
-	
-	/*@Override
-	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-
-		PlanAlgorithm router = null;
-
-		if (!this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			router = super.getRoutingAlgorithm(travelCosts, travelTimes);
-		} else {
-
-			router = new PlansCalcRouteKti(
-					super.getConfig().plansCalcRoute(), 
-					super.network, 
-					travelCosts, 
-					travelTimes, 
-					super.getLeastCostPathCalculatorFactory(), 
-					this.plansCalcRouteKtiInfo);
-
-		}
-
-		return router;
-	}*/
-	
 	
     public static void main (final String[] args) { 
     	Controler controler = new RetailersControler(args);
