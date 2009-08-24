@@ -278,9 +278,7 @@ public class AStarLandmarks extends AStarEuclidean {
 		}
 		if (bestIndex != -1) {
 			int[] newActiveLandmarks = new int[this.activeLandmarkIndexes.length + 1];
-			for (int i = 0; i < this.activeLandmarkIndexes.length; i++) {
-				newActiveLandmarks[i] = this.activeLandmarkIndexes[i];
-			}
+			System.arraycopy(this.activeLandmarkIndexes, 0, newActiveLandmarks, 0, this.activeLandmarkIndexes.length);
 			newActiveLandmarks[this.activeLandmarkIndexes.length] = bestIndex;
 			this.activeLandmarkIndexes = newActiveLandmarks;
 		}
