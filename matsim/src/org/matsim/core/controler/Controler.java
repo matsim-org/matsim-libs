@@ -1036,10 +1036,6 @@ public class Controler {
 	}
 
 	public final ActivityFacilities getFacilities() {
-		// TODO dg
-		if (this.scenarioData == null) {
-			return null;
-		}
 		return this.scenarioData.getActivityFacilities();
 	}
 
@@ -1088,7 +1084,7 @@ public class Controler {
 	 *         pricing is simulated.
 	 */
 	public final RoadPricing getRoadPricing() {
-		// TODO dg
+		// TODO integrate roadPricing (Scheme) better in scenario 
 		return this.roadPricing;
 	}
 
@@ -1176,6 +1172,25 @@ public class Controler {
 		s.append(filename);
 		return s.toString();
 	}
+	/**
+	 * @param filename
+	 *            the basename of the file to access
+	 * @return complete path to filename prefixed with the runId in the
+	 *         controler config module (if set) to a file in the
+	 *         output-directory  of the current iteration
+	 */
+	public final String getNameForIterationFilename(String filename){
+		StringBuilder s = new StringBuilder(getIterationPath(iteration));
+		s.append('/');
+		if (this.config.controler().getRunId() != null) {
+			s.append(this.config.controler().getRunId());
+			s.append('.');
+		}
+		s.append(iteration);
+		s.append(".");
+		s.append(filename);
+		return s.toString();
+	}
 
 	/**
 	 * Returns the complete filename to access a file in the output-directory.
@@ -1232,10 +1247,10 @@ public class Controler {
 				for (EventsFileFormat format : controler.config.controler().getEventsFileFormats()) {
 					switch (format) {
 					case txt:
-						this.eventWriters.add(new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS_TXT)));
+						this.eventWriters.add(new EventWriterTXT(event.getControler().getNameForIterationFilename(FILENAME_EVENTS_TXT)));
 						break;
 					case xml:
-						this.eventWriters.add(new EventWriterXML(Controler.getIterationFilename(FILENAME_EVENTS_XML)));
+						this.eventWriters.add(new EventWriterXML(event.getControler().getNameForIterationFilename(FILENAME_EVENTS_XML)));
 						break;
 					default:
 						log.warn("Unknown events file format specified: " + format.toString() + ".");
@@ -1274,7 +1289,7 @@ public class Controler {
 
 			if ((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) {
 				controler.events.removeHandler(controler.volumes);
-				controler.linkStats.writeFile(getIterationFilename(FILENAME_LINKSTATS));
+				controler.linkStats.writeFile(event.getControler().getNameForIterationFilename(FILENAME_LINKSTATS));
 			}
 
 			if (controler.legTimes != null) {
