@@ -260,12 +260,9 @@ public class QueueLink {
 	private void addUTurn() {
 		for (LinkImpl outLink : this.getLink().getToNode().getOutLinks().values()) {
 			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
-				QueueLane tempLane = null;
 				for (QueueLane l : this.toNodeQueueLanes) {
-					if ((tempLane == null) ||
-							((l.getVisualizerLane() == 1) && (l.getMeterFromLinkEnd() == 0))) {
-						tempLane = l;
-						tempLane.addDestinationLink(outLink);
+					if ((l.getVisualizerLane() == 1) && (l.getMeterFromLinkEnd() == 0)){
+						l.addDestinationLink(outLink);
 						this.originalLane.addDestinationLink(outLink);
 					}
 				}
