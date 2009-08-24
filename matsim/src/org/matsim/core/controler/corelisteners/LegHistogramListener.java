@@ -23,7 +23,6 @@ package org.matsim.core.controler.corelisteners;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -57,12 +56,12 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.histogram.write(Controler.getIterationFilename("legHistogram.txt"));
+		this.histogram.write(event.getControler().getNameForIterationFilename("legHistogram.txt"));
 		this.printStats();
 		if (this.outputGraph) {
-			this.histogram.writeGraphic(Controler.getIterationFilename("legHistogram_all.png"));
+			this.histogram.writeGraphic(event.getControler().getNameForIterationFilename("legHistogram_all.png"));
 			for (TransportMode legMode : this.histogram.getLegModes()) {
-				this.histogram.writeGraphic(Controler.getIterationFilename("legHistogram_" + legMode.toString() + ".png"), legMode);
+				this.histogram.writeGraphic(event.getControler().getNameForIterationFilename("legHistogram_" + legMode.toString() + ".png"), legMode);
 			}
 		}
 
