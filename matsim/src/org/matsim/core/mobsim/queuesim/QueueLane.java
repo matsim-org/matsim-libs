@@ -1006,4 +1006,9 @@ public class QueueLane {
 	void setLaneData(final BasicLane signalLane) {
 		this.laneData = signalLane;
 	}
+
+	
+	protected SortedMap<Id, BasicSignalGroupDefinition> getSignalGroups() {
+		return signalGroups;
+	}
 }
