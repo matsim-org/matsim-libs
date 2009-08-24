@@ -197,7 +197,12 @@ public class TransitRouter {
 		}
 		if (prevLink != null) {
 			leg = new LegImpl(TransportMode.walk);
-			double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.config.beelineWalkSpeed;
+			double walkTime;
+			if (accessStop == null) {
+				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
+			} else {
+				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.config.beelineWalkSpeed;
+			}
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
 		}
