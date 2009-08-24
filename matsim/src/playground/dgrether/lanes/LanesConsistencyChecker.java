@@ -20,7 +20,9 @@
 package playground.dgrether.lanes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -75,13 +77,22 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 				}
 			}
 			
-			
 			//check toLinks
 			for (BasicLane lane : l2l.getLanesList()) {
-				for (Id linkId : lane.getToLinkIds()) {
-					if (this.network.getLinks().get(linkId) == null){
-						log.error("No link found in network for toLinkId " + linkId + " of laneId " + lane.getId() + " of link id " + l2l.getLinkId());
+				Map<Id, BasicLane> toLinkIdToLaneMap = new HashMap<Id, BasicLane>();
+				//check availability of toLink in network
+				for (Id toLinkId : lane.getToLinkIds()) {
+					if (this.network.getLinks().get(toLinkId) == null){
+						log.error("No link found in network for toLinkId " + toLinkId + " of laneId " + lane.getId() + " of link id " + l2l.getLinkId());
 						malformedLinkIds.add(l2l.getLinkId());
+					}
+					//check if multiple lanes have the same toLink
+					if (toLinkIdToLaneMap.containsKey(toLinkId)){
+						//TODO improve error message
+						log.error("On link Id " + l2l.getLinkId() + " exists more than one lane leading to Link Id " + toLinkId);
+					}
+					else {
+						toLinkIdToLaneMap.put(toLinkId, lane);
 					}
 				}
 			}
