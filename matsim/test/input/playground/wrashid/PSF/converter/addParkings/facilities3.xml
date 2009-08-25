@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
+
+<facilities name="equil test facilities">
+
+<!-- ====================================================================== -->
+
+	<facility id="facility_1921" x="4590220.710354274" y="5822706.101701171">
+		<activity type="home">
+		</activity>
+
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+		<activity type="parkingArrival">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+	</facility>
+
+
+	<facility id="facility_13816" x="4562224.935893458" y="5831830.1171124475">
+		<activity type="home">
+		</activity>
+
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+		<activity type="parkingArrival">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+	</facility>
+	
+	<facility id="facility_11457" x="4611663.959241798" y="5802134.1864612745">
+		<activity type="home">
+		</activity>
+
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+		<activity type="parkingArrival">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+	</facility>
+	
+	<facility id="facility_11720" x="4611215.862364321" y="5797797.489749461">
+		<activity type="home">
+		</activity>
+
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+		<activity type="parkingArrival">
+		<!-- make this a private parking with electricity -->
+		</activity>
+
+	</facility>
+</facilities>
