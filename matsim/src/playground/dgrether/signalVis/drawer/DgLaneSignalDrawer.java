@@ -42,7 +42,7 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	private int numberOfQueueLanes;
 
 	private Point2D.Double branchPoint;
-	private Map<String, LaneData> laneData;
+	private Map<String, DgOtfLaneData> laneData;
 	
 	public DgLaneSignalDrawer() {
 	}
@@ -66,7 +66,7 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 
 		//only draw lanes if there are more than one
 		if (this.numberOfQueueLanes != 1) {
-			for (LaneData ld : this.laneData.values()){
+			for (DgOtfLaneData ld : this.laneData.values()){
 				// draw connections between branch point and lane end
 				gl.glColor3d(0.0, 0, 1.0);
 				gl.glBegin(GL.GL_LINES);
@@ -111,9 +111,9 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 
 	public void addNewQueueLaneData(String id, double endx, double endy) {
 		if (this.laneData == null) {
-			this.laneData = new LinkedHashMap<String, LaneData>();
+			this.laneData = new LinkedHashMap<String, DgOtfLaneData>();
 		}
-		LaneData ld = new LaneData();
+		DgOtfLaneData ld = new DgOtfLaneData();
 		ld.setId(id);
 		ld.setEndPoint(endx, endy);
 		this.laneData.put(id, ld);
@@ -121,36 +121,5 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 
 	public void updateGreenState(String id, boolean green) {
 		this.laneData.get(id).setGreen(green);
-	}
-
-	
-	private static final class LaneData {
-		private String id;
-		private Point2D.Double endPoint;
-		private boolean isGreen = false;
-
-		public void setId(String id){
-			this.id = id;
-		}
-
-		public void setEndPoint(double endx, double endy) {
-			this.endPoint = new Point2D.Double(endx, endy);
-		}
-
-		public void setGreen(boolean isGreen) {
-			this.isGreen = isGreen;
-		}
-		
-		public boolean isGreen(){
-			return this.isGreen ;
-		}
-		
-		public Point2D.Double getEndPoint() {
-			return endPoint;
-		}
-		
-		public String getId() {
-			return id;
-		}
 	}
 }
