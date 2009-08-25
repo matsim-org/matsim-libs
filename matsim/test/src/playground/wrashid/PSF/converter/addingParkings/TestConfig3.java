@@ -9,4 +9,4 @@ public class TestConfig3 extends MatsimTestCase {
 		new GeneralTestOptimizedCharger(configFilePath).optimizedChargerTest();
 	}
 	
-}
+} 
