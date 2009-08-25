@@ -978,7 +978,7 @@ public class QueueLane {
 		this.destinationLinks.add(l);
 	}
 
-	protected Set<Link> getDestinationLinks(){
+	public Set<Link> getDestinationLinks(){
 		return this.destinationLinks;
 	}
 
