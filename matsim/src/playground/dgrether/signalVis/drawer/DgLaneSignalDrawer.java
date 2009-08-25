@@ -24,10 +24,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.media.opengl.GL;
+import javax.vecmath.Point2d;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+
+import playground.dgrether.signalVis.io.DgOtfLaneWriter;
 
 
 /**
@@ -42,7 +45,7 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	private int numberOfQueueLanes;
 
 	private Point2D.Double branchPoint;
-	private Map<String, DgOtfLaneData> laneData;
+	private Map<String, DgOtfLaneData> laneData = new LinkedHashMap<String, DgOtfLaneData>();
 	
 	public DgLaneSignalDrawer() {
 	}
@@ -73,6 +76,15 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord); 
 		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
   			gl.glEnd();
+  			
+  			if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
+  				for (Point2d point : ld.getToLinkStartPoints()){
+  					gl.glBegin(GL.GL_LINES);
+  					  gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
+  	  			  gl.glVertex3d(point.x, point.y, zCoord); 
+    			  gl.glEnd();
+  				}
+  			}
   			
 				if (ld.isGreen()) {
 					gl.glColor3d(0.0, 1.0, 0.0);
@@ -109,17 +121,13 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 		this.branchPoint = new Point2D.Double(x, y);
 	}
 
-	public void addNewQueueLaneData(String id, double endx, double endy) {
-		if (this.laneData == null) {
-			this.laneData = new LinkedHashMap<String, DgOtfLaneData>();
-		}
-		DgOtfLaneData ld = new DgOtfLaneData();
-		ld.setId(id);
-		ld.setEndPoint(endx, endy);
-		this.laneData.put(id, ld);
-	}
 
 	public void updateGreenState(String id, boolean green) {
 		this.laneData.get(id).setGreen(green);
+	}
+
+	
+	public Map<String, DgOtfLaneData> getLaneData() {
+		return laneData;
 	}
 }

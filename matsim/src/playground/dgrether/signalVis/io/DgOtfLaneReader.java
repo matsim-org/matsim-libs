@@ -22,6 +22,8 @@ package playground.dgrether.signalVis.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import javax.vecmath.Point2d;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -29,6 +31,7 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 import playground.dgrether.signalVis.drawer.DgLaneSignalDrawer;
+import playground.dgrether.signalVis.drawer.DgOtfLaneData;
 
 
 /**
@@ -54,14 +57,15 @@ public class DgOtfLaneReader extends OTFDataReader {
 
 		if (nrToNodeLanes != 1){
 			for (int i = 0; i < nrToNodeLanes; i++){
-				this.drawer.addNewQueueLaneData(ByteBufferUtils.getString(in), in.getDouble(), in.getDouble());
+				DgOtfLaneData data = new DgOtfLaneData();
+				data.setId(ByteBufferUtils.getString(in));
+				data.setEndPoint(in.getDouble(), in.getDouble());
+				this.drawer.getLaneData().put(data.getId(), data);
 
 				if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
-					
 					int numberOfToLinks = in.getInt();
 					for (int j = 0; j < numberOfToLinks; j++) {
-						in.getDouble();
-						in.getDouble();
+						data.getToLinkStartPoints().add(new Point2d(in.getDouble(), in.getDouble()));
 					}
 				}
 			}
