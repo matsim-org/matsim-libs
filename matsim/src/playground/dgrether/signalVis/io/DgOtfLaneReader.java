@@ -57,6 +57,7 @@ public class DgOtfLaneReader extends OTFDataReader {
 				this.drawer.addNewQueueLaneData(ByteBufferUtils.getString(in), in.getDouble(), in.getDouble());
 
 				if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
+					
 					int numberOfToLinks = in.getInt();
 					for (int j = 0; j < numberOfToLinks; j++) {
 						in.getDouble();
