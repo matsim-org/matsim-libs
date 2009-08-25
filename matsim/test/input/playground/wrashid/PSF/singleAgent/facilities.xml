@@ -9,7 +9,11 @@
 		<activity type="h">
 		</activity>
 
-		<activity type="parking">
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+		
+		<activity type="parkingArrival">
 		<!-- make this a private parking with electricity -->
 		</activity>
 
@@ -23,20 +27,32 @@
 	</facility>
 	
 	<facility id="parkingAtWorkWithElectricity" x="2500" y="0">
-		<activity type="parking">
-		<!-- make this a public parking with electricity -->
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+		
+		<activity type="parkingArrival">
+		<!-- make this a private parking with electricity -->
 		</activity>
 	</facility>
 	
 	<facility id="parkingAtWorkWithoutElectricity" x="2500" y="0">
-		<activity type="parking">
-		<!-- make this a public parking without electricity -->
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+		
+		<activity type="parkingArrival">
+		<!-- make this a private parking with electricity -->
 		</activity>
 	</facility>
 	
 	<facility id="parkingAtWorkWithElectricity2" x="-7500" y="-10000">
-		<activity type="parking">
-		<!-- make this a public parking with electricity -->
+		<activity type="parkingDeparture">
+		<!-- make this a private parking with electricity -->
+		</activity>
+		
+		<activity type="parkingArrival">
+		<!-- make this a private parking with electricity -->
 		</activity>
 	</facility>
 
