@@ -101,7 +101,7 @@ public class PTActWriter {
 		plansReader.readFile(plansFile);
 	}
 	
-	public void SimplifyPtLegs(){
+	public void simplifyPtLegs(){
 		
 		SimplifyPtLegs SimplifyPtLegs = new SimplifyPtLegs();
 		

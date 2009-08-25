@@ -22,7 +22,7 @@ import org.matsim.core.population.routes.NodeNetworkRoute;
  */
 public class AdjList {
 	private TransitSchedule transitSchedule;
-	private Map <Id, List<TransitRoute>> AdjMap = new TreeMap <Id, List<TransitRoute>>();   //idStopFacility, <IdRoutes>
+	private Map <Id, List<TransitRoute>> AdjMap = new TreeMap <Id, List<TransitRoute>>();   //idStopFacility, <Routes>
 	private NetworkLayer plainNet;
 	
 	public AdjList(final TransitSchedule transitSchedule, final NetworkLayer plainNet ) {
@@ -37,8 +37,7 @@ public class AdjList {
 		
 		/**fill up adjList with StopFacilities Ids and empty route lists*/
 		for (Id idFacility : transitSchedule.getFacilities().keySet()){
-			List<TransitRoute> TransitRouteIdList = new ArrayList<TransitRoute>();
-			AdjMap.put(idFacility, TransitRouteIdList);
+			AdjMap.put(idFacility, new ArrayList<TransitRoute>());
 		}
 
 		/**Read all transitRoutes and store its nodes id's in their corresponding id facility*/
@@ -46,10 +45,8 @@ public class AdjList {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				List<Node> nodeList = new ArrayList<Node>();
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()){
-					Id stopId = transitRouteStop.getStopFacility().getId();
-					AdjMap.get(stopId).add(transitRoute);
-					Node node = plainNet.getNode(stopId);
-					nodeList.add(node);
+					AdjMap.get(transitRouteStop.getStopFacility().getId()).add(transitRoute);
+					nodeList.add(plainNet.getNode(transitRouteStop.getStopFacility().getId()));
 				}
 				
 		 		/**sets also route as nodes.*/ 
@@ -68,10 +65,8 @@ public class AdjList {
 	/**prints all stopFacilities and their correspondent adjacent TransitRoutes*/
 	public void printMap(){
 		for(Map.Entry <Id,List<TransitRoute>> entry: AdjMap.entrySet() ){
-			Id key = entry.getKey(); 
-			List<TransitRoute> value = entry.getValue();
-			System.out.print(key+ ": [" );
-			for (TransitRoute transitRoute : value){
+			System.out.print(entry.getKey() + ": [" );
+			for (TransitRoute transitRoute : entry.getValue()){
 				System.out.print(transitRoute.getId()+ ", " );
 			}
 			System.out.println("]");

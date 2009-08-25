@@ -9,7 +9,7 @@ import playground.mmoyo.Validators.CostValidator;
  * Calculates the travel time of each link depending on its type
  */
 public class PTTravelTime implements TravelTime {
-	double walkSpeed =  Walk.walkingSpeed();
+	double walkSpeed =  Walk.getAvgWalkSpeed();
 	private PTTimeTable ptTimeTable; 
 	public CostValidator costValidator = new CostValidator();
 	private String type = "";

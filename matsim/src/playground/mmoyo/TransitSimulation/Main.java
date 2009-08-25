@@ -22,7 +22,15 @@ import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTActWriter;
 import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.precalculation.PrecalRoutes;
+import playground.mmoyo.precalculation.KroutesCalculator;
+import playground.mmoyo.precalculation.StaticConnection;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+import org.matsim.api.basic.v01.Id;
+import java.util.List;
+
 
 /**
  * This class contains the options to route with a TransitSchedule object 
@@ -106,16 +114,25 @@ public class Main {
 				String planToSimplify = "output_plan.xml";
 				String simplifiedPlan = "simplfied_plan.xml";
 				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
-				ptActWriter.SimplifyPtLegs();
+				ptActWriter.simplifyPtLegs();
 				break;
+			
 			case 7:
-				PrecalRoutes precalRoutes = new PrecalRoutes(transitSchedule, plainNetwork);
+				/*
+				Map <Id, List<StaticConnection>> connectionMap = new TreeMap <Id, List<StaticConnection>>();
+				final TransitSchedule transitSchedule, final NetworkLayer plainNet, Map <Id, List<StaticConnection>> connectionMap, Map <Coord, Collection<NodeImpl>> nearStopMap
+				KroutesCalculator precalRoutes = new KroutesCalculator(transitSchedule, plainNetwork, connectionMap);
+				//agent 1409800
 				coord1 = new CoordImpl(682711, 237595);
 				coord2 = new CoordImpl(682308, 242093);
 				double startTime = System.currentTimeMillis();
 				precalRoutes.findPTPath(coord1, coord2, 400);
 				System.out.println("duration: " + (System.currentTimeMillis()-startTime));
+				*/
 				break;
+			
+				
+	
 		}
 	}
 }

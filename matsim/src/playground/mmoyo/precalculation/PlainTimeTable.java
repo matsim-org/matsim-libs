@@ -12,11 +12,11 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**reports the departures of transitStopFacilities without logic layer*/
-public class PlainTimeTables {
+public class PlainTimeTable {
 	TransitSchedule transitSchedule;
 	Map <Id, double[]> transitRouteDepartureMap = new TreeMap <Id, double[]>();
 	
-	public PlainTimeTables (final TransitSchedule transitSchedule){
+	public PlainTimeTable (final TransitSchedule transitSchedule){
 		this.transitSchedule = transitSchedule;
 		setDepartures();
 	}
@@ -36,7 +36,7 @@ public class PlainTimeTables {
 		}
 	}
 
-	
+	/**returns next departure at a stop facility aftr a given time*/
 	public double getNextDeparture(final TransitRoute transitRoute, final TransitStopFacility transitStopFacility, double time){
 		double[] departureArray = transitRouteDepartureMap.get(transitRoute.getId());
 		TransitRouteStop transitRouteStop =	transitRoute.getStop(transitStopFacility);

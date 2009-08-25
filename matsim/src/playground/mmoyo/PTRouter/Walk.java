@@ -11,7 +11,7 @@ public class Walk {
 
 	}
 
-	public static double walkingSpeed(){
+	public static double getAvgWalkSpeed(){
 		return AV_WALKING_SPEED;
 	}
 	
