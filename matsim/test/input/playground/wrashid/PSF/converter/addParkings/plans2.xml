@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans>
+
+	<person id="66128" sex="m" age="20" license="yes" car_avail="always" employed="yes">
+		<plan age="0" selected="yes">
+			<act type="home" link="1921" x="4590220.710354274" y="5822706.101701171" start_time="00:00" dur="08:00" end_time="08:00" ref_id="6" />
+			<leg num="0" mode="car" dep_time="08:00" trav_time="00:33" arr_time="08:33">
+				<route trav_time="00:33">
+					1880 1881 1884 9322 1887 1886 1968 1966 9333 9332 9336 9359 9355 9344 9346 9350 9375 9379 9365 9369 650087 650084 650204 650374 650075 650172 650171 630414 630056 630055 630054 630053 630153 
+				</route>
+			</leg>
+			<act type="work" link="13816" x="4562224.935893458" y="5831830.1171124475" start_time="08:00" dur="08:00" end_time="24:00" ref_id="917" />
+			<leg num="1" mode="car" dep_time="16:33" trav_time="00:33" arr_time="17:07">
+				<route trav_time="00:33">
+					630053 630054 630055 630056 630414 650171 650172 650075 650374 650204 650084 650087 9370 9368 9380 9376 9351 9347 9345 9354 9358 9337 9330 9204 1950 9333 1966 1968 1886 1887 9322 1884 1881 1880 1879 
+				</route>
+			</leg>
+			<act type="home" link="1921" x="4590220.710354274" y="5822706.101701171" start_time="11:33" dur="08:00" end_time="24:00" ref_id="6" />
+		</plan>
+	</person>
+
+	<person id="66805" sex="m" age="20" license="yes" car_avail="always" employed="yes">
+		<plan age="0" selected="yes">
+			<act type="home" link="11457" x="4611663.959241798" y="5802134.1864612745" start_time="00:00" dur="08:00" end_time="08:00" ref_id="901" />
+			<leg num="0" mode="car" dep_time="08:00" trav_time="00:03" arr_time="08:03">
+				<route trav_time="00:03">
+					610477 610393 610476 610047 610402 
+				</route>
+			</leg>
+			<act type="work" link="11720" x="4611215.862364321" y="5797797.489749461" start_time="08:00" dur="08:00" end_time="24:00" ref_id="903" />
+			<leg num="1" mode="car" dep_time="16:03" trav_time="00:06" arr_time="16:10">
+				<route trav_time="00:06">
+					610041 610402 610047 610476 610393 610477 610386 
+				</route>
+			</leg>
+			<act type="home" link="11457" x="4611663.959241798" y="5802134.1864612745" start_time="11:33" dur="08:00" end_time="24:00" ref_id="901" />
+		</plan>
+	</person>
+	
+	
+</plans>
