@@ -3,13 +3,12 @@ package playground.wrashid.PSF.energy.charging.optimizedCharging;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
-import playground.wrashid.PSF.energy.consumption.EnergyConsumptionInfo;
 import playground.wrashid.PSF.energy.consumption.LinkEnergyConsumptionLog;
 import playground.wrashid.PSF.parking.ParkLog;
-import playground.wrashid.PSF.parking.ParkingInfo;
 import playground.wrashid.PSF.parking.ParkingTimes;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -17,6 +16,8 @@ import playground.wrashid.PSF.energy.charging.EnergyChargingInfo;
 
 public class EnergyBalance {
 
+	private static final Logger log = Logger.getLogger(EnergyBalance.class);
+	
 	// for each parking log element we have the energy consumption, preceding it
 	// stored under the same index value in the lists.
 	LinkedList<ParkLog> parkingTimes = new LinkedList<ParkLog>();
@@ -216,6 +217,8 @@ public class EnergyBalance {
 				// TODO: report, that the current vehicle could not reach the
 				// destination, because the electricity was finished
 				// there should be some input here to the utility function
+				log.info("if this is an electric vehicle, then it has run out of power");
+				break;	
 			}
 
 			// get the parking index, where this car will charge
