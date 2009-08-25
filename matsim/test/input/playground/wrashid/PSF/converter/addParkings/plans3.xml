@@ -60,7 +60,7 @@
 					610477 610393 610476 610047 610402 
 				</route>
 			</leg>
-			<act type="parkingArrival" facility="facility_11457" x="4611215.862364321" y="5797797.489749461" link="11457" dur="00:01" />
+			<act type="parkingArrival" facility="facility_11720" x="4611215.862364321" y="5797797.489749461" link="11720" dur="00:01" />
 			<leg mode="walk" trav_time="00:00:10">
 				<route trav_time="00:00:10">
 					
@@ -72,7 +72,7 @@
 					
 				</route>
 			</leg>
-			<act type="parkingDeparture" facility="facility_11457" x="4611215.862364321" y="5797797.489749461" link="11457" dur="00:01" />
+			<act type="parkingDeparture" facility="facility_11720" x="4611215.862364321" y="5797797.489749461" link="11720" dur="00:01" />
 			<leg num="1" mode="car" dep_time="16:03" trav_time="00:06" arr_time="16:10">
 				<route trav_time="00:06">
 					610041 610402 610047 610476 610393 610477 610386 
