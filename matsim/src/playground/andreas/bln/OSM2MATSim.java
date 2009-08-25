@@ -41,14 +41,14 @@ public class OSM2MATSim {
 		osmReader.setHighwayDefaults(1, "motorway",      2,  100.0/3.6, 1.2, 2000, true); // 70
 		osmReader.setHighwayDefaults(1, "motorway_link", 1,  60.0/3.6, 1.2, 1500, true); // 60
 		// Pseudoautobahn
-		osmReader.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 0.6, 1000); // 45
-		osmReader.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 0.6, 1000); // 40
+		osmReader.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 0.5, 1000); // 45
+		osmReader.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 0.5, 1000); // 40
 		// Durchgangsstrassen
-		osmReader.setHighwayDefaults(3, "primary",       1,  50.0/3.6, 0.6, 1000); // 35
-		osmReader.setHighwayDefaults(3, "primary_link",  1,  50.0/3.6, 0.6, 1000); // 30
+		osmReader.setHighwayDefaults(3, "primary",       1,  50.0/3.6, 0.5, 1000); // 35
+		osmReader.setHighwayDefaults(3, "primary_link",  1,  50.0/3.6, 0.5, 1000); // 30
 		
 		// Hauptstrassen
-		osmReader.setHighwayDefaults(4, "secondary",     1,  50.0/3.6, 0.6, 1000); // 30
+		osmReader.setHighwayDefaults(4, "secondary",     1,  50.0/3.6, 0.5, 1000); // 30
 		// Weitere Hauptstrassen
 		osmReader.setHighwayDefaults(5, "tertiary",      1,  30.0/3.6, 0.8,  600); // 25 
 		// bis hier ca wip
@@ -76,12 +76,13 @@ public class OSM2MATSim {
 		
 		osmReader.setHierarchyLayer(53.6, 11.5, 52.8, 14.5, 4); // BerlinBrandenburg - Streifen 1
 		osmReader.setHierarchyLayer(53.0, 12.1, 52.0, 14.9, 4); // BerlinBrandenburg - Quadrat
-		osmReader.setHierarchyLayer(52.0, 13.0, 51.4, 14.9, 4); // BerlinBrandenburg - Streifen 2
+		osmReader.setHierarchyLayer(52.2, 13.0, 51.4, 14.9, 4); // BerlinBrandenburg - Streifen 2
 		
-		osmReader.setHierarchyLayer(52.62, 13.2, 52.37, 13.7, 6); // Stadtbereich Bln
-		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 6); // Potsdam
-		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 6); // Spandau
+		osmReader.setHierarchyLayer(52.62, 13.2, 52.37, 13.7, 5); // Stadtbereich Bln
+		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 5); // Potsdam
+		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 5); // Spandau
 
+//		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstraﬂe
 		
 		
 		
