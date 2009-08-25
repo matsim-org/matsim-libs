@@ -4,16 +4,17 @@
 <config>
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="./test/scenarios/berlin/network.xml.gz" />
+<!--		<param name="inputNetworkFile" value="./test/scenarios/berlin/network.xml.gz" />-->
+		<param name="inputNetworkFile" value="z:/osm_net/bb_osm_wip_cl.xml.gz"/>
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="z:/raw_plans_out.xml" />
-		<param name="inputPlansFile" value="z:/0.plans.xml.gz" />
+<!--		<param name="inputPlansFile" value="z:/output/raw_plans_out_w.xml" />-->
+		<param name="inputPlansFile" value="z:/population/output/bln_car_c.xml.gz" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/otf" />
+		<param name="outputDirectory" value="./output/osm_wip_car" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 	</module>
@@ -21,13 +22,13 @@
 	<module name="simulation">
 
 		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
+		<param name="endTime" value="30:00:00" />
 		
-		<param name = "snapshotperiod"	value = "00:02:30"/>
+		<param name = "snapshotperiod"	value = "00:05:00"/>
  		<param name = "snapshotFormat"	value = "otfvis"/> 
  		
- 		<param name = "flowCapacityFactor"	value = "0.10"/>
- 		<param name = "storageCapacityFactor"	value = "0.30"/>
+ 		<param name = "flowCapacityFactor"	value = "0.05"/> <!-- Yu uses 0.10 for 10% scenario -->
+ 		<param name = "storageCapacityFactor"	value = "0.15"/> <!-- Yu uses 0.30 for 10% scenario -->
 	</module>
 
 	<module name="planCalcScore">
@@ -129,7 +130,7 @@
 	</module>
 
 	<module name="vis">
-		<param name="logo"		value = "(c) 2006 TUB-VSP"/>
+		<param name="logo"		value = "(c) 2009 TUB-VSP"/>
 		<param name="delay"		value = "200"/>
 		<param name="linkwidthfactor"	value = "15"/>
 		<param name="shownodelabels"	value = "false"/>
