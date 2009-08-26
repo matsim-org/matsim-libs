@@ -42,27 +42,28 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.tryouts.plan.KeepOnlyMIVPlans;
 
 /*
- * add parking to plans (leg + activitites)
+ * add parking to plans (leg + activities)
  */
 public class AddParkingsToPlans {
-
+	
 	/**
 	 * As input this method receives a plan file, without parking acts (and
 	 * related lets) and adds these.
 	 */
 	public static void generatePlanWithParkingActs(String inputPlansFile,
-			String networkFile, String outputPlansFile) {
+			String networkFile, String outputPlansFile, String facilitiesFile) {
 		Population inPop = GeneralLib.readPopulation(inputPlansFile,
 				networkFile);
 		// modify population and write it out again
-		GeneralLib.writePopulation(addParkings(inPop), outputPlansFile);
+		GeneralLib.writePopulation(addParkings(inPop, facilitiesFile), outputPlansFile);
 	}
 
 	/*
 	 * returns the same population object, but added with parking act/legs
 	 */
-	private static Population addParkings(Population population) {
-
+	private static Population addParkings(Population population, String facilitiesFile) {
+		ActivityFacilities facilities=GeneralLib.readActivityFacilities(facilitiesFile);
+		
 		for (Person person : population.getPersons().values()) {
 			List<PlanElement> planElements = person.getSelectedPlan()
 					.getPlanElements();
@@ -87,14 +88,14 @@ public class AddParkingsToPlans {
 
 					// add parking departure activity
 					newPlanElements.add(getParkingFacility(previousActivity,
-							"parkingDeparture"));
+							"parkingDeparture",facilities));
 					
 					// add the actual car leg
 					newPlanElements.add(planElements.get(i));
 					
 					// add parking arrival activity
-					newPlanElements.add(getParkingFacility(previousActivity,
-					"parkingArrival"));
+					newPlanElements.add(getParkingFacility(nextActivity,
+					"parkingArrival",facilities));
 
 					// add leg from parking to next activity Activity to parking
 					newPlanElements.add(getParkingWalkLeg(nextActivity.getLink()));
@@ -139,7 +140,7 @@ public class AddParkingsToPlans {
 	 * @return
 	 */
 	private static ActivityImpl getParkingFacility(ActivityImpl activity,
-			String activityType) {
+			String activityType, ActivityFacilities facilities) {
 		double parkingActivityDuration = 10; // in seconds
 
 		// copy the activity
@@ -147,6 +148,7 @@ public class AddParkingsToPlans {
 
 		parkingActivity.setType(activityType);
 		parkingActivity.setDuration(parkingActivityDuration);
+		parkingActivity.setFacility(facilities.getFacilities().get(new IdImpl("facility_" + activity.getLinkId().toString())));
 
 		return parkingActivity;
 	}

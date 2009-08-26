@@ -12,6 +12,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.World;
 
@@ -21,6 +22,8 @@ public class GeneralLib {
 	 * Reads the population from the plans file. TODO: is it possible to remove
 	 * the networkFile parameter (it was added, because else some error is
 	 * caused).
+	 * 
+	 * Note: use the other constructior, if this poses problems.
 	 */
 	public static Population readPopulation(String plansFile, String networkFile) {
 
@@ -29,8 +32,25 @@ public class GeneralLib {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
-		PopulationReader popReader = new MatsimPopulationReader(population,
-				network);
+		PopulationReader popReader = new MatsimPopulationReader(population,	network);
+		popReader.readFile(plansFile);
+
+		return population;
+	}
+	
+	/*
+	 * Reads the population from the plans file. TODO: is it possible to remove
+	 * the networkFile parameter (it was added, because else some error is
+	 * caused).
+	 */
+	public static Population readPopulation(String plansFile, String networkFile, String facilititiesPath) {
+
+		Population population = new PopulationImpl();
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(networkFile);
+
+		PopulationReader popReader = new PopulationReaderMatsimV4(population,	network, readActivityFacilities(facilititiesPath) ,null);
 		popReader.readFile(plansFile);
 
 		return population;
@@ -53,6 +73,7 @@ public class GeneralLib {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
 		
+		
 		return facilities;	
 	}
 	
@@ -60,7 +81,8 @@ public class GeneralLib {
 	 * Write the facilities to the specified file.
 	 */
 	public static void writeActivityFacilities(ActivityFacilities facilities, String facilitiesFile) {
-		new FacilitiesWriter(facilities, facilitiesFile).write();
+		FacilitiesWriter facilitiesWriter=new FacilitiesWriter(facilities, facilitiesFile);
+		facilitiesWriter.write();
 	}
-	
-}
+	 
+} 

@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.GeneralLib;
@@ -14,11 +15,14 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		String basePathOfTestData="test/input/playground/wrashid/PSF/converter/addParkings/";
 		String networkFile = "test/scenarios/berlin/network.xml.gz";
 		
+		// generate parking facilities
+		GenerateParkingFacilities.generateParkingFacilties(basePathOfTestData + "plans5.xml",networkFile,"output/facilities.xml");
+		
 		
 		// generate plans with parking
-		AddParkingsToPlans.generatePlanWithParkingActs(basePathOfTestData + "plans5.xml", networkFile, "output/plans.xml");
+		AddParkingsToPlans.generatePlanWithParkingActs(basePathOfTestData + "plans5.xml", networkFile, "output/plans.xml","output/facilities.xml");
 		
-		Population population=GeneralLib.readPopulation("output/plans.xml", networkFile);
+		Population population=GeneralLib.readPopulation("output/plans.xml", networkFile, "output/facilities.xml");
 		
 		// check, the population size 
 		assertEquals(3, population.getPersons().size());
@@ -34,8 +38,12 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		assertEquals("parkingArrival", ((Activity) person.getSelectedPlan().getPlanElements().get(10)).getType());
 		
 		
-		// TODO: check, that the right facilities, linkIds are take for the parking facilities and the legs have the
-		// right time...
+		// check, that the parking activities have the right linkId assigned
+		assertEquals("1921", ((Activity) person.getSelectedPlan().getPlanElements().get(2)).getLinkId().toString());
+		
+		assertEquals("13816", ((Activity) person.getSelectedPlan().getPlanElements().get(4)).getLinkId().toString());
+		// TODO: the facility Ids seem to be missing...
+		
 		
 		//assertEquals(true, false);
 		
@@ -44,6 +52,7 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		assertEquals(9, person.getSelectedPlan().getPlanElements().size());
 		
 		
-	}
+	} 
 	
-}
+}  
+ 
