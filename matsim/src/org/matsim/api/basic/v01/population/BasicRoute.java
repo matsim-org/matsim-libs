@@ -34,8 +34,10 @@ public interface BasicRoute extends Serializable {
 
 	public void setDistance(final double distance);
 
+	/** @deprecated -- use leg.getTravelTime() instead. kai, aug09 */ 
 	public double getTravelTime();
 
+	/** @deprecated -- use leg.setTravelTime() instead. kai, aug09 */
 	public void setTravelTime(final double travelTime);
 
 	public Id getStartLinkId();
