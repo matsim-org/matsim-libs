@@ -14,10 +14,10 @@ public class Berlin {
 		String networkFile = basePathOfData+  "network.xml.gz";
 		
 		// generate parking facilities
-		GenerateParkingFacilities.generateParkingFacilties(basePathOfData + "plans_hwh_1pct.xml.gz", networkFile, "output/facilities.xml");		
+		GenerateParkingFacilities.generateParkingFacilties(basePathOfData + "plans_hwh_1pct.xml.gz", networkFile, "output/facilities.xml.gz");		
 		
 		// generate plans with parking
-		AddParkingsToPlans.generatePlanWithParkingActs(basePathOfData + "plans_hwh_1pct.xml.gz", networkFile, "output/plans.xml", "output/facilities.xml");
+		AddParkingsToPlans.generatePlanWithParkingActs(basePathOfData + "plans_hwh_1pct.xml.gz", networkFile, "output/plans.xml.gz", "output/facilities.xml.gz");
 		
 		// start simulation run
 		//String configFilePath="test/input/playground/wrashid/PSF/converter/addParkings/config4.xml";

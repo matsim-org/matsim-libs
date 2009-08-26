@@ -23,7 +23,7 @@ public class GeneralLib {
 	 * the networkFile parameter (it was added, because else some error is
 	 * caused).
 	 * 
-	 * Note: use the other constructior, if this poses problems.
+	 * Note: use the other method with the same name, if this poses problems.
 	 */
 	public static Population readPopulation(String plansFile, String networkFile) {
 

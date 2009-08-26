@@ -59,7 +59,8 @@ public class AddParkingsToPlans {
 	}
 
 	/*
-	 * returns the same population object, but added with parking act/legs
+	 * Returns the same population object, but added with parking act/legs. 
+	 * The facility is also added to the existing acts.
 	 */
 	private static Population addParkings(Population population, String facilitiesFile) {
 		ActivityFacilities facilities=GeneralLib.readActivityFacilities(facilitiesFile);
@@ -99,6 +100,11 @@ public class AddParkingsToPlans {
 
 					// add leg from parking to next activity Activity to parking
 					newPlanElements.add(getParkingWalkLeg(nextActivity.getLink()));
+					
+					
+					// set the facility of the activities also
+					previousActivity.setFacility(facilities.getFacilities().get(new IdImpl("facility_" + previousActivity.getLinkId().toString())));
+					nextActivity.setFacility(facilities.getFacilities().get(new IdImpl("facility_" + previousActivity.getLinkId().toString())));
 					
 				} else {
 					// add every thing else the new plan without change
