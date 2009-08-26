@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import java.util.Stack;
 
-import org.matsim.core.api.experimental.events.BasicEventsBuilder;
+import org.matsim.core.api.experimental.events.EventsBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
@@ -35,7 +35,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 	static public final String EVENTS = "events";
 
 	private final Events events;
-	private BasicEventsBuilder builder;
+	private EventsBuilder builder;
 
 	public EventsReaderXMLv1(final Events events) {
 		this.events = events;

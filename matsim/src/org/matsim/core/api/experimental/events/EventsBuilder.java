@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventsBuilder
+ * BasicEventBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,46 +20,50 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
+import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
+import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 
 
 /**
- * Builder for non basic events
+ * Builder for basic events.
  * @author dgrether
- * @deprecated just a draft, concept not ready for implementation:
- * how to deal with the activities, they have no container and are not 
- * a standalone part of the scenario. they have no id and their semantics
- * is not clear without the person's plan. same for the leg given in
- * non basic AgentEvents.
+ *
  */
-@Deprecated
 public interface EventsBuilder {
 
-	LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId);
+	BasicLinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId);
 
-	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
+	BasicLinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
 
-	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId);
+	BasicAgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId);
 
-	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
+	BasicAgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
 
-	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId);
+	BasicAgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId);
 
-	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId);
+	BasicAgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId);
 
-	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, ActivityImpl act);
+	BasicActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype);
 
-	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, ActivityImpl act);
+	BasicActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype);
 
-	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
+	BasicAgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
+
+	BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId);
+	BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId);
+
+	BasicVehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(double time, Id vehicleId, Id facilityId);
+	BasicVehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(double time, Id vehicleId, Id facilityId);
 	
 }

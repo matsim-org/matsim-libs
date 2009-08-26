@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventsBuilderImpl
+ * BasicEventsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.events;
 
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
@@ -30,76 +29,62 @@ import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.events.BasicEventsBuilder;
+import org.matsim.core.api.experimental.events.EventsBuilder;
+import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
+import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
-import org.matsim.core.population.ActivityImpl;
 
 
 /**
- * Builder for full, non basic events. use with care as activities are created
- * instead of set from the person's plan, the leg attributes of AgentEvents is set to null.
  * @author dgrether
  *
  */
-public class EventsBuilderImpl implements BasicEventsBuilder {
-
-	private ScenarioImpl scenario;
-
-	public EventsBuilderImpl(ScenarioImpl scenario){
-		this.scenario = scenario;
-	}
+public class EventsBuilderImpl implements EventsBuilder {
 
 	public BasicActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype) {
-		return new ActivityEndEvent(time, this.scenario.getPopulation().getPersons().get(agentId)
-				, this.scenario.getNetwork().getLinks().get(linkId), new ActivityImpl(acttype, (Coord)null));
+		return new ActivityEndEvent(time, agentId, linkId, acttype);
 	}
 
 	public BasicActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype) {
-		return new ActivityStartEvent(time, this.scenario.getPopulation().getPersons().get(agentId), 
-				this.scenario.getNetwork().getLinks().get(linkId), new ActivityImpl(acttype, (Coord)null));
+		return new ActivityStartEvent(time, agentId, linkId, acttype);
 	}
 
 	public BasicAgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId) {
-		return new AgentArrivalEvent(time, this.scenario.getPopulation().getPersons().get(agentId), 
-				this.scenario.getNetwork().getLinks().get(linkId), null);
+		return new AgentArrivalEvent(time, agentId, linkId);
 	}
 
 	public BasicAgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId) {
-		return new AgentDepartureEvent(time, this.scenario.getPopulation().getPersons().get(agentId), 
-				this.scenario.getNetwork().getLinks().get(linkId), null);
+		return new AgentDepartureEvent(time, agentId, linkId);
 	}
 
 	public BasicAgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
-		return new AgentMoneyEvent(time, this.scenario.getPopulation().getPersons().get(agentId), amountMoney);
+		return new AgentMoneyEvent(time, agentId, amountMoney);
 	}
 
 	public BasicAgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId) {
-		return new AgentStuckEvent(time, this.scenario.getPopulation().getPersons().get(agentId), 
-				this.scenario.getNetwork().getLinks().get(linkId), null);
+		return new AgentStuckEvent(time, agentId, linkId);
 	}
 
 	public BasicAgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
-		return new AgentWait2LinkEvent(time, this.scenario.getPopulation().getPersons().get(agentId), 
-				this.scenario.getNetwork().getLinks().get(linkId), null);
+		return new AgentWait2LinkEvent(time, agentId, linkId);
 	}
 
 	public BasicLinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {
-		return new LinkEnterEvent(time, this.scenario.getPopulation().getPersons().get(agentId), this.scenario.getNetwork().getLinks().get(linkId));
+		return new LinkEnterEvent(time, agentId, linkId);
 	}
 
 	public BasicLinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
-		return new LinkLeaveEvent(time, this.scenario.getPopulation().getPersons().get(agentId), this.scenario.getNetwork().getLinks().get(linkId));
+		return new LinkLeaveEvent(time, agentId, linkId);
 	}
-
-	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	
+	public BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		return new PersonEntersVehicleEvent(time, personId, vehicleId);
 	}
-
-	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	
+	public BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		return new PersonLeavesVehicleEvent(time, personId, vehicleId);
 	}
 	
@@ -110,5 +95,4 @@ public class EventsBuilderImpl implements BasicEventsBuilder {
 	public BasicVehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
 		return new BasicVehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId);
 	}
-
 }

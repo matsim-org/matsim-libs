@@ -52,7 +52,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
-import org.matsim.core.api.experimental.events.BasicEventsBuilder;
+import org.matsim.core.api.experimental.events.EventsBuilder;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
@@ -119,13 +119,13 @@ public class Events implements MatsimToplevelContainer {
 	private long counter = 0;
 	private long nextCounterMsg = 1;
 
-	private BasicEventsBuilder builder;
+	private EventsBuilder builder;
 	
 	public Events() {
-		this.builder = new BasicEventsBuilderImpl();
+		this.builder = new EventsBuilderImpl();
 	}
 	
-	public Events(BasicEventsBuilder builder) {
+	private Events(EventsBuilder builder) {
 		this.builder = builder;
 	}
 	
@@ -389,7 +389,7 @@ public class Events implements MatsimToplevelContainer {
 		}
 	}
 	
-	public BasicEventsBuilder getBuilder(){
+	public EventsBuilder getBuilder(){
 		return this.builder;
 	}
 
