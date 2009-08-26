@@ -21,7 +21,6 @@
 package org.matsim.core.network;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -60,12 +59,13 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
 		NodeImpl n = this.factory.createNode(id, coord, nodeType);
-		this.nodes.put(id, n);
-		if (this.nodeQuadTree != null) {
-			// we changed the nodes, invalidate the quadTree
-			this.nodeQuadTree.clear();
-			this.nodeQuadTree = null;
-		}
+//		this.nodes.put(id, n);
+//		if (this.nodeQuadTree != null) {
+//			// we changed the nodes, invalidate the quadTree
+//			this.nodeQuadTree.clear();
+//			this.nodeQuadTree = null;
+//		}
+		this.addNode( n ) ;
 		return n;
 	}
 
@@ -90,10 +90,9 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		LinkImpl link = this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 		link.setType(type);
 		link.setOrigId(origId);
-		fromNode.addOutLink(link);
-		toNode.addInLink(link);
-		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.getLocations() ;
-		locations.put(link.getId(),link);
+		
+		this.addLink( link ) ;
+
 		return link;
 	}
 	

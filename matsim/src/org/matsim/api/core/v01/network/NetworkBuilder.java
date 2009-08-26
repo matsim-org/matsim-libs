@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.api.core.v01.network;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
 
@@ -30,6 +31,8 @@ import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
 public interface NetworkBuilder extends BasicNetworkBuilder {
 
 	public Node createNode(final Id id);
+	
+	public Node createNode(final Id id, final Coord coord ) ;
 	
 	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId);
 	

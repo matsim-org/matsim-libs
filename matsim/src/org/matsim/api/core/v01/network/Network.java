@@ -26,4 +26,9 @@ public interface Network extends BasicNetwork<Node, Link> {
 
 	public NetworkBuilder getBuilder();
 	
+	public void addNode( Node nn ) ;
+	// "void" can still be changed into "boolean" or "Node", see "Collection" or "Map" interface.
+	
+	public void addLink( Link ll ) ;
+	
 }

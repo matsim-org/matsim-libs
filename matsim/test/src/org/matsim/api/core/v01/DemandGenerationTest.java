@@ -22,9 +22,10 @@ package org.matsim.api.core.v01;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
+
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
@@ -41,7 +42,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -172,15 +172,24 @@ public class DemandGenerationTest extends MatsimTestCase {
 	}
 	
 	private void createFakeNetwork(Scenario scenario, Network network){
-		Node n1 = network.getBuilder().createNode(ids.get(0));
-		((NodeImpl)n1).setCoord(scenario.createCoord(0, 0));		
-		((Map)network.getNodes()).put(n1.getId(), n1);
-		Node n2 = network.getBuilder().createNode(ids.get(1));
-		((NodeImpl)n2).setCoord(scenario.createCoord(0, 0));
-		((Map)network.getNodes()).put(n2.getId(), n2);
+		Coord coord = scenario.createCoord(0,0 ) ;
+
+		Node n1 = network.getBuilder().createNode(ids.get(0),coord);
+//		((NodeImpl)n1).setCoord(scenario.createCoord(0, 0));		
+//		((Map)network.getNodes()).put(n1.getId(), n1);
+		network.addNode( n1 ) ;
+
+		Node n2 = network.getBuilder().createNode(ids.get(1),coord);
+//		((NodeImpl)n2).setCoord(scenario.createCoord(0, 0));
+//		((Map)network.getNodes()).put(n2.getId(), n2);
+		network.addNode( n2 ) ;
+
 		for (Id id : ids){
-			Link l = ((NetworkLayer)network).getFactory().createLink(id, n1.getId(), n2.getId());
-			((Map)network.getLinks()).put(l.getId(), l);
+//			Link l = ((NetworkLayer)network).getFactory().createLink(id, n1.getId(), n2.getId());
+			Link l = network.getBuilder().createLink(id, n1.getId(), n2.getId() ) ;
+			
+//			((Map)network.getLinks()).put(l.getId(), l);
+			network.addLink( l ) ;
 		}
 	}
 	

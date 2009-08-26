@@ -61,6 +61,12 @@ public class NetworkFactory implements Serializable, NetworkBuilder {
 		return new NodeImpl(id);
 	}
 	
+	public NodeImpl createNode( final Id id, final Coord coord ) {
+		NodeImpl node = new NodeImpl( id ) ;
+		node.setCoord( coord ) ;
+		return node ;
+	}
+	
 	/**
 	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
 	 */

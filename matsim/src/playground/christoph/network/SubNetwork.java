@@ -90,4 +90,16 @@ public class SubNetwork implements Network {
 	{
 		links.put(link.getId(), link);
 	}
+
+	public void addNode(Node nn) {
+		// TODO Auto-generated method stub
+		//
+		throw new UnsupportedOperationException() ;
+	}
+
+	public void addLink(Link ll) {
+		// TODO Auto-generated method stub
+		//
+		throw new UnsupportedOperationException() ;
+	}
 }

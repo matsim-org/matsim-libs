@@ -30,12 +30,15 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.world.Layer;
 import org.matsim.world.LayerImpl;
+import org.matsim.world.MappedLocation;
 
 
 /**
@@ -79,6 +82,30 @@ public class NetworkImpl implements Network {
 	 */
 	protected NetworkImpl() {} 
 
+	// ////////////////////////////////////////////////////////////////////
+	// add methods
+	// ////////////////////////////////////////////////////////////////////
+	
+	public void addLink( Link link ) {
+		Node fromNode = link.getFromNode() ;
+		fromNode.addOutLink(link);
+		Node toNode = link.getToNode() ;
+		toNode.addInLink(link);
+		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) layerDelegate.getLocations() ;
+		locations.put( link.getId(), (LinkImpl) link);
+	}
+		
+
+
+	public void addNode( Node nn ) {
+		Id id = nn.getId() ;
+		this.nodes.put(id, (NodeImpl) nn);
+		if (this.nodeQuadTree != null) {
+			// we changed the nodes, invalidate the quadTree
+			this.nodeQuadTree.clear();
+			this.nodeQuadTree = null;
+		}
+	}
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////
