@@ -10,6 +10,8 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
+import playground.wrashid.lib.GeneralLib;
+
 public class GenerateParkingFacilitiesTest extends MatsimTestCase {
 
 	/*
@@ -23,22 +25,9 @@ public class GenerateParkingFacilitiesTest extends MatsimTestCase {
 
 		GenerateParkingFacilities.generateParkingFacilties(inputPlansFile,networkFile,outputFacilitiesFile);
 		
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = GeneralLib.readActivityFacilities(outputFacilitiesFile);
 		
-		try {
-			new MatsimFacilitiesReader(facilities).parse(outputFacilitiesFile);
-			
-			assertEquals(4, facilities.getFacilities().size());
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		assertEquals(4, facilities.getFacilities().size());
 	}
 	
 }

@@ -1,94 +1,154 @@
 package playground.wrashid.PSF.converter.addingParkings;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.basic.v01.population.BasicRouteImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
 import playground.andreas.bln.NewPopulation;
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.tryouts.plan.KeepOnlyMIVPlans;
 
 /*
  * add parking to plans (leg + activitites)
  */
-public class AddParkingsToPlans extends AbstractPersonAlgorithm {
+public class AddParkingsToPlans {
 
-	protected PopulationWriter popWriter;
-	
-	public AddParkingsToPlans(PopulationImpl inPop, String outputPlansFile) {
-		this.popWriter = new PopulationWriter(inPop, outputPlansFile, "v4");
-		this.popWriter.writeStartPlans();
-	}
-
-	public static void main(String[] args) {
-		String inputPlansFile = "test/input/playground/wrashid/PSF/converter/addParkings/plans2.xml";
-		String networkFile = "test/scenarios/berlin/network.xml.gz";
-		String outputPlansFile = "output/plans4.xml";
-		
-		String outputFacilitiesFile = "output/facilities4.xml";
-
-		// generate facilities file, this is needed by the config file...
-		//GenerateParkingFacilities.generateParkingFacilties(inputPlansFile,networkFile,outputFacilitiesFile);
-		// generate plans
-		generatePlanWithParkingActs(inputPlansFile,networkFile,outputPlansFile);
-	}
-	
 	/**
-	 * As input this method receives a parking (file?), without parkings acts
-	 * (and related lets) and adds these.
+	 * As input this method receives a plan file, without parking acts (and
+	 * related lets) and adds these.
 	 */
-	public static void generatePlanWithParkingActs(String inputPlansFile, String networkFile, String outputPlansFile) {
-		
-		String[] args=new String[1];
-		args[0]="test/input/playground/wrashid/PSF/converter/addParkings/config4.xml";
-		Config config = Gbl.createConfig(args);
-		//World world = Gbl.createWorld();
-		
-		PopulationImpl inPop = new PopulationImpl();
-		
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(networkFile);
-		
-		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
-		popReader.readFile(inputPlansFile);
-		
-		AddParkingsToPlans dp = new AddParkingsToPlans(inPop, outputPlansFile);
-		dp.run(inPop);
-		dp.popWriter.writeEndPlans();
+	public static void generatePlanWithParkingActs(String inputPlansFile,
+			String networkFile, String outputPlansFile) {
+		Population inPop = GeneralLib.readPopulation(inputPlansFile,
+				networkFile);
+		// modify population and write it out again
+		GeneralLib.writePopulation(addParkings(inPop), outputPlansFile);
 	}
 
-	@Override
-	public void run(PersonImpl person) {
-		//person.getSelectedPlan().
-	
-		Plan plan=person.getSelectedPlan();
-		
-		List<PlanElement> pe=plan.getPlanElements();
-		
-		// CONTINUE HERE
-		/*
-		for (int i=0;){
-			
-		}pe.
-		*/
-		
-		this.popWriter.writePerson(person);
+	/*
+	 * returns the same population object, but added with parking act/legs
+	 */
+	private static Population addParkings(Population population) {
+
+		for (Person person : population.getPersons().values()) {
+			List<PlanElement> planElements = person.getSelectedPlan()
+					.getPlanElements();
+			List<PlanElement> newPlanElements = new LinkedList<PlanElement>();
+
+			for (int i = 0; i < planElements.size(); i++) {
+				if (planElements.get(i) instanceof Leg
+						&& ((Leg) planElements.get(i)).getMode().equals(
+								TransportMode.car)) {
+					// only handle car legs specially
+					// expand the car leg into 3 legs and 2 parking activities
+					// home-car-work =>
+					// home-walk-parkingDeparuture-car-parkingArrival-walk-work
+
+					ActivityImpl previousActivity = (ActivityImpl)planElements.get(i - 1);
+					Leg carLeg = (Leg) planElements.get(i);
+					ActivityImpl nextActivity = (ActivityImpl) planElements.get(i + 1);
+
+					// add leg from previous Activity to parking
+					newPlanElements.add(getParkingWalkLeg(previousActivity
+							.getLink()));
+
+					// add parking departure activity
+					newPlanElements.add(getParkingFacility(previousActivity,
+							"parkingDeparture"));
+					
+					// add the actual car leg
+					newPlanElements.add(planElements.get(i));
+					
+					// add parking arrival activity
+					newPlanElements.add(getParkingFacility(previousActivity,
+					"parkingArrival"));
+
+					// add leg from parking to next activity Activity to parking
+					newPlanElements.add(getParkingWalkLeg(nextActivity.getLink()));
+					
+				} else {
+					// add every thing else the new plan without change
+					newPlanElements.add(planElements.get(i));
+				}
+			}
+
+			planElements.clear();
+			planElements.addAll(newPlanElements);
+		}
+
+		return population;
 	}
-	
-	
+
+	// the leg for going to parking or back
+	/**
+	 * walk duration in seconds link: where both the facility and the parking
+	 * is located
+	 */
+	private static Leg getParkingWalkLeg(Link link) {
+		double walkDuration = 10; // in seconds
+ 
+		Leg leg = new LegImpl(TransportMode.walk);
+
+		leg.setTravelTime(walkDuration);
+		leg.setRoute(new GenericRouteImpl(link, link));
+		leg.getRoute().setTravelTime(walkDuration);
+
+		return leg;
+	}
+
+	/**
+	 * Add a parking facility at the same location as the given activity.
+	 * 
+	 * activityType should either be parkingDeparture or parkingArrival
+	 * 
+	 * @param activity
+	 * @param activityType
+	 * @return
+	 */
+	private static ActivityImpl getParkingFacility(ActivityImpl activity,
+			String activityType) {
+		double parkingActivityDuration = 10; // in seconds
+
+		// copy the activity
+		ActivityImpl parkingActivity = new ActivityImpl((ActivityImpl) activity);
+
+		parkingActivity.setType(activityType);
+		parkingActivity.setDuration(parkingActivityDuration);
+
+		return parkingActivity;
+	}
 
 }
