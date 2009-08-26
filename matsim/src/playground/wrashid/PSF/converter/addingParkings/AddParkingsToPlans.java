@@ -25,11 +25,11 @@ import playground.wrashid.tryouts.plan.KeepOnlyMIVPlans;
 /*
  * add parking to plans (leg + activitites)
  */
-public class AddParkings extends AbstractPersonAlgorithm {
+public class AddParkingsToPlans extends AbstractPersonAlgorithm {
 
 	protected PopulationWriter popWriter;
 	
-	public AddParkings(PopulationImpl inPop, String outputPlansFile) {
+	public AddParkingsToPlans(PopulationImpl inPop, String outputPlansFile) {
 		this.popWriter = new PopulationWriter(inPop, outputPlansFile, "v4");
 		this.popWriter.writeStartPlans();
 	}
@@ -66,7 +66,7 @@ public class AddParkings extends AbstractPersonAlgorithm {
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
 		popReader.readFile(inputPlansFile);
 		
-		AddParkings dp = new AddParkings(inPop, outputPlansFile);
+		AddParkingsToPlans dp = new AddParkingsToPlans(inPop, outputPlansFile);
 		dp.run(inPop);
 		dp.popWriter.writeEndPlans();
 	}
